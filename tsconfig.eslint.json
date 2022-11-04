@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "./src/**/*.ts",
+    "./test/**/*.ts",
+    "./dtslint/**/*.ts",
+    "./examples/**/*.ts",
+    "./vitest.config.ts",
+    "./.eslintrc.cjs"
+  ]
+}
