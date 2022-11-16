@@ -14,19 +14,33 @@ Functional programming in TypeScript
   </a>
 </p>
 
-# Typed functional programming in TypeScript
+# Schema validation with static type inference
 
-This is a fork of [`fp-ts`](https://github.com/gcanti/fp-ts).
+## Supported data types
 
-The goal of this fork is a potential reconciliation with [`effect-ts`](https://github.com/effect-ts/core) in order to unify the ecosystems.
-
-# Installation
-
-To install the **alpha** version:
-
-```
-npm install @fp-ts/codec
-```
+|                      |                              | TypeScript                                      | Meta      |
+| -------------------- | ---------------------------- | ----------------------------------------------- | --------- |
+| Primitives           |                              |                                                 |           |
+|                      | strings                      | `string`                                        | `String`  |
+|                      | numbers                      | `number`                                        | `Number`  |
+|                      | booleans                     | `boolean`                                       | `Boolean` |
+| Literals             |                              |                                                 |           |
+|                      | string literals              | `"a"`                                           | `Of`      |
+|                      | number literals              | `1`                                             | `Of`      |
+|                      | boolean literals             | `true`                                          | `Of`      |
+| Objects              |                              |                                                 |           |
+|                      |                              | `{ a: string, b: number }`                      | `Struct`  |
+|                      | structs with index signature | `{ a: string, b: string, [_: string]: string }` | `Struct`  |
+| Records              |                              |                                                 |           |
+|                      |                              | `{ [_: string]: number }`                       | `Struct`  |
+| Tuples               |                              |                                                 |           |
+|                      |                              | `[string, number]`                              | `Tuple`   |
+|                      | tuples with rest element     | `[string, number, ...boolean[]]`                | `Tuple`   |
+| Arrays               |                              |                                                 |           |
+|                      |                              | `string[]`                                      | `Tuple`   |
+| Unions               |                              |                                                 |           |
+|                      |                              | `string \| number`                              | `Union`   |
+| Recursive data types |                              | `type A = { as: A[] }`                          | `Lazy`    |
 
 # Documentation
 
