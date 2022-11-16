@@ -18,7 +18,7 @@ Functional programming in TypeScript
 
 ## Supported data types
 
-|                      |                              | TypeScript                                      | Meta      |
+|                      |                              | TypeScript                                      | `AST`     |
 | -------------------- | ---------------------------- | ----------------------------------------------- | --------- |
 | Primitives           |                              |                                                 |           |
 |                      | strings                      | `string`                                        | `String`  |
