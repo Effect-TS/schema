@@ -16,35 +16,44 @@ Schema validation with static type inference
 
 # Basic usage
 
-Creating a simple string schema
+Creating a simple string decoder
 
 ```ts
-import { schema as S } from "@fp-ts/codec";
-import { unsafeDecoderFor } from "@fp-ts/codec/JsonCodec";
+import { decoder as D } from "@fp-ts/codec";
 
-const mySchema = S.string;
-const decoder = unsafeDecoderFor(mySchema);
+const mySchema = D.string;
 
-decoder.decode("tuna"); // => right("tuna")
-decoder.decode(12); // => left(DecodeError)
+mySchema.decode("tuna"); // => right("tuna")
+mySchema.decode(12); // => left(DecodeError)
 ```
 
-Creating an object schema
+Creating an object decoder
 
 ```ts
-import { schema as S } from "@fp-ts/codec";
-import { unsafeDecoderFor } from "@fp-ts/codec/JsonCodec";
+import { decoder as D, schema as S } from "@fp-ts/codec";
 
-const User = S.struct({
-  username: S.string,
+const User = D.struct({
+  username: D.string,
 });
 
-const decoder = unsafeDecoderFor(User);
-decoder.decode({ username: "Ludwig" });
+User.decode({ username: "Ludwig" });
 
 // extract the inferred type
 type User = S.Infer<typeof User>;
 // { username: string }
+```
+
+Deriving a guard
+
+```ts
+import { decoder as D, guard as G } from "@fp-ts/codec";
+
+const User = D.struct({
+  username: D.string,
+});
+
+const guard = G.unsafeGuardFor(User);
+guard.is({ username: "Ludwig" }); // => true
 ```
 
 # Supported data types
