@@ -5,7 +5,7 @@
 </h3>
 
 <p align="center">
-Functional programming in TypeScript
+Schema validation with static type inference
 </p>
 
 <p align="center">
@@ -14,9 +14,40 @@ Functional programming in TypeScript
   </a>
 </p>
 
-# Schema validation with static type inference
+# Basic usage
 
-## Supported data types
+Creating a simple string schema
+
+```ts
+import { schema as S } from "@fp-ts/codec";
+import { unsafeDecoderFor } from "@fp-ts/codec/JsonCodec";
+
+const mySchema = S.string;
+const decoder = unsafeDecoderFor(mySchema);
+
+decoder.decode("tuna"); // => right("tuna")
+decoder.decode(12); // => left(DecodeError)
+```
+
+Creating an object schema
+
+```ts
+import { schema as S } from "@fp-ts/codec";
+import { unsafeDecoderFor } from "@fp-ts/codec/JsonCodec";
+
+const User = S.struct({
+  username: S.string,
+});
+
+const decoder = unsafeDecoderFor(User);
+decoder.decode({ username: "Ludwig" });
+
+// extract the inferred type
+type User = S.Infer<typeof User>;
+// { username: string }
+```
+
+# Supported data types
 
 |                      |                   | TypeScript                                                       | `AST`          |
 | -------------------- | ----------------- | ---------------------------------------------------------------- | -------------- |
