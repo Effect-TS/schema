@@ -14,6 +14,13 @@ Schema validation with static type inference
   </a>
 </p>
 
+```mermaid
+flowchart TD
+  Schema -->|unsafeDecoderFor| Decoder
+  Schema -->|unsafeGuardFor| Guard
+  Schema -->|unsafeArbitraryFor| Arbitrary
+```
+
 # Schemas
 
 Creating a schema
