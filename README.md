@@ -21,6 +21,15 @@ flowchart TD
   Schema -->|unsafeArbitraryFor| Arbitrary
 ```
 
+# Features
+
+- Deriving (`Decoder`, `Guard`, `Arbitrary`)
+- Custom schema combinators
+- Custom data types
+- Custom decode errors
+- Versioning (TODO)
+- Migration (TODO)
+
 # Schemas
 
 Creating a schema
@@ -130,20 +139,45 @@ console.log(fc.sample(arb, 2));
 */
 ```
 
-# Native enums
+# Custom schema combinators
+
+Examples in `/codec/Schema.ts`.
+
+All the combinators defined in `/codec/Schema.ts` can be implemented in userland
+
+# Custom data types
+
+Examples in `/codec/Data/*`
+
+# Custom decode errors
 
 ```ts
+import * as DE from "@fp-ts/codec/DecodeError";
+import * as D from "@fp-ts/codec/Decoder";
 import * as S from "@fp-ts/codec/Schema";
+import { pipe } from "@fp-ts/data/Function";
 
-enum E {
-  a,
-  b,
-}
+const mystring = pipe(
+  S.string,
+  S.clone(Symbol.for("mystring"), {
+    [D.DecoderId]: () => mystringDecoder,
+  })
+);
 
-const e = S.nativeEnum(E);
-/*
-const e: S.Schema<typeof E>
-*/
+const mystringDecoder = D.make(mystring, (u) =>
+  typeof u === "string"
+    ? D.succeed(u)
+    : D.fail(DE.custom({ myCustomErrorConfig: "not a string" }, u))
+);
+
+const Person = S.struct({
+  name: mystring,
+  age: S.number,
+});
+
+const decoder = D.unsafeDecoderFor(Person);
+
+decoder.decode({ name: null, age: 18 }); // => left(DE.custom({ myCustomErrorConfig: "not a string" }, null))
 ```
 
 # Supported data types
