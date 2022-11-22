@@ -1,4 +1,0 @@
-# REQUIREMENTS
-
-- Versioning
-- Migration
