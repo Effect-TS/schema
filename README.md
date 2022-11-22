@@ -14,46 +14,129 @@ Schema validation with static type inference
   </a>
 </p>
 
-# Basic usage
+# Schemas
 
-Creating a simple string decoder
-
-```ts
-import { decoder as D } from "@fp-ts/codec";
-
-const mySchema = D.string;
-
-mySchema.decode("tuna"); // => right("tuna")
-mySchema.decode(12); // => left(DecodeError)
-```
-
-Creating an object decoder
+Creating a schema
 
 ```ts
-import { decoder as D, schema as S } from "@fp-ts/codec";
+import * as S from "@fp-ts/codec/Schema";
 
-const User = D.struct({
-  username: D.string,
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
 });
-
-User.decode({ username: "Ludwig" });
 
 // extract the inferred type
-type User = S.Infer<typeof User>;
-// { username: string }
+type Person = S.Infer<typeof Person>;
+/*
+type Person = {
+    readonly name: string;
+    readonly age: number;
+}
+*/
 ```
 
-Deriving a guard
+# Decoders
+
+Deriving a decoder from a schema
 
 ```ts
-import { decoder as D, guard as G } from "@fp-ts/codec";
+import * as S from "@fp-ts/codec/Schema";
+import * as D from "@fp-ts/codec/Decoder";
+import * as DE from "@fp-ts/codec/DecodeError";
 
-const User = D.struct({
-  username: D.string,
+const schema = S.struct({
+  name: S.string,
+  age: S.number,
 });
 
-const guard = G.unsafeGuardFor(User);
-guard.is({ username: "Ludwig" }); // => true
+const decoder = D.unsafeDecoderFor(schema);
+/*
+const decoder: D.Decoder<unknown, {
+  readonly name: string;
+  readonly age: number;
+}>
+*/
+
+expect(decoder.decode({ name: "name", age: 18 })).toEqual(
+  D.succeed({ name: "name", age: 18 })
+);
+
+expect(decoder.decode(null)).toEqual(
+  D.fail(DE.notType("{ readonly [_: string]: unknown }", null))
+);
+```
+
+# Guards
+
+Deriving a guard from a schema
+
+```ts
+import * as S from "@fp-ts/codec/Schema";
+import * as G from "@fp-ts/codec/Guard";
+
+const schema = S.struct({
+  name: S.string,
+  age: S.number,
+});
+
+const guard = G.unsafeGuardFor(schema);
+/*
+const decoder: G.Guard<{
+  readonly name: string;
+  readonly age: number;
+}>
+*/
+
+expect(guard.is({ name: "name", age: 18 })).toEqual(true);
+expect(guard.is(null)).toEqual(false);
+```
+
+# Arbitraries
+
+Deriving an arbitrary from a schema
+
+```ts
+import * as S from "@fp-ts/codec/Schema";
+import * as A from "@fp-ts/codec/Arbitrary";
+import * as fc from "fast-check";
+
+const schema = S.struct({
+  name: S.string,
+  age: S.number,
+});
+
+const arb = A.unsafeArbitraryFor(schema).arbitrary(fc);
+/*
+const arb: fc.Arbitrary<{
+  readonly name: string;
+  readonly age: number;
+}>
+*/
+
+console.log(fc.sample(arb, 2));
+/*
+[
+  { name: 't9dUS+\\Z', age: 3.4028228579130005e+38 },
+  { name: 'o', age: -3.4028218437925203e+38 }
+]
+*/
+```
+
+# Native enums
+
+```ts
+import * as S from "@fp-ts/codec/Schema";
+
+enum E {
+  a,
+  b,
+}
+
+const e = S.nativeEnum(E);
+/*
+const e: S.Schema<typeof E>
+*/
 ```
 
 # Supported data types
@@ -93,3 +176,7 @@ guard.is({ username: "Ludwig" }); // => true
 # License
 
 The MIT License (MIT)
+
+```
+
+```
