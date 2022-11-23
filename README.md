@@ -24,6 +24,7 @@ flowchart TD
 # Features
 
 - Deriving (`Decoder`, `Guard`, `Arbitrary`)
+- Custom interpreters
 - Custom schema combinators
 - Custom data types
 - Custom decode errors
@@ -139,15 +140,19 @@ console.log(fc.sample(arb, 2));
 */
 ```
 
+# Custom interpreters
+
+`src/Decoder.ts`, `src/Guard.ts` and `src/Arbitrary.ts` are good examples of defining a custom interpreter.
+
 # Custom schema combinators
 
-Examples in `/codec/Schema.ts`.
+Examples in `/src/Schema.ts`.
 
-All the combinators defined in `/codec/Schema.ts` can be implemented in userland
+All the combinators defined in `/src/Schema.ts` could be implemented in userland.
 
 # Custom data types
 
-Examples in `/codec/Data/*`
+Examples in `/src/data/*`
 
 # Custom decode errors
 
@@ -217,7 +222,3 @@ decoder.decode({ name: null, age: 18 }); // => left(DE.custom({ myCustomErrorCon
 # License
 
 The MIT License (MIT)
-
-```
-
-```
