@@ -8,4 +8,4 @@ has_toc: false
 
 <img alt="fp-ts logo" src="./fp-ts-logo.png" style="display: block; width: 200px; margin-bottom: 2em;">
 
-# Codec
+# Schema

@@ -6,8 +6,8 @@ search_enabled: true
 # Aux links for the upper right navigation
 aux_links:
   "Docs":
-    - "//fp-ts.github.io/codec"
+    - "//fp-ts.github.io/schema"
   "API Reference":
-    - "//fp-ts.github.io/codec/docs/modules"
+    - "//fp-ts.github.io/schema/docs/modules"
   "GitHub":
-    - "//github.com/fp-ts/codec"
+    - "//github.com/fp-ts/schema"

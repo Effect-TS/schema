@@ -1,6 +1,6 @@
 ---
 name: "\U0001F41B Bug report"
-about: Create a report to help make `@fp-ts/codec` better
+about: Create a report to help make `@fp-ts/schema` better
 ---
 
 ## 🐛 Bug report
@@ -17,7 +17,7 @@ about: Create a report to help make `@fp-ts/codec` better
 
 ### Suggested solution(s)
 
-<!-- How could we solve this bug? What changes would need to made to `@fp-ts/codec`? -->
+<!-- How could we solve this bug? What changes would need to made to `@fp-ts/schema`? -->
 
 ### Additional context
 
@@ -25,11 +25,11 @@ about: Create a report to help make `@fp-ts/codec` better
 
 ### Your environment
 
-Which versions of `@fp-ts/codec` are affected by this issue? Did this work in previous versions of `@fp-ts/codec`?
+Which versions of `@fp-ts/schema` are affected by this issue? Did this work in previous versions of `@fp-ts/schema`?
 
 <!-- PLEASE FILL THIS OUT -->
 
-| Software    | Version(s) |
-| ----------- | ---------- |
-| @fp-ts/codec |            |
-| TypeScript  |            |
+| Software      | Version(s) |
+| ------------- | ---------- |
+| @fp-ts/schema |            |
+| TypeScript    |            |

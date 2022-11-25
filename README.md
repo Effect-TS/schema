@@ -1,5 +1,5 @@
 <h3 align="center">
-  <a href="https://fp-ts.github.io/codec/">
+  <a href="https://fp-ts.github.io/schema/">
     <img src="./docs/fp-ts-logo.png">
   </a>
 </h3>
@@ -9,8 +9,8 @@ Schema validation with static type inference
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@fp-ts/codec">
-    <img src="https://img.shields.io/npm/dm/@fp-ts/codec.svg" alt="npm downloads" height="20">
+  <a href="https://www.npmjs.com/package/@fp-ts/schema">
+    <img src="https://img.shields.io/npm/dm/@fp-ts/schema.svg" alt="npm downloads" height="20">
   </a>
 </p>
 
@@ -36,7 +36,7 @@ flowchart TD
 Creating a schema
 
 ```ts
-import * as S from "@fp-ts/codec/Schema";
+import * as S from "@fp-ts/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
@@ -58,9 +58,9 @@ type Person = {
 Deriving a decoder from a schema
 
 ```ts
-import * as S from "@fp-ts/codec/Schema";
-import * as D from "@fp-ts/codec/Decoder";
-import * as DE from "@fp-ts/codec/DecodeError";
+import * as S from "@fp-ts/schema/Schema";
+import * as D from "@fp-ts/schema/Decoder";
+import * as DE from "@fp-ts/schema/DecodeError";
 
 const schema = S.struct({
   name: S.string,
@@ -89,8 +89,8 @@ expect(decoder.decode(null)).toEqual(
 Deriving a guard from a schema
 
 ```ts
-import * as S from "@fp-ts/codec/Schema";
-import * as G from "@fp-ts/codec/Guard";
+import * as S from "@fp-ts/schema/Schema";
+import * as G from "@fp-ts/schema/Guard";
 
 const schema = S.struct({
   name: S.string,
@@ -114,8 +114,8 @@ expect(guard.is(null)).toEqual(false);
 Deriving an arbitrary from a schema
 
 ```ts
-import * as S from "@fp-ts/codec/Schema";
-import * as A from "@fp-ts/codec/Arbitrary";
+import * as S from "@fp-ts/schema/Schema";
+import * as A from "@fp-ts/schema/Arbitrary";
 import * as fc from "fast-check";
 
 const schema = S.struct({
@@ -157,9 +157,9 @@ Examples in `/src/data/*`
 # Custom decode errors
 
 ```ts
-import * as DE from "@fp-ts/codec/DecodeError";
-import * as D from "@fp-ts/codec/Decoder";
-import * as S from "@fp-ts/codec/Schema";
+import * as DE from "@fp-ts/schema/DecodeError";
+import * as D from "@fp-ts/schema/Decoder";
+import * as S from "@fp-ts/schema/Schema";
 import { pipe } from "@fp-ts/data/Function";
 
 const mystring = pipe(
@@ -217,7 +217,7 @@ decoder.decode({ name: null, age: 18 }); // => left(DE.custom({ myCustomErrorCon
 
 # Documentation
 
-- [API Reference](https://fp-ts.github.io/codec/)
+- [API Reference](https://fp-ts.github.io/schema/)
 
 # License
 
