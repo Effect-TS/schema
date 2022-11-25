@@ -5,7 +5,7 @@ patchedDependencies:
     hash: wzvflwv62ngf22ppz3frldq37m
     path: patches/@effect-ts__build-utils@0.40.3.patch
   docs-ts@0.6.10:
-    hash: rrlbf7zn4oy2fixtfduedql2e4
+    hash: kn5eixy6frizaidrzh6vqnnk6m
     path: patches/docs-ts@0.6.10.patch
 
 importers:
@@ -83,7 +83,7 @@ importers:
       babel-plugin-annotate-pure-calls: 0.4.0_@babel+core@7.19.3
       concurrently: 7.4.0
       cpx: 1.5.0
-      docs-ts: 0.6.10_rrlbf7zn4oy2fixtfduedql2e4_dmjzcauo3cshxeipj7bv64ktgm
+      docs-ts: 0.6.10_kn5eixy6frizaidrzh6vqnnk6m_dmjzcauo3cshxeipj7bv64ktgm
       dtslint: github.com/gcanti/dtslint/f361dc93d6a195f530df28779082548e01cecd5e
       eslint: 8.25.0
       eslint-import-resolver-typescript: 3.5.1_fyln4uq2tv75svthy6prqvt6lm
@@ -2328,7 +2328,7 @@ packages:
     dev: true
     patched: true
 
-  /docs-ts/0.6.10_rrlbf7zn4oy2fixtfduedql2e4_dmjzcauo3cshxeipj7bv64ktgm:
+  /docs-ts/0.6.10_kn5eixy6frizaidrzh6vqnnk6m_dmjzcauo3cshxeipj7bv64ktgm:
     resolution: {integrity: sha512-DTX9c5AJ92ojMOKqqvwF8t77C8Gdgs9FPB8seymHs+F+Wl6aapc3ZkHUM+p8o+jwcBmPoihxssdK903dfwQ1JQ==}
     hasBin: true
     peerDependencies:
