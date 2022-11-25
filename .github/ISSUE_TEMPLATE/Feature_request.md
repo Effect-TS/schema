@@ -1,6 +1,6 @@
 ---
 name: "\U0001F680Feature request"
-about: Suggest an idea for `@fp-ts/codec`
+about: Suggest an idea for `@fp-ts/schema`
 ---
 
 ## 🚀 Feature request
@@ -35,7 +35,7 @@ about: Suggest an idea for `@fp-ts/codec`
 
 <!-- PLEASE FILL THIS OUT -->
 
-| Software    | Version(s) |
-| ----------- | ---------- |
-| @fp-ts/codec |            |
-| TypeScript  |            |
+| Software      | Version(s) |
+| ------------- | ---------- |
+| @fp-ts/schema |            |
+| TypeScript    |            |

@@ -10,8 +10,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@fp-ts/codec/test": path.resolve(__dirname, "/test"),
-      "@fp-ts/codec": path.resolve(__dirname, "/src")
+      "@fp-ts/schema/test": path.resolve(__dirname, "/test"),
+      "@fp-ts/schema": path.resolve(__dirname, "/src")
     }
   }
 })

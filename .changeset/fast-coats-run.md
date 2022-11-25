@@ -1,5 +1,5 @@
 ---
-"@fp-ts/codec": patch
+"@fp-ts/schema": patch
 ---
 
 Bootstrap
