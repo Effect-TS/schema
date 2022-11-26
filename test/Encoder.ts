@@ -42,4 +42,12 @@ describe("Encoder", () => {
     const encoder = E.unsafeEncoderFor(schema)
     expect(encoder.encode({ a: "a", b: 1 })).toEqual({ a: "a!", b: 2 })
   })
+
+  it("date", () => {
+    const schema = S.date
+    const encoder = E.unsafeEncoderFor(schema)
+    expect(encoder.encode(new Date(Date.UTC(2022, 0, 1, 0, 0, 0, 0)))).toEqual(
+      "2022-01-01T00:00:00.000Z"
+    )
+  })
 })
