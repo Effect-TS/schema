@@ -34,6 +34,15 @@ describe("JsonDecoder", () => {
       expect(decoder.decode("a")).toEqual(D.fail(DE.notType("number", "a")))
     })
 
+    it("date", () => {
+      const schema = S.date
+      const decoder = unsafeDecoderFor(schema)
+      expect(decoder.decode("2022-01-01T00:00:00.000Z")).toEqual(
+        D.succeed(new Date("2022-01-01T00:00:00.000Z"))
+      )
+      expect(decoder.decode("a")).toEqual(D.fail(DE.notType("date", "a")))
+    })
+
     it("boolean", () => {
       const schema = S.boolean
       const decoder = unsafeDecoderFor(schema)

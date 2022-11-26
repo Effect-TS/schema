@@ -18,6 +18,14 @@ describe("JsonEncoder", () => {
       expect(encoder.encode(1)).toEqual(1)
     })
 
+    it("date", () => {
+      const schema = S.date
+      const encoder = unsafeEncoderFor(schema)
+      expect(encoder.encode(new Date(Date.UTC(2022, 0, 1, 0, 0, 0, 0)))).toEqual(
+        "2022-01-01T00:00:00.000Z"
+      )
+    })
+
     it("tuple", () => {
       const schema = S.tuple(S.string, S.number)
       const encoder = unsafeEncoderFor(schema)

@@ -9,6 +9,7 @@ import * as O from "@fp-ts/data/Option"
 import type { AST } from "@fp-ts/schema/AST"
 import * as ast from "@fp-ts/schema/AST"
 import * as boolean_ from "@fp-ts/schema/data/boolean"
+import * as date_ from "@fp-ts/schema/data/date"
 import * as max_ from "@fp-ts/schema/data/max"
 import * as maxLength_ from "@fp-ts/schema/data/maxLength"
 import * as min_ from "@fp-ts/schema/data/min"
@@ -75,6 +76,11 @@ export const unknown: Schema<unknown> = unknown_.Schema
  * @since 1.0.0
  */
 export const string: Schema<string> = string_.Schema
+
+/**
+ * @since 1.0.0
+ */
+export const date: Schema<Date> = date_.Schema
 
 /**
  * @since 1.0.0
