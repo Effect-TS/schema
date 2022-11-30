@@ -16,14 +16,14 @@ Schema validation with static type inference
 
 ```mermaid
 flowchart TD
-  Schema -->|decoderFor| Decoder
+  Schema -->|jsonCodecFor| JsonCodec
   Schema -->|guardFor| Guard
   Schema -->|arbitraryFor| Arbitrary
 ```
 
 # Features
 
-- Deriving (`Decoder`, `Guard`, `Arbitrary`)
+- Deriving (`JsonCodec`, `Guard`, `Arbitrary`)
 - Custom interpreters
 - Custom schema combinators
 - Custom data types
@@ -53,13 +53,14 @@ type Person = {
 */
 ```
 
-# Decoders
+# JsonCodecs
 
-Deriving a decoder from a schema
+Deriving a `JsonCodec` from a schema
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
-import * as D from "@fp-ts/schema/Decoder";
+import * as JC from "@fp-ts/schema/JsonCodec";
+import * as T from "@fp-ts/data/These";
 import * as DE from "@fp-ts/schema/DecodeError";
 
 const schema = S.struct({
@@ -67,26 +68,26 @@ const schema = S.struct({
   age: S.number,
 });
 
-const decoder = D.decoderFor(schema);
+const jsonCodec = JC.jsonCodecFor(schema);
 /*
-const decoder: D.Decoder<unknown, {
+const jsonCodec: JC.JsonCodec<{
   readonly name: string;
   readonly age: number;
 }>
 */
 
 expect(decoder.decode({ name: "name", age: 18 })).toEqual(
-  D.succeed({ name: "name", age: 18 })
+  T.right({ name: "name", age: 18 })
 );
 
 expect(decoder.decode(null)).toEqual(
-  D.fail(DE.notType("{ readonly [_: string]: unknown }", null))
+  T.left([DE.notType("{ readonly [_: string]: unknown }", null)])
 );
 ```
 
 # Guards
 
-Deriving a guard from a schema
+Deriving a `Guard` from a schema
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
@@ -111,7 +112,7 @@ expect(guard.is(null)).toEqual(false);
 
 # Arbitraries
 
-Deriving an arbitrary from a schema
+Deriving an `Arbitrary` from a schema
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
