@@ -62,6 +62,7 @@ import * as S from "@fp-ts/schema/Schema";
 import * as JC from "@fp-ts/schema/JsonCodec";
 import * as T from "@fp-ts/data/These";
 import * as DE from "@fp-ts/schema/DecodeError";
+import * as C from "@fp-ts/data/Chunk";
 
 const schema = S.struct({
   name: S.string,
@@ -81,7 +82,7 @@ expect(decoder.decode({ name: "name", age: 18 })).toEqual(
 );
 
 expect(decoder.decode(null)).toEqual(
-  T.left([DE.notType("{ readonly [_: string]: unknown }", null)])
+  T.left(C.singleton(DE.notType("JsonObject", null)))
 );
 ```
 
