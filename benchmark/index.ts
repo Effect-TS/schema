@@ -10,8 +10,8 @@ schema (NonEmptyChunk)
 space-object (good) x 148,078 ops/sec ±4.17% (86 runs sampled)
 space-object (bad) x 238,464 ops/sec ±5.36% (80 runs sampled)
 schema (NonEmptyReadonlyArray)
-space-object (good) x 163,200 ops/sec ±2.00% (87 runs sampled)
-space-object (bad) x 278,866 ops/sec ±4.66% (81 runs sampled)
+space-object (good) x 163,626 ops/sec ±0.20% (90 runs sampled)
+space-object (bad) x 276,694 ops/sec ±4.55% (82 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -54,9 +54,9 @@ const Ship = t.struct({
   crew: t.array(CrewMember)
 })
 
-const T = t.union(Asteroid, Planet, Ship)
+export const T = t.union(Asteroid, Planet, Ship)
 
-const decoder = JD.jsonDecoderFor(T)
+const decoder = JD.jsonDecoderFor(Ship)
 
 const good = {
   type: "ship",
