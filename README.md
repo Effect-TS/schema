@@ -62,7 +62,6 @@ import * as S from "@fp-ts/schema/Schema";
 import * as JC from "@fp-ts/schema/JsonCodec";
 import * as D from "@fp-ts/schema/Decoder";
 import * as DE from "@fp-ts/schema/DecodeError";
-import * as C from "@fp-ts/data/Chunk";
 
 const schema = S.struct({
   name: S.string,
@@ -158,21 +157,22 @@ Examples in `/src/data/*`
 
 ```ts
 import * as DE from "@fp-ts/schema/DecodeError";
-import * as D from "@fp-ts/schema/Decoder";
+import * as JD from "@fp-ts/schema/JsonDecoder";
+import * as JC from "@fp-ts/schema/JsonCodec";
 import * as S from "@fp-ts/schema/Schema";
 import { pipe } from "@fp-ts/data/Function";
 
 const mystring = pipe(
   S.string,
   S.clone(Symbol.for("mystring"), {
-    [D.DecoderId]: () => mystringDecoder,
+    [JD.JsonDecoderId]: () => myJsonDecoder,
   })
 );
 
-const mystringDecoder = D.make(mystring, (u) =>
+const myJsonDecoder = D.make(mystring, (u) =>
   typeof u === "string"
-    ? D.succeed(u)
-    : D.fail(DE.custom({ myCustomErrorConfig: "not a string" }, u))
+    ? D.success(u)
+    : D.failure(DE.custom({ myCustomErrorConfig: "not a string" }, u))
 );
 
 const Person = S.struct({
@@ -180,9 +180,13 @@ const Person = S.struct({
   age: S.number,
 });
 
-const decoder = D.decoderFor(Person);
+const codec = JC.jsonCodecFor(Person);
 
-decoder.decode({ name: null, age: 18 }); // => left(DE.custom({ myCustomErrorConfig: "not a string" }, null))
+expect(codec.decode({ name: null, age: 18 })).toEqual(
+  D.failure(
+    DE.key("name", [DE.custom({ myCustomErrorConfig: "not a string" }, null)])
+  )
+);
 ```
 
 # Supported data types
