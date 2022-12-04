@@ -6,9 +6,12 @@ import * as Benchmark from "benchmark"
 io-ts
 space-object (good) x 476,424 ops/sec ±0.45% (92 runs sampled)
 space-object (bad) x 434,563 ops/sec ±0.58% (87 runs sampled)
-schema (Chunk)
+schema (NonEmptyChunk)
 space-object (good) x 148,078 ops/sec ±4.17% (86 runs sampled)
 space-object (bad) x 238,464 ops/sec ±5.36% (80 runs sampled)
+schema (NonEmptyReadonlyArray)
+space-object (good) x 163,200 ops/sec ±2.00% (87 runs sampled)
+space-object (bad) x 278,866 ops/sec ±4.66% (81 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -97,8 +100,8 @@ const bad = {
   ]
 }
 
-// console.log(T.decode(good))
-// console.log(T.decode(bad))
+// console.log(decoder.decode(good))
+// console.log(decoder.decode(bad))
 
 suite
   .add("space-object (good)", function() {
