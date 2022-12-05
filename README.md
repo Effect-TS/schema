@@ -39,14 +39,13 @@ flowchart TD
 - versioning (TODO)
 - migration (TODO)
 
-# Schemas
-
-Creating a schema
+# Summary
 
 ```ts
-import * as S from "@fp-ts/schema/Schema";
+import * as JC from "@fp-ts/schema/JsonCodec";
+import * as fc from "fast-check";
 
-const Person = S.struct({
+const Person = JC.struct({
   name: S.string,
   age: S.number,
 });
@@ -55,94 +54,38 @@ const Person = S.struct({
 type Person = S.Infer<typeof Person>;
 /*
 type Person = {
-    readonly name: string;
-    readonly age: number;
+  readonly name: string;
+  readonly age: number;
 }
 */
-```
 
-# JsonCodecs
-
-Deriving a `JsonCodec` from a schema
-
-```ts
-import * as S from "@fp-ts/schema/Schema";
-import * as JC from "@fp-ts/schema/JsonCodec";
-import * as D from "@fp-ts/schema/Decoder";
-import * as DE from "@fp-ts/schema/DecodeError";
-
-const schema = S.struct({
-  name: S.string,
-  age: S.number,
-});
-
-const jsonCodec = JC.jsonCodecFor(schema);
-/*
-const jsonCodec: JC.JsonCodec<{
-  readonly name: string;
-  readonly age: number;
-}>
-*/
-
-expect(decoder.decode({ name: "name", age: 18 })).toEqual(
+// decode from JSON
+expect(Person.decode({ name: "name", age: 18 })).toEqual(
   D.success({ name: "name", age: 18 })
 );
+expect(Person.decode(null)).toEqual(D.failure(DE.notType("JsonObject", null)));
 
-expect(decoder.decode(null)).toEqual(D.failure(DE.notType("JsonObject", null)));
-```
-
-# Guards
-
-Deriving a `Guard` from a schema
-
-```ts
-import * as S from "@fp-ts/schema/Schema";
-import * as G from "@fp-ts/schema/Guard";
-
-const schema = S.struct({
-  name: S.string,
-  age: S.number,
+// encode to JSON
+expect(Person.encode({ name: "name", age: 18 })).toEqual({
+  name: "name",
+  age: 18,
 });
 
-const guard = G.guardFor(schema);
-/*
-const decoder: G.Guard<{
-  readonly name: string;
-  readonly age: number;
-}>
-*/
+// guard
+expect(Person.is({ name: "name", age: 18 })).toEqual(true);
+expect(Person.is(null)).toEqual(false);
 
-expect(guard.is({ name: "name", age: 18 })).toEqual(true);
-expect(guard.is(null)).toEqual(false);
-```
+// pretty print
+expect(Person.pretty({ name: "name", age: 18 })).toEqual(
+  '{ "name": "name", "age": 18 }'
+);
 
-# Arbitraries
-
-Deriving an `Arbitrary` from a schema
-
-```ts
-import * as S from "@fp-ts/schema/Schema";
-import * as A from "@fp-ts/schema/Arbitrary";
-import * as fc from "fast-check";
-
-const schema = S.struct({
-  name: S.string,
-  age: S.number,
-});
-
-const arb = A.arbitraryFor(schema).arbitrary(fc);
-/*
-const arb: fc.Arbitrary<{
-  readonly name: string;
-  readonly age: number;
-}>
-*/
-
-console.log(fc.sample(arb, 2));
+// fast-check arbitrary
+console.log(fc.sample(Person.arbitrary(fc), 2));
 /*
 [
-  { name: 't9dUS+\\Z', age: 3.4028228579130005e+38 },
-  { name: 'o', age: -3.4028218437925203e+38 }
+  { name: '!U?z/X', age: -2.5223372357846707e-44 },
+  { name: 'valukeypro', age: -1.401298464324817e-45 }
 ]
 */
 ```
@@ -161,71 +104,165 @@ All the combinators defined in `/src/Schema.ts` could be implemented in userland
 
 Examples in `/src/data/*`
 
-# Custom decode errors
+# Understanding Schemas
+
+A schema is a description of a data structure that can be used to generate various artifacts from a single declaration.
+
+## JsonDecoder
+
+A `JsonDecoder` is a derivable artifact that is able to decode a value of type `Json` to a value of type `A`.
 
 ```ts
-import * as DE from "@fp-ts/schema/DecodeError";
-import * as JD from "@fp-ts/schema/JsonDecoder";
-import * as JC from "@fp-ts/schema/JsonCodec";
-import * as S from "@fp-ts/schema/Schema";
-import { pipe } from "@fp-ts/data/Function";
-
-const mystring = pipe(
-  S.string,
-  S.clone(Symbol.for("mystring"), {
-    [JD.JsonDecoderId]: () => myJsonDecoder,
-  })
-);
-
-const myJsonDecoder = D.make(mystring, (u) =>
-  typeof u === "string"
-    ? D.success(u)
-    : D.failure(DE.custom({ myCustomErrorConfig: "not a string" }, u))
-);
-
-const Person = S.struct({
-  name: mystring,
-  age: S.number,
-});
-
-const codec = JC.jsonCodecFor(Person);
-
-expect(codec.decode({ name: null, age: 18 })).toEqual(
-  D.failure(
-    DE.key("name", [DE.custom({ myCustomErrorConfig: "not a string" }, null)])
-  )
-);
+interface JsonDecoder<in out A> extends Schema<A> {
+  readonly decode: (json: Json) => These<NonEmptyReadonlyArray<DecodeError>, A>;
+}
 ```
 
-# Supported data types
+## JsonEncoder
 
-|                      |                   | TypeScript                                                       | `AST`          |
-| -------------------- | ----------------- | ---------------------------------------------------------------- | -------------- |
-| Primitives           |                   |                                                                  |                |
-|                      | strings           | `string`                                                         | `String`       |
-|                      | numbers           | `number`                                                         | `Number`       |
-|                      | booleans          | `boolean`                                                        | `Boolean`      |
-| Literals             |                   |                                                                  |                |
-|                      | string literals   | `"a"`                                                            | `Of`           |
-|                      | number literals   | `1`                                                              | `Of`           |
-|                      | boolean literals  | `true`                                                           | `Of`           |
-| Enums                |                   |                                                                  |                |
-|                      | numeric enums     | `enum Fruits { Apple, Banana }`                                  | `Of` + `Union` |
-|                      | string enums      | `enum Fruits { Apple = "apple", Banana = "banana" }`             | `Of` + `Union` |
-|                      | const enums       | `const Fruits = { Apple = "apple", Banana = "banana" } as const` | `Of` + `Union` |
-| Objects              |                   |                                                                  |                |
-|                      |                   | `{ a: string, b: number }`                                       | `Struct`       |
-|                      | index signature   | `{ a: string, b: string, [_: string]: string }`                  | `Struct`       |
-| Records              |                   |                                                                  |                |
-|                      |                   | `{ [_: string]: number }`                                        | `Struct`       |
-| Tuples               |                   |                                                                  |                |
-|                      |                   | `[string, number]`                                               | `Tuple`        |
-|                      | with rest element | `[string, number, ...boolean[]]`                                 | `Tuple`        |
-| Arrays               |                   |                                                                  |                |
-|                      |                   | `string[]`                                                       | `Tuple`        |
-| Unions               |                   |                                                                  |                |
-|                      |                   | `string \| number`                                               | `Union`        |
-| Recursive data types |                   | `type A = { as: A[] }`                                           | `Lazy`         |
+A `JsonEncoder` is a derivable artifact that is able to encode a value of type `A` to a value of type `Json`.
+
+```ts
+export interface JsonEncoder<A> extends Schema<A> {
+  readonly encode: (value: A) => Json;
+}
+```
+
+## Guard
+
+A `Guard` is a derivable artifact that is able to refine a value of type `unknown` to a value of type `A`.
+
+```ts
+export interface Guard<A> extends Schema<A> {
+  readonly is: (input: unknown) => input is A;
+}
+```
+
+# Basic usage
+
+## Primitives
+
+```ts
+import * as JC from "@fp-ts/schema/JsonCodec";
+
+// $ExpectType JsonCodec<string>
+JC.string;
+
+// $ExpectType JsonCodec<number>
+JC.number;
+
+// $ExpectType JsonCodec<boolean>
+JC.boolean;
+```
+
+## Literals
+
+```ts
+// $ExpectType JsonCodec<"a">
+JC.literal("a");
+
+// $ExpectType JsonCodec<"a" | "b" | "c">
+JC.literal("a", "b", "c");
+```
+
+## Native enums
+
+```ts
+enum Fruits {
+  Apple,
+  Banana,
+}
+
+// $ExpectType JsonCodec<typeof Fruits>
+JC.nativeEnum(Fruits);
+```
+
+## Unions
+
+```ts
+// $ExpectType JsonCodec<string | number>
+JC.union(JC.string, JC.number);
+```
+
+## Tuples
+
+```ts
+// $ExpectType JsonCodec<readonly [string, number]>
+JC.tuple(JC.string, JC.number);
+```
+
+## Rest element
+
+```ts
+// $ExpectType Schema<readonly [string, number, ...boolean[]]>
+pipe(JC.tuple(JC.string, JC.number), JC.withRest(JC.boolean));
+```
+
+## Arrays
+
+```ts
+// $ExpectType JsonCodec<readonly number[]>
+JC.array(JC.number);
+```
+
+## Non empty arrays
+
+```ts
+// $ExpectType JsonCodec<readonly [number, ...number[]]>
+JC.nonEmptyArray(JC.number);
+```
+
+## Structs
+
+```ts
+// $ExpectType JsonCodec<{ readonly a: string; readonly b: number; }>
+JC.struct({ a: JC.string, b: JC.number });
+```
+
+## Pick
+
+```ts
+// $ExpectType JsonCodec<{ readonly a: string; }>
+pipe(JC.struct({ a: JC.string, b: JC.number }), JC.pick("a"));
+```
+
+## Omit
+
+```ts
+// $ExpectType JsonCodec<{ readonly b: number; }>
+pipe(JC.struct({ a: JC.string, b: JC.number }), JC.omit("a"));
+```
+
+## Partial
+
+```ts
+// $ExpectType JsonCodec<Partial<{ readonly a: string; readonly b: number; }>>
+JC.partial(JC.struct({ a: JC.string, b: JC.number }));
+```
+
+## String index signature
+
+```ts
+// $ExpectType JsonCodec<{ readonly [_: string]: string; }>
+JC.stringIndexSignature(JC.string);
+```
+
+## Symbol index signature
+
+```ts
+// $ExpectType JsonCodec<{ readonly [_: symbol]: string; }>
+JC.symbolIndexSignature(JC.string);
+```
+
+## Extend
+
+```ts
+// $ExpectType JsonCodec<{ readonly a: string; readonly b: string; } & { readonly [_: string]: string; }>
+pipe(
+  JC.struct({ a: JC.string, b: JC.string }),
+  JC.extend(JC.stringIndexSignature(JC.string))
+);
+```
 
 # Documentation
 
