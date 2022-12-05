@@ -16,20 +16,28 @@ Schema validation with static type inference
 
 ```mermaid
 flowchart TD
-  Schema -->|jsonCodecFor| JsonCodec
+  Schema -->|jsonDecoderFor| JsonDecoder
+  Schema -->|jsonEncoderFor| JsonEncoder
   Schema -->|guardFor| Guard
   Schema -->|arbitraryFor| Arbitrary
+  Schema -->|prettyFor| Pretty
 ```
 
 # Features
 
-- Deriving (`JsonCodec`, `Guard`, `Arbitrary`)
-- Custom interpreters
-- Custom schema combinators
-- Custom data types
-- Custom decode errors
-- Versioning (TODO)
-- Migration (TODO)
+- deriving single artifacts from a `Schema`:
+  - `JsonDecoder`
+  - `JsonEncoder`
+  - `Guard`
+  - `Arbitrary`
+  - `Pretty`
+- `JsonCodec` (all in one artifact)
+- custom interpreters
+- custom schema combinators
+- custom data types
+- custom decode errors
+- versioning (TODO)
+- migration (TODO)
 
 # Schemas
 
