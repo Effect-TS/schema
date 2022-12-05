@@ -43,21 +43,23 @@ flowchart TD
 
 ```ts
 import * as JC from "@fp-ts/schema/JsonCodec";
-import * as fc from "fast-check";
 
 const Person = JC.struct({
-  name: S.string,
-  age: S.number,
+  name: JC.string,
+  age: JC.number,
 });
 
 // extract the inferred type
-type Person = S.Infer<typeof Person>;
+type Person = JC.Infer<typeof Person>;
 /*
 type Person = {
   readonly name: string;
   readonly age: number;
 }
 */
+
+import * as D from "@fp-ts/schema/Decoder";
+import * as DE from "@fp-ts/schema/DecodeError";
 
 // decode from JSON
 expect(Person.decode({ name: "name", age: 18 })).toEqual(
@@ -79,6 +81,8 @@ expect(Person.is(null)).toEqual(false);
 expect(Person.pretty({ name: "name", age: 18 })).toEqual(
   '{ "name": "name", "age": 18 }'
 );
+
+import * as fc from "fast-check";
 
 // fast-check arbitrary
 console.log(fc.sample(Person.arbitrary(fc), 2));
