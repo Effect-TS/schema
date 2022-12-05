@@ -148,8 +148,20 @@ import * as JC from "@fp-ts/schema/JsonCodec";
 // $ExpectType JsonCodec<string>
 JC.string;
 
+// $ExpectType JsonCodec<string>
+pipe(JC.string, JC.minLength(1));
+
+// $ExpectType JsonCodec<string>
+pipe(JC.string, JC.maxLength(10));
+
 // $ExpectType JsonCodec<number>
 JC.number;
+
+// $ExpectType JsonCodec<number>
+pipe(JC.number, JC.min(0));
+
+// $ExpectType JsonCodec<number>
+pipe(JC.number, JC.max(10));
 
 // $ExpectType JsonCodec<boolean>
 JC.boolean;
@@ -255,6 +267,16 @@ JC.symbolIndexSignature(JC.string);
 ```
 
 ## Extend
+
+```ts
+// $ExpectType JsonCodec<{ readonly a: string; readonly b: string; } & { readonly [_: string]: string; }>
+pipe(
+  JC.struct({ a: JC.string, b: JC.string }),
+  JC.extend(JC.stringIndexSignature(JC.string))
+);
+```
+
+## Option
 
 ```ts
 // $ExpectType JsonCodec<{ readonly a: string; readonly b: string; } & { readonly [_: string]: string; }>
