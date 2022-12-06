@@ -31,7 +31,7 @@ flowchart TD
   - `Guard`
   - `Arbitrary`
   - `Pretty`
-- `JsonCodec` (all in one artifact)
+- `Codec` (all in one artifact)
 - custom interpreters
 - custom schema combinators
 - custom data types
@@ -148,51 +148,54 @@ export interface Guard<A> extends Schema<A> {
 ## Primitives
 
 ```ts
-import * as JC from "@fp-ts/schema/JsonCodec";
+import * as C from "@fp-ts/schema/Codec";
 
-// $ExpectType JsonCodec<string>
-JC.string;
+// $ExpectType Codec<string>
+C.string;
 
-// $ExpectType JsonCodec<number>
-JC.number;
+// $ExpectType Codec<number>
+C.number;
 
-// $ExpectType JsonCodec<boolean>
-JC.boolean;
+// $ExpectType Codec<boolean>
+C.boolean;
 
-// $ExpectType JsonCodec<unknown>
-JC.unknown;
+// $ExpectType Codec<unknown>
+C.unknown;
 ```
 
 ## Filters
 
 ```ts
-// $ExpectType JsonCodec<string>
-pipe(JC.string, JC.minLength(1));
+// $ExpectType Codec<string>
+pipe(C.string, C.minLength(1));
 
-// $ExpectType JsonCodec<string>
-pipe(JC.string, JC.maxLength(10));
-
-// $ExpectType Codec<number>
-pipe(JC.number, JC.lessThan(0));
+// $ExpectType Codec<string>
+pipe(C.string, C.maxLength(10));
 
 // $ExpectType Codec<number>
-pipe(JC.number, JC.lessThanOrEqualTo(0));
+pipe(C.number, C.lessThan(0));
 
 // $ExpectType Codec<number>
-pipe(JC.number, JC.greaterThan(10));
+pipe(C.number, C.lessThanOrEqualTo(0));
 
 // $ExpectType Codec<number>
-pipe(JC.number, JC.greaterThanOrEqualTo(10));
+pipe(C.number, C.greaterThan(10));
+
+// $ExpectType Codec<number>
+pipe(C.number, C.greaterThanOrEqualTo(10));
+
+// $ExpectType Codec<number>
+pipe(C.number, C.int);
 ```
 
 ## Literals
 
 ```ts
-// $ExpectType JsonCodec<"a">
-JC.literal("a");
+// $ExpectType Codec<"a">
+C.literal("a");
 
-// $ExpectType JsonCodec<"a" | "b" | "c">
-JC.literal("a", "b", "c");
+// $ExpectType Codec<"a" | "b" | "c">
+C.literal("a", "b", "c");
 ```
 
 ## Native enums
@@ -203,109 +206,123 @@ enum Fruits {
   Banana,
 }
 
-// $ExpectType JsonCodec<typeof Fruits>
-JC.nativeEnum(Fruits);
+// $ExpectType Codec<typeof Fruits>
+C.nativeEnum(Fruits);
 ```
 
 ## Unions
 
 ```ts
-// $ExpectType JsonCodec<string | number>
-JC.union(JC.string, JC.number);
+// $ExpectType Codec<string | number>
+C.union(C.string, C.number);
 ```
 
 ## Tuples
 
 ```ts
-// $ExpectType JsonCodec<readonly [string, number]>
-JC.tuple(JC.string, JC.number);
+// $ExpectType Codec<readonly [string, number]>
+C.tuple(C.string, C.number);
 ```
 
 ## Rest element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, ...boolean[]]>
-pipe(JC.tuple(JC.string, JC.number), JC.withRest(JC.boolean));
+pipe(C.tuple(C.string, C.number), C.withRest(C.boolean));
 ```
 
 ## Arrays
 
 ```ts
-// $ExpectType JsonCodec<readonly number[]>
-JC.array(JC.number);
+// $ExpectType Codec<readonly number[]>
+C.array(C.number);
 ```
 
 ## Non empty arrays
 
 ```ts
-// $ExpectType JsonCodec<readonly [number, ...number[]]>
-JC.nonEmptyArray(JC.number);
+// $ExpectType Codec<readonly [number, ...number[]]>
+C.nonEmptyArray(C.number);
 ```
 
 ## Structs
 
 ```ts
-// $ExpectType JsonCodec<{ readonly a: string; readonly b: number; }>
-JC.struct({ a: JC.string, b: JC.number });
+// $ExpectType Codec<{ readonly a: string; readonly b: number; }>
+C.struct({ a: C.string, b: C.number });
 ```
 
 Optional fields
 
 ```ts
-// $ExpectType JsonCodec<{ readonly a: string; readonly b: number; readonly c?: boolean | undefined; }>
-JC.struct({ a: JC.string, b: JC.number }, { c: JC.boolean });
+// $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean | undefined; }>
+C.struct({ a: C.string, b: C.number }, { c: C.boolean });
 ```
 
 ## Pick
 
 ```ts
-// $ExpectType JsonCodec<{ readonly a: string; }>
-pipe(JC.struct({ a: JC.string, b: JC.number }), JC.pick("a"));
+// $ExpectType Codec<{ readonly a: string; }>
+pipe(C.struct({ a: C.string, b: C.number }), C.pick("a"));
 ```
 
 ## Omit
 
 ```ts
-// $ExpectType JsonCodec<{ readonly b: number; }>
-pipe(JC.struct({ a: JC.string, b: JC.number }), JC.omit("a"));
+// $ExpectType Codec<{ readonly b: number; }>
+pipe(C.struct({ a: C.string, b: C.number }), C.omit("a"));
 ```
 
 ## Partial
 
 ```ts
-// $ExpectType JsonCodec<Partial<{ readonly a: string; readonly b: number; }>>
-JC.partial(JC.struct({ a: JC.string, b: JC.number }));
+// $ExpectType Codec<Partial<{ readonly a: string; readonly b: number; }>>
+C.partial(C.struct({ a: C.string, b: C.number }));
 ```
 
 ## String index signature
 
 ```ts
-// $ExpectType JsonCodec<{ readonly [_: string]: string; }>
-JC.stringIndexSignature(JC.string);
+// $ExpectType Codec<{ readonly [_: string]: string; }>
+C.stringIndexSignature(C.string);
 ```
 
 ## Symbol index signature
 
 ```ts
-// $ExpectType JsonCodec<{ readonly [_: symbol]: string; }>
-JC.symbolIndexSignature(JC.string);
+// $ExpectType Codec<{ readonly [_: symbol]: string; }>
+C.symbolIndexSignature(C.string);
 ```
 
 ## Extend
 
 ```ts
-// $ExpectType JsonCodec<{ readonly a: string; readonly b: string; } & { readonly [_: string]: string; }>
+// $ExpectType Codec<{ readonly a: string; readonly b: string; } & { readonly [_: string]: string; }>
 pipe(
-  JC.struct({ a: JC.string, b: JC.string }),
-  JC.extend(JC.stringIndexSignature(JC.string))
+  C.struct({ a: C.string, b: C.string }),
+  C.extend(C.stringIndexSignature(C.string))
 );
 ```
 
 ## Option
 
 ```ts
-// $ExpectType JsonCodec<Option<number>>
-JC.option(JC.number);
+// $ExpectType Codec<Option<number>>
+C.option(C.number);
+```
+
+## ReadonlySet
+
+```ts
+// $ExpectType Codec<ReadonlySet<number>>
+C.readonlySet(C.number);
+```
+
+## Chunk
+
+```ts
+// $ExpectType Codec<Chunk<number>>
+C.chunk(C.number);
 ```
 
 # Documentation
