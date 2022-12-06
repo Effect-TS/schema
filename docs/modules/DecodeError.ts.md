@@ -1,6 +1,6 @@
 ---
 title: DecodeError.ts
-nav_order: 27
+nav_order: 33
 parent: Modules
 ---
 
@@ -15,12 +15,14 @@ Added in v1.0.0
 - [utils](#utils)
   - [Custom (interface)](#custom-interface)
   - [DecodeError (type alias)](#decodeerror-type-alias)
+  - [GreaterThan (interface)](#greaterthan-interface)
+  - [GreaterThanOrEqualTo (interface)](#greaterthanorequalto-interface)
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
-  - [Max (interface)](#max-interface)
+  - [LessThan (interface)](#lessthan-interface)
+  - [LessThanOrEqualTo (interface)](#lessthanorequalto-interface)
   - [MaxLength (interface)](#maxlength-interface)
   - [Member (interface)](#member-interface)
-  - [Min (interface)](#min-interface)
   - [MinLength (interface)](#minlength-interface)
   - [NaN (interface)](#nan-interface)
   - [NotEqual (interface)](#notequal-interface)
@@ -29,12 +31,14 @@ Added in v1.0.0
   - [UnexpectedIndex (interface)](#unexpectedindex-interface)
   - [UnexpectedKey (interface)](#unexpectedkey-interface)
   - [custom](#custom)
+  - [greaterThan](#greaterthan)
+  - [greaterThanOrEqualTo](#greaterthanorequalto)
   - [index](#index)
   - [key](#key)
-  - [max](#max)
+  - [lessThan](#lessthan)
+  - [lessThanOrEqualTo](#lessthanorequalto)
   - [maxLength](#maxlength)
   - [member](#member)
-  - [min](#min)
   - [minLength](#minlength)
   - [nan](#nan)
   - [notEqual](#notequal)
@@ -74,13 +78,43 @@ export type DecodeError =
   | NotFinite
   | MinLength
   | MaxLength
-  | Min
-  | Max
+  | LessThan
+  | GreaterThan
+  | LessThanOrEqualTo
+  | GreaterThanOrEqualTo
   | Index
   | Key
   | UnexpectedKey
   | UnexpectedIndex
   | Member
+```
+
+Added in v1.0.0
+
+## GreaterThan (interface)
+
+**Signature**
+
+```ts
+export interface GreaterThan {
+  readonly _tag: 'GreaterThan'
+  readonly min: number
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## GreaterThanOrEqualTo (interface)
+
+**Signature**
+
+```ts
+export interface GreaterThanOrEqualTo {
+  readonly _tag: 'GreaterThanOrEqualTo'
+  readonly min: number
+  readonly actual: unknown
+}
 ```
 
 Added in v1.0.0
@@ -113,13 +147,27 @@ export interface Key {
 
 Added in v1.0.0
 
-## Max (interface)
+## LessThan (interface)
 
 **Signature**
 
 ```ts
-export interface Max {
-  readonly _tag: 'Max'
+export interface LessThan {
+  readonly _tag: 'LessThan'
+  readonly max: number
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## LessThanOrEqualTo (interface)
+
+**Signature**
+
+```ts
+export interface LessThanOrEqualTo {
+  readonly _tag: 'LessThanOrEqualTo'
   readonly max: number
   readonly actual: unknown
 }
@@ -150,20 +198,6 @@ export interface Member {
   readonly _tag: 'Member'
   readonly index: number
   readonly errors: NonEmptyReadonlyArray<DecodeError>
-}
-```
-
-Added in v1.0.0
-
-## Min (interface)
-
-**Signature**
-
-```ts
-export interface Min {
-  readonly _tag: 'Min'
-  readonly min: number
-  readonly actual: unknown
 }
 ```
 
@@ -271,6 +305,26 @@ export declare const custom: (config: unknown, actual: unknown) => Custom
 
 Added in v1.0.0
 
+## greaterThan
+
+**Signature**
+
+```ts
+export declare const greaterThan: (min: number, actual: unknown) => GreaterThan
+```
+
+Added in v1.0.0
+
+## greaterThanOrEqualTo
+
+**Signature**
+
+```ts
+export declare const greaterThanOrEqualTo: (min: number, actual: unknown) => GreaterThanOrEqualTo
+```
+
+Added in v1.0.0
+
 ## index
 
 **Signature**
@@ -291,12 +345,22 @@ export declare const key: (key: PropertyKey, errors: readonly [DecodeError, ...D
 
 Added in v1.0.0
 
-## max
+## lessThan
 
 **Signature**
 
 ```ts
-export declare const max: (max: number, actual: unknown) => Max
+export declare const lessThan: (max: number, actual: unknown) => LessThan
+```
+
+Added in v1.0.0
+
+## lessThanOrEqualTo
+
+**Signature**
+
+```ts
+export declare const lessThanOrEqualTo: (max: number, actual: unknown) => LessThanOrEqualTo
 ```
 
 Added in v1.0.0
@@ -317,16 +381,6 @@ Added in v1.0.0
 
 ```ts
 export declare const member: (index: number, errors: readonly [DecodeError, ...DecodeError[]]) => Member
-```
-
-Added in v1.0.0
-
-## min
-
-**Signature**
-
-```ts
-export declare const min: (min: number, actual: unknown) => Min
 ```
 
 Added in v1.0.0

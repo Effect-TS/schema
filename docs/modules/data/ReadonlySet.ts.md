@@ -1,6 +1,6 @@
 ---
 title: data/ReadonlySet.ts
-nav_order: 21
+nav_order: 26
 parent: Modules
 ---
 
@@ -15,11 +15,11 @@ Added in v1.0.0
 - [utils](#utils)
   - [Provider](#provider)
   - [arbitrary](#arbitrary)
+  - [decoder](#decoder)
   - [guard](#guard)
   - [id](#id)
   - [pretty](#pretty)
   - [schema](#schema)
-  - [unknownDecoder](#unknowndecoder)
 
 ---
 
@@ -41,6 +41,16 @@ Added in v1.0.0
 
 ```ts
 export declare const arbitrary: <A>(item: any) => any
+```
+
+Added in v1.0.0
+
+## decoder
+
+**Signature**
+
+```ts
+export declare const decoder: <A>(item: any) => any
 ```
 
 Added in v1.0.0
@@ -81,16 +91,6 @@ Added in v1.0.0
 
 ```ts
 export declare const schema: <A>(item: any) => any
-```
-
-Added in v1.0.0
-
-## unknownDecoder
-
-**Signature**
-
-```ts
-export declare const unknownDecoder: <A>(item: UD.UnknownDecoder<A>) => UD.UnknownDecoder<ReadonlySet<A>>
 ```
 
 Added in v1.0.0

@@ -1,6 +1,6 @@
 ---
 title: data/String.ts
-nav_order: 23
+nav_order: 28
 parent: Modules
 ---
 

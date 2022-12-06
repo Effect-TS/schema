@@ -89,7 +89,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type Infer<C extends Codec<any>> = I.Infer<C>
+export type Infer<S extends Schema<any>> = Parameters<S['A']>[0]
 ```
 
 Added in v1.0.0

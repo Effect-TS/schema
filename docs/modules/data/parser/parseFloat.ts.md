@@ -1,6 +1,6 @@
 ---
 title: data/parser/parseFloat.ts
-nav_order: 20
+nav_order: 25
 parent: Modules
 ---
 
