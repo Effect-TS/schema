@@ -42,15 +42,15 @@ flowchart TD
 # Summary
 
 ```ts
-import * as JC from "@fp-ts/schema/JsonCodec";
+import * as C from "@fp-ts/schema/Codec";
 
-const Person = JC.struct({
-  name: JC.string,
-  age: JC.number,
+const Person = C.struct({
+  name: C.string,
+  age: C.number,
 });
 
 // extract the inferred type
-type Person = JC.Infer<typeof Person>;
+type Person = C.Infer<typeof Person>;
 /*
 type Person = {
   readonly name: string;
@@ -58,14 +58,15 @@ type Person = {
 }
 */
 
-import * as D from "@fp-ts/schema/Decoder";
 import * as DE from "@fp-ts/schema/DecodeError";
 
 // decode from JSON
 expect(Person.decode({ name: "name", age: 18 })).toEqual(
-  D.success({ name: "name", age: 18 })
+  C.success({ name: "name", age: 18 })
 );
-expect(Person.decode(null)).toEqual(D.failure(DE.notType("JsonObject", null)));
+expect(Person.decode(null)).toEqual(
+  C.failure(DE.notType("{ readonly [_: string]: unknown }", null))
+);
 
 // encode to JSON
 expect(Person.encode({ name: "name", age: 18 })).toEqual({
