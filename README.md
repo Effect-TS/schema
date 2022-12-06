@@ -16,8 +16,7 @@ Schema validation with static type inference
 
 ```mermaid
 flowchart TD
-  Schema -->|jsonDecoderFor| JsonDecoder
-  Schema -->|jsonEncoderFor| JsonEncoder
+  Schema -->|codecFor| Codec
   Schema -->|guardFor| Guard
   Schema -->|arbitraryFor| Arbitrary
   Schema -->|prettyFor| Pretty
@@ -113,24 +112,21 @@ Examples in `/src/data/*`
 
 A schema is a description of a data structure that can be used to generate various artifacts from a single declaration.
 
-## JsonDecoder
+## Codec
 
-A `JsonDecoder` is a derivable artifact that is able to decode a value of type `Json` to a value of type `A`.
+A `Codec` is a derivable artifact that is able to:
 
-```ts
-interface JsonDecoder<in out A> extends Schema<A> {
-  readonly decode: (json: Json) => These<NonEmptyReadonlyArray<DecodeError>, A>;
-}
-```
-
-## JsonEncoder
-
-A `JsonEncoder` is a derivable artifact that is able to encode a value of type `A` to a value of type `Json`.
+- decode a value of type `unknown` to a value of type `A`.
+- encode a value of type `A` to a value of type `unknown`.
 
 ```ts
-export interface JsonEncoder<A> extends Schema<A> {
-  readonly encode: (value: A) => Json;
-}
+export interface Codec<in out A>
+  extends Schema<A>,
+    Decoder<unknown, A>,
+    Encoder<unknown, A>,
+    Guard<A>,
+    Arbitrary<A>,
+    Pretty<A> {}
 ```
 
 ## Guard
@@ -159,8 +155,17 @@ C.number;
 // $ExpectType Codec<boolean>
 C.boolean;
 
+// $ExpectType Codec<bigint>
+C.bigint;
+
+// $ExpectType Codec<symbol>
+C.symbol;
+
 // $ExpectType Codec<unknown>
 C.unknown;
+
+// $ExpectType Codec<any>
+C.any;
 ```
 
 ## Filters
