@@ -1,6 +1,6 @@
 ---
 title: data/filterWith.ts
-nav_order: 12
+nav_order: 16
 parent: Modules
 ---
 

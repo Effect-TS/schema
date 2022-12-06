@@ -1,6 +1,6 @@
 ---
 title: Decoder.ts
-nav_order: 28
+nav_order: 34
 parent: Modules
 ---
 
@@ -14,12 +14,15 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [Decoder (interface)](#decoder-interface)
+  - [DecoderId](#decoderid)
+  - [decoderFor](#decoderfor)
   - [failure](#failure)
   - [failures](#failures)
   - [isFailure](#isfailure)
   - [isSuccess](#issuccess)
   - [isWarning](#iswarning)
   - [make](#make)
+  - [provideDecoderFor](#providedecoderfor)
   - [success](#success)
   - [warning](#warning)
   - [warnings](#warnings)
@@ -34,6 +37,26 @@ Added in v1.0.0
 
 ```ts
 export interface Decoder<
+```
+
+Added in v1.0.0
+
+## DecoderId
+
+**Signature**
+
+```ts
+export declare const DecoderId: symbol
+```
+
+Added in v1.0.0
+
+## decoderFor
+
+**Signature**
+
+```ts
+export declare const decoderFor: <A>(schema: any) => any
 ```
 
 Added in v1.0.0
@@ -96,6 +119,16 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <S, A>(schema: any, decode: any) => any
+```
+
+Added in v1.0.0
+
+## provideDecoderFor
+
+**Signature**
+
+```ts
+export declare const provideDecoderFor: (provider: Provider) => <A>(schema: any) => any
 ```
 
 Added in v1.0.0
