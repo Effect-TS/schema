@@ -169,7 +169,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const failure: (e: DecodeError) => These<readonly [DecodeError, ...DecodeError[]], never>
+export declare const failure: (e: DecodeError) => These<NonEmptyReadonlyArray<DecodeError>, never>
 ```
 
 Added in v1.0.0
@@ -181,7 +181,7 @@ Added in v1.0.0
 ```ts
 export declare const failures: (
   es: readonly [DecodeError, ...DecodeError[]]
-) => These<readonly [DecodeError, ...DecodeError[]], never>
+) => These<NonEmptyReadonlyArray<DecodeError>, never>
 ```
 
 Added in v1.0.0

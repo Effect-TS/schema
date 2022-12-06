@@ -19,6 +19,7 @@ importers:
       '@changesets/cli': ^2.25.2
       '@effect-ts/build-utils': 0.40.5
       '@effect-ts/core': ^0.60.2
+      '@effect/language-service': ^0.0.10
       '@fp-ts/core': ^0.0.9
       '@fp-ts/data': ^0.0.21
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
@@ -70,6 +71,7 @@ importers:
       '@changesets/cli': 2.25.2
       '@effect-ts/build-utils': 0.40.5_smskbqsf3q6kbozdrpluio47kq
       '@effect-ts/core': 0.60.4
+      '@effect/language-service': 0.0.10
       '@repo-tooling/eslint-plugin-dprint': 0.0.4_typescript@4.9.3
       '@types/benchmark': 2.1.2
       '@types/chai': 4.3.4
@@ -671,6 +673,30 @@ packages:
     resolution: {integrity: sha512-gGnOCvDv6829EeeC+NgTnwIt4XxclR0KqrG7BRemmNX5cm75cF0CKiuEB/o902wjAlt+MdrxTtFC+XsYdLnxzA==}
     dev: true
 
+  /@effect/io/0.0.30:
+    resolution: {integrity: sha512-2f7DL01GSwNJbC3l9e1gIm4zSI4FfghFGPDdGbHTL//dUCamt7d8EK7VjB3IECv7xcu3a2edCJUqWHQPDmNoAg==}
+    dependencies:
+      '@effect/printer': 0.1.9
+      '@fp-ts/core': 0.0.9
+      '@fp-ts/data': 0.0.20
+    dev: true
+
+  /@effect/language-service/0.0.10:
+    resolution: {integrity: sha512-/e+L5rdhlCeM9JI1z2gHfBAeB40EpibfSEnpowbWO7epLQjIBHB7+dy9RKUjKbbcHPHh4D9cf+GfBKuaB2qO+g==}
+    dependencies:
+      '@effect/io': 0.0.30
+      '@effect/printer': 0.1.9
+      '@fp-ts/core': 0.0.9
+      '@fp-ts/data': 0.0.20
+    dev: true
+
+  /@effect/printer/0.1.9:
+    resolution: {integrity: sha512-2RFcvrxHLjNAC9VI2WV8cN18vvSm23jgaY50wDHrcL1cTBL3FYn6Xi9hNU5OHQF9rIgNDlmSueXRx7X1JQSbIA==}
+    dependencies:
+      '@fp-ts/core': 0.0.9
+      '@fp-ts/data': 0.0.20
+    dev: true
+
   /@esbuild/android-arm/0.15.18:
     resolution: {integrity: sha512-5GT+kcs2WVGjVs7+boataCkO5Fg0y4kCjzkB5bAip7H4jfnOS3dA6KPiww9W1OEKTKeAcUVhdZGvgI65OXmUnw==}
     engines: {node: '>=12'}
@@ -717,7 +743,12 @@ packages:
 
   /@fp-ts/core/0.0.9:
     resolution: {integrity: sha512-FuXKPHTEvvgxV3LulGJXkSpAghovh7wLxux+Pm9LKefC0gtZZQ4OajTjTK5RsQtpyKIsAn26PwdG6W6zksF/UA==}
-    dev: false
+
+  /@fp-ts/data/0.0.20:
+    resolution: {integrity: sha512-7nv25VxgZiJzintT1Bsl4mXOZlIOGag/GsI0Rov1r/RTfOzd4RePpnDYZzC9BFJ5Iru2/mHeXejRuxgBP2v8Qg==}
+    dependencies:
+      '@fp-ts/core': 0.0.9
+    dev: true
 
   /@fp-ts/data/0.0.21:
     resolution: {integrity: sha512-8YcoRmHTiBCttJaVtej652hu6YMUGdzdwaqznX6NVKeJXRWLPcS77aCdMdyevZn3B2BIz+x+oeSCiVKgmrXT1Q==}
@@ -5756,7 +5787,7 @@ packages:
     resolution: {integrity: sha512-nBpuuYuY5jFsli/JIs1oldw6fOQCBioohqWZg/2hiaOybXOft4lonv85uDOKXdf8rhyK159cxU5cDcK/NKk8zw==}
     hasBin: true
     dependencies:
-      is-core-module: 2.10.0
+      is-core-module: 2.11.0
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
