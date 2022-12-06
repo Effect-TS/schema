@@ -25,8 +25,7 @@ flowchart TD
 # Features
 
 - deriving single artifacts from a `Schema`:
-  - `JsonDecoder`
-  - `JsonEncoder`
+  - `Codec`
   - `Guard`
   - `Arbitrary`
   - `Pretty`
@@ -96,7 +95,7 @@ console.log(fc.sample(Person.arbitrary(fc), 2));
 
 # Custom interpreters
 
-`src/Decoder.ts`, `src/Guard.ts` and `src/Arbitrary.ts` are good examples of defining a custom interpreter.
+`src/Pretty.ts`, `src/Guard.ts` and `src/Arbitrary.ts` are good examples of defining a custom interpreter.
 
 # Custom schema combinators
 
@@ -112,6 +111,36 @@ Examples in `/src/data/*`
 
 A schema is a description of a data structure that can be used to generate various artifacts from a single declaration.
 
+## Guard
+
+A `Guard` is a derivable artifact that is able to refine a value of type `unknown` to a value of type `A`.
+
+```ts
+interface Guard<A> extends Schema<A> {
+  readonly is: (input: unknown) => input is A;
+}
+```
+
+## Arbitrary
+
+An `Arbitrary` is a derivable artifact that is able to produce [`fast-check`](https://github.com/dubzzz/fast-check) arbitraries.
+
+```ts
+interface Arbitrary<in out A> extends Schema<A> {
+  readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>;
+}
+```
+
+## Pretty
+
+A `Pretty` is a derivable artifact that is able to pretty print a value of type `A`.
+
+```ts
+interface Pretty<in out A> extends Schema<A> {
+  readonly pretty: (a: A) => string;
+}
+```
+
 ## Codec
 
 A `Codec` is a derivable artifact that is able to:
@@ -120,23 +149,13 @@ A `Codec` is a derivable artifact that is able to:
 - encode a value of type `A` to a value of type `unknown`.
 
 ```ts
-export interface Codec<in out A>
+interface Codec<in out A>
   extends Schema<A>,
     Decoder<unknown, A>,
     Encoder<unknown, A>,
     Guard<A>,
     Arbitrary<A>,
     Pretty<A> {}
-```
-
-## Guard
-
-A `Guard` is a derivable artifact that is able to refine a value of type `unknown` to a value of type `A`.
-
-```ts
-export interface Guard<A> extends Schema<A> {
-  readonly is: (input: unknown) => input is A;
-}
 ```
 
 # Basic usage
