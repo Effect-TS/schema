@@ -330,6 +330,13 @@ C.readonlySet(C.number);
 C.chunk(C.number);
 ```
 
+## List
+
+```ts
+// $ExpectType Codec<List<number>>
+C.list(C.number);
+```
+
 # Documentation
 
 - [API Reference](https://fp-ts.github.io/schema/)
