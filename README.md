@@ -33,6 +33,7 @@ flowchart TD
 - custom `Schema` combinators
 - custom data types
 - custom decode errors (TODO)
+- refinements (TODO)
 - versioning (TODO)
 - migration (TODO)
 
@@ -158,12 +159,90 @@ Examples in `/src/data/*`
 
 A schema is a description of a data structure that can be used to generate various artifacts from a single declaration.
 
+From a technical point of view a schema is just a typed wrapper of an `AST` value
+
+```ts
+interface Schema<in out A> {
+  readonly ast: AST;
+}
+```
+
+The `AST` type represents a tiny portion of the TypeScript AST, roughly speaking the part describing ADTs (algebraic data types),
+i.e. products (like structs and tuples) and unions.
+
+This means that you can define your own schema constructors / combinators as long as you are able to manipulate the `AST` type accordingly, let's see an example.
+
+Say we want to define a `pair` schema constructor, which takes a `Schema<A>` as input and returns a `Schema<readonly [A, A]>` as output.
+
+First of all we need to define the signature of `pair`
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+
+declare const pair: <A>(schema: S.Schema<A>) => S.Schema<readonly [A, A]>;
+```
+
+Then we can implement the body using the APIs exported by the `AST.ts` module
+
+```ts
+import * as AST from "@fp-ts/schema/AST";
+import * as O from "@fp-ts/data/Option";
+
+const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
+  const item = AST.component(
+    schema.ast, // <= the type of the component
+    false // <= specifies if the component is optional
+  );
+  const tuple = AST.tuple(
+    [item, item], // <= components definitions
+    O.none, // <= rest element
+    true // <= specifies if the tuple is readonly
+  );
+  return S.make(tuple); // <= wrap the AST value in a Schema
+};
+```
+
+The goal of this example was showing the low-level APIs of the `AST` module, but the same result can
+be achieved using the much more handy APIs of the `Schema` module
+
+```ts
+const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> =>
+  S.tuple(schema, schema);
+```
+
+Please note that the `S.tuple` itself is nothing special and can be defined in userland
+
+```ts
+export const tuple = <Components extends ReadonlyArray<Schema<any>>>(
+  ...components: Components
+): Schema<{ readonly [K in keyof Components]: Infer<Components[K]> }> =>
+  make(
+    AST.tuple(
+      components.map((c) => AST.component(c.ast, false)),
+      O.none,
+      true
+    )
+  );
+```
+
+Now you can compile your `pair` schemas using the `codecFor` compiler
+
+```ts
+import * as C from "@fp-ts/schema/Codec";
+
+// const myNumberPair: C.Codec<readonly [number, number]>
+const myNumberPair = C.codecFor(pair(S.number));
+
+expect(myNumberPair.is([1, 2])).toEqual(true);
+expect(myNumberPair.is([1, "a"])).toEqual(false);
+```
+
 **Guard**
 
 A `Guard` is a derivable artifact that is able to refine a value of type `unknown` to a value of type `A`.
 
 ```ts
-interface Guard<A> extends Schema<A> {
+interface Guard<in out A> extends Schema<A> {
   readonly is: (input: unknown) => input is A;
 }
 ```
@@ -237,6 +316,8 @@ C.any;
 ```
 
 ## Filters
+
+**Note**. Filters don't change the `Schema` type.
 
 ```ts
 // $ExpectType Codec<string>
