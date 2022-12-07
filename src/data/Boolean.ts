@@ -9,8 +9,6 @@ import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Provider"
 import type * as S from "@fp-ts/schema/Schema"
 
-import * as ast from "@fp-ts/schema/AST"
-
 /**
  * @since 1.0.0
  */

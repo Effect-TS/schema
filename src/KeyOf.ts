@@ -29,20 +29,6 @@ export interface KeyOf<in out A> extends S.Schema<A> {
  */
 export const make: <A>(schema: Schema<A>, keyOf: KeyOf<A>["keyOf"]) => KeyOf<A> = I.makeKeyOf
 
-/**
- * @since 1.0.0
- */
-export const lazy = <A>(
-  f: () => KeyOf<A>
-): KeyOf<A> => {
-  const get = S.memoize<void, KeyOf<A>>(f)
-  const schema = S.lazy(f)
-  return make(
-    schema,
-    get().keyOf
-  )
-}
-
 function getUnionMembers(ast: AST): ReadonlyArray<AST> {
   if (ast._tag !== "Union") return ReadonlyArray.of(ast)
   return pipe(ast.members, ReadonlyArray.map(getUnionMembers), ReadonlyArray.flatten)
@@ -81,39 +67,33 @@ export const provideKeyOfFor = (provider: Provider) =>
           return make(S.make(ast), S.union(...components) as any)
         }
         case "Union": {
-          const members = pipe(
-            ast.members,
-            ReadonlyArray.map(go),
-            ReadonlyArray.map((_) => getUnionMembers(_.keyOf.ast)),
-            ReadonlyArray.map((_) => _.length > 0 ?  : ReadonlyArray.empty),
-            ReadonlyArray.flatten,
-            ReadonlyArray.uniq,
-            ReadonlyArray.map(S.make)
-          )
+          if (ast.members.length === 0) return make(S.make(ast), S.never as any)
+
+          let members = getUnionMembers(go(ast.members[0]).keyOf.ast)
+          for (let i = 0; i < ast.members.length; i++) {
+            const incoming = getUnionMembers(go(ast.members[i]).keyOf.ast)
+            members = ReadonlyArray.intersection(incoming)(members)
+          }
 
           // TODO: should contains only common members
-          return make(S.make(ast), S.union(...members) as any)
+          return make(S.make(ast), S.union(...members.map(S.make)) as any)
         }
         case "Struct": {
-          const fields = ast.fields.map((field) => S.of(field.key))
-          const stringIndex = pipe(
-            ast.stringIndexSignature,
-            O.map(() => S.string)
-          )
-          const symbolIndex = pipe(ast.symbolIndexSignature, O.map(() => S.symbol))
-
-          const members: Array<Schema<any>> = fields
-          if (O.isSome(stringIndex)) {
-            members.push(stringIndex.value)
+          const members: Array<Schema<any>> = ast.fields.map((field) => S.of(field.key))
+          if (O.isSome(ast.indexSignatures.string)) {
+            members.push(S.string)
           }
-          if (O.isSome(symbolIndex)) {
-            members.push(symbolIndex.value)
+          if (O.isSome(ast.indexSignatures.number)) {
+            members.push(S.number)
+          }
+          if (O.isSome(ast.indexSignatures.symbol)) {
+            members.push(S.symbol)
           }
 
           return make(S.make(ast), S.union(...members))
         }
         case "Lazy":
-          return lazy(() => go(ast.f()))
+          return _lazy(() => go(ast.f()))
       }
     }
 
@@ -126,3 +106,14 @@ export const provideKeyOfFor = (provider: Provider) =>
 export const keyOf: <A>(schema: Schema<A>) => KeyOf<A> = provideKeyOfFor(
   empty
 )
+
+const _lazy = <A>(
+  f: () => KeyOf<A>
+): KeyOf<A> => {
+  const get = I.memoize<void, KeyOf<A>>(f)
+  const schema = I.lazy(f)
+  return make(
+    schema,
+    get().keyOf
+  )
+}

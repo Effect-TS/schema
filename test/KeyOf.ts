@@ -27,7 +27,7 @@ describe("keyOfFor", () => {
   })
 
   it("tuple with rest", () => {
-    const schema = pipe(S.tuple(S.string, S.number), S.withRest(S.string))
+    const schema = pipe(S.tuple(S.string, S.number), S.restElement(S.string))
     expect(pipe(schema, keyOfRep)).toEqual(
       `number | 0 | 1`
     )
