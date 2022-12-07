@@ -25,19 +25,20 @@ flowchart TD
 # Features
 
 - deriving single artifacts from a `Schema`:
-  - `Codec`
   - `Guard`
   - `Arbitrary`
   - `Pretty`
 - `Codec` (all in one artifact)
-- custom interpreters
-- custom schema combinators
+- custom artifact compilers
+- custom `Schema` combinators
 - custom data types
-- custom decode errors
+- custom decode errors (TODO)
 - versioning (TODO)
 - migration (TODO)
 
 # Summary
+
+Schema definition
 
 ```ts
 import * as C from "@fp-ts/schema/Codec";
@@ -46,8 +47,11 @@ const Person = C.struct({
   name: C.string,
   age: C.number,
 });
+```
 
-// extract the inferred type
+Extract the inferred type
+
+```ts
 type Person = C.Infer<typeof Person>;
 /*
 type Person = {
@@ -55,47 +59,80 @@ type Person = {
   readonly age: number;
 }
 */
+```
 
+Decode from `unknown`
+
+```ts
 import * as DE from "@fp-ts/schema/DecodeError";
 
-// decode from JSON
 expect(Person.decode({ name: "name", age: 18 })).toEqual(
   C.success({ name: "name", age: 18 })
 );
 expect(Person.decode(null)).toEqual(
   C.failure(DE.notType(Symbol.for("@fp-ts/schema/data/UnknownObject"), null))
 );
+```
 
-// encode to JSON
+Parse from `JSON` string
+
+```ts
+expect(() => Person.parseOrThrow("{}")).toThrow(
+  new Error(
+    'Cannot parse object, errors: {"_tag":"Key","key":"name","errors":[{"_tag":"NotType"}]}'
+  )
+);
+```
+
+Encode to `unknown`
+
+```ts
 expect(Person.encode({ name: "name", age: 18 })).toEqual({
   name: "name",
   age: 18,
 });
+```
 
-// guard
+Encode to `JSON` string
+
+```ts
+expect(Person.stringify({ name: "name", age: 18 })).toEqual(
+  '{"name":"name","age":18}'
+);
+```
+
+Guard
+
+```ts
 expect(Person.is({ name: "name", age: 18 })).toEqual(true);
 expect(Person.is(null)).toEqual(false);
+```
 
-// pretty print
+Pretty print
+
+```ts
 expect(Person.pretty({ name: "name", age: 18 })).toEqual(
   '{ "name": "name", "age": 18 }'
 );
+```
 
-import * as fc from "fast-check";
+[`fast-check`](https://github.com/dubzzz/fast-check) `Arbitrary`
 
-// fast-check arbitrary
+```ts
+import \* as fc from "fast-check";
+
 console.log(fc.sample(Person.arbitrary(fc), 2));
 /*
 [
-  { name: '!U?z/X', age: -2.5223372357846707e-44 },
-  { name: 'valukeypro', age: -1.401298464324817e-45 }
+{ name: '!U?z/X', age: -2.5223372357846707e-44 },
+{ name: 'valukeypro', age: -1.401298464324817e-45 }
 ]
 */
 ```
 
-# Custom interpreters
+# Custom artifact compilers
 
-`src/Pretty.ts`, `src/Guard.ts` and `src/Arbitrary.ts` are good examples of defining a custom interpreter.
+`src/Pretty.ts`, `src/Guard.ts` and `src/Arbitrary.ts` are good examples of defining a custom compiler.
 
 # Custom schema combinators
 
@@ -111,7 +148,7 @@ Examples in `/src/data/*`
 
 A schema is a description of a data structure that can be used to generate various artifacts from a single declaration.
 
-## Guard
+**Guard**
 
 A `Guard` is a derivable artifact that is able to refine a value of type `unknown` to a value of type `A`.
 
@@ -121,7 +158,7 @@ interface Guard<A> extends Schema<A> {
 }
 ```
 
-## Arbitrary
+**Arbitrary**
 
 An `Arbitrary` is a derivable artifact that is able to produce [`fast-check`](https://github.com/dubzzz/fast-check) arbitraries.
 
@@ -131,7 +168,7 @@ interface Arbitrary<in out A> extends Schema<A> {
 }
 ```
 
-## Pretty
+**Pretty**
 
 A `Pretty` is a derivable artifact that is able to pretty print a value of type `A`.
 
@@ -141,12 +178,14 @@ interface Pretty<in out A> extends Schema<A> {
 }
 ```
 
-## Codec
+**Codec**
 
 A `Codec` is a derivable artifact that is able to:
 
-- decode a value of type `unknown` to a value of type `A`.
-- encode a value of type `A` to a value of type `unknown`.
+- decode a value of type `unknown` to a value of type `A`
+- encode a value of type `A` to a value of type `unknown`
+
+A `Codec` is also a `Guard`, an `Arbitrary` and a `Pretty`.
 
 ```ts
 interface Codec<in out A>
@@ -248,11 +287,11 @@ C.union(C.string, C.number);
 C.tuple(C.string, C.number);
 ```
 
-## Rest element
+Rest element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, ...boolean[]]>
-pipe(C.tuple(C.string, C.number), C.withRest(C.boolean));
+pipe(C.tuple(C.string, C.number), C.restElement(C.boolean));
 ```
 
 ## Arrays
@@ -263,6 +302,8 @@ C.array(C.number);
 ```
 
 ## Non empty arrays
+
+Equivalent to `pipe(tuple(item), restElement(item))`
 
 ```ts
 // $ExpectType Codec<readonly [number, ...number[]]>
