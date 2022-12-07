@@ -28,7 +28,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Pretty<
+export interface Pretty<A> extends Schema<A> {
+  readonly pretty: (a: A) => string
+}
 ```
 
 Added in v1.0.0
@@ -48,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <A>(schema: any, pretty: any) => any
+export declare const make: <A>(schema: Schema<A>, pretty: (a: A) => string) => Pretty<A>
 ```
 
 Added in v1.0.0
@@ -58,7 +60,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const prettyFor: <A>(schema: any) => any
+export declare const prettyFor: <A>(schema: Schema<A>) => Pretty<A>
 ```
 
 Added in v1.0.0
@@ -68,7 +70,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const providePrettyFor: (provider: Provider) => <A>(schema: any) => any
+export declare const providePrettyFor: (provider: Provider) => <A>(schema: Schema<A>) => Pretty<A>
 ```
 
 Added in v1.0.0

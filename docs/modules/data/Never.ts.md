@@ -14,6 +14,7 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [Schema](#schema)
+  - [id](#id)
 
 ---
 
@@ -24,7 +25,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const Schema: any
+export declare const Schema: S.Schema<never>
+```
+
+Added in v1.0.0
+
+## id
+
+**Signature**
+
+```ts
+export declare const id: typeof id
 ```
 
 Added in v1.0.0

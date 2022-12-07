@@ -28,7 +28,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Arbitrary<
+export interface Arbitrary<A> extends Schema<A> {
+  readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+}
 ```
 
 Added in v1.0.0
@@ -48,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const arbitraryFor: <A>(schema: any) => any
+export declare const arbitraryFor: <A>(schema: Schema<A>) => Arbitrary<A>
 ```
 
 Added in v1.0.0
@@ -58,7 +60,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <A>(schema: any, arbitrary: any) => any
+export declare const make: <A>(
+  schema: Schema<A>,
+  arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+) => Arbitrary<A>
 ```
 
 Added in v1.0.0
@@ -68,7 +73,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const provideArbitraryFor: (provider: Provider) => <A>(schema: any) => any
+export declare const provideArbitraryFor: (provider: Provider) => <A>(schema: Schema<A>) => Arbitrary<A>
 ```
 
 Added in v1.0.0

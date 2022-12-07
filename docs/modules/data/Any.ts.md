@@ -36,7 +36,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const Schema: any
+export declare const Schema: S.Schema<any>
 ```
 
 Added in v1.0.0

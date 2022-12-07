@@ -26,8 +26,8 @@ Added in v1.0.0
 ```ts
 export declare const filterWith: <Config, B>(
   id: symbol,
-  decode: (config: Config) => any
-) => (config: Config) => <A extends B>(self: any) => any
+  decode: (config: Config) => (i: B) => These<readonly [DecodeError, ...DecodeError[]], B>
+) => (config: Config) => <A extends B>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

@@ -36,7 +36,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Decoder<
+export interface Decoder<I, A> extends Schema<A> {
+  readonly I: (_: I) => void
+  readonly decode: (i: I) => These<NonEmptyReadonlyArray<DE.DecodeError>, A>
+}
 ```
 
 Added in v1.0.0
@@ -56,7 +59,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decoderFor: <A>(schema: any) => any
+export declare const decoderFor: <A>(schema: Schema<A>) => Decoder<unknown, A>
 ```
 
 Added in v1.0.0
@@ -118,7 +121,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <S, A>(schema: any, decode: any) => any
+export declare const make: <S, A>(
+  schema: Schema<A>,
+  decode: (i: S) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
+) => Decoder<S, A>
 ```
 
 Added in v1.0.0
@@ -128,7 +134,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const provideDecoderFor: (provider: Provider) => <A>(schema: any) => any
+export declare const provideDecoderFor: (provider: Provider) => <A>(schema: Schema<A>) => Decoder<unknown, A>
 ```
 
 Added in v1.0.0

@@ -262,7 +262,7 @@ Added in v1.0.0
 ```ts
 export interface NotType {
   readonly _tag: 'NotType'
-  readonly expected: string
+  readonly expected: symbol
   readonly actual: unknown
 }
 ```
@@ -430,7 +430,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const notType: (expected: string, actual: unknown) => NotType
+export declare const notType: (expected: symbol, actual: unknown) => NotType
 ```
 
 Added in v1.0.0

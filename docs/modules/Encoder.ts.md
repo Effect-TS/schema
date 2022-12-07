@@ -28,7 +28,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Encoder<out S,
+export interface Encoder<S, A> extends Schema<A> {
+  readonly encode: (value: A) => S
+}
 ```
 
 Added in v1.0.0
@@ -48,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encoderFor: <A>(schema: any) => Encoder<unknown, A>
+export declare const encoderFor: <A>(schema: Schema<A>) => Encoder<unknown, A>
 ```
 
 Added in v1.0.0
@@ -58,7 +60,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <S, A>(schema: any, encode: any) => Encoder<S, A>
+export declare const make: <S, A>(schema: Schema<A>, encode: (value: A) => S) => Encoder<S, A>
 ```
 
 Added in v1.0.0
@@ -68,7 +70,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const provideEncoderFor: (provider: Provider) => <A>(schema: any) => Encoder<unknown, A>
+export declare const provideEncoderFor: (provider: Provider) => <A>(schema: Schema<A>) => Encoder<unknown, A>
 ```
 
 Added in v1.0.0

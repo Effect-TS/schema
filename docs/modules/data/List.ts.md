@@ -46,7 +46,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const schema: <A>(item: any) => any
+export declare const schema: <A>(item: Schema<A>) => Schema<List<A>>
 ```
 
 Added in v1.0.0
