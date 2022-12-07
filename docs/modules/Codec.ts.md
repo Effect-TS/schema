@@ -55,6 +55,7 @@ Added in v1.0.0
   - [provideCodecFor](#providecodecfor)
   - [readonlySet](#readonlyset)
   - [refine](#refine)
+  - [restElement](#restelement)
   - [string](#string)
   - [stringIndexSignature](#stringindexsignature)
   - [struct](#struct)
@@ -68,7 +69,6 @@ Added in v1.0.0
   - [unknownObject](#unknownobject)
   - [warning](#warning)
   - [warnings](#warnings)
-  - [withRest](#withrest)
 
 ---
 
@@ -79,7 +79,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Codec<
+export interface Codec<A>
+  extends Schema<A>,
+    Decoder<unknown, A>,
+    Encoder<unknown, A>,
+    Guard<A>,
+    Arbitrary<A>,
+    Pretty<A> {
+  readonly parseOrThrow: (text: string, format?: (errors: NonEmptyReadonlyArray<DecodeError>) => string) => A
+  readonly stringify: (value: A) => string
+  readonly of: (value: A) => A
+}
 ```
 
 Added in v1.0.0
@@ -99,7 +109,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const any: any
+export declare const any: Codec<any>
 ```
 
 Added in v1.0.0
@@ -109,7 +119,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const array: <A>(item: any) => any
+export declare const array: <A>(item: Schema<A>) => Codec<readonly A[]>
 ```
 
 Added in v1.0.0
@@ -119,7 +129,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const bigint: any
+export declare const bigint: Codec<bigint>
 ```
 
 Added in v1.0.0
@@ -129,7 +139,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const boolean: any
+export declare const boolean: Codec<boolean>
 ```
 
 Added in v1.0.0
@@ -139,7 +149,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunk: <A>(item: any) => any
+export declare const chunk: <A>(item: Schema<A>) => Codec<Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -149,7 +159,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const codecFor: <A>(schema: any) => any
+export declare const codecFor: <A>(schema: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -159,7 +169,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const extend: <B>(that: any) => <A>(self: any) => any
+export declare const extend: <B>(that: Schema<B>) => <A>(self: Schema<A>) => Codec<A & B>
 ```
 
 Added in v1.0.0
@@ -191,7 +201,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const filter: <A>(id: symbol, decode: any) => (schema: any) => any
+export declare const filter: <A>(
+  id: symbol,
+  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
+) => (schema: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -203,8 +216,8 @@ Added in v1.0.0
 ```ts
 export declare const filterWith: <Config, A>(
   id: symbol,
-  decode: (config: Config) => any
-) => (config: Config) => (schema: any) => any
+  decode: (config: Config) => (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
+) => (config: Config) => (schema: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -214,7 +227,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const greaterThan: (max: number) => <A extends number>(self: any) => any
+export declare const greaterThan: (max: number) => <A extends number>(self: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -224,7 +237,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const greaterThanOrEqualTo: (max: number) => <A extends number>(self: any) => any
+export declare const greaterThanOrEqualTo: (max: number) => <A extends number>(self: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -234,7 +247,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const int: <A extends number>(self: any) => any
+export declare const int: <A extends number>(self: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -274,7 +287,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const json: any
+export declare const json: Codec<Json>
 ```
 
 Added in v1.0.0
@@ -284,7 +297,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const jsonArray: any
+export declare const jsonArray: Codec<JsonArray>
 ```
 
 Added in v1.0.0
@@ -294,7 +307,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const jsonObject: any
+export declare const jsonObject: Codec<JsonObject>
 ```
 
 Added in v1.0.0
@@ -304,7 +317,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const keyof: <A>(schema: any) => any
+export declare const keyof: <A>(schema: Schema<A>) => Codec<keyof A>
 ```
 
 Added in v1.0.0
@@ -314,7 +327,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <A>(f: () => any) => any
+export declare const lazy: <A>(f: () => Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -324,7 +337,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lessThan: (min: number) => <A extends number>(self: any) => any
+export declare const lessThan: (min: number) => <A extends number>(self: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -334,7 +347,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lessThanOrEqualTo: (min: number) => <A extends number>(self: any) => any
+export declare const lessThanOrEqualTo: (min: number) => <A extends number>(self: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -344,7 +357,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const list: <A>(item: any) => any
+export declare const list: <A>(item: Schema<A>) => Codec<List<A>>
 ```
 
 Added in v1.0.0
@@ -354,7 +367,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const literal: <A extends readonly (string | number | boolean | null | undefined)[]>(...a: A) => any
+export declare const literal: <A extends readonly (string | number | boolean | null | undefined)[]>(
+  ...a: A
+) => Codec<A[number]>
 ```
 
 Added in v1.0.0
@@ -364,7 +379,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <A>(schema: any, decode: any, encode: any, is: any, arbitrary: any, pretty: any) => any
+export declare const make: <A>(schema: Schema<A>, decode: (i: unknown) => These<readonly [DecodeError, ...DecodeError[]], A>, encode: (value: A) => unknown, is: (input: unknown) => input is A, arbitrary: (fc: typeof  => Arbitrary<A>, pretty: (a: A) => string) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -374,7 +389,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const maxLength: (maxLength: number) => <A extends { length: number }>(self: any) => any
+export declare const maxLength: (maxLength: number) => <A extends { length: number }>(self: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -384,7 +399,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const minLength: (minLength: number) => <A extends { length: number }>(self: any) => any
+export declare const minLength: (minLength: number) => <A extends { length: number }>(self: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -394,7 +409,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nativeEnum: <A extends { [_: string]: string | number }>(nativeEnum: A) => any
+export declare const nativeEnum: <A extends { [_: string]: string | number }>(nativeEnum: A) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -404,7 +419,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const never: any
+export declare const never: Codec<never>
 ```
 
 Added in v1.0.0
@@ -414,7 +429,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nonEmptyArray: <A>(item: any) => any
+export declare const nonEmptyArray: <A>(item: Schema<A>) => Codec<readonly [A, ...A[]]>
 ```
 
 Added in v1.0.0
@@ -424,7 +439,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const number: any
+export declare const number: Codec<number>
 ```
 
 Added in v1.0.0
@@ -434,7 +449,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const omit: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: any) => any
+export declare const omit: <A, Keys extends readonly (keyof A)[]>(
+  ...keys: Keys
+) => (self: Schema<A>) => Codec<{ readonly [P in Exclude<keyof A, Keys[number]>]: A[P] }>
 ```
 
 Added in v1.0.0
@@ -444,7 +461,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const option: <A>(value: any) => any
+export declare const option: <A>(value: Schema<A>) => Codec<Option<A>>
 ```
 
 Added in v1.0.0
@@ -454,7 +471,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: <A>(self: any) => any
+export declare const partial: <A>(self: Schema<A>) => Codec<Partial<A>>
 ```
 
 Added in v1.0.0
@@ -464,7 +481,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const pick: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: any) => any
+export declare const pick: <A, Keys extends readonly (keyof A)[]>(
+  ...keys: Keys
+) => (self: Schema<A>) => Codec<{ readonly [P in Keys[number]]: A[P] }>
 ```
 
 Added in v1.0.0
@@ -474,7 +493,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const provideCodecFor: (provider: Provider) => <A>(schema: any) => any
+export declare const provideCodecFor: (provider: Provider) => <A>(schema: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -484,7 +503,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const readonlySet: <A>(item: any) => any
+export declare const readonlySet: <A>(item: Schema<A>) => Codec<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -494,7 +513,22 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const refine: <A, B extends A>(id: symbol, decode: any) => (schema: any) => any
+export declare const refine: <A, B extends A>(
+  id: symbol,
+  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>
+) => (schema: Schema<A>) => Codec<B>
+```
+
+Added in v1.0.0
+
+## restElement
+
+**Signature**
+
+```ts
+export declare const restElement: <R>(
+  rest: Schema<R>
+) => <A extends readonly any[]>(self: Schema<A>) => Schema<readonly [...A, ...R[]]>
 ```
 
 Added in v1.0.0
@@ -504,7 +538,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const string: any
+export declare const string: Codec<string>
 ```
 
 Added in v1.0.0
@@ -514,7 +548,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const stringIndexSignature: <A>(value: any) => any
+export declare const stringIndexSignature: <A>(value: Schema<A>) => Codec<{ readonly [_: string]: A }>
 ```
 
 Added in v1.0.0
@@ -525,11 +559,22 @@ Added in v1.0.0
 
 ```ts
 export declare const struct: {
-  <Required extends Record<string | number | symbol, any>>(required: Required): any
-  <Required extends Record<string | number | symbol, any>, Optional extends Record<string | number | symbol, any>>(
+  <Required extends Record<string | number | symbol, Schema<any>>>(required: Required): Codec<{
+    readonly [K in keyof Required]: Infer<Required[K]>
+  }>
+  <
+    Required extends Record<string | number | symbol, Schema<any>>,
+    Optional extends Record<string | number | symbol, Schema<any>>
+  >(
     required: Required,
     optional: Optional
-  ): any
+  ): Codec<
+    S.Spread<
+      { readonly [K in keyof Required]: Infer<Required[K]> } & {
+        readonly [K in keyof Optional]?: Infer<Optional[K]> | undefined
+      }
+    >
+  >
 }
 ```
 
@@ -550,7 +595,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const symbol: any
+export declare const symbol: Codec<symbol>
 ```
 
 Added in v1.0.0
@@ -560,7 +605,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const symbolIndexSignature: <A>(value: any) => any
+export declare const symbolIndexSignature: <A>(value: Schema<A>) => Codec<{}>
 ```
 
 Added in v1.0.0
@@ -570,7 +615,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: <Components extends readonly any[]>(...components: Components) => any
+export declare const tuple: <Components extends readonly Schema<any>[]>(
+  ...components: Components
+) => Codec<{ readonly [K in keyof Components]: Infer<Components[K]> }>
 ```
 
 Added in v1.0.0
@@ -580,7 +627,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const union: <Members extends readonly any[]>(...members: Members) => any
+export declare const union: <Members extends readonly Schema<any>[]>(
+  ...members: Members
+) => Codec<Infer<Members[number]>>
 ```
 
 Added in v1.0.0
@@ -590,7 +639,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unknown: any
+export declare const unknown: Codec<unknown>
 ```
 
 Added in v1.0.0
@@ -600,7 +649,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unknownArray: any
+export declare const unknownArray: Codec<UnknownArray>
 ```
 
 Added in v1.0.0
@@ -610,7 +659,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unknownObject: any
+export declare const unknownObject: Codec<UnknownObject>
 ```
 
 Added in v1.0.0
@@ -634,16 +683,6 @@ export declare const warnings: <A>(
   es: readonly [DecodeError, ...DecodeError[]],
   a: A
 ) => These<readonly [DecodeError, ...DecodeError[]], A>
-```
-
-Added in v1.0.0
-
-## withRest
-
-**Signature**
-
-```ts
-export declare const withRest: <R>(rest: any) => <A extends readonly any[]>(self: any) => any
 ```
 
 Added in v1.0.0

@@ -40,7 +40,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const arbitrary: <A>(item: any) => any
+export declare const arbitrary: <A>(item: Arbitrary<A>) => Arbitrary<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -50,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decoder: <A>(item: any) => any
+export declare const decoder: <A>(item: D.Decoder<unknown, A>) => D.Decoder<unknown, ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -60,7 +60,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const guard: <A>(item: any) => any
+export declare const guard: <A>(item: Guard<A>) => Guard<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -80,7 +80,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const pretty: <A>(item: any) => any
+export declare const pretty: <A>(item: Pretty<A>) => Pretty<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -90,7 +90,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const schema: <A>(item: any) => any
+export declare const schema: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
 ```
 
 Added in v1.0.0

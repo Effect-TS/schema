@@ -24,7 +24,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const filter: <B>(id: symbol, decode: any) => <A extends B>(self: any) => any
+export declare const filter: <B>(
+  id: symbol,
+  decode: (i: B) => These<readonly [DecodeError, ...DecodeError[]], B>
+) => <A extends B>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

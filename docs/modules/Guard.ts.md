@@ -28,7 +28,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Guard<
+export interface Guard<A> extends Schema<A> {
+  readonly is: (input: unknown) => input is A
+}
 ```
 
 Added in v1.0.0
@@ -48,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const guardFor: <A>(schema: any) => any
+export declare const guardFor: <A>(schema: Schema<A>) => Guard<A>
 ```
 
 Added in v1.0.0
@@ -58,7 +60,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <A>(schema: any, is: any) => any
+export declare const make: <A>(schema: Schema<A>, is: (input: unknown) => input is A) => Guard<A>
 ```
 
 Added in v1.0.0
@@ -68,7 +70,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const provideGuardFor: (provider: Provider) => <A>(schema: any) => any
+export declare const provideGuardFor: (provider: Provider) => <A>(schema: Schema<A>) => Guard<A>
 ```
 
 Added in v1.0.0

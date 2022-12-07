@@ -35,7 +35,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const schema: (maxLength: number) => <A extends { length: number }>(self: any) => any
+export declare const schema: (maxLength: number) => <A extends { length: number }>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

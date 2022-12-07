@@ -14,25 +14,31 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [AST (type alias)](#ast-type-alias)
+  - [Component (interface)](#component-interface)
   - [Declaration (interface)](#declaration-interface)
   - [Field (interface)](#field-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
+  - [IndexSignatures (interface)](#indexsignatures-interface)
+  - [IndexSignaturesMonoid](#indexsignaturesmonoid)
   - [Lazy (interface)](#lazy-interface)
   - [Of (interface)](#of-interface)
   - [Struct (interface)](#struct-interface)
+  - [StructSemigroup](#structsemigroup)
   - [Tuple (interface)](#tuple-interface)
   - [Union (interface)](#union-interface)
+  - [component](#component)
   - [declare](#declare)
   - [field](#field)
   - [getFields](#getfields)
-  - [getStringIndexSignature](#getstringindexsignature)
-  - [getSymbolIndexSignature](#getsymbolindexsignature)
   - [indexSignature](#indexsignature)
+  - [indexSignatures](#indexsignatures)
   - [isDeclaration](#isdeclaration)
   - [isStruct](#isstruct)
   - [isTuple](#istuple)
+  - [isUnion](#isunion)
   - [lazy](#lazy)
   - [of](#of)
+  - [partial](#partial)
   - [struct](#struct)
   - [tuple](#tuple)
   - [union](#union)
@@ -47,6 +53,19 @@ Added in v1.0.0
 
 ```ts
 export type AST = Declaration | Of | Struct | Tuple | Union | Lazy
+```
+
+Added in v1.0.0
+
+## Component (interface)
+
+**Signature**
+
+```ts
+export interface Component {
+  readonly value: AST
+  readonly optional: boolean
+}
 ```
 
 Added in v1.0.0
@@ -95,6 +114,30 @@ export interface IndexSignature {
 
 Added in v1.0.0
 
+## IndexSignatures (interface)
+
+**Signature**
+
+```ts
+export interface IndexSignatures {
+  string: Option<IndexSignature>
+  number: Option<IndexSignature>
+  symbol: Option<IndexSignature>
+}
+```
+
+Added in v1.0.0
+
+## IndexSignaturesMonoid
+
+**Signature**
+
+```ts
+export declare const IndexSignaturesMonoid: Monoid.Monoid<IndexSignatures>
+```
+
+Added in v1.0.0
+
 ## Lazy (interface)
 
 **Signature**
@@ -129,9 +172,18 @@ Added in v1.0.0
 export interface Struct {
   readonly _tag: 'Struct'
   readonly fields: ReadonlyArray<Field>
-  readonly stringIndexSignature: Option<IndexSignature>
-  readonly symbolIndexSignature: Option<IndexSignature>
+  readonly indexSignatures: IndexSignatures
 }
+```
+
+Added in v1.0.0
+
+## StructSemigroup
+
+**Signature**
+
+```ts
+export declare const StructSemigroup: Semigroup.Semigroup<Struct>
 ```
 
 Added in v1.0.0
@@ -143,7 +195,7 @@ Added in v1.0.0
 ```ts
 export interface Tuple {
   readonly _tag: 'Tuple'
-  readonly components: ReadonlyArray<AST>
+  readonly components: ReadonlyArray<Component>
   readonly restElement: Option<AST>
   readonly readonly: boolean
 }
@@ -160,6 +212,16 @@ export interface Union {
   readonly _tag: 'Union'
   readonly members: ReadonlyArray<AST>
 }
+```
+
+Added in v1.0.0
+
+## component
+
+**Signature**
+
+```ts
+export declare const component: (value: AST, optional: boolean) => Component
 ```
 
 Added in v1.0.0
@@ -199,32 +261,26 @@ export declare const getFields: (ast: AST) => ReadonlyArray<Field>
 
 Added in v1.0.0
 
-## getStringIndexSignature
-
-**Signature**
-
-```ts
-export declare const getStringIndexSignature: (ast: AST) => Option<IndexSignature>
-```
-
-Added in v1.0.0
-
-## getSymbolIndexSignature
-
-**Signature**
-
-```ts
-export declare const getSymbolIndexSignature: (ast: AST) => Option<IndexSignature>
-```
-
-Added in v1.0.0
-
 ## indexSignature
 
 **Signature**
 
 ```ts
 export declare const indexSignature: (value: AST, readonly: boolean) => IndexSignature
+```
+
+Added in v1.0.0
+
+## indexSignatures
+
+**Signature**
+
+```ts
+export declare const indexSignatures: (
+  string: Option<IndexSignature>,
+  number: Option<IndexSignature>,
+  symbol: Option<IndexSignature>
+) => IndexSignatures
 ```
 
 Added in v1.0.0
@@ -259,6 +315,16 @@ export declare const isTuple: (ast: AST) => ast is Tuple
 
 Added in v1.0.0
 
+## isUnion
+
+**Signature**
+
+```ts
+export declare const isUnion: (ast: AST) => ast is Union
+```
+
+Added in v1.0.0
+
 ## lazy
 
 **Signature**
@@ -279,16 +345,22 @@ export declare const of: (value: unknown) => Of
 
 Added in v1.0.0
 
+## partial
+
+**Signature**
+
+```ts
+export declare const partial: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
 ## struct
 
 **Signature**
 
 ```ts
-export declare const struct: (
-  fields: ReadonlyArray<Field>,
-  stringIndexSignature: Option<IndexSignature>,
-  symbolIndexSignature: Option<IndexSignature>
-) => Struct
+export declare const struct: (fields: ReadonlyArray<Field>, indexSignatures: IndexSignatures) => Struct
 ```
 
 Added in v1.0.0
@@ -298,7 +370,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: (components: ReadonlyArray<AST>, restElement: Option<AST>, readonly: boolean) => Tuple
+export declare const tuple: (components: ReadonlyArray<Component>, restElement: Option<AST>, readonly: boolean) => Tuple
 ```
 
 Added in v1.0.0

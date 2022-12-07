@@ -52,6 +52,7 @@ Added in v1.0.0
   - [pick](#pick)
   - [readonlySet](#readonlyset)
   - [refine](#refine)
+  - [restElement](#restelement)
   - [string](#string)
   - [stringIndexSignature](#stringindexsignature)
   - [struct](#struct)
@@ -62,7 +63,6 @@ Added in v1.0.0
   - [unknown](#unknown)
   - [unknownArray](#unknownarray)
   - [unknownObject](#unknownobject)
-  - [withRest](#withrest)
 
 ---
 
@@ -83,7 +83,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Schema<
+export interface Schema<A> {
+  readonly A: (_: A) => A
+  readonly ast: AST.AST
+}
 ```
 
 Added in v1.0.0
@@ -107,7 +110,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const any: any
+export declare const any: Schema<any>
 ```
 
 Added in v1.0.0
@@ -117,7 +120,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const array: <A>(item: any) => any
+export declare const array: <A>(item: Schema<A>) => Schema<readonly A[]>
 ```
 
 Added in v1.0.0
@@ -127,7 +130,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const bigint: any
+export declare const bigint: Schema<bigint>
 ```
 
 Added in v1.0.0
@@ -137,7 +140,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const boolean: any
+export declare const boolean: Schema<boolean>
 ```
 
 Added in v1.0.0
@@ -147,7 +150,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunk: <A>(item: any) => any
+export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -157,7 +160,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const clone: (id: symbol, interpreters: Record<symbol, Function>) => <A>(schema: any) => any
+export declare const clone: (id: symbol, interpreters: Record<symbol, Function>) => <A>(schema: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -167,12 +170,12 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const declare: <Schemas extends readonly any[]>(
+export declare const declare: <Schemas extends readonly Schema<any>[]>(
   id: symbol,
   config: Option<unknown>,
   provider: Provider,
   ...schemas: Schemas
-) => any
+) => Schema<any>
 ```
 
 Added in v1.0.0
@@ -182,7 +185,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const extend: <B>(that: any) => <A>(self: any) => any
+export declare const extend: <B>(that: Schema<B>) => <A>(self: Schema<A>) => Schema<A & B>
 ```
 
 Added in v1.0.0
@@ -192,7 +195,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const filter: <A>(id: symbol, decode: any) => (schema: any) => any
+export declare const filter: <A>(
+  id: symbol,
+  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
+) => (schema: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -204,8 +210,8 @@ Added in v1.0.0
 ```ts
 export declare const filterWith: <Config, A>(
   id: symbol,
-  decode: (config: Config) => any
-) => (config: Config) => (schema: any) => any
+  decode: (config: Config) => (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
+) => (config: Config) => (schema: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -215,7 +221,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const greaterThan: (min: number) => <A extends number>(self: any) => any
+export declare const greaterThan: (min: number) => <A extends number>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -225,7 +231,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const greaterThanOrEqualTo: (min: number) => <A extends number>(self: any) => any
+export declare const greaterThanOrEqualTo: (min: number) => <A extends number>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -235,7 +241,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const int: <A extends number>(self: any) => any
+export declare const int: <A extends number>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -245,7 +251,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const json: any
+export declare const json: Schema<Json>
 ```
 
 Added in v1.0.0
@@ -255,7 +261,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const jsonArray: any
+export declare const jsonArray: Schema<JsonArray>
 ```
 
 Added in v1.0.0
@@ -265,7 +271,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const jsonObject: any
+export declare const jsonObject: Schema<JsonObject>
 ```
 
 Added in v1.0.0
@@ -275,7 +281,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const keyof: <A>(schema: any) => any
+export declare const keyof: <A>(schema: Schema<A>) => Schema<keyof A>
 ```
 
 Added in v1.0.0
@@ -285,7 +291,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <A>(f: () => any) => any
+export declare const lazy: <A>(f: () => Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -295,7 +301,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lessThan: (max: number) => <A extends number>(self: any) => any
+export declare const lessThan: (max: number) => <A extends number>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -305,7 +311,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lessThanOrEqualTo: (max: number) => <A extends number>(self: any) => any
+export declare const lessThanOrEqualTo: (max: number) => <A extends number>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -315,7 +321,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const list: <A>(item: any) => any
+export declare const list: <A>(item: Schema<A>) => Schema<List<A>>
 ```
 
 Added in v1.0.0
@@ -325,7 +331,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const literal: <A extends readonly (string | number | boolean | null | undefined)[]>(...a: A) => any
+export declare const literal: <A extends readonly (string | number | boolean | null | undefined)[]>(
+  ...a: A
+) => Schema<A[number]>
 ```
 
 Added in v1.0.0
@@ -335,7 +343,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <A>(ast: AST.AST) => any
+export declare const make: <A>(ast: AST.AST) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -345,7 +353,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const maxLength: (maxLength: number) => <A extends { length: number }>(self: any) => any
+export declare const maxLength: (maxLength: number) => <A extends { length: number }>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -355,7 +363,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const minLength: (minLength: number) => <A extends { length: number }>(self: any) => any
+export declare const minLength: (minLength: number) => <A extends { length: number }>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -365,7 +373,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nativeEnum: <A extends { [_: string]: string | number }>(nativeEnum: A) => any
+export declare const nativeEnum: <A extends { [_: string]: string | number }>(nativeEnum: A) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -375,7 +383,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const never: any
+export declare const never: Schema<never>
 ```
 
 Added in v1.0.0
@@ -385,7 +393,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nonEmptyArray: <A>(item: any) => any
+export declare const nonEmptyArray: <A>(item: Schema<A>) => Schema<readonly [A, ...A[]]>
 ```
 
 Added in v1.0.0
@@ -395,7 +403,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const number: any
+export declare const number: Schema<number>
 ```
 
 Added in v1.0.0
@@ -405,7 +413,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const of: <A>(value: A) => any
+export declare const of: <A>(value: A) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -415,7 +423,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const omit: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: any) => any
+export declare const omit: <A, Keys extends readonly (keyof A)[]>(
+  ...keys: Keys
+) => (self: Schema<A>) => Schema<{ readonly [P in Exclude<keyof A, Keys[number]>]: A[P] }>
 ```
 
 Added in v1.0.0
@@ -425,7 +435,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const option: <A>(value: any) => any
+export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0
@@ -435,7 +445,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: <A>(self: any) => any
+export declare const partial: <A>(self: Schema<A>) => Schema<Partial<A>>
 ```
 
 Added in v1.0.0
@@ -445,7 +455,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const pick: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: any) => any
+export declare const pick: <A, Keys extends readonly (keyof A)[]>(
+  ...keys: Keys
+) => (self: Schema<A>) => Schema<{ readonly [P in Keys[number]]: A[P] }>
 ```
 
 Added in v1.0.0
@@ -455,7 +467,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const readonlySet: <A>(item: any) => any
+export declare const readonlySet: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -465,7 +477,22 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const refine: <A, B extends A>(id: symbol, decode: any) => (schema: any) => any
+export declare const refine: <A, B extends A>(
+  id: symbol,
+  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>
+) => (schema: Schema<A>) => Schema<B>
+```
+
+Added in v1.0.0
+
+## restElement
+
+**Signature**
+
+```ts
+export declare const restElement: <R>(
+  rest: Schema<R>
+) => <A extends readonly any[]>(self: Schema<A>) => Schema<readonly [...A, ...R[]]>
 ```
 
 Added in v1.0.0
@@ -475,7 +502,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const string: any
+export declare const string: Schema<string>
 ```
 
 Added in v1.0.0
@@ -485,7 +512,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const stringIndexSignature: <A>(value: any) => any
+export declare const stringIndexSignature: <A>(value: Schema<A>) => Schema<{ readonly [_: string]: A }>
 ```
 
 Added in v1.0.0
@@ -496,11 +523,22 @@ Added in v1.0.0
 
 ```ts
 export declare const struct: {
-  <Required extends Record<string | number | symbol, any>>(required: Required): any
-  <Required extends Record<string | number | symbol, any>, Optional extends Record<string | number | symbol, any>>(
+  <Required extends Record<string | number | symbol, Schema<any>>>(required: Required): Schema<{
+    readonly [K in keyof Required]: Infer<Required[K]>
+  }>
+  <
+    Required extends Record<string | number | symbol, Schema<any>>,
+    Optional extends Record<string | number | symbol, Schema<any>>
+  >(
     required: Required,
     optional: Optional
-  ): any
+  ): Schema<
+    Spread<
+      { readonly [K in keyof Required]: Infer<Required[K]> } & {
+        readonly [K in keyof Optional]?: Infer<Optional[K]> | undefined
+      }
+    >
+  >
 }
 ```
 
@@ -511,7 +549,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const symbol: any
+export declare const symbol: Schema<symbol>
 ```
 
 Added in v1.0.0
@@ -521,7 +559,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const symbolIndexSignature: <A>(value: any) => any
+export declare const symbolIndexSignature: <A>(value: Schema<A>) => Schema<{}>
 ```
 
 Added in v1.0.0
@@ -531,7 +569,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: <Components extends readonly any[]>(...components: Components) => any
+export declare const tuple: <Components extends readonly Schema<any>[]>(
+  ...components: Components
+) => Schema<{ readonly [K in keyof Components]: Infer<Components[K]> }>
 ```
 
 Added in v1.0.0
@@ -541,7 +581,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const union: <Members extends readonly any[]>(...members: Members) => any
+export declare const union: <Members extends readonly Schema<any>[]>(
+  ...members: Members
+) => Schema<Infer<Members[number]>>
 ```
 
 Added in v1.0.0
@@ -551,7 +593,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unknown: any
+export declare const unknown: Schema<unknown>
 ```
 
 Added in v1.0.0
@@ -561,7 +603,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unknownArray: any
+export declare const unknownArray: Schema<DataUnknownArray.UnknownArray>
 ```
 
 Added in v1.0.0
@@ -571,17 +613,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unknownObject: any
-```
-
-Added in v1.0.0
-
-## withRest
-
-**Signature**
-
-```ts
-export declare const withRest: <R>(rest: any) => <A extends readonly any[]>(self: any) => any
+export declare const unknownObject: Schema<UnknownObject>
 ```
 
 Added in v1.0.0
