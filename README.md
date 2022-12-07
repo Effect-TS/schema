@@ -66,9 +66,9 @@ Decode from `unknown`
 ```ts
 import * as DE from "@fp-ts/schema/DecodeError";
 
-expect(Person.decode({ name: "name", age: 18 })).toEqual(
-  C.success({ name: "name", age: 18 })
-);
+const unknown: unknown = { name: "name", age: 18 };
+
+expect(Person.decode(unknown)).toEqual(C.success({ name: "name", age: 18 }));
 expect(Person.decode(null)).toEqual(
   C.failure(DE.notType(Symbol.for("@fp-ts/schema/data/UnknownObject"), null))
 );
@@ -77,9 +77,19 @@ expect(Person.decode(null)).toEqual(
 Parse from `JSON` string
 
 ```ts
+expect(() => Person.parseOrThrow("malformed")).toThrow(
+  new Error("Cannot parse JSON from: malformed")
+);
 expect(() => Person.parseOrThrow("{}")).toThrow(
+  new Error("Cannot decode JSON")
+);
+
+// with a custom formatter
+expect(() =>
+  Person.parseOrThrow("{}", (errors) => JSON.stringify(errors))
+).toThrow(
   new Error(
-    'Cannot parse object, errors: {"_tag":"Key","key":"name","errors":[{"_tag":"NotType"}]}'
+    'Cannot decode JSON, errors: [{"_tag":"Key","key":"name","errors":[{"_tag":"NotType"}]}]'
   )
 );
 ```
@@ -119,7 +129,7 @@ expect(Person.pretty({ name: "name", age: 18 })).toEqual(
 [`fast-check`](https://github.com/dubzzz/fast-check) `Arbitrary`
 
 ```ts
-import \* as fc from "fast-check";
+import * as fc from "fast-check";
 
 console.log(fc.sample(Person.arbitrary(fc), 2));
 /*
