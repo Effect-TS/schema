@@ -11,6 +11,7 @@ import * as D from "@fp-ts/schema/Decoder"
 import type { Encoder } from "@fp-ts/schema/Encoder"
 import type * as G from "@fp-ts/schema/Guard"
 import * as I from "@fp-ts/schema/internal/common"
+import type { KeyOf } from "@fp-ts/schema/KeyOf"
 import * as P from "@fp-ts/schema/Pretty"
 import { make } from "@fp-ts/schema/Provider"
 import type * as S from "@fp-ts/schema/Schema"
@@ -59,6 +60,12 @@ const pretty = <A>(value: P.Pretty<A>): P.Pretty<Option<A>> =>
     )
   )
 
+const keyOf = <A>(value: KeyOf<A>): KeyOf<Option<A>> =>
+  I.makeKeyOf(
+    schema(value),
+    I.literal("_tag")
+  )
+
 /**
  * @since 1.0.0
  */
@@ -67,7 +74,8 @@ export const Provider = make(id, {
   [I.ArbitraryId]: arbitrary,
   [I.DecoderId]: decoder,
   [I.EncoderId]: encoder,
-  [I.PrettyId]: pretty
+  [I.PrettyId]: pretty,
+  [I.KeyOfId]: keyOf
 })
 
 /**

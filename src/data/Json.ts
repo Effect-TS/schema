@@ -4,6 +4,7 @@
 import { identity } from "@fp-ts/data/Function"
 import type { Json } from "@fp-ts/data/Json"
 import * as O from "@fp-ts/data/Option"
+import * as never_ from "@fp-ts/schema/data/Never"
 import * as DE from "@fp-ts/schema/DecodeError"
 import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Provider"
@@ -22,7 +23,8 @@ export const Provider: P.Provider = P.make(id, {
   [I.ArbitraryId]: () => Arbitrary,
   [I.DecoderId]: () => Decoder,
   [I.EncoderId]: () => Encoder,
-  [I.PrettyId]: () => Pretty
+  [I.PrettyId]: () => Pretty,
+  [I.KeyOfId]: () => KeyOf
 })
 
 /**
@@ -40,3 +42,8 @@ const Encoder = I.makeEncoder<unknown, Json>(Schema, identity)
 const Arbitrary = I.makeArbitrary<Json>(Schema, (fc) => fc.jsonValue().map((json) => json as Json))
 
 const Pretty = I.makePretty<Json>(Schema, (json) => JSON.stringify(json))
+
+const KeyOf = I.makeKeyOf<any>(
+  Schema,
+  never_.Schema as any
+)

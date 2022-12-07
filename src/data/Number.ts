@@ -4,6 +4,7 @@
 import { identity } from "@fp-ts/data/Function"
 import * as Number from "@fp-ts/data/Number"
 import * as O from "@fp-ts/data/Option"
+import * as never_ from "@fp-ts/schema/data/Never"
 import * as DE from "@fp-ts/schema/DecodeError"
 import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Provider"
@@ -22,7 +23,8 @@ export const Provider = P.make(id, {
   [I.ArbitraryId]: () => Arbitrary,
   [I.DecoderId]: () => Decoder,
   [I.EncoderId]: () => Encoder,
-  [I.PrettyId]: () => Pretty
+  [I.PrettyId]: () => Pretty,
+  [I.KeyOfId]: () => KeyOf
 })
 
 /**
@@ -51,3 +53,5 @@ const Encoder = I.makeEncoder<unknown, number>(Schema, identity)
 export const Arbitrary = I.makeArbitrary<number>(Schema, (fc) => fc.float())
 
 const Pretty = I.makePretty<number>(Schema, (n) => JSON.stringify(n))
+
+const KeyOf = I.makeKeyOf<number>(Schema, never_.Schema as any)

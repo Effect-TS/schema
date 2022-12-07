@@ -5,11 +5,13 @@ import { pipe } from "@fp-ts/data/Function"
 import * as O from "@fp-ts/data/Option"
 import * as T from "@fp-ts/data/These"
 import type { Arbitrary } from "@fp-ts/schema/Arbitrary"
+import * as never_ from "@fp-ts/schema/data/Never"
 import * as D from "@fp-ts/schema/Decoder"
 import type { Decoder } from "@fp-ts/schema/Decoder"
 import type { Encoder } from "@fp-ts/schema/Encoder"
 import type { Guard } from "@fp-ts/schema/Guard"
 import * as I from "@fp-ts/schema/internal/common"
+import type { KeyOf } from "@fp-ts/schema/KeyOf"
 import type { Pretty } from "@fp-ts/schema/Pretty"
 import * as P from "@fp-ts/schema/Provider"
 import type { Schema } from "@fp-ts/schema/Schema"
@@ -58,12 +60,22 @@ export const pretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
 /**
  * @since 1.0.0
  */
+export const keyOf = <A>(item: KeyOf<A>): KeyOf<ReadonlySet<A>> =>
+  I.makeKeyOf(
+    schema(item),
+    never_.Schema as any
+  )
+
+/**
+ * @since 1.0.0
+ */
 export const Provider: P.Provider = P.make(id, {
   [I.GuardId]: guard,
   [I.ArbitraryId]: arbitrary,
   [I.DecoderId]: decoder,
   [I.EncoderId]: encoder,
-  [I.PrettyId]: pretty
+  [I.PrettyId]: pretty,
+  [I.KeyOfId]: keyOf
 })
 
 /**

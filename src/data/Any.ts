@@ -3,6 +3,10 @@
  */
 import { identity } from "@fp-ts/data/Function"
 import * as O from "@fp-ts/data/Option"
+import * as AST from "@fp-ts/schema/AST"
+import * as number_ from "@fp-ts/schema/data/Number"
+import * as string_ from "@fp-ts/schema/data/String"
+import * as symbol_ from "@fp-ts/schema/data/Symbol"
 import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Provider"
 import type * as S from "@fp-ts/schema/Schema"
@@ -20,7 +24,8 @@ export const Provider = P.make(id, {
   [I.ArbitraryId]: () => Arbitrary,
   [I.DecoderId]: () => Decoder,
   [I.EncoderId]: () => Encoder,
-  [I.PrettyId]: () => Pretty
+  [I.PrettyId]: () => Pretty,
+  [I.KeyOfId]: () => KeyOf
 })
 
 /**
@@ -37,3 +42,8 @@ const Encoder = I.makeEncoder<unknown, any>(Schema, identity)
 const Arbitrary = I.makeArbitrary<any>(Schema, (fc) => fc.anything())
 
 const Pretty = I.makePretty<any>(Schema, (a) => JSON.stringify(a))
+
+const KeyOf = I.makeKeyOf<any>(
+  Schema,
+  I.makeSchema(AST.union([string_.Schema.ast, number_.Schema.ast, symbol_.Schema.ast]))
+)

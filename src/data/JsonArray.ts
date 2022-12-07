@@ -4,6 +4,7 @@
 import { identity } from "@fp-ts/data/Function"
 import type { Json, JsonArray } from "@fp-ts/data/Json"
 import * as O from "@fp-ts/data/Option"
+import * as number_ from "@fp-ts/schema/data/Number"
 import * as DE from "@fp-ts/schema/DecodeError"
 import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Provider"
@@ -22,7 +23,8 @@ export const Provider = P.make(id, {
   [I.ArbitraryId]: () => Arbitrary,
   [I.DecoderId]: () => Decoder,
   [I.EncoderId]: () => Encoder,
-  [I.PrettyId]: () => Pretty
+  [I.PrettyId]: () => Pretty,
+  [I.KeyOfId]: () => KeyOf
 })
 
 /**
@@ -43,3 +45,5 @@ const Arbitrary = I.makeArbitrary<JsonArray>(
 )
 
 const Pretty = I.makePretty<JsonArray>(Schema, (json) => JSON.stringify(json))
+
+const KeyOf = I.makeKeyOf<JsonArray>(Schema, number_.Schema as any)

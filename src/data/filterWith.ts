@@ -8,6 +8,7 @@ import type { Decoder } from "@fp-ts/schema/Decoder"
 import type { Encoder } from "@fp-ts/schema/Encoder"
 import type { Guard } from "@fp-ts/schema/Guard"
 import * as I from "@fp-ts/schema/internal/common"
+import type { KeyOf } from "@fp-ts/schema/KeyOf"
 import type { Pretty } from "@fp-ts/schema/Pretty"
 import * as P from "@fp-ts/schema/Provider"
 import type { Schema } from "@fp-ts/schema/Schema"
@@ -40,12 +41,16 @@ export const filterWith = <Config, B>(
   const _pretty = (config: Config) =>
     (self: Pretty<B>): Pretty<B> => I.makePretty(schema(config)(self), (b) => self.pretty(b))
 
+  const _keyOf = (config: Config) =>
+    (self: KeyOf<B>): KeyOf<B> => I.makeKeyOf(schema(config)(self), self.keyOf)
+
   const Provider = P.make(id, {
     [I.GuardId]: _guard,
     [I.ArbitraryId]: _arbitrary,
     [I.DecoderId]: _decoder,
     [I.EncoderId]: _encoder,
-    [I.PrettyId]: _pretty
+    [I.PrettyId]: _pretty,
+    [I.KeyOfId]: _keyOf
   })
 
   const schema = (config: Config) =>

@@ -1,6 +1,7 @@
 /**
  * @since 1.0.0
  */
+import * as Never from "@fp-ts/schema/data/Never"
 import * as NumberData from "@fp-ts/schema/data/Number"
 import { parse } from "@fp-ts/schema/data/parse"
 import * as DE from "@fp-ts/schema/DecodeError"
@@ -25,5 +26,6 @@ export const schema = parse(
   String,
   NumberData.Guard.is,
   (fc) => NumberData.Arbitrary.arbitrary(fc).filter((n) => !isNaN(n) && isFinite(n)),
-  String
+  String,
+  Never.Schema as any
 )

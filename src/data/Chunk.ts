@@ -7,11 +7,13 @@ import { pipe } from "@fp-ts/data/Function"
 import * as O from "@fp-ts/data/Option"
 import * as T from "@fp-ts/data/These"
 import * as A from "@fp-ts/schema/Arbitrary"
+import * as never_ from "@fp-ts/schema/data/Never"
 import type { Decoder } from "@fp-ts/schema/Decoder"
 import * as D from "@fp-ts/schema/Decoder"
 import type { Encoder } from "@fp-ts/schema/Encoder"
 import type * as G from "@fp-ts/schema/Guard"
 import * as I from "@fp-ts/schema/internal/common"
+import type * as K from "@fp-ts/schema/KeyOf"
 import * as P from "@fp-ts/schema/Pretty"
 import { make } from "@fp-ts/schema/Provider"
 import type { Schema } from "@fp-ts/schema/Schema"
@@ -46,6 +48,11 @@ const pretty = <A>(item: P.Pretty<A>): P.Pretty<Chunk<A>> =>
     schema(item),
     (c) => `Chunk(${C.toReadonlyArray(c).map(item.pretty).join(", ")})`
   )
+const keyOf = <A>(item: K.KeyOf<A>): K.KeyOf<Chunk<A>> =>
+  I.makeKeyOf(
+    schema(item),
+    never_.Schema as any
+  )
 
 /**
  * @since 1.0.0
@@ -55,7 +62,8 @@ export const Provider = make(id, {
   [I.ArbitraryId]: arbitrary,
   [I.DecoderId]: decoder,
   [I.EncoderId]: encoder,
-  [I.PrettyId]: pretty
+  [I.PrettyId]: pretty,
+  [I.KeyOfId]: keyOf
 })
 
 /**

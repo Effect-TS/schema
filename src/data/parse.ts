@@ -8,6 +8,7 @@ import type { Decoder } from "@fp-ts/schema/Decoder"
 import type { Encoder } from "@fp-ts/schema/Encoder"
 import type { Guard } from "@fp-ts/schema/Guard"
 import * as I from "@fp-ts/schema/internal/common"
+import type { KeyOf } from "@fp-ts/schema/KeyOf"
 import type { Pretty } from "@fp-ts/schema/Pretty"
 import * as P from "@fp-ts/schema/Provider"
 import type { Schema } from "@fp-ts/schema/Schema"
@@ -21,7 +22,8 @@ export const parse = <A, B>(
   encode: Encoder<A, B>["encode"],
   is: (u: unknown) => u is B,
   arbitrary: Arbitrary<B>["arbitrary"],
-  pretty: Pretty<B>["pretty"]
+  pretty: Pretty<B>["pretty"],
+  keyOf: KeyOf<B>["keyOf"]
 ) => {
   const _guard = (self: Guard<A>): Guard<B> => I.makeGuard(schema(self), is)
 
@@ -35,12 +37,15 @@ export const parse = <A, B>(
 
   const _pretty = (self: Pretty<A>): Pretty<B> => I.makePretty(schema(self), pretty)
 
+  const _keyOf = (self: KeyOf<A>): KeyOf<B> => I.makeKeyOf(schema(self), keyOf)
+
   const Provider = P.make(id, {
     [I.GuardId]: _guard,
     [I.ArbitraryId]: _arbitrary,
     [I.DecoderId]: _decoder,
     [I.EncoderId]: _encoder,
-    [I.PrettyId]: _pretty
+    [I.PrettyId]: _pretty,
+    [I.KeyOfId]: _keyOf
   })
 
   const schema = (self: Schema<A>): Schema<B> => I.declareSchema(id, O.none, Provider, self)

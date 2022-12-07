@@ -5,6 +5,7 @@ import * as Boolean from "@fp-ts/data/Boolean"
 import * as Number from "@fp-ts/data/Number"
 import * as O from "@fp-ts/data/Option"
 import * as StringData from "@fp-ts/data/String"
+import * as Never from "@fp-ts/schema/data/Never"
 import * as DE from "@fp-ts/schema/DecodeError"
 import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Provider"
@@ -23,7 +24,8 @@ export const Provider = P.make(id, {
   [I.ArbitraryId]: () => Arbitrary,
   [I.DecoderId]: () => Decoder,
   [I.EncoderId]: () => Encoder,
-  [I.PrettyId]: () => Pretty
+  [I.PrettyId]: () => Pretty,
+  [I.KeyOfId]: () => KeyOf
 })
 
 /**
@@ -57,3 +59,5 @@ const Encoder = I.makeEncoder<unknown, bigint>(Schema, (n) => n.toString())
 const Arbitrary = I.makeArbitrary<bigint>(Schema, (fc) => fc.bigInt())
 
 const Pretty = I.makePretty<bigint>(Schema, (n) => n.toString())
+
+const KeyOf = I.makeKeyOf<bigint>(Schema, Never.Schema as any)

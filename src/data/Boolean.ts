@@ -4,6 +4,7 @@
 import { isBoolean } from "@fp-ts/data/Boolean"
 import { identity } from "@fp-ts/data/Function"
 import * as O from "@fp-ts/data/Option"
+import * as Never from "@fp-ts/schema/data/Never"
 import * as DE from "@fp-ts/schema/DecodeError"
 import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Provider"
@@ -22,7 +23,8 @@ export const Provider = P.make(id, {
   [I.ArbitraryId]: () => Arbitrary,
   [I.DecoderId]: () => Decoder,
   [I.EncoderId]: () => Encoder,
-  [I.PrettyId]: () => Pretty
+  [I.PrettyId]: () => Pretty,
+  [I.KeyOfId]: () => KeyOf
 })
 
 /**
@@ -39,3 +41,5 @@ const Encoder = I.makeEncoder<unknown, boolean>(Schema, identity)
 const Arbitrary = I.makeArbitrary<boolean>(Schema, (fc) => fc.boolean())
 
 const Pretty = I.makePretty<boolean>(Schema, (b) => JSON.stringify(b))
+
+const KeyOf = I.makeKeyOf<boolean>(Schema, Never.Schema as any)

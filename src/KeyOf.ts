@@ -75,7 +75,6 @@ export const provideKeyOfFor = (provider: Provider) =>
             members = ReadonlyArray.intersection(incoming)(members)
           }
 
-          // TODO: should contains only common members
           return make(S.make(ast), S.union(...members.map(S.make)) as any)
         }
         case "Struct": {
