@@ -20,8 +20,8 @@ importers:
       '@effect-ts/build-utils': 0.40.5
       '@effect-ts/core': ^0.60.2
       '@effect/language-service': ^0.0.10
-      '@fp-ts/core': ^0.0.9
-      '@fp-ts/data': ^0.0.21
+      '@fp-ts/core': ~0.0.9
+      '@fp-ts/data': ~0.0.22
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
       '@types/benchmark': ^2.1.2
       '@types/chai': ^4.3.4
@@ -32,7 +32,7 @@ importers:
       '@types/rimraf': ^3.0.2
       '@typescript-eslint/eslint-plugin': ^5.45.1
       '@typescript-eslint/parser': ^5.45.1
-      '@vitest/coverage-c8': ^0.25.4
+      '@vitest/coverage-c8': ^0.25.5
       ajv: ^8.11.2
       babel-plugin-annotate-pure-calls: ^0.4.0
       benchmark: ^2.1.4
@@ -58,10 +58,10 @@ importers:
       typescript: ^4.9.3
       ultra-runner: ^3.10.5
       vite: ^3.2.5
-      vitest: 0.25.4
+      vitest: 0.25.5
     dependencies:
       '@fp-ts/core': 0.0.9
-      '@fp-ts/data': 0.0.21
+      '@fp-ts/data': 0.0.22
       fast-check: 3.3.0
     devDependencies:
       '@babel/cli': 7.19.3_@babel+core@7.20.5
@@ -82,7 +82,7 @@ importers:
       '@types/rimraf': 3.0.2
       '@typescript-eslint/eslint-plugin': 5.45.1_tdm6ms4ntwhlpozn7kjqrhum74
       '@typescript-eslint/parser': 5.45.1_s5ps7njkmjlaqajutnox5ntcla
-      '@vitest/coverage-c8': 0.25.4
+      '@vitest/coverage-c8': 0.25.5
       ajv: 8.11.2
       babel-plugin-annotate-pure-calls: 0.4.0_@babel+core@7.20.5
       benchmark: 2.1.4
@@ -107,7 +107,7 @@ importers:
       typescript: 4.9.3
       ultra-runner: 3.10.5
       vite: 3.2.5_@types+node@18.11.11
-      vitest: 0.25.4
+      vitest: 0.25.5
     publishDirectory: dist
 
   packages/babel-plugin:
@@ -750,8 +750,8 @@ packages:
       '@fp-ts/core': 0.0.9
     dev: true
 
-  /@fp-ts/data/0.0.21:
-    resolution: {integrity: sha512-8YcoRmHTiBCttJaVtej652hu6YMUGdzdwaqznX6NVKeJXRWLPcS77aCdMdyevZn3B2BIz+x+oeSCiVKgmrXT1Q==}
+  /@fp-ts/data/0.0.22:
+    resolution: {integrity: sha512-chgnnyMAT17WCfAIbD8vvnJOsPtA2Xi79oMNklexprI9YaV/2u8QeeerHCYKuEJihK6GuIJtAYSsOwjBYMfWcQ==}
     dependencies:
       '@fp-ts/core': 0.0.9
     dev: false
@@ -1340,11 +1340,11 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vitest/coverage-c8/0.25.4:
-    resolution: {integrity: sha512-3ozqZUr3x8woBCBXJRzt1P8DRGKsIxajfzRu3ySKJE0bCkIl2hofzHYzkHBZafhfhMOt+hR6L395Io7gyMmpUQ==}
+  /@vitest/coverage-c8/0.25.5:
+    resolution: {integrity: sha512-tXlg0QVkTQ+7dqhsuwRFovP5vjgYGyBrRREFS55IQ20IsiSaRug9sRblRsckTXmGtz1OMJy/Lxv1gFVo24/ipA==}
     dependencies:
       c8: 7.12.0
-      vitest: 0.25.4
+      vitest: 0.25.5
     transitivePeerDependencies:
       - '@edge-runtime/vm'
       - '@vitest/browser'
@@ -6931,8 +6931,8 @@ packages:
       - supports-color
     dev: true
 
-  /vitest/0.25.4:
-    resolution: {integrity: sha512-v/qoSEYPrf8qa1CbKIKYK+1GGmPPEJyXFbkuD6jhh080cfNBsuUDAdMu6hV2h9Uv34EMiUrVETL/wB+EHxFtbA==}
+  /vitest/0.25.5:
+    resolution: {integrity: sha512-lFKSTZV+AjuL44/yNC0aDPKTiasYSqOQ97Gg2G4P2LnjyzQ21ZUs4rQOscHK3lrSnVuir3+1QavHzbDgH4tWQA==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
