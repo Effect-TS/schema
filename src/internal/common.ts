@@ -16,6 +16,7 @@ import type * as DE from "@fp-ts/schema/DecodeError"
 import type { Decoder } from "@fp-ts/schema/Decoder"
 import type { Encoder } from "@fp-ts/schema/Encoder"
 import type { Guard } from "@fp-ts/schema/Guard"
+import type { KeyOf } from "@fp-ts/schema/KeyOf"
 import type { Pretty } from "@fp-ts/schema/Pretty"
 import type { Provider } from "@fp-ts/schema/Provider"
 import type { Schema } from "@fp-ts/schema/Schema"
@@ -142,6 +143,11 @@ export const PrettyId: unique symbol = Symbol.for(
   "@fp-ts/schema/Pretty"
 )
 
+/** @internal */
+export const KeyOfId: unique symbol = Symbol.for(
+  "@fp-ts/schema/KeyOf"
+)
+
 // ---------------------------------------------
 // artifacts constructors
 // ---------------------------------------------
@@ -183,6 +189,12 @@ export const makePretty = <A>(
   schema: Schema<A>,
   pretty: Pretty<A>["pretty"]
 ): Pretty<A> => ({ ast: schema.ast, pretty }) as any
+
+/** @internal */
+export const makeKeyOf = <A>(
+  schema: Schema<A>,
+  keyOf: KeyOf<A>["keyOf"]
+): KeyOf<A> => ({ ast: schema.ast, keyOf }) as any
 
 // ---------------------------------------------
 // Schema APIs

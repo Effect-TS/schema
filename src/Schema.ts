@@ -96,28 +96,12 @@ export const clone = (id: symbol, interpreters: Record<symbol, Function>) =>
 /**
  * @since 1.0.0
  */
-export const of: <A>(value: A) => Schema<A> = I.of
+export const unknown: Schema<unknown> = Unknown.Schema
 
 /**
  * @since 1.0.0
  */
-export const literal: <A extends ReadonlyArray<string | number | boolean | null | undefined>>(
-  ...a: A
-) => Schema<A[number]> = I.literal
-
-/**
- * @since 1.0.0
- */
-export const nativeEnum = <A extends { [_: string]: string | number }>(nativeEnum: A): Schema<A> =>
-  make(AST.union(
-    Object.keys(nativeEnum).filter(
-      (key) => typeof nativeEnum[nativeEnum[key]] !== "number"
-    ).map((key) => AST.of(nativeEnum[key]))
-  ))
-
-// ---------------------------------------------
-// filters
-// ---------------------------------------------
+export const string: Schema<string> = String.Schema
 
 /**
  * @since 1.0.0

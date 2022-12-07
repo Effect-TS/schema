@@ -30,10 +30,8 @@ export const filter = <B>(
   const _encoder = (self: Encoder<unknown, B>): Encoder<unknown, B> =>
     I.makeEncoder(schema(self), self.encode)
 
-  const _arbitrary = (self: Arbitrary<B>): Arbitrary<B> =>
-    I.makeArbitrary(schema(self), (fc) => self.arbitrary(fc).filter(_predicate))
-
-  const _pretty = (self: Pretty<B>): Pretty<B> => I.makePretty(schema(self), (b) => self.pretty(b))
+  const arbitrary = (self: Arbitrary<B>): Arbitrary<B> =>
+    I.makeArbitrary(schema(self), (fc) => self.arbitrary(fc).filter(predicate))
 
   const Provider = P.make(id, {
     [I.GuardId]: _guard,
