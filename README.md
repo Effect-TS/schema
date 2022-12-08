@@ -71,7 +71,7 @@ const unknown: unknown = { name: "name", age: 18 };
 
 expect(Person.decode(unknown)).toEqual(C.success({ name: "name", age: 18 }));
 expect(Person.decode(null)).toEqual(
-  C.failure(DE.notType(Symbol.for("@fp-ts/schema/data/UnknownObject"), null))
+  C.failure(DE.notType("{ readonly [_: string]: unknown }", null))
 );
 ```
 
@@ -90,7 +90,7 @@ expect(() =>
   Person.parseOrThrow("{}", (errors) => JSON.stringify(errors))
 ).toThrow(
   new Error(
-    'Cannot decode JSON, errors: [{"_tag":"Key","key":"name","errors":[{"_tag":"NotType"}]}]'
+    'Cannot decode JSON, errors: [{"_tag":"Key","key":"name","errors":[{"_tag":"NotType","expected":"string"}]}]'
   )
 );
 ```
