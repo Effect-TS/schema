@@ -382,7 +382,7 @@ Rest element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, ...boolean[]]>
-pipe(C.tuple(C.string, C.number), C.restElement(C.boolean));
+pipe(C.tuple(C.string, C.number), C.rest(C.boolean));
 ```
 
 ## Arrays
@@ -394,7 +394,7 @@ C.array(C.number);
 
 ## Non empty arrays
 
-Equivalent to `pipe(tuple(item), restElement(item))`
+Equivalent to `pipe(tuple(item), rest(item))`
 
 ```ts
 // $ExpectType Codec<readonly [number, ...number[]]>
