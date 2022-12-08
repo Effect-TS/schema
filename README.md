@@ -467,27 +467,6 @@ pipe(
 C.option(C.number);
 ```
 
-## ReadonlySet
-
-```ts
-// $ExpectType Codec<ReadonlySet<number>>
-C.readonlySet(C.number);
-```
-
-## Chunk
-
-```ts
-// $ExpectType Codec<Chunk<number>>
-C.chunk(C.number);
-```
-
-## List
-
-```ts
-// $ExpectType Codec<List<number>>
-C.list(C.number);
-```
-
 # Documentation
 
 - [API Reference](https://fp-ts.github.io/schema/)
