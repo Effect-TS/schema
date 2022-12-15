@@ -190,7 +190,7 @@ import * as O from "@fp-ts/data/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
   const tuple = AST.tuple(
-    [schema.ast, schema.ast], // <= components definitions
+    [schema.ast, schema.ast], // <= elements definitions
     O.none, // <= rest element
     true // <= specifies if the tuple is readonly
   );
@@ -206,15 +206,15 @@ const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> =>
   S.tuple(schema, schema);
 ```
 
-Please note that the `S.tuple` itself is nothing special and can be defined in userland
+Please note that the `S.tuple` API itself is nothing special and can be defined in userland
 
 ```ts
-export const tuple = <Components extends ReadonlyArray<Schema<any>>>(
-  ...components: Components
-): Schema<{ readonly [K in keyof Components]: Infer<Components[K]> }> =>
+export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
+  ...elements: Elements
+): Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> =>
   makeSchema(
     AST.tuple(
-      components.map((c) => c.ast),
+      elements.map((c) => c.ast),
       O.none,
       true
     )
