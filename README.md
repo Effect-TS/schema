@@ -189,12 +189,8 @@ import * as AST from "@fp-ts/schema/AST";
 import * as O from "@fp-ts/data/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
-  const item = AST.component(
-    schema.ast, // <= the type of the component
-    false // <= specifies if the component is optional
-  );
   const tuple = AST.tuple(
-    [item, item], // <= components definitions
+    [schema.ast, schema.ast], // <= components definitions
     O.none, // <= rest element
     true // <= specifies if the tuple is readonly
   );
@@ -216,9 +212,9 @@ Please note that the `S.tuple` itself is nothing special and can be defined in u
 export const tuple = <Components extends ReadonlyArray<Schema<any>>>(
   ...components: Components
 ): Schema<{ readonly [K in keyof Components]: Infer<Components[K]> }> =>
-  make(
+  makeSchema(
     AST.tuple(
-      components.map((c) => AST.component(c.ast, false)),
+      components.map((c) => c.ast),
       O.none,
       true
     )
@@ -412,7 +408,7 @@ Optional fields
 
 ```ts
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean | undefined; }>
-C.struct({ a: C.string, b: C.number }, { c: C.boolean });
+C.struct({ a: C.string, b: C.number, c: C.optional(C.boolean) });
 ```
 
 ## Pick
