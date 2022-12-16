@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
     "moduleDetection": "force",
     "composite": true,
     "downlevelIteration": true,
