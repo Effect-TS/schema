@@ -190,7 +190,7 @@ import * as O from "@fp-ts/data/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
   const tuple = AST.tuple(
-    [schema.ast, schema.ast], // <= elements definitions
+    [AST.element(schema.ast, false), AST.element(schema.ast, false)], // <= elements definitions
     O.none, // <= rest element
     true // <= specifies if the tuple is readonly
   );
