@@ -90,7 +90,7 @@ expect(() =>
   Person.parseOrThrow("{}", (errors) => JSON.stringify(errors))
 ).toThrow(
   new Error(
-    'Cannot decode JSON, errors: [{"_tag":"Key","key":"name","errors":[{"_tag":"NotType","expected":"string"}]}]'
+    `Cannot decode JSON, errors: [{"_tag":"Key","key":"name","errors":[{"_tag":"Missing"}]}]`
   )
 );
 ```
@@ -123,7 +123,7 @@ Pretty print
 
 ```ts
 expect(Person.pretty({ name: "name", age: 18 })).toEqual(
-  '{ "name": "name", "age": 18 }'
+  `{ name: "name", age: 18 }`
 );
 ```
 
