@@ -37,20 +37,52 @@ flowchart TD
 - versioning (TODO)
 - migration (TODO)
 
-# Summary
+# Introduction
 
-Schema definition
+Welcome to the documentation for `@fp-ts/schema`, a library for defining and using schemas to validate and transform data in TypeScript. `@fp-ts/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as decoding from `unknown`, encoding to `unknown`, parsing from `JSON` strings, and stringifying to `JSON` strings. `@fp-ts/schema` also provides a number of other features, including the ability to derive various artifacts such as `Codec`s, `Guard`s, and `Arbitrary`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
+
+## Getting started
+
+To get started with `@fp-ts/schema`, you will need to install the library using npm or yarn:
+
+```
+npm install @fp-ts/schema
+```
+
+```
+yarn add @fp-ts/schema
+```
+
+Once you have installed the library, you can import the necessary types and functions from the `@fp-ts/schema/Codec` module.
 
 ```ts
 import * as C from "@fp-ts/schema/Codec";
+```
 
+## Defining a schema
+
+To define a `Schema`, you can use the provided `struct` function to define a new `Schema` that describes an object with a fixed set of properties. Each property of the object is described by a `Schema`, which specifies the data type and validation rules for that property.
+
+For example, consider the following `Schema` that describes a person object with a `name` property of type `string` and an `age` property of type `number`:
+
+```ts
 const Person = C.struct({
   name: C.string,
   age: C.number,
 });
 ```
 
-Extract the inferred type
+You can also use the `union` function to define a `Schema` that describes a value that can be one of a fixed set of types. For example, the following `Schema` describes a value that can be either a `string` or a `number`:
+
+```ts
+const StringOrNumber = C.union(C.string, C.number);
+```
+
+In addition to the provided `struct` and `union` functions, `@fp-ts/schema` also provides a number of other functions for defining `Schema`s, including functions for defining arrays, tuples, and dictionaries.
+
+## Extracting the inferred type
+
+Once you have defined a `Schema`, you can use the `Infer` type to extract the inferred type of the data described by the `Schema`. For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
 
 ```ts
 type Person = C.Infer<typeof Person>;
@@ -62,7 +94,9 @@ type Person = {
 */
 ```
 
-Decode from `unknown`
+## Decoding from `unknown`
+
+To use the `Person` `Schema` defined above to decode a value from `unknown`, you can use the `decode` function:
 
 ```ts
 import * as DE from "@fp-ts/schema/DecodeError";
@@ -75,7 +109,11 @@ expect(Person.decode(null)).toEqual(
 );
 ```
 
-Parse from `JSON` string
+The `decode` function returns a `Validated<DecodeError, A>` which is a type alias for `These<NonEmptyReadonlyArray<DecodeError>, A>`, where `DecodeError` is a type that represents a list of decode errors and `A` is the inferred type of the `Schema`. If the result is a `Right` or a `Both` value, it means that the decode was successful and the value inside the `Right` is the decoded value. If the result is a `Left` value, it means that the decode failed and the value inside the `Left` is a list of decode errors.
+
+## Parsing from JSON strings
+
+To use the `Person` `Schema` defined above to parse a `JSON` string, you can use the `parse` function:
 
 ```ts
 expect(() => Person.parseOrThrow("malformed")).toThrow(
@@ -95,7 +133,9 @@ expect(() =>
 );
 ```
 
-Encode to `unknown`
+## Encoding a value
+
+To use the `Person` `Schema` defined above to encode a value to `unknown`, you can use the `encode` function:
 
 ```ts
 expect(Person.encode({ name: "name", age: 18 })).toEqual({
@@ -104,7 +144,9 @@ expect(Person.encode({ name: "name", age: 18 })).toEqual({
 });
 ```
 
-Encode to `JSON` string
+## Stringifying to JSON strings
+
+To use the `Person` `Schema` defined above to stringify to a `JSON` string, you can use the `stringify` function:
 
 ```ts
 expect(Person.stringify({ name: "name", age: 18 })).toEqual(
