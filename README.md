@@ -398,8 +398,8 @@ enum Fruits {
   Banana,
 }
 
-// $ExpectType Codec<typeof Fruits>
-C.nativeEnum(Fruits);
+// $ExpectType Codec<Fruits>
+C.enums(Fruits);
 ```
 
 ## Unions
