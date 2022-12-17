@@ -331,6 +331,12 @@ interface Codec<in out A>
 ```ts
 import * as C from "@fp-ts/schema/Codec";
 
+// $ExpectType Codec<void>
+C.void;
+
+// $ExpectType Codec<undefined>
+C.undefined;
+
 // $ExpectType Codec<string>
 C.string;
 
@@ -416,6 +422,20 @@ C.union(C.string, C.number);
 C.tuple(C.string, C.number);
 ```
 
+Append a required element
+
+```ts
+// $ExpectType Codec<readonly [string, number, boolean]>
+pipe(C.tuple(C.string, C.number), C.element(C.boolean));
+```
+
+Append an optional element
+
+```ts
+// $ExpectType Codec<readonly [string, number, boolean]>
+pipe(C.tuple(C.string, C.number), C.element(C.boolean));
+```
+
 Rest element
 
 ```ts
@@ -449,7 +469,7 @@ C.struct({ a: C.string, b: C.number });
 Optional fields
 
 ```ts
-// $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean | undefined; }>
+// $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean; }>
 C.struct({ a: C.string, b: C.number, c: C.optional(C.boolean) });
 ```
 
