@@ -20,8 +20,8 @@ importers:
       '@effect-ts/build-utils': 0.40.5
       '@effect-ts/core': ^0.60.2
       '@effect/language-service': ^0.0.10
-      '@fp-ts/core': ~0.0.9
-      '@fp-ts/data': ~0.0.26
+      '@fp-ts/core': ~0.0.11
+      '@fp-ts/data': ~0.0.28
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
       '@types/benchmark': ^2.1.2
       '@types/chai': ^4.3.4
@@ -47,7 +47,7 @@ importers:
       eslint-plugin-import: ^2.26.0
       eslint-plugin-simple-import-sort: ^8.0.0
       eslint-plugin-sort-destructure-keys: ^1.4.0
-      fast-check: ^3.3.0
+      fast-check: ^3.4.0
       glob: ^8.0.3
       madge: ^5.0.1
       picocolors: ^1.0.0
@@ -60,9 +60,9 @@ importers:
       vite: ^3.2.5
       vitest: 0.25.5
     dependencies:
-      '@fp-ts/core': 0.0.9
-      '@fp-ts/data': 0.0.26
-      fast-check: 3.3.0
+      '@fp-ts/core': 0.0.11
+      '@fp-ts/data': 0.0.28
+      fast-check: 3.4.0
     devDependencies:
       '@babel/cli': 7.19.3_@babel+core@7.20.5
       '@babel/core': 7.20.5
@@ -741,8 +741,13 @@ packages:
       - supports-color
     dev: true
 
+  /@fp-ts/core/0.0.11:
+    resolution: {integrity: sha512-BCAJBYzghwoJpcUOARJ1tui50HoYJFlV2pJlVMlsEkDFhD8MTtq8xQVpZCRF66RmtkxtGBYINCQ+5H1lRaL35Q==}
+    dev: false
+
   /@fp-ts/core/0.0.9:
     resolution: {integrity: sha512-FuXKPHTEvvgxV3LulGJXkSpAghovh7wLxux+Pm9LKefC0gtZZQ4OajTjTK5RsQtpyKIsAn26PwdG6W6zksF/UA==}
+    dev: true
 
   /@fp-ts/data/0.0.20:
     resolution: {integrity: sha512-7nv25VxgZiJzintT1Bsl4mXOZlIOGag/GsI0Rov1r/RTfOzd4RePpnDYZzC9BFJ5Iru2/mHeXejRuxgBP2v8Qg==}
@@ -750,10 +755,10 @@ packages:
       '@fp-ts/core': 0.0.9
     dev: true
 
-  /@fp-ts/data/0.0.26:
-    resolution: {integrity: sha512-b8UyUEQtEsJj71sRrR7xtIJ2Lnppc27KgKWtoJ45gnOBUvpsnx2jkxcX0xT+ROMq0cIY6sBiSGS7sL34M4bjUA==}
+  /@fp-ts/data/0.0.28:
+    resolution: {integrity: sha512-GV0IZ8mNhee6znuJ3lFvqSOQO8H8KNWY9yAI7cbxX/9qbM7pyaHPFfmoyfzHpfiXGy9sd9UVVHSTgI+slRcsGQ==}
     dependencies:
-      '@fp-ts/core': 0.0.9
+      '@fp-ts/core': 0.0.11
     dev: false
 
   /@humanwhocodes/config-array/0.11.7:
@@ -3426,8 +3431,8 @@ packages:
       pure-rand: 5.0.3
     dev: true
 
-  /fast-check/3.3.0:
-    resolution: {integrity: sha512-Zu6tZ4g0T4H9Tiz3tdNPEHrSbuICj7yhdOM9RCZKNMkpjZ9avDV3ORklXaEmh4zvkX24/bGZ9DxKKqWfXttUqw==}
+  /fast-check/3.4.0:
+    resolution: {integrity: sha512-EWeu5YRzLuf5/PjLu3g6p823B4fOsGc/C8abGfEW4ZJfz1mf670TsP8CxeOuICESO88qu7YoPwKRZ2mTMRxwzg==}
     engines: {node: '>=8.0.0'}
     dependencies:
       pure-rand: 5.0.3
