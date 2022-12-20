@@ -1,6 +1,6 @@
 ---
 title: DecodeError.ts
-nav_order: 33
+nav_order: 25
 parent: Modules
 ---
 
@@ -24,7 +24,9 @@ Added in v1.0.0
   - [MaxLength (interface)](#maxlength-interface)
   - [Member (interface)](#member-interface)
   - [MinLength (interface)](#minlength-interface)
+  - [Missing (interface)](#missing-interface)
   - [NaN (interface)](#nan-interface)
+  - [NotEnums (interface)](#notenums-interface)
   - [NotEqual (interface)](#notequal-interface)
   - [NotFinite (interface)](#notfinite-interface)
   - [NotType (interface)](#nottype-interface)
@@ -40,7 +42,9 @@ Added in v1.0.0
   - [maxLength](#maxlength)
   - [member](#member)
   - [minLength](#minlength)
+  - [missing](#missing)
   - [nan](#nan)
+  - [notEnums](#notenums)
   - [notEqual](#notequal)
   - [notFinite](#notfinite)
   - [notType](#nottype)
@@ -74,6 +78,7 @@ export type DecodeError =
   | Custom
   | NotType
   | NotEqual
+  | NotEnums
   | NaN
   | NotFinite
   | MinLength
@@ -84,6 +89,7 @@ export type DecodeError =
   | GreaterThanOrEqualTo
   | Index
   | Key
+  | Missing
   | UnexpectedKey
   | UnexpectedIndex
   | Member
@@ -196,7 +202,6 @@ Added in v1.0.0
 ```ts
 export interface Member {
   readonly _tag: 'Member'
-  readonly index: number
   readonly errors: NonEmptyReadonlyArray<DecodeError>
 }
 ```
@@ -217,6 +222,18 @@ export interface MinLength {
 
 Added in v1.0.0
 
+## Missing (interface)
+
+**Signature**
+
+```ts
+export interface Missing {
+  readonly _tag: 'Missing'
+}
+```
+
+Added in v1.0.0
+
 ## NaN (interface)
 
 **Signature**
@@ -224,6 +241,20 @@ Added in v1.0.0
 ```ts
 export interface NaN {
   readonly _tag: 'NaN'
+}
+```
+
+Added in v1.0.0
+
+## NotEnums (interface)
+
+**Signature**
+
+```ts
+export interface NotEnums {
+  readonly _tag: 'NotEnums'
+  readonly enums: ReadonlyArray<readonly [string, string | number]>
+  readonly actual: unknown
 }
 ```
 
@@ -262,7 +293,7 @@ Added in v1.0.0
 ```ts
 export interface NotType {
   readonly _tag: 'NotType'
-  readonly expected: symbol
+  readonly expected: string
   readonly actual: unknown
 }
 ```
@@ -380,7 +411,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const member: (index: number, errors: readonly [DecodeError, ...DecodeError[]]) => Member
+export declare const member: (errors: readonly [DecodeError, ...DecodeError[]]) => Member
 ```
 
 Added in v1.0.0
@@ -395,12 +426,32 @@ export declare const minLength: (minLength: number, actual: unknown) => MinLengt
 
 Added in v1.0.0
 
+## missing
+
+**Signature**
+
+```ts
+export declare const missing: Missing
+```
+
+Added in v1.0.0
+
 ## nan
 
 **Signature**
 
 ```ts
 export declare const nan: NaN
+```
+
+Added in v1.0.0
+
+## notEnums
+
+**Signature**
+
+```ts
+export declare const notEnums: (enums: ReadonlyArray<readonly [string, string | number]>, actual: unknown) => NotEnums
 ```
 
 Added in v1.0.0
@@ -430,7 +481,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const notType: (expected: symbol, actual: unknown) => NotType
+export declare const notType: (expected: string, actual: unknown) => NotType
 ```
 
 Added in v1.0.0

@@ -1,6 +1,6 @@
 ---
 title: Decoder.ts
-nav_order: 34
+nav_order: 26
 parent: Modules
 ---
 
@@ -14,7 +14,6 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [Decoder (interface)](#decoder-interface)
-  - [DecoderId](#decoderid)
   - [decoderFor](#decoderfor)
   - [failure](#failure)
   - [failures](#failures)
@@ -22,7 +21,6 @@ Added in v1.0.0
   - [isSuccess](#issuccess)
   - [isWarning](#iswarning)
   - [make](#make)
-  - [provideDecoderFor](#providedecoderfor)
   - [success](#success)
   - [warning](#warning)
   - [warnings](#warnings)
@@ -38,18 +36,8 @@ Added in v1.0.0
 ```ts
 export interface Decoder<I, A> extends Schema<A> {
   readonly I: (_: I) => void
-  readonly decode: (i: I) => These<NonEmptyReadonlyArray<DE.DecodeError>, A>
+  readonly decode: (i: I) => Validated<DE.DecodeError, A>
 }
-```
-
-Added in v1.0.0
-
-## DecoderId
-
-**Signature**
-
-```ts
-export declare const DecoderId: symbol
 ```
 
 Added in v1.0.0
@@ -125,16 +113,6 @@ export declare const make: <S, A>(
   schema: Schema<A>,
   decode: (i: S) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
 ) => Decoder<S, A>
-```
-
-Added in v1.0.0
-
-## provideDecoderFor
-
-**Signature**
-
-```ts
-export declare const provideDecoderFor: (provider: Provider) => <A>(schema: Schema<A>) => Decoder<unknown, A>
 ```
 
 Added in v1.0.0

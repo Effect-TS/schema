@@ -1,6 +1,6 @@
 ---
 title: Guard.ts
-nav_order: 36
+nav_order: 28
 parent: Modules
 ---
 
@@ -14,10 +14,8 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [Guard (interface)](#guard-interface)
-  - [GuardId](#guardid)
   - [guardFor](#guardfor)
   - [make](#make)
-  - [provideGuardFor](#provideguardfor)
 
 ---
 
@@ -31,16 +29,6 @@ Added in v1.0.0
 export interface Guard<A> extends Schema<A> {
   readonly is: (input: unknown) => input is A
 }
-```
-
-Added in v1.0.0
-
-## GuardId
-
-**Signature**
-
-```ts
-export declare const GuardId: symbol
 ```
 
 Added in v1.0.0
@@ -61,16 +49,6 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <A>(schema: Schema<A>, is: (input: unknown) => input is A) => Guard<A>
-```
-
-Added in v1.0.0
-
-## provideGuardFor
-
-**Signature**
-
-```ts
-export declare const provideGuardFor: (provider: Provider) => <A>(schema: Schema<A>) => Guard<A>
 ```
 
 Added in v1.0.0

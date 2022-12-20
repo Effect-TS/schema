@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 40
+nav_order: 31
 parent: Modules
 ---
 
@@ -12,59 +12,72 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [symbol](#symbol)
+  - [FieldSchemaId (type alias)](#fieldschemaid-type-alias)
 - [utils](#utils)
   - [Infer (type alias)](#infer-type-alias)
+  - [OptionalKeys (type alias)](#optionalkeys-type-alias)
+  - [OptionalSchema (interface)](#optionalschema-interface)
   - [Schema (interface)](#schema-interface)
   - [Spread (type alias)](#spread-type-alias)
+  - [annotation](#annotation)
+  - [annotations](#annotations)
   - [any](#any)
   - [array](#array)
   - [bigint](#bigint)
   - [boolean](#boolean)
-  - [chunk](#chunk)
-  - [clone](#clone)
-  - [declare](#declare)
+  - [element](#element)
+  - [enums](#enums)
   - [extend](#extend)
   - [filter](#filter)
-  - [filterWith](#filterwith)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
   - [int](#int)
   - [json](#json)
-  - [jsonArray](#jsonarray)
-  - [jsonObject](#jsonobject)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [lessThan](#lessthan)
   - [lessThanOrEqualTo](#lessthanorequalto)
-  - [list](#list)
   - [literal](#literal)
   - [make](#make)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
-  - [nativeEnum](#nativeenum)
   - [never](#never)
   - [nonEmptyArray](#nonemptyarray)
   - [number](#number)
-  - [of](#of)
   - [omit](#omit)
   - [option](#option)
+  - [optional](#optional)
+  - [optionalElement](#optionalelement)
+  - [parse](#parse)
   - [partial](#partial)
   - [pick](#pick)
-  - [readonlySet](#readonlyset)
-  - [refine](#refine)
-  - [restElement](#restelement)
+  - [rest](#rest)
   - [string](#string)
   - [stringIndexSignature](#stringindexsignature)
   - [struct](#struct)
-  - [symbol](#symbol)
+  - [symbol](#symbol-1)
   - [symbolIndexSignature](#symbolindexsignature)
   - [tuple](#tuple)
+  - [undefined](#undefined)
   - [union](#union)
+  - [uniqueSymbol](#uniquesymbol)
   - [unknown](#unknown)
-  - [unknownArray](#unknownarray)
-  - [unknownObject](#unknownobject)
+  - [void](#void)
 
 ---
+
+# symbol
+
+## FieldSchemaId (type alias)
+
+**Signature**
+
+```ts
+export type FieldSchemaId = typeof I.FieldSchemaId
+```
+
+Added in v1.0.0
 
 # utils
 
@@ -74,6 +87,31 @@ Added in v1.0.0
 
 ```ts
 export type Infer<S extends Schema<any>> = Parameters<S['A']>[0]
+```
+
+Added in v1.0.0
+
+## OptionalKeys (type alias)
+
+**Signature**
+
+```ts
+export type OptionalKeys<T> = {
+  [K in keyof T]: T[K] extends OptionalSchema<any, true> ? K : never
+}[keyof T]
+```
+
+Added in v1.0.0
+
+## OptionalSchema (interface)
+
+**Signature**
+
+```ts
+export interface OptionalSchema<A, isOptional extends boolean> extends Schema<A>, AST.Annotated {
+  readonly _id: FieldSchemaId
+  readonly isOptional: isOptional
+}
 ```
 
 Added in v1.0.0
@@ -101,6 +139,26 @@ export type Spread<A> = {
 } extends infer B
   ? B
   : never
+```
+
+Added in v1.0.0
+
+## annotation
+
+**Signature**
+
+```ts
+export declare const annotation: (annotation: unknown) => <A>(schema: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## annotations
+
+**Signature**
+
+```ts
+export declare const annotations: (annotations: ReadonlyArray<unknown>) => <A>(schema: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -145,37 +203,24 @@ export declare const boolean: Schema<boolean>
 
 Added in v1.0.0
 
-## chunk
+## element
 
 **Signature**
 
 ```ts
-export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const element: <E>(
+  element: Schema<E>
+) => <A extends readonly any[]>(self: Schema<A>) => Schema<readonly [...A, E]>
 ```
 
 Added in v1.0.0
 
-## clone
+## enums
 
 **Signature**
 
 ```ts
-export declare const clone: (id: symbol, interpreters: Record<symbol, Function>) => <A>(schema: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## declare
-
-**Signature**
-
-```ts
-export declare const declare: <Schemas extends readonly Schema<any>[]>(
-  id: symbol,
-  config: Option<unknown>,
-  provider: Provider,
-  ...schemas: Schemas
-) => Schema<any>
+export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Schema<A[keyof A]>
 ```
 
 Added in v1.0.0
@@ -195,23 +240,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const filter: <A>(
-  id: symbol,
-  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
-) => (schema: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## filterWith
-
-**Signature**
-
-```ts
-export declare const filterWith: <Config, A>(
-  id: symbol,
-  decode: (config: Config) => (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
-) => (config: Config) => (schema: Schema<A>) => Schema<A>
+export declare const filter: <A, B extends A>(
+  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>,
+  annotations: ReadonlyArray<unknown>
+) => (self: Schema<A>) => Schema<B>
 ```
 
 Added in v1.0.0
@@ -256,26 +288,6 @@ export declare const json: Schema<Json>
 
 Added in v1.0.0
 
-## jsonArray
-
-**Signature**
-
-```ts
-export declare const jsonArray: Schema<JsonArray>
-```
-
-Added in v1.0.0
-
-## jsonObject
-
-**Signature**
-
-```ts
-export declare const jsonObject: Schema<JsonObject>
-```
-
-Added in v1.0.0
-
 ## keyof
 
 **Signature**
@@ -316,24 +328,14 @@ export declare const lessThanOrEqualTo: (max: number) => <A extends number>(self
 
 Added in v1.0.0
 
-## list
-
-**Signature**
-
-```ts
-export declare const list: <A>(item: Schema<A>) => Schema<List<A>>
-```
-
-Added in v1.0.0
-
 ## literal
 
 **Signature**
 
 ```ts
-export declare const literal: <A extends readonly (string | number | boolean | null | undefined)[]>(
-  ...a: A
-) => Schema<A[number]>
+export declare const literal: <Literals extends readonly AST.Literal[]>(
+  ...literals: Literals
+) => Schema<Literals[number]>
 ```
 
 Added in v1.0.0
@@ -368,16 +370,6 @@ export declare const minLength: (minLength: number) => <A extends { length: numb
 
 Added in v1.0.0
 
-## nativeEnum
-
-**Signature**
-
-```ts
-export declare const nativeEnum: <A extends { [_: string]: string | number }>(nativeEnum: A) => Schema<A>
-```
-
-Added in v1.0.0
-
 ## never
 
 **Signature**
@@ -408,16 +400,6 @@ export declare const number: Schema<number>
 
 Added in v1.0.0
 
-## of
-
-**Signature**
-
-```ts
-export declare const of: <A>(value: A) => Schema<A>
-```
-
-Added in v1.0.0
-
 ## omit
 
 **Signature**
@@ -436,6 +418,38 @@ Added in v1.0.0
 
 ```ts
 export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
+```
+
+Added in v1.0.0
+
+## optional
+
+**Signature**
+
+```ts
+export declare const optional: <A>(schema: Schema<A>) => OptionalSchema<A, true>
+```
+
+Added in v1.0.0
+
+## optionalElement
+
+**Signature**
+
+```ts
+export declare const optionalElement: <E>(
+  element: Schema<E>
+) => <A extends readonly any[]>(self: Schema<A>) => Schema<readonly [...A, (E | undefined)?]>
+```
+
+Added in v1.0.0
+
+## parse
+
+**Signature**
+
+```ts
+export declare const parse: <A, B>(decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>, encode: (value: B) => A, is: (u: unknown) => u is B, arbitrary: (fc: typeof  => Arbitrary<B>, pretty: (a: B) => string, annotations: ReadonlyArray<unknown>) => (self: Schema<A>) => Schema<B>
 ```
 
 Added in v1.0.0
@@ -462,35 +476,12 @@ export declare const pick: <A, Keys extends readonly (keyof A)[]>(
 
 Added in v1.0.0
 
-## readonlySet
+## rest
 
 **Signature**
 
 ```ts
-export declare const readonlySet: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
-```
-
-Added in v1.0.0
-
-## refine
-
-**Signature**
-
-```ts
-export declare const refine: <A, B extends A>(
-  id: symbol,
-  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>
-) => (schema: Schema<A>) => Schema<B>
-```
-
-Added in v1.0.0
-
-## restElement
-
-**Signature**
-
-```ts
-export declare const restElement: <R>(
+export declare const rest: <R>(
   rest: Schema<R>
 ) => <A extends readonly any[]>(self: Schema<A>) => Schema<readonly [...A, ...R[]]>
 ```
@@ -512,7 +503,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const stringIndexSignature: <A>(value: Schema<A>) => Schema<{ readonly [_: string]: A }>
+export declare const stringIndexSignature: <A>(value: Schema<A>) => Schema<{ readonly [x: string]: A }>
 ```
 
 Added in v1.0.0
@@ -522,24 +513,15 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const struct: {
-  <Required extends Record<string | number | symbol, Schema<any>>>(required: Required): Schema<{
-    readonly [K in keyof Required]: Infer<Required[K]>
-  }>
-  <
-    Required extends Record<string | number | symbol, Schema<any>>,
-    Optional extends Record<string | number | symbol, Schema<any>>
-  >(
-    required: Required,
-    optional: Optional
-  ): Schema<
-    Spread<
-      { readonly [K in keyof Required]: Infer<Required[K]> } & {
-        readonly [K in keyof Optional]?: Infer<Optional[K]> | undefined
-      }
-    >
+export declare const struct: <Fields extends Record<string | number | symbol, Schema<any>>>(
+  fields: Fields
+) => Schema<
+  Spread<
+    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: Infer<Fields[K]> } & {
+      readonly [K in OptionalKeys<Fields>]?: Infer<Fields[K]> | undefined
+    }
   >
-}
+>
 ```
 
 Added in v1.0.0
@@ -569,9 +551,19 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: <Components extends readonly Schema<any>[]>(
-  ...components: Components
-) => Schema<{ readonly [K in keyof Components]: Infer<Components[K]> }>
+export declare const tuple: <Elements extends readonly Schema<any>[]>(
+  ...elements: Elements
+) => Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }>
+```
+
+Added in v1.0.0
+
+## undefined
+
+**Signature**
+
+```ts
+export declare const undefined: Schema<undefined>
 ```
 
 Added in v1.0.0
@@ -588,6 +580,16 @@ export declare const union: <Members extends readonly Schema<any>[]>(
 
 Added in v1.0.0
 
+## uniqueSymbol
+
+**Signature**
+
+```ts
+export declare const uniqueSymbol: <S extends symbol>(symbol: S) => Schema<S>
+```
+
+Added in v1.0.0
+
 ## unknown
 
 **Signature**
@@ -598,22 +600,12 @@ export declare const unknown: Schema<unknown>
 
 Added in v1.0.0
 
-## unknownArray
+## void
 
 **Signature**
 
 ```ts
-export declare const unknownArray: Schema<DataUnknownArray.UnknownArray>
-```
-
-Added in v1.0.0
-
-## unknownObject
-
-**Signature**
-
-```ts
-export declare const unknownObject: Schema<UnknownObject>
+export declare const void: Schema<void>
 ```
 
 Added in v1.0.0

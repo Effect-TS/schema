@@ -1,6 +1,6 @@
 ---
 title: Encoder.ts
-nav_order: 35
+nav_order: 27
 parent: Modules
 ---
 
@@ -14,10 +14,8 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [Encoder (interface)](#encoder-interface)
-  - [EncoderId](#encoderid)
   - [encoderFor](#encoderfor)
   - [make](#make)
-  - [provideEncoderFor](#provideencoderfor)
 
 ---
 
@@ -31,16 +29,6 @@ Added in v1.0.0
 export interface Encoder<S, A> extends Schema<A> {
   readonly encode: (value: A) => S
 }
-```
-
-Added in v1.0.0
-
-## EncoderId
-
-**Signature**
-
-```ts
-export declare const EncoderId: symbol
 ```
 
 Added in v1.0.0
@@ -61,16 +49,6 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <S, A>(schema: Schema<A>, encode: (value: A) => S) => Encoder<S, A>
-```
-
-Added in v1.0.0
-
-## provideEncoderFor
-
-**Signature**
-
-```ts
-export declare const provideEncoderFor: (provider: Provider) => <A>(schema: Schema<A>) => Encoder<unknown, A>
 ```
 
 Added in v1.0.0

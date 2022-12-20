@@ -1,6 +1,6 @@
 ---
 title: Codec.ts
-nav_order: 3
+nav_order: 11
 parent: Modules
 ---
 
@@ -15,17 +15,19 @@ Added in v1.0.0
 - [utils](#utils)
   - [Codec (interface)](#codec-interface)
   - [Infer (type alias)](#infer-type-alias)
+  - [annotation](#annotation)
+  - [annotations](#annotations)
   - [any](#any)
   - [array](#array)
   - [bigint](#bigint)
   - [boolean](#boolean)
-  - [chunk](#chunk)
   - [codecFor](#codecfor)
+  - [element](#element)
+  - [enums](#enums)
   - [extend](#extend)
   - [failure](#failure)
   - [failures](#failures)
   - [filter](#filter)
-  - [filterWith](#filterwith)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
   - [int](#int)
@@ -33,29 +35,25 @@ Added in v1.0.0
   - [isSuccess](#issuccess)
   - [isWarning](#iswarning)
   - [json](#json)
-  - [jsonArray](#jsonarray)
-  - [jsonObject](#jsonobject)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [lessThan](#lessthan)
   - [lessThanOrEqualTo](#lessthanorequalto)
-  - [list](#list)
   - [literal](#literal)
   - [make](#make)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
-  - [nativeEnum](#nativeenum)
   - [never](#never)
   - [nonEmptyArray](#nonemptyarray)
   - [number](#number)
   - [omit](#omit)
   - [option](#option)
+  - [optional](#optional)
+  - [optionalElement](#optionalelement)
+  - [parse](#parse)
   - [partial](#partial)
   - [pick](#pick)
-  - [provideCodecFor](#providecodecfor)
-  - [readonlySet](#readonlyset)
-  - [refine](#refine)
-  - [restElement](#restelement)
+  - [rest](#rest)
   - [string](#string)
   - [stringIndexSignature](#stringindexsignature)
   - [struct](#struct)
@@ -63,10 +61,11 @@ Added in v1.0.0
   - [symbol](#symbol)
   - [symbolIndexSignature](#symbolindexsignature)
   - [tuple](#tuple)
+  - [undefined](#undefined)
   - [union](#union)
+  - [uniqueSymbol](#uniquesymbol)
   - [unknown](#unknown)
-  - [unknownArray](#unknownarray)
-  - [unknownObject](#unknownobject)
+  - [void](#void)
   - [warning](#warning)
   - [warnings](#warnings)
 
@@ -100,6 +99,26 @@ Added in v1.0.0
 
 ```ts
 export type Infer<S extends Schema<any>> = Parameters<S['A']>[0]
+```
+
+Added in v1.0.0
+
+## annotation
+
+**Signature**
+
+```ts
+export declare const annotation: (annotation: unknown) => <A>(schema: Schema<A>) => Codec<A>
+```
+
+Added in v1.0.0
+
+## annotations
+
+**Signature**
+
+```ts
+export declare const annotations: (annotations: ReadonlyArray<unknown>) => <A>(schema: Schema<A>) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -144,22 +163,34 @@ export declare const boolean: Codec<boolean>
 
 Added in v1.0.0
 
-## chunk
-
-**Signature**
-
-```ts
-export declare const chunk: <A>(item: Schema<A>) => Codec<Chunk<A>>
-```
-
-Added in v1.0.0
-
 ## codecFor
 
 **Signature**
 
 ```ts
 export declare const codecFor: <A>(schema: Schema<A>) => Codec<A>
+```
+
+Added in v1.0.0
+
+## element
+
+**Signature**
+
+```ts
+export declare const element: <E>(
+  element: Schema<E>
+) => <A extends readonly any[]>(self: Schema<A>) => Codec<readonly [...A, E]>
+```
+
+Added in v1.0.0
+
+## enums
+
+**Signature**
+
+```ts
+export declare const enums: <A extends { [x: string]: string | number }>(nativeEnum: A) => Codec<A[keyof A]>
 ```
 
 Added in v1.0.0
@@ -201,23 +232,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const filter: <A>(
-  id: symbol,
-  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
-) => (schema: Schema<A>) => Codec<A>
-```
-
-Added in v1.0.0
-
-## filterWith
-
-**Signature**
-
-```ts
-export declare const filterWith: <Config, A>(
-  id: symbol,
-  decode: (config: Config) => (i: A) => These<readonly [DecodeError, ...DecodeError[]], A>
-) => (config: Config) => (schema: Schema<A>) => Codec<A>
+export declare const filter: <A, B extends A>(
+  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>,
+  annotations: ReadonlyArray<unknown>
+) => (self: Schema<A>) => Codec<B>
 ```
 
 Added in v1.0.0
@@ -287,27 +305,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const json: Codec<Json>
-```
-
-Added in v1.0.0
-
-## jsonArray
-
-**Signature**
-
-```ts
-export declare const jsonArray: Codec<JsonArray>
-```
-
-Added in v1.0.0
-
-## jsonObject
-
-**Signature**
-
-```ts
-export declare const jsonObject: Codec<JsonObject>
+export declare const json: Codec<Json.Json>
 ```
 
 Added in v1.0.0
@@ -352,24 +350,12 @@ export declare const lessThanOrEqualTo: (min: number) => <A extends number>(self
 
 Added in v1.0.0
 
-## list
-
-**Signature**
-
-```ts
-export declare const list: <A>(item: Schema<A>) => Codec<List<A>>
-```
-
-Added in v1.0.0
-
 ## literal
 
 **Signature**
 
 ```ts
-export declare const literal: <A extends readonly (string | number | boolean | null | undefined)[]>(
-  ...a: A
-) => Codec<A[number]>
+export declare const literal: <A extends readonly Literal[]>(...a: A) => Codec<A[number]>
 ```
 
 Added in v1.0.0
@@ -400,16 +386,6 @@ Added in v1.0.0
 
 ```ts
 export declare const minLength: (minLength: number) => <A extends { length: number }>(self: Schema<A>) => Codec<A>
-```
-
-Added in v1.0.0
-
-## nativeEnum
-
-**Signature**
-
-```ts
-export declare const nativeEnum: <A extends { [_: string]: string | number }>(nativeEnum: A) => Codec<A>
 ```
 
 Added in v1.0.0
@@ -466,6 +442,38 @@ export declare const option: <A>(value: Schema<A>) => Codec<Option<A>>
 
 Added in v1.0.0
 
+## optional
+
+**Signature**
+
+```ts
+export declare const optional: <A>(schema: Schema<A>) => S.OptionalSchema<A, true>
+```
+
+Added in v1.0.0
+
+## optionalElement
+
+**Signature**
+
+```ts
+export declare const optionalElement: <E>(
+  element: Schema<E>
+) => <A extends readonly any[]>(self: Schema<A>) => Codec<readonly [...A, (E | undefined)?]>
+```
+
+Added in v1.0.0
+
+## parse
+
+**Signature**
+
+```ts
+export declare const parse: <A, B>(decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>, encode: (value: B) => A, is: (u: unknown) => u is B, arbitrary: (fc: typeof  => Arbitrary<B>, pretty: (a: B) => string, annotations: ReadonlyArray<unknown>) => (self: Schema<A>) => Codec<B>
+```
+
+Added in v1.0.0
+
 ## partial
 
 **Signature**
@@ -488,47 +496,14 @@ export declare const pick: <A, Keys extends readonly (keyof A)[]>(
 
 Added in v1.0.0
 
-## provideCodecFor
+## rest
 
 **Signature**
 
 ```ts
-export declare const provideCodecFor: (provider: Provider) => <A>(schema: Schema<A>) => Codec<A>
-```
-
-Added in v1.0.0
-
-## readonlySet
-
-**Signature**
-
-```ts
-export declare const readonlySet: <A>(item: Schema<A>) => Codec<ReadonlySet<A>>
-```
-
-Added in v1.0.0
-
-## refine
-
-**Signature**
-
-```ts
-export declare const refine: <A, B extends A>(
-  id: symbol,
-  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>
-) => (schema: Schema<A>) => Codec<B>
-```
-
-Added in v1.0.0
-
-## restElement
-
-**Signature**
-
-```ts
-export declare const restElement: <R>(
+export declare const rest: <R>(
   rest: Schema<R>
-) => <A extends readonly any[]>(self: Schema<A>) => Schema<readonly [...A, ...R[]]>
+) => <A extends readonly any[]>(self: Schema<A>) => Codec<readonly [...A, ...R[]]>
 ```
 
 Added in v1.0.0
@@ -548,7 +523,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const stringIndexSignature: <A>(value: Schema<A>) => Codec<{ readonly [_: string]: A }>
+export declare const stringIndexSignature: <A>(value: Schema<A>) => Codec<{ readonly [x: string]: A }>
 ```
 
 Added in v1.0.0
@@ -558,24 +533,15 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const struct: {
-  <Required extends Record<string | number | symbol, Schema<any>>>(required: Required): Codec<{
-    readonly [K in keyof Required]: Infer<Required[K]>
-  }>
-  <
-    Required extends Record<string | number | symbol, Schema<any>>,
-    Optional extends Record<string | number | symbol, Schema<any>>
-  >(
-    required: Required,
-    optional: Optional
-  ): Codec<
-    S.Spread<
-      { readonly [K in keyof Required]: Infer<Required[K]> } & {
-        readonly [K in keyof Optional]?: Infer<Optional[K]> | undefined
-      }
-    >
+export declare const struct: <Fields extends Record<string | number | symbol, Schema<any>>>(
+  fields: Fields
+) => Codec<
+  S.Spread<
+    { readonly [K in Exclude<keyof Fields, S.OptionalKeys<Fields>>]: Infer<Fields[K]> } & {
+      readonly [K in S.OptionalKeys<Fields>]?: Infer<Fields[K]> | undefined
+    }
   >
-}
+>
 ```
 
 Added in v1.0.0
@@ -615,9 +581,19 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: <Components extends readonly Schema<any>[]>(
-  ...components: Components
-) => Codec<{ readonly [K in keyof Components]: Infer<Components[K]> }>
+export declare const tuple: <Elements extends readonly Schema<any>[]>(
+  ...elements: Elements
+) => Codec<{ readonly [K in keyof Elements]: Infer<Elements[K]> }>
+```
+
+Added in v1.0.0
+
+## undefined
+
+**Signature**
+
+```ts
+export declare const undefined: Codec<undefined>
 ```
 
 Added in v1.0.0
@@ -634,6 +610,16 @@ export declare const union: <Members extends readonly Schema<any>[]>(
 
 Added in v1.0.0
 
+## uniqueSymbol
+
+**Signature**
+
+```ts
+export declare const uniqueSymbol: <S extends symbol>(symbol: S) => Codec<S>
+```
+
+Added in v1.0.0
+
 ## unknown
 
 **Signature**
@@ -644,22 +630,12 @@ export declare const unknown: Codec<unknown>
 
 Added in v1.0.0
 
-## unknownArray
+## void
 
 **Signature**
 
 ```ts
-export declare const unknownArray: Codec<UnknownArray>
-```
-
-Added in v1.0.0
-
-## unknownObject
-
-**Signature**
-
-```ts
-export declare const unknownObject: Codec<UnknownObject>
+export declare const void: Codec<void>
 ```
 
 Added in v1.0.0
