@@ -1,6 +1,6 @@
 ---
 title: AST.ts
-nav_order: 2
+nav_order: 10
 parent: Modules
 ---
 
@@ -14,34 +14,67 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [AST (type alias)](#ast-type-alias)
-  - [Component (interface)](#component-interface)
-  - [Declaration (interface)](#declaration-interface)
+  - [Annotated (interface)](#annotated-interface)
+  - [AnyKeyword (interface)](#anykeyword-interface)
+  - [BigIntKeyword (interface)](#bigintkeyword-interface)
+  - [BooleanKeyword (interface)](#booleankeyword-interface)
+  - [Element (interface)](#element-interface)
+  - [Enums (interface)](#enums-interface)
   - [Field (interface)](#field-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
-  - [IndexSignatures (interface)](#indexsignatures-interface)
-  - [IndexSignaturesMonoid](#indexsignaturesmonoid)
   - [Lazy (interface)](#lazy-interface)
-  - [Of (interface)](#of-interface)
+  - [Literal (type alias)](#literal-type-alias)
+  - [LiteralType (interface)](#literaltype-interface)
+  - [NeverKeyword (interface)](#neverkeyword-interface)
+  - [NumberKeyword (interface)](#numberkeyword-interface)
+  - [Refinement (interface)](#refinement-interface)
+  - [StringKeyword (interface)](#stringkeyword-interface)
   - [Struct (interface)](#struct-interface)
-  - [StructSemigroup](#structsemigroup)
+  - [SymbolKeyword (interface)](#symbolkeyword-interface)
   - [Tuple (interface)](#tuple-interface)
+  - [TypeAliasDeclaration (interface)](#typealiasdeclaration-interface)
+  - [UndefinedKeyword (interface)](#undefinedkeyword-interface)
   - [Union (interface)](#union-interface)
-  - [component](#component)
-  - [declare](#declare)
+  - [UniqueSymbol (interface)](#uniquesymbol-interface)
+  - [UnknownKeyword (interface)](#unknownkeyword-interface)
+  - [VoidKeyword (interface)](#voidkeyword-interface)
+  - [anyKeyword](#anykeyword)
+  - [appendElement](#appendelement)
+  - [appendRestElement](#appendrestelement)
+  - [bigIntKeyword](#bigintkeyword)
+  - [booleanKeyword](#booleankeyword)
+  - [element](#element)
+  - [enums](#enums)
   - [field](#field)
   - [getFields](#getfields)
   - [indexSignature](#indexsignature)
-  - [indexSignatures](#indexsignatures)
-  - [isDeclaration](#isdeclaration)
+  - [isLazy](#islazy)
+  - [isLiteralType](#isliteraltype)
   - [isStruct](#isstruct)
   - [isTuple](#istuple)
+  - [isTypeAliasDeclaration](#istypealiasdeclaration)
   - [isUnion](#isunion)
+  - [keyof](#keyof)
   - [lazy](#lazy)
-  - [of](#of)
+  - [literalType](#literaltype)
+  - [neverKeyword](#neverkeyword)
+  - [numberKeyword](#numberkeyword)
+  - [omit](#omit)
   - [partial](#partial)
+  - [pick](#pick)
+  - [prependAllAnnotations](#prependallannotations)
+  - [prependAnnotation](#prependannotation)
+  - [refinement](#refinement)
+  - [stringKeyword](#stringkeyword)
   - [struct](#struct)
+  - [symbolKeyword](#symbolkeyword)
   - [tuple](#tuple)
+  - [typeAliasDeclaration](#typealiasdeclaration)
+  - [undefinedKeyword](#undefinedkeyword)
   - [union](#union)
+  - [uniqueSymbol](#uniquesymbol)
+  - [unknownKeyword](#unknownkeyword)
+  - [voidKeyword](#voidkeyword)
 
 ---
 
@@ -52,35 +85,99 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type AST = Declaration | Of | Struct | Tuple | Union | Lazy
+export type AST =
+  | TypeAliasDeclaration
+  | LiteralType
+  | UniqueSymbol
+  | UndefinedKeyword
+  | VoidKeyword
+  | NeverKeyword
+  | UnknownKeyword
+  | AnyKeyword
+  | StringKeyword
+  | NumberKeyword
+  | BooleanKeyword
+  | BigIntKeyword
+  | SymbolKeyword
+  | Tuple
+  | Struct
+  | Union
+  | Lazy
+  | Enums
+  | Refinement
 ```
 
 Added in v1.0.0
 
-## Component (interface)
+## Annotated (interface)
 
 **Signature**
 
 ```ts
-export interface Component {
-  readonly value: AST
-  readonly optional: boolean
+export interface Annotated {
+  readonly annotations: ReadonlyArray<unknown>
 }
 ```
 
 Added in v1.0.0
 
-## Declaration (interface)
+## AnyKeyword (interface)
 
 **Signature**
 
 ```ts
-export interface Declaration {
-  readonly _tag: 'Declaration'
-  readonly id: symbol
-  readonly config: Option<unknown>
-  readonly provider: Provider
-  readonly nodes: ReadonlyArray<AST>
+export interface AnyKeyword extends Annotated {
+  readonly _tag: 'AnyKeyword'
+}
+```
+
+Added in v1.0.0
+
+## BigIntKeyword (interface)
+
+**Signature**
+
+```ts
+export interface BigIntKeyword extends Annotated {
+  readonly _tag: 'BigIntKeyword'
+}
+```
+
+Added in v1.0.0
+
+## BooleanKeyword (interface)
+
+**Signature**
+
+```ts
+export interface BooleanKeyword extends Annotated {
+  readonly _tag: 'BooleanKeyword'
+}
+```
+
+Added in v1.0.0
+
+## Element (interface)
+
+**Signature**
+
+```ts
+export interface Element extends Annotated {
+  readonly type: AST
+  readonly isOptional: boolean
+}
+```
+
+Added in v1.0.0
+
+## Enums (interface)
+
+**Signature**
+
+```ts
+export interface Enums extends Annotated {
+  readonly _tag: 'Enums'
+  readonly enums: ReadonlyArray<readonly [string, string | number]>
 }
 ```
 
@@ -91,11 +188,11 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Field {
+export interface Field extends Annotated {
   readonly key: PropertyKey
   readonly value: AST
-  readonly optional: boolean
-  readonly readonly: boolean
+  readonly isOptional: boolean
+  readonly isReadonly: boolean
 }
 ```
 
@@ -106,34 +203,11 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface IndexSignature {
+export interface IndexSignature extends Annotated {
+  readonly key: 'string' | 'symbol'
   readonly value: AST
-  readonly readonly: boolean
+  readonly isReadonly: boolean
 }
-```
-
-Added in v1.0.0
-
-## IndexSignatures (interface)
-
-**Signature**
-
-```ts
-export interface IndexSignatures {
-  string: Option<IndexSignature>
-  number: Option<IndexSignature>
-  symbol: Option<IndexSignature>
-}
-```
-
-Added in v1.0.0
-
-## IndexSignaturesMonoid
-
-**Signature**
-
-```ts
-export declare const IndexSignaturesMonoid: Monoid.Monoid<IndexSignatures>
 ```
 
 Added in v1.0.0
@@ -143,7 +217,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Lazy {
+export interface Lazy extends Annotated {
   readonly _tag: 'Lazy'
   readonly f: () => AST
 }
@@ -151,14 +225,74 @@ export interface Lazy {
 
 Added in v1.0.0
 
-## Of (interface)
+## Literal (type alias)
 
 **Signature**
 
 ```ts
-export interface Of {
-  readonly _tag: 'Of'
-  readonly value: unknown
+export type Literal = string | number | boolean | null | bigint
+```
+
+Added in v1.0.0
+
+## LiteralType (interface)
+
+**Signature**
+
+```ts
+export interface LiteralType extends Annotated {
+  readonly _tag: 'LiteralType'
+  readonly literal: Literal
+}
+```
+
+Added in v1.0.0
+
+## NeverKeyword (interface)
+
+**Signature**
+
+```ts
+export interface NeverKeyword extends Annotated {
+  readonly _tag: 'NeverKeyword'
+}
+```
+
+Added in v1.0.0
+
+## NumberKeyword (interface)
+
+**Signature**
+
+```ts
+export interface NumberKeyword extends Annotated {
+  readonly _tag: 'NumberKeyword'
+}
+```
+
+Added in v1.0.0
+
+## Refinement (interface)
+
+**Signature**
+
+```ts
+export interface Refinement extends Annotated {
+  readonly _tag: 'Refinement'
+  readonly from: AST
+  readonly decode: Decoder<any, any>['decode']
+}
+```
+
+Added in v1.0.0
+
+## StringKeyword (interface)
+
+**Signature**
+
+```ts
+export interface StringKeyword extends Annotated {
+  readonly _tag: 'StringKeyword'
 }
 ```
 
@@ -169,21 +303,23 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Struct {
+export interface Struct extends Annotated {
   readonly _tag: 'Struct'
   readonly fields: ReadonlyArray<Field>
-  readonly indexSignatures: IndexSignatures
+  readonly indexSignatures: ReadonlyArray<IndexSignature>
 }
 ```
 
 Added in v1.0.0
 
-## StructSemigroup
+## SymbolKeyword (interface)
 
 **Signature**
 
 ```ts
-export declare const StructSemigroup: Semigroup.Semigroup<Struct>
+export interface SymbolKeyword extends Annotated {
+  readonly _tag: 'SymbolKeyword'
+}
 ```
 
 Added in v1.0.0
@@ -193,11 +329,37 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Tuple {
+export interface Tuple extends Annotated {
   readonly _tag: 'Tuple'
-  readonly components: ReadonlyArray<Component>
-  readonly restElement: Option<AST>
-  readonly readonly: boolean
+  readonly elements: ReadonlyArray<Element>
+  readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
+  readonly isReadonly: boolean
+}
+```
+
+Added in v1.0.0
+
+## TypeAliasDeclaration (interface)
+
+**Signature**
+
+```ts
+export interface TypeAliasDeclaration extends Annotated {
+  readonly _tag: 'TypeAliasDeclaration'
+  readonly typeParameters: ReadonlyArray<AST>
+  readonly type: AST
+}
+```
+
+Added in v1.0.0
+
+## UndefinedKeyword (interface)
+
+**Signature**
+
+```ts
+export interface UndefinedKeyword extends Annotated {
+  readonly _tag: 'UndefinedKeyword'
 }
 ```
 
@@ -208,35 +370,120 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Union {
+export interface Union extends Annotated {
   readonly _tag: 'Union'
-  readonly members: ReadonlyArray<AST>
+  readonly members: readonly [AST, AST, ...Array<AST>]
 }
 ```
 
 Added in v1.0.0
 
-## component
+## UniqueSymbol (interface)
 
 **Signature**
 
 ```ts
-export declare const component: (value: AST, optional: boolean) => Component
+export interface UniqueSymbol extends Annotated {
+  readonly _tag: 'UniqueSymbol'
+  readonly symbol: symbol
+}
 ```
 
 Added in v1.0.0
 
-## declare
+## UnknownKeyword (interface)
 
 **Signature**
 
 ```ts
-export declare const declare: (
-  id: symbol,
-  config: Option<unknown>,
-  provider: Provider,
-  nodes: ReadonlyArray<AST>
-) => Declaration
+export interface UnknownKeyword extends Annotated {
+  readonly _tag: 'UnknownKeyword'
+}
+```
+
+Added in v1.0.0
+
+## VoidKeyword (interface)
+
+**Signature**
+
+```ts
+export interface VoidKeyword extends Annotated {
+  readonly _tag: 'VoidKeyword'
+}
+```
+
+Added in v1.0.0
+
+## anyKeyword
+
+**Signature**
+
+```ts
+export declare const anyKeyword: (annotations: ReadonlyArray<unknown>) => AnyKeyword
+```
+
+Added in v1.0.0
+
+## appendElement
+
+**Signature**
+
+```ts
+export declare const appendElement: (ast: Tuple, element: Element, annotations: ReadonlyArray<unknown>) => Tuple
+```
+
+Added in v1.0.0
+
+## appendRestElement
+
+**Signature**
+
+```ts
+export declare const appendRestElement: (ast: Tuple, restElement: AST, annotations: ReadonlyArray<unknown>) => Tuple
+```
+
+Added in v1.0.0
+
+## bigIntKeyword
+
+**Signature**
+
+```ts
+export declare const bigIntKeyword: (annotations: ReadonlyArray<unknown>) => BigIntKeyword
+```
+
+Added in v1.0.0
+
+## booleanKeyword
+
+**Signature**
+
+```ts
+export declare const booleanKeyword: (annotations: ReadonlyArray<unknown>) => BooleanKeyword
+```
+
+Added in v1.0.0
+
+## element
+
+**Signature**
+
+```ts
+export declare const element: (type: AST, isOptional: boolean, annotations: ReadonlyArray<unknown>) => Element
+```
+
+Added in v1.0.0
+
+## enums
+
+**Signature**
+
+```ts
+export declare const enums: (
+  enums: ReadonlyArray<readonly [string, string | number]>,
+  annotations: ReadonlyArray<unknown>
+) => Enums
 ```
 
 Added in v1.0.0
@@ -246,7 +493,13 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const field: (key: PropertyKey, value: AST, optional: boolean, readonly: boolean) => Field
+export declare const field: (
+  key: PropertyKey,
+  value: AST,
+  isOptional: boolean,
+  isReadonly: boolean,
+  annotations: ReadonlyArray<unknown>
+) => Field
 ```
 
 Added in v1.0.0
@@ -266,31 +519,32 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const indexSignature: (value: AST, readonly: boolean) => IndexSignature
+export declare const indexSignature: (
+  key: 'string' | 'symbol',
+  value: AST,
+  isReadonly: boolean,
+  annotations: ReadonlyArray<unknown>
+) => IndexSignature
 ```
 
 Added in v1.0.0
 
-## indexSignatures
+## isLazy
 
 **Signature**
 
 ```ts
-export declare const indexSignatures: (
-  string: Option<IndexSignature>,
-  number: Option<IndexSignature>,
-  symbol: Option<IndexSignature>
-) => IndexSignatures
+export declare const isLazy: (ast: AST) => ast is Lazy
 ```
 
 Added in v1.0.0
 
-## isDeclaration
+## isLiteralType
 
 **Signature**
 
 ```ts
-export declare const isDeclaration: (ast: AST) => ast is Declaration
+export declare const isLiteralType: (ast: AST) => ast is LiteralType
 ```
 
 Added in v1.0.0
@@ -315,6 +569,16 @@ export declare const isTuple: (ast: AST) => ast is Tuple
 
 Added in v1.0.0
 
+## isTypeAliasDeclaration
+
+**Signature**
+
+```ts
+export declare const isTypeAliasDeclaration: (ast: AST) => ast is TypeAliasDeclaration
+```
+
+Added in v1.0.0
+
 ## isUnion
 
 **Signature**
@@ -325,22 +589,62 @@ export declare const isUnion: (ast: AST) => ast is Union
 
 Added in v1.0.0
 
+## keyof
+
+**Signature**
+
+```ts
+export declare const keyof: (ast: AST) => ReadonlyArray<PropertyKey>
+```
+
+Added in v1.0.0
+
 ## lazy
 
 **Signature**
 
 ```ts
-export declare const lazy: (f: () => AST) => Lazy
+export declare const lazy: (f: () => AST, annotations: ReadonlyArray<unknown>) => Lazy
 ```
 
 Added in v1.0.0
 
-## of
+## literalType
 
 **Signature**
 
 ```ts
-export declare const of: (value: unknown) => Of
+export declare const literalType: (literal: Literal, annotations: ReadonlyArray<unknown>) => LiteralType
+```
+
+Added in v1.0.0
+
+## neverKeyword
+
+**Signature**
+
+```ts
+export declare const neverKeyword: (annotations: ReadonlyArray<unknown>) => NeverKeyword
+```
+
+Added in v1.0.0
+
+## numberKeyword
+
+**Signature**
+
+```ts
+export declare const numberKeyword: (annotations: ReadonlyArray<unknown>) => NumberKeyword
+```
+
+Added in v1.0.0
+
+## omit
+
+**Signature**
+
+```ts
+export declare const omit: (ast: AST, keys: ReadonlyArray<PropertyKey>, annotations: ReadonlyArray<unknown>) => Struct
 ```
 
 Added in v1.0.0
@@ -350,7 +654,61 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: (ast: AST) => AST
+export declare const partial: (ast: AST, annotations: ReadonlyArray<unknown>) => AST
+```
+
+Added in v1.0.0
+
+## pick
+
+**Signature**
+
+```ts
+export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>, annotations: ReadonlyArray<unknown>) => Struct
+```
+
+Added in v1.0.0
+
+## prependAllAnnotations
+
+**Signature**
+
+```ts
+export declare const prependAllAnnotations: (ast: AST, annotations: ReadonlyArray<unknown>) => AST
+```
+
+Added in v1.0.0
+
+## prependAnnotation
+
+**Signature**
+
+```ts
+export declare const prependAnnotation: (ast: AST, annotation: unknown) => AST
+```
+
+Added in v1.0.0
+
+## refinement
+
+**Signature**
+
+```ts
+export declare const refinement: (
+  from: AST,
+  decode: Decoder<any, any>['decode'],
+  annotations: ReadonlyArray<unknown>
+) => Refinement
+```
+
+Added in v1.0.0
+
+## stringKeyword
+
+**Signature**
+
+```ts
+export declare const stringKeyword: (annotations: ReadonlyArray<unknown>) => StringKeyword
 ```
 
 Added in v1.0.0
@@ -360,7 +718,21 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const struct: (fields: ReadonlyArray<Field>, indexSignatures: IndexSignatures) => Struct
+export declare const struct: (
+  fields: ReadonlyArray<Field>,
+  indexSignatures: ReadonlyArray<IndexSignature>,
+  annotations: ReadonlyArray<unknown>
+) => Struct
+```
+
+Added in v1.0.0
+
+## symbolKeyword
+
+**Signature**
+
+```ts
+export declare const symbolKeyword: (annotations: ReadonlyArray<unknown>) => SymbolKeyword
 ```
 
 Added in v1.0.0
@@ -370,7 +742,36 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: (components: ReadonlyArray<Component>, restElement: Option<AST>, readonly: boolean) => Tuple
+export declare const tuple: (
+  elements: ReadonlyArray<Element>,
+  rest: Option<RA.NonEmptyReadonlyArray<AST>>,
+  isReadonly: boolean,
+  annotations: ReadonlyArray<unknown>
+) => Tuple
+```
+
+Added in v1.0.0
+
+## typeAliasDeclaration
+
+**Signature**
+
+```ts
+export declare const typeAliasDeclaration: (
+  typeParameters: ReadonlyArray<AST>,
+  type: AST,
+  annotations: ReadonlyArray<unknown>
+) => TypeAliasDeclaration
+```
+
+Added in v1.0.0
+
+## undefinedKeyword
+
+**Signature**
+
+```ts
+export declare const undefinedKeyword: (annotations: ReadonlyArray<unknown>) => UndefinedKeyword
 ```
 
 Added in v1.0.0
@@ -380,7 +781,37 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const union: (members: ReadonlyArray<AST>) => Union
+export declare const union: (candidates: ReadonlyArray<AST>, annotations: ReadonlyArray<unknown>) => AST
+```
+
+Added in v1.0.0
+
+## uniqueSymbol
+
+**Signature**
+
+```ts
+export declare const uniqueSymbol: (symbol: symbol, annotations: ReadonlyArray<unknown>) => UniqueSymbol
+```
+
+Added in v1.0.0
+
+## unknownKeyword
+
+**Signature**
+
+```ts
+export declare const unknownKeyword: (annotations: ReadonlyArray<unknown>) => UnknownKeyword
+```
+
+Added in v1.0.0
+
+## voidKeyword
+
+**Signature**
+
+```ts
+export declare const voidKeyword: (annotations: ReadonlyArray<unknown>) => VoidKeyword
 ```
 
 Added in v1.0.0

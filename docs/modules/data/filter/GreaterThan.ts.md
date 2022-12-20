@@ -1,6 +1,6 @@
 ---
 title: data/filter/GreaterThan.ts
-nav_order: 9
+nav_order: 13
 parent: Modules
 ---
 
@@ -13,22 +13,11 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [id](#id)
   - [schema](#schema)
 
 ---
 
 # utils
-
-## id
-
-**Signature**
-
-```ts
-export declare const id: typeof id
-```
-
-Added in v1.0.0
 
 ## schema
 

@@ -1,6 +1,6 @@
 ---
 title: data/Json.ts
-nav_order: 17
+nav_order: 20
 parent: Modules
 ---
 
@@ -13,23 +13,11 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [Provider](#provider)
   - [Schema](#schema)
-  - [id](#id)
 
 ---
 
 # utils
-
-## Provider
-
-**Signature**
-
-```ts
-export declare const Provider: P.Provider
-```
-
-Added in v1.0.0
 
 ## Schema
 
@@ -37,16 +25,6 @@ Added in v1.0.0
 
 ```ts
 export declare const Schema: S.Schema<Json>
-```
-
-Added in v1.0.0
-
-## id
-
-**Signature**
-
-```ts
-export declare const id: typeof id
 ```
 
 Added in v1.0.0

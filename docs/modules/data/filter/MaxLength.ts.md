@@ -1,6 +1,6 @@
 ---
 title: data/filter/MaxLength.ts
-nav_order: 14
+nav_order: 18
 parent: Modules
 ---
 
@@ -13,22 +13,11 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [id](#id)
   - [schema](#schema)
 
 ---
 
 # utils
-
-## id
-
-**Signature**
-
-```ts
-export declare const id: typeof id
-```
-
-Added in v1.0.0
 
 ## schema
 
