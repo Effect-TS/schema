@@ -18,22 +18,21 @@ Schema validation with static type inference
 flowchart TD
   Schema -->|codecFor| Codec
   Schema -->|guardFor| Guard
-  Schema -->|arbitraryFor| Arbitrary
-  Schema -->|prettyFor| Pretty
+  Schema -->|encoderFor| Encoder
 ```
 
 # Features
 
-- deriving single artifacts from a `Schema`:
+- deriving artifacts from a `Schema`:
   - `Guard`
-  - `Arbitrary`
-  - `Pretty`
-- `Codec` (all in one artifact)
+  - `Decoder`
+  - `Encoder`
+  - `Codec` (`Decoder` + `Encoder` + `Guard`)
 - custom artifact compilers
 - custom `Schema` combinators
 - custom data types
-- custom decode errors (TODO)
-- refinements (TODO)
+- custom decode errors
+- refinements
 - versioning (TODO)
 - migration (TODO)
 
@@ -154,14 +153,14 @@ expect(Person.stringify({ name: "name", age: 18 })).toEqual(
 );
 ```
 
-Guard
+## Guards
 
 ```ts
 expect(Person.is({ name: "name", age: 18 })).toEqual(true);
 expect(Person.is(null)).toEqual(false);
 ```
 
-Pretty print
+## Pretty print
 
 ```ts
 expect(Person.pretty({ name: "name", age: 18 })).toEqual(
@@ -169,7 +168,7 @@ expect(Person.pretty({ name: "name", age: 18 })).toEqual(
 );
 ```
 
-[`fast-check`](https://github.com/dubzzz/fast-check) `Arbitrary`
+## [`fast-check`](https://github.com/dubzzz/fast-check) `Arbitrary`
 
 ```ts
 import * as fc from "fast-check";
@@ -182,20 +181,6 @@ console.log(fc.sample(Person.arbitrary(fc), 2));
 ]
 */
 ```
-
-# Custom artifact compilers
-
-`src/Pretty.ts`, `src/Guard.ts` and `src/Arbitrary.ts` are good examples of defining a custom compiler.
-
-# Custom schema combinators
-
-Examples in `/src/Schema.ts`.
-
-All the combinators defined in `/src/Schema.ts` could be implemented in userland.
-
-# Custom data types
-
-Examples in `/src/data/*`
 
 # Understanding Schemas
 
@@ -332,69 +317,66 @@ interface Codec<in out A>
 ```ts
 import * as C from "@fp-ts/schema/Codec";
 
-// $ExpectType Codec<void>
-C.void;
-
-// $ExpectType Codec<undefined>
-C.undefined;
-
-// $ExpectType Codec<string>
+// primitive values
 C.string;
-
-// $ExpectType Codec<number>
 C.number;
-
-// $ExpectType Codec<boolean>
-C.boolean;
-
-// $ExpectType Codec<bigint>
 C.bigint;
-
-// $ExpectType Codec<symbol>
+C.boolean;
 C.symbol;
+C.object;
 
-// $ExpectType Codec<unknown>
+// empty types
+C.undefined;
+C.void; // accepts undefined
+
+// catch-all types
+// allows any value
+C.any;
 C.unknown;
 
-// $ExpectType Codec<any>
-C.any;
+// never type
+// allows no values
+C.never;
+```
+
+## Literals
+
+```ts
+C.literal(null);
+C.literal("a");
+C.literal("a", "b", "c"); // union of literals
+C.literal(1);
+C.literal(2n); // bigint literal
+C.literal(true);
 ```
 
 ## Filters
 
 **Note**. Filters don't change the `Schema` type.
 
+### Strings
+
 ```ts
-// $ExpectType Codec<string>
-pipe(C.string, C.minLength(1));
-
-// $ExpectType Codec<string>
-pipe(C.string, C.maxLength(10));
-
-// $ExpectType Codec<number>
-pipe(C.number, C.lessThan(0));
-
-// $ExpectType Codec<number>
-pipe(C.number, C.lessThanOrEqualTo(0));
-
-// $ExpectType Codec<number>
-pipe(C.number, C.greaterThan(10));
-
-// $ExpectType Codec<number>
-pipe(C.number, C.greaterThanOrEqualTo(10));
-
-// $ExpectType Codec<number>
-pipe(C.number, C.int);
+C.string.max(5);
+C.string.min(5);
+C.string.length(5);
+C.string.regex(regex);
+C.string.startsWith(string);
+C.string.endsWith(string);
 ```
 
-## Literals
+### Numbers
 
 ```ts
-// $ExpectType Codec<"a">
-C.literal("a");
+C.number.gt(5);
+C.number.gte(5);
+C.number.lt(5);
+C.number.lte(5);
 
-// $ExpectType Codec<"a" | "b" | "c">
-C.literal("a", "b", "c");
+C.number.int(); // value must be an integer
+
+C.number.nonNaN(); // not NaN
+C.number.finite(); // value must be finite, not Infinity or -Infinity
 ```
 
 ## Native enums
@@ -407,6 +389,13 @@ enum Fruits {
 
 // $ExpectType Codec<Fruits>
 C.enums(Fruits);
+```
+
+## Nullables
+
+```ts
+// $ExpectType Codec<string | null>
+C.nullable(C.string);
 ```
 
 ## Unions
@@ -433,8 +422,8 @@ pipe(C.tuple(C.string, C.number), C.element(C.boolean));
 Append an optional element
 
 ```ts
-// $ExpectType Codec<readonly [string, number, boolean]>
-pipe(C.tuple(C.string, C.number), C.element(C.boolean));
+// $ExpectType Codec<readonly [string, number, boolean?]>
+pipe(C.tuple(C.string, C.number), C.optionalElement(C.boolean));
 ```
 
 Rest element
@@ -451,9 +440,7 @@ pipe(C.tuple(C.string, C.number), C.rest(C.boolean));
 C.array(C.number);
 ```
 
-## Non empty arrays
-
-Equivalent to `pipe(tuple(item), rest(item))`
+Non empty arrays
 
 ```ts
 // $ExpectType Codec<readonly [number, ...number[]]>
@@ -512,10 +499,11 @@ C.symbolIndexSignature(C.string);
 ## Extend
 
 ```ts
-// $ExpectType Codec<{ readonly a: string; readonly b: string; } & { readonly [x: string]: string; }>
+// $ExpectType Codec<{ readonly a: string; readonly b: string; } & { readonly c: boolean; } & { readonly [x: string]: string; }>
 pipe(
   C.struct({ a: C.string, b: C.string }),
-  C.extend(C.stringIndexSignature(C.string))
+  C.extend(C.struct({ c: C.boolean })), // <= you can add more fields
+  C.extend(C.stringIndexSignature(C.string)) // <= you can add more index signatures
 );
 ```
 
@@ -524,6 +512,17 @@ pipe(
 ```ts
 // $ExpectType Codec<Option<number>>
 C.option(C.number);
+```
+
+## InstanceOf
+
+```ts
+class Test {
+  constructor(readonly name: string) {}
+}
+
+// $ExpectType Codec<Test>
+const TestSchema = pipe(C.object, C.instanceOf(Test));
 ```
 
 # Documentation
