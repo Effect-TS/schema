@@ -105,7 +105,7 @@ const unknown: unknown = { name: "name", age: 18 };
 
 expect(Person.decode(unknown)).toEqual(C.success({ name: "name", age: 18 }));
 expect(Person.decode(null)).toEqual(
-  C.failure(DE.notType("{ readonly [_: string]: unknown }", null))
+  C.failure(DE.notType("{ readonly [x: string]: unknown }", null))
 );
 ```
 
@@ -498,21 +498,21 @@ C.partial(C.struct({ a: C.string, b: C.number }));
 ## String index signature
 
 ```ts
-// $ExpectType Codec<{ readonly [_: string]: string; }>
+// $ExpectType Codec<{ readonly [x: string]: string; }>
 C.stringIndexSignature(C.string);
 ```
 
 ## Symbol index signature
 
 ```ts
-// $ExpectType Codec<{ readonly [_: symbol]: string; }>
+// $ExpectType Codec<{ readonly [x: symbol]: string; }>
 C.symbolIndexSignature(C.string);
 ```
 
 ## Extend
 
 ```ts
-// $ExpectType Codec<{ readonly a: string; readonly b: string; } & { readonly [_: string]: string; }>
+// $ExpectType Codec<{ readonly a: string; readonly b: string; } & { readonly [x: string]: string; }>
 pipe(
   C.struct({ a: C.string, b: C.string }),
   C.extend(C.stringIndexSignature(C.string))
