@@ -482,18 +482,14 @@ pipe(C.struct({ a: C.string, b: C.number }), C.omit("a"));
 C.partial(C.struct({ a: C.string, b: C.number }));
 ```
 
-## String index signature
+## Records
 
 ```ts
 // $ExpectType Codec<{ readonly [x: string]: string; }>
-C.stringIndexSignature(C.string);
-```
+C.record("string", C.string);
 
-## Symbol index signature
-
-```ts
 // $ExpectType Codec<{ readonly [x: symbol]: string; }>
-C.symbolIndexSignature(C.string);
+C.record("symbol", C.string);
 ```
 
 ## Extend
