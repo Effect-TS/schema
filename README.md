@@ -31,8 +31,8 @@ flowchart TD
 - custom artifact compilers
 - custom `Schema` combinators
 - custom data types
-- custom decode errors
 - refinements
+- custom decode errors (TODO)
 - versioning (TODO)
 - migration (TODO)
 
