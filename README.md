@@ -356,26 +356,26 @@ C.literal(true);
 ### Strings
 
 ```ts
-C.string.max(5);
-C.string.min(5);
-C.string.length(5);
-C.string.regex(regex);
-C.string.startsWith(string);
-C.string.endsWith(string);
+pipe(C.string, C.maxLength(5));
+pipe(C.string, C.minLength(5));
+pipe(C.string, C.length(5));
+pipe(C.string, C.regex(regex));
+pipe(C.string, C.startsWith(string));
+pipe(C.string, C.endsWith(string));
 ```
 
 ### Numbers
 
 ```ts
-C.number.gt(5);
-C.number.gte(5);
-C.number.lt(5);
-C.number.lte(5);
+pipe(C.number, C.greaterThan(5));
+pipe(C.number, C.greaterThanOrEqualTo(5));
+pipe(C.number, C.lessThan(5));
+pipe(C.number, C.lessThanOrEqualTo(5));
 
-C.number.int(); // value must be an integer
+pipe(C.number, C.int); // value must be an integer
 
-C.number.nonNaN(); // not NaN
-C.number.finite(); // value must be finite, not Infinity or -Infinity
+pipe(C.number, C.nonNaN); // not NaN
+pipe(C.number, C.finite); // value must be finite, not Infinity or -Infinity
 ```
 
 ## Native enums
