@@ -1,6 +1,6 @@
 ---
 title: Encoder.ts
-nav_order: 27
+nav_order: 21
 parent: Modules
 ---
 
@@ -12,14 +12,28 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [utils](#utils)
-  - [Encoder (interface)](#encoder-interface)
-  - [encoderFor](#encoderfor)
+- [constructors](#constructors)
   - [make](#make)
+- [model](#model)
+  - [Encoder (interface)](#encoder-interface)
+- [utils](#utils)
+  - [encoderFor](#encoderfor)
 
 ---
 
-# utils
+# constructors
+
+## make
+
+**Signature**
+
+```ts
+export declare const make: <S, A>(schema: Schema<A>, encode: (value: A) => S) => Encoder<S, A>
+```
+
+Added in v1.0.0
+
+# model
 
 ## Encoder (interface)
 
@@ -33,22 +47,14 @@ export interface Encoder<S, A> extends Schema<A> {
 
 Added in v1.0.0
 
+# utils
+
 ## encoderFor
 
 **Signature**
 
 ```ts
 export declare const encoderFor: <A>(schema: Schema<A>) => Encoder<unknown, A>
-```
-
-Added in v1.0.0
-
-## make
-
-**Signature**
-
-```ts
-export declare const make: <S, A>(schema: Schema<A>, encode: (value: A) => S) => Encoder<S, A>
 ```
 
 Added in v1.0.0

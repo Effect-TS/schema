@@ -1,6 +1,6 @@
 ---
 title: data/ReadonlySet.ts
-nav_order: 24
+nav_order: 17
 parent: Modules
 ---
 
@@ -13,18 +13,18 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [schema](#schema)
+  - [readonlySet](#readonlyset)
 
 ---
 
 # utils
 
-## schema
+## readonlySet
 
 **Signature**
 
 ```ts
-export declare const schema: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
+export declare const readonlySet: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
 ```
 
 Added in v1.0.0

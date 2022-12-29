@@ -1,6 +1,6 @@
 ---
 title: data/Option.ts
-nav_order: 21
+nav_order: 14
 parent: Modules
 ---
 
@@ -13,18 +13,18 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [schema](#schema)
+  - [option](#option)
 
 ---
 
 # utils
 
-## schema
+## option
 
 **Signature**
 
 ```ts
-export declare const schema: <A>(value: Schema<A>) => Schema<Option<A>>
+export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0

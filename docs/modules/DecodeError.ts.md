@@ -1,6 +1,6 @@
 ---
 title: DecodeError.ts
-nav_order: 25
+nav_order: 19
 parent: Modules
 ---
 
@@ -13,41 +13,30 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [Custom (interface)](#custom-interface)
   - [DecodeError (type alias)](#decodeerror-type-alias)
-  - [GreaterThan (interface)](#greaterthan-interface)
-  - [GreaterThanOrEqualTo (interface)](#greaterthanorequalto-interface)
+  - [Enums (interface)](#enums-interface)
+  - [Equal (interface)](#equal-interface)
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
-  - [LessThan (interface)](#lessthan-interface)
-  - [LessThanOrEqualTo (interface)](#lessthanorequalto-interface)
-  - [MaxLength (interface)](#maxlength-interface)
   - [Member (interface)](#member-interface)
-  - [MinLength (interface)](#minlength-interface)
+  - [Meta (interface)](#meta-interface)
   - [Missing (interface)](#missing-interface)
-  - [NaN (interface)](#nan-interface)
-  - [NotEnums (interface)](#notenums-interface)
-  - [NotEqual (interface)](#notequal-interface)
-  - [NotFinite (interface)](#notfinite-interface)
-  - [NotType (interface)](#nottype-interface)
+  - [Parse (interface)](#parse-interface)
+  - [Refinement (interface)](#refinement-interface)
+  - [Type (interface)](#type-interface)
   - [UnexpectedIndex (interface)](#unexpectedindex-interface)
   - [UnexpectedKey (interface)](#unexpectedkey-interface)
-  - [custom](#custom)
-  - [greaterThan](#greaterthan)
-  - [greaterThanOrEqualTo](#greaterthanorequalto)
+  - [enums](#enums)
+  - [equal](#equal)
   - [index](#index)
   - [key](#key)
-  - [lessThan](#lessthan)
-  - [lessThanOrEqualTo](#lessthanorequalto)
-  - [maxLength](#maxlength)
   - [member](#member)
-  - [minLength](#minlength)
+  - [meta](#meta)
   - [missing](#missing)
-  - [nan](#nan)
-  - [notEnums](#notenums)
-  - [notEqual](#notequal)
-  - [notFinite](#notfinite)
-  - [notType](#nottype)
+  - [parse](#parse)
+  - [refinement](#refinement)
+  - [some](#some)
+  - [type](#type)
   - [unexpectedIndex](#unexpectedindex)
   - [unexpectedKey](#unexpectedkey)
 
@@ -55,38 +44,18 @@ Added in v1.0.0
 
 # utils
 
-## Custom (interface)
-
-**Signature**
-
-```ts
-export interface Custom {
-  readonly _tag: 'Custom'
-  readonly config: unknown
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
 ## DecodeError (type alias)
 
 **Signature**
 
 ```ts
 export type DecodeError =
-  | Custom
-  | NotType
-  | NotEqual
-  | NotEnums
-  | NaN
-  | NotFinite
-  | MinLength
-  | MaxLength
-  | LessThan
-  | GreaterThan
-  | LessThanOrEqualTo
-  | GreaterThanOrEqualTo
+  | Meta
+  | Type
+  | Equal
+  | Enums
+  | Refinement
+  | Parse
   | Index
   | Key
   | Missing
@@ -97,28 +66,28 @@ export type DecodeError =
 
 Added in v1.0.0
 
-## GreaterThan (interface)
+## Enums (interface)
 
 **Signature**
 
 ```ts
-export interface GreaterThan {
-  readonly _tag: 'GreaterThan'
-  readonly min: number
+export interface Enums {
+  readonly _tag: 'Enums'
+  readonly enums: ReadonlyArray<readonly [string, string | number]>
   readonly actual: unknown
 }
 ```
 
 Added in v1.0.0
 
-## GreaterThanOrEqualTo (interface)
+## Equal (interface)
 
 **Signature**
 
 ```ts
-export interface GreaterThanOrEqualTo {
-  readonly _tag: 'GreaterThanOrEqualTo'
-  readonly min: number
+export interface Equal {
+  readonly _tag: 'Equal'
+  readonly expected: unknown
   readonly actual: unknown
 }
 ```
@@ -153,48 +122,6 @@ export interface Key {
 
 Added in v1.0.0
 
-## LessThan (interface)
-
-**Signature**
-
-```ts
-export interface LessThan {
-  readonly _tag: 'LessThan'
-  readonly max: number
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## LessThanOrEqualTo (interface)
-
-**Signature**
-
-```ts
-export interface LessThanOrEqualTo {
-  readonly _tag: 'LessThanOrEqualTo'
-  readonly max: number
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## MaxLength (interface)
-
-**Signature**
-
-```ts
-export interface MaxLength {
-  readonly _tag: 'MaxLength'
-  readonly maxLength: number
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
 ## Member (interface)
 
 **Signature**
@@ -208,14 +135,14 @@ export interface Member {
 
 Added in v1.0.0
 
-## MinLength (interface)
+## Meta (interface)
 
 **Signature**
 
 ```ts
-export interface MinLength {
-  readonly _tag: 'MinLength'
-  readonly minLength: number
+export interface Meta {
+  readonly _tag: 'Meta'
+  readonly meta: unknown
   readonly actual: unknown
 }
 ```
@@ -234,65 +161,42 @@ export interface Missing {
 
 Added in v1.0.0
 
-## NaN (interface)
+## Parse (interface)
 
 **Signature**
 
 ```ts
-export interface NaN {
-  readonly _tag: 'NaN'
-}
-```
-
-Added in v1.0.0
-
-## NotEnums (interface)
-
-**Signature**
-
-```ts
-export interface NotEnums {
-  readonly _tag: 'NotEnums'
-  readonly enums: ReadonlyArray<readonly [string, string | number]>
+export interface Parse {
+  readonly _tag: 'Parse'
+  readonly from: string
+  readonly to: string
   readonly actual: unknown
 }
 ```
 
 Added in v1.0.0
 
-## NotEqual (interface)
+## Refinement (interface)
 
 **Signature**
 
 ```ts
-export interface NotEqual {
-  readonly _tag: 'NotEqual'
-  readonly expected: unknown
+export interface Refinement {
+  readonly _tag: 'Refinement'
+  readonly meta: unknown
   readonly actual: unknown
 }
 ```
 
 Added in v1.0.0
 
-## NotFinite (interface)
+## Type (interface)
 
 **Signature**
 
 ```ts
-export interface NotFinite {
-  readonly _tag: 'NotFinite'
-}
-```
-
-Added in v1.0.0
-
-## NotType (interface)
-
-**Signature**
-
-```ts
-export interface NotType {
-  readonly _tag: 'NotType'
+export interface Type {
+  readonly _tag: 'Type'
   readonly expected: string
   readonly actual: unknown
 }
@@ -308,6 +212,7 @@ Added in v1.0.0
 export interface UnexpectedIndex {
   readonly _tag: 'UnexpectedIndex'
   readonly index: number
+  readonly actual: unknown
 }
 ```
 
@@ -321,37 +226,28 @@ Added in v1.0.0
 export interface UnexpectedKey {
   readonly _tag: 'UnexpectedKey'
   readonly key: PropertyKey
+  readonly actual: unknown
 }
 ```
 
 Added in v1.0.0
 
-## custom
+## enums
 
 **Signature**
 
 ```ts
-export declare const custom: (config: unknown, actual: unknown) => Custom
+export declare const enums: (enums: ReadonlyArray<readonly [string, string | number]>, actual: unknown) => Enums
 ```
 
 Added in v1.0.0
 
-## greaterThan
+## equal
 
 **Signature**
 
 ```ts
-export declare const greaterThan: (min: number, actual: unknown) => GreaterThan
-```
-
-Added in v1.0.0
-
-## greaterThanOrEqualTo
-
-**Signature**
-
-```ts
-export declare const greaterThanOrEqualTo: (min: number, actual: unknown) => GreaterThanOrEqualTo
+export declare const equal: (expected: unknown, actual: unknown) => Equal
 ```
 
 Added in v1.0.0
@@ -376,36 +272,6 @@ export declare const key: (key: PropertyKey, errors: readonly [DecodeError, ...D
 
 Added in v1.0.0
 
-## lessThan
-
-**Signature**
-
-```ts
-export declare const lessThan: (max: number, actual: unknown) => LessThan
-```
-
-Added in v1.0.0
-
-## lessThanOrEqualTo
-
-**Signature**
-
-```ts
-export declare const lessThanOrEqualTo: (max: number, actual: unknown) => LessThanOrEqualTo
-```
-
-Added in v1.0.0
-
-## maxLength
-
-**Signature**
-
-```ts
-export declare const maxLength: (maxLength: number, actual: unknown) => MaxLength
-```
-
-Added in v1.0.0
-
 ## member
 
 **Signature**
@@ -416,12 +282,12 @@ export declare const member: (errors: readonly [DecodeError, ...DecodeError[]]) 
 
 Added in v1.0.0
 
-## minLength
+## meta
 
 **Signature**
 
 ```ts
-export declare const minLength: (minLength: number, actual: unknown) => MinLength
+export declare const meta: (meta: unknown, actual: unknown) => Meta
 ```
 
 Added in v1.0.0
@@ -436,52 +302,44 @@ export declare const missing: Missing
 
 Added in v1.0.0
 
-## nan
+## parse
 
 **Signature**
 
 ```ts
-export declare const nan: NaN
+export declare const parse: (from: string, to: string, actual: unknown) => Parse
 ```
 
 Added in v1.0.0
 
-## notEnums
+## refinement
 
 **Signature**
 
 ```ts
-export declare const notEnums: (enums: ReadonlyArray<readonly [string, string | number]>, actual: unknown) => NotEnums
+export declare const refinement: (meta: unknown, actual: unknown) => Refinement
 ```
 
 Added in v1.0.0
 
-## notEqual
+## some
 
 **Signature**
 
 ```ts
-export declare const notEqual: (expected: unknown, actual: unknown) => NotEqual
+export declare const some: (
+  predicate: Predicate<DecodeError>
+) => (errors: readonly [DecodeError, ...DecodeError[]]) => boolean
 ```
 
 Added in v1.0.0
 
-## notFinite
+## type
 
 **Signature**
 
 ```ts
-export declare const notFinite: NotFinite
-```
-
-Added in v1.0.0
-
-## notType
-
-**Signature**
-
-```ts
-export declare const notType: (expected: string, actual: unknown) => NotType
+export declare const type: (expected: string, actual: unknown) => Type
 ```
 
 Added in v1.0.0
@@ -491,7 +349,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unexpectedIndex: (index: number) => UnexpectedIndex
+export declare const unexpectedIndex: (index: number, actual: unknown) => UnexpectedIndex
 ```
 
 Added in v1.0.0
@@ -501,7 +359,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unexpectedKey: (key: PropertyKey) => UnexpectedKey
+export declare const unexpectedKey: (key: PropertyKey, actual: unknown) => UnexpectedKey
 ```
 
 Added in v1.0.0

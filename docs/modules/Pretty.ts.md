@@ -1,6 +1,6 @@
 ---
 title: Pretty.ts
-nav_order: 30
+nav_order: 24
 parent: Modules
 ---
 
@@ -12,14 +12,28 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [utils](#utils)
-  - [Pretty (interface)](#pretty-interface)
+- [constructors](#constructors)
   - [make](#make)
+- [model](#model)
+  - [Pretty (interface)](#pretty-interface)
+- [utils](#utils)
   - [prettyFor](#prettyfor)
 
 ---
 
-# utils
+# constructors
+
+## make
+
+**Signature**
+
+```ts
+export declare const make: <A>(schema: Schema<A>, pretty: (a: A) => string) => Pretty<A>
+```
+
+Added in v1.0.0
+
+# model
 
 ## Pretty (interface)
 
@@ -33,15 +47,7 @@ export interface Pretty<A> extends Schema<A> {
 
 Added in v1.0.0
 
-## make
-
-**Signature**
-
-```ts
-export declare const make: <A>(schema: Schema<A>, pretty: (a: A) => string) => Pretty<A>
-```
-
-Added in v1.0.0
+# utils
 
 ## prettyFor
 
