@@ -14,13 +14,6 @@ Schema validation with static type inference
   </a>
 </p>
 
-```mermaid
-flowchart TD
-  Schema -->|codecFor| Codec
-  Schema -->|guardFor| Guard
-  Schema -->|encoderFor| Encoder
-```
-
 # Features
 
 - deriving artifacts from a `Schema`:
@@ -28,6 +21,8 @@ flowchart TD
   - `Decoder`
   - `Encoder`
   - `Codec` (`Decoder` + `Encoder` + `Guard`)
+  - `Arbitrary`
+  - `Pretty`
 - custom artifact compilers
 - custom `Schema` combinators
 - custom data types
@@ -77,11 +72,13 @@ You can also use the `union` function to define a `Schema` that describes a valu
 const StringOrNumber = C.union(C.string, C.number);
 ```
 
-In addition to the provided `struct` and `union` functions, `@fp-ts/schema` also provides a number of other functions for defining `Schema`s, including functions for defining arrays, tuples, and dictionaries.
+In addition to the provided `struct` and `union` functions, `@fp-ts/schema` also provides a number of other functions for defining `Schema`s, including functions for defining arrays, tuples, and records.
 
 ## Extracting the inferred type
 
-Once you have defined a `Schema`, you can use the `Infer` type to extract the inferred type of the data described by the `Schema`. For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
+Once you have defined a `Schema`, you can use the `Infer` type to extract the inferred type of the data described by the `Schema`.
+
+For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
 
 ```ts
 type Person = C.Infer<typeof Person>;
@@ -108,7 +105,7 @@ expect(Person.decode(null)).toEqual(
 );
 ```
 
-The `decode` function returns a `Validated<DecodeError, A>` which is a type alias for `These<NonEmptyReadonlyArray<DecodeError>, A>`, where `DecodeError` is a type that represents a list of decode errors and `A` is the inferred type of the `Schema`. If the result is a `Right` or a `Both` value, it means that the decode was successful and the value inside the `Right` is the decoded value. If the result is a `Left` value, it means that the decode failed and the value inside the `Left` is a list of decode errors.
+The `decode` function returns a value of type `Validated<DecodeError, A>`, which is a type alias for `These<NonEmptyReadonlyArray<DecodeError>, A>`, where `DecodeError` represents a list of errors that occurred during the decoding process and `A` is the inferred type of the data described by the `Schema`. A successful decode will result in a `Right` or `Both` value, containing the decoded data. A `Right` value indicates that the decode was successful and no errors occurred. A `Both` value represents a successful decode that also includes some decode errors (as warnings). It is important to note that a `Both` value still represents a successful decode, as the data was able to be successfully decoded despite the presence of decode errors. In the case of a failed decode, the result will be a `Left` value containing a list of `DecodeError`s.
 
 ## Parsing from JSON strings
 
@@ -155,12 +152,34 @@ expect(Person.stringify({ name: "name", age: 18 })).toEqual(
 
 ## Guards
 
+`Guard` is a type provided by the `@fp-ts/schema` library that represents a way of verifying that a value conforms to a given `Schema`. A `Guard` is a function that takes a value as an argument and returns a `boolean` indicating whether or not the value conforms to the `Schema`.
+
+```ts
+interface Guard<in out A> extends Schema<A> {
+  readonly is: (input: unknown) => input is A;
+}
+```
+
+For example, given the `Person` `Schema` defined above, you can use the `is` function provided by the `Person` `Guard` to check if a value conforms to the `Person` `Schema`:
+
 ```ts
 expect(Person.is({ name: "name", age: 18 })).toEqual(true);
 expect(Person.is(null)).toEqual(false);
 ```
 
 ## Pretty print
+
+`Pretty` is a type provided by the `@fp-ts/schema` library that represents a way of pretty-printing values that conform to a given `Schema`. The `Pretty` type provides a `pretty` function that takes a value and returns a string representation of the value with proper indentation and formatting.
+
+```ts
+interface Pretty<in out A> extends Schema<A> {
+  readonly pretty: (a: A) => string;
+}
+```
+
+You can use the `Pretty` type to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
+
+For example, given the `Person` `Schema` defined above, you can use the `pretty` function provided by the `Person` `Pretty` to create a pretty-printed string representation of a value that conforms to the `Person` `Schema`:
 
 ```ts
 expect(Person.pretty({ name: "name", age: 18 })).toEqual(
@@ -169,6 +188,16 @@ expect(Person.pretty({ name: "name", age: 18 })).toEqual(
 ```
 
 ## [`fast-check`](https://github.com/dubzzz/fast-check) `Arbitrary`
+
+`Arbitrary` is a type provided by the `@fp-ts/schema` library that represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
+
+```ts
+interface Arbitrary<in out A> extends Schema<A> {
+  readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>;
+}
+```
+
+For example, given the `Person` `Schema` defined above, you can use the `arbitrary` function provided by the `Person` `Arbitrary` to generate random values that conform to the `Person` `Schema`:
 
 ```ts
 import * as fc from "fast-check";
@@ -209,7 +238,7 @@ import * as S from "@fp-ts/schema/Schema";
 declare const pair: <A>(schema: S.Schema<A>) => S.Schema<readonly [A, A]>;
 ```
 
-Then we can implement the body using the APIs exported by the `AST.ts` module
+Then we can implement the body using the APIs exported by the `@fp-ts/schema/AST` module
 
 ```ts
 import * as AST from "@fp-ts/schema/AST";
@@ -258,55 +287,6 @@ const myNumberPair = C.codecFor(pair(S.number));
 
 expect(myNumberPair.is([1, 2])).toEqual(true);
 expect(myNumberPair.is([1, "a"])).toEqual(false);
-```
-
-**Guard**
-
-A `Guard` is a derivable artifact that is able to refine a value of type `unknown` to a value of type `A`.
-
-```ts
-interface Guard<in out A> extends Schema<A> {
-  readonly is: (input: unknown) => input is A;
-}
-```
-
-**Arbitrary**
-
-An `Arbitrary` is a derivable artifact that is able to produce [`fast-check`](https://github.com/dubzzz/fast-check) arbitraries.
-
-```ts
-interface Arbitrary<in out A> extends Schema<A> {
-  readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>;
-}
-```
-
-**Pretty**
-
-A `Pretty` is a derivable artifact that is able to pretty print a value of type `A`.
-
-```ts
-interface Pretty<in out A> extends Schema<A> {
-  readonly pretty: (a: A) => string;
-}
-```
-
-**Codec**
-
-A `Codec` is a derivable artifact that is able to:
-
-- decode a value of type `unknown` to a value of type `A`
-- encode a value of type `A` to a value of type `unknown`
-
-A `Codec` is also a `Guard`, an `Arbitrary` and a `Pretty`.
-
-```ts
-interface Codec<in out A>
-  extends Schema<A>,
-    Decoder<unknown, A>,
-    Encoder<unknown, A>,
-    Guard<A>,
-    Arbitrary<A>,
-    Pretty<A> {}
 ```
 
 # Basic usage
@@ -504,7 +484,7 @@ C.record(C.union(C.literal("a"), C.literal("b")), C.string);
 pipe(
   C.struct({ a: C.string, b: C.string }),
   C.extend(C.struct({ c: C.boolean })), // <= you can add more fields
-  C.extend(C.record(C.string, C.string)) // <= you can add more index signatures
+  C.extend(C.record(C.string, C.string)) // <= you can add more records
 );
 ```
 
@@ -513,6 +493,80 @@ pipe(
 ```ts
 // $ExpectType Codec<Option<number>>
 C.option(C.number);
+```
+
+## ReadonlySet
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as C from "@fp-ts/schema/Codec";
+import { readonlySet } from "@fp-ts/schema/data/ReadonlySet";
+import * as DE from "@fp-ts/schema/DecodeError";
+
+// define a schema for ReadonlySet of numbers
+const schema = readonlySet(S.number);
+
+// create a codec based on the schema
+const codec = C.codecFor(schema);
+
+// test decoding a valid input
+expect(codec.decode([1, 2, 3])).toEqual(C.success(new Set([1, 2, 3])));
+
+// test decoding an invalid input with a wrong type for the third element
+expect(codec.decode([1, 2, "a"])).toEqual(
+  C.failure(DE.index(2, [DE.type("number", "a")]))
+); // wrong type for values
+```
+
+## ReadonlyMap
+
+```ts
+import * as G from "@fp-ts/schema/Guard";
+import { readonlyMap } from "@fp-ts/schema/data/ReadonlyMap";
+import * as C from "@fp-ts/schema/Codec";
+import * as DE from "@fp-ts/schema/DecodeError";
+
+// define the schema for a readonly map with number keys and string values
+const schema = readonlyMap(S.number, S.string);
+// create a codec based on the schema
+const codec = C.codecFor(schema);
+
+// success cases
+expect(
+  codec.decode([
+    [1, "a"],
+    [2, "b"],
+    [3, "c"],
+  ])
+).toEqual(
+  C.success(
+    new Map([
+      [1, "a"],
+      [2, "b"],
+      [3, "c"],
+    ])
+  )
+);
+
+// failure cases
+expect(
+  codec.decode([
+    ["a", 1],
+    ["b", 2],
+    ["c", 3],
+  ])
+).toEqual(
+  C.failure(DE.index(0, [DE.index(0, [DE.type("number", "a")])])) // wrong type for keys
+);
+expect(
+  codec.decode([
+    [1, 2],
+    [3, 4],
+    [5, 6],
+  ])
+).toEqual(
+  C.failure(DE.index(0, [DE.index(1, [DE.type("string", 2)])])) // wrong type for values
+);
 ```
 
 ## InstanceOf
