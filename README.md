@@ -182,7 +182,11 @@ You can use the `Pretty` type to create a human-readable string representation o
 For example, given the `Person` `Schema` defined above, you can use the `pretty` function provided by the `Person` `Pretty` to create a pretty-printed string representation of a value that conforms to the `Person` `Schema`:
 
 ```ts
-expect(Person.pretty({ name: "name", age: 18 })).toEqual(
+import * as P from "@fp-ts/schema/Pretty";
+
+const PersonPretty = P.prettyFor(Person);
+
+expect(PersonPretty.pretty({ name: "name", age: 18 })).toEqual(
   `{ "name": "name", "age": 18 }`
 );
 ```
@@ -200,9 +204,12 @@ interface Arbitrary<in out A> extends Schema<A> {
 For example, given the `Person` `Schema` defined above, you can use the `arbitrary` function provided by the `Person` `Arbitrary` to generate random values that conform to the `Person` `Schema`:
 
 ```ts
+import * as A from "@fp-ts/schema/Arbitrary";
 import * as fc from "fast-check";
 
-console.log(fc.sample(Person.arbitrary(fc), 2));
+const PersonArbitrary = A.prettyFor(Person);
+
+console.log(fc.sample(PersonArbitrary.arbitrary(fc), 2));
 /*
 [
 { name: '!U?z/X', age: -2.5223372357846707e-44 },
@@ -321,7 +328,7 @@ C.never;
 ## Literals
 
 ```ts
-C.null;
+C.null; // same as C.literal(null)
 C.literal("a");
 C.literal("a", "b", "c"); // union of literals
 C.literal(1);
@@ -405,7 +412,7 @@ Append an optional element
 pipe(C.tuple(C.string, C.number), C.optionalElement(C.boolean));
 ```
 
-Rest element
+Append a rest element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, ...boolean[]]>
@@ -484,15 +491,46 @@ C.record(C.union(C.literal("a"), C.literal("b")), C.string);
 pipe(
   C.struct({ a: C.string, b: C.string }),
   C.extend(C.struct({ c: C.boolean })), // <= you can add more fields
-  C.extend(C.record(C.string, C.string)) // <= you can add more records
+  C.extend(C.record(C.string, C.string)) // <= you can add index signatures
 );
 ```
 
 ## Option
 
 ```ts
-// $ExpectType Codec<Option<number>>
-C.option(C.number);
+import * as S from "@fp-ts/schema/Schema";
+import * as C from "@fp-ts/schema/Codec";
+import { option } from "@fp-ts/schema/data/Option";
+import * as DE from "@fp-ts/schema/DecodeError";
+import * as O from "@fp-ts/data/Option";
+
+const schema = S.struct({ a: S.string, b: option(S.number) });
+const codec = C.codecFor(schema);
+
+// success cases
+expect(codec.decode({ a: "hello", b: 1 })).toEqual(
+  C.success({ a: "hello", b: O.some(1) })
+);
+expect(codec.decode({ a: "hello", b: null })).toEqual(
+  C.success({ a: "hello", b: O.none })
+);
+
+// failure cases
+expect(codec.decode({ a: 1, b: 1 })).toEqual(
+  C.failure(DE.key("a", [DE.type("string", 1)]))
+); // wrong type for key "a"
+expect(codec.decode({ a: "hello", b: "world" })).toEqual(
+  C.failure(
+    DE.key("b", [
+      DE.member([DE.type("undefined", "world")]),
+      DE.member([DE.equal(null, "world")]),
+      DE.member([DE.type("number", "world")]),
+    ])
+  )
+); // wrong type for key "b"
+expect(codec.decode({ a: "hello" })).toEqual(
+  C.failure(DE.key("b", [DE.missing]))
+); // missing key "b"
 ```
 
 ## ReadonlySet
@@ -578,6 +616,29 @@ class Test {
 
 // $ExpectType Codec<Test>
 const TestSchema = pipe(C.object, C.instanceOf(Test));
+```
+
+## parseString
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as C from "@fp-ts/schema/Codec";
+import { parseString } from "@fp-ts/schema/data/parser";
+import * as DE from "@fp-ts/schema/DecodeError";
+
+const schema = parseString(S.string); // converts string schema to number schema
+const codec = C.codecFor(schema);
+
+// success cases
+expect(codec.decode("1")).toEqual(C.success(1));
+expect(codec.decode("-1")).toEqual(C.success(-1));
+expect(codec.decode("1.5")).toEqual(C.success(1.5));
+expect(codec.decode("NaN")).toEqual(C.success(NaN));
+expect(codec.decode("Infinity")).toEqual(C.success(Infinity));
+expect(codec.decode("-Infinity")).toEqual(C.success(-Infinity));
+
+// failure cases
+expect(codec.decode("a")).toEqual(C.failure(DE.parse("string", "number", "a")));
 ```
 
 # Documentation
