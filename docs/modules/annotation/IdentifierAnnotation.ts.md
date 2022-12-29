@@ -15,8 +15,8 @@ Added in v1.0.0
 - [utils](#utils)
   - [IdentifierAnnotation (interface)](#identifierannotation-interface)
   - [IdentifierAnnotationId](#identifierannotationid)
+  - [getIdentifierAnnotation](#getidentifierannotation)
   - [identifierAnnotation](#identifierannotation)
-  - [isIdentifierAnnotation](#isidentifierannotation)
 
 ---
 
@@ -28,7 +28,6 @@ Added in v1.0.0
 
 ```ts
 export interface IdentifierAnnotation {
-  readonly _id: typeof IdentifierAnnotationId
   readonly identifier: string
 }
 ```
@@ -45,22 +44,22 @@ export declare const IdentifierAnnotationId: '@fp-ts/schema/annotation/Identifie
 
 Added in v1.0.0
 
+## getIdentifierAnnotation
+
+**Signature**
+
+```ts
+export declare const getIdentifierAnnotation: (annotated: Annotated) => Option<IdentifierAnnotation>
+```
+
+Added in v1.0.0
+
 ## identifierAnnotation
 
 **Signature**
 
 ```ts
 export declare const identifierAnnotation: (identifier: string) => IdentifierAnnotation
-```
-
-Added in v1.0.0
-
-## isIdentifierAnnotation
-
-**Signature**
-
-```ts
-export declare const isIdentifierAnnotation: (u: unknown) => u is IdentifierAnnotation
 ```
 
 Added in v1.0.0

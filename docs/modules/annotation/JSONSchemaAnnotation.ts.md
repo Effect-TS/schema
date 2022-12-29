@@ -13,25 +13,14 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [JSONSchema (type alias)](#jsonschema-type-alias)
   - [JSONSchemaAnnotation (interface)](#jsonschemaannotation-interface)
   - [JSONSchemaAnnotationId](#jsonschemaannotationid)
-  - [isJSONSchemaAnnotation](#isjsonschemaannotation)
+  - [getJSONSchemaAnnotation](#getjsonschemaannotation)
   - [jsonSchemaAnnotation](#jsonschemaannotation)
 
 ---
 
 # utils
-
-## JSONSchema (type alias)
-
-**Signature**
-
-```ts
-export type JSONSchema = {}
-```
-
-Added in v1.0.0
 
 ## JSONSchemaAnnotation (interface)
 
@@ -39,8 +28,7 @@ Added in v1.0.0
 
 ```ts
 export interface JSONSchemaAnnotation {
-  readonly _id: typeof JSONSchemaAnnotationId
-  readonly schema: JSONSchema
+  readonly schema: object
 }
 ```
 
@@ -56,12 +44,12 @@ export declare const JSONSchemaAnnotationId: '@fp-ts/schema/annotation/JSONSchem
 
 Added in v1.0.0
 
-## isJSONSchemaAnnotation
+## getJSONSchemaAnnotation
 
 **Signature**
 
 ```ts
-export declare const isJSONSchemaAnnotation: (u: unknown) => u is JSONSchemaAnnotation
+export declare const getJSONSchemaAnnotation: (annotated: Annotated) => Option<JSONSchemaAnnotation>
 ```
 
 Added in v1.0.0
@@ -71,7 +59,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const jsonSchemaAnnotation: (schema: JSONSchema) => JSONSchemaAnnotation
+export declare const jsonSchemaAnnotation: (schema: object) => JSONSchemaAnnotation
 ```
 
 Added in v1.0.0

@@ -16,7 +16,7 @@ Added in v1.0.0
   - [DocumentationAnnotation (interface)](#documentationannotation-interface)
   - [DocumentationAnnotationId](#documentationannotationid)
   - [documentationAnnotation](#documentationannotation)
-  - [isDocumentationAnnotation](#isdocumentationannotation)
+  - [getDocumentationAnnotation](#getdocumentationannotation)
 
 ---
 
@@ -28,7 +28,6 @@ Added in v1.0.0
 
 ```ts
 export interface DocumentationAnnotation {
-  readonly _id: typeof DocumentationAnnotationId
   readonly documentation: string
 }
 ```
@@ -55,12 +54,12 @@ export declare const documentationAnnotation: (documentation: string) => Documen
 
 Added in v1.0.0
 
-## isDocumentationAnnotation
+## getDocumentationAnnotation
 
 **Signature**
 
 ```ts
-export declare const isDocumentationAnnotation: (u: unknown) => u is DocumentationAnnotation
+export declare const getDocumentationAnnotation: (annotated: Annotated) => Option<DocumentationAnnotation>
 ```
 
 Added in v1.0.0

@@ -13,18 +13,18 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [schema](#schema)
+  - [chunk](#chunk)
 
 ---
 
 # utils
 
-## schema
+## chunk
 
 **Signature**
 
 ```ts
-export declare const schema: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
 ```
 
 Added in v1.0.0
