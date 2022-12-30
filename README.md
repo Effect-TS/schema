@@ -17,12 +17,14 @@ Schema validation with static type inference
 # Features
 
 - deriving artifacts from a `Schema`:
-  - `Guard`
-  - `Decoder`
-  - `Encoder`
-  - `Codec` (`Decoder` + `Encoder` + `Guard`)
-  - `Arbitrary`
-  - `Pretty`
+  - guards
+  - decoders
+  - encoders
+  - codecs (decoder + encoder + guard)
+  - [fast-check](https://github.com/dubzzz/fast-check) arbitraries
+  - pretty printing
+  - JSON Schema
+  - TypeScript AST
 - custom artifact compilers
 - custom `Schema` combinators
 - custom data types
@@ -33,7 +35,7 @@ Schema validation with static type inference
 
 # Introduction
 
-Welcome to the documentation for `@fp-ts/schema`, a library for defining and using schemas to validate and transform data in TypeScript. `@fp-ts/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as decoding from `unknown`, encoding to `unknown`, parsing from `JSON` strings, and stringifying to `JSON` strings. `@fp-ts/schema` also provides a number of other features, including the ability to derive various artifacts such as `Codec`s, `Guard`s, and `Arbitrary`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
+Welcome to the documentation for `@fp-ts/schema`, a library for defining and using schemas to validate and transform data in TypeScript. `@fp-ts/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as decoding from `unknown`, encoding to `unknown`, verifying that a value conforms to a given `Schema`. `@fp-ts/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
 
 ## Getting started
 
@@ -107,28 +109,6 @@ expect(Person.decode(null)).toEqual(
 
 The `decode` function returns a value of type `Validated<DecodeError, A>`, which is a type alias for `These<NonEmptyReadonlyArray<DecodeError>, A>`, where `DecodeError` represents a list of errors that occurred during the decoding process and `A` is the inferred type of the data described by the `Schema`. A successful decode will result in a `Right` or `Both` value, containing the decoded data. A `Right` value indicates that the decode was successful and no errors occurred. A `Both` value represents a successful decode that also includes some decode errors (as warnings). It is important to note that a `Both` value still represents a successful decode, as the data was able to be successfully decoded despite the presence of decode errors. In the case of a failed decode, the result will be a `Left` value containing a list of `DecodeError`s.
 
-## Parsing from JSON strings
-
-To use the `Person` `Schema` defined above to parse a `JSON` string, you can use the `parse` function:
-
-```ts
-expect(() => Person.parseOrThrow("malformed")).toThrow(
-  new Error("Cannot parse JSON from: malformed")
-);
-expect(() => Person.parseOrThrow("{}")).toThrow(
-  new Error("Cannot decode JSON")
-);
-
-// with a custom formatter
-expect(() =>
-  Person.parseOrThrow("{}", (errors) => JSON.stringify(errors))
-).toThrow(
-  new Error(
-    `Cannot decode JSON, errors: [{"_tag":"Key","key":"name","errors":[{"_tag":"Missing"}]}]`
-  )
-);
-```
-
 ## Encoding a value
 
 To use the `Person` `Schema` defined above to encode a value to `unknown`, you can use the `encode` function:
@@ -138,16 +118,6 @@ expect(Person.encode({ name: "name", age: 18 })).toEqual({
   name: "name",
   age: 18,
 });
-```
-
-## Stringifying to JSON strings
-
-To use the `Person` `Schema` defined above to stringify to a `JSON` string, you can use the `stringify` function:
-
-```ts
-expect(Person.stringify({ name: "name", age: 18 })).toEqual(
-  '{"name":"name","age":18}'
-);
 ```
 
 ## Guards
@@ -167,31 +137,7 @@ expect(Person.is({ name: "name", age: 18 })).toEqual(true);
 expect(Person.is(null)).toEqual(false);
 ```
 
-## Pretty print
-
-`Pretty` is a type provided by the `@fp-ts/schema` library that represents a way of pretty-printing values that conform to a given `Schema`. The `Pretty` type provides a `pretty` function that takes a value and returns a string representation of the value with proper indentation and formatting.
-
-```ts
-interface Pretty<in out A> extends Schema<A> {
-  readonly pretty: (a: A) => string;
-}
-```
-
-You can use the `Pretty` type to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
-
-For example, given the `Person` `Schema` defined above, you can use the `pretty` function provided by the `Person` `Pretty` to create a pretty-printed string representation of a value that conforms to the `Person` `Schema`:
-
-```ts
-import * as P from "@fp-ts/schema/Pretty";
-
-const PersonPretty = P.prettyFor(Person);
-
-expect(PersonPretty.pretty({ name: "name", age: 18 })).toEqual(
-  `{ "name": "name", "age": 18 }`
-);
-```
-
-## [`fast-check`](https://github.com/dubzzz/fast-check) `Arbitrary`
+## [fast-check](https://github.com/dubzzz/fast-check) arbitraries
 
 `Arbitrary` is a type provided by the `@fp-ts/schema` library that represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
 
@@ -216,6 +162,30 @@ console.log(fc.sample(PersonArbitrary.arbitrary(fc), 2));
 { name: 'valukeypro', age: -1.401298464324817e-45 }
 ]
 */
+```
+
+## Pretty print
+
+`Pretty` is a type provided by the `@fp-ts/schema` library that represents a way of pretty-printing values that conform to a given `Schema`. The `Pretty` type provides a `pretty` function that takes a value and returns a string representation of the value with proper indentation and formatting.
+
+```ts
+interface Pretty<in out A> extends Schema<A> {
+  readonly pretty: (a: A) => string;
+}
+```
+
+You can use the `Pretty` type to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
+
+For example, given the `Person` `Schema` defined above, you can use the `pretty` function provided by the `Person` `Pretty` to create a pretty-printed string representation of a value that conforms to the `Person` `Schema`:
+
+```ts
+import * as P from "@fp-ts/schema/Pretty";
+
+const PersonPretty = P.prettyFor(Person);
+
+expect(PersonPretty.pretty({ name: "name", age: 18 })).toEqual(
+  `{ "name": "name", "age": 18 }`
+);
 ```
 
 # Understanding Schemas
