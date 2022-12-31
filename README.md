@@ -306,6 +306,20 @@ C.literal(2n); // bigint literal
 C.literal(true);
 ```
 
+## Template literals
+
+```ts
+// $ExpectType Codec<`a${string}`>
+C.templateLiteral(C.literal("a"), C.string);
+
+// example from https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html
+const EmailLocaleIDs = C.literal("welcome_email", "email_heading");
+const FooterLocaleIDs = C.literal("footer_title", "footer_sendoff");
+
+// $ExpectType Codec<"welcome_email_id" | "email_heading_id" | "footer_title_id" | "footer_sendoff_id">
+C.templateLiteral(C.union(EmailLocaleIDs, FooterLocaleIDs), C.literal("_id"));
+```
+
 ## Filters
 
 **Note**. Filters don't change the `Schema` type.
@@ -465,6 +479,40 @@ pipe(
 );
 ```
 
+## InstanceOf
+
+```ts
+class Test {
+  constructor(readonly name: string) {}
+}
+
+// $ExpectType Codec<Test>
+pipe(C.object, C.instanceOf(Test));
+```
+
+## parseString
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as C from "@fp-ts/schema/Codec";
+import { parseString } from "@fp-ts/schema/data/parser";
+import * as DE from "@fp-ts/schema/DecodeError";
+
+const schema = parseString(S.string); // converts string schema to number schema
+const codec = C.codecFor(schema);
+
+// success cases
+expect(codec.decode("1")).toEqual(C.success(1));
+expect(codec.decode("-1")).toEqual(C.success(-1));
+expect(codec.decode("1.5")).toEqual(C.success(1.5));
+expect(codec.decode("NaN")).toEqual(C.success(NaN));
+expect(codec.decode("Infinity")).toEqual(C.success(Infinity));
+expect(codec.decode("-Infinity")).toEqual(C.success(-Infinity));
+
+// failure cases
+expect(codec.decode("a")).toEqual(C.failure(DE.parse("string", "number", "a")));
+```
+
 ## Option
 
 ```ts
@@ -575,40 +623,6 @@ expect(
 ).toEqual(
   C.failure(DE.index(0, [DE.index(1, [DE.type("string", 2)])])) // wrong type for values
 );
-```
-
-## InstanceOf
-
-```ts
-class Test {
-  constructor(readonly name: string) {}
-}
-
-// $ExpectType Codec<Test>
-const TestSchema = pipe(C.object, C.instanceOf(Test));
-```
-
-## parseString
-
-```ts
-import * as S from "@fp-ts/schema/Schema";
-import * as C from "@fp-ts/schema/Codec";
-import { parseString } from "@fp-ts/schema/data/parser";
-import * as DE from "@fp-ts/schema/DecodeError";
-
-const schema = parseString(S.string); // converts string schema to number schema
-const codec = C.codecFor(schema);
-
-// success cases
-expect(codec.decode("1")).toEqual(C.success(1));
-expect(codec.decode("-1")).toEqual(C.success(-1));
-expect(codec.decode("1.5")).toEqual(C.success(1.5));
-expect(codec.decode("NaN")).toEqual(C.success(NaN));
-expect(codec.decode("Infinity")).toEqual(C.success(Infinity));
-expect(codec.decode("-Infinity")).toEqual(C.success(-Infinity));
-
-// failure cases
-expect(codec.decode("a")).toEqual(C.failure(DE.parse("string", "number", "a")));
 ```
 
 # Documentation
