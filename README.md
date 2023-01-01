@@ -28,7 +28,7 @@ Schema validation with static type inference
 - custom artifact compilers
 - custom `Schema` combinators
 - custom data types
-- refinements
+- refinements (TODO)
 - custom decode errors (TODO)
 - versioning (TODO)
 - migration (TODO)
@@ -454,15 +454,35 @@ C.partial(C.struct({ a: C.string, b: C.number }));
 
 ## Records
 
+String keys
+
 ```ts
 // $ExpectType Codec<{ readonly [x: string]: string; }>
 C.record(C.string, C.string);
 
-// $ExpectType Codec<{ readonly [x: symbol]: string; }>
-C.record(C.symbol, C.string);
-
 // $ExpectType Codec<{ readonly a: string; readonly b: string; }>
 C.record(C.union(C.literal("a"), C.literal("b")), C.string);
+```
+
+Keys refinements
+
+```ts
+// $ExpectType Codec<{ readonly [x: string]: string; }>
+C.record(pipe(C.string, C.minLength(2)), C.string);
+```
+
+Symbol keys
+
+```ts
+// $ExpectType Codec<{ readonly [x: symbol]: string; }>
+C.record(C.symbol, C.string);
+```
+
+Template literal keys
+
+```ts
+// $ExpectType Codec<{ readonly [x: `a${string}`]: string; }>
+C.record(C.templateLiteral(C.literal("a"), C.string), C.string);
 ```
 
 ## Extend
