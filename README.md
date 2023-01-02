@@ -83,9 +83,9 @@ Once you have defined a `Schema`, you can use the `Infer` type to extract the in
 For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
 
 ```ts
-type Person = C.Infer<typeof Person>;
+interface Person extends C.Infer<typeof Person> {}
 /*
-type Person = {
+interface Person {
   readonly name: string;
   readonly age: number;
 }
