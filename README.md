@@ -109,6 +109,18 @@ expect(Person.decode(null)).toEqual(
 
 The `decode` function returns a value of type `Validated<DecodeError, A>`, which is a type alias for `These<NonEmptyReadonlyArray<DecodeError>, A>`, where `DecodeError` represents a list of errors that occurred during the decoding process and `A` is the inferred type of the data described by the `Schema`. A successful decode will result in a `Right` or `Both` value, containing the decoded data. A `Right` value indicates that the decode was successful and no errors occurred. A `Both` value represents a successful decode that also includes some decode errors (as warnings). It is important to note that a `Both` value still represents a successful decode, as the data was able to be successfully decoded despite the presence of decode errors. In the case of a failed decode, the result will be a `Left` value containing a list of `DecodeError`s.
 
+The `decodeOrThrow` function is used to decode a value and throw an error if the decoding fails.
+It is useful when you want to ensure that the value being decoded is in the correct format, and want to throw an error if it is not.
+
+```ts
+Person.decodeOrThrow({});
+/*
+1 error(s) found
+└─ key "name"
+   └─ is missing
+*/
+```
+
 ## Encoding a value
 
 To use the `Person` `Schema` defined above to encode a value to `unknown`, you can use the `encode` function:
