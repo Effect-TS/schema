@@ -99,9 +99,9 @@ To use the `Person` `Schema` defined above to decode a value from `unknown`, you
 ```ts
 import * as DE from "@fp-ts/schema/DecodeError";
 
-const unknown: unknown = { name: "name", age: 18 };
+const unknown: unknown = { name: "Alice", age: 30 };
 
-expect(Person.decode(unknown)).toEqual(C.success({ name: "name", age: 18 }));
+expect(Person.decode(unknown)).toEqual(C.success({ name: "Alice", age: 30 }));
 expect(Person.decode(null)).toEqual(
   C.failure(DE.notType("{ readonly [x: string]: unknown }", null))
 );
@@ -121,14 +121,59 @@ Person.decodeOrThrow({});
 */
 ```
 
+**Excess properties**
+
+When using a `Codec` to decode a value, any properties that are not specified in the `Codec` will result in a decoding error. This is because the `Codec` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
+
+However, you can use the `allowUnexpected` combinator to allow excess properties while decoding, and instead of a fatal error, it will return a warning and strip away the excess properties. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
+
+Here's an example of how you might use `allowUnexpected`:
+
+```ts
+const Person = C.allowUnexpected(
+  C.struct({
+    name: C.string,
+    age: C.number,
+  })
+);
+
+// This will succeed and return a value with no warnings
+const result = personCodec.decode({ name: "Alice", age: 30 });
+
+// This will succeed, but return a warning about the excess property "email"
+console.log(
+  "%o",
+  Person.decode({ name: "Bob", age: 40, email: "bob@example.com" })
+);
+/*
+{
+  _tag: 'Both',
+  left: [
+    {
+      _tag: 'Key',
+      key: 'email',
+      errors: [
+        { _tag: 'Unexpected', actual: 'bob@example.com' },
+        [length]: 1
+      ]
+    },
+    [length]: 1
+  ],
+  right: { name: 'Bob', age: 40 }
+}
+*/
+```
+
+The `disallowUnexpected` combinator can be used to switch the decoding behavior of a `Codec` back to the default behavior of raising fatal errors for excess properties.
+
 ## Encoding a value
 
 To use the `Person` `Schema` defined above to encode a value to `unknown`, you can use the `encode` function:
 
 ```ts
-expect(Person.encode({ name: "name", age: 18 })).toEqual({
-  name: "name",
-  age: 18,
+expect(Person.encode({ name: "Alice", age: 30 })).toEqual({
+  name: "Alice",
+  age: 30,
 });
 ```
 
@@ -145,7 +190,7 @@ interface Guard<in out A> extends Schema<A> {
 For example, given the `Person` `Schema` defined above, you can use the `is` function provided by the `Person` `Guard` to check if a value conforms to the `Person` `Schema`:
 
 ```ts
-expect(Person.is({ name: "name", age: 18 })).toEqual(true);
+expect(Person.is({ name: "Alice", age: 30 })).toEqual(true);
 expect(Person.is(null)).toEqual(false);
 ```
 
@@ -195,8 +240,8 @@ import * as P from "@fp-ts/schema/Pretty";
 
 const PersonPretty = P.prettyFor(Person);
 
-expect(PersonPretty.pretty({ name: "name", age: 18 })).toEqual(
-  `{ "name": "name", "age": 18 }`
+expect(PersonPretty.pretty({ name: "Alice", age: 30 })).toEqual(
+  `{ "name": "Alice", "age": 30 }`
 );
 ```
 
