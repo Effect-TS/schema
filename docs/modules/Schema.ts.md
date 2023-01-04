@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 25
+nav_order: 22
 parent: Modules
 ---
 
@@ -13,7 +13,6 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [combinators](#combinators)
-  - [annotations](#annotations)
   - [array](#array)
   - [element](#element)
   - [extend](#extend)
@@ -26,12 +25,13 @@ Added in v1.0.0
   - [omit](#omit)
   - [optional](#optional)
   - [optionalElement](#optionalelement)
-  - [parse](#parse)
   - [partial](#partial)
   - [pick](#pick)
   - [record](#record)
   - [rest](#rest)
   - [struct](#struct)
+  - [transform](#transform)
+  - [transformOrFail](#transformorfail)
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
@@ -39,6 +39,7 @@ Added in v1.0.0
   - [instanceOf](#instanceof)
   - [literal](#literal)
   - [make](#make)
+  - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [data](#data)
   - [json](#json)
@@ -81,6 +82,7 @@ Added in v1.0.0
   - [disallowUnexpected](#disallowunexpected)
 - [utils](#utils)
   - [Infer (type alias)](#infer-type-alias)
+  - [Join (type alias)](#join-type-alias)
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [OptionalSchema (interface)](#optionalschema-interface)
   - [Spread (type alias)](#spread-type-alias)
@@ -88,16 +90,6 @@ Added in v1.0.0
 ---
 
 # combinators
-
-## annotations
-
-**Signature**
-
-```ts
-export declare const annotations: (annotations: AST.Annotated['annotations']) => <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
 
 ## array
 
@@ -139,7 +131,8 @@ Added in v1.0.0
 export declare const field: <Key extends string | number | symbol, A, isOptional extends boolean>(
   key: Key,
   value: Schema<A>,
-  isOptional: isOptional
+  isOptional: isOptional,
+  annotations?: Record<string | symbol, unknown> | undefined
 ) => Schema<isOptional extends true ? { readonly [K in Key]?: A | undefined } : { readonly [K in Key]: A }>
 ```
 
@@ -233,20 +226,6 @@ export declare const optionalElement: <E>(
 
 Added in v1.0.0
 
-## parse
-
-**Signature**
-
-```ts
-export declare const parse: <A, B>(
-  to: Schema<B>,
-  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>,
-  encode: (value: B) => A
-) => (self: Schema<A>) => Schema<B>
-```
-
-Added in v1.0.0
-
 ## partial
 
 **Signature**
@@ -274,7 +253,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const record: <K extends string | number | symbol, V>(
+export declare const record: <K extends string | symbol, V>(
   key: Schema<K>,
   value: Schema<V>
 ) => Schema<{ readonly [k in K]: V }>
@@ -312,6 +291,34 @@ export declare const struct: <Fields extends Record<string | number | symbol, Sc
 
 Added in v1.0.0
 
+## transform
+
+Creates a new schema that transforms values from one type to another using the provided functions.
+
+**Signature**
+
+```ts
+export declare const transform: <A, B>(to: Schema<B>, f: (a: A) => B, g: (b: B) => A) => (self: Schema<A>) => Schema<B>
+```
+
+Added in v1.0.0
+
+## transformOrFail
+
+Combinator that creates a new Schema by transforming the input and output of an existing Schema using the provided decoding functions.
+
+**Signature**
+
+```ts
+export declare const transformOrFail: <A, B>(
+  to: Schema<B>,
+  f: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>,
+  g: (i: B) => These<readonly [DecodeError, ...DecodeError[]], A>
+) => (self: Schema<A>) => Schema<B>
+```
+
+Added in v1.0.0
+
 ## tuple
 
 **Signature**
@@ -343,7 +350,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Schema<A[keyof A]>
+export declare const enums: <A extends { [x: string]: string | number }>(
+  enums: A,
+  annotations?: AST.Annotated['annotations']
+) => Schema<A[keyof A]>
 ```
 
 Added in v1.0.0
@@ -365,7 +375,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const literal: <Literals extends readonly AST.Literal[]>(
+export declare const literal: <Literals extends readonly AST.LiteralValue[]>(
   ...literals: Literals
 ) => Schema<Literals[number]>
 ```
@@ -382,12 +392,27 @@ export declare const make: <A>(ast: AST.AST) => Schema<A>
 
 Added in v1.0.0
 
+## templateLiteral
+
+**Signature**
+
+```ts
+export declare const templateLiteral: <T extends [Schema<any>, ...Schema<any>[]]>(
+  ...[head, ...tail]: T
+) => Schema<Join<{ [K in keyof T]: Infer<T[K]> }>>
+```
+
+Added in v1.0.0
+
 ## uniqueSymbol
 
 **Signature**
 
 ```ts
-export declare const uniqueSymbol: <S extends symbol>(symbol: S) => Schema<S>
+export declare const uniqueSymbol: <S extends symbol>(
+  symbol: S,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => Schema<S>
 ```
 
 Added in v1.0.0
@@ -406,10 +431,12 @@ Added in v1.0.0
 
 ## option
 
+Creates a `Schema` for an `Option` of `A`.
+
 **Signature**
 
 ```ts
-export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
+export declare const option: <A>(value: Schema<A>, kind?: 'plain' | 'fromNullable' | 'inline') => Schema<Option<A>>
 ```
 
 Added in v1.0.0
@@ -745,6 +772,18 @@ Added in v1.0.0
 
 ```ts
 export type Infer<S extends Schema<any>> = Parameters<S['A']>[0]
+```
+
+Added in v1.0.0
+
+## Join (type alias)
+
+**Signature**
+
+```ts
+export type Join<T> = T extends [infer Head, ...infer Tail]
+  ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? '' : Join<Tail>}`
+  : never
 ```
 
 Added in v1.0.0

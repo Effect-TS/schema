@@ -365,6 +365,8 @@ C.literal(true);
 
 ## Template literals
 
+The `templateLiteral` combinator allows you to create a codec for a TypeScript template literal type.
+
 ```ts
 // $ExpectType Codec<`a${string}`>
 C.templateLiteral(C.literal("a"), C.string);
@@ -544,6 +546,8 @@ C.record(C.templateLiteral(C.literal("a"), C.string), C.string);
 
 ## Extend
 
+The `extend` combinator allows you to add additional fields or index signatures to an existing `Codec` or `Schema`.
+
 ```ts
 // $ExpectType Codec<{ [x: string]: string; readonly a: string; readonly b: string; readonly c: boolean; }>
 pipe(
@@ -555,6 +559,8 @@ pipe(
 
 ## InstanceOf
 
+In the following section, we demonstrate how to use the `instanceOf` combinator to create a `Codec` for a class instance.
+
 ```ts
 class Test {
   constructor(readonly name: string) {}
@@ -565,6 +571,8 @@ pipe(C.object, C.instanceOf(Test));
 ```
 
 ## parseNumber
+
+In the following section, we demonstrate how to use the `parseNumber` combinator to convert a `string` schema to a `number` schema and parse string inputs into numbers. The `parseNumber` combinator allows parsing special values such as `NaN`, `Infinity`, and `-Infinity` in addition to regular numbers.
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
@@ -588,6 +596,10 @@ expect(codec.decode("a")).toEqual(C.failure(DE.parse("string", "number", "a")));
 ```
 
 ## Option
+
+The `option` combinator allows you to specify that a field in a schema may be either an optional value or `null`. This is useful when working with JSON data that may contain `null` values for optional fields.
+
+In the example below, we define a schema for an object with a required `a` field of type `string` and an optional `b` field of type `number`. We use the `option` combinator to specify that the `b` field may be either a `number` or `null`. We then use a codec created from this schema to decode some sample data and examine the results.
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
@@ -627,6 +639,8 @@ expect(codec.decode({ a: "hello" })).toEqual(
 
 ## ReadonlySet
 
+In the following section, we demonstrate how to use the `fromArray` combinator to decode a `ReadonlySet` from an array.
+
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as C from "@fp-ts/schema/Codec";
@@ -649,6 +663,8 @@ expect(codec.decode([1, 2, "a"])).toEqual(
 ```
 
 ## ReadonlyMap
+
+In the following section, we demonstrate how to use the `fromEntries` combinator to create a `Codec` for a `ReadonlyMap` with specific key and value types.
 
 ```ts
 import * as G from "@fp-ts/schema/Guard";

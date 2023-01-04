@@ -1,6 +1,6 @@
 ---
 title: data/Chunk.ts
-nav_order: 12
+nav_order: 8
 parent: Modules
 ---
 
@@ -14,6 +14,7 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [chunk](#chunk)
+  - [fromArray](#fromarray)
 
 ---
 
@@ -25,6 +26,16 @@ Added in v1.0.0
 
 ```ts
 export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
+```
+
+Added in v1.0.0
+
+## fromArray
+
+**Signature**
+
+```ts
+export declare const fromArray: <A>(item: Schema<A>) => Schema<Chunk<A>>
 ```
 
 Added in v1.0.0

@@ -1,6 +1,6 @@
 ---
 title: AST.ts
-nav_order: 10
+nav_order: 6
 parent: Modules
 ---
 
@@ -18,16 +18,18 @@ Added in v1.0.0
   - [booleanKeyword](#booleankeyword)
   - [enums](#enums)
   - [lazy](#lazy)
-  - [literalType](#literaltype)
+  - [literal](#literal)
   - [neverKeyword](#neverkeyword)
   - [numberKeyword](#numberkeyword)
   - [objectKeyword](#objectkeyword)
   - [refinement](#refinement)
   - [stringKeyword](#stringkeyword)
-  - [struct](#struct)
   - [symbolKeyword](#symbolkeyword)
+  - [templateLiteral](#templateliteral)
+  - [transformOrFail](#transformorfail)
   - [tuple](#tuple)
   - [typeAlias](#typealias)
+  - [typeLiteral](#typeliteral)
   - [undefinedKeyword](#undefinedkeyword)
   - [union](#union)
   - [uniqueSymbol](#uniquesymbol)
@@ -35,13 +37,14 @@ Added in v1.0.0
   - [voidKeyword](#voidkeyword)
 - [guards](#guards)
   - [isLazy](#islazy)
-  - [isLiteralType](#isliteraltype)
+  - [isLiteral](#isliteral)
   - [isNumberKeyword](#isnumberkeyword)
   - [isStringKeyword](#isstringkeyword)
-  - [isStruct](#isstruct)
   - [isSymbolKeyword](#issymbolkeyword)
+  - [isTemplateLiteral](#istemplateliteral)
   - [isTuple](#istuple)
   - [isTypeAlias](#istypealias)
+  - [isTypeLiteral](#istypeliteral)
   - [isUnion](#isunion)
   - [isUniqueSymbol](#isuniquesymbol)
 - [model](#model)
@@ -51,16 +54,18 @@ Added in v1.0.0
   - [BooleanKeyword (interface)](#booleankeyword-interface)
   - [Enums (interface)](#enums-interface)
   - [Lazy (interface)](#lazy-interface)
-  - [LiteralType (interface)](#literaltype-interface)
+  - [Literal (interface)](#literal-interface)
   - [NeverKeyword (interface)](#neverkeyword-interface)
   - [NumberKeyword (interface)](#numberkeyword-interface)
   - [ObjectKeyword (interface)](#objectkeyword-interface)
   - [Refinement (interface)](#refinement-interface)
   - [StringKeyword (interface)](#stringkeyword-interface)
-  - [Struct (interface)](#struct-interface)
   - [SymbolKeyword (interface)](#symbolkeyword-interface)
+  - [TemplateLiteral (interface)](#templateliteral-interface)
+  - [Transform (interface)](#transform-interface)
   - [Tuple (interface)](#tuple-interface)
   - [TypeAlias (interface)](#typealias-interface)
+  - [TypeLiteral (interface)](#typeliteral-interface)
   - [UndefinedKeyword (interface)](#undefinedkeyword-interface)
   - [Union (interface)](#union-interface)
   - [UniqueSymbol (interface)](#uniquesymbol-interface)
@@ -69,21 +74,20 @@ Added in v1.0.0
 - [utils](#utils)
   - [Annotated (interface)](#annotated-interface)
   - [Element (interface)](#element-interface)
-  - [Field (interface)](#field-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
-  - [Literal (type alias)](#literal-type-alias)
-  - [annotations](#annotations)
+  - [LiteralValue (type alias)](#literalvalue-type-alias)
+  - [PropertySignature (interface)](#propertysignature-interface)
+  - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
   - [appendElement](#appendelement)
   - [appendRestElement](#appendrestelement)
   - [element](#element)
-  - [field](#field)
-  - [getFields](#getfields)
+  - [getPropertySignatures](#getpropertysignatures)
   - [indexSignature](#indexsignature)
   - [keyof](#keyof)
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
-  - [propertyKeys](#propertykeys)
+  - [propertySignature](#propertysignature)
   - [record](#record)
 
 ---
@@ -138,17 +142,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: (f: () => AST, annotations?: Annotated['annotations']) => Lazy
+export declare const lazy: (f: () => AST) => Lazy
 ```
 
 Added in v1.0.0
 
-## literalType
+## literal
 
 **Signature**
 
 ```ts
-export declare const literalType: (literal: Literal, annotations?: Annotated['annotations']) => LiteralType
+export declare const literal: (literal: LiteralValue) => Literal
 ```
 
 Added in v1.0.0
@@ -188,12 +192,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const refinement: (
-  from: AST,
-  refinement: Predicate<any>,
-  meta: unknown,
-  annotations?: Annotated['annotations']
-) => Refinement
+export declare const refinement: (from: AST, refinement: Predicate<any>, meta: unknown) => Refinement
 ```
 
 Added in v1.0.0
@@ -208,27 +207,35 @@ export declare const stringKeyword: StringKeyword
 
 Added in v1.0.0
 
-## struct
-
-**Signature**
-
-```ts
-export declare const struct: (
-  fields: ReadonlyArray<Field>,
-  indexSignatures: ReadonlyArray<IndexSignature>,
-  annotations?: Annotated['annotations'],
-  allowUnexpected?: boolean
-) => Struct
-```
-
-Added in v1.0.0
-
 ## symbolKeyword
 
 **Signature**
 
 ```ts
 export declare const symbolKeyword: SymbolKeyword
+```
+
+Added in v1.0.0
+
+## templateLiteral
+
+**Signature**
+
+```ts
+export declare const templateLiteral: (
+  head: string,
+  spans: ReadonlyArray<TemplateLiteralSpan>
+) => TemplateLiteral | Literal
+```
+
+Added in v1.0.0
+
+## transformOrFail
+
+**Signature**
+
+```ts
+export declare const transformOrFail: (from: AST, to: AST, f: Transform['f'], g: Transform['g']) => Transform
 ```
 
 Added in v1.0.0
@@ -242,8 +249,8 @@ export declare const tuple: (
   elements: ReadonlyArray<Element>,
   rest: Option<RA.NonEmptyReadonlyArray<AST>>,
   isReadonly: boolean,
-  annotations?: Annotated['annotations'],
-  allowUnexpected?: boolean
+  isUnexpectedAllowed?: boolean,
+  annotations?: Annotated['annotations']
 ) => Tuple
 ```
 
@@ -263,6 +270,21 @@ export declare const typeAlias: (
 
 Added in v1.0.0
 
+## typeLiteral
+
+**Signature**
+
+```ts
+export declare const typeLiteral: (
+  propertySignatures: ReadonlyArray<PropertySignature>,
+  indexSignatures: ReadonlyArray<IndexSignature>,
+  isUnexpectedAllowed?: boolean,
+  annotations?: Annotated['annotations']
+) => TypeLiteral
+```
+
+Added in v1.0.0
+
 ## undefinedKeyword
 
 **Signature**
@@ -278,7 +300,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const union: (candidates: ReadonlyArray<AST>, annotations?: Annotated['annotations']) => AST
+export declare const union: (candidates: ReadonlyArray<AST>) => AST
 ```
 
 Added in v1.0.0
@@ -325,12 +347,12 @@ export declare const isLazy: (ast: AST) => ast is Lazy
 
 Added in v1.0.0
 
-## isLiteralType
+## isLiteral
 
 **Signature**
 
 ```ts
-export declare const isLiteralType: (ast: AST) => ast is LiteralType
+export declare const isLiteral: (ast: AST) => ast is Literal
 ```
 
 Added in v1.0.0
@@ -355,22 +377,22 @@ export declare const isStringKeyword: (ast: AST) => ast is StringKeyword
 
 Added in v1.0.0
 
-## isStruct
-
-**Signature**
-
-```ts
-export declare const isStruct: (ast: AST) => ast is Struct
-```
-
-Added in v1.0.0
-
 ## isSymbolKeyword
 
 **Signature**
 
 ```ts
 export declare const isSymbolKeyword: (ast: AST) => ast is SymbolKeyword
+```
+
+Added in v1.0.0
+
+## isTemplateLiteral
+
+**Signature**
+
+```ts
+export declare const isTemplateLiteral: (ast: AST) => ast is TemplateLiteral
 ```
 
 Added in v1.0.0
@@ -391,6 +413,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isTypeAlias: (ast: AST) => ast is TypeAlias
+```
+
+Added in v1.0.0
+
+## isTypeLiteral
+
+**Signature**
+
+```ts
+export declare const isTypeLiteral: (ast: AST) => ast is TypeLiteral
 ```
 
 Added in v1.0.0
@@ -424,7 +456,7 @@ Added in v1.0.0
 ```ts
 export type AST =
   | TypeAlias
-  | LiteralType
+  | Literal
   | UniqueSymbol
   | UndefinedKeyword
   | VoidKeyword
@@ -438,11 +470,13 @@ export type AST =
   | SymbolKeyword
   | ObjectKeyword
   | Tuple
-  | Struct
+  | TypeLiteral
   | Union
   | Lazy
   | Enums
   | Refinement
+  | TemplateLiteral
+  | Transform
 ```
 
 Added in v1.0.0
@@ -452,7 +486,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface AnyKeyword extends Annotated {
+export interface AnyKeyword {
   readonly _tag: 'AnyKeyword'
 }
 ```
@@ -464,7 +498,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface BigIntKeyword extends Annotated {
+export interface BigIntKeyword {
   readonly _tag: 'BigIntKeyword'
 }
 ```
@@ -476,7 +510,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface BooleanKeyword extends Annotated {
+export interface BooleanKeyword {
   readonly _tag: 'BooleanKeyword'
 }
 ```
@@ -501,7 +535,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Lazy extends Annotated {
+export interface Lazy {
   readonly _tag: 'Lazy'
   readonly f: () => AST
 }
@@ -509,14 +543,14 @@ export interface Lazy extends Annotated {
 
 Added in v1.0.0
 
-## LiteralType (interface)
+## Literal (interface)
 
 **Signature**
 
 ```ts
-export interface LiteralType extends Annotated {
-  readonly _tag: 'LiteralType'
-  readonly literal: Literal
+export interface Literal {
+  readonly _tag: 'Literal'
+  readonly literal: LiteralValue
 }
 ```
 
@@ -527,7 +561,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface NeverKeyword extends Annotated {
+export interface NeverKeyword {
   readonly _tag: 'NeverKeyword'
 }
 ```
@@ -539,7 +573,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface NumberKeyword extends Annotated {
+export interface NumberKeyword {
   readonly _tag: 'NumberKeyword'
 }
 ```
@@ -551,7 +585,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface ObjectKeyword extends Annotated {
+export interface ObjectKeyword {
   readonly _tag: 'ObjectKeyword'
 }
 ```
@@ -563,7 +597,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Refinement extends Annotated {
+export interface Refinement {
   readonly _tag: 'Refinement'
   readonly from: AST
   readonly refinement: Predicate<any>
@@ -578,23 +612,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface StringKeyword extends Annotated {
+export interface StringKeyword {
   readonly _tag: 'StringKeyword'
-}
-```
-
-Added in v1.0.0
-
-## Struct (interface)
-
-**Signature**
-
-```ts
-export interface Struct extends Annotated {
-  readonly _tag: 'Struct'
-  readonly fields: ReadonlyArray<Field>
-  readonly indexSignatures: ReadonlyArray<IndexSignature>
-  readonly allowUnexpected: boolean
 }
 ```
 
@@ -605,8 +624,38 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface SymbolKeyword extends Annotated {
+export interface SymbolKeyword {
   readonly _tag: 'SymbolKeyword'
+}
+```
+
+Added in v1.0.0
+
+## TemplateLiteral (interface)
+
+**Signature**
+
+```ts
+export interface TemplateLiteral {
+  readonly _tag: 'TemplateLiteral'
+  readonly head: string
+  readonly spans: RA.NonEmptyReadonlyArray<TemplateLiteralSpan>
+}
+```
+
+Added in v1.0.0
+
+## Transform (interface)
+
+**Signature**
+
+```ts
+export interface Transform {
+  readonly _tag: 'Transform'
+  readonly from: AST
+  readonly to: AST
+  readonly f: Decoder<any, any>['decode']
+  readonly g: Decoder<any, any>['decode']
 }
 ```
 
@@ -622,7 +671,7 @@ export interface Tuple extends Annotated {
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
-  readonly allowUnexpected: boolean
+  readonly isUnexpectedAllowed: boolean
 }
 ```
 
@@ -642,12 +691,27 @@ export interface TypeAlias extends Annotated {
 
 Added in v1.0.0
 
+## TypeLiteral (interface)
+
+**Signature**
+
+```ts
+export interface TypeLiteral extends Annotated {
+  readonly _tag: 'TypeLiteral'
+  readonly propertySignatures: ReadonlyArray<PropertySignature>
+  readonly indexSignatures: ReadonlyArray<IndexSignature>
+  readonly isUnexpectedAllowed: boolean
+}
+```
+
+Added in v1.0.0
+
 ## UndefinedKeyword (interface)
 
 **Signature**
 
 ```ts
-export interface UndefinedKeyword extends Annotated {
+export interface UndefinedKeyword {
   readonly _tag: 'UndefinedKeyword'
 }
 ```
@@ -659,9 +723,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Union extends Annotated {
+export interface Union {
   readonly _tag: 'Union'
-  readonly members: readonly [AST, AST, ...Array<AST>]
+  readonly types: readonly [AST, AST, ...Array<AST>]
 }
 ```
 
@@ -685,7 +749,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface UnknownKeyword extends Annotated {
+export interface UnknownKeyword {
   readonly _tag: 'UnknownKeyword'
 }
 ```
@@ -697,7 +761,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface VoidKeyword extends Annotated {
+export interface VoidKeyword {
   readonly _tag: 'VoidKeyword'
 }
 ```
@@ -723,24 +787,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Element extends Annotated {
+export interface Element {
   readonly type: AST
   readonly isOptional: boolean
-}
-```
-
-Added in v1.0.0
-
-## Field (interface)
-
-**Signature**
-
-```ts
-export interface Field extends Annotated {
-  readonly key: PropertyKey
-  readonly value: AST
-  readonly isOptional: boolean
-  readonly isReadonly: boolean
 }
 ```
 
@@ -751,31 +800,49 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface IndexSignature extends Annotated {
-  readonly key: 'string' | 'number' | 'symbol'
-  readonly value: AST
+export interface IndexSignature {
+  readonly parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement
+  readonly type: AST
   readonly isReadonly: boolean
 }
 ```
 
 Added in v1.0.0
 
-## Literal (type alias)
+## LiteralValue (type alias)
 
 **Signature**
 
 ```ts
-export type Literal = string | number | boolean | null | bigint
+export type LiteralValue = string | number | boolean | null | bigint
 ```
 
 Added in v1.0.0
 
-## annotations
+## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export declare const annotations: (ast: AST, annotations?: Annotated['annotations']) => AST
+export interface PropertySignature extends Annotated {
+  readonly name: PropertyKey
+  readonly type: AST
+  readonly isOptional: boolean
+  readonly isReadonly: boolean
+}
+```
+
+Added in v1.0.0
+
+## TemplateLiteralSpan (interface)
+
+**Signature**
+
+```ts
+export interface TemplateLiteralSpan {
+  readonly type: StringKeyword
+  readonly literal: string
+}
 ```
 
 Added in v1.0.0
@@ -785,7 +852,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const appendElement: (ast: Tuple, newElement: Element, annotations?: Annotated['annotations']) => Tuple
+export declare const appendElement: (ast: Tuple, newElement: Element) => Tuple
 ```
 
 Added in v1.0.0
@@ -795,7 +862,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const appendRestElement: (ast: Tuple, restElement: AST, annotations?: Annotated['annotations']) => Tuple
+export declare const appendRestElement: (ast: Tuple, restElement: AST) => Tuple
 ```
 
 Added in v1.0.0
@@ -805,33 +872,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const element: (type: AST, isOptional: boolean, annotations?: Annotated['annotations']) => Element
+export declare const element: (type: AST, isOptional: boolean) => Element
 ```
 
 Added in v1.0.0
 
-## field
+## getPropertySignatures
 
 **Signature**
 
 ```ts
-export declare const field: (
-  key: PropertyKey,
-  value: AST,
-  isOptional: boolean,
-  isReadonly: boolean,
-  annotations?: Annotated['annotations']
-) => Field
-```
-
-Added in v1.0.0
-
-## getFields
-
-**Signature**
-
-```ts
-export declare const getFields: (ast: AST) => ReadonlyArray<Field>
+export declare const getPropertySignatures: (ast: AST) => ReadonlyArray<PropertySignature>
 ```
 
 Added in v1.0.0
@@ -842,10 +893,9 @@ Added in v1.0.0
 
 ```ts
 export declare const indexSignature: (
-  key: IndexSignature['key'],
-  value: AST,
-  isReadonly: boolean,
-  annotations?: Annotated['annotations']
+  parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement,
+  type: AST,
+  isReadonly: boolean
 ) => IndexSignature
 ```
 
@@ -866,7 +916,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const omit: (ast: AST, keys: ReadonlyArray<PropertyKey>) => Struct
+export declare const omit: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
 ```
 
 Added in v1.0.0
@@ -886,17 +936,23 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>) => Struct
+export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
 ```
 
 Added in v1.0.0
 
-## propertyKeys
+## propertySignature
 
 **Signature**
 
 ```ts
-export declare const propertyKeys: (ast: AST) => ReadonlyArray<PropertyKey>
+export declare const propertySignature: (
+  name: PropertyKey,
+  type: AST,
+  isOptional: boolean,
+  isReadonly: boolean,
+  annotations?: Annotated['annotations']
+) => PropertySignature
 ```
 
 Added in v1.0.0
@@ -906,7 +962,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const record: (key: AST, value: AST, isReadonly: boolean) => Struct
+export declare const record: (key: AST, value: AST, isReadonly: boolean) => TypeLiteral
 ```
 
 Added in v1.0.0

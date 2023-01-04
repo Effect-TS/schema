@@ -1,6 +1,6 @@
 ---
 title: Codec.ts
-nav_order: 11
+nav_order: 7
 parent: Modules
 ---
 
@@ -13,7 +13,6 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [combinators](#combinators)
-  - [annotations](#annotations)
   - [array](#array)
   - [element](#element)
   - [extend](#extend)
@@ -26,12 +25,13 @@ Added in v1.0.0
   - [omit](#omit)
   - [optional](#optional)
   - [optionalElement](#optionalelement)
-  - [parse](#parse)
   - [partial](#partial)
   - [pick](#pick)
   - [record](#record)
   - [rest](#rest)
   - [struct](#struct)
+  - [transform](#transform)
+  - [transformOrFail](#transformorfail)
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
@@ -41,6 +41,7 @@ Added in v1.0.0
   - [instanceOf](#instanceof)
   - [literal](#literal)
   - [success](#success)
+  - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
   - [warning](#warning)
   - [warnings](#warnings)
@@ -67,16 +68,7 @@ Added in v1.0.0
   - [isSuccess](#issuccess)
   - [isWarning](#iswarning)
 - [model](#model)
-  - [Codec (class)](#codec-class)
-    - [parseOrThrow (method)](#parseorthrow-method)
-    - [stringify (method)](#stringify-method)
-    - [of (method)](#of-method)
-    - [A (property)](#a-property)
-    - [I (property)](#i-property)
-    - [ast (property)](#ast-property)
-    - [decode (property)](#decode-property)
-    - [encode (property)](#encode-property)
-    - [is (property)](#is-property)
+  - [Codec (interface)](#codec-interface)
 - [primitives](#primitives)
   - [any](#any)
   - [bigint](#bigint)
@@ -100,16 +92,6 @@ Added in v1.0.0
 ---
 
 # combinators
-
-## annotations
-
-**Signature**
-
-```ts
-export declare const annotations: (annotations: Annotated['annotations']) => <A>(schema: Schema<A>) => Codec<A>
-```
-
-Added in v1.0.0
 
 ## array
 
@@ -151,7 +133,8 @@ Added in v1.0.0
 export declare const field: <Key extends string | number | symbol, A, isOptional extends boolean>(
   key: Key,
   value: Schema<A>,
-  isOptional: isOptional
+  isOptional: isOptional,
+  annotations?: Record<string | symbol, unknown> | undefined
 ) => Codec<isOptional extends true ? { readonly [K in Key]?: A | undefined } : { readonly [K in Key]: A }>
 ```
 
@@ -245,20 +228,6 @@ export declare const optionalElement: <E>(
 
 Added in v1.0.0
 
-## parse
-
-**Signature**
-
-```ts
-export declare const parse: <A, B>(
-  to: Schema<B>,
-  decode: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>,
-  encode: (value: B) => A
-) => (self: Schema<A>) => Codec<B>
-```
-
-Added in v1.0.0
-
 ## partial
 
 **Signature**
@@ -286,7 +255,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const record: <K extends string | number | symbol, V>(
+export declare const record: <K extends string | symbol, V>(
   key: Schema<K>,
   value: Schema<V>
 ) => Codec<{ readonly [k in K]: V }>
@@ -324,6 +293,30 @@ export declare const struct: <Fields extends Record<string | number | symbol, Sc
 
 Added in v1.0.0
 
+## transform
+
+**Signature**
+
+```ts
+export declare const transform: <A, B>(to: Schema<B>, f: (a: A) => B, g: (b: B) => A) => (self: Schema<A>) => Codec<B>
+```
+
+Added in v1.0.0
+
+## transformOrFail
+
+**Signature**
+
+```ts
+export declare const transformOrFail: <A, B>(
+  to: Schema<B>,
+  f: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>,
+  g: (i: B) => These<readonly [DecodeError, ...DecodeError[]], A>
+) => (self: Schema<A>) => Codec<B>
+```
+
+Added in v1.0.0
+
 ## tuple
 
 **Signature**
@@ -355,7 +348,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const enums: <A extends { [x: string]: string | number }>(nativeEnum: A) => Codec<A[keyof A]>
+export declare const enums: <A extends { [x: string]: string | number }>(
+  nativeEnum: A,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => Codec<A[keyof A]>
 ```
 
 Added in v1.0.0
@@ -399,7 +395,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const literal: <A extends readonly Literal[]>(...a: A) => Codec<A[number]>
+export declare const literal: <A extends readonly LiteralValue[]>(...a: A) => Codec<A[number]>
 ```
 
 Added in v1.0.0
@@ -414,12 +410,27 @@ export declare const success: <A>(a: A) => These<never, A>
 
 Added in v1.0.0
 
+## templateLiteral
+
+**Signature**
+
+```ts
+export declare const templateLiteral: <T extends [Schema<any>, ...Schema<any>[]]>(
+  ...spans: T
+) => Codec<S.Join<{ [K in keyof T]: Infer<T[K]> }>>
+```
+
+Added in v1.0.0
+
 ## uniqueSymbol
 
 **Signature**
 
 ```ts
-export declare const uniqueSymbol: <S extends symbol>(symbol: S) => Codec<S>
+export declare const uniqueSymbol: <S extends symbol>(
+  symbol: S,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => Codec<S>
 ```
 
 Added in v1.0.0
@@ -464,7 +475,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const option: <A>(value: Schema<A>) => Codec<Option<A>>
+export declare const option: <A>(value: Schema<A>, kind?: 'plain' | 'fromNullable' | 'inline') => Codec<Option<A>>
 ```
 
 Added in v1.0.0
@@ -645,107 +656,14 @@ Added in v1.0.0
 
 # model
 
-## Codec (class)
+## Codec (interface)
 
 **Signature**
 
 ```ts
-export declare class Codec<A> {
-  constructor(schema: Schema<A>)
+export interface Codec<A> extends Schema<A>, Decoder<unknown, A>, Encoder<unknown, A>, Guard<A> {
+  readonly decodeOrThrow: (u: unknown) => A
 }
-```
-
-Added in v1.0.0
-
-### parseOrThrow (method)
-
-**Signature**
-
-```ts
-parseOrThrow(
-    text: string,
-    format?: (errors: NonEmptyReadonlyArray<DecodeError>) => string
-  ): A
-```
-
-Added in v1.0.0
-
-### stringify (method)
-
-**Signature**
-
-```ts
-stringify(value: A): string
-```
-
-Added in v1.0.0
-
-### of (method)
-
-**Signature**
-
-```ts
-of(value: A): A
-```
-
-Added in v1.0.0
-
-### A (property)
-
-**Signature**
-
-```ts
-readonly A: (_: A) => A
-```
-
-Added in v1.0.0
-
-### I (property)
-
-**Signature**
-
-```ts
-readonly I: (_: unknown) => void
-```
-
-Added in v1.0.0
-
-### ast (property)
-
-**Signature**
-
-```ts
-readonly ast: AST
-```
-
-Added in v1.0.0
-
-### decode (property)
-
-**Signature**
-
-```ts
-readonly decode: (i: unknown) => These<readonly [DecodeError, ...DecodeError[]], A>
-```
-
-Added in v1.0.0
-
-### encode (property)
-
-**Signature**
-
-```ts
-readonly encode: (value: A) => unknown
-```
-
-Added in v1.0.0
-
-### is (property)
-
-**Signature**
-
-```ts
-readonly is: (input: unknown) => input is A
 ```
 
 Added in v1.0.0

@@ -1,6 +1,6 @@
 ---
 title: Arbitrary.ts
-nav_order: 9
+nav_order: 5
 parent: Modules
 ---
 
