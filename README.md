@@ -564,15 +564,15 @@ class Test {
 pipe(C.object, C.instanceOf(Test));
 ```
 
-## parseString
+## parseNumber
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as C from "@fp-ts/schema/Codec";
-import { parseString } from "@fp-ts/schema/data/parser";
+import { parseNumber } from "@fp-ts/schema/data/parser";
 import * as DE from "@fp-ts/schema/DecodeError";
 
-const schema = parseString(S.string); // converts string schema to number schema
+const schema = parseNumber(S.string); // converts string schema to number schema
 const codec = C.codecFor(schema);
 
 // success cases
