@@ -1,6 +1,6 @@
 ---
 title: data/Option.ts
-nav_order: 14
+nav_order: 10
 parent: Modules
 ---
 
@@ -13,11 +13,33 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
+  - [fromNullable](#fromnullable)
+  - [inline](#inline)
   - [option](#option)
 
 ---
 
 # utils
+
+## fromNullable
+
+**Signature**
+
+```ts
+export declare const fromNullable: <A>(value: Schema<A>) => Schema<Option<A>>
+```
+
+Added in v1.0.0
+
+## inline
+
+**Signature**
+
+```ts
+export declare const inline: <A>(value: Schema<A>) => Schema<Option<A>>
+```
+
+Added in v1.0.0
 
 ## option
 

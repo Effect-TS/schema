@@ -1,6 +1,6 @@
 ---
 title: data/parser.ts
-nav_order: 15
+nav_order: 11
 parent: Modules
 ---
 
@@ -13,33 +13,22 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [parse](#parse)
-  - [parseString](#parsestring)
+  - [parseNumber](#parsenumber)
 
 ---
 
 # utils
 
-## parse
+## parseNumber
+
+Transforms a `string` schema into a `number` schema by parsing the string value as a number.
+If the string is not a valid number representation, the decoding will fail with a `DecodeError.transform` error.
+The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
 **Signature**
 
 ```ts
-export declare const parse: <A, B>(
-  to: Schema<B>,
-  decode: (i: A) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], B>,
-  encode: (value: B) => A
-) => (from: Schema<A>) => Schema<B>
-```
-
-Added in v1.0.0
-
-## parseString
-
-**Signature**
-
-```ts
-export declare const parseString: (self: Schema<string>) => Schema<number>
+export declare const parseNumber: (self: Schema<string>) => Schema<number>
 ```
 
 Added in v1.0.0

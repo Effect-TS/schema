@@ -1,6 +1,6 @@
 ---
 title: DecodeError.ts
-nav_order: 19
+nav_order: 15
 parent: Modules
 ---
 
@@ -12,7 +12,23 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [utils](#utils)
+- [constructors](#constructors)
+  - [enums](#enums)
+  - [equal](#equal)
+  - [index](#index)
+  - [key](#key)
+  - [member](#member)
+  - [meta](#meta)
+  - [missing](#missing)
+  - [refinement](#refinement)
+  - [transform](#transform)
+  - [type](#type)
+  - [unexpected](#unexpected)
+- [guards](#guards)
+  - [isIndex](#isindex)
+  - [isKey](#iskey)
+  - [isUnexpected](#isunexpected)
+- [model](#model)
   - [DecodeError (type alias)](#decodeerror-type-alias)
   - [Enums (interface)](#enums-interface)
   - [Equal (interface)](#equal-interface)
@@ -21,216 +37,14 @@ Added in v1.0.0
   - [Member (interface)](#member-interface)
   - [Meta (interface)](#meta-interface)
   - [Missing (interface)](#missing-interface)
-  - [Parse (interface)](#parse-interface)
   - [Refinement (interface)](#refinement-interface)
+  - [Transform (interface)](#transform-interface)
   - [Type (interface)](#type-interface)
-  - [UnexpectedIndex (interface)](#unexpectedindex-interface)
-  - [UnexpectedKey (interface)](#unexpectedkey-interface)
-  - [enums](#enums)
-  - [equal](#equal)
-  - [index](#index)
-  - [key](#key)
-  - [member](#member)
-  - [meta](#meta)
-  - [missing](#missing)
-  - [parse](#parse)
-  - [refinement](#refinement)
-  - [some](#some)
-  - [type](#type)
-  - [unexpectedIndex](#unexpectedindex)
-  - [unexpectedKey](#unexpectedkey)
+  - [Unexpected (interface)](#unexpected-interface)
 
 ---
 
-# utils
-
-## DecodeError (type alias)
-
-**Signature**
-
-```ts
-export type DecodeError =
-  | Meta
-  | Type
-  | Equal
-  | Enums
-  | Refinement
-  | Parse
-  | Index
-  | Key
-  | Missing
-  | UnexpectedKey
-  | UnexpectedIndex
-  | Member
-```
-
-Added in v1.0.0
-
-## Enums (interface)
-
-**Signature**
-
-```ts
-export interface Enums {
-  readonly _tag: 'Enums'
-  readonly enums: ReadonlyArray<readonly [string, string | number]>
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## Equal (interface)
-
-**Signature**
-
-```ts
-export interface Equal {
-  readonly _tag: 'Equal'
-  readonly expected: unknown
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## Index (interface)
-
-**Signature**
-
-```ts
-export interface Index {
-  readonly _tag: 'Index'
-  readonly index: number
-  readonly errors: NonEmptyReadonlyArray<DecodeError>
-}
-```
-
-Added in v1.0.0
-
-## Key (interface)
-
-**Signature**
-
-```ts
-export interface Key {
-  readonly _tag: 'Key'
-  readonly key: PropertyKey
-  readonly errors: NonEmptyReadonlyArray<DecodeError>
-}
-```
-
-Added in v1.0.0
-
-## Member (interface)
-
-**Signature**
-
-```ts
-export interface Member {
-  readonly _tag: 'Member'
-  readonly errors: NonEmptyReadonlyArray<DecodeError>
-}
-```
-
-Added in v1.0.0
-
-## Meta (interface)
-
-**Signature**
-
-```ts
-export interface Meta {
-  readonly _tag: 'Meta'
-  readonly meta: unknown
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## Missing (interface)
-
-**Signature**
-
-```ts
-export interface Missing {
-  readonly _tag: 'Missing'
-}
-```
-
-Added in v1.0.0
-
-## Parse (interface)
-
-**Signature**
-
-```ts
-export interface Parse {
-  readonly _tag: 'Parse'
-  readonly from: string
-  readonly to: string
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## Refinement (interface)
-
-**Signature**
-
-```ts
-export interface Refinement {
-  readonly _tag: 'Refinement'
-  readonly meta: unknown
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## Type (interface)
-
-**Signature**
-
-```ts
-export interface Type {
-  readonly _tag: 'Type'
-  readonly expected: string
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## UnexpectedIndex (interface)
-
-**Signature**
-
-```ts
-export interface UnexpectedIndex {
-  readonly _tag: 'UnexpectedIndex'
-  readonly index: number
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
-
-## UnexpectedKey (interface)
-
-**Signature**
-
-```ts
-export interface UnexpectedKey {
-  readonly _tag: 'UnexpectedKey'
-  readonly key: PropertyKey
-  readonly actual: unknown
-}
-```
-
-Added in v1.0.0
+# constructors
 
 ## enums
 
@@ -302,16 +116,6 @@ export declare const missing: Missing
 
 Added in v1.0.0
 
-## parse
-
-**Signature**
-
-```ts
-export declare const parse: (from: string, to: string, actual: unknown) => Parse
-```
-
-Added in v1.0.0
-
 ## refinement
 
 **Signature**
@@ -322,14 +126,12 @@ export declare const refinement: (meta: unknown, actual: unknown) => Refinement
 
 Added in v1.0.0
 
-## some
+## transform
 
 **Signature**
 
 ```ts
-export declare const some: (
-  predicate: Predicate<DecodeError>
-) => (errors: readonly [DecodeError, ...DecodeError[]]) => boolean
+export declare const transform: (from: string, to: string, actual: unknown) => Transform
 ```
 
 Added in v1.0.0
@@ -344,22 +146,273 @@ export declare const type: (expected: string, actual: unknown) => Type
 
 Added in v1.0.0
 
-## unexpectedIndex
+## unexpected
 
 **Signature**
 
 ```ts
-export declare const unexpectedIndex: (index: number, actual: unknown) => UnexpectedIndex
+export declare const unexpected: (actual: unknown) => Unexpected
 ```
 
 Added in v1.0.0
 
-## unexpectedKey
+# guards
+
+## isIndex
 
 **Signature**
 
 ```ts
-export declare const unexpectedKey: (key: PropertyKey, actual: unknown) => UnexpectedKey
+export declare const isIndex: (e: DecodeError) => e is Index
+```
+
+Added in v1.0.0
+
+## isKey
+
+**Signature**
+
+```ts
+export declare const isKey: (e: DecodeError) => e is Key
+```
+
+Added in v1.0.0
+
+## isUnexpected
+
+**Signature**
+
+```ts
+export declare const isUnexpected: (e: DecodeError) => e is Unexpected
+```
+
+Added in v1.0.0
+
+# model
+
+## DecodeError (type alias)
+
+`DecodeError` is a type that represents the different types of errors that can occur when decoding a value.
+
+**Signature**
+
+```ts
+export type DecodeError =
+  | Meta
+  | Type
+  | Equal
+  | Enums
+  | Refinement
+  | Transform
+  | Index
+  | Key
+  | Missing
+  | Unexpected
+  | Member
+```
+
+Added in v1.0.0
+
+## Enums (interface)
+
+The `Enums` variant of the `DecodeError` type represents an error that occurs when the `actual` value being decoded
+is not one of the expected enum values. This error typically occurs when decoding a string or number value that is expected
+to match one of a predefined set of values. The `enums` field of this error type is an array of tuples, where each tuple contains
+a string representation of the expected enum value and its corresponding raw value.
+The `actual` field contains the value that was actually encountered during decoding.
+This error is often used in combination with the `S.enums` schema constructor,
+which allows users to specify a set of allowed enum values for a decoded value.
+
+**Signature**
+
+```ts
+export interface Enums {
+  readonly _tag: 'Enums'
+  readonly enums: ReadonlyArray<readonly [string, string | number]>
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## Equal (interface)
+
+The `Equal` variant of the `DecodeError` type represents an error that occurs when the `actual` value being decoded is not equal
+to the `expected` value. This error is typically used when decoding a value that must match a specific value, such as a boolean or a
+string literal. The `expected` field of the `Equal` error contains the expected value, and the `actual` field contains the value
+that was actually encountered during decoding.
+
+**Signature**
+
+```ts
+export interface Equal {
+  readonly _tag: 'Equal'
+  readonly expected: unknown
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## Index (interface)
+
+The `Index` decode error indicates that there was an error at a specific index in an array or tuple.
+The `errors` field contains the decode errors for that index. This error is typically used when decoding an array or tuple
+with a schema that has constraints on the elements. For example, you might use an `Index` decode error to indicate
+that a specific element in an array did not match the expected type or value.
+
+**Signature**
+
+```ts
+export interface Index {
+  readonly _tag: 'Index'
+  readonly index: number
+  readonly errors: NonEmptyReadonlyArray<DecodeError>
+}
+```
+
+Added in v1.0.0
+
+## Key (interface)
+
+The `Key` variant of the `DecodeError` type represents an error that occurs when a key in an object is invalid.
+This error typically occurs when the `actual` value is not a valid key type (e.g. a string or number)
+or when the key is not present in the object being decoded. In either case, the `key` field of the error will contain
+the invalid key value. This error is typically used in combination with the `Unexpected` error,
+which indicates that an unexpected key was found in the object being decoded.
+
+**Signature**
+
+```ts
+export interface Key {
+  readonly _tag: 'Key'
+  readonly key: PropertyKey
+  readonly errors: NonEmptyReadonlyArray<DecodeError>
+}
+```
+
+Added in v1.0.0
+
+## Member (interface)
+
+Error that occurs when a member in a union has an error.
+
+**Signature**
+
+```ts
+export interface Member {
+  readonly _tag: 'Member'
+  readonly errors: NonEmptyReadonlyArray<DecodeError>
+}
+```
+
+Added in v1.0.0
+
+## Meta (interface)
+
+The `Meta` variant of the `DecodeError` type allows users to attach custom metadata to a decode error.
+This metadata can be any value, and is typically used to provide additional context or information about the error.
+For example, you might use the `meta` field to include information about the expected type or shape of the value being decoded,
+or to include a custom error message.
+
+**Signature**
+
+```ts
+export interface Meta {
+  readonly _tag: 'Meta'
+  readonly meta: unknown
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## Missing (interface)
+
+Error that occurs when a required key or index is missing.
+
+**Signature**
+
+```ts
+export interface Missing {
+  readonly _tag: 'Missing'
+}
+```
+
+Added in v1.0.0
+
+## Refinement (interface)
+
+The `Refinement` variant of the `DecodeError` type indicates that the actual value did not pass a refinement check.
+This error typically occurs when a `filter` function is used to further validate the shape or type of a value.
+The `meta` field can be used to include additional information about the refinement,
+such as the expected type or shape of the value, or a custom error message.
+
+**Signature**
+
+```ts
+export interface Refinement {
+  readonly _tag: 'Refinement'
+  readonly meta: unknown
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## Transform (interface)
+
+The `Transform` variant of the `DecodeError` type represents an error that occurs when a value cannot be transformed
+from one format to another. For example, this error might occur when attempting to parse a string as a number.
+The `from` field specifies the format that the value is being transformed from, and the `to` field specifies the format
+that the value is being transformed to. The `actual` field contains the value that caused the error.
+This error is typically used in conjunction with the `parse` function from the `@fp-ts/schema/data/parser` module,
+which allows users to define custom parsers for specific types or formats.
+
+**Signature**
+
+```ts
+export interface Transform {
+  readonly _tag: 'Transform'
+  readonly from: string
+  readonly to: string
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## Type (interface)
+
+The `Type` variant of the `DecodeError` type represents an error that occurs when the `actual` value is not of the expected type.
+The `expected` field specifies the name of the expected type, and the `actual` field contains the value that caused the error.
+This error can occur when trying to decode a value using a codec that is only able to decode values of a specific type,
+and the actual value is not of that type. For example, if you are using a codec to decode a string value and the actual value
+is a number, a `Type` decode error would be returned.
+
+**Signature**
+
+```ts
+export interface Type {
+  readonly _tag: 'Type'
+  readonly expected: string
+  readonly actual: unknown
+}
+```
+
+Added in v1.0.0
+
+## Unexpected (interface)
+
+Error that occurs when an unexpected key or index is present.
+
+**Signature**
+
+```ts
+export interface Unexpected {
+  readonly _tag: 'Unexpected'
+  readonly actual: unknown
+}
 ```
 
 Added in v1.0.0

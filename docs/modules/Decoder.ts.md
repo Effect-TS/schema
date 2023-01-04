@@ -1,6 +1,6 @@
 ---
 title: Decoder.ts
-nav_order: 20
+nav_order: 16
 parent: Modules
 ---
 
