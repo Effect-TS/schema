@@ -570,6 +570,123 @@ class Test {
 pipe(C.object, C.instanceOf(Test));
 ```
 
+## Recursive types
+
+The `lazy` combinator is useful when you need to define a `Schema` that depends on itself, like in the case of recursive data structures. In this example, the `Category` schema depends on itself because it has a field `subcategories` that is an array of `Category` objects.
+
+```ts
+interface Category {
+  readonly name: string;
+  readonly subcategories: ReadonlyArray<Category>;
+}
+
+const Category: S.Schema<Category> = S.lazy(() =>
+  S.struct({
+    name: S.string,
+    subcategories: S.array(Category),
+  })
+);
+```
+
+Here's an example of two mutually recursive schemas, `Expression` and `Operation`, that represent a simple arithmetic expression tree.
+
+```ts
+interface Expression {
+  readonly type: "expression";
+  readonly value: number | Operation;
+}
+
+interface Operation {
+  readonly type: "operation";
+  readonly operator: "+" | "-";
+  readonly left: Expression;
+  readonly right: Expression;
+}
+
+const Expression: S.Schema<Expression> = S.lazy(() =>
+  S.struct({
+    type: S.literal("expression"),
+    value: S.union(S.number, Operation),
+  })
+);
+
+const Operation: S.Schema<Operation> = S.lazy(() =>
+  S.struct({
+    type: S.literal("operation"),
+    operator: S.union(S.literal("+"), S.literal("-")),
+    left: Expression,
+    right: Expression,
+  })
+);
+```
+
+## Transformations
+
+In some cases, we may need to transform the output of a schema to a different type. For instance, we may want to parse a string into a number, or we may want to transform a date string into a `Date` object.
+
+To perform these kinds of transformations, the `@fp-ts/schema` library provides the `transform` and `transformOrFail` combinators.
+
+The `transform` combinator takes a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to decode a value, the transformed schema will also fail.
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+
+// define a schema for the string type
+const stringSchema: S.Schema<string> = S.string;
+
+// define a schema for a tuple with one element of type string
+const tupleSchema: S.Schema<[string]> = S.tuple(S.string);
+
+// define a function that converts a string into a tuple with one element of type string
+const f = (s: string): [string] => [s];
+
+// define a function that converts a tuple with one element of type string into a string
+const g = ([s]: [string]): string => s;
+
+// use the transform combinator to convert the string schema into the tuple schema
+const transformedSchema: S.Schema<[string]> = pipe(
+  stringSchema,
+  S.transform(tupleSchema, f, g)
+);
+```
+
+In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `f` and `g` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
+
+The `transformOrFail` combinator works in a similar way, but allows the transformation function to return a `DecodeResult` object, which can either be a success or a failure. This allows us to specify custom error messages in case the transformation fails.
+
+Here's an example of the `transformOrFail` combinator which converts a `string` into a `boolean`:
+
+```ts
+import { pipe } from "@fp-ts/data/Function";
+import * as DE from "@fp-ts/schema/DecodeError";
+import * as D from "@fp-ts/schema/Decoder";
+import type { DecodeResult } from "@fp-ts/schema/Decoder";
+import * as S from "@fp-ts/schema/Schema";
+
+// define a schema for the string type
+const stringSchema: S.Schema<string> = S.string;
+
+// define a schema for the boolean type
+const booleanSchema: S.Schema<boolean> = S.boolean;
+
+// define a function that converts a string into a boolean
+const f = (s: string): DecodeResult<boolean> =>
+  s === "true"
+    ? D.success(true)
+    : s === "false"
+    ? D.success(false)
+    : D.failure(DE.transform("string", "boolean", s));
+
+// define a function that converts a boolean into a string
+const g = (b: boolean): DecodeResult<string> => D.success(String(b));
+
+// use the transformOrFail combinator to convert the string schema into the boolean schema
+const transformedSchema: S.Schema<boolean> = pipe(
+  stringSchema,
+  S.transformOrFail(booleanSchema, f, g)
+);
+```
+
 ## parseNumber
 
 In the following section, we demonstrate how to use the `parseNumber` combinator to convert a `string` schema to a `number` schema and parse string inputs into numbers. The `parseNumber` combinator allows parsing special values such as `NaN`, `Infinity`, and `-Infinity` in addition to regular numbers.
