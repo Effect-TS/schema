@@ -630,11 +630,11 @@ expect(codec.decode({ a: "hello" })).toEqual(
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as C from "@fp-ts/schema/Codec";
-import { readonlySet } from "@fp-ts/schema/data/ReadonlySet";
+import { fromArray } from "@fp-ts/schema/data/ReadonlySet";
 import * as DE from "@fp-ts/schema/DecodeError";
 
 // define a schema for ReadonlySet of numbers
-const schema = readonlySet(S.number);
+const schema = fromArray(S.number);
 
 // create a codec based on the schema
 const codec = C.codecFor(schema);
@@ -652,12 +652,12 @@ expect(codec.decode([1, 2, "a"])).toEqual(
 
 ```ts
 import * as G from "@fp-ts/schema/Guard";
-import { readonlyMap } from "@fp-ts/schema/data/ReadonlyMap";
+import { fromEntries } from "@fp-ts/schema/data/ReadonlyMap";
 import * as C from "@fp-ts/schema/Codec";
 import * as DE from "@fp-ts/schema/DecodeError";
 
 // define the schema for a readonly map with number keys and string values
-const schema = readonlyMap(S.number, S.string);
+const schema = fromEntries(S.number, S.string);
 // create a codec based on the schema
 const codec = C.codecFor(schema);
 
