@@ -412,6 +412,7 @@ pipe(S.string, S.length(5));
 pipe(S.string, S.regex(regex));
 pipe(S.string, S.startsWith(string));
 pipe(S.string, S.endsWith(string));
+pipe(S.string, S.includes(searchString));
 ```
 
 ### Numbers
