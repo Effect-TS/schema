@@ -184,6 +184,26 @@ expect(E.encode(Person)({ name: "Alice", age: 30 })).toEqual(
 );
 ```
 
+## Formatting errors
+
+To format errors when a `decode` or an `encode` function fails, you can use the `format` function from the `@fp-ts/schema/formatter/Tree` module.
+
+```ts
+import { format } from "@fp-ts/schema/formatter/Tree";
+
+const result = D.decode(Person)({});
+if (DE.isFailure(result)) {
+  console.log(format(result.left));
+}
+/*
+1 error(s) found
+└─ key "name"
+   └─ is missing
+*/
+```
+
+**Note**. In the future, additional formatting functions will be available in the `@fp-ts/schema` library.
+
 ## Assertions
 
 The `is` function provided by the `@fp-ts/schema/Guard` module represents a way of verifying that a value conforms to a given `Schema`. `is` is a refinement that takes a value of type `unknown` as an argument and returns a `boolean` indicating whether or not the value conforms to the `Schema`.
