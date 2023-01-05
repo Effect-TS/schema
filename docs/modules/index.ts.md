@@ -1,6 +1,6 @@
 ---
 title: index.ts
-nav_order: 20
+nav_order: 19
 parent: Modules
 ---
 
@@ -13,22 +13,11 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [codec](#codec)
   - [schema](#schema)
 
 ---
 
 # utils
-
-## codec
-
-**Signature**
-
-```ts
-export declare const codec: typeof codec
-```
-
-Added in v1.0.0
 
 ## schema
 

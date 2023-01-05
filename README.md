@@ -215,6 +215,8 @@ assertsPerson({ name: "Alice", age: 30 });
 
 ## [fast-check](https://github.com/dubzzz/fast-check) arbitraries
 
+**Note**. The Arbitrary module will be extracted into a separate package in the near future.
+
 The `arbitrary` function provided by the `@fp-ts/schema/Arbitrary` module represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
 
 ```ts
@@ -233,6 +235,8 @@ console.log(fc.sample(PersonArbitrary, 2));
 ```
 
 ## Pretty print
+
+**Note**. The Pretty module will be extracted into a separate package in the near future.
 
 The `pretty` function provided by the `@fp-ts/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
 

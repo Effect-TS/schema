@@ -12,6 +12,8 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [arbitrary](#arbitrary)
+  - [arbitrary](#arbitrary-1)
 - [constructors](#constructors)
   - [make](#make)
 - [model](#model)
@@ -20,6 +22,18 @@ Added in v1.0.0
   - [arbitraryFor](#arbitraryfor)
 
 ---
+
+# arbitrary
+
+## arbitrary
+
+**Signature**
+
+```ts
+export declare const arbitrary: <A>(schema: Schema<A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+```
+
+Added in v1.0.0
 
 # constructors
 
