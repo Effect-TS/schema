@@ -1,6 +1,6 @@
 ---
 title: Guard.ts
-nav_order: 19
+nav_order: 18
 parent: Modules
 ---
 
@@ -12,6 +12,9 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [assertions](#assertions)
+  - [asserts](#asserts)
+  - [is](#is)
 - [constructors](#constructors)
   - [make](#make)
 - [model](#model)
@@ -20,6 +23,28 @@ Added in v1.0.0
   - [guardFor](#guardfor)
 
 ---
+
+# assertions
+
+## asserts
+
+**Signature**
+
+```ts
+export declare const asserts: <A>(schema: Schema<A>, message?: string) => (input: unknown) => asserts input is A
+```
+
+Added in v1.0.0
+
+## is
+
+**Signature**
+
+```ts
+export declare const is: <A>(schema: Schema<A>) => (input: unknown) => input is A
+```
+
+Added in v1.0.0
 
 # constructors
 

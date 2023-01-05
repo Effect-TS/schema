@@ -1,6 +1,6 @@
 ---
 title: DecodeError.ts
-nav_order: 15
+nav_order: 14
 parent: Modules
 ---
 
@@ -15,18 +15,26 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [enums](#enums)
   - [equal](#equal)
+  - [failure](#failure)
+  - [failures](#failures)
   - [index](#index)
   - [key](#key)
   - [member](#member)
   - [meta](#meta)
   - [missing](#missing)
   - [refinement](#refinement)
+  - [success](#success)
   - [transform](#transform)
   - [type](#type)
   - [unexpected](#unexpected)
+  - [warning](#warning)
+  - [warnings](#warnings)
 - [guards](#guards)
+  - [hasWarnings](#haswarnings)
+  - [isFailure](#isfailure)
   - [isIndex](#isindex)
   - [isKey](#iskey)
+  - [isSuccess](#issuccess)
   - [isUnexpected](#isunexpected)
 - [model](#model)
   - [DecodeError (type alias)](#decodeerror-type-alias)
@@ -41,6 +49,8 @@ Added in v1.0.0
   - [Transform (interface)](#transform-interface)
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
+- [utils](#utils)
+  - [DecodeResult (type alias)](#decoderesult-type-alias)
 
 ---
 
@@ -62,6 +72,26 @@ Added in v1.0.0
 
 ```ts
 export declare const equal: (expected: unknown, actual: unknown) => Equal
+```
+
+Added in v1.0.0
+
+## failure
+
+**Signature**
+
+```ts
+export declare const failure: (e: DecodeError) => DecodeResult<never>
+```
+
+Added in v1.0.0
+
+## failures
+
+**Signature**
+
+```ts
+export declare const failures: (es: readonly [DecodeError, ...DecodeError[]]) => DecodeResult<never>
 ```
 
 Added in v1.0.0
@@ -126,6 +156,16 @@ export declare const refinement: (meta: unknown, actual: unknown) => Refinement
 
 Added in v1.0.0
 
+## success
+
+**Signature**
+
+```ts
+export declare const success: <A>(a: A) => T.These<readonly [DecodeError, ...DecodeError[]], A>
+```
+
+Added in v1.0.0
+
 ## transform
 
 **Signature**
@@ -156,7 +196,54 @@ export declare const unexpected: (actual: unknown) => Unexpected
 
 Added in v1.0.0
 
+## warning
+
+**Signature**
+
+```ts
+export declare const warning: <A>(e: DecodeError, a: A) => T.These<readonly [DecodeError, ...DecodeError[]], A>
+```
+
+Added in v1.0.0
+
+## warnings
+
+**Signature**
+
+```ts
+export declare const warnings: <A>(
+  es: readonly [DecodeError, ...DecodeError[]],
+  a: A
+) => T.These<readonly [DecodeError, ...DecodeError[]], A>
+```
+
+Added in v1.0.0
+
 # guards
+
+## hasWarnings
+
+**Signature**
+
+```ts
+export declare const hasWarnings: <A>(
+  self: T.These<readonly [DecodeError, ...DecodeError[]], A>
+) => self is T.Both<readonly [DecodeError, ...DecodeError[]], A>
+```
+
+Added in v1.0.0
+
+## isFailure
+
+**Signature**
+
+```ts
+export declare const isFailure: <A>(
+  self: T.These<readonly [DecodeError, ...DecodeError[]], A>
+) => self is Left<readonly [DecodeError, ...DecodeError[]]>
+```
+
+Added in v1.0.0
 
 ## isIndex
 
@@ -174,6 +261,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isKey: (e: DecodeError) => e is Key
+```
+
+Added in v1.0.0
+
+## isSuccess
+
+**Signature**
+
+```ts
+export declare const isSuccess: <A>(self: T.These<readonly [DecodeError, ...DecodeError[]], A>) => self is Right<A>
 ```
 
 Added in v1.0.0
@@ -413,6 +510,18 @@ export interface Unexpected {
   readonly _tag: 'Unexpected'
   readonly actual: unknown
 }
+```
+
+Added in v1.0.0
+
+# utils
+
+## DecodeResult (type alias)
+
+**Signature**
+
+```ts
+export type DecodeResult<A> = Validated<DecodeError, A>
 ```
 
 Added in v1.0.0

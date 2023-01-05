@@ -1,6 +1,6 @@
 ---
 title: Pretty.ts
-nav_order: 21
+nav_order: 20
 parent: Modules
 ---
 
@@ -16,6 +16,8 @@ Added in v1.0.0
   - [make](#make)
 - [model](#model)
   - [Pretty (interface)](#pretty-interface)
+- [prettify](#prettify)
+  - [pretty](#pretty)
 - [utils](#utils)
   - [prettyFor](#prettyfor)
 
@@ -43,6 +45,18 @@ Added in v1.0.0
 export interface Pretty<A> extends Schema<A> {
   readonly pretty: (a: A) => string
 }
+```
+
+Added in v1.0.0
+
+# prettify
+
+## pretty
+
+**Signature**
+
+```ts
+export declare const pretty: <A>(schema: Schema<A>) => (a: A) => string
 ```
 
 Added in v1.0.0
