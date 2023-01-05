@@ -123,7 +123,7 @@ D.decodeOrThrow(Person)({});
 */
 ```
 
-**Excess properties**
+### Excess properties
 
 When using a `Schema` to decode a value, any properties that are not specified in the `Schema` will result in a decoding error. This is because the `Schema` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
 
@@ -167,6 +167,33 @@ console.log(
 ```
 
 The `disallowUnexpected` combinator can be used to switch the decoding behavior of a `Schema` back to the default behavior of raising fatal errors for excess properties.
+
+### Sensitive informations
+
+You can use the `sensitive` combinator for storing sensitive information that you do not want to be visible in decode errors.
+
+Here is an example of using the `sensitive` combinator to store a sensitive password:
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as D from "@fp-ts/schema/Decoder";
+import * as DE from "@fp-ts/schema/DecodeError";
+
+// define a schema for a password with a minimum length of 8 characters
+const passwordSchema = pipe(S.string, S.minLength(8));
+
+// use the `sensitive` combinator to create a schema for a sensitive password
+const sensitivePasswordSchema = S.sensitive(passwordSchema);
+
+// try to decode a password that is too short
+const result = D.decode(sensitivePasswordSchema)("pwd123");
+if (DE.isFailure(result)) {
+  // the decode error will not show the actual value of the password
+  console.log(result.left); // "********" did not satisfy refinement({"minLength":8})
+}
+```
+
+Remember that using the `sensitive` combinator will not actually prevent sensitive data from being logged, traced, or encoded. It is only intended to mask the sensitive data in decode errors. It is important to handle sensitive data with care and to use appropriate security measures to protect it.
 
 ## Encoding
 
