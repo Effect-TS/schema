@@ -384,6 +384,7 @@ S.bigint;
 S.boolean;
 S.symbol;
 S.object;
+S.json;
 
 // empty types
 S.undefined;
@@ -767,12 +768,11 @@ In the example below, we define a schema for an object with a required `a` field
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
-import { option } from "@fp-ts/schema/data/Option";
 import * as D from "@fp-ts/schema/Decoder";
 import * as DE from "@fp-ts/schema/DecodeError";
 import * as O from "@fp-ts/data/Option";
 
-const schema = S.struct({ a: S.string, b: option(S.number) });
+const schema = S.struct({ a: S.string, b: S.option(S.number) });
 const decode = D.decode(schema);
 
 // success cases
