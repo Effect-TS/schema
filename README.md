@@ -801,16 +801,16 @@ expect(decode({ a: "hello" })).toEqual(DE.failure(DE.key("b", [DE.missing]))); /
 
 ## ReadonlySet
 
-In the following section, we demonstrate how to use the `fromArray` combinator to decode a `ReadonlySet` from an array.
+In the following section, we demonstrate how to use the `fromValues` combinator to decode a `ReadonlySet` from an array of values.
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
-import { fromArray } from "@fp-ts/schema/data/ReadonlySet";
+import { fromValues } from "@fp-ts/schema/data/ReadonlySet";
 import * as D from "@fp-ts/schema/Decoder";
 import * as DE from "@fp-ts/schema/DecodeError";
 
 // define a schema for ReadonlySet of numbers
-const schema = fromArray(S.number);
+const schema = fromValues(S.number);
 const decode = D.decode(schema);
 
 // test decoding a valid input
@@ -824,7 +824,7 @@ expect(decode([1, 2, "a"])).toEqual(
 
 ## ReadonlyMap
 
-In the following section, we demonstrate how to use the `fromEntries` combinator to create a `Schema` for a `ReadonlyMap` with specific key and value types.
+In the following section, we demonstrate how to use the `fromEntries` combinator to decode a `ReadonlyMap` from an array of entries.
 
 ```ts
 import * as G from "@fp-ts/schema/Guard";
