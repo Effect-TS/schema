@@ -16,11 +16,8 @@ space-object (bad) x 276,694 ops/sec ±4.55% (82 runs sampled)
 space-object (good) x 289,187 ops/sec ±0.25% (87 runs sampled)
 space-object (bad) x 885,639 ops/sec ±5.38% (76 runs sampled)
 0.0.8
-space-object (good) x 261,189 ops/sec ±0.58% (89 runs sampled)
-space-object (bad) x 646,456 ops/sec ±5.77% (77 runs sampled)
-
-space-object (good) x 128,184 ops/sec ±0.63% (84 runs sampled)
-space-object (bad) x 197,166 ops/sec ±5.85% (80 runs sampled)
+space-object (good) x 130,549 ops/sec ±0.54% (85 runs sampled)
+space-object (bad) x 190,785 ops/sec ±5.91% (75 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
