@@ -127,25 +127,30 @@ D.decodeOrThrow(Person)({});
 
 When using a `Schema` to decode a value, any properties that are not specified in the `Schema` will result in a decoding error. This is because the `Schema` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
 
-However, you can use the `allowUnexpected` combinator to allow excess properties while decoding, and instead of a fatal error, it will return a warning and strip away the excess properties. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
+However, you can use the `isUnexpectedAllowed` option to allow excess properties while decoding, and instead of a fatal error, it will return a warning and strip away the excess properties. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
 
-Here's an example of how you might use `allowUnexpected`:
+Here's an example of how you might use `isUnexpectedAllowed`:
 
 ```ts
-const Person = S.allowUnexpected(
-  S.struct({
-    name: S.string,
-    age: S.number,
-  })
-);
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
 
 // This will succeed and return a value with no warnings
-const result = D.decode(Person)({ name: "Alice", age: 30 });
+const result = D.decode(Person, { isUnexpectedAllowed: true })({
+  name: "Alice",
+  age: 30,
+});
 
 // This will succeed, but return a warning about the excess property "email"
 console.log(
   "%o",
-  D.decode(Person)({ name: "Bob", age: 40, email: "bob@example.com" })
+  D.decode(Person, { isUnexpectedAllowed: true })({
+    name: "Bob",
+    age: 40,
+    email: "bob@example.com",
+  })
 );
 /*
 {
@@ -165,8 +170,6 @@ console.log(
 }
 */
 ```
-
-The `disallowUnexpected` combinator can be used to switch the decoding behavior of a `Schema` back to the default behavior of raising fatal errors for excess properties.
 
 ### Sensitive informations
 
