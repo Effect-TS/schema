@@ -1,4 +1,4 @@
-import * as C from "@fp-ts/schema/Codec"
+import * as D from "@fp-ts/schema/Decoder"
 import * as t from "@fp-ts/schema/Schema"
 import * as Benchmark from "benchmark"
 
@@ -18,6 +18,9 @@ space-object (bad) x 885,639 ops/sec ±5.38% (76 runs sampled)
 0.0.8
 space-object (good) x 261,189 ops/sec ±0.58% (89 runs sampled)
 space-object (bad) x 646,456 ops/sec ±5.77% (77 runs sampled)
+
+space-object (good) x 128,184 ops/sec ±0.63% (84 runs sampled)
+space-object (bad) x 197,166 ops/sec ±5.85% (80 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -62,7 +65,7 @@ const Ship = t.struct({
 
 export const T = t.union(Asteroid, Planet, Ship)
 
-const codec = C.codecFor(T)
+const decode = D.decode(T, { isUnexpectedAllowed: false })
 
 const good = {
   type: "ship",
@@ -106,15 +109,15 @@ const bad = {
   ]
 }
 
-// console.log(decoder.decode(good))
-// console.log(decoder.decode(bad))
+// console.log(decode(good))
+// console.log(decode(bad))
 
 suite
   .add("space-object (good)", function() {
-    codec.decode(good)
+    decode(good)
   })
   .add("space-object (bad)", function() {
-    codec.decode(bad)
+    decode(bad)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))
