@@ -501,7 +501,7 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 pipe(S.string, S.maxLength(5));
 pipe(S.string, S.minLength(5));
 pipe(S.string, S.length(5));
-pipe(S.string, S.regex(regex));
+pipe(S.string, S.pattern(regex));
 pipe(S.string, S.startsWith(string));
 pipe(S.string, S.endsWith(string));
 pipe(S.string, S.includes(searchString));
