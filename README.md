@@ -138,19 +138,25 @@ const Person = S.struct({
 });
 
 // This will succeed and return a value with no warnings
-const result = D.decode(Person, { isUnexpectedAllowed: true })({
-  name: "Alice",
-  age: 30,
-});
+const result = D.decode(Person)(
+  {
+    name: "Alice",
+    age: 30,
+  },
+  { isUnexpectedAllowed: true }
+);
 
 // This will succeed, but return a warning about the excess property "email"
 console.log(
   "%o",
-  D.decode(Person, { isUnexpectedAllowed: true })({
-    name: "Bob",
-    age: 40,
-    email: "bob@example.com",
-  })
+  D.decode(Person)(
+    {
+      name: "Bob",
+      age: 40,
+      email: "bob@example.com",
+    },
+    { isUnexpectedAllowed: true }
+  )
 );
 /*
 {
@@ -185,11 +191,14 @@ const Person = S.struct({
 
 console.log(
   "%o",
-  D.decode(Person, { allErrors: true })({
-    name: "Bob",
-    age: "abc",
-    email: "bob@example.com",
-  })
+  D.decode(Person)(
+    {
+      name: "Bob",
+      age: "abc",
+      email: "bob@example.com",
+    },
+    { allErrors: true }
+  )
 );
 /*
 {
