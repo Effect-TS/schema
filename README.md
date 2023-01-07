@@ -171,6 +171,52 @@ console.log(
 */
 ```
 
+### All errors
+
+The `allErrors` option is a feature that allows you to receive all decoding errors when attempting to decode a value using a schema. By default, only the first error is returned, but by setting the `allErrors` option to `true`, you can receive all errors that occurred during the decoding process. This can be useful for debugging or for providing more comprehensive error messages to the user.
+
+Here's an example of how you might use `allErrors`:
+
+```ts
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
+
+console.log(
+  "%o",
+  D.decode(Person, { allErrors: true })({
+    name: "Bob",
+    age: "abc",
+    email: "bob@example.com",
+  })
+);
+/*
+{
+  _tag: 'Left',
+  left: [
+    {
+      _tag: 'Key',
+      key: 'age',
+      errors: [
+        { _tag: 'Type', expected: 'number', actual: 'abc' },
+        [length]: 1
+      ]
+    },
+    {
+      _tag: 'Key',
+      key: 'email',
+      errors: [
+        { _tag: 'Unexpected', actual: 'bob@example.com' },
+        [length]: 1
+      ]
+    },
+    [length]: 2
+  ]
+}
+*/
+```
+
 ### Sensitive informations
 
 You can use the `sensitive` combinator for storing sensitive information that you do not want to be visible in decode errors.
