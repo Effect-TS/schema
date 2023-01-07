@@ -36,6 +36,12 @@ Schema validation with static type inference
 
 Welcome to the documentation for `@fp-ts/schema`, a library for defining and using schemas to validate and transform data in TypeScript. `@fp-ts/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as decoding from `unknown`, encoding to `unknown`, verifying that a value conforms to a given `Schema`. `@fp-ts/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
 
+## Requirements
+
+- TypeScript 4.7 or newer
+- The `strict` flag enabled in your `tsconfig.json` file
+- The `exactOptionalPropertyTypes` flag enabled in your `tsconfig.json` file
+
 ## Getting started
 
 To get started with `@fp-ts/schema`, you will need to install the library using npm or yarn:
