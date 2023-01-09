@@ -17,6 +17,8 @@ Schema validation with static type inference
 # Features
 
 - deriving artifacts from a `Schema`:
+  - guards
+  - assertions
   - decoders
   - encoders
   - [fast-check](https://github.com/dubzzz/fast-check) arbitraries
@@ -264,9 +266,9 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 
 ```ts
 import * as DE from "@fp-ts/schema/DecodeError";
-import * as E from "@fp-ts/schema/Encoder";
+import * as D from "@fp-ts/schema/Decoder";
 
-expect(E.encode(Person)({ name: "Alice", age: 30 })).toEqual(
+expect(D.encode(Person)({ name: "Alice", age: 30 })).toEqual(
   DE.success({
     name: "Alice",
     age: 30,
