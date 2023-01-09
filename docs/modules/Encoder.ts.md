@@ -1,6 +1,6 @@
 ---
 title: Encoder.ts
-nav_order: 16
+nav_order: 17
 parent: Modules
 ---
 
@@ -20,7 +20,7 @@ Added in v1.0.0
 - [model](#model)
   - [Encoder (interface)](#encoder-interface)
 - [utils](#utils)
-  - [encoderFor](#encoderfor)
+  - [InferOutput (type alias)](#inferoutput-type-alias)
 
 ---
 
@@ -32,8 +32,8 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <O, A>(
-  schema: Schema<A>,
-  encode: (value: A) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], O>
+  schema: S.Schema<A>,
+  encode: (value: A, options?: DecodeOptions | undefined) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], O>
 ) => Encoder<O, A>
 ```
 
@@ -46,7 +46,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encode: <A>(schema: Schema<A>) => (a: A) => DE.DecodeResult<unknown>
+export declare const encode: <A>(
+  schema: S.Schema<A>
+) => (a: A, options?: DecodeOptions | undefined) => DE.DecodeResult<unknown>
 ```
 
 Added in v1.0.0
@@ -56,7 +58,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A) => unknown
+export declare const encodeOrThrow: <A>(schema: S.Schema<A>) => (a: A, options?: DecodeOptions | undefined) => unknown
 ```
 
 Added in v1.0.0
@@ -68,8 +70,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Encoder<O, A> extends Schema<A> {
-  readonly encode: (value: A) => DE.DecodeResult<O>
+export interface Encoder<O, A> extends S.Schema<A> {
+  readonly O: () => O
+  readonly encode: (value: A, options?: DecodeOptions) => DE.DecodeResult<O>
 }
 ```
 
@@ -77,12 +80,12 @@ Added in v1.0.0
 
 # utils
 
-## encoderFor
+## InferOutput (type alias)
 
 **Signature**
 
 ```ts
-export declare const encoderFor: <A>(schema: Schema<A>) => Encoder<unknown, A>
+export type InferOutput<E extends Encoder<any, any>> = ReturnType<E['O']>
 ```
 
 Added in v1.0.0

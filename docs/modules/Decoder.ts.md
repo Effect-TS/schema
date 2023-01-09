@@ -1,6 +1,6 @@
 ---
 title: Decoder.ts
-nav_order: 15
+nav_order: 16
 parent: Modules
 ---
 
@@ -12,17 +12,43 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [assertions](#assertions)
+  - [asserts](#asserts)
+  - [is](#is)
 - [constructors](#constructors)
   - [make](#make)
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeOrThrow](#decodeorthrow)
 - [model](#model)
+  - [DecodeOptions (interface)](#decodeoptions-interface)
   - [Decoder (interface)](#decoder-interface)
 - [utils](#utils)
-  - [decoderFor](#decoderfor)
+  - [InferInput (type alias)](#inferinput-type-alias)
 
 ---
+
+# assertions
+
+## asserts
+
+**Signature**
+
+```ts
+export declare const asserts: <A>(schema: Schema<A>) => (input: unknown) => asserts input is A
+```
+
+Added in v1.0.0
+
+## is
+
+**Signature**
+
+```ts
+export declare const is: <A>(schema: Schema<A>) => (input: unknown) => input is A
+```
+
+Added in v1.0.0
 
 # constructors
 
@@ -33,7 +59,7 @@ Added in v1.0.0
 ```ts
 export declare const make: <I, A>(
   schema: Schema<A>,
-  decode: (i: I) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
+  decode: (i: I, options?: DecodeOptions | undefined) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
 ) => Decoder<I, A>
 ```
 
@@ -48,7 +74,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <A>(
   schema: Schema<A>
-) => (u: unknown) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
+) => (i: unknown, options?: DecodeOptions | undefined) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
 ```
 
 Added in v1.0.0
@@ -58,12 +84,25 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeOrThrow: <A>(schema: Schema<A>) => (u: unknown) => A
+export declare const decodeOrThrow: <A>(schema: Schema<A>) => (u: unknown, options?: DecodeOptions | undefined) => A
 ```
 
 Added in v1.0.0
 
 # model
+
+## DecodeOptions (interface)
+
+**Signature**
+
+```ts
+export interface DecodeOptions {
+  readonly isUnexpectedAllowed?: boolean
+  readonly allErrors?: boolean
+}
+```
+
+Added in v1.0.0
 
 ## Decoder (interface)
 
@@ -71,7 +110,8 @@ Added in v1.0.0
 
 ```ts
 export interface Decoder<I, A> extends Schema<A> {
-  readonly decode: (i: I) => DE.DecodeResult<A>
+  readonly I: (i: I) => void
+  readonly decode: (i: I, options?: DecodeOptions) => DE.DecodeResult<A>
 }
 ```
 
@@ -79,12 +119,12 @@ Added in v1.0.0
 
 # utils
 
-## decoderFor
+## InferInput (type alias)
 
 **Signature**
 
 ```ts
-export declare const decoderFor: <A>(schema: Schema<A>) => Decoder<unknown, A>
+export type InferInput<D extends Decoder<any, any>> = Parameters<D['I']>[0]
 ```
 
 Added in v1.0.0

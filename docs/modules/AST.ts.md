@@ -83,12 +83,14 @@ Added in v1.0.0
   - [element](#element)
   - [getPropertySignatures](#getpropertysignatures)
   - [indexSignature](#indexsignature)
+  - [isSensitive](#issensitive)
   - [keyof](#keyof)
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
   - [propertySignature](#propertysignature)
   - [record](#record)
+  - [sensitive](#sensitive)
 
 ---
 
@@ -142,7 +144,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: (f: () => AST) => Lazy
+export declare const lazy: (f: () => AST, annotations?: Annotated['annotations']) => Lazy
 ```
 
 Added in v1.0.0
@@ -192,7 +194,12 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const refinement: (from: AST, refinement: Predicate<any>, meta: unknown) => Refinement
+export declare const refinement: (
+  from: AST,
+  refinement: Predicate<any>,
+  meta: unknown,
+  annotations?: Annotated['annotations']
+) => Refinement
 ```
 
 Added in v1.0.0
@@ -249,7 +256,6 @@ export declare const tuple: (
   elements: ReadonlyArray<Element>,
   rest: Option<RA.NonEmptyReadonlyArray<AST>>,
   isReadonly: boolean,
-  isUnexpectedAllowed?: boolean,
   annotations?: Annotated['annotations']
 ) => Tuple
 ```
@@ -278,7 +284,6 @@ Added in v1.0.0
 export declare const typeLiteral: (
   propertySignatures: ReadonlyArray<PropertySignature>,
   indexSignatures: ReadonlyArray<IndexSignature>,
-  isUnexpectedAllowed?: boolean,
   annotations?: Annotated['annotations']
 ) => TypeLiteral
 ```
@@ -535,7 +540,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Lazy {
+export interface Lazy extends Annotated {
   readonly _tag: 'Lazy'
   readonly f: () => AST
 }
@@ -597,7 +602,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Refinement {
+export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
   readonly refinement: Predicate<any>
@@ -614,6 +619,7 @@ Added in v1.0.0
 ```ts
 export interface StringKeyword {
   readonly _tag: 'StringKeyword'
+  readonly isSensitive: boolean
 }
 ```
 
@@ -671,7 +677,6 @@ export interface Tuple extends Annotated {
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
-  readonly isUnexpectedAllowed: boolean
 }
 ```
 
@@ -700,7 +705,6 @@ export interface TypeLiteral extends Annotated {
   readonly _tag: 'TypeLiteral'
   readonly propertySignatures: ReadonlyArray<PropertySignature>
   readonly indexSignatures: ReadonlyArray<IndexSignature>
-  readonly isUnexpectedAllowed: boolean
 }
 ```
 
@@ -840,7 +844,7 @@ Added in v1.0.0
 
 ```ts
 export interface TemplateLiteralSpan {
-  readonly type: StringKeyword
+  readonly type: StringKeyword | NumberKeyword
   readonly literal: string
 }
 ```
@@ -897,6 +901,16 @@ export declare const indexSignature: (
   type: AST,
   isReadonly: boolean
 ) => IndexSignature
+```
+
+Added in v1.0.0
+
+## isSensitive
+
+**Signature**
+
+```ts
+export declare const isSensitive: (ast: AST) => boolean
 ```
 
 Added in v1.0.0
@@ -963,6 +977,16 @@ Added in v1.0.0
 
 ```ts
 export declare const record: (key: AST, value: AST, isReadonly: boolean) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## sensitive
+
+**Signature**
+
+```ts
+export declare const sensitive: (ast: AST) => AST
 ```
 
 Added in v1.0.0

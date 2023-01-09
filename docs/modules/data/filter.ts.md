@@ -1,10 +1,10 @@
 ---
-title: data/refinement.ts
-nav_order: 13
+title: data/filter.ts
+nav_order: 8
 parent: Modules
 ---
 
-## refinement overview
+## filter overview
 
 Added in v1.0.0
 
@@ -13,11 +13,11 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [Class (class)](#class-class)
   - [endsWith](#endswith)
   - [finite](#finite)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
+  - [includes](#includes)
   - [instanceOf](#instanceof)
   - [int](#int)
   - [lessThan](#lessthan)
@@ -25,24 +25,12 @@ Added in v1.0.0
   - [maxLength](#maxlength)
   - [minLength](#minlength)
   - [nonNaN](#nonnan)
-  - [regex](#regex)
+  - [pattern](#pattern)
   - [startsWith](#startswith)
 
 ---
 
 # utils
-
-## Class (class)
-
-**Signature**
-
-```ts
-export declare class Class {
-  constructor(..._: Array<any>)
-}
-```
-
-Added in v1.0.0
 
 ## endsWith
 
@@ -84,14 +72,22 @@ export declare const greaterThanOrEqualTo: (min: number) => <A extends number>(s
 
 Added in v1.0.0
 
+## includes
+
+**Signature**
+
+```ts
+export declare const includes: (searchString: string) => <A extends string>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## instanceOf
 
 **Signature**
 
 ```ts
-export declare const instanceOf: <A extends typeof Class>(
-  constructor: A
-) => (self: Schema<object>) => Schema<InstanceType<A>>
+export declare const instanceOf: new (...args: any) => any
 ```
 
 Added in v1.0.0
@@ -156,12 +152,16 @@ export declare const nonNaN: <A extends number>(self: Schema<A>) => Schema<A>
 
 Added in v1.0.0
 
-## regex
+## pattern
 
 **Signature**
 
 ```ts
-export declare const regex: (regex: RegExp) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const pattern: (
+  regex: RegExp,
+  meta?: object | undefined,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => <A extends string>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

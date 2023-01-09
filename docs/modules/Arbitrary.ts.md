@@ -18,8 +18,6 @@ Added in v1.0.0
   - [make](#make)
 - [model](#model)
   - [Arbitrary (interface)](#arbitrary-interface)
-- [utils](#utils)
-  - [arbitraryFor](#arbitraryfor)
 
 ---
 
@@ -60,18 +58,6 @@ Added in v1.0.0
 export interface Arbitrary<A> extends Schema<A> {
   readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
 }
-```
-
-Added in v1.0.0
-
-# utils
-
-## arbitraryFor
-
-**Signature**
-
-```ts
-export declare const arbitraryFor: <A>(schema: Schema<A>) => Arbitrary<A>
 ```
 
 Added in v1.0.0
