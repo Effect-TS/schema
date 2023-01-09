@@ -1,6 +1,6 @@
 ---
 title: formatter/Tree.ts
-nav_order: 17
+nav_order: 18
 parent: Modules
 ---
 
@@ -17,6 +17,7 @@ Added in v1.0.0
   - [Tree (interface)](#tree-interface)
   - [format](#format)
   - [make](#make)
+  - [stringify](#stringify)
 
 ---
 
@@ -61,6 +62,16 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <A>(value: A, forest?: Forest<A>) => Tree<A>
+```
+
+Added in v1.0.0
+
+## stringify
+
+**Signature**
+
+```ts
+export declare const stringify: (actual: unknown) => string
 ```
 
 Added in v1.0.0

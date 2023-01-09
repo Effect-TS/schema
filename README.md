@@ -17,7 +17,6 @@ Schema validation with static type inference
 # Features
 
 - deriving artifacts from a `Schema`:
-  - guards
   - decoders
   - encoders
   - [fast-check](https://github.com/dubzzz/fast-check) arbitraries
@@ -297,13 +296,13 @@ if (DE.isFailure(result)) {
 
 ## Assertions
 
-The `is` function provided by the `@fp-ts/schema/Guard` module represents a way of verifying that a value conforms to a given `Schema`. `is` is a refinement that takes a value of type `unknown` as an argument and returns a `boolean` indicating whether or not the value conforms to the `Schema`.
+The `is` function provided by the `@fp-ts/schema/Decoder` module represents a way of verifying that a value conforms to a given `Schema`. `is` is a refinement that takes a value of type `unknown` as an argument and returns a `boolean` indicating whether or not the value conforms to the `Schema`.
 
 ```ts
-import * as G from "@fp-ts/schema/Guard";
+import * as D from "@fp-ts/schema/Decoder";
 
 // const isPerson: (u: unknown) => u is Person
-const isPerson = G.is(Person);
+const isPerson = D.is(Person);
 
 expect(isPerson({ name: "Alice", age: 30 })).toEqual(true);
 expect(isPerson(null)).toEqual(false);
@@ -312,10 +311,10 @@ expect(isPerson(null)).toEqual(false);
 The `asserts` function takes a `Schema` and an optional error message as arguments, and returns a function that takes an input value and checks if it matches the schema. If it does not match the schema, it throws an error with the specified message.
 
 ```ts
-import * as G from "@fp-ts/schema/Guard";
+import * as D from "@fp-ts/schema/Decoder";
 
 // const assertsPerson: (input: unknown) => asserts input is Person
-const assertsPerson = G.asserts(personSchema);
+const assertsPerson = D.asserts(personSchema);
 
 // this will throw an error with the message "Assertion failed"
 assertsPerson({ name: "Alice", age: "30" });
@@ -891,7 +890,6 @@ expect(decode([1, 2, "a"])).toEqual(
 In the following section, we demonstrate how to use the `fromEntries` combinator to decode a `ReadonlyMap` from an array of entries.
 
 ```ts
-import * as G from "@fp-ts/schema/Guard";
 import { fromEntries } from "@fp-ts/schema/data/ReadonlyMap";
 import * as D from "@fp-ts/schema/Decoder";
 import * as DE from "@fp-ts/schema/DecodeError";

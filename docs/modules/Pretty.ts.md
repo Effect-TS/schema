@@ -18,8 +18,6 @@ Added in v1.0.0
   - [Pretty (interface)](#pretty-interface)
 - [prettify](#prettify)
   - [pretty](#pretty)
-- [utils](#utils)
-  - [prettyFor](#prettyfor)
 
 ---
 
@@ -57,18 +55,6 @@ Added in v1.0.0
 
 ```ts
 export declare const pretty: <A>(schema: Schema<A>) => (a: A) => string
-```
-
-Added in v1.0.0
-
-# utils
-
-## prettyFor
-
-**Signature**
-
-```ts
-export declare const prettyFor: <A>(schema: Schema<A>) => Pretty<A>
 ```
 
 Added in v1.0.0

@@ -1,10 +1,10 @@
 ---
-title: data/Json.ts
-nav_order: 9
+title: data/UUID.ts
+nav_order: 14
 parent: Modules
 ---
 
-## Json overview
+## UUID overview
 
 Added in v1.0.0
 
@@ -13,18 +13,18 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [json](#json)
+  - [UUID](#uuid)
 
 ---
 
 # utils
 
-## json
+## UUID
 
 **Signature**
 
 ```ts
-export declare const json: S.Schema<Json>
+export declare const UUID: S.Schema<string>
 ```
 
 Added in v1.0.0

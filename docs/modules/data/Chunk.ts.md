@@ -14,7 +14,7 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [chunk](#chunk)
-  - [fromArray](#fromarray)
+  - [fromValues](#fromvalues)
 
 ---
 
@@ -30,12 +30,12 @@ export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
 
 Added in v1.0.0
 
-## fromArray
+## fromValues
 
 **Signature**
 
 ```ts
-export declare const fromArray: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const fromValues: <A>(item: Schema<A>) => Schema<Chunk<A>>
 ```
 
 Added in v1.0.0

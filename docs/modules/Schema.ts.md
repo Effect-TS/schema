@@ -33,10 +33,10 @@ Added in v1.0.0
   - [transform](#transform)
   - [transformOrFail](#transformorfail)
   - [tuple](#tuple)
+  - [typeAlias](#typealias)
   - [union](#union)
 - [constructors](#constructors)
   - [enums](#enums)
-  - [instanceOf](#instanceof)
   - [literal](#literal)
   - [make](#make)
   - [templateLiteral](#templateliteral)
@@ -49,6 +49,7 @@ Added in v1.0.0
   - [finite](#finite)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
+  - [includes](#includes)
   - [int](#int)
   - [length](#length)
   - [lessThan](#lessthan)
@@ -57,7 +58,7 @@ Added in v1.0.0
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
   - [nonNaN](#nonnan)
-  - [regex](#regex)
+  - [pattern](#pattern)
   - [startsWith](#startswith)
 - [model](#model)
   - [Schema (interface)](#schema-interface)
@@ -77,15 +78,13 @@ Added in v1.0.0
 - [symbol](#symbol-1)
   - [OptionalSchemaId](#optionalschemaid)
   - [OptionalSchemaId (type alias)](#optionalschemaid-type-alias)
-- [unexpected keys / indexes](#unexpected-keys--indexes)
-  - [allowUnexpected](#allowunexpected)
-  - [disallowUnexpected](#disallowunexpected)
 - [utils](#utils)
   - [Infer (type alias)](#infer-type-alias)
   - [Join (type alias)](#join-type-alias)
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [OptionalSchema (interface)](#optionalschema-interface)
   - [Spread (type alias)](#spread-type-alias)
+  - [sensitive](#sensitive)
 
 ---
 
@@ -146,7 +145,7 @@ Added in v1.0.0
 export declare const filter: <A, B extends A>(
   refinement: Refinement<A, B>,
   meta: unknown,
-  annotations?: AST.Annotated['annotations']
+  annotations?: Record<string | symbol, unknown> | undefined
 ) => (self: Schema<A>) => Schema<B>
 ```
 
@@ -312,8 +311,8 @@ Combinator that creates a new Schema by transforming the input and output of an 
 ```ts
 export declare const transformOrFail: <A, B>(
   to: Schema<B>,
-  f: (i: A) => These<readonly [DecodeError, ...DecodeError[]], B>,
-  g: (i: B) => These<readonly [DecodeError, ...DecodeError[]], A>
+  f: (i: A, options?: DecodeOptions | undefined) => These<readonly [DecodeError, ...DecodeError[]], B>,
+  g: (i: B, options?: DecodeOptions | undefined) => These<readonly [DecodeError, ...DecodeError[]], A>
 ) => (self: Schema<A>) => Schema<B>
 ```
 
@@ -327,6 +326,20 @@ Added in v1.0.0
 export declare const tuple: <Elements extends readonly Schema<any>[]>(
   ...elements: Elements
 ) => Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }>
+```
+
+Added in v1.0.0
+
+## typeAlias
+
+**Signature**
+
+```ts
+export declare const typeAlias: (
+  typeParameters: ReadonlyArray<Schema<any>>,
+  type: Schema<any>,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => Schema<any>
 ```
 
 Added in v1.0.0
@@ -354,18 +367,6 @@ export declare const enums: <A extends { [x: string]: string | number }>(
   enums: A,
   annotations?: AST.Annotated['annotations']
 ) => Schema<A[keyof A]>
-```
-
-Added in v1.0.0
-
-## instanceOf
-
-**Signature**
-
-```ts
-export declare const instanceOf: <A extends typeof R.Class>(
-  constructor: A
-) => (self: Schema<object>) => Schema<InstanceType<A>>
 ```
 
 Added in v1.0.0
@@ -431,12 +432,10 @@ Added in v1.0.0
 
 ## option
 
-Creates a `Schema` for an `Option` of `A`.
-
 **Signature**
 
 ```ts
-export declare const option: <A>(value: Schema<A>, kind?: 'plain' | 'fromNullable' | 'inline') => Schema<Option<A>>
+export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0
@@ -479,6 +478,16 @@ Added in v1.0.0
 
 ```ts
 export declare const greaterThanOrEqualTo: (min: number) => <A extends number>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## includes
+
+**Signature**
+
+```ts
+export declare const includes: (searchString: string) => <A extends string>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -563,12 +572,16 @@ export declare const nonNaN: <A extends number>(self: Schema<A>) => Schema<A>
 
 Added in v1.0.0
 
-## regex
+## pattern
 
 **Signature**
 
 ```ts
-export declare const regex: (regex: RegExp) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const pattern: (
+  regex: RegExp,
+  meta?: object | undefined,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => <A extends string>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -742,28 +755,6 @@ export type OptionalSchemaId = typeof OptionalSchemaId
 
 Added in v1.0.0
 
-# unexpected keys / indexes
-
-## allowUnexpected
-
-**Signature**
-
-```ts
-export declare const allowUnexpected: <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## disallowUnexpected
-
-**Signature**
-
-```ts
-export declare const disallowUnexpected: <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
 # utils
 
 ## Infer (type alias)
@@ -823,6 +814,16 @@ export type Spread<A> = {
 } extends infer B
   ? B
   : never
+```
+
+Added in v1.0.0
+
+## sensitive
+
+**Signature**
+
+```ts
+export declare const sensitive: <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
