@@ -15,7 +15,6 @@ Added in v1.0.0
 - [utils](#utils)
   - [ArbitraryHookId](#arbitraryhookid)
   - [DecoderHookId](#decoderhookid)
-  - [EncoderHookId](#encoderhookid)
   - [Hook (interface)](#hook-interface)
   - [PrettyHookId](#prettyhookid)
   - [getHook](#gethook)
@@ -41,16 +40,6 @@ Added in v1.0.0
 
 ```ts
 export declare const DecoderHookId: '@fp-ts/schema/annotation/DecoderHookId'
-```
-
-Added in v1.0.0
-
-## EncoderHookId
-
-**Signature**
-
-```ts
-export declare const EncoderHookId: '@fp-ts/schema/annotation/EncoderHookId'
 ```
 
 Added in v1.0.0

@@ -20,6 +20,9 @@ Added in v1.0.0
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeOrThrow](#decodeorthrow)
+- [encoding](#encoding)
+  - [encode](#encode)
+  - [encodeOrThrow](#encodeorthrow)
 - [model](#model)
   - [DecodeOptions (interface)](#decodeoptions-interface)
   - [Decoder (interface)](#decoder-interface)
@@ -85,6 +88,30 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeOrThrow: <A>(schema: Schema<A>) => (u: unknown, options?: DecodeOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+# encoding
+
+## encode
+
+**Signature**
+
+```ts
+export declare const encode: <A>(
+  schema: Schema<A>
+) => (a: A, options?: DecodeOptions | undefined) => DE.DecodeResult<unknown>
+```
+
+Added in v1.0.0
+
+## encodeOrThrow
+
+**Signature**
+
+```ts
+export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: DecodeOptions | undefined) => unknown
 ```
 
 Added in v1.0.0
