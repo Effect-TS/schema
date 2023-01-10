@@ -10,8 +10,10 @@ space-object (bad) x 434,563 ops/sec ±0.58% (87 runs sampled)
 space-object (good) x 289,187 ops/sec ±0.25% (87 runs sampled)
 space-object (bad) x 885,639 ops/sec ±5.38% (76 runs sampled)
 0.0.8
-space-object (good) x 259,893 ops/sec ±0.50% (91 runs sampled)
-space-object (bad) x 682,268 ops/sec ±4.97% (81 runs sampled)
+decode (good) x 244,100 ops/sec ±4.51% (82 runs sampled)
+decode (bad) x 698,427 ops/sec ±4.93% (81 runs sampled)
+is (good) x 133,939 ops/sec ±0.56% (86 runs sampled)
+is (bad) x 204,531 ops/sec ±7.83% (81 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -56,7 +58,8 @@ const Ship = t.struct({
 
 export const T = t.union(Asteroid, Planet, Ship)
 
-const decode = P.decode(T)
+export const decode = P.decode(T)
+export const is = P.is(T)
 
 const good = {
   type: "ship",
@@ -104,12 +107,18 @@ const bad = {
 // console.log(decode(bad))
 
 suite
-  .add("space-object (good)", function() {
+  .add("decode (good)", function() {
     decode(good)
   })
-  .add("space-object (bad)", function() {
+  .add("decode (bad)", function() {
     decode(bad)
   })
+  // .add("is (good)", function() {
+  //   is(good)
+  // })
+  // .add("is (bad)", function() {
+  //   is(bad)
+  // })
   .on("cycle", function(event: any) {
     console.log(String(event.target))
   })
