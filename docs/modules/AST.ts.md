@@ -26,7 +26,7 @@ Added in v1.0.0
   - [stringKeyword](#stringkeyword)
   - [symbolKeyword](#symbolkeyword)
   - [templateLiteral](#templateliteral)
-  - [transformOrFail](#transformorfail)
+  - [transform](#transform)
   - [tuple](#tuple)
   - [typeAlias](#typealias)
   - [typeLiteral](#typeliteral)
@@ -42,6 +42,7 @@ Added in v1.0.0
   - [isStringKeyword](#isstringkeyword)
   - [isSymbolKeyword](#issymbolkeyword)
   - [isTemplateLiteral](#istemplateliteral)
+  - [isTransform](#istransform)
   - [isTuple](#istuple)
   - [isTypeAlias](#istypealias)
   - [isTypeLiteral](#istypeliteral)
@@ -83,14 +84,12 @@ Added in v1.0.0
   - [element](#element)
   - [getPropertySignatures](#getpropertysignatures)
   - [indexSignature](#indexsignature)
-  - [isSensitive](#issensitive)
   - [keyof](#keyof)
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
   - [propertySignature](#propertysignature)
   - [record](#record)
-  - [sensitive](#sensitive)
 
 ---
 
@@ -196,7 +195,7 @@ Added in v1.0.0
 ```ts
 export declare const refinement: (
   from: AST,
-  refinement: Predicate<any>,
+  decode: Parser<any, any>['parse'],
   meta: unknown,
   annotations?: Annotated['annotations']
 ) => Refinement
@@ -237,12 +236,17 @@ export declare const templateLiteral: (
 
 Added in v1.0.0
 
-## transformOrFail
+## transform
 
 **Signature**
 
 ```ts
-export declare const transformOrFail: (from: AST, to: AST, f: Transform['f'], g: Transform['g']) => Transform
+export declare const transform: (
+  from: AST,
+  to: AST,
+  decode: Transform['decode'],
+  encode: Transform['encode']
+) => Transform
 ```
 
 Added in v1.0.0
@@ -398,6 +402,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isTemplateLiteral: (ast: AST) => ast is TemplateLiteral
+```
+
+Added in v1.0.0
+
+## isTransform
+
+**Signature**
+
+```ts
+export declare const isTransform: (ast: AST) => ast is Transform
 ```
 
 Added in v1.0.0
@@ -605,7 +619,7 @@ Added in v1.0.0
 export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
-  readonly refinement: Predicate<any>
+  readonly decode: Parser<any, any>['parse']
   readonly meta: unknown
 }
 ```
@@ -619,7 +633,6 @@ Added in v1.0.0
 ```ts
 export interface StringKeyword {
   readonly _tag: 'StringKeyword'
-  readonly isSensitive: boolean
 }
 ```
 
@@ -660,8 +673,8 @@ export interface Transform {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
-  readonly f: Decoder<any, any>['decode']
-  readonly g: Decoder<any, any>['decode']
+  readonly decode: Parser<any, any>['parse']
+  readonly encode: Parser<any, any>['parse']
 }
 ```
 
@@ -905,16 +918,6 @@ export declare const indexSignature: (
 
 Added in v1.0.0
 
-## isSensitive
-
-**Signature**
-
-```ts
-export declare const isSensitive: (ast: AST) => boolean
-```
-
-Added in v1.0.0
-
 ## keyof
 
 **Signature**
@@ -977,16 +980,6 @@ Added in v1.0.0
 
 ```ts
 export declare const record: (key: AST, value: AST, isReadonly: boolean) => TypeLiteral
-```
-
-Added in v1.0.0
-
-## sensitive
-
-**Signature**
-
-```ts
-export declare const sensitive: (ast: AST) => AST
 ```
 
 Added in v1.0.0

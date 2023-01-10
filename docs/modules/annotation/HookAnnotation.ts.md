@@ -14,8 +14,8 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [ArbitraryHookId](#arbitraryhookid)
-  - [DecoderHookId](#decoderhookid)
   - [Hook (interface)](#hook-interface)
+  - [ParserHookId](#parserhookid)
   - [PrettyHookId](#prettyhookid)
   - [getHook](#gethook)
   - [hook](#hook)
@@ -34,16 +34,6 @@ export declare const ArbitraryHookId: '@fp-ts/schema/annotation/ArbitraryHookId'
 
 Added in v1.0.0
 
-## DecoderHookId
-
-**Signature**
-
-```ts
-export declare const DecoderHookId: '@fp-ts/schema/annotation/DecoderHookId'
-```
-
-Added in v1.0.0
-
 ## Hook (interface)
 
 **Signature**
@@ -52,6 +42,16 @@ Added in v1.0.0
 export interface Hook<A> {
   readonly handler: (...typeParameters: ReadonlyArray<A>) => A
 }
+```
+
+Added in v1.0.0
+
+## ParserHookId
+
+**Signature**
+
+```ts
+export declare const ParserHookId: '@fp-ts/schema/annotation/ParserHookId'
 ```
 
 Added in v1.0.0

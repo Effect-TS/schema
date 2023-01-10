@@ -1,6 +1,6 @@
 ---
 title: formatter/Tree.ts
-nav_order: 17
+nav_order: 15
 parent: Modules
 ---
 
@@ -51,7 +51,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const format: (errors: readonly [DE.DecodeError, ...DE.DecodeError[]]) => string
+export declare const format: (errors: readonly [DE.ParseError, ...DE.ParseError[]]) => string
 ```
 
 Added in v1.0.0
