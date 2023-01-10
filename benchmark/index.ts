@@ -1,4 +1,4 @@
-import * as D from "@fp-ts/schema/Decoder"
+import * as P from "@fp-ts/schema/Parser"
 import * as t from "@fp-ts/schema/Schema"
 import * as Benchmark from "benchmark"
 
@@ -56,7 +56,7 @@ const Ship = t.struct({
 
 export const T = t.union(Asteroid, Planet, Ship)
 
-const decode = D.decode(T)
+const decode = P.decode(T)
 
 const good = {
   type: "ship",
