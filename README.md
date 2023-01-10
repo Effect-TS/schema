@@ -28,10 +28,6 @@ Schema validation with static type inference
 - custom artifact compilers
 - custom `Schema` combinators
 - custom data types
-- refinements (TODO)
-- custom decode errors (TODO)
-- versioning (TODO)
-- migration (TODO)
 
 # Introduction
 

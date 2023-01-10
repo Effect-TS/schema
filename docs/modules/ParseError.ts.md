@@ -1,10 +1,10 @@
 ---
-title: DecodeError.ts
-nav_order: 15
+title: ParseError.ts
+nav_order: 17
 parent: Modules
 ---
 
-## DecodeError overview
+## ParseError overview
 
 Added in v1.0.0
 
@@ -37,7 +37,6 @@ Added in v1.0.0
   - [isSuccess](#issuccess)
   - [isUnexpected](#isunexpected)
 - [model](#model)
-  - [DecodeError (type alias)](#decodeerror-type-alias)
   - [Enums (interface)](#enums-interface)
   - [Equal (interface)](#equal-interface)
   - [Index (interface)](#index-interface)
@@ -45,12 +44,13 @@ Added in v1.0.0
   - [Member (interface)](#member-interface)
   - [Meta (interface)](#meta-interface)
   - [Missing (interface)](#missing-interface)
+  - [ParseError (type alias)](#parseerror-type-alias)
   - [Refinement (interface)](#refinement-interface)
   - [Transform (interface)](#transform-interface)
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
 - [utils](#utils)
-  - [DecodeResult (type alias)](#decoderesult-type-alias)
+  - [ParseResult (type alias)](#parseresult-type-alias)
 
 ---
 
@@ -81,7 +81,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const failure: (e: DecodeError) => DecodeResult<never>
+export declare const failure: (e: ParseError) => ParseResult<never>
 ```
 
 Added in v1.0.0
@@ -91,7 +91,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const failures: (es: readonly [DecodeError, ...DecodeError[]]) => DecodeResult<never>
+export declare const failures: (es: readonly [ParseError, ...ParseError[]]) => ParseResult<never>
 ```
 
 Added in v1.0.0
@@ -101,7 +101,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const index: (index: number, errors: readonly [DecodeError, ...DecodeError[]]) => Index
+export declare const index: (index: number, errors: readonly [ParseError, ...ParseError[]]) => Index
 ```
 
 Added in v1.0.0
@@ -111,7 +111,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const key: (key: PropertyKey, errors: readonly [DecodeError, ...DecodeError[]]) => Key
+export declare const key: (key: PropertyKey, errors: readonly [ParseError, ...ParseError[]]) => Key
 ```
 
 Added in v1.0.0
@@ -121,7 +121,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const member: (errors: readonly [DecodeError, ...DecodeError[]]) => Member
+export declare const member: (errors: readonly [ParseError, ...ParseError[]]) => Member
 ```
 
 Added in v1.0.0
@@ -161,7 +161,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const success: <A>(a: A) => T.These<readonly [DecodeError, ...DecodeError[]], A>
+export declare const success: <A>(a: A) => T.These<readonly [ParseError, ...ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -201,7 +201,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const warning: <A>(e: DecodeError, a: A) => T.These<readonly [DecodeError, ...DecodeError[]], A>
+export declare const warning: <A>(e: ParseError, a: A) => T.These<readonly [ParseError, ...ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -212,9 +212,9 @@ Added in v1.0.0
 
 ```ts
 export declare const warnings: <A>(
-  es: readonly [DecodeError, ...DecodeError[]],
+  es: readonly [ParseError, ...ParseError[]],
   a: A
-) => T.These<readonly [DecodeError, ...DecodeError[]], A>
+) => T.These<readonly [ParseError, ...ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -227,8 +227,8 @@ Added in v1.0.0
 
 ```ts
 export declare const hasWarnings: <A>(
-  self: T.These<readonly [DecodeError, ...DecodeError[]], A>
-) => self is T.Both<readonly [DecodeError, ...DecodeError[]], A>
+  self: T.These<readonly [ParseError, ...ParseError[]], A>
+) => self is T.Both<readonly [ParseError, ...ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -239,8 +239,8 @@ Added in v1.0.0
 
 ```ts
 export declare const isFailure: <A>(
-  self: T.These<readonly [DecodeError, ...DecodeError[]], A>
-) => self is Left<readonly [DecodeError, ...DecodeError[]]>
+  self: T.These<readonly [ParseError, ...ParseError[]], A>
+) => self is Left<readonly [ParseError, ...ParseError[]]>
 ```
 
 Added in v1.0.0
@@ -250,7 +250,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isIndex: (e: DecodeError) => e is Index
+export declare const isIndex: (e: ParseError) => e is Index
 ```
 
 Added in v1.0.0
@@ -260,7 +260,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isKey: (e: DecodeError) => e is Key
+export declare const isKey: (e: ParseError) => e is Key
 ```
 
 Added in v1.0.0
@@ -270,7 +270,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isSuccess: <A>(self: T.These<readonly [DecodeError, ...DecodeError[]], A>) => self is Right<A>
+export declare const isSuccess: <A>(self: T.These<readonly [ParseError, ...ParseError[]], A>) => self is Right<A>
 ```
 
 Added in v1.0.0
@@ -280,35 +280,12 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isUnexpected: (e: DecodeError) => e is Unexpected
+export declare const isUnexpected: (e: ParseError) => e is Unexpected
 ```
 
 Added in v1.0.0
 
 # model
-
-## DecodeError (type alias)
-
-`DecodeError` is a type that represents the different types of errors that can occur when decoding a value.
-
-**Signature**
-
-```ts
-export type DecodeError =
-  | Meta
-  | Type
-  | Equal
-  | Enums
-  | Refinement
-  | Transform
-  | Index
-  | Key
-  | Missing
-  | Unexpected
-  | Member
-```
-
-Added in v1.0.0
 
 ## Enums (interface)
 
@@ -364,7 +341,7 @@ that a specific element in an array did not match the expected type or value.
 export interface Index {
   readonly _tag: 'Index'
   readonly index: number
-  readonly errors: NonEmptyReadonlyArray<DecodeError>
+  readonly errors: NonEmptyReadonlyArray<ParseError>
 }
 ```
 
@@ -384,7 +361,7 @@ which indicates that an unexpected key was found in the object being decoded.
 export interface Key {
   readonly _tag: 'Key'
   readonly key: PropertyKey
-  readonly errors: NonEmptyReadonlyArray<DecodeError>
+  readonly errors: NonEmptyReadonlyArray<ParseError>
 }
 ```
 
@@ -399,7 +376,7 @@ Error that occurs when a member in a union has an error.
 ```ts
 export interface Member {
   readonly _tag: 'Member'
-  readonly errors: NonEmptyReadonlyArray<DecodeError>
+  readonly errors: NonEmptyReadonlyArray<ParseError>
 }
 ```
 
@@ -434,6 +411,29 @@ Error that occurs when a required key or index is missing.
 export interface Missing {
   readonly _tag: 'Missing'
 }
+```
+
+Added in v1.0.0
+
+## ParseError (type alias)
+
+`DecodeError` is a type that represents the different types of errors that can occur when decoding a value.
+
+**Signature**
+
+```ts
+export type ParseError =
+  | Meta
+  | Type
+  | Equal
+  | Enums
+  | Refinement
+  | Transform
+  | Index
+  | Key
+  | Missing
+  | Unexpected
+  | Member
 ```
 
 Added in v1.0.0
@@ -516,12 +516,12 @@ Added in v1.0.0
 
 # utils
 
-## DecodeResult (type alias)
+## ParseResult (type alias)
 
 **Signature**
 
 ```ts
-export type DecodeResult<A> = Validated<DecodeError, A>
+export type ParseResult<A> = Validated<ParseError, A>
 ```
 
 Added in v1.0.0

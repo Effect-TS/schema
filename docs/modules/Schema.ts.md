@@ -18,6 +18,7 @@ Added in v1.0.0
   - [extend](#extend)
   - [field](#field)
   - [filter](#filter)
+  - [filterOrFail](#filterorfail)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
@@ -84,7 +85,6 @@ Added in v1.0.0
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [OptionalSchema (interface)](#optionalschema-interface)
   - [Spread (type alias)](#spread-type-alias)
-  - [sensitive](#sensitive)
 
 ---
 
@@ -142,8 +142,27 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const filter: <A, B extends A>(
+export declare function filter<A, B extends A>(
   refinement: Refinement<A, B>,
+  meta: unknown,
+  annotations?: AST.Annotated['annotations']
+): (self: Schema<A>) => Schema<B>
+export declare function filter<A>(
+  predicate: Predicate<A>,
+  meta: unknown,
+  annotations?: AST.Annotated['annotations']
+): (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## filterOrFail
+
+**Signature**
+
+```ts
+export declare const filterOrFail: <A, B extends A>(
+  decode: (i: A, options?: ParseOptions | undefined) => These<readonly [ParseError, ...ParseError[]], B>,
   meta: unknown,
   annotations?: Record<string | symbol, unknown> | undefined
 ) => (self: Schema<A>) => Schema<B>
@@ -292,7 +311,8 @@ Added in v1.0.0
 
 ## transform
 
-Creates a new schema that transforms values from one type to another using the provided functions.
+Create a new `Schema` by transforming the input and output of an existing `Schema`
+using the provided mapping functions.
 
 **Signature**
 
@@ -304,15 +324,16 @@ Added in v1.0.0
 
 ## transformOrFail
 
-Combinator that creates a new Schema by transforming the input and output of an existing Schema using the provided decoding functions.
+Create a new `Schema` by transforming the input and output of an existing `Schema`
+using the provided decoding functions.
 
 **Signature**
 
 ```ts
 export declare const transformOrFail: <A, B>(
   to: Schema<B>,
-  f: (i: A, options?: DecodeOptions | undefined) => These<readonly [DecodeError, ...DecodeError[]], B>,
-  g: (i: B, options?: DecodeOptions | undefined) => These<readonly [DecodeError, ...DecodeError[]], A>
+  f: (i: A, options?: ParseOptions | undefined) => These<readonly [ParseError, ...ParseError[]], B>,
+  g: (i: B, options?: ParseOptions | undefined) => These<readonly [ParseError, ...ParseError[]], A>
 ) => (self: Schema<A>) => Schema<B>
 ```
 
@@ -814,16 +835,6 @@ export type Spread<A> = {
 } extends infer B
   ? B
   : never
-```
-
-Added in v1.0.0
-
-## sensitive
-
-**Signature**
-
-```ts
-export declare const sensitive: <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

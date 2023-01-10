@@ -1,10 +1,10 @@
 ---
-title: Decoder.ts
-nav_order: 16
+title: Parser.ts
+nav_order: 18
 parent: Modules
 ---
 
-## Decoder overview
+## Parser overview
 
 Added in v1.0.0
 
@@ -24,8 +24,8 @@ Added in v1.0.0
   - [encode](#encode)
   - [encodeOrThrow](#encodeorthrow)
 - [model](#model)
-  - [DecodeOptions (interface)](#decodeoptions-interface)
-  - [Decoder (interface)](#decoder-interface)
+  - [ParseOptions (interface)](#parseoptions-interface)
+  - [Parser (interface)](#parser-interface)
 - [utils](#utils)
   - [InferInput (type alias)](#inferinput-type-alias)
 
@@ -38,7 +38,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const asserts: <A>(schema: Schema<A>) => (input: unknown) => asserts input is A
+export declare const asserts: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: ParseOptions | undefined) => asserts input is A
 ```
 
 Added in v1.0.0
@@ -48,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <A>(schema: Schema<A>) => (input: unknown) => input is A
+export declare const is: <A>(schema: Schema<A>) => (input: unknown, options?: ParseOptions | undefined) => input is A
 ```
 
 Added in v1.0.0
@@ -62,8 +64,8 @@ Added in v1.0.0
 ```ts
 export declare const make: <I, A>(
   schema: Schema<A>,
-  decode: (i: I, options?: DecodeOptions | undefined) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
-) => Decoder<I, A>
+  parse: (i: I, options?: ParseOptions | undefined) => These<readonly [PE.ParseError, ...PE.ParseError[]], A>
+) => Parser<I, A>
 ```
 
 Added in v1.0.0
@@ -77,7 +79,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <A>(
   schema: Schema<A>
-) => (i: unknown, options?: DecodeOptions | undefined) => These<readonly [DE.DecodeError, ...DE.DecodeError[]], A>
+) => (i: unknown, options?: ParseOptions | undefined) => These<readonly [PE.ParseError, ...PE.ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -87,7 +89,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeOrThrow: <A>(schema: Schema<A>) => (u: unknown, options?: DecodeOptions | undefined) => A
+export declare const decodeOrThrow: <A>(schema: Schema<A>) => (u: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -101,7 +103,7 @@ Added in v1.0.0
 ```ts
 export declare const encode: <A>(
   schema: Schema<A>
-) => (a: A, options?: DecodeOptions | undefined) => DE.DecodeResult<unknown>
+) => (a: A, options?: ParseOptions | undefined) => PE.ParseResult<unknown>
 ```
 
 Added in v1.0.0
@@ -111,19 +113,19 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: DecodeOptions | undefined) => unknown
+export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: ParseOptions | undefined) => unknown
 ```
 
 Added in v1.0.0
 
 # model
 
-## DecodeOptions (interface)
+## ParseOptions (interface)
 
 **Signature**
 
 ```ts
-export interface DecodeOptions {
+export interface ParseOptions {
   readonly isUnexpectedAllowed?: boolean
   readonly allErrors?: boolean
 }
@@ -131,14 +133,14 @@ export interface DecodeOptions {
 
 Added in v1.0.0
 
-## Decoder (interface)
+## Parser (interface)
 
 **Signature**
 
 ```ts
-export interface Decoder<I, A> extends Schema<A> {
+export interface Parser<I, A> extends Schema<A> {
   readonly I: (i: I) => void
-  readonly decode: (i: I, options?: DecodeOptions) => DE.DecodeResult<A>
+  readonly parse: (i: I, options?: ParseOptions) => PE.ParseResult<A>
 }
 ```
 
@@ -151,7 +153,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type InferInput<D extends Decoder<any, any>> = Parameters<D['I']>[0]
+export type InferInput<D extends Parser<any, any>> = Parameters<D['I']>[0]
 ```
 
 Added in v1.0.0
