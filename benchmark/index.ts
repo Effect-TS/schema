@@ -6,18 +6,12 @@ import * as Benchmark from "benchmark"
 io-ts
 space-object (good) x 476,424 ops/sec ±0.45% (92 runs sampled)
 space-object (bad) x 434,563 ops/sec ±0.58% (87 runs sampled)
-(NonEmptyChunk)
-space-object (good) x 148,078 ops/sec ±4.17% (86 runs sampled)
-space-object (bad) x 238,464 ops/sec ±5.36% (80 runs sampled)
-0.0.5
-space-object (good) x 163,626 ops/sec ±0.20% (90 runs sampled)
-space-object (bad) x 276,694 ops/sec ±4.55% (82 runs sampled)
 0.0.6
 space-object (good) x 289,187 ops/sec ±0.25% (87 runs sampled)
 space-object (bad) x 885,639 ops/sec ±5.38% (76 runs sampled)
 0.0.8
-space-object (good) x 135,359 ops/sec ±0.58% (87 runs sampled)
-space-object (bad) x 201,004 ops/sec ±5.49% (76 runs sampled)
+space-object (good) x 259,893 ops/sec ±0.50% (91 runs sampled)
+space-object (bad) x 682,268 ops/sec ±4.97% (81 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -62,7 +56,7 @@ const Ship = t.struct({
 
 export const T = t.union(Asteroid, Planet, Ship)
 
-const decode = D.decode(T, { isUnexpectedAllowed: false, allErrors: false })
+const decode = D.decode(T)
 
 const good = {
   type: "ship",
