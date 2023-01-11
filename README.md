@@ -470,6 +470,7 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 ```ts
 pipe(S.string, S.maxLength(5));
 pipe(S.string, S.minLength(5));
+pipe(S.string, nonEmpty); // same as S.minLength(1)
 pipe(S.string, S.length(5));
 pipe(S.string, S.pattern(regex));
 pipe(S.string, S.startsWith(string));
