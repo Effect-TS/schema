@@ -663,7 +663,7 @@ interface Category {
   readonly subcategories: ReadonlyArray<Category>;
 }
 
-const Category: S.Schema<Category> = S.lazy(() =>
+const Category: S.Schema<Category> = S.lazy("Category", () =>
   S.struct({
     name: S.string,
     subcategories: S.array(Category),
@@ -686,14 +686,14 @@ interface Operation {
   readonly right: Expression;
 }
 
-const Expression: S.Schema<Expression> = S.lazy(() =>
+const Expression: S.Schema<Expression> = S.lazy("Expression", () =>
   S.struct({
     type: S.literal("expression"),
     value: S.union(S.number, Operation),
   })
 );
 
-const Operation: S.Schema<Operation> = S.lazy(() =>
+const Operation: S.Schema<Operation> = S.lazy("Operation", () =>
   S.struct({
     type: S.literal("operation"),
     operator: S.union(S.literal("+"), S.literal("-")),
