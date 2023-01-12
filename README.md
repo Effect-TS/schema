@@ -23,11 +23,8 @@ Schema validation with static type inference
   - encoders
   - [fast-check](https://github.com/dubzzz/fast-check) arbitraries
   - pretty printing
-  - JSON Schema
-  - TypeScript AST
 - custom artifact compilers
 - custom `Schema` combinators
-- custom data types
 
 # Introduction
 
