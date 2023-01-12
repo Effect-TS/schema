@@ -21,7 +21,7 @@ importers:
       '@effect-ts/core': ^0.60.2
       '@effect/language-service': ^0.0.10
       '@fp-ts/core': ~0.0.11
-      '@fp-ts/data': ~0.0.36
+      '@fp-ts/data': ~0.0.39
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
       '@types/benchmark': ^2.1.2
       '@types/chai': ^4.3.4
@@ -47,7 +47,7 @@ importers:
       eslint-plugin-import: ^2.26.0
       eslint-plugin-simple-import-sort: ^8.0.0
       eslint-plugin-sort-destructure-keys: ^1.4.0
-      fast-check: ^3.4.0
+      fast-check: ^3.5.0
       glob: ^8.0.3
       madge: ^5.0.1
       picocolors: ^1.0.0
@@ -61,8 +61,8 @@ importers:
       vitest: 0.25.5
     dependencies:
       '@fp-ts/core': 0.0.11
-      '@fp-ts/data': 0.0.36
-      fast-check: 3.4.0
+      '@fp-ts/data': 0.0.39
+      fast-check: 3.5.0
     devDependencies:
       '@babel/cli': 7.19.3_@babel+core@7.20.5
       '@babel/core': 7.20.5
@@ -755,8 +755,8 @@ packages:
       '@fp-ts/core': 0.0.9
     dev: true
 
-  /@fp-ts/data/0.0.36:
-    resolution: {integrity: sha512-uC8S69OO+KyXrVTQhDr+JWXmex9blTwZcwG9BcxflPnytHA3lU8BxMz0DjxgSpeWzoGJIZ9F5L6bbwCnvcLeEA==}
+  /@fp-ts/data/0.0.39:
+    resolution: {integrity: sha512-dNw1LWjQmChmdenrDuxPct+ycucgKQQboVtWqov8rkAGY3DULznoSDJZam6l2kaLdq1ScPv810N4mzLLT+cBBw==}
     dependencies:
       '@fp-ts/core': 0.0.11
     dev: false
@@ -3431,8 +3431,8 @@ packages:
       pure-rand: 5.0.3
     dev: true
 
-  /fast-check/3.4.0:
-    resolution: {integrity: sha512-EWeu5YRzLuf5/PjLu3g6p823B4fOsGc/C8abGfEW4ZJfz1mf670TsP8CxeOuICESO88qu7YoPwKRZ2mTMRxwzg==}
+  /fast-check/3.5.0:
+    resolution: {integrity: sha512-5Yk9kfPy1DR8+9nl+wgRbXGM+p7e25nDRuZ/4b3TjIaWu53p/KkwS4uyKFc+Ek2Ft5nF40KRCbPYGrWYp0SjPw==}
     engines: {node: '>=8.0.0'}
     dependencies:
       pure-rand: 5.0.3
