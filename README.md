@@ -105,7 +105,7 @@ expect(decodePerson({ name: "Alice", age: 30 })).toEqual(
   PE.success({ name: "Alice", age: 30 })
 );
 expect(decodePerson(null)).toEqual(
-  PE.failure(PE.notType("{ readonly [x: string]: unknown }", null))
+  PE.failure(PE.type(..., null))
 );
 ```
 
@@ -127,7 +127,7 @@ P.decodeOrThrow(Person)({});
 
 When using a `Schema` to decode a value, any properties that are not specified in the `Schema` will result in a decoding error. This is because the `Schema` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
 
-However, you can use the `isUnexpectedAllowed` option to allow excess properties while decoding, and instead of a fatal error, it will return a warning and strip away the excess properties. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
+However, you can use the `isUnexpectedAllowed` option to allow excess properties while decoding. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
 
 Here's an example of how you might use `isUnexpectedAllowed`:
 
@@ -137,16 +137,6 @@ const Person = S.struct({
   age: S.number,
 });
 
-// This will succeed and return a value with no warnings
-const result = P.decode(Person)(
-  {
-    name: "Alice",
-    age: 30,
-  },
-  { isUnexpectedAllowed: true }
-);
-
-// This will succeed, but return a warning about the excess property "email"
 console.log(
   "%o",
   P.decode(Person)(
@@ -160,18 +150,7 @@ console.log(
 );
 /*
 {
-  _tag: 'Both',
-  left: [
-    {
-      _tag: 'Key',
-      key: 'email',
-      errors: [
-        { _tag: 'Unexpected', actual: 'bob@example.com' },
-        [length]: 1
-      ]
-    },
-    [length]: 1
-  ],
+  _tag: 'Right',
   right: { name: 'Bob', age: 40 }
 }
 */
@@ -208,7 +187,7 @@ console.log(
       _tag: 'Key',
       key: 'age',
       errors: [
-        { _tag: 'Type', expected: 'number', actual: 'abc' },
+        { _tag: 'Type', expected: ..., actual: 'abc' },
         [length]: 1
       ]
     },
@@ -259,8 +238,6 @@ if (PE.isFailure(result)) {
    └─ is missing
 */
 ```
-
-**Note**. In the future, additional formatting functions will be available in the `@fp-ts/schema` library.
 
 ## Assertions
 

@@ -1,6 +1,6 @@
 ---
 title: data/filter.ts
-nav_order: 8
+nav_order: 6
 parent: Modules
 ---
 

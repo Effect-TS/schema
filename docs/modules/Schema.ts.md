@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 20
+nav_order: 18
 parent: Modules
 ---
 
@@ -12,13 +12,18 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [annotations](#annotations)
+  - [description](#description)
+  - [documentation](#documentation)
+  - [examples](#examples)
+  - [identifier](#identifier)
+  - [message](#message)
+  - [title](#title)
 - [combinators](#combinators)
   - [array](#array)
   - [element](#element)
   - [extend](#extend)
-  - [field](#field)
   - [filter](#filter)
-  - [filterOrFail](#filterorfail)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
@@ -88,6 +93,68 @@ Added in v1.0.0
 
 ---
 
+# annotations
+
+## description
+
+**Signature**
+
+```ts
+export declare const description: (description: annotations.Description) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## documentation
+
+**Signature**
+
+```ts
+export declare const documentation: (documentation: annotations.Documentation) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## examples
+
+**Signature**
+
+```ts
+export declare const examples: (examples: annotations.Examples) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## identifier
+
+**Signature**
+
+```ts
+export declare const identifier: (identifier: annotations.Identifier) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## message
+
+**Signature**
+
+```ts
+export declare const message: (message: annotations.Message) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## title
+
+**Signature**
+
+```ts
+export declare const title: (title: annotations.Title) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 # combinators
 
 ## array
@@ -122,21 +189,6 @@ export declare const extend: <B>(that: Schema<B>) => <A>(self: Schema<A>) => Sch
 
 Added in v1.0.0
 
-## field
-
-**Signature**
-
-```ts
-export declare const field: <Key extends string | number | symbol, A, isOptional extends boolean>(
-  key: Key,
-  value: Schema<A>,
-  isOptional: isOptional,
-  annotations?: Record<string | symbol, unknown> | undefined
-) => Schema<isOptional extends true ? { readonly [K in Key]?: A | undefined } : { readonly [K in Key]: A }>
-```
-
-Added in v1.0.0
-
 ## filter
 
 **Signature**
@@ -144,28 +196,16 @@ Added in v1.0.0
 ```ts
 export declare function filter<A, B extends A>(
   refinement: Refinement<A, B>,
+  description: string,
   meta: unknown,
   annotations?: AST.Annotated['annotations']
 ): (self: Schema<A>) => Schema<B>
 export declare function filter<A>(
   predicate: Predicate<A>,
+  description: string,
   meta: unknown,
   annotations?: AST.Annotated['annotations']
 ): (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## filterOrFail
-
-**Signature**
-
-```ts
-export declare const filterOrFail: <A, B extends A>(
-  decode: (i: A, options?: ParseOptions | undefined) => These<readonly [ParseError, ...ParseError[]], B>,
-  meta: unknown,
-  annotations?: Record<string | symbol, unknown> | undefined
-) => (self: Schema<A>) => Schema<B>
 ```
 
 Added in v1.0.0
@@ -185,7 +225,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <A>(f: () => Schema<A>) => Schema<A>
+export declare const lazy: <A>(
+  f: () => Schema<A>,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -332,8 +375,8 @@ using the provided decoding functions.
 ```ts
 export declare const transformOrFail: <A, B>(
   to: Schema<B>,
-  f: (i: A, options?: ParseOptions | undefined) => These<readonly [ParseError, ...ParseError[]], B>,
-  g: (i: B, options?: ParseOptions | undefined) => These<readonly [ParseError, ...ParseError[]], A>
+  decode: (i: A, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], B>,
+  encode: (i: B, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], A>
 ) => (self: Schema<A>) => Schema<B>
 ```
 
@@ -384,10 +427,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const enums: <A extends { [x: string]: string | number }>(
-  enums: A,
-  annotations?: AST.Annotated['annotations']
-) => Schema<A[keyof A]>
+export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Schema<A[keyof A]>
 ```
 
 Added in v1.0.0
