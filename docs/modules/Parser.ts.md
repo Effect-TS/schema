@@ -1,6 +1,6 @@
 ---
 title: Parser.ts
-nav_order: 18
+nav_order: 16
 parent: Modules
 ---
 
@@ -64,7 +64,7 @@ Added in v1.0.0
 ```ts
 export declare const make: <I, A>(
   schema: Schema<A>,
-  parse: (i: I, options?: ParseOptions | undefined) => These<readonly [PE.ParseError, ...PE.ParseError[]], A>
+  parse: (i: I, options?: ParseOptions | undefined) => Either<readonly [PE.ParseError, ...PE.ParseError[]], A>
 ) => Parser<I, A>
 ```
 
@@ -79,7 +79,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <A>(
   schema: Schema<A>
-) => (i: unknown, options?: ParseOptions | undefined) => These<readonly [PE.ParseError, ...PE.ParseError[]], A>
+) => (i: unknown, options?: ParseOptions | undefined) => Either<readonly [PE.ParseError, ...PE.ParseError[]], A>
 ```
 
 Added in v1.0.0

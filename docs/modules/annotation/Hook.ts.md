@@ -1,10 +1,10 @@
 ---
-title: annotation/HookAnnotation.ts
+title: annotation/Hook.ts
 nav_order: 2
 parent: Modules
 ---
 
-## HookAnnotation overview
+## Hook overview
 
 Added in v1.0.0
 
@@ -17,7 +17,6 @@ Added in v1.0.0
   - [Hook (interface)](#hook-interface)
   - [ParserHookId](#parserhookid)
   - [PrettyHookId](#prettyhookid)
-  - [getHook](#gethook)
   - [hook](#hook)
 
 ---
@@ -62,16 +61,6 @@ Added in v1.0.0
 
 ```ts
 export declare const PrettyHookId: '@fp-ts/schema/annotation/PrettyHookId'
-```
-
-Added in v1.0.0
-
-## getHook
-
-**Signature**
-
-```ts
-export declare const getHook: <A>(key: string | number | symbol) => (annotated: Annotated) => Option<A>
 ```
 
 Added in v1.0.0
