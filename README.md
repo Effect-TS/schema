@@ -498,7 +498,7 @@ enum Fruits {
 }
 
 // $ExpectType Schema<Fruits>
-S.enums("Fruits", Fruits);
+S.enums(Fruits);
 ```
 
 ## Nullables
@@ -661,7 +661,7 @@ interface Category {
   readonly subcategories: ReadonlyArray<Category>;
 }
 
-const Category: S.Schema<Category> = S.lazy("Category", () =>
+const Category: S.Schema<Category> = S.lazy(() =>
   S.struct({
     name: S.string,
     subcategories: S.array(Category),
@@ -684,14 +684,14 @@ interface Operation {
   readonly right: Expression;
 }
 
-const Expression: S.Schema<Expression> = S.lazy("Expression", () =>
+const Expression: S.Schema<Expression> = S.lazy(() =>
   S.struct({
     type: S.literal("expression"),
     value: S.union(S.number, Operation),
   })
 );
 
-const Operation: S.Schema<Operation> = S.lazy("Operation", () =>
+const Operation: S.Schema<Operation> = S.lazy(() =>
   S.struct({
     type: S.literal("operation"),
     operator: S.union(S.literal("+"), S.literal("-")),
