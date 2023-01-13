@@ -13,6 +13,8 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
+  - [Custom (type alias)](#custom-type-alias)
+  - [CustomId](#customid)
   - [Description (type alias)](#description-type-alias)
   - [DescriptionId](#descriptionid)
   - [Documentation (type alias)](#documentation-type-alias)
@@ -31,6 +33,26 @@ Added in v1.0.0
 ---
 
 # utils
+
+## Custom (type alias)
+
+**Signature**
+
+```ts
+export type Custom = unknown
+```
+
+Added in v1.0.0
+
+## CustomId
+
+**Signature**
+
+```ts
+export declare const CustomId: '@fp-ts/schema/annotation/CustomId'
+```
+
+Added in v1.0.0
 
 ## Description (type alias)
 
@@ -137,7 +159,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type Message = string
+export type Message<A> = (a: A) => string
 ```
 
 Added in v1.0.0

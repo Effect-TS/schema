@@ -61,6 +61,8 @@ To define a `Schema`, you can use the provided `struct` function to define a new
 For example, consider the following `Schema` that describes a person object with a `name` property of type `string` and an `age` property of type `number`:
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
+
 const Person = S.struct({
   name: S.string,
   age: S.number,
@@ -93,20 +95,29 @@ interface Person {
 
 ## Decoding
 
-To use the `Schema` defined above to decode a value from `unknown`, you can use the `decode` function:
+To use the `Schema` defined above to decode a value from `unknown`, you can use the `decode` function from the `@fp-ts/schema/Parser` module:
 
 ```ts
-import * as PE from "@fp-ts/schema/ParseError";
+import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
+import * as PE from "@fp-ts/schema/ParseError";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
 
 const decodePerson = P.decode(Person);
 
-expect(decodePerson({ name: "Alice", age: 30 })).toEqual(
-  PE.success({ name: "Alice", age: 30 })
-);
-expect(decodePerson(null)).toEqual(
-  PE.failure(PE.type(..., null))
-);
+const result1 = decodePerson({ name: "Alice", age: 30 });
+if (PE.isSuccess(result1)) {
+  console.log(result1.right); // { name: "Alice", age: 30 }
+}
+
+const result2 = decodePerson(null);
+if (PE.isFailure(result2)) {
+  console.log(result2.left); // [PE.type(..., null)]
+}
 ```
 
 The `decodePerson` function returns a value of type `ParseResult<A>`, which is a type alias for `Either<NonEmptyReadonlyArray<ParseError>, A>`, where `NonEmptyReadonlyArray<ParseError>` represents a list of errors that occurred during the decoding process and `A` is the inferred type of the data described by the `Schema`. A successful decode will result in a `Right`, containing the decoded data. A `Right` value indicates that the decode was successful and no errors occurred. In the case of a failed decode, the result will be a `Left` value containing a list of `ParseError`s.
@@ -115,8 +126,15 @@ The `decodeOrThrow` function is used to decode a value and throw an error if the
 It is useful when you want to ensure that the value being decoded is in the correct format, and want to throw an error if it is not.
 
 ```ts
-P.decodeOrThrow(Person)({});
+try {
+  const person = P.decodeOrThrow(Person)({});
+  console.log(person);
+} catch (e) {
+  console.error("Decoding failed:");
+  console.error(e);
+}
 /*
+Decoding failed:
 1 error(s) found
 └─ key "name"
    └─ is missing
@@ -132,6 +150,9 @@ However, you can use the `isUnexpectedAllowed` option to allow excess properties
 Here's an example of how you might use `isUnexpectedAllowed`:
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as P from "@fp-ts/schema/Parser";
+
 const Person = S.struct({
   name: S.string,
   age: S.number,
@@ -158,11 +179,14 @@ console.log(
 
 ### All errors
 
-The `allErrors` option is a feature that allows you to receive all decoding errors when attempting to decode a value using a schema. By default, only the first error is returned, but by setting the `allErrors` option to `true`, you can receive all errors that occurred during the decoding process. This can be useful for debugging or for providing more comprehensive error messages to the user.
+The `allErrors` option is a feature that allows you to receive all decoding errors when attempting to decode a value using a schema. By default only the first error is returned, but by setting the `allErrors` option to `true`, you can receive all errors that occurred during the decoding process. This can be useful for debugging or for providing more comprehensive error messages to the user.
 
 Here's an example of how you might use `allErrors`:
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as P from "@fp-ts/schema/Parser";
+
 const Person = S.struct({
   name: S.string,
   age: S.number,
@@ -210,29 +234,50 @@ console.log(
 To use the `Schema` defined above to encode a value to `unknown`, you can use the `encode` function:
 
 ```ts
-import * as PE from "@fp-ts/schema/ParseError";
+import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
+import * as PE from "@fp-ts/schema/ParseError";
+import { pipe } from "@fp-ts/data/Function";
+import { parseNumber } from "@fp-ts/schema/data/parser";
 
-expect(P.encode(Person)({ name: "Alice", age: 30 })).toEqual(
-  PE.success({
-    name: "Alice",
-    age: 30,
-  })
-);
+// Age is a schema that can decode a string to a number and encode a number to a string
+const Age = pipe(S.string, parseNumber);
+
+const Person = S.struct({
+  name: S.string,
+  age: Age,
+});
+
+const encoded = P.encode(Person)({ name: "Alice", age: 30 });
+if (PE.isSuccess(encoded)) {
+  console.log(encoded.right); // { name: "Alice", age: "30" }
+}
 ```
+
+Note that during encoding, the number value `30` was converted to a string `"30"`.
 
 ## Formatting errors
 
 To format errors when a `decode` or an `encode` function fails, you can use the `format` function from the `@fp-ts/schema/formatter/Tree` module.
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as P from "@fp-ts/schema/Parser";
+import * as PE from "@fp-ts/schema/ParseError";
 import { format } from "@fp-ts/schema/formatter/Tree";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
 
 const result = P.decode(Person)({});
 if (PE.isFailure(result)) {
-  console.log(format(result.left));
+  console.error("Decoding failed:");
+  console.error(format(result.left));
 }
 /*
+Decoding failed:
 1 error(s) found
 └─ key "name"
    └─ is missing
@@ -244,25 +289,48 @@ if (PE.isFailure(result)) {
 The `is` function provided by the `@fp-ts/schema/Parser` module represents a way of verifying that a value conforms to a given `Schema`. `is` is a refinement that takes a value of type `unknown` as an argument and returns a `boolean` indicating whether or not the value conforms to the `Schema`.
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
 
 // const isPerson: (u: unknown) => u is Person
 const isPerson = P.is(Person);
 
-expect(isPerson({ name: "Alice", age: 30 })).toEqual(true);
-expect(isPerson(null)).toEqual(false);
+console.log(isPerson({ name: "Alice", age: 30 })); // true
+console.log(isPerson(null)); // false
+console.log(isPerson({})); // false
 ```
 
 The `asserts` function takes a `Schema` and an optional error message as arguments, and returns a function that takes an input value and checks if it matches the schema. If it does not match the schema, it throws an error with the specified message.
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
 
-// const assertsPerson: (input: unknown) => asserts input is Person
-const assertsPerson = P.asserts(personSchema);
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
 
-// this will throw an error with the message "Assertion failed"
-assertsPerson({ name: "Alice", age: "30" });
+// const assertsPerson: (input: unknown) => asserts input is Person
+const assertsPerson: P.InferAsserts<typeof Person> = P.asserts(Person);
+
+try {
+  assertsPerson({ name: "Alice", age: "30" });
+} catch (e) {
+  console.error("The input does not match the schema:");
+  console.error(e);
+}
+/*
+The input does not match the schema:
+Error: 1 error(s) found
+└─ key "age"
+   └─ Expected number, actual "30"
+*/
 
 // this will not throw an error
 assertsPerson({ name: "Alice", age: 30 });
@@ -270,13 +338,17 @@ assertsPerson({ name: "Alice", age: 30 });
 
 ## [fast-check](https://github.com/dubzzz/fast-check) arbitraries
 
-**Note**. The Arbitrary module will be extracted into a separate package in the near future.
-
 The `arbitrary` function provided by the `@fp-ts/schema/Arbitrary` module represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
 import * as A from "@fp-ts/schema/Arbitrary";
 import * as fc from "fast-check";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
 
 const PersonArbitrary = A.arbitrary(Person)(fc);
 
@@ -291,20 +363,23 @@ console.log(fc.sample(PersonArbitrary, 2));
 
 ## Pretty print
 
-**Note**. The Pretty module will be extracted into a separate package in the near future.
-
 The `pretty` function provided by the `@fp-ts/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
 
 You can use the `pretty` function to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Pretty";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
 
 const PersonPretty = P.pretty(Person);
 
-expect(PersonPretty({ name: "Alice", age: 30 })).toEqual(
-  `{ "name": "Alice", "age": 30 }`
-);
+// returns a string representation of the object
+console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "age": 30 }`
 ```
 
 # Understanding Schemas
@@ -334,7 +409,7 @@ import * as S from "@fp-ts/schema/Schema";
 declare const pair: <A>(schema: S.Schema<A>) => S.Schema<readonly [A, A]>;
 ```
 
-Then we can implement the body using the APIs exported by the `@fp-ts/schema/AST` module
+Then we can implement the body using the APIs exported by the `@fp-ts/schema/AST` module:
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
@@ -355,15 +430,14 @@ const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
 };
 ```
 
-The goal of this example was showing the low-level APIs of the `AST` module, but the same result can
-be achieved using the much more handy APIs of the `Schema` module:
+This example demonstrates the use of the low-level APIs of the `AST` module, however, the same result can be achieved more easily and conveniently by using the high-level APIs provided by the `Schema` module.
 
 ```ts
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> =>
   S.tuple(schema, schema);
 ```
 
-Please note that the `S.tuple` API itself is nothing special and can be defined in userland:
+Please note that the `S.tuple` API is a convenient utility provided by the library, but it can also be easily defined and implemented in userland.
 
 ```ts
 export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
@@ -376,6 +450,91 @@ export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
       true
     )
   );
+```
+
+## Annotations
+
+One of the fundamental requirements in the design of `@fp-ts/schema` is that it is extensible and customizable. Customizations are achieved through "annotations". Each node contained in the AST of `@fp-ts/schema/AST` contains an `annotations: Record<string | symbol, unknown>` field that can be used to attach additional information to the schema.
+
+Let's see some examples:
+
+```ts
+import { pipe } from "@fp-ts/data/Function";
+import * as S from "@fp-ts/schema/Schema";
+
+const Password = pipe(
+  // initial schema, a string
+  S.string,
+  // add an error message for non-string values (annotation)
+  S.message(() => "not a string"),
+  // add a constraint to the schema, only non-empty strings are valid
+  S.nonEmpty,
+  // add an error message for empty strings (annotation)
+  S.message(() => "required"),
+  // add a constraint to the schema, only strings with a length less or equal than 10 are valid
+  S.maxLength(10),
+  // add an error message for strings that are too long (annotation)
+  S.message((s) => `${s} is too long`),
+  // add an identifier to the schema (annotation)
+  S.identifier("Password"),
+  // add a title to the schema (annotation)
+  S.title("password"),
+  // add a description to the schema (annotation)
+  S.description(
+    "A password is a string of characters used to verify the identity of a user during the authentication process"
+  ),
+  // add examples to the schema (annotation)
+  S.examples(["1Ki77y", "jelly22fi$h"]),
+  // add documentation to the schema (annotation)
+  S.documentation(`
+    jsDoc documentation...
+  `)
+);
+```
+
+The example shows some built-in combinators to add meta information, but users can easily add their own meta information by defining a custom combinator.
+
+Here's an example of how to add a `deprecated` annotation:
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as AST from "@fp-ts/schema/AST";
+import { pipe } from "@fp-ts/data/Function";
+
+const DeprecatedId = "some/unique/identifier/for/the/custom/annotation";
+
+const deprecated = <A>(self: S.Schema<A>): S.Schema<A> =>
+  S.make(AST.annotation(self.ast, DeprecatedId, true));
+
+const schema = pipe(S.string, deprecated);
+
+console.log(schema);
+/*
+{
+  ast: {
+    _tag: 'StringKeyword',
+    annotations: {
+      '@fp-ts/schema/annotation/TitleId': 'string',
+      'some/unique/identifier/for/the/custom/annotation': true
+    }
+  }
+}
+*/
+```
+
+Annotations can be read using the `getAnnotation` helper, here's an example:
+
+```ts
+import * as O from "@fp-ts/data/Option";
+
+const isDeprecated = <A>(schema: S.Schema<A>): boolean =>
+  pipe(
+    AST.getAnnotation<boolean>(DeprecatedId)(schema.ast),
+    O.getOrElse(() => false)
+  );
+
+console.log(isDeprecated(S.string)); // false
+console.log(isDeprecated(schema)); // true
 ```
 
 # Basic usage
@@ -437,14 +596,14 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 
 ## Filters
 
-**Note**. Filters don't change the `Schema` type.
+**Note**. Please note that the use of filters do not alter the type of the `Schema`. They only serve to add additional constraints to the decoding process.
 
 ### Strings
 
 ```ts
 pipe(S.string, S.maxLength(5));
 pipe(S.string, S.minLength(5));
-pipe(S.string, nonEmpty); // same as S.minLength(1)
+pipe(S.string, nonEmpty()); // same as S.minLength(1)
 pipe(S.string, S.length(5));
 pipe(S.string, S.pattern(regex));
 pipe(S.string, S.startsWith(string));
@@ -460,10 +619,10 @@ pipe(S.number, S.greaterThanOrEqualTo(5));
 pipe(S.number, S.lessThan(5));
 pipe(S.number, S.lessThanOrEqualTo(5));
 
-pipe(S.number, S.int); // value must be an integer
+pipe(S.number, S.int()); // value must be an integer
 
-pipe(S.number, S.nonNaN); // not NaN
-pipe(S.number, S.finite); // value must be finite, not Infinity or -Infinity
+pipe(S.number, S.nonNaN()); // not NaN
+pipe(S.number, S.finite()); // ensures that the value being decoded is finite and not equal to Infinity or -Infinity
 ```
 
 ## Native enums
@@ -499,21 +658,21 @@ S.union(S.string, S.number);
 S.tuple(S.string, S.number);
 ```
 
-Append a required element
+### Append a required element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, boolean]>
 pipe(S.tuple(S.string, S.number), S.element(S.boolean));
 ```
 
-Append an optional element
+### Append an optional element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, boolean?]>
 pipe(S.tuple(S.string, S.number), S.optionalElement(S.boolean));
 ```
 
-Append a rest element
+### Append a rest element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, ...boolean[]]>
@@ -527,7 +686,7 @@ pipe(S.tuple(S.string, S.number), S.rest(S.boolean));
 S.array(S.number);
 ```
 
-Non empty arrays
+### Non empty arrays
 
 ```ts
 // $ExpectType Schema<readonly [number, ...number[]]>
@@ -541,7 +700,7 @@ S.nonEmptyArray(S.number);
 S.struct({ a: S.string, b: S.number });
 ```
 
-Optional fields
+### Optional fields
 
 ```ts
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }>
@@ -571,7 +730,7 @@ S.partial(S.struct({ a: S.string, b: S.number }));
 
 ## Records
 
-String keys
+### String keys
 
 ```ts
 // $ExpectType Schema<{ readonly [x: string]: string; }>
@@ -581,21 +740,21 @@ S.record(S.string, S.string);
 S.record(S.union(S.literal("a"), S.literal("b")), S.string);
 ```
 
-Keys refinements
+### Keys refinements
 
 ```ts
 // $ExpectType Schema<{ readonly [x: string]: string; }>
 S.record(pipe(S.string, S.minLength(2)), S.string);
 ```
 
-Symbol keys
+### Symbol keys
 
 ```ts
 // $ExpectType Schema<{ readonly [x: symbol]: string; }>
 S.record(C.symbol, S.string);
 ```
 
-Template literal keys
+### Template literal keys
 
 ```ts
 // $ExpectType Schema<{ readonly [x: `a${string}`]: string; }>
@@ -696,19 +855,19 @@ const stringSchema: S.Schema<string> = S.string;
 const tupleSchema: S.Schema<[string]> = S.tuple(S.string);
 
 // define a function that converts a string into a tuple with one element of type string
-const f = (s: string): [string] => [s];
+const decode = (s: string): [string] => [s];
 
 // define a function that converts a tuple with one element of type string into a string
-const g = ([s]: [string]): string => s;
+const encode = ([s]: [string]): string => s;
 
 // use the transform combinator to convert the string schema into the tuple schema
 const transformedSchema: S.Schema<[string]> = pipe(
   stringSchema,
-  S.transform(tupleSchema, f, g)
+  S.transform(tupleSchema, decode, encode)
 );
 ```
 
-In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `f` and `g` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
+In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
 
 The `transformOrFail` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure. This allows us to specify custom error messages in case the transformation fails.
 
@@ -727,7 +886,7 @@ const stringSchema: S.Schema<string> = S.string;
 const booleanSchema: S.Schema<boolean> = S.boolean;
 
 // define a function that converts a string into a boolean
-const f = (s: string): ParseResult<boolean> =>
+const decode = (s: string): ParseResult<boolean> =>
   s === "true"
     ? PE.success(true)
     : s === "false"
@@ -735,12 +894,12 @@ const f = (s: string): ParseResult<boolean> =>
     : PE.failure(PE.transform("string", "boolean", s));
 
 // define a function that converts a boolean into a string
-const g = (b: boolean): ParseResult<string> => PE.success(String(b));
+const encode = (b: boolean): ParseResult<string> => PE.success(String(b));
 
 // use the transformOrFail combinator to convert the string schema into the boolean schema
 const transformedSchema: S.Schema<boolean> = pipe(
   stringSchema,
-  S.transformOrFail(booleanSchema, f, g)
+  S.transformOrFail(booleanSchema, decode, encode)
 );
 ```
 
@@ -766,7 +925,7 @@ expect(decode("Infinity")).toEqual(PE.success(Infinity));
 expect(decode("-Infinity")).toEqual(PE.success(-Infinity));
 
 // failure cases
-expect(decode("a")).toEqual(PE.failure(PE.parse("string", "number", "a")));
+console.error(decode("a")); // PE.failure(PE.type(..., "a"))
 ```
 
 ## Option
@@ -781,31 +940,19 @@ import * as P from "@fp-ts/schema/Parser";
 import * as PE from "@fp-ts/schema/ParseError";
 import * as O from "@fp-ts/data/Option";
 
-const schema = S.struct({ a: S.string, b: S.option(S.number) });
+const schema = S.struct({
+  a: S.string,
+  // define a schema for Option with number values
+  b: S.option(S.number),
+});
 const decode = P.decode(schema);
 
-// success cases
 expect(decode({ a: "hello", b: 1 })).toEqual(
   PE.success({ a: "hello", b: O.some(1) })
 );
 expect(decode({ a: "hello", b: null })).toEqual(
   PE.success({ a: "hello", b: O.none })
 );
-
-// failure cases
-expect(decode({ a: 1, b: 1 })).toEqual(
-  PE.failure(PE.key("a", [PE.type("string", 1)]))
-); // wrong type for key "a"
-expect(decode({ a: "hello", b: "world" })).toEqual(
-  PE.failure(
-    PE.key("b", [
-      PE.member([PE.type("undefined", "world")]),
-      PE.member([PE.equal(null, "world")]),
-      PE.member([PE.type("number", "world")]),
-    ])
-  )
-); // wrong type for key "b"
-expect(decode({ a: "hello" })).toEqual(PE.failure(PE.key("b", [PE.missing]))); // missing key "b"
 ```
 
 ## ReadonlySet
@@ -818,17 +965,11 @@ import { fromValues } from "@fp-ts/schema/data/ReadonlySet";
 import * as P from "@fp-ts/schema/Parser";
 import * as PE from "@fp-ts/schema/ParseError";
 
-// define a schema for ReadonlySet of numbers
+// define a schema for ReadonlySet with number values
 const schema = fromValues(S.number);
 const decode = P.decode(schema);
 
-// test decoding a valid input
 expect(decode([1, 2, 3])).toEqual(PE.success(new Set([1, 2, 3])));
-
-// test decoding an invalid input with a wrong type for the third element
-expect(decode([1, 2, "a"])).toEqual(
-  PE.failure(PE.index(2, [PE.type("number", "a")]))
-); // wrong type for values
 ```
 
 ## ReadonlyMap
@@ -836,15 +977,15 @@ expect(decode([1, 2, "a"])).toEqual(
 In the following section, we demonstrate how to use the `fromEntries` combinator to decode a `ReadonlyMap` from an array of entries.
 
 ```ts
+import * as S from "@fp-ts/schema/Schema";
 import { fromEntries } from "@fp-ts/schema/data/ReadonlyMap";
 import * as P from "@fp-ts/schema/Parser";
 import * as PE from "@fp-ts/schema/ParseError";
 
-// define the schema for a readonly map with number keys and string values
+// define the schema for ReadonlyMap with number keys and string values
 const schema = fromEntries(S.number, S.string);
 const decode = P.decode(schema);
 
-// success cases
 expect(
   decode([
     [1, "a"],
@@ -860,25 +1001,42 @@ expect(
     ])
   )
 );
+```
 
-// failure cases
-expect(
-  decode([
-    ["a", 1],
-    ["b", 2],
-    ["c", 3],
-  ])
-).toEqual(
-  PE.failure(PE.index(0, [PE.index(0, [PE.type("number", "a")])])) // wrong type for keys
+# Adding new data types
+
+The easiest way to define a new data type is through the `filter` combinator.
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as P from "@fp-ts/schema/Parser";
+
+const LongString = pipe(
+  S.string,
+  S.filter((s) => s.length >= 10, {
+    message: () => "a string at least 10 characters long",
+  })
 );
-expect(
-  decode([
-    [1, 2],
-    [3, 4],
-    [5, 6],
-  ])
-).toEqual(
-  PE.failure(PE.index(0, [PE.index(1, [PE.type("string", 2)])])) // wrong type for values
+
+console.log(P.decodeOrThrow(LongString)("a"));
+/*
+1 error(s) found
+└─ Expected a string at least 10 characters long, actual "a"
+*/
+```
+
+It is good practice to add as much metadata as possible so that it can be used later by introspecting the schema.
+
+```ts
+const LongString = pipe(
+  S.string,
+  S.filter((s) => s.length >= 10, {
+    message: () => "a string at least 10 characters long",
+    identifier: "LongString",
+    jsonSchema: { minLength: 10 },
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+  })
 );
 ```
 

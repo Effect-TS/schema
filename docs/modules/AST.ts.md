@@ -80,6 +80,7 @@ Added in v1.0.0
   - [PropertySignature (interface)](#propertysignature-interface)
   - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
   - [annotation](#annotation)
+  - [annotations](#annotations)
   - [appendElement](#appendelement)
   - [appendRestElement](#appendrestelement)
   - [element](#element)
@@ -195,7 +196,6 @@ Added in v1.0.0
 export declare const refinement: (
   from: AST,
   refinement: Predicate<any>,
-  meta: unknown,
   annotations?: Annotated['annotations']
 ) => Refinement
 ```
@@ -619,7 +619,6 @@ export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
   readonly refinement: Predicate<any>
-  readonly meta: unknown
 }
 ```
 
@@ -909,7 +908,65 @@ export declare const annotation: (
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any>; meta: unknown }
+  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Transform'
+      from: AST
+      to: AST
+      decode: (i: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      encode: (i: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
+```
+
+Added in v1.0.0
+
+## annotations
+
+**Signature**
+
+```ts
+export declare const annotations: (
+  ast: AST,
+  annotations: Annotated['annotations']
+) =>
+  | { annotations: { [x: string]: unknown }; _tag: 'TypeAlias'; typeParameters: readonly AST[]; type: AST }
+  | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
+  | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
+  | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'VoidKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'TemplateLiteral'
+      head: string
+      spans: readonly [TemplateLiteralSpan, ...TemplateLiteralSpan[]]
+    }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Tuple'
+      elements: readonly Element[]
+      rest: Option<readonly [AST, ...AST[]]>
+      isReadonly: boolean
+    }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'TypeLiteral'
+      propertySignatures: readonly PropertySignature[]
+      indexSignatures: readonly IndexSignature[]
+    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
+  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
+  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Transform'

@@ -13,6 +13,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [annotations](#annotations)
+  - [annotations](#annotations-1)
   - [description](#description)
   - [documentation](#documentation)
   - [examples](#examples)
@@ -20,6 +21,7 @@ Added in v1.0.0
   - [message](#message)
   - [title](#title)
 - [combinators](#combinators)
+  - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [array](#array)
   - [element](#element)
   - [extend](#extend)
@@ -95,12 +97,22 @@ Added in v1.0.0
 
 # annotations
 
+## annotations
+
+**Signature**
+
+```ts
+export declare const annotations: (annotations: AST.Annotated['annotations']) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## description
 
 **Signature**
 
 ```ts
-export declare const description: (description: annotations.Description) => <A>(self: Schema<A>) => Schema<A>
+export declare const description: (description: A.Description) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -110,7 +122,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const documentation: (documentation: annotations.Documentation) => <A>(self: Schema<A>) => Schema<A>
+export declare const documentation: (documentation: A.Documentation) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -120,7 +132,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const examples: (examples: annotations.Examples) => <A>(self: Schema<A>) => Schema<A>
+export declare const examples: (examples: A.Examples) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -130,7 +142,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const identifier: (identifier: annotations.Identifier) => <A>(self: Schema<A>) => Schema<A>
+export declare const identifier: (identifier: A.Identifier) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -140,7 +152,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const message: (message: annotations.Message) => <A>(self: Schema<A>) => Schema<A>
+export declare const message: (message: A.Message<unknown>) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -150,12 +162,31 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const title: (title: annotations.Title) => <A>(self: Schema<A>) => Schema<A>
+export declare const title: (title: A.Title) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
 
 # combinators
+
+## AnnotationOptions (type alias)
+
+**Signature**
+
+```ts
+export type AnnotationOptions<A> = {
+  message?: A.Message<A>
+  identifier?: A.Identifier
+  title?: A.Title
+  description?: A.Description
+  examples?: A.Examples
+  documentation?: A.Documentation
+  jsonSchema?: A.JSONSchema
+  custom?: A.Custom
+}
+```
+
+Added in v1.0.0
 
 ## array
 
@@ -196,15 +227,11 @@ Added in v1.0.0
 ```ts
 export declare function filter<A, B extends A>(
   refinement: Refinement<A, B>,
-  description: string,
-  meta: unknown,
-  annotations?: AST.Annotated['annotations']
+  annotationOptions?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<B>
 export declare function filter<A>(
   predicate: Predicate<A>,
-  description: string,
-  meta: unknown,
-  annotations?: AST.Annotated['annotations']
+  options?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A>
 ```
 
@@ -508,7 +535,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const endsWith: (endsWith: string) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const endsWith: <A extends string>(
+  endsWith: string,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -518,7 +548,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const finite: <A extends number>(self: Schema<A>) => Schema<A>
+export declare const finite: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -528,7 +560,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const greaterThan: (min: number) => <A extends number>(self: Schema<A>) => Schema<A>
+export declare const greaterThan: <A extends number>(
+  min: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -538,7 +573,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const greaterThanOrEqualTo: (min: number) => <A extends number>(self: Schema<A>) => Schema<A>
+export declare const greaterThanOrEqualTo: <A extends number>(
+  min: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -548,7 +586,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const includes: (searchString: string) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const includes: <A extends string>(
+  searchString: string,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -558,7 +599,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const int: <A extends number>(self: Schema<A>) => Schema<A>
+export declare const int: <A extends number>(
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -568,7 +611,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const length: (length: number) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const length: <A extends string>(
+  length: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -578,7 +624,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lessThan: (max: number) => <A extends number>(self: Schema<A>) => Schema<A>
+export declare const lessThan: <A extends number>(
+  max: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -588,7 +637,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lessThanOrEqualTo: (max: number) => <A extends number>(self: Schema<A>) => Schema<A>
+export declare const lessThanOrEqualTo: <A extends number>(
+  max: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -598,7 +650,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const maxLength: (maxLength: number) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const maxLength: <A extends string>(
+  maxLength: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -608,7 +663,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const minLength: (minLength: number) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const minLength: <A extends string>(
+  minLength: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -618,7 +676,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nonEmpty: <A extends string>(self: Schema<A>) => Schema<A>
+export declare const nonEmpty: <A extends string>(
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -628,7 +688,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nonNaN: <A extends number>(self: Schema<A>) => Schema<A>
+export declare const nonNaN: <A extends number>(
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -638,11 +700,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const pattern: (
+export declare const pattern: <A extends string>(
   regex: RegExp,
-  meta?: object | undefined,
-  annotations?: Record<string | symbol, unknown> | undefined
-) => <A extends string>(self: Schema<A>) => Schema<A>
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -652,7 +713,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const startsWith: (startsWith: string) => <A extends string>(self: Schema<A>) => Schema<A>
+export declare const startsWith: <A extends string>(
+  startsWith: string,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
