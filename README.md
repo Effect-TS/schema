@@ -711,14 +711,14 @@ S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean) });
 
 ```ts
 // $ExpectType Schema<{ readonly a: string; }>
-pipe(S.struct({ a: S.string, b: S.number }), C.pick("a"));
+pipe(S.struct({ a: S.string, b: S.number }), S.pick("a"));
 ```
 
 ## Omit
 
 ```ts
 // $ExpectType Schema<{ readonly b: number; }>
-pipe(S.struct({ a: S.string, b: S.number }), C.omit("a"));
+pipe(S.struct({ a: S.string, b: S.number }), S.omit("a"));
 ```
 
 ## Partial
@@ -751,7 +751,7 @@ S.record(pipe(S.string, S.minLength(2)), S.string);
 
 ```ts
 // $ExpectType Schema<{ readonly [x: symbol]: string; }>
-S.record(C.symbol, S.string);
+S.record(S.symbol, S.string);
 ```
 
 ### Template literal keys
