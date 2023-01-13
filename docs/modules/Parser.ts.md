@@ -27,6 +27,7 @@ Added in v1.0.0
   - [ParseOptions (interface)](#parseoptions-interface)
   - [Parser (interface)](#parser-interface)
 - [utils](#utils)
+  - [InferAsserts (type alias)](#inferasserts-type-alias)
   - [InferInput (type alias)](#inferinput-type-alias)
 
 ---
@@ -147,6 +148,16 @@ export interface Parser<I, A> extends Schema<A> {
 Added in v1.0.0
 
 # utils
+
+## InferAsserts (type alias)
+
+**Signature**
+
+```ts
+export type InferAsserts<S extends Schema<any>> = (input: unknown, options?: ParseOptions) => asserts input is Infer<S>
+```
+
+Added in v1.0.0
 
 ## InferInput (type alias)
 
