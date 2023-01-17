@@ -264,7 +264,7 @@ To format errors when a `decode` or an `encode` function fails, you can use the 
 import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
 import * as PE from "@fp-ts/schema/ParseError";
-import { format } from "@fp-ts/schema/formatter/Tree";
+import { formatErrors } from "@fp-ts/schema/formatter/Tree";
 
 const Person = S.struct({
   name: S.string,
@@ -274,7 +274,7 @@ const Person = S.struct({
 const result = P.decode(Person)({});
 if (PE.isFailure(result)) {
   console.error("Decoding failed:");
-  console.error(format(result.left));
+  console.error(formatErrors(result.left));
 }
 /*
 Decoding failed:
