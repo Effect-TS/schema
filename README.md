@@ -893,7 +893,7 @@ const decode = (s: string): ParseResult<boolean> =>
     ? PE.success(true)
     : s === "false"
     ? PE.success(false)
-    : PE.failure(PE.type(AST.stringKeyword, s));
+    : PE.failure(PE.type(AST.union([AST.literal('true'), AST.literal('false')]), s));
 
 // define a function that converts a boolean into a string
 const encode = (b: boolean): ParseResult<string> => PE.success(String(b));
