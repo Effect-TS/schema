@@ -609,6 +609,7 @@ pipe(S.string, S.pattern(regex));
 pipe(S.string, S.startsWith(string));
 pipe(S.string, S.endsWith(string));
 pipe(S.string, S.includes(searchString));
+pipe(S.string, S.trimmed());
 ```
 
 ### Numbers
@@ -926,6 +927,23 @@ expect(decode("-Infinity")).toEqual(PE.success(-Infinity));
 
 // failure cases
 console.error(decode("a")); // PE.failure(PE.type(..., "a"))
+```
+
+## trim
+
+The `trim` combinator allows removing whitespace from both ends of a string.
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as P from "@fp-ts/schema/Parser";
+
+const schema = S.trim(S.string);
+const decode = P.decode(schema);
+
+expect(decode("a")).toEqual("a");
+expect(decode(" a")).toEqual("a");
+expect(decode("a ")).toEqual("a");
+expect(decode(" a ")).toEqual("a");
 ```
 
 ## Option
