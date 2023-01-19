@@ -879,6 +879,7 @@ import { pipe } from "@fp-ts/data/Function";
 import * as PE from "@fp-ts/schema/ParseError";
 import type { ParseResult } from "@fp-ts/schema/ParseError";
 import * as S from "@fp-ts/schema/Schema";
+import * as AST from "@fp-ts/schema/AST";
 
 // define a schema for the string type
 const stringSchema: S.Schema<string> = S.string;
@@ -892,7 +893,7 @@ const decode = (s: string): ParseResult<boolean> =>
     ? PE.success(true)
     : s === "false"
     ? PE.success(false)
-    : PE.failure(PE.transform("string", "boolean", s));
+    : PE.failure(PE.type(AST.stringKeyword, s));
 
 // define a function that converts a boolean into a string
 const encode = (b: boolean): ParseResult<string> => PE.success(String(b));
