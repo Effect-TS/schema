@@ -85,6 +85,14 @@ describe.concurrent("Encoder", () => {
     Util.expectEncodingSuccess(schema, [1, 2, 3], [1, 2, 3])
   })
 
+  it("date", () => {
+    const schema = S.date
+    const now = new Date()
+    const jan12023 = new Date(2023, 0, 1)
+    Util.expectEncodingSuccess(schema, now, now)
+    Util.expectEncodingSuccess(schema, jan12023, jan12023)
+  })
+
   it("literal", () => {
     const schema = S.literal(null)
     Util.expectEncodingSuccess(schema, null, null)

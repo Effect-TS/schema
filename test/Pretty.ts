@@ -122,6 +122,12 @@ describe.concurrent("Pretty", () => {
     expect(pretty(a)).toEqual("Symbol(@fp-ts/schema/test/a)")
   })
 
+  it("date", () => {
+    const schema = S.date
+    const pretty = P.pretty(schema)
+    expect(pretty(new Date(0))).toEqual(`new Date("1970-01-01T00:00:00.000Z")`)
+  })
+
   describe.concurrent("enums", () => {
     it("Numeric enums", () => {
       enum Fruits {

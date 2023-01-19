@@ -108,6 +108,7 @@ export const formatExpected = (ast: AST.AST): string => {
     case "UnknownKeyword":
     case "VoidKeyword":
     case "NeverKeyword":
+    case "DateKeyword":
       return pipe(getExpected(ast), O.getOrElse(() => ast._tag))
     case "Literal":
       return pipe(getExpected(ast), O.getOrElse(() => formatActual(ast.literal)))

@@ -330,6 +330,16 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailure(schema, true, `Expected object, actual true`)
   })
 
+  it("Date", () => {
+    const schema = S.date
+    Util.expectDecodingSuccess(schema, new Date())
+    Util.expectDecodingSuccess(schema, new Date("202e-01-01T00:00:00.000Z"))
+    Util.expectDecodingFailure(schema, null, `Expected Date, actual null`)
+    Util.expectDecodingFailure(schema, "a", `Expected Date, actual "a"`)
+    Util.expectDecodingFailure(schema, 1, `Expected Date, actual 1`)
+    Util.expectDecodingFailure(schema, true, `Expected Date, actual true`)
+  })
+
   it("literal 1 member", () => {
     const schema = S.literal(1)
     Util.expectDecodingSuccess(schema, 1)

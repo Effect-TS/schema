@@ -130,6 +130,12 @@ describe.concurrent("is", () => {
     expect(is(true)).toEqual(false)
   })
 
+  it("date", () => {
+    const is = P.is(S.date)
+    expect(is(new Date())).toEqual(true)
+    expect(is(1)).toEqual(false)
+  })
+
   it("literal 1 member", () => {
     const schema = S.literal(1)
     const is = P.is(schema)
