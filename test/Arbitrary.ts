@@ -76,6 +76,10 @@ describe.concurrent("Arbitrary", () => {
     property(S.object)
   })
 
+  it("date", () => {
+    property(S.date)
+  })
+
   it("literal 1 member", () => {
     const schema = S.literal(1)
     property(schema)
