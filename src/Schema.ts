@@ -698,6 +698,12 @@ export const symbol: Schema<symbol> = I.symbol
 export const object: Schema<object> = I.object
 
 /**
+ * @category primitives
+ * @since 1.0.0
+ */
+export const date: Schema<Date> = I.date
+
+/**
  * @category data
  * @since 1.0.0
  */

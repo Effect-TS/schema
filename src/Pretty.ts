@@ -82,6 +82,8 @@ const prettyFor = <A>(schema: Schema<A>): Pretty<A> => {
         )
       case "BigIntKeyword":
         return make(I.makeSchema(ast), (bi) => `${bi.toString()}n`)
+      case "DateKeyword":
+        return make(I.makeSchema(ast), (d) => `new Date(${JSON.stringify(d.toISOString())})`)
       case "Tuple": {
         const elements = ast.elements.map((e) => go(e.type))
         const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))

@@ -231,6 +231,12 @@ export const object: Schema<object> = makeSchema(AST.objectKeyword)
 export const isObject = (u: unknown): u is object => typeof u === "object" && u !== null
 
 /** @internal */
+export const date: Schema<Date> = makeSchema(AST.dateKeyword)
+
+/** @internal */
+export const isDate = (u: unknown): u is Date => u instanceof Date
+
+/** @internal */
 export const isNotNull = (u: unknown): u is {} => u !== null
 
 type Infer<S extends Schema<any>> = Parameters<S["A"]>[0]

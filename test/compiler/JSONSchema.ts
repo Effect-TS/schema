@@ -24,6 +24,11 @@ export type JsonSchema7StringType = {
   maxLength?: number
 }
 
+export type JsonSchema7DateType = {
+  type: "string"
+  format: "date-time"
+}
+
 export type JsonSchema7NumberType = {
   type: "number" | "integer"
   minimum?: number
@@ -79,6 +84,7 @@ export type JsonSchema7Type =
   | JsonSchema7AnyOfType
   | JsonSchema7AllOfType
   | JsonSchema7ObjectType
+  | JsonSchema7DateType
 
 const getJSONSchemaAnnotation = AST.getAnnotation<JSONSchema>(
   JSONSchemaId
@@ -126,6 +132,8 @@ const jsonSchemaFor = <A>(schema: Schema<A>): JsonSchema7Type => {
         throw new Error("cannot convert `symbol` to JSON Schema")
       case "ObjectKeyword":
         return {}
+      case "DateKeyword":
+        return { type: "string", format: "date-time" }
       case "Tuple": {
         const elements = ast.elements.map((e) => go(e.type))
         const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
@@ -456,5 +464,11 @@ describe("jsonSchemaFor", () => {
 
   it("integer", () => {
     property(pipe(S.number, S.int()))
+  })
+
+  it("date", () => {
+    const jsonSchema = jsonSchemaFor(S.date)
+
+    expect(jsonSchema).toEqual({ type: "string", format: "date-time" })
   })
 })

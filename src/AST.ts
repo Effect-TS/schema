@@ -33,6 +33,7 @@ export type AST =
   | BigIntKeyword
   | SymbolKeyword
   | ObjectKeyword
+  | DateKeyword
   | Enums
   | TemplateLiteral
   | Tuple
@@ -360,6 +361,25 @@ export const objectKeyword: ObjectKeyword = {
   _tag: "ObjectKeyword",
   annotations: {
     [TitleId]: "object"
+  }
+}
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface DateKeyword extends Annotated {
+  readonly _tag: "DateKeyword"
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const dateKeyword: DateKeyword = {
+  _tag: "DateKeyword",
+  annotations: {
+    [TitleId]: "Date"
   }
 }
 

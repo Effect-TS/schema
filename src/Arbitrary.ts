@@ -92,6 +92,11 @@ const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
           I.makeSchema(ast),
           (fc) => fc.oneof(fc.object(), fc.array(fc.anything()))
         )
+      case "DateKeyword":
+        return make(
+          I.makeSchema(ast),
+          (fc) => fc.date()
+        )
       case "Tuple": {
         const elements = ast.elements.map((e) => go(e.type))
         const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))

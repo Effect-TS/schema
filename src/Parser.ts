@@ -164,6 +164,8 @@ const parserFor = <A>(
         return I.fromRefinement(I.makeSchema(ast), I.isSymbol)
       case "ObjectKeyword":
         return I.fromRefinement(I.makeSchema(ast), I.isObject)
+      case "DateKeyword":
+        return I.fromRefinement(I.makeSchema(ast), I.isDate)
       case "Enums":
         return I.fromRefinement(
           I.makeSchema(ast),
