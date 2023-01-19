@@ -877,7 +877,7 @@ Here's an example of the `transformOrFail` combinator which converts a `string` 
 ```ts
 import { pipe } from "@fp-ts/data/Function";
 import * as PE from "@fp-ts/schema/ParseError";
-import type { ParseResult } from "@fp-ts/schema/Parser";
+import type { ParseResult } from "@fp-ts/schema/ParseError";
 import * as S from "@fp-ts/schema/Schema";
 
 // define a schema for the string type
