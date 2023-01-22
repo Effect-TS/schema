@@ -100,7 +100,7 @@ To use the `Schema` defined above to decode a value from `unknown`, you can use 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
-import * as PE from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
 
 const Person = S.struct({
   name: S.string,
@@ -110,13 +110,13 @@ const Person = S.struct({
 const decodePerson = P.decode(Person);
 
 const result1 = decodePerson({ name: "Alice", age: 30 });
-if (PE.isSuccess(result1)) {
+if (PR.isSuccess(result1)) {
   console.log(result1.right); // { name: "Alice", age: 30 }
 }
 
 const result2 = decodePerson(null);
-if (PE.isFailure(result2)) {
-  console.log(result2.left); // [PE.type(..., null)]
+if (PR.isFailure(result2)) {
+  console.log(result2.left); // [PR.type(..., null)]
 }
 ```
 
@@ -236,7 +236,7 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
-import * as PE from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
 import { pipe } from "@fp-ts/data/Function";
 import { parseNumber } from "@fp-ts/schema/data/parser";
 
@@ -249,7 +249,7 @@ const Person = S.struct({
 });
 
 const encoded = P.encode(Person)({ name: "Alice", age: 30 });
-if (PE.isSuccess(encoded)) {
+if (PR.isSuccess(encoded)) {
   console.log(encoded.right); // { name: "Alice", age: "30" }
 }
 ```
@@ -263,7 +263,7 @@ To format errors when a `decode` or an `encode` function fails, you can use the 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
-import * as PE from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
 import { formatErrors } from "@fp-ts/schema/formatter/Tree";
 
 const Person = S.struct({
@@ -272,7 +272,7 @@ const Person = S.struct({
 });
 
 const result = P.decode(Person)({});
-if (PE.isFailure(result)) {
+if (PR.isFailure(result)) {
   console.error("Decoding failed:");
   console.error(formatErrors(result.left));
 }
@@ -876,8 +876,8 @@ Here's an example of the `transformOrFail` combinator which converts a `string` 
 
 ```ts
 import { pipe } from "@fp-ts/data/Function";
-import * as PE from "@fp-ts/schema/ParseError";
-import type { ParseResult } from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
+import type { ParseResult } from "@fp-ts/schema/ParseResult";
 import * as S from "@fp-ts/schema/Schema";
 import * as AST from "@fp-ts/schema/AST";
 
@@ -890,15 +890,15 @@ const booleanSchema: S.Schema<boolean> = S.boolean;
 // define a function that converts a string into a boolean
 const decode = (s: string): ParseResult<boolean> =>
   s === "true"
-    ? PE.success(true)
+    ? PR.success(true)
     : s === "false"
-    ? PE.success(false)
-    : PE.failure(
-        PE.type(AST.union([AST.literal("true"), AST.literal("false")]), s)
+    ? PR.success(false)
+    : PR.failure(
+        PR.type(AST.union([AST.literal("true"), AST.literal("false")]), s)
       );
 
 // define a function that converts a boolean into a string
-const encode = (b: boolean): ParseResult<string> => PE.success(String(b));
+const encode = (b: boolean): ParseResult<string> => PR.success(String(b));
 
 // use the transformOrFail combinator to convert the string schema into the boolean schema
 const transformedSchema: S.Schema<boolean> = pipe(
@@ -915,21 +915,21 @@ In the following section, we demonstrate how to use the `parseNumber` combinator
 import * as S from "@fp-ts/schema/Schema";
 import { parseNumber } from "@fp-ts/schema/data/parser";
 import * as P from "@fp-ts/schema/Parser";
-import * as PE from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
 
 const schema = parseNumber(S.string); // converts string schema to number schema
 const decode = P.decode(schema);
 
 // success cases
-expect(decode("1")).toEqual(PE.success(1));
-expect(decode("-1")).toEqual(PE.success(-1));
-expect(decode("1.5")).toEqual(PE.success(1.5));
-expect(decode("NaN")).toEqual(PE.success(NaN));
-expect(decode("Infinity")).toEqual(PE.success(Infinity));
-expect(decode("-Infinity")).toEqual(PE.success(-Infinity));
+expect(decode("1")).toEqual(PR.success(1));
+expect(decode("-1")).toEqual(PR.success(-1));
+expect(decode("1.5")).toEqual(PR.success(1.5));
+expect(decode("NaN")).toEqual(PR.success(NaN));
+expect(decode("Infinity")).toEqual(PR.success(Infinity));
+expect(decode("-Infinity")).toEqual(PR.success(-Infinity));
 
 // failure cases
-console.error(decode("a")); // PE.failure(PE.type(..., "a"))
+console.error(decode("a")); // PR.failure(PR.type(..., "a"))
 ```
 
 ## trim
@@ -958,7 +958,7 @@ In the example below, we define a schema for an object with a required `a` field
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
-import * as PE from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
 import * as O from "@fp-ts/data/Option";
 
 const schema = S.struct({
@@ -969,10 +969,10 @@ const schema = S.struct({
 const decode = P.decode(schema);
 
 expect(decode({ a: "hello", b: 1 })).toEqual(
-  PE.success({ a: "hello", b: O.some(1) })
+  PR.success({ a: "hello", b: O.some(1) })
 );
 expect(decode({ a: "hello", b: null })).toEqual(
-  PE.success({ a: "hello", b: O.none })
+  PR.success({ a: "hello", b: O.none })
 );
 ```
 
@@ -984,13 +984,13 @@ In the following section, we demonstrate how to use the `fromValues` combinator 
 import * as S from "@fp-ts/schema/Schema";
 import { fromValues } from "@fp-ts/schema/data/ReadonlySet";
 import * as P from "@fp-ts/schema/Parser";
-import * as PE from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
 
 // define a schema for ReadonlySet with number values
 const schema = fromValues(S.number);
 const decode = P.decode(schema);
 
-expect(decode([1, 2, 3])).toEqual(PE.success(new Set([1, 2, 3])));
+expect(decode([1, 2, 3])).toEqual(PR.success(new Set([1, 2, 3])));
 ```
 
 ## ReadonlyMap
@@ -1001,7 +1001,7 @@ In the following section, we demonstrate how to use the `fromEntries` combinator
 import * as S from "@fp-ts/schema/Schema";
 import { fromEntries } from "@fp-ts/schema/data/ReadonlyMap";
 import * as P from "@fp-ts/schema/Parser";
-import * as PE from "@fp-ts/schema/ParseError";
+import * as PR from "@fp-ts/schema/ParseResult";
 
 // define the schema for ReadonlyMap with number keys and string values
 const schema = fromEntries(S.number, S.string);
@@ -1014,7 +1014,7 @@ expect(
     [3, "c"],
   ])
 ).toEqual(
-  PE.success(
+  PR.success(
     new Map([
       [1, "a"],
       [2, "b"],
