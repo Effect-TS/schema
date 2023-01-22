@@ -5,7 +5,7 @@
 </h3>
 
 <p align="center">
-Schema validation with static type inference
+Modeling the schema of data structures as first-class values
 </p>
 
 <p align="center">
@@ -305,7 +305,7 @@ console.log(isPerson(null)); // false
 console.log(isPerson({})); // false
 ```
 
-The `asserts` function takes a `Schema` and an optional error message as arguments, and returns a function that takes an input value and checks if it matches the schema. If it does not match the schema, it throws an error with the specified message.
+The `asserts` function takes a `Schema` and returns a function that takes an input value and checks if it matches the schema. If it does not match the schema, it throws an error with a comprehensive error message.
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
@@ -870,7 +870,7 @@ const transformedSchema: S.Schema<[string]> = pipe(
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
 
-The `transformOrFail` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure. This allows us to specify custom error messages in case the transformation fails.
+The `transformOrFail` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
 
 Here's an example of the `transformOrFail` combinator which converts a `string` into a `boolean`:
 
@@ -893,7 +893,9 @@ const decode = (s: string): ParseResult<boolean> =>
     ? PE.success(true)
     : s === "false"
     ? PE.success(false)
-    : PE.failure(PE.type(AST.union([AST.literal('true'), AST.literal('false')]), s));
+    : PE.failure(
+        PE.type(AST.union([AST.literal("true"), AST.literal("false")]), s)
+      );
 
 // define a function that converts a boolean into a string
 const encode = (b: boolean): ParseResult<string> => PE.success(String(b));
