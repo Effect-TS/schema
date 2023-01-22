@@ -417,11 +417,11 @@ import * as AST from "@fp-ts/schema/AST";
 import * as O from "@fp-ts/data/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
-  const element = AST.element(
+  const element = AST.createElement(
     schema.ast, // <= the element type
     false // <= is optional?
   );
-  const tuple = AST.tuple(
+  const tuple = AST.createTuple(
     [element, element], // <= elements definitions
     O.none, // <= rest element
     true // <= is readonly?
@@ -444,8 +444,8 @@ export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
   ...elements: Elements
 ): Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> =>
   makeSchema(
-    AST.tuple(
-      elements.map((schema) => AST.element(schema.ast, false)),
+    AST.createTuple(
+      elements.map((schema) => AST.createElement(schema.ast, false)),
       O.none,
       true
     )
@@ -552,6 +552,7 @@ S.boolean;
 S.symbol;
 S.object;
 S.json;
+S.date; // value must be a Date
 
 // empty types
 S.undefined;
@@ -598,7 +599,7 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 
 **Note**. Please note that the use of filters do not alter the type of the `Schema`. They only serve to add additional constraints to the decoding process.
 
-### Strings
+### String filters
 
 ```ts
 pipe(S.string, S.maxLength(5));
@@ -609,10 +610,12 @@ pipe(S.string, S.pattern(regex));
 pipe(S.string, S.startsWith(string));
 pipe(S.string, S.endsWith(string));
 pipe(S.string, S.includes(searchString));
-pipe(S.string, S.trimmed());
+pipe(S.string, S.trimmed()); // verifies that a string contains no leading or trailing whitespaces
 ```
 
-### Numbers
+**Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+
+### Number filters
 
 ```ts
 pipe(S.number, S.greaterThan(5));
@@ -907,9 +910,11 @@ const transformedSchema: S.Schema<boolean> = pipe(
 );
 ```
 
-## parseNumber
+### parseNumber
 
-In the following section, we demonstrate how to use the `parseNumber` combinator to convert a `string` schema to a `number` schema and parse string inputs into numbers. The `parseNumber` combinator allows parsing special values such as `NaN`, `Infinity`, and `-Infinity` in addition to regular numbers.
+Transforms a `string` into a `number` by parsing the string using `parseFloat`.
+
+The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
@@ -917,36 +922,55 @@ import { parseNumber } from "@fp-ts/schema/data/parser";
 import * as P from "@fp-ts/schema/Parser";
 import * as PR from "@fp-ts/schema/ParseResult";
 
-const schema = parseNumber(S.string); // converts string schema to number schema
-const decode = P.decode(schema);
+const schema = parseNumber(S.string);
+const decodeOrThrow = P.decodeOrThrow(schema);
 
 // success cases
-expect(decode("1")).toEqual(PR.success(1));
-expect(decode("-1")).toEqual(PR.success(-1));
-expect(decode("1.5")).toEqual(PR.success(1.5));
-expect(decode("NaN")).toEqual(PR.success(NaN));
-expect(decode("Infinity")).toEqual(PR.success(Infinity));
-expect(decode("-Infinity")).toEqual(PR.success(-Infinity));
+decodeOrThrow("1"); // 1
+decodeOrThrow("-1"); // -1
+decodeOrThrow("1.5"); // 1.5
+decodeOrThrow("NaN"); // NaN
+decodeOrThrow("Infinity"); // Infinity
+decodeOrThrow("-Infinity"); // -Infinity
 
 // failure cases
-console.error(decode("a")); // PR.failure(PR.type(..., "a"))
+decodeOrThrow("a"); // throws
 ```
 
-## trim
+### trim
 
-The `trim` combinator allows removing whitespace from both ends of a string.
+The `trim` parser allows removing whitespaces from the beginning and end of a string.
 
 ```ts
 import * as S from "@fp-ts/schema/Schema";
 import * as P from "@fp-ts/schema/Parser";
 
 const schema = S.trim(S.string);
-const decode = P.decode(schema);
+const decodeOrThrow = P.decodeOrThrow(schema);
 
-expect(decode("a")).toEqual("a");
-expect(decode(" a")).toEqual("a");
-expect(decode("a ")).toEqual("a");
-expect(decode(" a ")).toEqual("a");
+decodeOrThrow("a"); // "a"
+decodeOrThrow(" a"); // "a"
+decodeOrThrow("a "); // "a"
+decodeOrThrow(" a "); // "a"
+```
+
+**Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
+
+### parseDate
+
+Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import { parseDate } from "@fp-ts/schema/data/parser";
+import * as P from "@fp-ts/schema/Parser";
+
+const schema = parseDate(S.string);
+const decodeOrThrow = P.decodeOrThrow(schema);
+
+decodeOrThrow("1970-01-01T00:00:00.000Z"); // new Date(0)
+
+decodeOrThrow("a"); // throws
 ```
 
 ## Option
