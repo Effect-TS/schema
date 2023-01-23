@@ -14,27 +14,44 @@ Modeling the schema of data structures as first-class values
   </a>
 </p>
 
-# Features
-
-- deriving artifacts from a `Schema`:
-  - guards
-  - assertions
-  - decoders
-  - encoders
-  - [fast-check](https://github.com/dubzzz/fast-check) arbitraries
-  - pretty printing
-- custom artifact compilers
-- custom `Schema` combinators
-
 # Introduction
 
-Welcome to the documentation for `@fp-ts/schema`, a library for defining and using schemas to validate and transform data in TypeScript. `@fp-ts/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as decoding from `unknown`, encoding to `unknown`, verifying that a value conforms to a given `Schema`. `@fp-ts/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
+Welcome to the documentation for `@fp-ts/schema`, **a library for defining and using schemas** to validate and transform data in TypeScript.
+
+`@fp-ts/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as **decoding** from `unknown`, **encoding** to `unknown`, **verifying** that a value conforms to a given `Schema`.
+
+`@fp-ts/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
+
+If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/fp-ts/schema#basic-usage) section!
+
+# Credits and sponsorship
+
+This library was inspired by the following projects:
+
+- [io-ts](https://github.com/gcanti/io-ts)
+- [zod](https://github.com/colinhacks/zod)
+- [zio-schema](https://github.com/zio/zio-schema)
+
+A huge thanks to my sponsors who made the development of `@fp-ts/schema` possible.
+
+If you also want to **become a sponsor** to ensure this library continues to improve and receive maintenance, check out my [GitHub Sponsors profile](https://github.com/sponsors/gcanti?o=sd&sc=t)
 
 ## Requirements
 
 - TypeScript 4.7 or newer
 - The `strict` flag enabled in your `tsconfig.json` file
 - The `exactOptionalPropertyTypes` flag enabled in your `tsconfig.json` file
+
+```json
+{
+  // ...
+  "compilerOptions": {
+    // ...
+    "strict": true,
+    "exactOptionalPropertyTypes": true
+  }
+}
+```
 
 ## Getting started
 
@@ -380,76 +397,6 @@ const PersonPretty = P.pretty(Person);
 
 // returns a string representation of the object
 console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "age": 30 }`
-```
-
-# Understanding Schemas
-
-A schema is a description of a data structure that can be used to generate various artifacts from a single declaration.
-
-From a technical point of view a schema is just a typed wrapper of an `AST` value:
-
-```ts
-interface Schema<in out A> {
-  readonly ast: AST;
-}
-```
-
-The `AST` type represents a tiny portion of the TypeScript AST, roughly speaking the part describing ADTs (algebraic data types),
-i.e. products (like structs and tuples) and unions.
-
-This means that you can define your own schema constructors / combinators as long as you are able to manipulate the `AST` value accordingly, let's see an example.
-
-Say we want to define a `pair` schema constructor, which takes a `Schema<A>` as input and returns a `Schema<readonly [A, A]>` as output.
-
-First of all we need to define the signature of `pair`
-
-```ts
-import * as S from "@fp-ts/schema/Schema";
-
-declare const pair: <A>(schema: S.Schema<A>) => S.Schema<readonly [A, A]>;
-```
-
-Then we can implement the body using the APIs exported by the `@fp-ts/schema/AST` module:
-
-```ts
-import * as S from "@fp-ts/schema/Schema";
-import * as AST from "@fp-ts/schema/AST";
-import * as O from "@fp-ts/data/Option";
-
-const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
-  const element = AST.createElement(
-    schema.ast, // <= the element type
-    false // <= is optional?
-  );
-  const tuple = AST.createTuple(
-    [element, element], // <= elements definitions
-    O.none, // <= rest element
-    true // <= is readonly?
-  );
-  return S.make(tuple); // <= wrap the AST value in a Schema
-};
-```
-
-This example demonstrates the use of the low-level APIs of the `AST` module, however, the same result can be achieved more easily and conveniently by using the high-level APIs provided by the `Schema` module.
-
-```ts
-const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> =>
-  S.tuple(schema, schema);
-```
-
-Please note that the `S.tuple` API is a convenient utility provided by the library, but it can also be easily defined and implemented in userland.
-
-```ts
-export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
-  ...elements: Elements
-): Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> =>
-  makeSchema(
-    AST.createTuple(
-      elements.map((schema) => AST.createElement(schema.ast, false)),
-      O.none,
-      true
-    )
-  );
 ```
 
 ## Annotations
@@ -1083,6 +1030,78 @@ const LongString = pipe(
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   })
 );
+```
+
+# Technical overview
+
+## Understanding Schemas
+
+A schema is a description of a data structure that can be used to generate various artifacts from a single declaration.
+
+From a technical point of view a schema is just a typed wrapper of an `AST` value:
+
+```ts
+interface Schema<in out A> {
+  readonly ast: AST;
+}
+```
+
+The `AST` type represents a tiny portion of the TypeScript AST, roughly speaking the part describing ADTs (algebraic data types),
+i.e. products (like structs and tuples) and unions.
+
+This means that you can define your own schema constructors / combinators as long as you are able to manipulate the `AST` value accordingly, let's see an example.
+
+Say we want to define a `pair` schema constructor, which takes a `Schema<A>` as input and returns a `Schema<readonly [A, A]>` as output.
+
+First of all we need to define the signature of `pair`
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+
+declare const pair: <A>(schema: S.Schema<A>) => S.Schema<readonly [A, A]>;
+```
+
+Then we can implement the body using the APIs exported by the `@fp-ts/schema/AST` module:
+
+```ts
+import * as S from "@fp-ts/schema/Schema";
+import * as AST from "@fp-ts/schema/AST";
+import * as O from "@fp-ts/data/Option";
+
+const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
+  const element = AST.createElement(
+    schema.ast, // <= the element type
+    false // <= is optional?
+  );
+  const tuple = AST.createTuple(
+    [element, element], // <= elements definitions
+    O.none, // <= rest element
+    true // <= is readonly?
+  );
+  return S.make(tuple); // <= wrap the AST value in a Schema
+};
+```
+
+This example demonstrates the use of the low-level APIs of the `AST` module, however, the same result can be achieved more easily and conveniently by using the high-level APIs provided by the `Schema` module.
+
+```ts
+const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> =>
+  S.tuple(schema, schema);
+```
+
+Please note that the `S.tuple` API is a convenient utility provided by the library, but it can also be easily defined and implemented in userland.
+
+```ts
+export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
+  ...elements: Elements
+): Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> =>
+  makeSchema(
+    AST.createTuple(
+      elements.map((schema) => AST.createElement(schema.ast, false)),
+      O.none,
+      true
+    )
+  );
 ```
 
 # Documentation
