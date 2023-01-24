@@ -24,11 +24,9 @@ Added in v1.0.0
   - [encode](#encode)
   - [encodeOrThrow](#encodeorthrow)
 - [model](#model)
-  - [ParseOptions (interface)](#parseoptions-interface)
   - [Parser (interface)](#parser-interface)
 - [utils](#utils)
   - [InferAsserts (type alias)](#inferasserts-type-alias)
-  - [InferInput (type alias)](#inferinput-type-alias)
 
 ---
 
@@ -41,7 +39,7 @@ Added in v1.0.0
 ```ts
 export declare const asserts: <A>(
   schema: Schema<A>
-) => (input: unknown, options?: ParseOptions | undefined) => asserts input is A
+) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
 ```
 
 Added in v1.0.0
@@ -51,7 +49,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <A>(schema: Schema<A>) => (input: unknown, options?: ParseOptions | undefined) => input is A
+export declare const is: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
 ```
 
 Added in v1.0.0
@@ -63,10 +63,13 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <I, A>(
+export declare const make: <A>(
   schema: Schema<A>,
-  parse: (i: I, options?: ParseOptions | undefined) => Either<readonly [PE.ParseError, ...PE.ParseError[]], A>
-) => Parser<I, A>
+  parse: (
+    input: unknown,
+    options?: AST.ParseOptions | undefined
+  ) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => Parser<A>
 ```
 
 Added in v1.0.0
@@ -80,7 +83,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <A>(
   schema: Schema<A>
-) => (i: unknown, options?: ParseOptions | undefined) => Either<readonly [PE.ParseError, ...PE.ParseError[]], A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -90,7 +93,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeOrThrow: <A>(schema: Schema<A>) => (u: unknown, options?: ParseOptions | undefined) => A
+export declare const decodeOrThrow: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -104,7 +109,7 @@ Added in v1.0.0
 ```ts
 export declare const encode: <A>(
   schema: Schema<A>
-) => (a: A, options?: ParseOptions | undefined) => PE.ParseResult<unknown>
+) => (a: A, options?: AST.ParseOptions | undefined) => ParseResult<unknown>
 ```
 
 Added in v1.0.0
@@ -114,34 +119,20 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: ParseOptions | undefined) => unknown
+export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
 ```
 
 Added in v1.0.0
 
 # model
 
-## ParseOptions (interface)
-
-**Signature**
-
-```ts
-export interface ParseOptions {
-  readonly isUnexpectedAllowed?: boolean
-  readonly allErrors?: boolean
-}
-```
-
-Added in v1.0.0
-
 ## Parser (interface)
 
 **Signature**
 
 ```ts
-export interface Parser<I, A> extends Schema<A> {
-  readonly I: (i: I) => void
-  readonly parse: (i: I, options?: ParseOptions) => PE.ParseResult<A>
+export interface Parser<A> extends Schema<A> {
+  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<A>
 }
 ```
 
@@ -155,16 +146,6 @@ Added in v1.0.0
 
 ```ts
 export type InferAsserts<S extends Schema<any>> = (input: unknown, options?: ParseOptions) => asserts input is Infer<S>
-```
-
-Added in v1.0.0
-
-## InferInput (type alias)
-
-**Signature**
-
-```ts
-export type InferInput<D extends Parser<any, any>> = Parameters<D['I']>[0]
 ```
 
 Added in v1.0.0

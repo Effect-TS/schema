@@ -1,10 +1,10 @@
 ---
-title: ParseError.ts
-nav_order: 15
+title: ParseResult.ts
+nav_order: 17
 parent: Modules
 ---
 
-## ParseError overview
+## ParseResult overview
 
 Added in v1.0.0
 
@@ -24,10 +24,7 @@ Added in v1.0.0
   - [unionMember](#unionmember)
 - [guards](#guards)
   - [isFailure](#isfailure)
-  - [isIndex](#isindex)
-  - [isKey](#iskey)
   - [isSuccess](#issuccess)
-  - [isUnexpected](#isunexpected)
 - [model](#model)
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
@@ -147,42 +144,12 @@ export declare const isFailure: <A>(
 
 Added in v1.0.0
 
-## isIndex
-
-**Signature**
-
-```ts
-export declare const isIndex: (e: ParseError) => e is Index
-```
-
-Added in v1.0.0
-
-## isKey
-
-**Signature**
-
-```ts
-export declare const isKey: (e: ParseError) => e is Key
-```
-
-Added in v1.0.0
-
 ## isSuccess
 
 **Signature**
 
 ```ts
 export declare const isSuccess: <A>(self: Either<readonly [ParseError, ...ParseError[]], A>) => self is Right<A>
-```
-
-Added in v1.0.0
-
-## isUnexpected
-
-**Signature**
-
-```ts
-export declare const isUnexpected: (e: ParseError) => e is Unexpected
 ```
 
 Added in v1.0.0

@@ -1,6 +1,6 @@
 ---
 title: data/filter.ts
-nav_order: 6
+nav_order: 7
 parent: Modules
 ---
 
@@ -24,9 +24,11 @@ Added in v1.0.0
   - [lessThanOrEqualTo](#lessthanorequalto)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
+  - [multipleOf](#multipleof)
   - [nonNaN](#nonnan)
   - [pattern](#pattern)
   - [startsWith](#startswith)
+  - [trimmed](#trimmed)
 
 ---
 
@@ -170,6 +172,19 @@ export declare const minLength: <A extends string>(
 
 Added in v1.0.0
 
+## multipleOf
+
+**Signature**
+
+```ts
+export declare const multipleOf: <A extends number>(
+  divisor: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## nonNaN
 
 **Signature**
@@ -202,6 +217,23 @@ Added in v1.0.0
 ```ts
 export declare const startsWith: <A extends string>(
   startsWith: string,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## trimmed
+
+Verifies that a string contains no leading or trailing whitespaces.
+
+Note. This combinator does not make any transformations, it only validates.
+If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+
+**Signature**
+
+```ts
+export declare const trimmed: <A extends string>(
   annotationOptions?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
