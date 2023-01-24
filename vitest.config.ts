@@ -5,8 +5,11 @@ import { defineConfig } from "vite"
 export default defineConfig({
   test: {
     include: ["./test/**/*.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    exclude: ["./test/**/util.ts"],
-    globals: true
+    exclude: ["./src/index.ts", "./test/**/util.ts"],
+    globals: true,
+    coverage: {
+      provider: "c8"
+    }
   },
   resolve: {
     alias: {
