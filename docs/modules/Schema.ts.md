@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 18
+nav_order: 19
 parent: Modules
 ---
 
@@ -50,8 +50,8 @@ Added in v1.0.0
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [data](#data)
+  - [date](#date)
   - [json](#json)
-  - [option](#option)
 - [filters](#filters)
   - [endsWith](#endswith)
   - [finite](#finite)
@@ -68,8 +68,12 @@ Added in v1.0.0
   - [nonNaN](#nonnan)
   - [pattern](#pattern)
   - [startsWith](#startswith)
+  - [trimmed](#trimmed)
 - [model](#model)
   - [Schema (interface)](#schema-interface)
+- [parsers](#parsers)
+  - [option](#option)
+  - [trim](#trim)
 - [primitives](#primitives)
   - [any](#any)
   - [bigint](#bigint)
@@ -402,8 +406,8 @@ using the provided decoding functions.
 ```ts
 export declare const transformOrFail: <A, B>(
   to: Schema<B>,
-  decode: (i: A, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], B>,
-  encode: (i: B, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], A>
+  decode: (input: A, options?: AST.ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], B>,
+  encode: (input: B, options?: AST.ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], A>
 ) => (self: Schema<A>) => Schema<B>
 ```
 
@@ -508,22 +512,24 @@ Added in v1.0.0
 
 # data
 
+## date
+
+Transforms a `string` into a `string` with no leading or trailing whitespace.
+
+**Signature**
+
+```ts
+export declare const date: Schema<Date>
+```
+
+Added in v1.0.0
+
 ## json
 
 **Signature**
 
 ```ts
-export declare const json: Schema<Json>
-```
-
-Added in v1.0.0
-
-## option
-
-**Signature**
-
-```ts
-export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
+export declare const json: Schema<DataJson.Json>
 ```
 
 Added in v1.0.0
@@ -721,6 +727,21 @@ export declare const startsWith: <A extends string>(
 
 Added in v1.0.0
 
+## trimmed
+
+Note. This combinator does not make any transformations, it only validates.
+If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+
+**Signature**
+
+```ts
+export declare const trimmed: <A extends string>(
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 # model
 
 ## Schema (interface)
@@ -732,6 +753,30 @@ export interface Schema<A> {
   readonly A: (_: A) => A
   readonly ast: AST.AST
 }
+```
+
+Added in v1.0.0
+
+# parsers
+
+## option
+
+**Signature**
+
+```ts
+export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
+```
+
+Added in v1.0.0
+
+## trim
+
+Transforms a `string` into a `string` with no leading or trailing whitespace.
+
+**Signature**
+
+```ts
+export declare const trim: (item: Schema<string>) => Schema<string>
 ```
 
 Added in v1.0.0

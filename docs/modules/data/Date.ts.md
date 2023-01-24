@@ -1,10 +1,10 @@
 ---
-title: data/UUID.ts
-nav_order: 13
+title: data/Date.ts
+nav_order: 6
 parent: Modules
 ---
 
-## UUID overview
+## Date overview
 
 Added in v1.0.0
 
@@ -13,18 +13,18 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [UUID](#uuid)
+  - [date](#date)
 
 ---
 
 # utils
 
-## UUID
+## date
 
 **Signature**
 
 ```ts
-export declare const UUID: S.Schema<string>
+export declare const date: Schema<Date>
 ```
 
 Added in v1.0.0

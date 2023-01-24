@@ -1,6 +1,6 @@
 ---
 title: Pretty.ts
-nav_order: 17
+nav_order: 18
 parent: Modules
 ---
 

@@ -16,29 +16,30 @@ Added in v1.0.0
   - [anyKeyword](#anykeyword)
   - [bigIntKeyword](#bigintkeyword)
   - [booleanKeyword](#booleankeyword)
-  - [enums](#enums)
-  - [lazy](#lazy)
-  - [literal](#literal)
+  - [createEnums](#createenums)
+  - [createLazy](#createlazy)
+  - [createLiteral](#createliteral)
+  - [createRefinement](#createrefinement)
+  - [createTemplateLiteral](#createtemplateliteral)
+  - [createTransform](#createtransform)
+  - [createTuple](#createtuple)
+  - [createTypeAlias](#createtypealias)
+  - [createTypeLiteral](#createtypeliteral)
+  - [createUnion](#createunion)
+  - [createUniqueSymbol](#createuniquesymbol)
   - [neverKeyword](#neverkeyword)
   - [numberKeyword](#numberkeyword)
   - [objectKeyword](#objectkeyword)
-  - [refinement](#refinement)
   - [stringKeyword](#stringkeyword)
   - [symbolKeyword](#symbolkeyword)
-  - [templateLiteral](#templateliteral)
-  - [transform](#transform)
-  - [tuple](#tuple)
-  - [typeAlias](#typealias)
-  - [typeLiteral](#typeliteral)
   - [undefinedKeyword](#undefinedkeyword)
-  - [union](#union)
-  - [uniqueSymbol](#uniquesymbol)
   - [unknownKeyword](#unknownkeyword)
   - [voidKeyword](#voidkeyword)
 - [guards](#guards)
   - [isLazy](#islazy)
   - [isLiteral](#isliteral)
   - [isNumberKeyword](#isnumberkeyword)
+  - [isRefinement](#isrefinement)
   - [isStringKeyword](#isstringkeyword)
   - [isSymbolKeyword](#issymbolkeyword)
   - [isTemplateLiteral](#istemplateliteral)
@@ -59,6 +60,7 @@ Added in v1.0.0
   - [NeverKeyword (interface)](#neverkeyword-interface)
   - [NumberKeyword (interface)](#numberkeyword-interface)
   - [ObjectKeyword (interface)](#objectkeyword-interface)
+  - [ParseOptions (interface)](#parseoptions-interface)
   - [Refinement (interface)](#refinement-interface)
   - [StringKeyword (interface)](#stringkeyword-interface)
   - [SymbolKeyword (interface)](#symbolkeyword-interface)
@@ -79,20 +81,19 @@ Added in v1.0.0
   - [LiteralValue (type alias)](#literalvalue-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
-  - [annotation](#annotation)
-  - [annotations](#annotations)
   - [appendElement](#appendelement)
   - [appendRestElement](#appendrestelement)
-  - [element](#element)
+  - [createElement](#createelement)
+  - [createIndexSignature](#createindexsignature)
+  - [createPropertySignature](#createpropertysignature)
+  - [createRecord](#createrecord)
   - [getAnnotation](#getannotation)
-  - [getPropertySignatures](#getpropertysignatures)
-  - [indexSignature](#indexsignature)
   - [keyof](#keyof)
+  - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
-  - [propertySignature](#propertysignature)
-  - [record](#record)
+  - [setAnnotation](#setannotation)
 
 ---
 
@@ -128,32 +129,137 @@ export declare const booleanKeyword: BooleanKeyword
 
 Added in v1.0.0
 
-## enums
+## createEnums
 
 **Signature**
 
 ```ts
-export declare const enums: (enums: ReadonlyArray<readonly [string, string | number]>) => Enums
+export declare const createEnums: (enums: ReadonlyArray<readonly [string, string | number]>) => Enums
 ```
 
 Added in v1.0.0
 
-## lazy
+## createLazy
 
 **Signature**
 
 ```ts
-export declare const lazy: (f: () => AST, annotations?: Annotated['annotations']) => Lazy
+export declare const createLazy: (f: () => AST, annotations?: Annotated['annotations']) => Lazy
 ```
 
 Added in v1.0.0
 
-## literal
+## createLiteral
 
 **Signature**
 
 ```ts
-export declare const literal: (literal: LiteralValue) => Literal
+export declare const createLiteral: (literal: LiteralValue) => Literal
+```
+
+Added in v1.0.0
+
+## createRefinement
+
+**Signature**
+
+```ts
+export declare const createRefinement: (
+  from: AST,
+  refinement: Predicate<any>,
+  annotations?: Annotated['annotations']
+) => Refinement
+```
+
+Added in v1.0.0
+
+## createTemplateLiteral
+
+**Signature**
+
+```ts
+export declare const createTemplateLiteral: (
+  head: string,
+  spans: ReadonlyArray<TemplateLiteralSpan>
+) => TemplateLiteral | Literal
+```
+
+Added in v1.0.0
+
+## createTransform
+
+**Signature**
+
+```ts
+export declare const createTransform: (
+  from: AST,
+  to: AST,
+  decode: Transform['decode'],
+  encode: Transform['encode']
+) => Transform
+```
+
+Added in v1.0.0
+
+## createTuple
+
+**Signature**
+
+```ts
+export declare const createTuple: (
+  elements: ReadonlyArray<Element>,
+  rest: Option<RA.NonEmptyReadonlyArray<AST>>,
+  isReadonly: boolean,
+  annotations?: Annotated['annotations']
+) => Tuple
+```
+
+Added in v1.0.0
+
+## createTypeAlias
+
+**Signature**
+
+```ts
+export declare const createTypeAlias: (
+  typeParameters: ReadonlyArray<AST>,
+  type: AST,
+  annotations?: Annotated['annotations']
+) => TypeAlias
+```
+
+Added in v1.0.0
+
+## createTypeLiteral
+
+**Signature**
+
+```ts
+export declare const createTypeLiteral: (
+  propertySignatures: ReadonlyArray<PropertySignature>,
+  indexSignatures: ReadonlyArray<IndexSignature>,
+  annotations?: Annotated['annotations']
+) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## createUnion
+
+**Signature**
+
+```ts
+export declare const createUnion: (candidates: ReadonlyArray<AST>, annotations?: Annotated['annotations']) => AST
+```
+
+Added in v1.0.0
+
+## createUniqueSymbol
+
+**Signature**
+
+```ts
+export declare const createUniqueSymbol: (symbol: symbol, annotations?: Annotated['annotations']) => UniqueSymbol
 ```
 
 Added in v1.0.0
@@ -188,20 +294,6 @@ export declare const objectKeyword: ObjectKeyword
 
 Added in v1.0.0
 
-## refinement
-
-**Signature**
-
-```ts
-export declare const refinement: (
-  from: AST,
-  refinement: Predicate<any>,
-  annotations?: Annotated['annotations']
-) => Refinement
-```
-
-Added in v1.0.0
-
 ## stringKeyword
 
 **Signature**
@@ -222,103 +314,12 @@ export declare const symbolKeyword: SymbolKeyword
 
 Added in v1.0.0
 
-## templateLiteral
-
-**Signature**
-
-```ts
-export declare const templateLiteral: (
-  head: string,
-  spans: ReadonlyArray<TemplateLiteralSpan>
-) => TemplateLiteral | Literal
-```
-
-Added in v1.0.0
-
-## transform
-
-**Signature**
-
-```ts
-export declare const transform: (
-  from: AST,
-  to: AST,
-  decode: Transform['decode'],
-  encode: Transform['encode']
-) => Transform
-```
-
-Added in v1.0.0
-
-## tuple
-
-**Signature**
-
-```ts
-export declare const tuple: (
-  elements: ReadonlyArray<Element>,
-  rest: Option<RA.NonEmptyReadonlyArray<AST>>,
-  isReadonly: boolean,
-  annotations?: Annotated['annotations']
-) => Tuple
-```
-
-Added in v1.0.0
-
-## typeAlias
-
-**Signature**
-
-```ts
-export declare const typeAlias: (
-  typeParameters: ReadonlyArray<AST>,
-  type: AST,
-  annotations?: Annotated['annotations']
-) => TypeAlias
-```
-
-Added in v1.0.0
-
-## typeLiteral
-
-**Signature**
-
-```ts
-export declare const typeLiteral: (
-  propertySignatures: ReadonlyArray<PropertySignature>,
-  indexSignatures: ReadonlyArray<IndexSignature>,
-  annotations?: Annotated['annotations']
-) => TypeLiteral
-```
-
-Added in v1.0.0
-
 ## undefinedKeyword
 
 **Signature**
 
 ```ts
 export declare const undefinedKeyword: UndefinedKeyword
-```
-
-Added in v1.0.0
-
-## union
-
-**Signature**
-
-```ts
-export declare const union: (candidates: ReadonlyArray<AST>, annotations?: Annotated['annotations']) => AST
-```
-
-Added in v1.0.0
-
-## uniqueSymbol
-
-**Signature**
-
-```ts
-export declare const uniqueSymbol: (symbol: symbol, annotations?: Annotated['annotations']) => UniqueSymbol
 ```
 
 Added in v1.0.0
@@ -371,6 +372,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isNumberKeyword: (ast: AST) => ast is NumberKeyword
+```
+
+Added in v1.0.0
+
+## isRefinement
+
+**Signature**
+
+```ts
+export declare const isRefinement: (ast: AST) => ast is Refinement
 ```
 
 Added in v1.0.0
@@ -610,6 +621,19 @@ export interface ObjectKeyword extends Annotated {
 
 Added in v1.0.0
 
+## ParseOptions (interface)
+
+**Signature**
+
+```ts
+export interface ParseOptions {
+  readonly isUnexpectedAllowed?: boolean
+  readonly allErrors?: boolean
+}
+```
+
+Added in v1.0.0
+
 ## Refinement (interface)
 
 **Signature**
@@ -671,8 +695,8 @@ export interface Transform extends Annotated {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
-  readonly decode: Parser<any, any>['parse']
-  readonly encode: Parser<any, any>['parse']
+  readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
 }
 ```
 
@@ -862,12 +886,211 @@ export interface TemplateLiteralSpan {
 
 Added in v1.0.0
 
-## annotation
+## appendElement
+
+Appends an element to a tuple or throws an exception in the following cases:
+
+- A required element cannot follow an optional element. ts(1257)
+- An optional element cannot follow a rest element. ts(1266)
 
 **Signature**
 
 ```ts
-export declare const annotation: (
+export declare const appendElement: (ast: Tuple, newElement: Element) => Tuple
+```
+
+Added in v1.0.0
+
+## appendRestElement
+
+Adds a rest element to the end of a tuple, or throws an exception if the rest element is already present.
+
+**Signature**
+
+```ts
+export declare const appendRestElement: (ast: Tuple, restElement: AST) => Tuple
+```
+
+Added in v1.0.0
+
+## createElement
+
+**Signature**
+
+```ts
+export declare const createElement: (type: AST, isOptional: boolean) => Element
+```
+
+Added in v1.0.0
+
+## createIndexSignature
+
+**Signature**
+
+```ts
+export declare const createIndexSignature: (
+  parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement,
+  type: AST,
+  isReadonly: boolean
+) => IndexSignature
+```
+
+Added in v1.0.0
+
+## createPropertySignature
+
+**Signature**
+
+```ts
+export declare const createPropertySignature: (
+  name: PropertyKey,
+  type: AST,
+  isOptional: boolean,
+  isReadonly: boolean,
+  annotations?: Annotated['annotations']
+) => PropertySignature
+```
+
+Added in v1.0.0
+
+## createRecord
+
+Create a record with the specified key type and value type.
+
+**Signature**
+
+```ts
+export declare const createRecord: (key: AST, value: AST, isReadonly: boolean) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## getAnnotation
+
+**Signature**
+
+```ts
+export declare const getAnnotation: <A>(key: PropertyKey) => (annotated: Annotated) => Option<A>
+```
+
+Added in v1.0.0
+
+## keyof
+
+Equivalent at runtime to the TypeScript type-level `keyof` operator.
+
+**Signature**
+
+```ts
+export declare const keyof: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
+## mergeAnnotations
+
+Adds a group of annotations, potentially overwriting existing annotations.
+
+**Signature**
+
+```ts
+export declare const mergeAnnotations: (
+  ast: AST,
+  annotations: Annotated['annotations']
+) =>
+  | { annotations: { [x: string]: unknown }; _tag: 'TypeAlias'; typeParameters: readonly AST[]; type: AST }
+  | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
+  | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
+  | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'VoidKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'TemplateLiteral'
+      head: string
+      spans: readonly [TemplateLiteralSpan, ...TemplateLiteralSpan[]]
+    }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Tuple'
+      elements: readonly Element[]
+      rest: Option<readonly [AST, ...AST[]]>
+      isReadonly: boolean
+    }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'TypeLiteral'
+      propertySignatures: readonly PropertySignature[]
+      indexSignatures: readonly IndexSignature[]
+    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
+  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
+  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Transform'
+      from: AST
+      to: AST
+      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
+```
+
+Added in v1.0.0
+
+## omit
+
+Equivalent at runtime to the built-in TypeScript utility type `Omit`.
+
+**Signature**
+
+```ts
+export declare const omit: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## partial
+
+Equivalent at runtime to the built-in TypeScript utility type `Partial`.
+
+**Signature**
+
+```ts
+export declare const partial: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
+## pick
+
+Equivalent at runtime to the built-in TypeScript utility type `Pick`.
+
+**Signature**
+
+```ts
+export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## setAnnotation
+
+Adds an annotation, potentially overwriting the existing annotation with the specified id.
+
+**Signature**
+
+```ts
+export declare const setAnnotation: (
   ast: AST,
   id: PropertyKey,
   value: unknown
@@ -914,197 +1137,9 @@ export declare const annotation: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (i: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      encode: (i: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
     }
-```
-
-Added in v1.0.0
-
-## annotations
-
-**Signature**
-
-```ts
-export declare const annotations: (
-  ast: AST,
-  annotations: Annotated['annotations']
-) =>
-  | { annotations: { [x: string]: unknown }; _tag: 'TypeAlias'; typeParameters: readonly AST[]; type: AST }
-  | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
-  | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
-  | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'VoidKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'TemplateLiteral'
-      head: string
-      spans: readonly [TemplateLiteralSpan, ...TemplateLiteralSpan[]]
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Tuple'
-      elements: readonly Element[]
-      rest: Option<readonly [AST, ...AST[]]>
-      isReadonly: boolean
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'TypeLiteral'
-      propertySignatures: readonly PropertySignature[]
-      indexSignatures: readonly IndexSignature[]
-    }
-  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
-  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      decode: (i: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      encode: (i: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-    }
-```
-
-Added in v1.0.0
-
-## appendElement
-
-**Signature**
-
-```ts
-export declare const appendElement: (ast: Tuple, newElement: Element) => Tuple
-```
-
-Added in v1.0.0
-
-## appendRestElement
-
-**Signature**
-
-```ts
-export declare const appendRestElement: (ast: Tuple, restElement: AST) => Tuple
-```
-
-Added in v1.0.0
-
-## element
-
-**Signature**
-
-```ts
-export declare const element: (type: AST, isOptional: boolean) => Element
-```
-
-Added in v1.0.0
-
-## getAnnotation
-
-**Signature**
-
-```ts
-export declare const getAnnotation: <A>(key: PropertyKey) => (annotated: Annotated) => Option<A>
-```
-
-Added in v1.0.0
-
-## getPropertySignatures
-
-**Signature**
-
-```ts
-export declare const getPropertySignatures: (ast: AST) => ReadonlyArray<PropertySignature>
-```
-
-Added in v1.0.0
-
-## indexSignature
-
-**Signature**
-
-```ts
-export declare const indexSignature: (
-  parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement,
-  type: AST,
-  isReadonly: boolean
-) => IndexSignature
-```
-
-Added in v1.0.0
-
-## keyof
-
-**Signature**
-
-```ts
-export declare const keyof: (ast: AST) => AST
-```
-
-Added in v1.0.0
-
-## omit
-
-**Signature**
-
-```ts
-export declare const omit: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
-```
-
-Added in v1.0.0
-
-## partial
-
-**Signature**
-
-```ts
-export declare const partial: (ast: AST) => AST
-```
-
-Added in v1.0.0
-
-## pick
-
-**Signature**
-
-```ts
-export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
-```
-
-Added in v1.0.0
-
-## propertySignature
-
-**Signature**
-
-```ts
-export declare const propertySignature: (
-  name: PropertyKey,
-  type: AST,
-  isOptional: boolean,
-  isReadonly: boolean,
-  annotations?: Annotated['annotations']
-) => PropertySignature
-```
-
-Added in v1.0.0
-
-## record
-
-**Signature**
-
-```ts
-export declare const record: (key: AST, value: AST, isReadonly: boolean) => TypeLiteral
 ```
 
 Added in v1.0.0
