@@ -42,7 +42,7 @@ If you also want to **become a sponsor** to ensure this library continues to imp
 - The `strict` flag enabled in your `tsconfig.json` file
 - The `exactOptionalPropertyTypes` flag enabled in your `tsconfig.json` file
 
-```json
+```
 {
   // ...
   "compilerOptions": {
