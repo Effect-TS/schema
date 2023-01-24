@@ -1,6 +1,6 @@
 <h3 align="center">
   <a href="https://fp-ts.github.io/schema/">
-    <img src="./docs/fp-ts-logo.png">
+    <img src="./docs/example.png" width="500">
   </a>
 </h3>
 
