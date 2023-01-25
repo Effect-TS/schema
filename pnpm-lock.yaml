@@ -1,6 +1,9 @@
 lockfileVersion: 5.4
 
 patchedDependencies:
+  '@fp-ts/core@0.1.1':
+    hash: y3lbm4arx3ydwimrg32hyta3vu
+    path: patches/@fp-ts__core@0.1.1.patch
   '@effect-ts/build-utils@0.40.3':
     hash: wzvflwv62ngf22ppz3frldq37m
     path: patches/@effect-ts__build-utils@0.40.3.patch
@@ -60,7 +63,7 @@ importers:
       vite: ^3.2.5
       vitest: 0.25.5
     dependencies:
-      '@fp-ts/core': 0.1.1
+      '@fp-ts/core': 0.1.1_y3lbm4arx3ydwimrg32hyta3vu
       '@fp-ts/data': 0.1.0
       fast-check: 3.6.2
     devDependencies:
@@ -745,9 +748,10 @@ packages:
     resolution: {integrity: sha512-FuXKPHTEvvgxV3LulGJXkSpAghovh7wLxux+Pm9LKefC0gtZZQ4OajTjTK5RsQtpyKIsAn26PwdG6W6zksF/UA==}
     dev: true
 
-  /@fp-ts/core/0.1.1:
+  /@fp-ts/core/0.1.1_y3lbm4arx3ydwimrg32hyta3vu:
     resolution: {integrity: sha512-7vQnrnvJAMrXgIwt0qQNhXkPDtm4l8vwql8EvXeY47v/FwnWpDvt1HISoO9Kq3am5SZ0A8Av+4NqPab2FRdKxw==}
     dev: false
+    patched: true
 
   /@fp-ts/data/0.0.20:
     resolution: {integrity: sha512-7nv25VxgZiJzintT1Bsl4mXOZlIOGag/GsI0Rov1r/RTfOzd4RePpnDYZzC9BFJ5Iru2/mHeXejRuxgBP2v8Qg==}
@@ -758,7 +762,7 @@ packages:
   /@fp-ts/data/0.1.0:
     resolution: {integrity: sha512-T4PbFVo2fzy2XaUHbFmEc24TJSPzTl/xUHC+1qCXZZfb3MaIKdKHS10aUt+9zcQ75KpiZbHL8hBfoP9fHOI6Mg==}
     dependencies:
-      '@fp-ts/core': 0.1.1
+      '@fp-ts/core': 0.1.1_y3lbm4arx3ydwimrg32hyta3vu
     dev: false
 
   /@humanwhocodes/config-array/0.11.7:

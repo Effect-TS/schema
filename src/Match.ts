@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * @since 1.0.0
  */
@@ -5,6 +6,7 @@ import * as E from "@fp-ts/core/Either"
 import { identity } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
 import * as RA from "@fp-ts/core/ReadonlyArray"
+import type * as T from "@fp-ts/core/These"
 import type * as AST from "@fp-ts/schema/AST"
 import * as P from "@fp-ts/schema/Parser"
 import * as S from "@fp-ts/schema/Schema"
@@ -131,18 +133,18 @@ export const when: {
   <R, P extends DeepPartial<R>, B>(
     pattern: Narrow<P>,
     f: (_: TryExtract<R, WithoutSchema<P>>) => B
-  ): <I, A>(self: Matcher<I, R, A>) => Matcher<I, Exclude<R, WithoutSchema<P>>, A | B>
+  ): <I, A>(self: Matcher<I, R, A>) => Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<A | B>>
 
   <P, R, B>(
     schema: S.Schema<P>,
     f: (_: TryExtract<R, P>) => B
-  ): <I, A>(self: Matcher<I, R, A>) => Matcher<I, Exclude<R, P>, A | B>
+  ): <I, A>(self: Matcher<I, R, A>) => Matcher<I, Exclude<R, P>, Unify<A | B>>
 } = <R, P extends DeepPartial<R>, B>(
   pattern: Narrow<P>,
   f: (_: TryExtract<R, WithoutSchema<P>>) => B
 ) =>
   <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, Exclude<R, WithoutSchema<P>>, A | B>([
+    new Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<Unify<A | B>>>([
       ...self.cases,
       new When(P.is(makeSchema(pattern)), f as any)
     ])
@@ -152,7 +154,7 @@ export const when: {
  */
 export const notSchema = <P, R, B>(schema: S.Schema<P>, f: (b: Exclude<R, P>) => B) =>
   <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, TryExtract<R, P>, A | B>([
+    new Matcher<I, TryExtract<R, P>, Unify<A | B>>([
       ...self.cases,
       new Not(P.is(schema), f as any)
     ])
@@ -165,7 +167,7 @@ export const not = <R, P extends DeepPartial<R>, B>(
   f: (_: Exclude<R, WithoutSchema<P>>) => B
 ) =>
   <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, TryExtract<R, WithoutSchema<P>>, A | B>([
+    new Matcher<I, TryExtract<R, WithoutSchema<P>>, Unify<A | B>>([
       ...self.cases,
       new Not(P.is(makeSchema(pattern)), f as any)
     ])
@@ -175,7 +177,7 @@ export const not = <R, P extends DeepPartial<R>, B>(
  */
 export const orElse = <R, B>(f: (b: R) => B) =>
   <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, never, A | B>([...self.cases, new OrElse(f as any)])
+    new Matcher<I, never, Unify<A | B>>([...self.cases, new OrElse(f as any)])
 
 /**
  * @since 1.0.0
@@ -256,3 +258,34 @@ type ExtractWithoutLiterals<A, E> = A extends WithoutLiterals<E> ? A : never
 
 type TryExtract<A, E> = Extract<A, E> extends never ? ExtractWithoutLiterals<A, E>
   : Extract<A, E>
+
+export declare const unifyF: unique symbol
+export type unifyF = typeof unifyF
+
+export declare const unify: unique symbol
+export type unify = typeof unify
+
+export type Unify<A> = [A] extends [{ [unify]?: any; [unifyF]?: () => any }]
+  ? ReturnType<NonNullable<(A & { [unify]: A })[unifyF]>>
+  : A
+
+declare module "@fp-ts/core/Either" {
+  interface Left<E> {
+    [unify]?: unknown
+    [unifyF]?: () => this[unify] extends E.Either<infer E0, infer A0> ? E.Either<E0, A0>
+      : this[unify]
+  }
+  interface Right<A> {
+    [unify]?: unknown
+    [unifyF]?: () => this[unify] extends E.Either<infer E0, infer A0> ? E.Either<E0, A0>
+      : this[unify]
+  }
+}
+
+declare module "@fp-ts/core/These" {
+  interface Both<E, A> {
+    [unify]?: unknown
+    [unifyF]?: () => this[unify] extends T.These<infer E0, infer A0> ? T.These<E0, A0>
+      : this[unify]
+  }
+}

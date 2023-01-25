@@ -1,0 +1,35 @@
+diff --git a/Either.d.ts b/Either.d.ts
+index ae0db343b032c39b8c0ddce9e228be7e276eac7e..68ebce1e6c6501c672f19434fb9ec614ef670c5d 100644
+--- a/Either.d.ts
++++ b/Either.d.ts
+@@ -38,7 +38,7 @@ import * as traversable from "@fp-ts/core/typeclass/Traversable";
+  * @category models
+  * @since 1.0.0
+  */
+-export type Left<E> = {
++export interface Left<E> {
+     readonly _tag: "Left";
+     readonly left: E;
+ };
+@@ -46,7 +46,7 @@ export type Left<E> = {
+  * @category models
+  * @since 1.0.0
+  */
+-export type Right<A> = {
++export interface Right<A> {
+     readonly _tag: "Right";
+     readonly right: A;
+ };
+diff --git a/These.d.ts b/These.d.ts
+index 1b7d4a3d28cbb18de1ca2b711ab0dfbc72c67768..27a2eed42f1641610af4ca6ed88124d26548d9da 100644
+--- a/These.d.ts
++++ b/These.d.ts
+@@ -44,7 +44,7 @@ import * as traversable from "@fp-ts/core/typeclass/Traversable";
+  * @category model
+  * @since 1.0.0
+  */
+-export type Both<E, A> = {
++export interface Both<E, A> {
+     readonly _tag: "Both";
+     readonly left: E;
+     readonly right: A;

@@ -110,7 +110,8 @@
   "pnpm": {
     "patchedDependencies": {
       "@effect-ts/build-utils@0.40.3": "patches/@effect-ts__build-utils@0.40.3.patch",
-      "docs-ts@0.6.10": "patches/docs-ts@0.6.10.patch"
+      "docs-ts@0.6.10": "patches/docs-ts@0.6.10.patch",
+      "@fp-ts/core@0.1.1": "patches/@fp-ts__core@0.1.1.patch"
     }
   },
   "dependencies": {
