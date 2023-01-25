@@ -171,8 +171,8 @@ export const when: {
  * @since 1.0.0
  */
 export const tag: {
-  <R, P, B>(
-    pattern: P & Extract<R, { _tag: any }>["_tag"],
+  <R, P extends Tags<R> & (string | number | symbol | object | {}), B>(
+    pattern: P,
     f: (_: Extract<R, { readonly _tag: P }>) => B
   ): <I, A, Pr>(
     self: Matcher<I, R, A, Pr>
@@ -319,6 +319,8 @@ type ExtractWithoutLiterals<A, E> = A extends WithoutLiterals<E> ? A : never
 
 type TryExtract<A, E> = Extract<A, E> extends never ? ExtractWithoutLiterals<A, E>
   : Extract<A, E>
+
+type Tags<P> = P extends { _tag: infer X } ? X : never
 
 export declare const unifyF: unique symbol
 export type unifyF = typeof unifyF
