@@ -248,58 +248,55 @@ export const orElse = <RA, B>(f: (b: RA) => B) =>
 /**
  * @since 1.0.0
  */
-export const either: {
-  <I, R, RA, A, Pr>(
-    self: Matcher<I, R, RA, A, Pr>
-  ): [Pr] extends [never] ? (input: I) => E.Either<RA, A>
-    : E.Either<RA, A>
-} = (<I, R, RA, A>(self: Matcher<I, R, RA, A, I>) => {
-  const body = (input: I): E.Either<RA, A> => {
-    for (const _case of self.cases) {
-      if (
-        _case._tag === "When" &&
-        _case.guard(input, { isUnexpectedAllowed: true })
-      ) {
-        return E.right(_case.evaluate(input))
-      } else if (
-        _case._tag === "Not" &&
-        !_case.guard(input, { isUnexpectedAllowed: true })
-      ) {
-        return E.right(_case.evaluate(input))
-      } else if (_case._tag === "OrElse") {
-        return E.right(_case.evaluate(input))
+export const either: <I, R, RA, A, Pr>(
+  self: Matcher<I, R, RA, A, Pr>
+) => [Pr] extends [never] ? (input: I) => E.Either<RA, A>
+  : E.Either<RA, A> = (<I, R, RA, A>(self: Matcher<I, R, RA, A, I>) => {
+    const body = (input: I): E.Either<RA, A> => {
+      for (const _case of self.cases) {
+        if (
+          _case._tag === "When" &&
+          _case.guard(input, { isUnexpectedAllowed: true })
+        ) {
+          return E.right(_case.evaluate(input))
+        } else if (
+          _case._tag === "Not" &&
+          !_case.guard(input, { isUnexpectedAllowed: true })
+        ) {
+          return E.right(_case.evaluate(input))
+        } else if (_case._tag === "OrElse") {
+          return E.right(_case.evaluate(input))
+        }
       }
+
+      return E.left(input as any)
     }
-
-    return E.left(input as any)
-  }
-  if (self.provided) {
-    return body(self.provided.provided)
-  }
-  return body
-}) as any
+    if (self.provided) {
+      return body(self.provided.provided)
+    }
+    return body
+  }) as any
 
 /**
  * @since 1.0.0
  */
-export const option: {
-  <I, R, RA, A, Pr>(
-    self: Matcher<I, R, RA, A, Pr>
-  ): [Pr] extends [never] ? (input: I) => O.Option<A> : O.Option<A>
-} = (<I, A>(self: Matcher<I, any, any, A, I>) => {
-  const toEither = either(self)
-  if (E.isEither(toEither)) {
-    return O.fromEither(toEither)
-  }
-  return (input: I): O.Option<A> => O.fromEither((toEither as any)(input))
-}) as any
+export const option: <I, R, RA, A, Pr>(
+  self: Matcher<I, R, RA, A, Pr>
+) => [Pr] extends [never] ? (input: I) => O.Option<A> : O.Option<A> =
+  (<I, A>(self: Matcher<I, any, any, A, I>) => {
+    const toEither = either(self)
+    if (E.isEither(toEither)) {
+      return O.fromEither(toEither)
+    }
+    return (input: I): O.Option<A> => O.fromEither((toEither as any)(input))
+  }) as any
 
 /**
  * @since 1.0.0
  */
-export const exaustive: {
-  <I, R, A, Pr>(self: Matcher<I, R, never, A, Pr>): [Pr] extends [never] ? (u: I) => A : A
-} = (<I, A>(
+export const exaustive: <I, R, A, Pr>(
+  self: Matcher<I, R, never, A, Pr>
+) => [Pr] extends [never] ? (u: I) => A : A = (<I, A>(
   self: Matcher<I, any, never, A, I>
 ) => {
   const toEither = either(self as any)
