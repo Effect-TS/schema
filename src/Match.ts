@@ -3,7 +3,7 @@
  * @since 1.0.0
  */
 import * as E from "@fp-ts/core/Either"
-import { identity } from "@fp-ts/core/Function"
+import { identity, pipe } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
 import * as RA from "@fp-ts/core/ReadonlyArray"
 import type * as T from "@fp-ts/core/These"
@@ -211,7 +211,10 @@ export const not: {
  */
 export const orElse = <R, B>(f: (b: R) => B) =>
   <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
-    new Matcher<I, never, Unify<A | B>, Pr>([...self.cases, new OrElse(f as any)], self.provided)
+    pipe(
+      new Matcher<I, never, Unify<A | B>, Pr>([...self.cases, new OrElse(f as any)], self.provided),
+      exaustive
+    )
 
 /**
  * @since 1.0.0
