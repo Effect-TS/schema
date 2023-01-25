@@ -163,7 +163,6 @@ export const when: {
     Unify<A | B>,
     Pr
   >
-
   <P, R, RA, B>(
     schema: S.Schema<P>,
     f: (_: Replace<TryExtract<RA, P>, P>) => B
@@ -210,7 +209,6 @@ export const not: {
   ): <I, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<I, AddOnly<R, P>, ApplyFilters<AddOnly<R, P>>, Unify<A | B>, Pr>
-
   <R, RA, P extends DeepPartial<RA>, B>(
     pattern: Narrow<P>,
     f: (_: Exclude<RA, WithoutSchema<P>>) => B
@@ -250,11 +248,11 @@ export const orElse = <RA, B>(f: (b: RA) => B) =>
  * @since 1.0.0
  */
 export const either: {
-  <I, RA, A, Pr>(
-    self: Matcher<I, any, RA, A, Pr>
+  <I, R, RA, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
   ): [Pr] extends [never] ? (input: I) => E.Either<RA, A>
     : E.Either<RA, A>
-} = (<I, RA, A>(self: Matcher<I, any, RA, A, I>) => {
+} = (<I, R, RA, A>(self: Matcher<I, R, RA, A, I>) => {
   const body = (input: I): E.Either<RA, A> => {
     for (const _case of self.cases) {
       if (
@@ -284,8 +282,8 @@ export const either: {
  * @since 1.0.0
  */
 export const option: {
-  <I, A, Pr>(
-    self: Matcher<I, any, any, A, Pr>
+  <I, R, RA, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
   ): [Pr] extends [never] ? (input: I) => O.Option<A> : O.Option<A>
 } = (<I, A>(self: Matcher<I, any, any, A, I>) => {
   const toEither = either(self)

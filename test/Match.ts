@@ -44,7 +44,6 @@ describe("Match", () => {
       Match.value(E.right(0)),
       Match.tag("Right", (_) => _.right),
       Match.tag("Left", (_) => _.left),
-      (a) => a,
       Match.exaustive
     )
     expect(result).toEqual(0)
