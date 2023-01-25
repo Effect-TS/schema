@@ -170,6 +170,20 @@ export const when: {
 /**
  * @since 1.0.0
  */
+export const tag: {
+  <R, P, B>(
+    pattern: P & Extract<R, { _tag: any }>["_tag"],
+    f: (_: Extract<R, { readonly _tag: P }>) => B
+  ): <I, A, Pr>(
+    self: Matcher<I, R, A, Pr>
+  ) => Matcher<I, Exclude<R, Extract<R, { _tag: P }>>, Unify<A | B>, Pr>
+} = (pattern, f) =>
+  // @ts-expect-error
+  when({ _tag: pattern }, f)
+
+/**
+ * @since 1.0.0
+ */
 export const notSchema = <P, R, B>(schema: S.Schema<P>, f: (b: Exclude<R, P>) => B) =>
   <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
     new Matcher<I, TryExtract<R, P>, Unify<A | B>, Pr>([

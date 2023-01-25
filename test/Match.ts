@@ -31,8 +31,8 @@ describe("Match", () => {
   it("inline", () => {
     const result = pipe(
       Match.value(E.right(0)),
-      Match.when({ _tag: "Right" }, (_) => _.right),
-      Match.when({ _tag: "Left" }, (_) => _.left),
+      Match.tag("Right", (_) => _.right),
+      Match.tag("Left", (_) => _.left),
       Match.exaustive
     )
     expect(result).toEqual(0)
