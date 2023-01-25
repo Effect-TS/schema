@@ -14,7 +14,7 @@ import * as S from "@fp-ts/schema/Schema"
 /**
  * @since 1.0.0
  */
-export class Matcher<Input, Remaining, Result, Provided> {
+export class Matcher<Input, Remaining, RemainingApplied, Result, Provided> {
   /**
    * @since 1.0.0
    */
@@ -27,6 +27,10 @@ export class Matcher<Input, Remaining, Result, Provided> {
    * @since 1.0.0
    */
   readonly _remaining: (_: never) => Remaining = identity
+  /**
+   * @since 1.0.0
+   */
+  readonly _remainingApplied: (_: never) => RemainingApplied = identity
   /**
    * @since 1.0.0
    */
@@ -129,54 +133,69 @@ const makeSchema = <I>(
  * @since 1.0.0
  */
 export const type: {
-  <I>(): Matcher<I, I, never, never>
+  <I>(): Matcher<I, I, I, never, never>
 } = <I>(...args: Array<any>) =>
   // @ts-expect-error
-  new Matcher<I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
+  new Matcher<I, I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
 
 /**
  * @since 1.0.0
  */
 export const value: {
-  <I>(i: I): Matcher<I, I, never, I>
+  <I>(i: I): Matcher<I, I, I, never, I>
 } = <I>(...args: Array<any>) =>
   // @ts-expect-error
-  new Matcher<I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
+  new Matcher<I, I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
 
 /**
  * @since 1.0.0
  */
 export const when: {
-  <R, P extends DeepPartial<R>, B>(
+  <R, RA, P extends DeepPartial<RA>, B>(
     pattern: Narrow<P>,
-    f: (_: Replace<TryExtract<R, WithoutSchema<P>>, P>) => B
+    f: (_: Replace<TryExtract<RA, WithoutSchema<P>>, P>) => B
   ): <I, A, Pr>(
-    self: Matcher<I, R, A, Pr>
-  ) => Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<A | B>, Pr>
-  <P, R, B>(
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<
+    I,
+    AddWithout<R, WithoutSchema<P>>,
+    ApplyFilters<AddWithout<R, WithoutSchema<P>>>,
+    Unify<A | B>,
+    Pr
+  >
+
+  <P, R, RA, B>(
     schema: S.Schema<P>,
-    f: (_: Replace<TryExtract<R, P>, P>) => B
-  ): <I, A, Pr>(self: Matcher<I, R, A, Pr>) => Matcher<I, Exclude<R, P>, Unify<A | B>, Pr>
-} = <R, P extends DeepPartial<R>, B>(
-  pattern: Narrow<P>,
-  f: (_: TryExtract<R, WithoutSchema<P>>) => B
+    f: (_: Replace<TryExtract<RA, P>, P>) => B
+  ): <I, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<I, AddWithout<R, P>, ApplyFilters<AddWithout<R, P>>, Unify<A | B>, Pr>
+} = (
+  pattern: any,
+  f: (input: unknown) => any
 ) =>
-  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
-    new Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<Unify<A | B>>, Pr>([
+  (self: any) =>
+    new Matcher([
       ...self.cases,
-      new When(P.is(makeSchema(pattern)), f as any)
-    ], self.provided)
+      new When(P.is(makeSchema(pattern)), f)
+    ], self.provided) as any
 
 /**
  * @since 1.0.0
  */
 export const tag: {
-  <R, P extends Tags<R> & (string | number | symbol | object | {}), B>(
+  <R, RA, P extends Tags<RA> & (string | number | symbol | object | {}), B>(
     pattern: P,
-    f: (_: Extract<R, { readonly _tag: P }>) => B
+    f: (_: Extract<RA, { readonly _tag: P }>) => B
   ): <I, A, Pr>(
-    self: Matcher<I, R, A, Pr>
-  ) => Matcher<I, Exclude<R, Extract<R, { _tag: P }>>, Unify<A | B>, Pr>
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<
+    I,
+    AddWithout<R, Extract<RA, { _tag: P }>>,
+    ApplyFilters<AddWithout<R, Extract<RA, { _tag: P }>>>,
+    Unify<A | B>,
+    Pr
+  >
 } = (pattern, f) =>
   // @ts-expect-error
   when({ _tag: pattern }, f)
@@ -185,23 +204,31 @@ export const tag: {
  * @since 1.0.0
  */
 export const not: {
-  <P, R, B>(
+  <P, R, RA, B>(
     schema: S.Schema<P>,
-    f: (b: Exclude<R, P>) => B
-  ): <I, A, Pr>(self: Matcher<I, R, A, Pr>) => Matcher<I, TryExtract<R, P>, Unify<A | B>, Pr>
-
-  <R, P extends DeepPartial<R>, B>(
-    pattern: Narrow<P>,
-    f: (_: Exclude<R, WithoutSchema<P>>) => B
+    f: (_: Exclude<RA, P>) => B
   ): <I, A, Pr>(
-    self: Matcher<I, R, A, Pr>
-  ) => Matcher<I, TryExtract<R, WithoutSchema<P>>, Unify<A | B>, Pr>
-} = <R, P extends DeepPartial<R>, B>(
-  pattern: Narrow<P>,
-  f: (_: Exclude<R, WithoutSchema<P>>) => B
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<I, AddOnly<R, P>, ApplyFilters<AddOnly<R, P>>, Unify<A | B>, Pr>
+
+  <R, RA, P extends DeepPartial<RA>, B>(
+    pattern: Narrow<P>,
+    f: (_: Exclude<RA, WithoutSchema<P>>) => B
+  ): <I, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<
+    I,
+    AddOnly<R, WithoutSchema<P>>,
+    ApplyFilters<AddOnly<R, WithoutSchema<P>>>,
+    Unify<A | B>,
+    Pr
+  >
+} = (
+  pattern: any,
+  f: (_: never) => any
 ) =>
-  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
-    new Matcher<I, TryExtract<R, WithoutSchema<P>>, Unify<A | B>, Pr>([
+  (self: any): any =>
+    new Matcher([
       ...self.cases,
       new Not(P.is(makeSchema(pattern)), f as any)
     ], self.provided)
@@ -209,10 +236,13 @@ export const not: {
 /**
  * @since 1.0.0
  */
-export const orElse = <R, B>(f: (b: R) => B) =>
-  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
+export const orElse = <RA, B>(f: (b: RA) => B) =>
+  <I, R, A, Pr>(self: Matcher<I, R, RA, A, Pr>) =>
     pipe(
-      new Matcher<I, never, Unify<A | B>, Pr>([...self.cases, new OrElse(f as any)], self.provided),
+      new Matcher<I, never, never, Unify<A | B>, Pr>(
+        [...self.cases, new OrElse(f as any)],
+        self.provided
+      ),
       exaustive
     )
 
@@ -220,11 +250,12 @@ export const orElse = <R, B>(f: (b: R) => B) =>
  * @since 1.0.0
  */
 export const either: {
-  <I, R, A, Pr>(
-    self: Matcher<I, R, A, Pr>
-  ): [Pr] extends [never] ? (input: I) => E.Either<R, A> : E.Either<R, A>
-} = (<I, R, A>(self: Matcher<I, R, A, I>) => {
-  const body = (input: I): E.Either<R, A> => {
+  <I, RA, A, Pr>(
+    self: Matcher<I, any, RA, A, Pr>
+  ): [Pr] extends [never] ? (input: I) => E.Either<RA, A>
+    : E.Either<RA, A>
+} = (<I, RA, A>(self: Matcher<I, any, RA, A, I>) => {
+  const body = (input: I): E.Either<RA, A> => {
     for (const _case of self.cases) {
       if (
         _case._tag === "When" &&
@@ -254,9 +285,9 @@ export const either: {
  */
 export const option: {
   <I, A, Pr>(
-    self: Matcher<I, any, A, Pr>
+    self: Matcher<I, any, any, A, Pr>
   ): [Pr] extends [never] ? (input: I) => O.Option<A> : O.Option<A>
-} = (<I, A>(self: Matcher<I, any, A, I>) => {
+} = (<I, A>(self: Matcher<I, any, any, A, I>) => {
   const toEither = either(self)
   if (E.isEither(toEither)) {
     return O.fromEither(toEither)
@@ -268,9 +299,9 @@ export const option: {
  * @since 1.0.0
  */
 export const exaustive: {
-  <I, A, Pr>(self: Matcher<I, never, A, Pr>): [Pr] extends [never] ? (u: I) => A : A
+  <I, R, A, Pr>(self: Matcher<I, R, never, A, Pr>): [Pr] extends [never] ? (u: I) => A : A
 } = (<I, A>(
-  self: Matcher<I, never, A, I>
+  self: Matcher<I, any, never, A, I>
 ) => {
   const toEither = either(self as any)
 
@@ -333,6 +364,29 @@ type TryExtract<A, E> = Extract<A, ExpandTuples<E>> extends never
 type Replace<A, B> = A extends Record<string | number, any>
   ? { [K in keyof A]: K extends keyof B ? Replace<A[K], B[K]> : A[K] }
   : B extends A ? B
+  : A
+
+interface Without<A, X> {
+  readonly _A: A
+  readonly _Without: X
+}
+
+interface Only<A, X> {
+  readonly _A: A
+  readonly _Only: X
+}
+
+type AddWithout<A, X> = A extends Without<infer P, infer WX> ? Without<P, X | WX>
+  : A extends Only<infer P, infer OX> ? Only<P, Exclude<OX, X>>
+  : Without<A, X>
+
+type AddOnly<A, X> = A extends Without<infer P, infer WX> ? X extends WX ? never
+: Only<P, X>
+  : A extends Only<infer P, infer OX> ? X extends OX ? Only<P, X> : never
+  : Only<A, X>
+
+type ApplyFilters<A> = A extends Only<any, infer X> ? (X extends never ? never : X)
+  : A extends Without<infer P, infer X> ? Exclude<P, X>
   : A
 
 type Tags<P> = P extends { _tag: infer X } ? X : never
