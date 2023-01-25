@@ -47,4 +47,26 @@ describe("Match", () => {
     )
     expect(result).toEqual(O.some(1))
   })
+
+  it("tuples", () => {
+    const match = pipe(
+      Match.type<[string, string]>(),
+      Match.when(["yeah"], (_) => true),
+      Match.option
+    )
+
+    expect(match(["yeah", "a"])).toEqual({ _tag: "Some", value: true })
+  })
+
+  it("literals", () => {
+    const match = pipe(
+      Match.type<string>(),
+      Match.when("yeah", (_) => _ === "yeah"),
+      Match.orElse(() => "nah"),
+      Match.exaustive
+    )
+
+    expect(match("yeah")).toEqual(true)
+    expect(match("a")).toEqual("nah")
+  })
 })
