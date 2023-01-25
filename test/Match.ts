@@ -69,4 +69,36 @@ describe("Match", () => {
     expect(match("yeah")).toEqual(true)
     expect(match("a")).toEqual("nah")
   })
+
+  it("piped", () => {
+    const result = pipe(
+      E.right(0),
+      Match.value,
+      Match.when({ _tag: "Right" }, (_) => _.right),
+      Match.option
+    )
+    expect(result).toEqual(O.some(0))
+  })
+
+  it("not schema", () => {
+    const match = pipe(
+      Match.type<string | number>(),
+      Match.not(S.number, (_) => "a"),
+      Match.when(S.number, (_) => "b"),
+      Match.exaustive
+    )
+    expect(match("hi")).toEqual("a")
+    expect(match(123)).toEqual("b")
+  })
+
+  it("not literal", () => {
+    const match = pipe(
+      Match.type<string | number>(),
+      Match.not("hi", (_) => "a"),
+      Match.orElse(() => "b"),
+      Match.exaustive
+    )
+    expect(match("hello")).toEqual("a")
+    expect(match("hi")).toEqual("b")
+  })
 })

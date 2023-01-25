@@ -184,17 +184,19 @@ export const tag: {
 /**
  * @since 1.0.0
  */
-export const notSchema = <P, R, B>(schema: S.Schema<P>, f: (b: Exclude<R, P>) => B) =>
-  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
-    new Matcher<I, TryExtract<R, P>, Unify<A | B>, Pr>([
-      ...self.cases,
-      new Not(P.is(schema), f as any)
-    ], self.provided)
+export const not: {
+  <P, R, B>(
+    schema: S.Schema<P>,
+    f: (b: Exclude<R, P>) => B
+  ): <I, A, Pr>(self: Matcher<I, R, A, Pr>) => Matcher<I, TryExtract<R, P>, Unify<A | B>, Pr>
 
-/**
- * @since 1.0.0
- */
-export const not = <R, P extends DeepPartial<R>, B>(
+  <R, P extends DeepPartial<R>, B>(
+    pattern: Narrow<P>,
+    f: (_: Exclude<R, WithoutSchema<P>>) => B
+  ): <I, A, Pr>(
+    self: Matcher<I, R, A, Pr>
+  ) => Matcher<I, TryExtract<R, WithoutSchema<P>>, Unify<A | B>, Pr>
+} = <R, P extends DeepPartial<R>, B>(
   pattern: Narrow<P>,
   f: (_: Exclude<R, WithoutSchema<P>>) => B
 ) =>
