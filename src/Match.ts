@@ -22,15 +22,15 @@ export class Matcher<Input, Remaining, Result, Provided> {
   /**
    * @since 1.0.0
    */
-  readonly _input: (_: Input) => Input = identity
+  readonly _input: (_: Input) => unknown = identity
   /**
    * @since 1.0.0
    */
-  readonly _remaining: (_: Remaining) => Remaining = identity
+  readonly _remaining: (_: never) => Remaining = identity
   /**
    * @since 1.0.0
    */
-  readonly _result: (_: Result) => Result = identity
+  readonly _result: (_: never) => Result = identity
   constructor(
     /**
      * @since 1.0.0

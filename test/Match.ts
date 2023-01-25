@@ -1,5 +1,6 @@
 import * as E from "@fp-ts/core/Either"
 import { pipe } from "@fp-ts/core/Function"
+import * as O from "@fp-ts/core/Option"
 import * as T from "@fp-ts/core/These"
 import * as Match from "@fp-ts/schema/Match"
 import * as S from "@fp-ts/schema/Schema"
@@ -42,9 +43,8 @@ describe("Match", () => {
       E.right(0),
       Match.value,
       Match.when({ _tag: "Right" }, (_) => _.right),
-      Match.when({ _tag: "Left" }, (_) => _.left),
-      Match.exaustive
+      Match.option
     )
-    expect(result).toEqual(0)
+    expect(result).toEqual(O.some(1))
   })
 })
