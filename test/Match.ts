@@ -26,4 +26,14 @@ describe("Match", () => {
     expect(match({ _tag: "A", a: 0 })).toEqual(E.right(0))
     expect(match({ _tag: "B", b: 1 })).toEqual(T.right(1))
   })
+
+  it("inline", () => {
+    const result = pipe(
+      Match.match(E.right(0)),
+      Match.when({ _tag: "Right" }, (_) => _.right),
+      Match.when({ _tag: "Left" }, (_) => _.left),
+      Match.exaustive
+    )
+    expect(result).toEqual(0)
+  })
 })

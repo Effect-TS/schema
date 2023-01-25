@@ -14,7 +14,7 @@ import * as S from "@fp-ts/schema/Schema"
 /**
  * @since 1.0.0
  */
-export class Matcher<Input, Remaining, Result> {
+export class Matcher<Input, Remaining, Result, Provided> {
   /**
    * @since 1.0.0
    */
@@ -35,7 +35,11 @@ export class Matcher<Input, Remaining, Result> {
     /**
      * @since 1.0.0
      */
-    readonly cases: ReadonlyArray<Case>
+    readonly cases: ReadonlyArray<Case>,
+    /**
+     * @since 1.0.0
+     */
+    readonly provided?: { provided: Provided }
   ) {}
 }
 
@@ -124,7 +128,12 @@ const makeSchema = <I>(
 /**
  * @since 1.0.0
  */
-export const match = <I>() => new Matcher<I, I, never>([])
+export const match: {
+  <I>(i: I): Matcher<I, I, never, I>
+  <I>(): Matcher<I, I, never, never>
+} = <I>(...args: Array<any>) =>
+  // @ts-expect-error
+  new Matcher<I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
 
 /**
  * @since 1.0.0
@@ -133,31 +142,32 @@ export const when: {
   <R, P extends DeepPartial<R>, B>(
     pattern: Narrow<P>,
     f: (_: TryExtract<R, WithoutSchema<P>>) => B
-  ): <I, A>(self: Matcher<I, R, A>) => Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<A | B>>
-
+  ): <I, A, Pr>(
+    self: Matcher<I, R, A, Pr>
+  ) => Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<A | B>, Pr>
   <P, R, B>(
     schema: S.Schema<P>,
     f: (_: TryExtract<R, P>) => B
-  ): <I, A>(self: Matcher<I, R, A>) => Matcher<I, Exclude<R, P>, Unify<A | B>>
+  ): <I, A, Pr>(self: Matcher<I, R, A, Pr>) => Matcher<I, Exclude<R, P>, Unify<A | B>, Pr>
 } = <R, P extends DeepPartial<R>, B>(
   pattern: Narrow<P>,
   f: (_: TryExtract<R, WithoutSchema<P>>) => B
 ) =>
-  <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<Unify<A | B>>>([
+  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
+    new Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<Unify<A | B>>, Pr>([
       ...self.cases,
       new When(P.is(makeSchema(pattern)), f as any)
-    ])
+    ], self.provided)
 
 /**
  * @since 1.0.0
  */
 export const notSchema = <P, R, B>(schema: S.Schema<P>, f: (b: Exclude<R, P>) => B) =>
-  <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, TryExtract<R, P>, Unify<A | B>>([
+  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
+    new Matcher<I, TryExtract<R, P>, Unify<A | B>, Pr>([
       ...self.cases,
       new Not(P.is(schema), f as any)
-    ])
+    ], self.provided)
 
 /**
  * @since 1.0.0
@@ -166,24 +176,28 @@ export const not = <R, P extends DeepPartial<R>, B>(
   pattern: Narrow<P>,
   f: (_: Exclude<R, WithoutSchema<P>>) => B
 ) =>
-  <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, TryExtract<R, WithoutSchema<P>>, Unify<A | B>>([
+  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
+    new Matcher<I, TryExtract<R, WithoutSchema<P>>, Unify<A | B>, Pr>([
       ...self.cases,
       new Not(P.is(makeSchema(pattern)), f as any)
-    ])
+    ], self.provided)
 
 /**
  * @since 1.0.0
  */
 export const orElse = <R, B>(f: (b: R) => B) =>
-  <I, A>(self: Matcher<I, R, A>) =>
-    new Matcher<I, never, Unify<A | B>>([...self.cases, new OrElse(f as any)])
+  <I, A, Pr>(self: Matcher<I, R, A, Pr>) =>
+    new Matcher<I, never, Unify<A | B>, Pr>([...self.cases, new OrElse(f as any)], self.provided)
 
 /**
  * @since 1.0.0
  */
-export const either = <I, R, A>(self: Matcher<I, R, A>) =>
-  (input: I): E.Either<R, A> => {
+export const either: {
+  <I, R, A, Pr>(
+    self: Matcher<I, R, A, Pr>
+  ): [Pr] extends [never] ? (input: I) => E.Either<R, A> : E.Either<R, A>
+} = (<I, R, A>(self: Matcher<I, R, A, I>) => {
+  const body = (input: I): E.Either<R, A> => {
     for (const _case of self.cases) {
       if (
         _case._tag === "When" &&
@@ -202,31 +216,56 @@ export const either = <I, R, A>(self: Matcher<I, R, A>) =>
 
     return E.left(input as any)
   }
+  if (self.provided) {
+    return body(self.provided.provided)
+  }
+  return body
+}) as any
 
 /**
  * @since 1.0.0
  */
-export const option = <I, A>(self: Matcher<I, any, A>) => {
+export const option: {
+  <I, A, Pr>(
+    self: Matcher<I, any, A, Pr>
+  ): [Pr] extends [never] ? (input: I) => O.Option<A> : O.Option<A>
+} = (<I, A>(self: Matcher<I, any, A, I>) => {
   const toEither = either(self)
-  return (input: I): O.Option<A> => O.fromEither(toEither(input))
-}
+  if (E.isEither(toEither)) {
+    return O.fromEither(toEither)
+  }
+  return (input: I): O.Option<A> => O.fromEither((toEither as any)(input))
+}) as any
 
 /**
  * @since 1.0.0
  */
-export const exaustive = <I, A>(self: Matcher<I, never, A>) => {
-  const toEither = either(self)
+export const exaustive: {
+  <I, A, Pr>(self: Matcher<I, never, A, Pr>): [Pr] extends [never] ? (u: I) => A : A
+} = (<I, A>(
+  self: Matcher<I, never, A, I>
+) => {
+  const toEither = either(self as any)
 
-  return (u: I): A => {
-    const result = toEither(u)
-
-    if (result._tag === "Right") {
-      return result.right
+  if (E.isEither(toEither)) {
+    if (toEither._tag === "Right") {
+      return toEither.right
     }
 
     throw "absurd"
   }
-}
+
+  return (u: I): A => {
+    // @ts-expect-error
+    const result = toEither(u)
+
+    if (result._tag === "Right") {
+      return result.right as any
+    }
+
+    throw "absurd"
+  }
+}) as any
 
 // type helpers
 type Narrow<A> = NarrowRaw<A> | S.Schema<any>
