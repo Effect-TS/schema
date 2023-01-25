@@ -128,9 +128,17 @@ const makeSchema = <I>(
 /**
  * @since 1.0.0
  */
-export const match: {
-  <I>(i: I): Matcher<I, I, never, I>
+export const type: {
   <I>(): Matcher<I, I, never, never>
+} = <I>(...args: Array<any>) =>
+  // @ts-expect-error
+  new Matcher<I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
+
+/**
+ * @since 1.0.0
+ */
+export const value: {
+  <I>(i: I): Matcher<I, I, never, I>
 } = <I>(...args: Array<any>) =>
   // @ts-expect-error
   new Matcher<I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)

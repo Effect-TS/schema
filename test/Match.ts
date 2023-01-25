@@ -7,7 +7,7 @@ import * as S from "@fp-ts/schema/Schema"
 describe("Match", () => {
   it("exhaustive", () => {
     const match = pipe(
-      Match.match<{ a: number } | { b: number }>(),
+      Match.type<{ a: number } | { b: number }>(),
       Match.when({ a: S.number }, (_) => _.a),
       Match.when({ b: S.number }, (_) => _.b),
       Match.exaustive
@@ -18,7 +18,7 @@ describe("Match", () => {
 
   it("exhaustive-literal", () => {
     const match = pipe(
-      Match.match<{ _tag: "A"; a: number } | { _tag: "B"; b: number }>(),
+      Match.type<{ _tag: "A"; a: number } | { _tag: "B"; b: number }>(),
       Match.when({ _tag: "A" }, (_) => E.right(_.a)),
       Match.when({ _tag: "B" }, (_) => T.right(_.b)),
       Match.exaustive
@@ -29,7 +29,18 @@ describe("Match", () => {
 
   it("inline", () => {
     const result = pipe(
-      Match.match(E.right(0)),
+      Match.value(E.right(0)),
+      Match.when({ _tag: "Right" }, (_) => _.right),
+      Match.when({ _tag: "Left" }, (_) => _.left),
+      Match.exaustive
+    )
+    expect(result).toEqual(0)
+  })
+
+  it("piped", () => {
+    const result = pipe(
+      E.right(0),
+      Match.value,
       Match.when({ _tag: "Right" }, (_) => _.right),
       Match.when({ _tag: "Left" }, (_) => _.left),
       Match.exaustive
