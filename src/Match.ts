@@ -385,7 +385,7 @@ type AddOnly<A, X> = A extends Without<infer P, infer WX> ? X extends WX ? never
   : A extends Only<infer P, infer OX> ? X extends OX ? Only<P, X> : never
   : Only<A, X>
 
-type ApplyFilters<A> = A extends Only<any, infer X> ? (X extends never ? never : X)
+type ApplyFilters<A> = A extends Only<any, infer X> ? X
   : A extends Without<infer P, infer X> ? Exclude<P, X>
   : A
 
