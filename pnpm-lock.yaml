@@ -21,7 +21,7 @@ importers:
       '@effect-ts/core': ^0.60.2
       '@effect/language-service': ^0.0.10
       '@fp-ts/core': 0.1.1
-      '@fp-ts/data': ^0.0.40
+      '@fp-ts/data': ^0.1.0
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
       '@types/benchmark': ^2.1.2
       '@types/chai': ^4.3.4
@@ -61,7 +61,7 @@ importers:
       vitest: 0.25.5
     dependencies:
       '@fp-ts/core': 0.1.1
-      '@fp-ts/data': 0.0.40
+      '@fp-ts/data': 0.1.0
       fast-check: 3.6.2
     devDependencies:
       '@babel/cli': 7.19.3_@babel+core@7.20.5
@@ -741,10 +741,6 @@ packages:
       - supports-color
     dev: true
 
-  /@fp-ts/core/0.0.11:
-    resolution: {integrity: sha512-BCAJBYzghwoJpcUOARJ1tui50HoYJFlV2pJlVMlsEkDFhD8MTtq8xQVpZCRF66RmtkxtGBYINCQ+5H1lRaL35Q==}
-    dev: false
-
   /@fp-ts/core/0.0.9:
     resolution: {integrity: sha512-FuXKPHTEvvgxV3LulGJXkSpAghovh7wLxux+Pm9LKefC0gtZZQ4OajTjTK5RsQtpyKIsAn26PwdG6W6zksF/UA==}
     dev: true
@@ -759,10 +755,10 @@ packages:
       '@fp-ts/core': 0.0.9
     dev: true
 
-  /@fp-ts/data/0.0.40:
-    resolution: {integrity: sha512-Wo/2KNO3n6TdUuX+vFEkK1hkQ3EDWp/5Uha8ZLtIvurndQxlDcF4kpU20c0CKJL8g5DpnRHiKN/cni5yyb09eQ==}
+  /@fp-ts/data/0.1.0:
+    resolution: {integrity: sha512-T4PbFVo2fzy2XaUHbFmEc24TJSPzTl/xUHC+1qCXZZfb3MaIKdKHS10aUt+9zcQ75KpiZbHL8hBfoP9fHOI6Mg==}
     dependencies:
-      '@fp-ts/core': 0.0.11
+      '@fp-ts/core': 0.1.1
     dev: false
 
   /@humanwhocodes/config-array/0.11.7:

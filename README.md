@@ -55,15 +55,13 @@ If you also want to **become a sponsor** to ensure this library continues to imp
 
 ## Getting started
 
-To get started with `@fp-ts/schema`, you will need to install the library using npm or yarn:
+To install the **alpha** version:
 
 ```
 npm install @fp-ts/schema
 ```
 
-```
-yarn add @fp-ts/schema
-```
+**Warning**. This package is primarily published to receive early feedback and for contributors, during this development phase we cannot guarantee the stability of the APIs, consider each release to contain breaking changes.
 
 Once you have installed the library, you can import the necessary types and functions from the `@fp-ts/schema` module.
 
