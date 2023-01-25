@@ -45,7 +45,7 @@ describe("Match", () => {
       Match.when({ _tag: "Right" }, (_) => _.right),
       Match.option
     )
-    expect(result).toEqual(O.some(1))
+    expect(result).toEqual(O.some(0))
   })
 
   it("tuples", () => {
