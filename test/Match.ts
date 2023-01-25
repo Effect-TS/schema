@@ -62,8 +62,7 @@ describe("Match", () => {
     const match = pipe(
       Match.type<string>(),
       Match.when("yeah", (_) => _ === "yeah"),
-      Match.orElse(() => "nah"),
-      Match.exaustive
+      Match.orElse(() => "nah")
     )
 
     expect(match("yeah")).toEqual(true)
@@ -95,8 +94,7 @@ describe("Match", () => {
     const match = pipe(
       Match.type<string | number>(),
       Match.not("hi", (_) => "a"),
-      Match.orElse(() => "b"),
-      Match.exaustive
+      Match.orElse(() => "b")
     )
     expect(match("hello")).toEqual("a")
     expect(match("hi")).toEqual("b")
@@ -116,8 +114,7 @@ describe("Match", () => {
     const match = pipe(
       Match.type<string>(),
       Match.when("yeah", (_) => _ === "yeah"),
-      Match.orElse(() => "nah"),
-      Match.exaustive
+      Match.orElse(() => "nah")
     )
 
     expect(match("yeah")).toEqual(true)
