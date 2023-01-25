@@ -28,11 +28,23 @@ describe("Match", () => {
     expect(match({ _tag: "B", b: 1 })).toEqual(T.right(1))
   })
 
+  it("exhaustive literal with not", () => {
+    const match = pipe(
+      Match.type<number>(),
+      Match.when(1, () => true),
+      Match.not(1, () => false),
+      Match.exaustive
+    )
+    expect(match(1)).toEqual(true)
+    expect(match(2)).toEqual(false)
+  })
+
   it("inline", () => {
     const result = pipe(
       Match.value(E.right(0)),
       Match.tag("Right", (_) => _.right),
       Match.tag("Left", (_) => _.left),
+      (a) => a,
       Match.exaustive
     )
     expect(result).toEqual(0)
