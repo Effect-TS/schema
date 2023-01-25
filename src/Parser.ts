@@ -86,7 +86,7 @@ export const asserts = <A>(schema: Schema<A>) =>
  */
 export const encode = <A>(
   schema: Schema<A>
-): (a: A, options?: ParseOptions) => ParseResult<unknown> => parserFor(schema, "encoder").parse
+): (a: A, options?: ParseOptions) => ParseResult<A> => parserFor(schema, "encoder").parse
 
 /**
  * @category encoding
