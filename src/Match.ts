@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * @since 1.0.0
  */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as E from "@fp-ts/core/Either"
 import { identity, pipe } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
@@ -103,7 +103,8 @@ export class OrElse {
   constructor(
     /**
      * @since 1.0.0
-     */ readonly evaluate: (input: unknown) => any
+     */
+    readonly evaluate: (input: unknown) => any
   ) {}
 }
 
@@ -389,12 +390,25 @@ type ApplyFilters<A> = A extends Only<any, infer X> ? X
 
 type Tags<P> = P extends { _tag: infer X } ? X : never
 
+/**
+ * @since 1.0.0
+ */
 export declare const unifyF: unique symbol
+/**
+ * @since 1.0.0
+ */
 export type unifyF = typeof unifyF
-
+/**
+ * @since 1.0.0
+ */
 export declare const unify: unique symbol
+/**
+ * @since 1.0.0
+ */
 export type unify = typeof unify
-
+/**
+ * @since 1.0.0
+ */
 export type Unify<A> = [A] extends [{ [unify]?: any; [unifyF]?: () => any }]
   ? ReturnType<NonNullable<(A & { [unify]: A })[unifyF]>>
   : A
