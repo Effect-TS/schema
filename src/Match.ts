@@ -149,13 +149,13 @@ export const value: {
 export const when: {
   <R, P extends DeepPartial<R>, B>(
     pattern: Narrow<P>,
-    f: (_: TryExtract<R, WithoutSchema<P>>) => B
+    f: (_: Replace<TryExtract<R, WithoutSchema<P>>, P>) => B
   ): <I, A, Pr>(
     self: Matcher<I, R, A, Pr>
   ) => Matcher<I, Exclude<R, WithoutSchema<P>>, Unify<A | B>, Pr>
   <P, R, B>(
     schema: S.Schema<P>,
-    f: (_: TryExtract<R, P>) => B
+    f: (_: Replace<TryExtract<R, P>, P>) => B
   ): <I, A, Pr>(self: Matcher<I, R, A, Pr>) => Matcher<I, Exclude<R, P>, Unify<A | B>, Pr>
 } = <R, P extends DeepPartial<R>, B>(
   pattern: Narrow<P>,
@@ -304,6 +304,10 @@ type WithoutSchema<A> = A extends S.Schema<infer S> ? S
     ? { [K in keyof A]: A[K] extends S.Schema<infer S> ? S : WithoutSchema<A[K]> }
   : S.Schema<A> | A
 
+type ExpandTuples<A> = A extends Array<(infer I)> ? (Array<I> | A)
+  : A extends Record<string, any> ? { [K in keyof A]: ExpandTuples<A[K]> }
+  : A
+
 type DeepPartial<A> = A extends Record<string, any>
   ? Partial<{ [K in keyof A]: DeepPartial<A[K]> | S.Schema<A[K]> }>
   : A | S.Schema<any>
@@ -317,8 +321,14 @@ type WithoutLiterals<A> = A extends string ? string
 
 type ExtractWithoutLiterals<A, E> = A extends WithoutLiterals<E> ? A : never
 
-type TryExtract<A, E> = Extract<A, E> extends never ? ExtractWithoutLiterals<A, E>
-  : Extract<A, E>
+type TryExtract<A, E> = Extract<A, ExpandTuples<E>> extends never
+  ? ExtractWithoutLiterals<A, ExpandTuples<E>>
+  : Extract<A, ExpandTuples<E>>
+
+type Replace<A, B> = A extends Record<string | number, any>
+  ? { [K in keyof A]: K extends keyof B ? Replace<A[K], B[K]> : A[K] }
+  : B extends A ? B
+  : A
 
 export declare const unifyF: unique symbol
 export type unifyF = typeof unifyF
