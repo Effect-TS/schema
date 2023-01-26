@@ -620,10 +620,10 @@ S.record(S.templateLiteral(S.literal("a"), S.string), S.string);
 The `extend` combinator allows you to add additional fields or index signatures to an existing `Schema`.
 
 ```ts
-// $ExpectType Schema<{ [x: string]: string; readonly a: string; readonly b: string; readonly c: boolean; }>
+// $ExpectType Schema<{ [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
 pipe(
   S.struct({ a: S.string, b: S.string }),
-  S.extend(S.struct({ c: S.boolean })), // <= you can add more fields
+  S.extend(S.struct({ c: S.string })), // <= you can add more fields
   S.extend(S.record(S.string, S.string)) // <= you can add index signatures
 );
 ```
