@@ -183,11 +183,7 @@ const makeSchema = <I>(
 /**
  * @since 1.0.0
  */
-export const type: {
-  <I>(): Matcher<I, I, I, never, never>
-} = <I>(...args: Array<any>) =>
-  // @ts-expect-error
-  new TypeMatcher<I, I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
+export const type = <I>(): Matcher<I, I, I, never, never> => new TypeMatcher([])
 
 /**
  * @since 1.0.0
@@ -198,10 +194,10 @@ export const value = <I>(i: I): Matcher<I, I, I, never, I> => new ValueMatcher(i
  * @since 1.0.0
  */
 export const when: {
-  <R, RA, P extends DeepPartial<RA>, B>(
+  <RA, P extends DeepPartial<RA>, B>(
     pattern: Narrow<P>,
     f: (_: Replace<TryExtract<RA, WithoutSchema<P>>, P>) => B
-  ): <I, A, Pr>(
+  ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
@@ -210,10 +206,11 @@ export const when: {
     Unify<A | B>,
     Pr
   >
-  <P, R, RA, B>(
+
+  <P, RA, B>(
     schema: S.Schema<P>,
     f: (_: Replace<TryExtract<RA, P>, P>) => B
-  ): <I, A, Pr>(
+  ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<I, AddWithout<R, P>, ApplyFilters<AddWithout<R, P>>, Unify<A | B>, Pr>
 } = (
@@ -225,10 +222,10 @@ export const when: {
  * @since 1.0.0
  */
 export const tag: {
-  <R, RA, P extends Tags<RA> & (string | number | symbol | object | {}), B>(
+  <RA, P extends Tags<RA> & (string | number | symbol | object | {}), B>(
     pattern: P,
     f: (_: Extract<RA, { readonly _tag: P }>) => B
-  ): <I, A, Pr>(
+  ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
@@ -250,16 +247,17 @@ export const tag: {
  * @since 1.0.0
  */
 export const not: {
-  <P, R, RA, B>(
+  <P, RA, B>(
     schema: S.Schema<P>,
     f: (_: Exclude<RA, P>) => B
-  ): <I, A, Pr>(
+  ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<I, AddOnly<R, P>, ApplyFilters<AddOnly<R, P>>, Unify<A | B>, Pr>
-  <R, RA, P extends DeepPartial<RA>, B>(
+
+  <RA, P extends DeepPartial<RA>, B>(
     pattern: Narrow<P>,
     f: (_: Exclude<RA, WithoutSchema<P>>) => B
-  ): <I, A, Pr>(
+  ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
