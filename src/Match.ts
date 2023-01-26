@@ -3,7 +3,7 @@
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import * as E from "@fp-ts/core/Either"
-import { identity, pipe } from "@fp-ts/core/Function"
+import { identity } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
 import * as RA from "@fp-ts/core/ReadonlyArray"
 import type * as T from "@fp-ts/core/These"
@@ -50,7 +50,7 @@ export class Matcher<Input, Remaining, RemainingApplied, Result, Provided> {
 /**
  * @since 1.0.0
  */
-export type Case = When | Not | OrElse
+export type Case = When | Not
 
 /**
  * @since 1.0.0
@@ -85,22 +85,6 @@ export class Not {
      * @since 1.0.0
      */
     readonly guard: (u: unknown, opts: AST.ParseOptions) => boolean,
-    /**
-     * @since 1.0.0
-     */
-    readonly evaluate: (input: unknown) => any
-  ) {}
-}
-
-/**
- * @since 1.0.0
- */
-export class OrElse {
-  /**
-   * @since 1.0.0
-   */
-  readonly _tag = "OrElse"
-  constructor(
     /**
      * @since 1.0.0
      */
@@ -236,14 +220,22 @@ export const not: {
  * @since 1.0.0
  */
 export const orElse = <RA, B>(f: (b: RA) => B) =>
-  <I, R, A, Pr>(self: Matcher<I, R, RA, A, Pr>) =>
-    pipe(
-      new Matcher<I, never, never, Unify<A | B>, Pr>(
-        [...self.cases, new OrElse(f as any)],
-        self.provided
-      ),
-      exaustive
-    )
+  <I, R, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
+  ): [Pr] extends [never] ? (input: I) => (A | B) : (A | B) => {
+    const result = either(self)
+
+    if (E.isEither(result)) {
+      // @ts-expect-error
+      return result._tag === "Right" ? result.right : f(result.left)
+    }
+
+    // @ts-expect-error
+    return (input: I) => {
+      const a = result(input)
+      return a._tag === "Right" ? a.right : f(a.left)
+    }
+  }
 
 /**
  * @since 1.0.0
@@ -263,8 +255,6 @@ export const either: <I, R, RA, A, Pr>(
           _case._tag === "Not" &&
           !_case.guard(input, { isUnexpectedAllowed: true })
         ) {
-          return E.right(_case.evaluate(input))
-        } else if (_case._tag === "OrElse") {
           return E.right(_case.evaluate(input))
         }
       }
