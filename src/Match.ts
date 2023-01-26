@@ -14,11 +14,55 @@ import * as S from "@fp-ts/schema/Schema"
 /**
  * @since 1.0.0
  */
-export class Matcher<Input, Remaining, RemainingApplied, Result, Provided> {
+export type Matcher<Input, Remaining, RemainingApplied, Result, Provided> =
+  | TypeMatcher<Input, Remaining, RemainingApplied, Result, Provided>
+  | ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided>
+
+class TypeMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
   /**
    * @since 1.0.0
    */
-  readonly _tag = "Matcher"
+  readonly _tag = "TypeMatcher"
+  /**
+   * @since 1.0.0
+   */
+  readonly _input: (_: Input) => unknown = identity
+  /**
+   * @since 1.0.0
+   */
+  readonly _remaining: (_: never) => Remaining = identity
+  /**
+   * @since 1.0.0
+   */
+  readonly _remainingApplied: (_: never) => RemainingApplied = identity
+  /**
+   * @since 1.0.0
+   */
+  readonly _result: (_: never) => Result = identity
+  /**
+   * @since 1.0.0
+   */
+  readonly _provided: (_: Provided) => unknown = identity
+  constructor(
+    /**
+     * @since 1.0.0
+     */
+    readonly cases: ReadonlyArray<Case>
+  ) {}
+
+  add<I, R, RA, A, Pr>(_case: Case): TypeMatcher<I, R, RA, A, Pr> {
+    return new TypeMatcher([...this.cases, _case])
+  }
+}
+
+/**
+ * @since 1.0.0
+ */
+class ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
+  /**
+   * @since 1.0.0
+   */
+  readonly _tag = "ValueMatcher"
   /**
    * @since 1.0.0
    */
@@ -39,12 +83,29 @@ export class Matcher<Input, Remaining, RemainingApplied, Result, Provided> {
     /**
      * @since 1.0.0
      */
-    readonly cases: ReadonlyArray<Case>,
+    readonly provided: Provided,
     /**
      * @since 1.0.0
      */
-    readonly provided?: { provided: Provided }
+    readonly value: E.Either<RemainingApplied, Provided>
   ) {}
+
+  add<I, R, RA, A, Pr>(_case: Case): ValueMatcher<I, R, RA, A, Pr> {
+    if (_case._tag === "When" && _case.guard(this.provided, { isUnexpectedAllowed: true })) {
+      return new ValueMatcher(
+        this.provided,
+        E.right(_case.evaluate(this.provided))
+      )
+    } else if (_case._tag === "Not" && !_case.guard(this.provided, { isUnexpectedAllowed: true })) {
+      return new ValueMatcher(
+        this.provided,
+        E.right(_case.evaluate(this.provided))
+      )
+    }
+
+    // @ts-expect-error
+    return this
+  }
 }
 
 /**
@@ -121,16 +182,12 @@ export const type: {
   <I>(): Matcher<I, I, I, never, never>
 } = <I>(...args: Array<any>) =>
   // @ts-expect-error
-  new Matcher<I, I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
+  new TypeMatcher<I, I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
 
 /**
  * @since 1.0.0
  */
-export const value: {
-  <I>(i: I): Matcher<I, I, I, never, I>
-} = <I>(...args: Array<any>) =>
-  // @ts-expect-error
-  new Matcher<I, I, I, never, never>([], args.length === 1 ? { provided: args[0] } : void 0)
+export const value = <I>(i: I): Matcher<I, I, I, never, I> => new ValueMatcher(i, E.left(i))
 
 /**
  * @since 1.0.0
@@ -157,12 +214,7 @@ export const when: {
 } = (
   pattern: any,
   f: (input: unknown) => any
-) =>
-  (self: any) =>
-    new Matcher([
-      ...self.cases,
-      new When(P.is(makeSchema(pattern)), f)
-    ], self.provided) as any
+) => (self: any) => self.add(new When(P.is(makeSchema(pattern)), f))
 
 /**
  * @since 1.0.0
@@ -181,8 +233,13 @@ export const tag: {
     Pr
   >
 } = (pattern, f) =>
-  // @ts-expect-error
-  when({ _tag: pattern }, f)
+  (self: any) =>
+    self.add(
+      new When(
+        (_) => typeof _ === "object" && _ != null && "_tag" in _ && _._tag === pattern,
+        f as any
+      )
+    )
 
 /**
  * @since 1.0.0
@@ -209,12 +266,7 @@ export const not: {
 } = (
   pattern: any,
   f: (_: never) => any
-) =>
-  (self: any): any =>
-    new Matcher([
-      ...self.cases,
-      new Not(P.is(makeSchema(pattern)), f as any)
-    ], self.provided)
+) => (self: any): any => self.add(new Not(P.is(makeSchema(pattern)), f as any))
 
 /**
  * @since 1.0.0
@@ -244,7 +296,11 @@ export const either: <I, R, RA, A, Pr>(
   self: Matcher<I, R, RA, A, Pr>
 ) => [Pr] extends [never] ? (input: I) => E.Either<RA, A>
   : E.Either<RA, A> = (<I, R, RA, A>(self: Matcher<I, R, RA, A, I>) => {
-    const body = (input: I): E.Either<RA, A> => {
+    if (self._tag === "ValueMatcher") {
+      return self.value
+    }
+
+    return (input: I): E.Either<RA, A> => {
       for (const _case of self.cases) {
         if (
           _case._tag === "When" &&
@@ -261,10 +317,6 @@ export const either: <I, R, RA, A, Pr>(
 
       return E.left(input as any)
     }
-    if (self.provided) {
-      return body(self.provided.provided)
-    }
-    return body
   }) as any
 
 /**
