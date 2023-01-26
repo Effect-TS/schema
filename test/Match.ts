@@ -131,4 +131,15 @@ describe("Match", () => {
     expect(match("yeah")).toEqual(true)
     expect(match("a")).toEqual("nah")
   })
+
+  it("literals duplicate", () => {
+    const result = pipe(
+      Match.value("yeah"),
+      Match.when("yeah", (_) => _ === "yeah"),
+      Match.when("yeah", (_) => "dupe"),
+      Match.orElse(() => "nah")
+    )
+
+    expect(result).toEqual(true)
+  })
 })
