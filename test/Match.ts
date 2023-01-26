@@ -142,4 +142,26 @@ describe("Match", () => {
 
     expect(result).toEqual(true)
   })
+
+  it("nested", () => {
+    const match = pipe(
+      Match.type<
+        | { foo: { bar: { baz: { qux: string } } } }
+        | { foo: { bar: { baz: { qux: number } } } }
+        | { foo: { bar: null } }
+      >(),
+      Match.when({ foo: { bar: { baz: { qux: 2 } } } }, (_) => `literal ${_.foo.bar.baz.qux}`),
+      Match.when({ foo: { bar: { baz: { qux: "b" } } } }, (_) => `literal ${_.foo.bar.baz.qux}`),
+      Match.when({ foo: { bar: { baz: { qux: S.number } } } }, (_) => _.foo.bar.baz.qux),
+      Match.when({ foo: { bar: { baz: { qux: S.string } } } }, (_) => _.foo.bar.baz.qux),
+      Match.when({ foo: { bar: null } }, (_) => _.foo.bar),
+      Match.exaustive
+    )
+
+    expect(match({ foo: { bar: { baz: { qux: 1 } } } })).toEqual(1)
+    expect(match({ foo: { bar: { baz: { qux: 2 } } } })).toEqual("literal 2")
+    expect(match({ foo: { bar: { baz: { qux: "a" } } } })).toEqual("a")
+    expect(match({ foo: { bar: { baz: { qux: "b" } } } })).toEqual("literal b")
+    expect(match({ foo: { bar: null } })).toEqual(null)
+  })
 })
