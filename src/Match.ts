@@ -379,7 +379,7 @@ type Narrowable = string | number | bigint | boolean
 type WithoutSchema<A> = A extends S.Schema<infer S> ? S
   : A extends Record<string, any>
     ? { [K in keyof A]: A[K] extends S.Schema<infer S> ? S : WithoutSchema<A[K]> }
-  : S.Schema<A> | A
+  : A
 
 type ExpandTuples<A> = A extends Array<(infer I)> ? (Array<I> | A)
   : A extends Record<string, any> ? { [K in keyof A]: ExpandTuples<A[K]> }
