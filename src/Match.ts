@@ -15,10 +15,13 @@ import * as S from "@fp-ts/schema/Schema"
  * @since 1.0.0
  */
 export type Matcher<Input, Remaining, RemainingApplied, Result, Provided> =
-  | TypeMatcher<Input, Remaining, RemainingApplied, Result, Provided>
+  | TypeMatcher<Input, Remaining, RemainingApplied, Result>
   | ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided>
 
-class TypeMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
+/**
+ * @since 1.0.0
+ */
+export class TypeMatcher<Input, Remaining, RemainingApplied, Result> {
   /**
    * @since 1.0.0
    */
@@ -39,10 +42,7 @@ class TypeMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
    * @since 1.0.0
    */
   readonly _result: (_: never) => Result = identity
-  /**
-   * @since 1.0.0
-   */
-  readonly _provided: (_: Provided) => unknown = identity
+
   constructor(
     /**
      * @since 1.0.0
@@ -50,7 +50,10 @@ class TypeMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
     readonly cases: ReadonlyArray<Case>
   ) {}
 
-  add<I, R, RA, A, Pr>(_case: Case): TypeMatcher<I, R, RA, A, Pr> {
+  /**
+   * @since 1.0.0
+   */
+  add<I, R, RA, A>(_case: Case): TypeMatcher<I, R, RA, A> {
     return new TypeMatcher([...this.cases, _case])
   }
 }
@@ -58,7 +61,7 @@ class TypeMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
 /**
  * @since 1.0.0
  */
-class ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
+export class ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
   /**
    * @since 1.0.0
    */
@@ -74,11 +77,8 @@ class ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided> {
   /**
    * @since 1.0.0
    */
-  readonly _remainingApplied: (_: never) => RemainingApplied = identity
-  /**
-   * @since 1.0.0
-   */
   readonly _result: (_: never) => Result = identity
+
   constructor(
     /**
      * @since 1.0.0
