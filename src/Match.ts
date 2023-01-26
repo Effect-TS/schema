@@ -91,6 +91,11 @@ export class ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided> 
   ) {}
 
   add<I, R, RA, A, Pr>(_case: Case): ValueMatcher<I, R, RA, A, Pr> {
+    if (this.value._tag === "Right") {
+      // @ts-expect-error
+      return this
+    }
+
     if (_case._tag === "When" && _case.guard(this.provided, { isUnexpectedAllowed: true })) {
       return new ValueMatcher(
         this.provided,
