@@ -51,7 +51,6 @@ Added in v1.0.0
   - [uniqueSymbol](#uniquesymbol)
 - [data](#data)
   - [date](#date)
-  - [json](#json)
 - [filters](#filters)
   - [endsWith](#endswith)
   - [finite](#finite)
@@ -520,16 +519,6 @@ Transforms a `string` into a `string` with no leading or trailing whitespace.
 
 ```ts
 export declare const date: Schema<Date>
-```
-
-Added in v1.0.0
-
-## json
-
-**Signature**
-
-```ts
-export declare const json: Schema<DataJson.Json>
 ```
 
 Added in v1.0.0
