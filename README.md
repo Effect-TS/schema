@@ -561,6 +561,23 @@ S.struct({ a: S.string, b: S.number });
 S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean) });
 ```
 
+**Note**. The `optional` constructor only exists to be used in combination with the `struct` API to signal an optional field and does not have a broader meaning. This means that it is only allowed to use it as an outer wrapper of a `Schema` and **it cannot be followed by other combinators**, for example this type of operation is prohibited:
+
+```ts
+S.struct({
+  // the use of S.optional should be the last step in the pipeline and not preceeded by other combinators like S.nullable
+  c: pipe(S.boolean, S.optional, S.nullable), // type checker error
+});
+```
+
+and it must be rewritten like this:
+
+```ts
+S.struct({
+  c: pipe(S.boolean, S.nullable, S.optional), // ok
+});
+```
+
 ## Pick
 
 ```ts
