@@ -301,7 +301,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optional: <A>(schema: Schema<A>) => OptionalSchema<A, true>
+export declare const optional: <A>(schema: Schema<A>) => OptionalSchema<A>
 ```
 
 Added in v1.0.0
@@ -370,7 +370,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const struct: <Fields extends Record<string | number | symbol, Schema<any>>>(
+export declare const struct: <Fields extends Record<string | number | symbol, Schema<any> | OptionalSchema<any>>>(
   fields: Fields
 ) => Schema<
   Spread<
@@ -932,7 +932,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type Infer<S extends Schema<any>> = Parameters<S['A']>[0]
+export type Infer<S extends { readonly A: (_: any) => any }> = Parameters<S['A']>[0]
 ```
 
 Added in v1.0.0
@@ -955,7 +955,7 @@ Added in v1.0.0
 
 ```ts
 export type OptionalKeys<T> = {
-  [K in keyof T]: T[K] extends OptionalSchema<any, true> ? K : never
+  [K in keyof T]: T[K] extends OptionalSchema<any> ? K : never
 }[keyof T]
 ```
 
@@ -966,9 +966,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface OptionalSchema<A, isOptional extends boolean> extends Schema<A>, AST.Annotated {
+export interface OptionalSchema<A> {
+  readonly A: (_: A) => A
   readonly _id: OptionalSchemaId
-  readonly isOptional: isOptional
 }
 ```
 
