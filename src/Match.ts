@@ -90,6 +90,9 @@ export class ValueMatcher<Input, Remaining, RemainingApplied, Result, Provided> 
     readonly value: E.Either<RemainingApplied, Provided>
   ) {}
 
+  /**
+   * @since 1.0.0
+   */
   add<I, R, RA, A, Pr>(_case: Case): ValueMatcher<I, R, RA, A, Pr> {
     if (this.value._tag === "Right") {
       // @ts-expect-error
