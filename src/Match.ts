@@ -2,7 +2,6 @@
  * @since 1.0.0
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { string } from "@fp-ts/core"
 import * as E from "@fp-ts/core/Either"
 import { identity } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
@@ -274,8 +273,8 @@ export const not: {
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
-    AddOnly<R, ResolveSchema<ResolvePred<P>>>,
-    ApplyFilters<AddOnly<R, ResolveSchema<ResolvePred<P>>>>,
+    AddOnly<R, ResolveSchema<PredToSchema<P>>>,
+    ApplyFilters<AddOnly<R, ResolveSchema<PredToSchema<P>>>>,
     Unify<A | B>,
     Pr
   >
