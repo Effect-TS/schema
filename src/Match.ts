@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { string } from "@fp-ts/core"
 import * as E from "@fp-ts/core/Either"
 import { identity } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
@@ -200,19 +201,6 @@ export const value = <I>(i: I): Matcher<I, I, I, never, I> => new ValueMatcher(i
  * @since 1.0.0
  */
 export const when: {
-  <RA, P extends DeepPartial<RA>, B>(
-    pattern: Narrow<P>,
-    f: (_: WhenMatch<RA, P>) => B
-  ): <I, R, A, Pr>(
-    self: Matcher<I, R, RA, A, Pr>
-  ) => Matcher<
-    I,
-    AddWithout<R, WithoutSchema<PredToSchema<P>>>,
-    ApplyFilters<AddWithout<R, WithoutSchema<PredToSchema<P>>>>,
-    Unify<A | B>,
-    Pr
-  >
-
   <P, RA, B>(
     schema: S.Schema<P>,
     f: (_: WhenSchemaMatch<RA, P>) => B
@@ -222,6 +210,19 @@ export const when: {
     I,
     AddWithout<R, P>,
     ApplyFilters<AddWithout<R, P>>,
+    Unify<A | B>,
+    Pr
+  >
+
+  <RA, P extends PatternBase<RA>, B>(
+    pattern: Narrow<P>,
+    f: (_: WhenMatch<RA, P>) => B
+  ): <I, R, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<
+    I,
+    AddWithout<R, ResolveSchema<PredToSchema<P>>>,
+    ApplyFilters<AddWithout<R, ResolveSchema<PredToSchema<P>>>>,
     Unify<A | B>,
     Pr
   >
@@ -266,15 +267,15 @@ export const not: {
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<I, AddOnly<R, P>, ApplyFilters<AddOnly<R, P>>, Unify<A | B>, Pr>
 
-  <RA, P extends DeepPartial<RA>, B>(
+  <RA, P extends PatternBase<RA>, B>(
     pattern: Narrow<P>,
-    f: (_: Exclude<RA, WithoutSchema<PredToSchema<P>>>) => B
+    f: (_: Exclude<RA, ResolveSchema<PredToSchema<P>>>) => B
   ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
-    AddOnly<R, WithoutSchema<WithoutPred<P>>>,
-    ApplyFilters<AddOnly<R, WithoutSchema<WithoutPred<P>>>>,
+    AddOnly<R, ResolveSchema<ResolvePred<P>>>,
+    ApplyFilters<AddOnly<R, ResolveSchema<ResolvePred<P>>>>,
     Unify<A | B>,
     Pr
   >
@@ -381,7 +382,10 @@ export const exaustive: <I, R, A, Pr>(
 // type helpers
 
 // combinations
-type WhenMatch<R, P> = Replace<TryExtract<R, WithoutSchema<WithoutPred<P>>>, WithoutPred<P>>
+type WhenMatch<R, P> = Replace<
+  TryExtract<R, ResolveSchema<ResolvePred<P>>>,
+  ResolveSchema<ResolvePred<P>>
+>
 type WhenSchemaMatch<R, P> = Replace<TryExtract<R, P>, P>
 
 // utilities
@@ -400,14 +404,14 @@ type NarrowRaw<A> =
 
 type Narrowable = string | number | bigint | boolean
 
-type WithoutSchema<A> = A extends S.Schema<infer S> ? S
-  : A extends Record<string, any> ? { [K in keyof A]: WithoutSchema<A[K]> }
+type ResolveSchema<A> = A extends S.Schema<infer S> ? S
+  : A extends Record<string, any> ? { [K in keyof A]: ResolveSchema<A[K]> }
   : A
 
-type WithoutPred<A> = A extends Refinement<any, infer P> ? P
+type ResolvePred<A> = A extends Refinement<any, infer P> ? P
   : A extends Predicate<infer P> ? P
   : A extends S.Schema<any> ? A
-  : A extends Record<string, any> ? { [K in keyof A]: WithoutPred<A[K]> }
+  : A extends Record<string, any> ? { [K in keyof A]: ResolvePred<A[K]> }
   : A
 
 type PredToSchema<A> = A extends Refinement<any, infer P> ? S.Schema<P>
@@ -420,9 +424,9 @@ type ExpandTuples<A> = A extends Array<(infer I)> ? (Array<I> | A)
   : A extends Record<string, any> ? { [K in keyof A]: ExpandTuples<A[K]> }
   : A
 
-type DeepPartial<A> = A extends Record<string, any>
-  ? Partial<{ [K in keyof A]: DeepPartial<A[K]> | PredicateA<A[K]> | S.Schema<A[K]> }>
-  : A | PredicateA<A> | S.Schema<A>
+type PatternBase<A> = A extends Record<string, any>
+  ? Partial<{ [K in keyof A]: PatternBase<A[K]> | PredicateA<A[K]> | S.Schema<any> }>
+  : A | PredicateA<A> | S.Schema<any>
 
 type WithoutLiterals<A> = A extends string ? string
   : A extends number ? number
@@ -443,13 +447,15 @@ type Replace<A, B> = A extends Record<string | number, any>
   : A
 
 interface Without<A, X> {
+  readonly _tag: "Without"
   readonly _A: A
-  readonly _Without: X
+  readonly _X: X
 }
 
 interface Only<A, X> {
+  readonly _tag: "Only"
   readonly _A: A
-  readonly _Only: X
+  readonly _X: X
 }
 
 type AddWithout<A, X> = A extends Without<infer P, infer WX> ? Without<P, X | WX>
