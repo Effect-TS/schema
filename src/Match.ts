@@ -268,13 +268,13 @@ export const not: {
 
   <RA, P extends PatternBase<RA>, B>(
     pattern: Narrow<P>,
-    f: (_: Exclude<RA, ResolveSchema<PredToSchema<P>>>) => B
+    f: (_: NotMatch<RA, P>) => B
   ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
-    AddOnly<R, ResolveSchema<PredToSchema<P>>>,
-    ApplyFilters<AddOnly<R, ResolveSchema<PredToSchema<P>>>>,
+    AddOnly<R, ResolveSchema<ResolvePred<P>>>,
+    ApplyFilters<AddOnly<R, ResolveSchema<ResolvePred<P>>>>,
     Unify<A | B>,
     Pr
   >
@@ -386,6 +386,8 @@ type WhenMatch<R, P> = Replace<
   ResolveSchema<ResolvePred<P>>
 >
 type WhenSchemaMatch<R, P> = Replace<TryExtract<R, P>, P>
+
+type NotMatch<R, P> = Exclude<R, ResolveSchema<PredToSchema<P>>>
 
 // utilities
 type PredicateA<A> = Predicate<A> | Refinement<A, any>

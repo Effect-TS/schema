@@ -178,26 +178,22 @@ describe("Match", () => {
   it("predicate", () => {
     const match = pipe(
       Match.type<{ age: number }>(),
-      Match.when({
-        age: (_) => _ >= 5
-      }, (_) => `Age: ${_.age}`),
-      Match.orElse((_) => `${_} is too young`)
+      Match.when({ age: (a) => a >= 5 }, (_) => `Age: ${_.age}`),
+      Match.orElse((_) => `${_.age} is too young`)
     )
 
-    expect(match({ age: 5 }), "Age: 5")
-    expect(match({ age: 4 }), "4 is too young")
+    expect(match({ age: 5 })).toEqual("Age: 5")
+    expect(match({ age: 4 })).toEqual("4 is too young")
   })
 
   it("predicate not", () => {
     const match = pipe(
       Match.type<{ age: number }>(),
-      Match.not({
-        age: (_) => _ >= 5
-      }, (_) => `Age: ${_.age}`),
-      Match.orElse((_) => `${_} is too old`)
+      Match.not({ age: (a) => a >= 5 }, (_) => `Age: ${_.age}`),
+      Match.orElse((_) => `${_.age} is too old`)
     )
 
-    expect(match({ age: 4 }), "Age: 4")
-    expect(match({ age: 5 }), "5 is too old")
+    expect(match({ age: 4 })).toEqual("Age: 4")
+    expect(match({ age: 5 })).toEqual("5 is too old")
   })
 })
