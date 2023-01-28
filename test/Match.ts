@@ -31,7 +31,7 @@ describe("Match", () => {
   it("schema exhaustive-literal", () => {
     const match = pipe(
       Match.type<{ _tag: "A"; a: number } | { _tag: "B"; b: number }>(),
-      Match.when({ _tag: S.literal("A", "B") }, (_) => E.right(_._tag)),
+      Match.when({ _tag: Match.is("A", "B") }, (_) => E.right(_._tag)),
       Match.exaustive
     )
     expect(match({ _tag: "A", a: 0 })).toEqual(E.right("A"))

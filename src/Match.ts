@@ -286,6 +286,11 @@ export const not: {
 /**
  * @since 1.0.0
  */
+export const is = S.literal
+
+/**
+ * @since 1.0.0
+ */
 export const orElse = <RA, B>(f: (b: RA) => B) =>
   <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
