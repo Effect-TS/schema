@@ -31,11 +31,11 @@ describe("Match", () => {
   it("schema exhaustive-literal", () => {
     const match = pipe(
       Match.type<{ _tag: "A"; a: number } | { _tag: "B"; b: number }>(),
-      Match.when({ _tag: S.literal("A", "B") }, (_) => E.right(_)),
+      Match.when({ _tag: S.literal("A", "B") }, (_) => E.right(_._tag)),
       Match.exaustive
     )
-    expect(match({ _tag: "A", a: 0 })).toEqual(E.right(0))
-    expect(match({ _tag: "B", b: 1 })).toEqual(T.right(1))
+    expect(match({ _tag: "A", a: 0 })).toEqual(E.right("A"))
+    expect(match({ _tag: "B", b: 1 })).toEqual(T.right("B"))
   })
 
   it("exhaustive literal with not", () => {
@@ -186,5 +186,18 @@ describe("Match", () => {
 
     expect(match({ age: 5 }), "Age: 5")
     expect(match({ age: 4 }), "4 is too young")
+  })
+
+  it("predicate not", () => {
+    const match = pipe(
+      Match.type<{ age: number }>(),
+      Match.not({
+        age: (_) => _ >= 5
+      }, (_) => `Age: ${_.age}`),
+      Match.orElse((_) => `${_} is too old`)
+    )
+
+    expect(match({ age: 4 }), "Age: 4")
+    expect(match({ age: 5 }), "5 is too old")
   })
 })
