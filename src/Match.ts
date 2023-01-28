@@ -5,6 +5,7 @@
 import * as E from "@fp-ts/core/Either"
 import { identity } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
+import type { Predicate, Refinement } from "@fp-ts/core/Predicate"
 import * as RA from "@fp-ts/core/ReadonlyArray"
 import type * as T from "@fp-ts/core/These"
 import type * as AST from "@fp-ts/schema/AST"
@@ -164,7 +165,9 @@ export class Not {
 const makeSchema = <I>(
   pattern: I
 ): I extends S.Schema<any> ? I : S.Schema<I> => {
-  if (Array.isArray(pattern)) {
+  if (typeof pattern === "function") {
+    return S.filter(pattern as any)(S.any) as any
+  } else if (Array.isArray(pattern)) {
     return RA.isNonEmpty(pattern)
       ? S.tuple(...pattern.map(makeSchema))
       : (S.array(S.any) as any)
@@ -199,23 +202,29 @@ export const value = <I>(i: I): Matcher<I, I, I, never, I> => new ValueMatcher(i
 export const when: {
   <RA, P extends DeepPartial<RA>, B>(
     pattern: Narrow<P>,
-    f: (_: Replace<TryExtract<RA, WithoutSchema<P>>, P>) => B
+    f: (_: WhenMatch<RA, P>) => B
   ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
-    AddWithout<R, WithoutSchema<P>>,
-    ApplyFilters<AddWithout<R, WithoutSchema<P>>>,
+    AddWithout<R, WithoutSchema<PredToSchema<P>>>,
+    ApplyFilters<AddWithout<R, WithoutSchema<PredToSchema<P>>>>,
     Unify<A | B>,
     Pr
   >
 
   <P, RA, B>(
     schema: S.Schema<P>,
-    f: (_: Replace<TryExtract<RA, P>, P>) => B
+    f: (_: WhenSchemaMatch<RA, P>) => B
   ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
-  ) => Matcher<I, AddWithout<R, P>, ApplyFilters<AddWithout<R, P>>, Unify<A | B>, Pr>
+  ) => Matcher<
+    I,
+    AddWithout<R, P>,
+    ApplyFilters<AddWithout<R, P>>,
+    Unify<A | B>,
+    Pr
+  >
 } = (
   pattern: any,
   f: (input: unknown) => any
@@ -259,13 +268,13 @@ export const not: {
 
   <RA, P extends DeepPartial<RA>, B>(
     pattern: Narrow<P>,
-    f: (_: Exclude<RA, WithoutSchema<P>>) => B
+    f: (_: Exclude<RA, WithoutSchema<PredToSchema<P>>>) => B
   ): <I, R, A, Pr>(
     self: Matcher<I, R, RA, A, Pr>
   ) => Matcher<
     I,
-    AddOnly<R, WithoutSchema<P>>,
-    ApplyFilters<AddOnly<R, WithoutSchema<P>>>,
+    AddOnly<R, WithoutSchema<WithoutPred<P>>>,
+    ApplyFilters<AddOnly<R, WithoutSchema<WithoutPred<P>>>>,
     Unify<A | B>,
     Pr
   >
@@ -370,18 +379,41 @@ export const exaustive: <I, R, A, Pr>(
 }) as any
 
 // type helpers
-type Narrow<A> = NarrowRaw<A> | S.Schema<any>
+
+// combinations
+type WhenMatch<R, P> = Replace<TryExtract<R, WithoutSchema<WithoutPred<P>>>, WithoutPred<P>>
+type WhenSchemaMatch<R, P> = Replace<TryExtract<R, P>, P>
+
+// utilities
+type PredicateA<A> = Predicate<A> | Refinement<A, any>
+
+type Narrow<A> = NarrowRaw<A> | PredicateA<any> | S.Schema<any>
 
 type NarrowRaw<A> =
   | (A extends [] ? [] : never)
-  | { [K in keyof A]: A[K] extends S.Schema<any> ? A[K] : NarrowRaw<A[K]> }
+  | (A extends PredicateA<any> ? A : never)
+  | {
+    [K in keyof A]: A[K] extends S.Schema<any> ? A[K]
+      : NarrowRaw<A[K]>
+  }
   | (A extends Narrowable ? A : never)
 
 type Narrowable = string | number | bigint | boolean
 
 type WithoutSchema<A> = A extends S.Schema<infer S> ? S
-  : A extends Record<string, any>
-    ? { [K in keyof A]: A[K] extends S.Schema<infer S> ? S : WithoutSchema<A[K]> }
+  : A extends Record<string, any> ? { [K in keyof A]: WithoutSchema<A[K]> }
+  : A
+
+type WithoutPred<A> = A extends Refinement<any, infer P> ? P
+  : A extends Predicate<infer P> ? P
+  : A extends S.Schema<any> ? A
+  : A extends Record<string, any> ? { [K in keyof A]: WithoutPred<A[K]> }
+  : A
+
+type PredToSchema<A> = A extends Refinement<any, infer P> ? S.Schema<P>
+  : A extends Predicate<any> ? S.Schema<never>
+  : A extends S.Schema<any> ? A
+  : A extends Record<string, any> ? { [K in keyof A]: PredToSchema<A[K]> }
   : A
 
 type ExpandTuples<A> = A extends Array<(infer I)> ? (Array<I> | A)
@@ -389,8 +421,8 @@ type ExpandTuples<A> = A extends Array<(infer I)> ? (Array<I> | A)
   : A
 
 type DeepPartial<A> = A extends Record<string, any>
-  ? Partial<{ [K in keyof A]: DeepPartial<A[K]> | S.Schema<A[K]> }>
-  : A | S.Schema<any>
+  ? Partial<{ [K in keyof A]: DeepPartial<A[K]> | PredicateA<A[K]> | S.Schema<A[K]> }>
+  : A | PredicateA<A> | S.Schema<A>
 
 type WithoutLiterals<A> = A extends string ? string
   : A extends number ? number

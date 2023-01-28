@@ -164,4 +164,17 @@ describe("Match", () => {
     expect(match({ foo: { bar: { baz: { qux: "b" } } } })).toEqual("literal b")
     expect(match({ foo: { bar: null } })).toEqual(null)
   })
+
+  it("predicate", () => {
+    const match = pipe(
+      Match.type<{ age: number }>(),
+      Match.when({
+        age: (_) => _ >= 5
+      }, (_) => `Age: ${_.age}`),
+      Match.orElse((_) => `${_} is too young`)
+    )
+
+    expect(match({ age: 5 }), "Age: 5")
+    expect(match({ age: 4 }), "4 is too young")
+  })
 })
