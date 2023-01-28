@@ -28,6 +28,16 @@ describe("Match", () => {
     expect(match({ _tag: "B", b: 1 })).toEqual(T.right(1))
   })
 
+  it("schema exhaustive-literal", () => {
+    const match = pipe(
+      Match.type<{ _tag: "A"; a: number } | { _tag: "B"; b: number }>(),
+      Match.when({ _tag: S.literal("A", "B") }, (_) => E.right(_)),
+      Match.exaustive
+    )
+    expect(match({ _tag: "A", a: 0 })).toEqual(E.right(0))
+    expect(match({ _tag: "B", b: 1 })).toEqual(T.right(1))
+  })
+
   it("exhaustive literal with not", () => {
     const match = pipe(
       Match.type<number>(),
