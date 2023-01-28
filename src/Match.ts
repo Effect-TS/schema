@@ -200,19 +200,6 @@ export const value = <I>(i: I): Matcher<I, I, I, never, I> => new ValueMatcher(i
  * @since 1.0.0
  */
 export const when: {
-  <P, RA, B>(
-    schema: S.Schema<P>,
-    f: (_: WhenSchemaMatch<RA, P>) => B
-  ): <I, R, A, Pr>(
-    self: Matcher<I, R, RA, A, Pr>
-  ) => Matcher<
-    I,
-    AddWithout<R, P>,
-    ApplyFilters<AddWithout<R, P>>,
-    Unify<A | B>,
-    Pr
-  >
-
   <RA, P extends PatternBase<RA>, B>(
     pattern: Narrow<P>,
     f: (_: WhenMatch<RA, P>) => B
@@ -222,6 +209,19 @@ export const when: {
     I,
     AddWithout<R, ResolveSchema<PredToSchema<P>>>,
     ApplyFilters<AddWithout<R, ResolveSchema<PredToSchema<P>>>>,
+    Unify<A | B>,
+    Pr
+  >
+
+  <P, RA, B>(
+    schema: S.Schema<P>,
+    f: (_: WhenSchemaMatch<RA, P>) => B
+  ): <I, R, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<
+    I,
+    AddWithout<R, P>,
+    ApplyFilters<AddWithout<R, P>>,
     Unify<A | B>,
     Pr
   >
@@ -259,13 +259,6 @@ export const tag: {
  * @since 1.0.0
  */
 export const not: {
-  <P, RA, B>(
-    schema: S.Schema<P>,
-    f: (_: Exclude<RA, P>) => B
-  ): <I, R, A, Pr>(
-    self: Matcher<I, R, RA, A, Pr>
-  ) => Matcher<I, AddOnly<R, P>, ApplyFilters<AddOnly<R, P>>, Unify<A | B>, Pr>
-
   <RA, P extends PatternBase<RA>, B>(
     pattern: Narrow<P>,
     f: (_: NotMatch<RA, P>) => B
@@ -278,6 +271,13 @@ export const not: {
     Unify<A | B>,
     Pr
   >
+
+  <P, RA, B>(
+    schema: S.Schema<P>,
+    f: (_: Exclude<RA, P>) => B
+  ): <I, R, A, Pr>(
+    self: Matcher<I, R, RA, A, Pr>
+  ) => Matcher<I, AddOnly<R, P>, ApplyFilters<AddOnly<R, P>>, Unify<A | B>, Pr>
 } = (
   pattern: any,
   f: (_: never) => any
