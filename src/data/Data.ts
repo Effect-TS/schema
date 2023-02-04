@@ -7,6 +7,7 @@ import * as E from "@fp-ts/data/Equal"
 import { IdentifierId } from "@fp-ts/schema/annotation/AST"
 import * as H from "@fp-ts/schema/annotation/Hook"
 import * as A from "@fp-ts/schema/Arbitrary"
+import type { ParseOptions } from "@fp-ts/schema/AST"
 import * as I from "@fp-ts/schema/internal/common"
 import * as P from "@fp-ts/schema/Parser"
 import * as PR from "@fp-ts/schema/ParseResult"
@@ -48,27 +49,62 @@ const pretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
  */
 export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
-): Schema<D.Data<A>> =>
-  I.typeAlias(
-    [item],
-    item,
-    {
-      [IdentifierId]: "Data",
-      [H.ParserHookId]: H.hook(parser),
-      [H.PrettyHookId]: H.hook(pretty),
-      [H.ArbitraryHookId]: H.hook(arbitrary)
+): DataSchema<A> =>
+  pipe(
+    I.typeAlias(
+      [item],
+      item,
+      {
+        [IdentifierId]: "Data",
+        [H.ParserHookId]: H.hook(parser),
+        [H.PrettyHookId]: H.hook(pretty),
+        [H.ArbitraryHookId]: H.hook(arbitrary)
+      }
+    ),
+    (s) => {
+      const assertS: (
+        input: unknown,
+        options?: ParseOptions | undefined
+      ) => asserts input is D.Data<A> = P.asserts(s)
+      return Object.assign(s, {
+        of: (a: A) => {
+          assertS(a)
+          return toData(a)
+        }
+      })
     }
   )
 
 /**
  * @since 1.0.0
  */
+export interface DataSchema<A extends Readonly<Record<string, any>> | ReadonlyArray<any>>
+  extends Schema<D.Data<A>>
+{
+  of(_: A): D.Data<A>
+}
+
+/**
+ * @since 1.0.0
+ */
 export const fromStructure = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
-): Schema<D.Data<A>> =>
+): DataSchema<A> =>
   pipe(
     item,
     I.transform(data(item), toData, (a) =>
       // @ts-expect-error
-      Array.isArray(a) ? Array.from(a) : Object.assign({}, a))
+      Array.isArray(a) ? Array.from(a) : Object.assign({}, a)),
+    (s) => {
+      const assertS: (
+        input: unknown,
+        options?: ParseOptions | undefined
+      ) => asserts input is D.Data<A> = P.asserts(s)
+      return Object.assign(s, {
+        of: (a: A) => {
+          assertS(a)
+          return toData(a)
+        }
+      })
+    }
   )

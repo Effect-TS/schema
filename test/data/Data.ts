@@ -22,8 +22,8 @@ describe.concurrent("Data", () => {
     const schema = _.data(S.struct({ a: S.string, b: S.number }))
     Util.expectDecodingSuccess(
       schema,
-      Data.struct({ a: "ok", b: 0 }),
-      Data.struct({ a: "ok", b: 0 })
+      schema.of({ a: "ok", b: 0 }),
+      schema.of({ a: "ok", b: 0 })
     )
     Util.expectDecodingFailure(
       schema,
@@ -41,8 +41,8 @@ describe.concurrent("Data", () => {
     const schema = _.data(S.struct({ a: S.string, b: S.number }))
     Util.expectEncodingSuccess(
       schema,
-      Data.struct({ a: "ok", b: 0 }),
-      Data.struct({ a: "ok", b: 0 })
+      schema.of({ a: "ok", b: 0 }),
+      schema.of({ a: "ok", b: 0 })
     )
   })
 
@@ -80,6 +80,6 @@ describe.concurrent("Data", () => {
 
   it("fromStructure. encoder", () => {
     const schema = _.fromStructure(S.struct({ a: S.string, b: S.number }))
-    Util.expectEncodingSuccess(schema, Data.struct({ a: "ok", b: 0 }), { a: "ok", b: 0 })
+    Util.expectEncodingSuccess(schema, schema.of({ a: "ok", b: 0 }), { a: "ok", b: 0 })
   })
 })
