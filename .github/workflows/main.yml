@@ -42,6 +42,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - run: pnpm install
       - run: pnpm build
+      - run: pnpm circular
       - run: pnpm test
       - run: pnpm lint
       - run: pnpm run docs
