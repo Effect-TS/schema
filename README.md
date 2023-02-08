@@ -477,6 +477,11 @@ pipe(S.number, S.int()); // value must be an integer
 
 pipe(S.number, S.nonNaN()); // not NaN
 pipe(S.number, S.finite()); // ensures that the value being decoded is finite and not equal to Infinity or -Infinity
+
+pipe(S.number, S.positive()); // > 0
+pipe(S.number, S.nonNegative()); // >= 0
+pipe(S.number, S.negative()); // < 0
+pipe(S.number, S.nonPositive()); // <= 0
 ```
 
 ## Native enums
