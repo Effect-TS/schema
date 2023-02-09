@@ -484,6 +484,14 @@ pipe(S.number, S.negative()); // < 0
 pipe(S.number, S.nonPositive()); // <= 0
 ```
 
+### Array filters
+
+```ts
+pipe(S.array(S.number), A.maxItems(2)) // max array length
+pipe(S.array(S.number), A.minItems(2)) // min array length
+pipe(S.array(S.number), A.itemsCount(2)) // exact array length
+```
+
 ## Native enums
 
 ```ts
