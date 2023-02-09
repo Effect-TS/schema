@@ -21,7 +21,7 @@ importers:
       '@effect-ts/core': ^0.60.2
       '@effect/data': ~0.1.0
       '@effect/language-service': ^0.0.19
-      '@fp-ts/core': ~0.2.0
+      '@fp-ts/core': ~0.2.1
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
       '@types/benchmark': ^2.1.2
       '@types/chai': ^4.3.4
@@ -61,7 +61,7 @@ importers:
       vitest: 0.25.5
     dependencies:
       '@effect/data': 0.1.0
-      '@fp-ts/core': 0.2.0
+      '@fp-ts/core': 0.2.1
       fast-check: 3.6.2
     devDependencies:
       '@babel/cli': 7.19.3_@babel+core@7.20.5
@@ -676,7 +676,7 @@ packages:
   /@effect/data/0.1.0:
     resolution: {integrity: sha512-p9/AYs06o7IVyKRUvzq73+XnzmYQIkflo+F/IDMJRzulOEdfSyl3+Tvkw0pXVeXqlcKxlTSdos1VYs2wbRFQDg==}
     dependencies:
-      '@fp-ts/core': 0.2.0
+      '@fp-ts/core': 0.2.1
     dev: false
 
   /@effect/language-service/0.0.19:
@@ -734,8 +734,8 @@ packages:
     resolution: {integrity: sha512-BCAJBYzghwoJpcUOARJ1tui50HoYJFlV2pJlVMlsEkDFhD8MTtq8xQVpZCRF66RmtkxtGBYINCQ+5H1lRaL35Q==}
     dev: true
 
-  /@fp-ts/core/0.2.0:
-    resolution: {integrity: sha512-oDMfMDId/Op6EHLTBZvhsW6d0XmXZDWQsvcZmC2wXGt+utv8hXGi41IJD8SwBJsvQvoJYe/NRTamDco4Bl7qsQ==}
+  /@fp-ts/core/0.2.1:
+    resolution: {integrity: sha512-gjp/LTCsxqe8KYvPOcMcsEXT+J6tKC4v1nNqK4RZsZcB6pMcQgrullh5Oa371O9WHSULivpgOvjWyeioFevg5g==}
     dev: false
 
   /@fp-ts/data/0.0.41:
@@ -914,7 +914,7 @@ packages:
       open: 8.4.0
       picocolors: 1.0.0
       tiny-glob: 0.2.9
-      tslib: 2.4.1
+      tslib: 2.5.0
     dev: true
 
   /@repo-tooling/eslint-plugin-dprint/0.0.4_typescript@4.9.3:
