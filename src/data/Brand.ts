@@ -3,7 +3,7 @@
  */
 import type * as E from "@fp-ts/core/Either"
 import { pipe } from "@fp-ts/core/Function"
-import * as B from "@fp-ts/data/Brand"
+import * as B from "@effect/data/Brand"
 import * as I from "@fp-ts/schema/internal/common"
 import type * as S from "@fp-ts/schema/Schema"
 
