@@ -2,11 +2,13 @@
  * @since 1.0.0
  */
 
+import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { Option } from "@effect/data/Option"
 import * as P from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import * as Effect from "@effect/io/Effect"
 import * as H from "@effect/schema/annotation/Hook"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -44,7 +46,7 @@ export const decode = <A>(
  */
 export const getOption = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): Option<A> =>
-    O.fromEither(parserFor(schema).parse(input, options))
+    O.fromEither(Effect.runSyncEither(parserFor(schema).parse(input, options)))
 
 /**
  * @category decoding
@@ -52,8 +54,8 @@ export const getOption = <A>(schema: Schema<A>) =>
  */
 export const decodeOrThrow = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): A => {
-    const t = parserFor(schema).parse(input, options)
-    if (PR.isFailure(t)) {
+    const t = Effect.runSyncEither(parserFor(schema).parse(input, options))
+    if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
     return t.right
@@ -65,7 +67,7 @@ export const decodeOrThrow = <A>(schema: Schema<A>) =>
  */
 export const is = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): input is A =>
-    !PR.isFailure(parserFor(schema, "guard").parse(input, options))
+    !E.isLeft(Effect.runSyncEither(parserFor(schema, "guard").parse(input, options)))
 
 /**
  * @since 1.0.0
@@ -81,8 +83,8 @@ export type InferAsserts<S extends Schema<any>> = (
  */
 export const asserts = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): asserts input is A => {
-    const t = parserFor(schema, "guard").parse(input, options)
-    if (PR.isFailure(t)) {
+    const t = Effect.runSyncEither(parserFor(schema, "guard").parse(input, options))
+    if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
   }
@@ -101,8 +103,8 @@ export const encode = <A>(
  */
 export const encodeOrThrow = <A>(schema: Schema<A>) =>
   (a: A, options?: ParseOptions): unknown => {
-    const t = parserFor(schema, "encoder").parse(a, options)
-    if (PR.isFailure(t)) {
+    const t = Effect.runSyncEither(parserFor(schema, "encoder").parse(a, options))
+    if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
     return t.right
@@ -171,114 +173,117 @@ const parserFor = <A>(
         const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
         return make(
           I.makeSchema(ast),
-          (input: unknown, options) => {
-            if (!Array.isArray(input)) {
-              return PR.failure(PR.type(unknownArray, input))
-            }
-            const output: Array<any> = []
-            const es: Array<PR.ParseError> = []
-            const allErrors = options?.allErrors
-            let i = 0
-            // ---------------------------------------------
-            // handle elements
-            // ---------------------------------------------
-            for (; i < elements.length; i++) {
-              if (input.length < i + 1) {
-                // the input element is missing...
-                if (!ast.elements[i].isOptional) {
-                  // ...but the element is required
-                  const e = PR.index(i, [PR.missing])
-                  if (allErrors) {
-                    es.push(e)
-                    continue
-                  } else {
-                    return PR.failure(e)
-                  }
-                }
-              } else {
-                const parser = elements[i]
-                const t = parser.parse(input[i], options)
-                if (PR.isFailure(t)) {
-                  // the input element is present but is not valid
-                  const e = PR.index(i, t.left)
-                  if (allErrors) {
-                    es.push(e)
-                    continue
-                  } else {
-                    return PR.failures(I.mutableAppend(es, e))
-                  }
-                }
-                output.push(t.right)
+          (input: unknown, options) =>
+            Effect.gen(function*($) {
+              if (!Array.isArray(input)) {
+                return yield* $(PR.failure(PR.type(unknownArray, input)))
               }
-            }
-            // ---------------------------------------------
-            // handle rest element
-            // ---------------------------------------------
-            if (O.isSome(rest)) {
-              const head = RA.headNonEmpty(rest.value)
-              const tail = RA.tailNonEmpty(rest.value)
-              for (; i < input.length - tail.length; i++) {
-                const t = head.parse(input[i], options)
-                if (PR.isFailure(t)) {
-                  const e = PR.index(i, t.left)
-                  if (allErrors) {
-                    es.push(e)
-                    continue
-                  } else {
-                    return PR.failures(I.mutableAppend(es, e))
-                  }
-                } else {
-                  output.push(t.right)
-                }
-              }
+              const output: Array<any> = []
+              const es: Array<PR.ParseError> = []
+              const allErrors = options?.allErrors
+              let i = 0
               // ---------------------------------------------
-              // handle post rest elements
+              // handle elements
               // ---------------------------------------------
-              for (let j = 0; j < tail.length; j++) {
-                i += j
+              for (; i < elements.length; i++) {
                 if (input.length < i + 1) {
-                  // the input element is missing and the element is required, bail out
-                  return PR.failures(I.mutableAppend(es, PR.index(i, [PR.missing])))
+                  // the input element is missing...
+                  if (!ast.elements[i].isOptional) {
+                    // ...but the element is required
+                    const e = PR.index(i, [PR.missing])
+                    if (allErrors) {
+                      es.push(e)
+                      continue
+                    } else {
+                      return yield* $(PR.failure(e))
+                    }
+                  }
                 } else {
-                  const t = tail[j].parse(input[i], options)
-                  if (PR.isFailure(t)) {
+                  const parser = elements[i]
+                  const t = yield* $(Effect.either(parser.parse(input[i], options)))
+                  if (E.isLeft(t)) {
                     // the input element is present but is not valid
                     const e = PR.index(i, t.left)
                     if (allErrors) {
                       es.push(e)
                       continue
                     } else {
-                      return PR.failures(I.mutableAppend(es, e))
+                      return yield* $(PR.failures(I.mutableAppend(es, e)))
                     }
                   }
                   output.push(t.right)
                 }
               }
-            } else {
               // ---------------------------------------------
-              // handle unexpected indexes
+              // handle rest element
               // ---------------------------------------------
-              const isUnexpectedAllowed = options?.isUnexpectedAllowed
-              for (; i < input.length; i++) {
-                const e = PR.index(i, [PR.unexpected(input[i])])
-                if (!isUnexpectedAllowed) {
-                  if (allErrors) {
-                    es.push(e)
-                    continue
+              if (O.isSome(rest)) {
+                const head = RA.headNonEmpty(rest.value)
+                const tail = RA.tailNonEmpty(rest.value)
+                for (; i < input.length - tail.length; i++) {
+                  const t = yield* $(Effect.either(head.parse(input[i], options)))
+                  if (E.isLeft(t)) {
+                    const e = PR.index(i, t.left)
+                    if (allErrors) {
+                      es.push(e)
+                      continue
+                    } else {
+                      return yield* $(PR.failures(I.mutableAppend(es, e)))
+                    }
                   } else {
-                    return PR.failures(I.mutableAppend(es, e))
+                    output.push(t.right)
+                  }
+                }
+                // ---------------------------------------------
+                // handle post rest elements
+                // ---------------------------------------------
+                for (let j = 0; j < tail.length; j++) {
+                  i += j
+                  if (input.length < i + 1) {
+                    // the input element is missing and the element is required, bail out
+                    return yield* $(PR.failures(I.mutableAppend(es, PR.index(i, [PR.missing]))))
+                  } else {
+                    const t = yield* $(Effect.either(tail[j].parse(input[i], options)))
+                    if (E.isLeft(t)) {
+                      // the input element is present but is not valid
+                      const e = PR.index(i, t.left)
+                      if (allErrors) {
+                        es.push(e)
+                        continue
+                      } else {
+                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      }
+                    }
+                    output.push(t.right)
+                  }
+                }
+              } else {
+                // ---------------------------------------------
+                // handle unexpected indexes
+                // ---------------------------------------------
+                const isUnexpectedAllowed = options?.isUnexpectedAllowed
+                for (; i < input.length; i++) {
+                  const e = PR.index(i, [PR.unexpected(input[i])])
+                  if (!isUnexpectedAllowed) {
+                    if (allErrors) {
+                      es.push(e)
+                      continue
+                    } else {
+                      return yield* $(PR.failures(I.mutableAppend(es, e)))
+                    }
                   }
                 }
               }
-            }
 
-            // ---------------------------------------------
-            // compute output
-            // ---------------------------------------------
-            return I.isNonEmptyReadonlyArray(es) ?
-              PR.failures(es) :
-              PR.success(output)
-          }
+              // ---------------------------------------------
+              // compute output
+              // ---------------------------------------------
+              return yield* $(
+                I.isNonEmptyReadonlyArray(es) ?
+                  PR.failures(es) :
+                  PR.success(output)
+              )
+            })
         )
       }
       case "TypeLiteral": {
@@ -291,117 +296,118 @@ const parserFor = <A>(
         )
         return make(
           I.makeSchema(ast),
-          (input: unknown, options) => {
-            if (!P.isRecord(input)) {
-              return PR.failure(PR.type(unknownRecord, input))
-            }
-            const output: any = {}
-            const expectedKeys: any = {}
-            const es: Array<PR.ParseError> = []
-            const allErrors = options?.allErrors
-            // ---------------------------------------------
-            // handle property signatures
-            // ---------------------------------------------
-            for (let i = 0; i < propertySignaturesTypes.length; i++) {
-              const ps = ast.propertySignatures[i]
-              const parser = propertySignaturesTypes[i]
-              const name = ps.name
-              expectedKeys[name] = null
-              if (!Object.prototype.hasOwnProperty.call(input, name)) {
-                if (!ps.isOptional) {
-                  const e = PR.key(name, [PR.missing])
-                  if (allErrors) {
-                    es.push(e)
-                    continue
-                  } else {
-                    return PR.failure(e)
+          (input: unknown, options) =>
+            Effect.gen(function*($) {
+              if (!P.isRecord(input)) {
+                return yield* $(PR.failure(PR.type(unknownRecord, input)))
+              }
+              const output: any = {}
+              const expectedKeys: any = {}
+              const es: Array<PR.ParseError> = []
+              const allErrors = options?.allErrors
+              // ---------------------------------------------
+              // handle property signatures
+              // ---------------------------------------------
+              for (let i = 0; i < propertySignaturesTypes.length; i++) {
+                const ps = ast.propertySignatures[i]
+                const parser = propertySignaturesTypes[i]
+                const name = ps.name
+                expectedKeys[name] = null
+                if (!Object.prototype.hasOwnProperty.call(input, name)) {
+                  if (!ps.isOptional) {
+                    const e = PR.key(name, [PR.missing])
+                    if (allErrors) {
+                      es.push(e)
+                      continue
+                    } else {
+                      return yield* $(PR.failure(e))
+                    }
+                  }
+                } else {
+                  const t = yield* $(Effect.either(parser.parse(input[name], options)))
+                  if (E.isLeft(t)) {
+                    // the input key is present but is not valid
+                    const e = PR.key(name, t.left)
+                    if (allErrors) {
+                      es.push(e)
+                      continue
+                    } else {
+                      return yield* $(PR.failures(I.mutableAppend(es, e)))
+                    }
+                  }
+                  output[name] = t.right
+                }
+              }
+              // ---------------------------------------------
+              // handle index signatures
+              // ---------------------------------------------
+              if (indexSignatures.length > 0) {
+                for (let i = 0; i < indexSignatures.length; i++) {
+                  const parameter = indexSignatures[i][0]
+                  const type = indexSignatures[i][1]
+                  const keys = I.getKeysForIndexSignature(input, ast.indexSignatures[i].parameter)
+                  for (const key of keys) {
+                    if (Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
+                      continue
+                    }
+                    // ---------------------------------------------
+                    // handle keys
+                    // ---------------------------------------------
+                    let t = yield* $(Effect.either(parameter.parse(key, options)))
+                    if (E.isLeft(t)) {
+                      const e = PR.key(key, t.left)
+                      if (allErrors) {
+                        es.push(e)
+                        continue
+                      } else {
+                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      }
+                    }
+                    // ---------------------------------------------
+                    // handle values
+                    // ---------------------------------------------
+                    t = yield* $(Effect.either(type.parse(input[key], options)))
+                    if (E.isLeft(t)) {
+                      const e = PR.key(key, t.left)
+                      if (allErrors) {
+                        es.push(e)
+                        continue
+                      } else {
+                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      }
+                    } else {
+                      output[key] = t.right
+                    }
                   }
                 }
               } else {
-                const t = parser.parse(input[name], options)
-                if (PR.isFailure(t)) {
-                  // the input key is present but is not valid
-                  const e = PR.key(name, t.left)
-                  if (allErrors) {
-                    es.push(e)
-                    continue
-                  } else {
-                    return PR.failures(I.mutableAppend(es, e))
-                  }
-                }
-                output[name] = t.right
-              }
-            }
-            // ---------------------------------------------
-            // handle index signatures
-            // ---------------------------------------------
-            if (indexSignatures.length > 0) {
-              for (let i = 0; i < indexSignatures.length; i++) {
-                const parameter = indexSignatures[i][0]
-                const type = indexSignatures[i][1]
-                const keys = I.getKeysForIndexSignature(input, ast.indexSignatures[i].parameter)
-                for (const key of keys) {
-                  if (Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
-                    continue
-                  }
-
-                  // ---------------------------------------------
-                  // handle keys
-                  // ---------------------------------------------
-                  let t = parameter.parse(key, options)
-                  if (PR.isFailure(t)) {
-                    const e = PR.key(key, t.left)
-                    if (allErrors) {
-                      es.push(e)
-                      continue
-                    } else {
-                      return PR.failures(I.mutableAppend(es, e))
+                // ---------------------------------------------
+                // handle unexpected keys
+                // ---------------------------------------------
+                const isUnexpectedAllowed = options?.isUnexpectedAllowed
+                for (const key of Reflect.ownKeys(input)) {
+                  if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
+                    const e = PR.key(key, [PR.unexpected(input[key])])
+                    if (!isUnexpectedAllowed) {
+                      if (allErrors) {
+                        es.push(e)
+                        continue
+                      } else {
+                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      }
                     }
-                  }
-                  // ---------------------------------------------
-                  // handle values
-                  // ---------------------------------------------
-                  t = type.parse(input[key], options)
-                  if (PR.isFailure(t)) {
-                    const e = PR.key(key, t.left)
-                    if (allErrors) {
-                      es.push(e)
-                      continue
-                    } else {
-                      return PR.failures(I.mutableAppend(es, e))
-                    }
-                  } else {
-                    output[key] = t.right
                   }
                 }
               }
-            } else {
               // ---------------------------------------------
-              // handle unexpected keys
+              // compute output
               // ---------------------------------------------
-              const isUnexpectedAllowed = options?.isUnexpectedAllowed
-              for (const key of Reflect.ownKeys(input)) {
-                if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
-                  const e = PR.key(key, [PR.unexpected(input[key])])
-                  if (!isUnexpectedAllowed) {
-                    if (allErrors) {
-                      es.push(e)
-                      continue
-                    } else {
-                      return PR.failures(I.mutableAppend(es, e))
-                    }
-                  }
-                }
-              }
-            }
-
-            // ---------------------------------------------
-            // compute output
-            // ---------------------------------------------
-            return I.isNonEmptyReadonlyArray(es) ?
-              PR.failures(es) :
-              PR.success(output)
-          }
+              return yield* $(
+                I.isNonEmptyReadonlyArray(es) ?
+                  PR.failures(es) :
+                  PR.success(output)
+              )
+            })
         )
       }
       case "Union": {
@@ -410,66 +416,68 @@ const parserFor = <A>(
         const ownKeys = Reflect.ownKeys(searchTree.keys)
         const len = ownKeys.length
         const otherwise = searchTree.otherwise
-        return make(I.makeSchema(ast), (input, options) => {
-          const es: Array<PR.ParseError> = []
-
-          if (len > 0) {
-            // if there is at least one key then input must be an object
-            if (P.isRecord(input)) {
-              for (let i = 0; i < len; i++) {
-                const name = ownKeys[i]
-                const buckets = searchTree.keys[name].buckets
-                // for each property that should contain a literal, check if the input contains that property
-                if (Object.prototype.hasOwnProperty.call(input, name)) {
-                  const literal = String(input[name])
-                  // check that the value obtained from the input for the property corresponds to an existing bucket
-                  if (Object.prototype.hasOwnProperty.call(buckets, literal)) {
-                    // retrive the minimal set of candidates for decoding
-                    const bucket = buckets[literal]
-                    for (let i = 0; i < bucket.length; i++) {
-                      const t = bucket[i].parse(input, options)
-                      if (PR.isSuccess(t)) {
-                        return t
-                      } else {
-                        es.push(PR.unionMember(t.left))
+        return make(I.makeSchema(ast), (input, options) =>
+          Effect.gen(function*($) {
+            const es: Array<PR.ParseError> = []
+            if (len > 0) {
+              // if there is at least one key then input must be an object
+              if (P.isRecord(input)) {
+                for (let i = 0; i < len; i++) {
+                  const name = ownKeys[i]
+                  const buckets = searchTree.keys[name].buckets
+                  // for each property that should contain a literal, check if the input contains that property
+                  if (Object.prototype.hasOwnProperty.call(input, name)) {
+                    const literal = String(input[name])
+                    // check that the value obtained from the input for the property corresponds to an existing bucket
+                    if (Object.prototype.hasOwnProperty.call(buckets, literal)) {
+                      // retrive the minimal set of candidates for decoding
+                      const bucket = buckets[literal]
+                      for (let i = 0; i < bucket.length; i++) {
+                        const t = yield* $(Effect.either(bucket[i].parse(input, options)))
+                        if (E.isRight(t)) {
+                          return t.right
+                        } else {
+                          es.push(PR.unionMember(t.left))
+                        }
                       }
+                    } else {
+                      es.push(
+                        PR.key(name, [
+                          PR.type(
+                            searchTree.keys[name].ast,
+                            input[name]
+                          )
+                        ])
+                      )
                     }
                   } else {
-                    es.push(
-                      PR.key(name, [
-                        PR.type(
-                          searchTree.keys[name].ast,
-                          input[name]
-                        )
-                      ])
-                    )
+                    es.push(PR.key(name, [PR.missing]))
                   }
-                } else {
-                  es.push(PR.key(name, [PR.missing]))
                 }
+              } else {
+                es.push(PR.type(unknownRecord, input))
               }
-            } else {
-              es.push(PR.type(unknownRecord, input))
             }
-          }
-          // if none of the schemas with at least one property with a literal value succeeded,
-          // proceed with those that have no literal at all
-          for (let i = 0; i < otherwise.length; i++) {
-            const t = otherwise[i].parse(input, options)
-            if (PR.isSuccess(t)) {
-              return t
-            } else {
-              es.push(PR.unionMember(t.left))
+            // if none of the schemas with at least one property with a literal value succeeded,
+            // proceed with those that have no literal at all
+            for (let i = 0; i < otherwise.length; i++) {
+              const t = yield* $(Effect.either(otherwise[i].parse(input, options)))
+              if (E.isRight(t)) {
+                return t.right
+              } else {
+                es.push(PR.unionMember(t.left))
+              }
             }
-          }
 
-          // ---------------------------------------------
-          // compute output
-          // ---------------------------------------------
-          return I.isNonEmptyReadonlyArray(es) ?
-            PR.failures(es) :
-            PR.failure(PR.type(AST.neverKeyword, input))
-        })
+            // ---------------------------------------------
+            // compute output
+            // ---------------------------------------------
+            return yield* $(
+              I.isNonEmptyReadonlyArray(es) ?
+                PR.failures(es) :
+                PR.failure(PR.type(AST.neverKeyword, input))
+            )
+          }))
       }
       case "Lazy": {
         const f = () => go(ast.f())
@@ -487,12 +495,13 @@ const parserFor = <A>(
           case "decoder":
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(type.parse(u, options), I.flatMap(checkRefinement))
+              (u, options) => pipe(type.parse(u, options), Effect.flatMap(checkRefinement))
             )
           case "encoder":
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(checkRefinement(u), I.flatMap((a) => type.parse(a, options)))
+              (u, options) =>
+                pipe(checkRefinement(u), Effect.flatMap((a) => type.parse(a, options)))
             )
         }
       }
@@ -502,7 +511,11 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(from.parse(u, options), I.flatMap((a) => ast.decode(a, options)))
+              (u, options) =>
+                Effect.flatMap(
+                  from.parse(u, options),
+                  (a) => ast.decode(a, options)
+                )
             )
           }
           case "guard":
@@ -511,7 +524,8 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode)),
-              (a, options) => pipe(ast.encode(a, options), I.flatMap((a) => from.parse(a, options)))
+              (a, options) =>
+                pipe(ast.encode(a, options), Effect.flatMap((a) => from.parse(a, options)))
             )
           }
         }

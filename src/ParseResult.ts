@@ -2,15 +2,14 @@
  * @since 1.0.0
  */
 
-import type { Either, Left, Right } from "@effect/data/Either"
-import * as E from "@effect/data/Either"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
+import * as Effect from "@effect/io/Effect"
 import type * as AST from "@effect/schema/AST"
 
 /**
  * @since 1.0.0
  */
-export type ParseResult<A> = Either<NonEmptyReadonlyArray<ParseError>, A>
+export type ParseResult<A> = Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
 
 /**
  * `ParseError` is a type that represents the different types of errors that can occur when decoding a value.
@@ -173,13 +172,13 @@ export const unionMember = (
  * @category constructors
  * @since 1.0.0
  */
-export const success: <A>(a: A) => ParseResult<A> = E.right
+export const success: <A>(a: A) => ParseResult<A> = Effect.succeed
 
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const failure = (e: ParseError): ParseResult<never> => E.left([e])
+export const failure = (e: ParseError): ParseResult<never> => Effect.fail([e])
 
 /**
  * @category constructors
@@ -187,18 +186,4 @@ export const failure = (e: ParseError): ParseResult<never> => E.left([e])
  */
 export const failures = (
   es: NonEmptyReadonlyArray<ParseError>
-): ParseResult<never> => E.left(es)
-
-/**
- * @category guards
- * @since 1.0.0
- */
-export const isSuccess: <A>(self: ParseResult<A>) => self is Right<A> = E.isRight
-
-/**
- * @category guards
- * @since 1.0.0
- */
-export const isFailure: <A>(
-  self: ParseResult<A>
-) => self is Left<NonEmptyReadonlyArray<ParseError>> = E.isLeft
+): ParseResult<never> => Effect.fail(es)

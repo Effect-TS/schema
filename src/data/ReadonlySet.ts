@@ -1,7 +1,9 @@
 /**
  * @since 1.0.0
  */
+
 import { pipe } from "@effect/data/Function"
+import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
@@ -24,7 +26,7 @@ const parser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
         pipe(
           Array.from(u.values()),
           (us) => items(us, options),
-          I.map((as) => new Set(as))
+          Effect.map((as) => new Set(as))
         )
   )
 }

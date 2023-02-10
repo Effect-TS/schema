@@ -3,6 +3,7 @@ import { pipe } from "@effect/data/Function"
 import { isNumber } from "@effect/data/Number"
 import { isRecord } from "@effect/data/Predicate"
 import { isString } from "@effect/data/String"
+import * as Effect from "@effect/io/Effect"
 import type { Json, JsonArray, JsonObject } from "@effect/schema/data/Json"
 import { json } from "@effect/schema/data/Json"
 import * as _ from "@effect/schema/formatter/Tree"
@@ -27,8 +28,10 @@ describe.concurrent("Tree", () => {
       S.union(S.string, S.number),
       (u): u is string | number => isString(u) || isNumber(u)
     )
-    expect(pipe(parser.parse(null), E.mapLeft(_.formatErrors))).toEqual(E.left(`1 error(s) found
-└─ Expected string or number, actual null`))
+    expect(pipe(parser.parse(null), Effect.runSyncEither, E.mapLeft(_.formatErrors))).toEqual(
+      E.left(`1 error(s) found
+└─ Expected string or number, actual null`)
+    )
   })
 
   it("formatErrors/ lazy", () => {
@@ -44,7 +47,7 @@ describe.concurrent("Tree", () => {
       isJsonObject(u)
 
     const parser = I.fromRefinement(json, isJson)
-    expect(pipe(parser.parse(undefined), E.mapLeft(_.formatErrors))).toEqual(
+    expect(pipe(parser.parse(undefined), Effect.runSyncEither, E.mapLeft(_.formatErrors))).toEqual(
       E.left(`1 error(s) found
 └─ Expected <anonymous Lazy schema>, actual undefined`)
     )

@@ -4,6 +4,7 @@
 import * as D from "@effect/data/Data"
 import * as E from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
+import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
@@ -27,7 +28,7 @@ const parser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
     (u, options) =>
       !E.isEqual(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(decode(u, options), I.map(toData))
+        pipe(decode(u, options), Effect.map(toData))
   )
 }
 

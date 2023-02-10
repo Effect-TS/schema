@@ -2,7 +2,6 @@
  * @since 1.0.0
  */
 
-import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
@@ -15,12 +14,6 @@ import type { Parser } from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type * as S from "@effect/schema/Schema"
-
-/** @internal */
-export const flatMap = E.flatMap
-
-/** @internal */
-export const map = E.map
 
 /** @internal */
 export const mutableAppend = <A>(self: Array<A>, a: A): NonEmptyReadonlyArray<A> => {

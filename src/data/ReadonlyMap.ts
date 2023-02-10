@@ -1,7 +1,9 @@
 /**
  * @since 1.0.0
  */
+
 import { pipe } from "@effect/data/Function"
+import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
@@ -27,7 +29,7 @@ const parser = <K, V>(
         pipe(
           Array.from(u.entries()),
           (us) => items(us, options),
-          I.map((as) => new Map(as))
+          Effect.map((as) => new Map(as))
         )
   )
 }

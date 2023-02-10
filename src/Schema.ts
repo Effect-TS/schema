@@ -9,6 +9,7 @@ import { pipe } from "@effect/data/Function"
 import type { Option } from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import * as Effect from "@effect/io/Effect"
 import * as A from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -611,7 +612,10 @@ export const brand = <B extends string, A>(
       ast,
       option: (input: unknown) => getOption(input),
       either: (input: unknown) =>
-        E.mapLeft(decode(input), (errors) => [{ meta: input, message: formatErrors(errors) }]),
+        E.mapLeft(
+          Effect.runSyncEither(decode(input)),
+          (errors) => [{ meta: input, message: formatErrors(errors) }]
+        ),
       refine: (input: unknown): input is A & Brand<B> => is(input)
     })
     return out

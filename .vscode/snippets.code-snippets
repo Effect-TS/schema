@@ -1,0 +1,12 @@
+{
+  "Gen Function $": {
+    "prefix": "gg",
+    "body": ["function* ($) {}"],
+    "description": "Generator FUnction with _ input"
+  },
+  "Gen Yield $": {
+    "prefix": "yy",
+    "body": ["yield* $($0)"],
+    "description": "Yield generator calling $()"
+  }
+}

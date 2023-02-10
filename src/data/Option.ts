@@ -1,11 +1,13 @@
 /**
  * @since 1.0.0
  */
+
 import * as Equal from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
 import * as Hash from "@effect/data/Hash"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
@@ -26,7 +28,7 @@ const parser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
         PR.failure(PR.type(schema.ast, u)) :
         O.isNone(u) ?
         PR.success(O.none()) :
-        pipe(decodeValue(u.value, options), I.map(O.some))
+        pipe(decodeValue(u.value, options), Effect.map(O.some))
   )
 }
 

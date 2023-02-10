@@ -1,11 +1,13 @@
 /**
  * @since 1.0.0
  */
+
 import type { Either } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
 import * as Hash from "@effect/data/Hash"
+import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
@@ -25,8 +27,8 @@ const parser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E,
       !E.isEither(u) ?
         PR.failure(PR.type(schema.ast, u)) :
         E.isLeft(u) ?
-        pipe(decodeLeft(u.left, options), I.map(E.left)) :
-        pipe(decodeRight(u.right, options), I.map(E.right))
+        pipe(decodeLeft(u.left, options), Effect.map(E.left)) :
+        pipe(decodeRight(u.right, options), Effect.map(E.right))
   )
 }
 

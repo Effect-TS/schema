@@ -549,4 +549,12 @@ describe.concurrent("Schema", () => {
       })
     ).toEqual({ sideLength: 10 })
   })
+
+  // TODO
+  it.skip("lazy", () => {
+    type A = null | { readonly a: A }
+    const schema: S.Schema<A> = S.lazy(() => S.union(S.null, schema))
+    const is = P.is(schema)
+    expect(is(null)).toEqual(true) // Infinite recursion, out of memory.
+  })
 })

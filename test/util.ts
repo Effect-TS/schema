@@ -3,14 +3,14 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
+import * as Effect from "@effect/io/Effect"
 import * as annotations from "@effect/schema/annotation/AST"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/formatter/Tree"
-import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
+import type * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
 import * as fc from "fast-check"
 
@@ -21,8 +21,13 @@ export const property = <A>(schema: Schema<A>) => {
     if (!is(a)) {
       return false
     }
-    const roundtrip = pipe(a, P.encode(schema), I.flatMap(P.decode(schema)))
-    if (PR.isFailure(roundtrip)) {
+    const roundtrip = pipe(
+      a,
+      P.encode(schema),
+      Effect.flatMap(P.decode(schema)),
+      Effect.runSyncEither
+    )
+    if (E.isLeft(roundtrip)) {
       return false
     }
     return is(roundtrip.right)
@@ -35,7 +40,7 @@ export const expectDecodingSuccess = <A>(
   a: A = u as any,
   options?: ParseOptions
 ) => {
-  const t = P.decode(schema)(u, options)
+  const t = Effect.runSyncEither(P.decode(schema)(u, options))
   expect(t).toStrictEqual(E.right(a))
 }
 
@@ -45,7 +50,7 @@ export const expectDecodingFailure = <A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(P.decode(schema)(u, options), E.mapLeft(formatAll))
+  const t = pipe(P.decode(schema)(u, options), Effect.runSyncEither, E.mapLeft(formatAll))
   expect(t).toStrictEqual(E.left(message))
 }
 
@@ -55,7 +60,7 @@ export const expectEncodingSuccess = <A>(
   o: unknown,
   options?: ParseOptions
 ) => {
-  const t = P.encode(schema)(a, options)
+  const t = Effect.runSyncEither(P.encode(schema)(a, options))
   expect(t).toStrictEqual(E.right(o))
 }
 
@@ -65,7 +70,7 @@ export const expectEncodingFailure = <A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(P.encode(schema)(a, options), E.mapLeft(formatAll))
+  const t = pipe(P.encode(schema)(a, options), Effect.runSyncEither, E.mapLeft(formatAll))
   expect(t).toStrictEqual(E.left(message))
 }
 
@@ -99,7 +104,7 @@ const formatDecodeError = (e: PR.ParseError): string => {
 }
 
 export const expectDecodingFailureTree = <A>(schema: Schema<A>, u: unknown, message: string) => {
-  const t = pipe(P.decode(schema)(u), E.mapLeft(formatErrors))
+  const t = pipe(P.decode(schema)(u), Effect.runSyncEither, E.mapLeft(formatErrors))
   expect(E.isLeft(t)).toEqual(true)
   expect(t).toEqual(E.left(message))
 }

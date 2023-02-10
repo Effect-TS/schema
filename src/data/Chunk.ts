@@ -4,6 +4,7 @@
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
 import { pipe } from "@effect/data/Function"
+import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
@@ -21,7 +22,7 @@ const parser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
     (u, options) =>
       !C.isChunk(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(C.toReadonlyArray(u), (us) => items(us, options), I.map(C.fromIterable))
+        pipe(C.toReadonlyArray(u), (us) => items(us, options), Effect.map(C.fromIterable))
   )
 }
 
