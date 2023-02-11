@@ -35,9 +35,10 @@ export const minItems = <A>(
     pipe(
       self,
       I.filter((a): a is ReadonlyArray<A> => a.length >= n, {
+        id: MinItemsId,
         description: `an array of at least ${n} items`,
         jsonSchema: { minItems: n },
-        custom: { id: MinItemsId },
+        props: { minItems: n },
         ...annotationOptions
       })
     )
@@ -53,9 +54,10 @@ export const maxItems = <A>(
     pipe(
       self,
       I.filter((a): a is ReadonlyArray<A> => a.length <= n, {
+        id: MaxItemsId,
         description: `an array of at most ${n} items`,
         jsonSchema: { maxItems: n },
-        custom: { id: MaxItemsId },
+        props: { maxItems: n },
         ...annotationOptions
       })
     )
@@ -71,9 +73,10 @@ export const itemsCount = <A>(
     pipe(
       self,
       I.filter((a): a is ReadonlyArray<A> => a.length === n, {
+        id: ItemsCountId,
         description: `an array of exactly ${n} items`,
         jsonSchema: { minItems: n, maxItems: n },
-        custom: { id: ItemsCountId },
+        props: { itemsCount: n },
         ...annotationOptions
       })
     )
