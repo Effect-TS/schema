@@ -81,3 +81,13 @@ export type Documentation = string
  * @since 1.0.0
  */
 export const DocumentationId = "@fp-ts/schema/annotation/DocumentationId"
+
+/**
+ * @since 1.0.0
+ */
+export type Type = string
+
+/**
+ * @since 1.0.0
+ */
+export const TypeId = "@fp-ts/schema/annotation/TypeId"

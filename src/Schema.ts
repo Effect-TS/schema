@@ -597,6 +597,7 @@ export const lazy: <A>(
  * @since 1.0.0
  */
 export type AnnotationOptions<A> = {
+  type: A.Type
   message?: A.Message<A>
   identifier?: A.Identifier
   title?: A.Title
@@ -604,7 +605,6 @@ export type AnnotationOptions<A> = {
   examples?: A.Examples
   documentation?: A.Documentation
   jsonSchema?: A.JSONSchema
-  custom?: A.Custom
 }
 
 /**

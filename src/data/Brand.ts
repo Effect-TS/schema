@@ -10,6 +10,11 @@ import type * as S from "@fp-ts/schema/Schema"
 /**
  * @since 1.0.0
  */
+export const BrandId = "@fp-ts/schema/data/Brand/BrandId"
+
+/**
+ * @since 1.0.0
+ */
 export const brand = <C extends B.Brand<string>>(
   constructor: B.Brand.Constructor<C>,
   annotationOptions?: S.AnnotationOptions<B.Brand.Unbranded<C>>
@@ -22,6 +27,7 @@ export const brand = <C extends B.Brand<string>>(
         I.filter<A, A & C>(
           (x): x is A & C => constructor.refine(x),
           {
+            type: BrandId,
             message: (a) =>
               (constructor.either(a) as E.Left<B.Brand.BrandErrors>).left.map((v) => v.message)
                 .join(", "),
