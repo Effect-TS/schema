@@ -118,6 +118,9 @@ export function filter<A>(
   options?: S.AnnotationOptions<A>
 ): (from: S.Schema<A>) => S.Schema<A> {
   const annotations: AST.Annotated["annotations"] = {}
+  if (options?.id !== undefined) {
+    annotations[A.IdId] = options?.id
+  }
   if (options?.message !== undefined) {
     annotations[A.MessageId] = options?.message
   }

@@ -9,6 +9,11 @@ import type { AnnotationOptions, Schema } from "@fp-ts/schema/Schema"
 /**
  * @since 1.0.0
  */
+export const InstanceOfId = "@fp-ts/schema/data/String/InstanceOfId"
+
+/**
+ * @since 1.0.0
+ */
 export const instanceOf = <A extends abstract new(...args: any) => any>(
   constructor: A,
   annotationOptions?: AnnotationOptions<object>
@@ -19,8 +24,9 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
       I.filter(
         (a): a is InstanceType<A> => a instanceof constructor,
         {
+          id: InstanceOfId,
           description: `an instance of ${constructor.name}`,
-          custom: { type: "instanceOf", instanceOf: constructor },
+          props: { instanceOf: constructor },
           ...annotationOptions
         }
       )

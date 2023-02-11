@@ -27,7 +27,7 @@ export const brand = <C extends B.Brand<string>>(
         I.filter<A, A & C>(
           (x): x is A & C => constructor.refine(x),
           {
-            type: BrandId,
+            id: BrandId,
             message: (a) =>
               (constructor.either(a) as E.Left<B.Brand.BrandErrors>).left.map((v) => v.message)
                 .join(", "),

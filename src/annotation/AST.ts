@@ -5,16 +5,6 @@
 /**
  * @since 1.0.0
  */
-export type Custom = unknown
-
-/**
- * @since 1.0.0
- */
-export const CustomId = "@fp-ts/schema/annotation/CustomId"
-
-/**
- * @since 1.0.0
- */
 export type Message<A> = (a: A) => string
 
 /**
@@ -85,9 +75,19 @@ export const DocumentationId = "@fp-ts/schema/annotation/DocumentationId"
 /**
  * @since 1.0.0
  */
-export type Type = string
+export type Id = string
 
 /**
  * @since 1.0.0
  */
-export const TypeId = "@fp-ts/schema/annotation/TypeId"
+export const IdId = "@fp-ts/schema/annotation/IdId"
+
+/**
+ * @since 1.0.0
+ */
+export type Props = Record<string | number | symbol, any>
+
+/**
+ * @since 1.0.0
+ */
+export const PropsId = "@fp-ts/schema/annotation/PropsId"

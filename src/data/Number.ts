@@ -74,7 +74,7 @@ export const finite = <A extends number>(annotationOptions?: AnnotationOptions<A
     pipe(
       self,
       I.filter((a): a is A => Number.isFinite(a), {
-        type: FiniteId,
+        id: FiniteId,
         description: "a finite number",
         ...annotationOptions
       })
@@ -91,7 +91,7 @@ export const greaterThan = <A extends number>(
     pipe(
       self,
       I.filter((a): a is A => a > min, {
-        type: GreaterThanId,
+        id: GreaterThanId,
         description: `a number greater than ${min}`,
         jsonSchema: { exclusiveMinimum: min },
         ...annotationOptions
@@ -109,7 +109,7 @@ export const greaterThanOrEqualTo = <A extends number>(
     pipe(
       self,
       I.filter((a): a is A => a >= min, {
-        type: GreaterThanOrEqualToId,
+        id: GreaterThanOrEqualToId,
         description: `a number greater than or equal to ${min}`,
         jsonSchema: { minimum: min },
         ...annotationOptions
@@ -138,7 +138,7 @@ export const multipleOf = <A extends number>(
     pipe(
       self,
       I.filter((a): a is A => floatSafeRemainder(a, divisor) === 0, {
-        type: MultipleOfId,
+        id: MultipleOfId,
         description: `a number divisible by ${divisor}`,
         jsonSchema: { multipleOf: divisor < 0 ? -divisor : divisor }, // spec requires positive divisor
         ...annotationOptions
@@ -153,7 +153,7 @@ export const int = <A extends number>(annotationOptions?: AnnotationOptions<A>) 
     pipe(
       self,
       I.filter((a): a is A => Number.isInteger(a), {
-        type: IntId,
+        id: IntId,
         description: "integer",
         jsonSchema: { type: "integer" },
         ...annotationOptions
@@ -168,7 +168,7 @@ export const lessThan = <A extends number>(max: number, annotationOptions?: Anno
     pipe(
       self,
       I.filter((a): a is A => a < max, {
-        type: LessThanId,
+        id: LessThanId,
         description: `a number less than ${max}`,
         jsonSchema: { exclusiveMaximum: max },
         ...annotationOptions
@@ -186,7 +186,7 @@ export const lessThanOrEqualTo = <A extends number>(
     pipe(
       self,
       I.filter((a): a is A => a <= max, {
-        type: LessThanOrEqualToId,
+        id: LessThanOrEqualToId,
         description: `a number less than or equal to ${max}`,
         jsonSchema: { maximum: max },
         ...annotationOptions
@@ -201,7 +201,7 @@ export const nonNaN = <A extends number>(annotationOptions?: AnnotationOptions<A
     pipe(
       self,
       I.filter((a): a is A => !Number.isNaN(a), {
-        type: NonNaNId,
+        id: NonNaNId,
         description: "a number NaN excluded",
         ...annotationOptions
       })
@@ -214,7 +214,7 @@ export const positive = <A extends number>(
   annotationOptions?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   greaterThan(0, {
-    type: PositiveId,
+    id: PositiveId,
     description: "a positive number",
     ...annotationOptions
   })
@@ -226,7 +226,7 @@ export const negative = <A extends number>(
   annotationOptions?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   lessThan(0, {
-    type: NegativeId,
+    id: NegativeId,
     description: "a negative number",
     ...annotationOptions
   })
@@ -238,7 +238,7 @@ export const nonNegative = <A extends number>(
   annotationOptions?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   greaterThanOrEqualTo(0, {
-    type: NonNegativeId,
+    id: NonNegativeId,
     description: "a non-negative number",
     ...annotationOptions
   })
@@ -250,7 +250,7 @@ export const nonPositive = <A extends number>(
   annotationOptions?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   lessThanOrEqualTo(0, {
-    type: NonPositiveId,
+    id: NonPositiveId,
     description: "a non-positive number",
     ...annotationOptions
   })

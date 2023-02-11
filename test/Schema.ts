@@ -384,7 +384,7 @@ describe.concurrent("Schema", () => {
     const schema = pipe(
       S.string,
       S.filter((s): s is string => s.length === 1, {
-        custom: { type: "Char" },
+        type: "Char",
         description: "description",
         documentation: "documentation",
         examples: ["examples"],
@@ -394,9 +394,7 @@ describe.concurrent("Schema", () => {
       })
     )
     expect(schema.ast.annotations).toEqual({
-      "@fp-ts/schema/annotation/CustomId": {
-        "type": "Char"
-      },
+      "@fp-ts/schema/annotation/TypeId": "Char",
       "@fp-ts/schema/annotation/DescriptionId": "description",
       "@fp-ts/schema/annotation/DocumentationId": "documentation",
       "@fp-ts/schema/annotation/ExamplesId": [

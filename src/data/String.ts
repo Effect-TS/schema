@@ -58,7 +58,7 @@ export const trimmed = <A extends string>(annotationOptions?: AnnotationOptions<
     pipe(
       self,
       I.filter((a): a is A => trimmedRegex.test(a), {
-        type: TrimmedId,
+        id: TrimmedId,
         description: "a string with no leading or trailing whitespace",
         jsonSchema: {
           type: "string",
@@ -81,7 +81,7 @@ export const maxLength = <A extends string>(
       I.filter(
         (a): a is A => a.length <= maxLength,
         {
-          type: MaxLengthId,
+          id: MaxLengthId,
           description: `a string at most ${maxLength} character(s) long`,
           jsonSchema: { maxLength },
           ...annotationOptions
@@ -102,7 +102,7 @@ export const minLength = <A extends string>(
       I.filter(
         (a): a is A => a.length >= minLength,
         {
-          type: MinLengthId,
+          id: MinLengthId,
           description: `a string at least ${minLength} character(s) long`,
           jsonSchema: { minLength },
           ...annotationOptions
@@ -124,10 +124,10 @@ export const pattern = <A extends string>(
       I.filter(
         (a): a is A => regex.test(a),
         {
-          type: PatternId,
+          id: PatternId,
           description: `a string matching the pattern ${pattern}`,
           jsonSchema: { pattern },
-          // custom: { regex },
+          props: { regex },
           ...annotationOptions
         }
       )
@@ -147,10 +147,10 @@ export const startsWith = <A extends string>(
       I.filter(
         (a): a is A => a.startsWith(startsWith),
         {
-          type: StartsWithId,
+          id: StartsWithId,
           description: `a string starting with ${JSON.stringify(startsWith)}`,
           jsonSchema: { pattern: `^${startsWith}` },
-          // custom: { startsWith },
+          props: { startsWith },
           ...annotationOptions
         }
       )
@@ -169,10 +169,10 @@ export const endsWith = <A extends string>(
       I.filter(
         (a): a is A => a.endsWith(endsWith),
         {
-          type: EndsWithId,
+          id: EndsWithId,
           description: `a string ending with ${JSON.stringify(endsWith)}`,
           jsonSchema: { pattern: `^.*${endsWith}$` },
-          // custom: { endsWith },
+          props: { endsWith },
           ...annotationOptions
         }
       )
@@ -191,10 +191,10 @@ export const includes = <A extends string>(
       I.filter(
         (a): a is A => a.includes(searchString),
         {
-          type: IncludesId,
+          id: IncludesId,
           description: `a string including ${JSON.stringify(searchString)}`,
           jsonSchema: { pattern: `.*${searchString}.*` },
-          // custom: { includes: searchString },
+          props: { includes: searchString },
           ...annotationOptions
         }
       )
