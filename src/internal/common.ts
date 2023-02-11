@@ -142,6 +142,9 @@ export function filter<A>(
   if (options?.jsonSchema !== undefined) {
     annotations[A.JSONSchemaId] = options?.jsonSchema
   }
+  if (options?.props !== undefined) {
+    annotations[A.PropsId] = options?.props
+  }
   return (from) => makeSchema(AST.createRefinement(from.ast, predicate, annotations))
 }
 

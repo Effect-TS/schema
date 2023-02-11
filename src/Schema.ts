@@ -661,6 +661,20 @@ export const transform: <A, B>(
  * @category annotations
  * @since 1.0.0
  */
+export const id = (id: A.Id) =>
+  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, A.IdId, id))
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const props = (props: A.Props) =>
+  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, A.PropsId, props))
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
 export const annotations: (
   annotations: AST.Annotated["annotations"]
 ) => <A>(self: Schema<A>) => Schema<A> = I.annotations

@@ -10,6 +10,20 @@ describe.concurrent("Schema", () => {
     expect(S.OptionalSchemaId).exist
   })
 
+  it("id", () => {
+    expect(pipe(S.string, S.id("TestId")).ast.annotations).toEqual({
+      "@fp-ts/schema/annotation/IdId": "TestId",
+      "@fp-ts/schema/annotation/TitleId": "string"
+    })
+  })
+
+  it("props", () => {
+    expect(pipe(S.string, S.props({ testProp: "test" })).ast.annotations).toEqual({
+      "@fp-ts/schema/annotation/PropsId": { testProp: "test" },
+      "@fp-ts/schema/annotation/TitleId": "string"
+    })
+  })
+
   it("title", () => {
     expect(pipe(S.string, S.title("MyString")).ast.annotations).toEqual({
       "@fp-ts/schema/annotation/TitleId": "MyString"
@@ -384,17 +398,18 @@ describe.concurrent("Schema", () => {
     const schema = pipe(
       S.string,
       S.filter((s): s is string => s.length === 1, {
-        type: "Char",
+        id: "Char",
         description: "description",
         documentation: "documentation",
         examples: ["examples"],
         identifier: "identifier",
         jsonSchema: { minLength: 1, maxLength: 1 },
-        title: "title"
+        title: "title",
+        props: { minLength: 1, maxLength: 1 }
       })
     )
     expect(schema.ast.annotations).toEqual({
-      "@fp-ts/schema/annotation/TypeId": "Char",
+      "@fp-ts/schema/annotation/IdId": "Char",
       "@fp-ts/schema/annotation/DescriptionId": "description",
       "@fp-ts/schema/annotation/DocumentationId": "documentation",
       "@fp-ts/schema/annotation/ExamplesId": [
@@ -402,6 +417,10 @@ describe.concurrent("Schema", () => {
       ],
       "@fp-ts/schema/annotation/IdentifierId": "identifier",
       "@fp-ts/schema/annotation/JSONSchemaId": {
+        "maxLength": 1,
+        "minLength": 1
+      },
+      "@fp-ts/schema/annotation/PropsId": {
         "maxLength": 1,
         "minLength": 1
       },
