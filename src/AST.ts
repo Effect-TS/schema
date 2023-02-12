@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+// import type * as E from "@fp-ts/core/Either"
 import { pipe } from "@fp-ts/core/Function"
 import * as Number from "@fp-ts/core/Number"
 import { isNumber } from "@fp-ts/core/Number"
@@ -41,6 +42,35 @@ export type AST =
   | Lazy
   | Refinement
   | Transform
+
+export interface TypeMap {
+  "TypeAlias": TypeAlias
+  "Literal": Literal
+  "UniqueSymbol": UniqueSymbol
+  "UndefinedKeyword": UndefinedKeyword
+  "VoidKeyword": VoidKeyword
+  "NeverKeyword": NeverKeyword
+  "UnknownKeyword": UnknownKeyword
+  "AnyKeyword": AnyKeyword
+  "StringKeyword": StringKeyword
+  "NumberKeyword": NumberKeyword
+  "BooleanKeyword": BooleanKeyword
+  "BigIntKeyword": BigIntKeyword
+  "SymbolKeyword": SymbolKeyword
+  "ObjectKeyword": ObjectKeyword
+  "Enums": Enums
+  "TemplateLiteral": TemplateLiteral
+  "Tuple": Tuple
+  "TypeLiteral": TypeLiteral
+  "Union": Union
+  "Lazy": Lazy
+  "Refinement": Refinement
+  "Transform": Transform
+}
+
+export type Compiler<Model> = {
+  [k in keyof TypeMap]: (ast: TypeMap[k]) => Model
+}
 
 /**
  * @since 1.0.0

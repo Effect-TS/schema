@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+// import * as E from "@fp-ts/core/Either"
 import { pipe } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
 import * as RA from "@fp-ts/core/ReadonlyArray"
@@ -51,30 +52,6 @@ const getHook = AST.getAnnotation<TAH.Hook<FastCheck.Arbitrary<any>>>(
 )
 
 type Go<Model> = (ast: AST.AST) => Model
-
-export type CompilerMap<Model> = {
-  StringKeyword: (a: AST.StringKeyword) => Model
-  NumberKeyword: (a: AST.NumberKeyword) => Model
-  BooleanKeyword: (a: AST.BooleanKeyword) => Model
-  BigIntKeyword: (a: AST.BigIntKeyword) => Model
-  UnknownKeyword: (a: AST.UnknownKeyword) => Model
-  UndefinedKeyword: (a: AST.UndefinedKeyword) => Model
-  AnyKeyword: (a: AST.AnyKeyword) => Model
-  VoidKeyword: (a: AST.VoidKeyword) => Model
-  Literal: (a: AST.Literal) => Model
-  UniqueSymbol: (a: AST.UniqueSymbol) => Model
-  SymbolKeyword: (a: AST.SymbolKeyword) => Model
-  ObjectKeyword: (a: AST.ObjectKeyword) => Model
-  Enums: (a: AST.Enums) => Model
-  Refinement: (a: AST.Refinement) => Model
-  Lazy: (a: AST.Lazy) => Model
-  Union: (a: AST.Union) => Model
-  TypeAlias: (a: AST.TypeAlias) => Model
-  Transform: (a: AST.Transform) => Model
-  TemplateLiteral: (a: AST.TemplateLiteral) => Model
-  Tuple: (a: AST.Tuple) => Model
-  TypeLiteral: (a: AST.TypeLiteral) => Model
-}
 
 const typeLiteral = (fc: typeof FastCheck, go: Go<FastCheck.Arbitrary<any>>) =>
   (ast: AST.TypeLiteral) => {
@@ -152,7 +129,8 @@ const tuple = (fc: typeof FastCheck, go: Go<FastCheck.Arbitrary<any>>) =>
 const compilerMap = (
   fc: typeof FastCheck,
   go: Go<FastCheck.Arbitrary<any>>
-): CompilerMap<FastCheck.Arbitrary<any>> => ({
+): AST.Compiler<FastCheck.Arbitrary<any>> => ({
+  NeverKeyword: () => fc.string(), // TODO
   StringKeyword: () => fc.string(),
   NumberKeyword: () => fc.float(),
   BooleanKeyword: () => fc.boolean(),
