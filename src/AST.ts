@@ -68,7 +68,17 @@ export interface TypeMap {
   "Transform": Transform
 }
 
-export type Compiler<Model> = {
+/*
+ * @since 1.0.0
+ * A function that takes an AST and returns a odel
+ */
+export type Compiler<Model> = (ast: AST) => Model
+
+/*
+ * @since 1.0.0
+ * Maps AST types to instances of Model
+ */
+export type CompilerASTMap<Model> = {
   [k in keyof TypeMap]: (ast: TypeMap[k]) => Model
 }
 

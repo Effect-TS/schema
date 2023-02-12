@@ -24,8 +24,10 @@ export interface Arbitrary<A> extends Schema<A> {
  * @category constructors
  * @since 1.0.0
  */
-export const make: <A>(schema: Schema<A>, arbitrary: Arbitrary<A>["arbitrary"]) => Arbitrary<A> =
-  I.makeArbitrary
+export const make: <A>(
+  schema: Schema<A>,
+  arbitrary: FastCheck.Arbitrary<A>
+) => FastCheck.Arbitrary<A> = I.makeArbitrary
 
 /**
  * @category arbitrary
@@ -51,9 +53,7 @@ const getHook = AST.getAnnotation<TAH.Hook<FastCheck.Arbitrary<any>>>(
   TAH.ArbitraryHookId
 )
 
-type Go<Model> = (ast: AST.AST) => Model
-
-const typeLiteral = (fc: typeof FastCheck, go: Go<FastCheck.Arbitrary<any>>) =>
+const typeLiteral = (fc: typeof FastCheck, go: AST.Compiler<FastCheck.Arbitrary<any>>) =>
   (ast: AST.TypeLiteral) => {
     const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
     const indexSignatures = ast.indexSignatures.map((is) =>
@@ -76,18 +76,14 @@ const typeLiteral = (fc: typeof FastCheck, go: Go<FastCheck.Arbitrary<any>>) =>
     // ---------------------------------------------
     // handle index signatures
     // ---------------------------------------------
-    for (let i = 0; i < indexSignatures.length; i++) {
-      const parameter = indexSignatures[i][0]
-      const type = indexSignatures[i][1]
-      output = output.chain((o) => {
-        return record(fc, parameter, type).map((d) => ({ ...d, ...o }))
-      })
-    }
+    indexSignatures.forEach(([parameter, type]) => {
+      output = output.chain((o) => record(fc, parameter, type).map((d) => ({ ...d, ...o })))
+    })
 
     return output
   }
 
-const tuple = (fc: typeof FastCheck, go: Go<FastCheck.Arbitrary<any>>) =>
+const tuple = (fc: typeof FastCheck, go: AST.Compiler<FastCheck.Arbitrary<any>>) =>
   (ast: AST.Tuple) => {
     const elements = ast.elements.map((e) => go(e.type))
     const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
@@ -128,8 +124,8 @@ const tuple = (fc: typeof FastCheck, go: Go<FastCheck.Arbitrary<any>>) =>
 
 const compilerMap = (
   fc: typeof FastCheck,
-  go: Go<FastCheck.Arbitrary<any>>
-): AST.Compiler<FastCheck.Arbitrary<any>> => ({
+  go: AST.Compiler<FastCheck.Arbitrary<any>>
+): AST.CompilerASTMap<FastCheck.Arbitrary<any>> => ({
   NeverKeyword: () => fc.string(), // TODO
   StringKeyword: () => fc.string(),
   NumberKeyword: () => fc.float(),
@@ -163,7 +159,7 @@ const compilerMap = (
 
 const arbitraryFor = (fc: typeof FastCheck) =>
   <A>(schema: Schema<A>): FastCheck.Arbitrary<A> => {
-    const go = (ast: AST.AST): FastCheck.Arbitrary<any> => {
+    const go: AST.Compiler<FastCheck.Arbitrary<any>> = (ast) => {
       switch (ast._tag) {
         case "TypeAlias":
           return pipe(

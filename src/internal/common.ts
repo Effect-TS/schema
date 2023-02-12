@@ -9,13 +9,13 @@ import type { Predicate, Refinement } from "@fp-ts/core/Predicate"
 import type { NonEmptyReadonlyArray } from "@fp-ts/core/ReadonlyArray"
 import * as RA from "@fp-ts/core/ReadonlyArray"
 import * as A from "@fp-ts/schema/annotation/AST"
-import type { Arbitrary } from "@fp-ts/schema/Arbitrary"
 import * as AST from "@fp-ts/schema/AST"
 import type { Json, JsonArray, JsonObject } from "@fp-ts/schema/data/Json"
 import type { Parser } from "@fp-ts/schema/Parser"
 import * as PR from "@fp-ts/schema/ParseResult"
 import type { Pretty } from "@fp-ts/schema/Pretty"
 import type * as S from "@fp-ts/schema/Schema"
+import type * as FastCheck from "fast-check"
 
 /** @internal */
 export const flatMap = E.flatMap
@@ -59,8 +59,8 @@ export const isJson = (u: unknown): u is Json =>
 /** @internal */
 export const makeArbitrary = <A>(
   schema: S.Schema<A>,
-  arbitrary: Arbitrary<A>["arbitrary"]
-): Arbitrary<A> => ({ ast: schema.ast, arbitrary }) as any
+  arbitrary: FastCheck.Arbitrary<A>
+): FastCheck.Arbitrary<A> => arbitrary
 
 /** @internal */
 export const makeParser = <A>(
