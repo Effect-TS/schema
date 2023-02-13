@@ -202,7 +202,15 @@ const compilerMap = (
       E.right(fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))),
   Refinement: (ast) => pipe(go(ast.from), E.map((arb) => arb.filter((a) => ast.refinement(a)))),
   Union: (ast) => pipe(ast.types.map(go), all, E.map((arbs) => fc.oneof(...arbs))),
-  TypeAlias: (ast) => go(ast.type),
+  TypeAlias: (ast) => {
+    return pipe(
+      getHook(ast),
+      O.match(
+        () => go(ast.type),
+        ({ handler }) => pipe(ast.typeParameters.map(go), all, E.map((arbs) => handler(...arbs)))
+      )
+    )
+  },
   Transform: (ast) => go(ast.to),
   TemplateLiteral: (ast) => {
     const components = [fc.constant(ast.head)]
@@ -229,14 +237,7 @@ const arbitraryFor = (fc: typeof FastCheck) =>
     const go: AST.Compiler<string, FastCheck.Arbitrary<any>> = (ast) => {
       switch (ast._tag) {
         case "TypeAlias":
-          return pipe(
-            getHook(ast),
-            O.match(
-              () => compilerMap(fc, go)[ast._tag](ast),
-              ({ handler }) =>
-                pipe(ast.typeParameters.map(go), all, E.map((arbs) => handler(...arbs)))
-            )
-          )
+          return compilerMap(fc, go)[ast._tag](ast)
         case "Literal":
           return compilerMap(fc, go)[ast._tag](ast)
         case "UniqueSymbol":
