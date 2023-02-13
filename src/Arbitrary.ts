@@ -2,7 +2,7 @@
  * @since 1.0.0
  */
 
-// import * as E from "@fp-ts/core/Either"
+import * as E from "@fp-ts/core/Either"
 import { pipe } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
 import * as RA from "@fp-ts/core/ReadonlyArray"
@@ -11,6 +11,39 @@ import * as AST from "@fp-ts/schema/AST"
 import * as I from "@fp-ts/schema/internal/common"
 import type { Schema } from "@fp-ts/schema/Schema"
 import type * as FastCheck from "fast-check"
+
+/*
+ * @since 1.0.0
+ * Pending ecosystem package update
+ */
+export const all = <E, A>(
+  collection: Iterable<E.Either<E, A>>
+): E.Either<E, Array<A>> => {
+  const out: Array<A> = []
+  for (const e of collection) {
+    if (E.isLeft(e)) {
+      return e
+    }
+    out.push(e.right)
+  }
+  return E.right(out)
+}
+
+/*
+ * @since 1.0.0
+ * Pending ecosystem package update
+ */
+export const eitherTuple = <E, A>(
+  tuple: readonly [E.Either<E, A>, E.Either<E, A>]
+): E.Either<E, readonly [A, A]> =>
+  pipe(
+    E.Do,
+    E.andThenBind("a", tuple[0]),
+    E.andThenBind("b", tuple[1]),
+    E.map(({ a, b }) => [a, b])
+  )
+
+export const mapLazy = <A, B>(g: (a: A) => B) => (f: () => A) => () => g(f())
 
 /**
  * @category model
@@ -53,11 +86,13 @@ const getHook = AST.getAnnotation<TAH.Hook<FastCheck.Arbitrary<any>>>(
   TAH.ArbitraryHookId
 )
 
-const typeLiteral = (fc: typeof FastCheck, go: AST.Compiler<FastCheck.Arbitrary<any>>) =>
-  (ast: AST.TypeLiteral) => {
+const typeLiteral = (fc: typeof FastCheck, go: AST.Compiler<string, FastCheck.Arbitrary<any>>) =>
+  (ast: AST.TypeLiteral): E.Either<string, FastCheck.Arbitrary<any>> => {
     const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
-    const indexSignatures = ast.indexSignatures.map((is) =>
-      [go(is.parameter), go(is.type)] as const
+    const indexSignatures = pipe(
+      ast.indexSignatures.map((is) => [go(is.parameter), go(is.type)] as const),
+      (x) => x.map(eitherTuple),
+      all
     )
     const arbs: any = {}
     const requiredKeys: Array<PropertyKey> = []
@@ -76,27 +111,37 @@ const typeLiteral = (fc: typeof FastCheck, go: AST.Compiler<FastCheck.Arbitrary<
     // ---------------------------------------------
     // handle index signatures
     // ---------------------------------------------
-    indexSignatures.forEach(([parameter, type]) => {
-      output = output.chain((o) => record(fc, parameter, type).map((d) => ({ ...d, ...o })))
-    })
-
-    return output
+    pipe(
+      indexSignatures,
+      E.map((arbs) =>
+        arbs.forEach(([parameter, type]) => {
+          output = output.chain((o) => record(fc, parameter, type).map((d) => ({ ...d, ...o })))
+        })
+      )
+    )
+    return E.right(output)
   }
 
-const tuple = (fc: typeof FastCheck, go: AST.Compiler<FastCheck.Arbitrary<any>>) =>
-  (ast: AST.Tuple) => {
+const tuple = (fc: typeof FastCheck, go: AST.Compiler<string, FastCheck.Arbitrary<any>>) =>
+  (ast: AST.Tuple): E.Either<string, FastCheck.Arbitrary<any>> => {
     const elements = ast.elements.map((e) => go(e.type))
     const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
     // ---------------------------------------------
     // handle elements
     // ---------------------------------------------
-    let output = fc.tuple(...elements.map((e) => e))
+    let output = pipe(elements, all, E.map((arbs) => fc.tuple(...arbs)))
+
     if (elements.length > 0 && O.isNone(rest)) {
       const firstOptionalIndex = ast.elements.findIndex((e) => e.isOptional)
       if (firstOptionalIndex !== -1) {
-        output = output.chain((as) =>
-          fc.integer({ min: firstOptionalIndex, max: elements.length - 1 }).map((i) =>
-            as.slice(0, i)
+        output = pipe(
+          output,
+          E.map((arbs) =>
+            arbs.chain((as) =>
+              fc.integer({ min: firstOptionalIndex, max: elements.length - 1 }).map((i) =>
+                as.slice(0, i)
+              )
+            )
           )
         )
       }
@@ -108,14 +153,17 @@ const tuple = (fc: typeof FastCheck, go: AST.Compiler<FastCheck.Arbitrary<any>>)
     if (O.isSome(rest)) {
       const head = RA.headNonEmpty(rest.value)
       const tail = RA.tailNonEmpty(rest.value)
-      output = output.chain((as) =>
-        fc.array(head, { maxLength: 5 }).map((rest) => [...as, ...rest])
+      output = pipe(
+        output,
+        E.map((arbs) =>
+          arbs.chain((as) => fc.array(head, { maxLength: 5 }).map((rest) => [...as, ...rest]))
+        )
       )
       // ---------------------------------------------
       // handle post rest elements
       // ---------------------------------------------
       for (let j = 0; j < tail.length; j++) {
-        output = output.chain((as) => tail[j].map((a) => [...as, a]))
+        output = pipe(output, E.map((arbs) => arbs.chain((as) => tail[j].map((a) => [...as, a]))))
       }
     }
 
@@ -124,25 +172,24 @@ const tuple = (fc: typeof FastCheck, go: AST.Compiler<FastCheck.Arbitrary<any>>)
 
 const compilerMap = (
   fc: typeof FastCheck,
-  go: AST.Compiler<FastCheck.Arbitrary<any>>
-): AST.CompilerASTMap<FastCheck.Arbitrary<any>> => ({
-  NeverKeyword: () => fc.string(), // TODO
-  StringKeyword: () => fc.string(),
-  NumberKeyword: () => fc.float(),
-  BooleanKeyword: () => fc.boolean(),
-  BigIntKeyword: () => fc.bigInt(),
-  UnknownKeyword: () => fc.anything(),
-  AnyKeyword: () => fc.anything(),
-  VoidKeyword: () => fc.constant(undefined),
-  UndefinedKeyword: () => fc.constant(undefined),
-  SymbolKeyword: () => fc.string().map((s) => Symbol.for(s)),
-  ObjectKeyword: () => fc.oneof(fc.object(), fc.array(fc.anything())),
-  Literal: (ast) => fc.constant(ast.literal),
-  UniqueSymbol: (ast) => fc.constant(ast.symbol),
-  Enums: (ast) => fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value))),
-  Refinement: (ast) => go(ast.from).filter((a) => ast.refinement(a)),
-  Lazy: (ast) => fc.constant(null).chain(() => go(ast.f())),
-  Union: (ast) => fc.oneof(...ast.types.map(go).map((c) => c)),
+  go: AST.Compiler<string, FastCheck.Arbitrary<any>>
+): AST.CompilerASTMap<string, FastCheck.Arbitrary<any>> => ({
+  NeverKeyword: () => E.left("never"),
+  StringKeyword: () => E.right(fc.string()),
+  NumberKeyword: () => E.right(fc.float()),
+  BooleanKeyword: () => E.right(fc.boolean()),
+  BigIntKeyword: () => E.right(fc.bigInt()),
+  UnknownKeyword: () => E.right(fc.anything()),
+  AnyKeyword: () => E.right(fc.anything()),
+  VoidKeyword: () => E.right(fc.constant(undefined)),
+  UndefinedKeyword: () => E.right(fc.constant(undefined)),
+  SymbolKeyword: () => E.right(fc.string().map((s) => Symbol.for(s))),
+  ObjectKeyword: () => E.right(fc.oneof(fc.object(), fc.array(fc.anything()))),
+  Literal: (ast) => E.right(fc.constant(ast.literal)),
+  UniqueSymbol: (ast) => E.right(fc.constant(ast.symbol)),
+  Enums: (ast) => E.right(fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))),
+  Refinement: (ast) => pipe(go(ast.from), E.map((arb) => arb.filter((a) => ast.refinement(a)))),
+  Union: (ast) => pipe(ast.types.map(go), all, E.map((arbs) => fc.oneof(...arbs))),
   TypeAlias: (ast) => go(ast.type),
   Transform: (ast) => go(ast.to),
   TemplateLiteral: (ast) => {
@@ -151,15 +198,16 @@ const compilerMap = (
       components.push(fc.string({ maxLength: 5 }))
       components.push(fc.constant(span.literal))
     }
-    return fc.tuple(...components).map((spans) => spans.join(""))
+    return E.right(fc.tuple(...components).map((spans) => spans.join("")))
   },
   Tuple: tuple(fc, go),
-  TypeLiteral: typeLiteral(fc, go)
+  TypeLiteral: typeLiteral(fc, go),
+  Lazy: (ast) => pipe(() => go(ast.f()), mapLazy(E.map((x) => fc.constant(null).chain(() => x))))()
 } as const)
 
 const arbitraryFor = (fc: typeof FastCheck) =>
   <A>(schema: Schema<A>): FastCheck.Arbitrary<A> => {
-    const go: AST.Compiler<FastCheck.Arbitrary<any>> = (ast) => {
+    const go: AST.Compiler<string, FastCheck.Arbitrary<any>> = (ast) => {
       switch (ast._tag) {
         case "TypeAlias":
           return pipe(

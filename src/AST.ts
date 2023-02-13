@@ -2,7 +2,7 @@
  * @since 1.0.0
  */
 
-// import type * as E from "@fp-ts/core/Either"
+import type * as E from "@fp-ts/core/Either"
 import { pipe } from "@fp-ts/core/Function"
 import * as Number from "@fp-ts/core/Number"
 import { isNumber } from "@fp-ts/core/Number"
@@ -72,14 +72,14 @@ export interface TypeMap {
  * @since 1.0.0
  * A function that takes an AST and returns a odel
  */
-export type Compiler<Model> = (ast: AST) => Model
+export type Compiler<Err, Model> = (ast: AST) => E.Either<Err, Model>
 
 /*
  * @since 1.0.0
  * Maps AST types to instances of Model
  */
-export type CompilerASTMap<Model> = {
-  [k in keyof TypeMap]: (ast: TypeMap[k]) => Model
+export type CompilerASTMap<Err, Model> = {
+  [k in keyof TypeMap]: (ast: TypeMap[k]) => E.Either<Err, Model>
 }
 
 /**
