@@ -155,16 +155,27 @@ const tuple = (fc: typeof FastCheck, go: AST.Compiler<string, FastCheck.Arbitrar
       const tail = RA.tailNonEmpty(rest.value)
       output = pipe(
         output,
-        E.map((arbs) =>
-          arbs.chain((as) => fc.array(head, { maxLength: 5 }).map((rest) => [...as, ...rest]))
+        E.flatMap((arbs) =>
+          pipe(
+            head,
+            E.map((h) =>
+              arbs.chain((as) => fc.array(h, { maxLength: 5 }).map((rest) => [...as, ...rest]))
+            )
+          )
         )
       )
       // ---------------------------------------------
       // handle post rest elements
       // ---------------------------------------------
-      for (let j = 0; j < tail.length; j++) {
-        output = pipe(output, E.map((arbs) => arbs.chain((as) => tail[j].map((a) => [...as, a]))))
-      }
+      pipe(
+        tail,
+        all,
+        E.map((t) =>
+          t.forEach((t) => {
+            output = pipe(output, E.map((arbs) => arbs.chain((as) => t.map((a) => [...as, a]))))
+          })
+        )
+      )
     }
 
     return output
