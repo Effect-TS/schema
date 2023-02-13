@@ -3,7 +3,7 @@
  */
 
 import * as E from "@fp-ts/core/Either"
-import { pipe } from "@fp-ts/core/Function"
+import { compose, pipe } from "@fp-ts/core/Function"
 import * as O from "@fp-ts/core/Option"
 import * as RA from "@fp-ts/core/ReadonlyArray"
 import * as TAH from "@fp-ts/schema/annotation/Hook"
@@ -42,8 +42,6 @@ export const eitherTuple = <E, A>(
     E.andThenBind("b", tuple[1]),
     E.map(({ a, b }) => [a, b])
   )
-
-export const mapLazy = <A, B>(g: (a: A) => B) => (f: () => A) => () => g(f())
 
 /**
  * @category model
@@ -216,7 +214,14 @@ const compilerMap = (
   },
   Tuple: tuple(fc, go),
   TypeLiteral: typeLiteral(fc, go),
-  Lazy: (ast) => pipe(() => go(ast.f()), mapLazy(E.map((x) => fc.constant(null).chain(() => x))))()
+  Lazy: (ast) => {
+    const f = () => go(ast.f())
+    try {
+      return E.right(fc.constant(null).chain(() => E.getOrThrow(f())))
+    } catch (e) {
+      return E.left("Lazy fn threw an error")
+    }
+  }
 } as const)
 
 const arbitraryFor = (fc: typeof FastCheck) =>
