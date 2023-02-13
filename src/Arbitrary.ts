@@ -206,7 +206,7 @@ const compilerMap = (
 } as const)
 
 const arbitraryFor = (fc: typeof FastCheck) =>
-  <A>(schema: Schema<A>): FastCheck.Arbitrary<A> => {
+  <A>(schema: Schema<A>): E.Either<string, FastCheck.Arbitrary<A>> => {
     const go: AST.Compiler<string, FastCheck.Arbitrary<any>> = (ast) => {
       switch (ast._tag) {
         case "TypeAlias":
@@ -214,7 +214,8 @@ const arbitraryFor = (fc: typeof FastCheck) =>
             getHook(ast),
             O.match(
               () => compilerMap(fc, go)[ast._tag](ast),
-              ({ handler }) => handler(...ast.typeParameters.map(go))
+              ({ handler }) =>
+                pipe(ast.typeParameters.map(go), all, E.map((arbs) => handler(...arbs)))
             )
           )
         case "Literal":
