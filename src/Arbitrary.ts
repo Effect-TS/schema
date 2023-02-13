@@ -67,7 +67,7 @@ export const make: <A>(
  * @since 1.0.0
  */
 export const arbitrary = <A>(schema: Schema<A>) =>
-  (fc: typeof FastCheck): FastCheck.Arbitrary<A> => arbitraryFor(fc)(schema)
+  (fc: typeof FastCheck): E.Either<string, FastCheck.Arbitrary<A>> => arbitraryFor(fc)(schema)
 
 const record = <K extends PropertyKey, V>(
   fc: typeof FastCheck,

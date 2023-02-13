@@ -1,3 +1,4 @@
+import * as E from "@fp-ts/core/Either"
 import { pipe } from "@fp-ts/core/Function"
 import * as A from "@fp-ts/schema/Arbitrary"
 import * as P from "@fp-ts/schema/Parser"
@@ -7,7 +8,12 @@ import * as fc from "fast-check"
 export const property = <A>(schema: S.Schema<A>) => {
   const arbitrary = A.arbitrary(schema)
   const is = P.is(schema)
-  fc.assert(fc.property(arbitrary(fc), (a) => is(a)))
+  const arbE = arbitrary(fc)
+
+  expect(arbE._tag).toBe("Right")
+  if (arbE._tag === "Right") {
+    fc.assert(fc.property(arbE.right, (a) => is(a)))
+  }
 }
 
 describe.concurrent("Arbitrary", () => {
@@ -52,9 +58,7 @@ describe.concurrent("Arbitrary", () => {
   })
 
   it("never", () => {
-    expect(() => A.arbitrary(S.never)(fc)).toThrowError(
-      new Error("cannot build an Arbitrary for `never`")
-    )
+    expect(A.arbitrary(S.never)(fc)).toStrictEqual(E.left("cannot build an Arbitrary for `never`"))
   })
 
   it("string", () => {
@@ -101,11 +105,11 @@ describe.concurrent("Arbitrary", () => {
     property(schema)
   })
 
-  it("empty enums should throw", () => {
+  it("empty enums", () => {
     enum Fruits {}
     const schema = S.enums(Fruits)
-    expect(() => A.arbitrary(schema)(fc)).toThrowError(
-      new Error("cannot build an Arbitrary for an empty enum")
+    expect(A.arbitrary(schema)(fc)).toStrictEqual(
+      E.left("cannot build an Arbitrary for an empty enum")
     )
   })
 
