@@ -401,7 +401,6 @@ S.bigint;
 S.boolean;
 S.symbol;
 S.object;
-S.json;
 S.date; // value must be a Date
 
 // empty types
