@@ -174,7 +174,7 @@ const compilerMap = (
   fc: typeof FastCheck,
   go: AST.Compiler<string, FastCheck.Arbitrary<any>>
 ): AST.CompilerASTMap<string, FastCheck.Arbitrary<any>> => ({
-  NeverKeyword: () => E.left("never"),
+  NeverKeyword: () => E.left("cannot build an Arbitrary for `never`"),
   StringKeyword: () => E.right(fc.string()),
   NumberKeyword: () => E.right(fc.float()),
   BooleanKeyword: () => E.right(fc.boolean()),
@@ -187,7 +187,10 @@ const compilerMap = (
   ObjectKeyword: () => E.right(fc.oneof(fc.object(), fc.array(fc.anything()))),
   Literal: (ast) => E.right(fc.constant(ast.literal)),
   UniqueSymbol: (ast) => E.right(fc.constant(ast.symbol)),
-  Enums: (ast) => E.right(fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))),
+  Enums: (ast) =>
+    ast.enums.length === 0 ?
+      E.left("cannot build an Arbitrary for an empty enum") :
+      E.right(fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))),
   Refinement: (ast) => pipe(go(ast.from), E.map((arb) => arb.filter((a) => ast.refinement(a)))),
   Union: (ast) => pipe(ast.types.map(go), all, E.map((arbs) => fc.oneof(...arbs))),
   TypeAlias: (ast) => go(ast.type),
@@ -227,7 +230,7 @@ const arbitraryFor = (fc: typeof FastCheck) =>
         case "VoidKeyword":
           return compilerMap(fc, go)[ast._tag](ast)
         case "NeverKeyword":
-          throw new Error("cannot build an Arbitrary for `never`")
+          return compilerMap(fc, go)[ast._tag](ast)
         case "UnknownKeyword":
           return compilerMap(fc, go)[ast._tag](ast)
         case "AnyKeyword":
@@ -248,18 +251,12 @@ const arbitraryFor = (fc: typeof FastCheck) =>
           return compilerMap(fc, go)[ast._tag](ast)
         case "TypeLiteral":
           return compilerMap(fc, go)[ast._tag](ast)
-        case "Union": {
+        case "Union":
           return compilerMap(fc, go)[ast._tag](ast)
-        }
-        case "Lazy": {
+        case "Lazy":
           return compilerMap(fc, go)[ast._tag](ast)
-        }
-        case "Enums": {
-          if (ast.enums.length === 0) {
-            throw new Error("cannot build an Arbitrary for an empty enum")
-          }
+        case "Enums":
           return compilerMap(fc, go)[ast._tag](ast)
-        }
         case "Refinement":
           return compilerMap(fc, go)[ast._tag](ast)
         case "TemplateLiteral":
