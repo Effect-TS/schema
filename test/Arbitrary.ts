@@ -8,7 +8,7 @@ import * as fc from "fast-check"
 export const property = <A>(schema: S.Schema<A>) => {
   const arbitrary = A.arbitrary(schema)
   const is = P.is(schema)
-  const arbE = arbitrary(fc)
+  const arbE = arbitrary({ fc })
 
   expect(arbE._tag).toBe("Right")
   if (arbE._tag === "Right") {
@@ -58,7 +58,9 @@ describe.concurrent("Arbitrary", () => {
   })
 
   it("never", () => {
-    expect(A.arbitrary(S.never)(fc)).toStrictEqual(E.left("cannot build an Arbitrary for `never`"))
+    expect(A.arbitrary(S.never)({ fc })).toStrictEqual(
+      E.left("cannot build an Arbitrary for `never`")
+    )
   })
 
   it("string", () => {
@@ -108,7 +110,7 @@ describe.concurrent("Arbitrary", () => {
   it("empty enums", () => {
     enum Fruits {}
     const schema = S.enums(Fruits)
-    expect(A.arbitrary(schema)(fc)).toStrictEqual(
+    expect(A.arbitrary(schema)({ fc })).toStrictEqual(
       E.left("cannot build an Arbitrary for an empty enum")
     )
   })

@@ -82,6 +82,75 @@ export type CompilerASTMap<Err, Model> = {
   [k in keyof TypeMap]: (ast: TypeMap[k]) => E.Either<Err, Model>
 }
 
+/*
+ * @since 1.0.0
+ * Creates a CompilerASTMap from a given context
+ */
+export type CompilerMapConstructor<Err, Model, Ctx> = (
+  c: Ctx,
+  g: Compiler<Err, Model>
+) => CompilerASTMap<Err, Model>
+
+/*
+ * @since 1.0.0
+ */
+export const createCompiler = <Err, Model, Ctx>(
+  createMap: (c: Ctx, g: Compiler<Err, Model>) => CompilerASTMap<Err, Model>
+) =>
+  (ctx: Ctx) => {
+    const compiler: Compiler<Err, Model> = (ast) => {
+      const map = createMap(ctx, compiler)
+
+      switch (ast._tag) {
+        case "TypeAlias":
+          return map[ast._tag](ast)
+        case "Literal":
+          return map[ast._tag](ast)
+        case "UniqueSymbol":
+          return map[ast._tag](ast)
+        case "UndefinedKeyword":
+          return map[ast._tag](ast)
+        case "VoidKeyword":
+          return map[ast._tag](ast)
+        case "NeverKeyword":
+          return map[ast._tag](ast)
+        case "UnknownKeyword":
+          return map[ast._tag](ast)
+        case "AnyKeyword":
+          return map[ast._tag](ast)
+        case "StringKeyword":
+          return map[ast._tag](ast)
+        case "NumberKeyword":
+          return map[ast._tag](ast)
+        case "BooleanKeyword":
+          return map[ast._tag](ast)
+        case "BigIntKeyword":
+          return map[ast._tag](ast)
+        case "SymbolKeyword":
+          return map[ast._tag](ast)
+        case "ObjectKeyword":
+          return map[ast._tag](ast)
+        case "Tuple":
+          return map[ast._tag](ast)
+        case "TypeLiteral":
+          return map[ast._tag](ast)
+        case "Union":
+          return map[ast._tag](ast)
+        case "Lazy":
+          return map[ast._tag](ast)
+        case "Enums":
+          return map[ast._tag](ast)
+        case "Refinement":
+          return map[ast._tag](ast)
+        case "TemplateLiteral":
+          return map[ast._tag](ast)
+        case "Transform":
+          return map[ast._tag](ast)
+      }
+    }
+    return compiler
+  }
+
 /**
  * @since 1.0.0
  */
