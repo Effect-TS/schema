@@ -65,7 +65,7 @@ export const make: <A>(
  * @since 1.0.0
  */
 export const arbitrary = <A>(schema: Schema<A>) =>
-  (fc: typeof FastCheck): E.Either<string, FastCheck.Arbitrary<A>> => arbitraryFor(fc)(schema)
+  (fc: typeof FastCheck): E.Either<string, FastCheck.Arbitrary<A>> => compilerFor(fc)(schema)
 
 const record = <K extends PropertyKey, V>(
   fc: typeof FastCheck,
@@ -181,7 +181,7 @@ const tuple = (fc: typeof FastCheck, go: AST.Compiler<string, FastCheck.Arbitrar
 
 const compilerMap = (
   fc: typeof FastCheck,
-  go: AST.Compiler<string, FastCheck.Arbitrary<any>>
+  compile: AST.Compiler<string, FastCheck.Arbitrary<any>>
 ): AST.CompilerASTMap<string, FastCheck.Arbitrary<any>> => ({
   NeverKeyword: () => E.left("cannot build an Arbitrary for `never`"),
   StringKeyword: () => E.right(fc.string()),
@@ -200,18 +200,20 @@ const compilerMap = (
     ast.enums.length === 0 ?
       E.left("cannot build an Arbitrary for an empty enum") :
       E.right(fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))),
-  Refinement: (ast) => pipe(go(ast.from), E.map((arb) => arb.filter((a) => ast.refinement(a)))),
-  Union: (ast) => pipe(ast.types.map(go), all, E.map((arbs) => fc.oneof(...arbs))),
+  Refinement: (ast) =>
+    pipe(compile(ast.from), E.map((arb) => arb.filter((a) => ast.refinement(a)))),
+  Union: (ast) => pipe(ast.types.map(compile), all, E.map((arbs) => fc.oneof(...arbs))),
   TypeAlias: (ast) => {
     return pipe(
       getHook(ast),
       O.match(
-        () => go(ast.type),
-        ({ handler }) => pipe(ast.typeParameters.map(go), all, E.map((arbs) => handler(...arbs)))
+        () => compile(ast.type),
+        ({ handler }) =>
+          pipe(ast.typeParameters.map(compile), all, E.map((arbs) => handler(...arbs)))
       )
     )
   },
-  Transform: (ast) => go(ast.to),
+  Transform: (ast) => compile(ast.to),
   TemplateLiteral: (ast) => {
     const components = [fc.constant(ast.head)]
     for (const span of ast.spans) {
@@ -220,10 +222,10 @@ const compilerMap = (
     }
     return E.right(fc.tuple(...components).map((spans) => spans.join("")))
   },
-  Tuple: tuple(fc, go),
-  TypeLiteral: typeLiteral(fc, go),
+  Tuple: tuple(fc, compile),
+  TypeLiteral: typeLiteral(fc, compile),
   Lazy: (ast) => {
-    const f = () => go(ast.f())
+    const f = () => compile(ast.f())
     try {
       return E.right(fc.constant(null).chain(() => E.getOrThrow(f())))
     } catch (e) {
@@ -232,56 +234,58 @@ const compilerMap = (
   }
 } as const)
 
-const arbitraryFor = (fc: typeof FastCheck) =>
+const compilerFor = (fc: typeof FastCheck) =>
   <A>(schema: Schema<A>): E.Either<string, FastCheck.Arbitrary<A>> => {
-    const go: AST.Compiler<string, FastCheck.Arbitrary<any>> = (ast) => {
+    const compiler: AST.Compiler<string, FastCheck.Arbitrary<any>> = (ast) => {
+      const map = compilerMap(fc, compiler)
+
       switch (ast._tag) {
         case "TypeAlias":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "Literal":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "UniqueSymbol":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "UndefinedKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "VoidKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "NeverKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "UnknownKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "AnyKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "StringKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "NumberKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "BooleanKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "BigIntKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "SymbolKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "ObjectKeyword":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "Tuple":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "TypeLiteral":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "Union":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "Lazy":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "Enums":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "Refinement":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "TemplateLiteral":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
         case "Transform":
-          return compilerMap(fc, go)[ast._tag](ast)
+          return map[ast._tag](ast)
       }
     }
 
-    return go(schema.ast)
+    return compiler(schema.ast)
   }
