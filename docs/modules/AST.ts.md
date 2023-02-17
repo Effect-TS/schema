@@ -76,9 +76,11 @@ Added in v1.0.0
   - [VoidKeyword (interface)](#voidkeyword-interface)
 - [utils](#utils)
   - [Annotated (interface)](#annotated-interface)
+  - [Compiler (type alias)](#compiler-type-alias)
   - [Element (interface)](#element-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
   - [LiteralValue (type alias)](#literalvalue-type-alias)
+  - [Match (type alias)](#match-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
   - [appendElement](#appendelement)
@@ -88,6 +90,7 @@ Added in v1.0.0
   - [createPropertySignature](#createpropertysignature)
   - [createRecord](#createrecord)
   - [getAnnotation](#getannotation)
+  - [getCompiler](#getcompiler)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
@@ -821,6 +824,16 @@ export interface Annotated {
 
 Added in v1.0.0
 
+## Compiler (type alias)
+
+**Signature**
+
+```ts
+export type Compiler<A> = (ast: AST) => A
+```
+
+Added in v1.0.0
+
 ## Element (interface)
 
 **Signature**
@@ -854,6 +867,18 @@ Added in v1.0.0
 
 ```ts
 export type LiteralValue = string | number | boolean | null | bigint
+```
+
+Added in v1.0.0
+
+## Match (type alias)
+
+**Signature**
+
+```ts
+export type Match<A> = {
+  [K in AST['_tag']]: (ast: Extract<AST, { _tag: K }>, compile: Compiler<A>) => A
+}
 ```
 
 Added in v1.0.0
@@ -971,6 +996,16 @@ Added in v1.0.0
 
 ```ts
 export declare const getAnnotation: <A>(key: PropertyKey) => (annotated: Annotated) => Option<A>
+```
+
+Added in v1.0.0
+
+## getCompiler
+
+**Signature**
+
+```ts
+export declare const getCompiler: <A>(match: Match<A>) => Compiler<A>
 ```
 
 Added in v1.0.0

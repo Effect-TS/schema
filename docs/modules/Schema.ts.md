@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 20
+nav_order: 25
 parent: Modules
 ---
 
@@ -52,20 +52,28 @@ Added in v1.0.0
 - [data](#data)
   - [date](#date)
 - [filters](#filters)
+  - [between](#between)
   - [endsWith](#endswith)
   - [finite](#finite)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
   - [includes](#includes)
   - [int](#int)
+  - [itemsCount](#itemscount)
   - [length](#length)
   - [lessThan](#lessthan)
   - [lessThanOrEqualTo](#lessthanorequalto)
+  - [maxItems](#maxitems)
   - [maxLength](#maxlength)
+  - [minItems](#minitems)
   - [minLength](#minlength)
+  - [negative](#negative)
   - [nonEmpty](#nonempty)
   - [nonNaN](#nonnan)
+  - [nonNegative](#nonnegative)
+  - [nonPositive](#nonpositive)
   - [pattern](#pattern)
+  - [positive](#positive)
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
 - [model](#model)
@@ -525,6 +533,20 @@ Added in v1.0.0
 
 # filters
 
+## between
+
+**Signature**
+
+```ts
+export declare const between: <A extends number>(
+  min: number,
+  max: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## endsWith
 
 **Signature**
@@ -601,6 +623,19 @@ export declare const int: <A extends number>(
 
 Added in v1.0.0
 
+## itemsCount
+
+**Signature**
+
+```ts
+export declare const itemsCount: <A>(
+  n: number,
+  options?: AnnotationOptions<readonly A[]> | undefined
+) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
 ## length
 
 **Signature**
@@ -640,6 +675,19 @@ export declare const lessThanOrEqualTo: <A extends number>(
 
 Added in v1.0.0
 
+## maxItems
+
+**Signature**
+
+```ts
+export declare const maxItems: <A>(
+  n: number,
+  options?: AnnotationOptions<readonly A[]> | undefined
+) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
 ## maxLength
 
 **Signature**
@@ -653,6 +701,19 @@ export declare const maxLength: <A extends string>(
 
 Added in v1.0.0
 
+## minItems
+
+**Signature**
+
+```ts
+export declare const minItems: <A>(
+  n: number,
+  options?: AnnotationOptions<readonly A[]> | undefined
+) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
 ## minLength
 
 **Signature**
@@ -661,6 +722,18 @@ Added in v1.0.0
 export declare const minLength: <A extends string>(
   minLength: number,
   annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## negative
+
+**Signature**
+
+```ts
+export declare const negative: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -690,6 +763,30 @@ export declare const nonNaN: <A extends number>(
 
 Added in v1.0.0
 
+## nonNegative
+
+**Signature**
+
+```ts
+export declare const nonNegative: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## nonPositive
+
+**Signature**
+
+```ts
+export declare const nonPositive: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## pattern
 
 **Signature**
@@ -698,6 +795,18 @@ Added in v1.0.0
 export declare const pattern: <A extends string>(
   regex: RegExp,
   annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## positive
+
+**Signature**
+
+```ts
+export declare const positive: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 

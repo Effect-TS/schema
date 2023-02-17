@@ -1,6 +1,6 @@
 ---
 title: Pretty.ts
-nav_order: 19
+nav_order: 24
 parent: Modules
 ---
 
@@ -18,6 +18,8 @@ Added in v1.0.0
   - [Pretty (interface)](#pretty-interface)
 - [prettify](#prettify)
   - [pretty](#pretty)
+- [utils](#utils)
+  - [match](#match)
 
 ---
 
@@ -55,6 +57,18 @@ Added in v1.0.0
 
 ```ts
 export declare const pretty: <A>(schema: Schema<A>) => (a: A) => string
+```
+
+Added in v1.0.0
+
+# utils
+
+## match
+
+**Signature**
+
+```ts
+export declare const match: AST.Match<Pretty<any>>
 ```
 
 Added in v1.0.0
