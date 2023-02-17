@@ -1,10 +1,10 @@
 ---
-title: data/filter.ts
-nav_order: 8
+title: data/String.ts
+nav_order: 18
 parent: Modules
 ---
 
-## filter overview
+## String overview
 
 Added in v1.0.0
 
@@ -14,20 +14,14 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [endsWith](#endswith)
-  - [finite](#finite)
-  - [greaterThan](#greaterthan)
-  - [greaterThanOrEqualTo](#greaterthanorequalto)
   - [includes](#includes)
-  - [instanceOf](#instanceof)
-  - [int](#int)
-  - [lessThan](#lessthan)
-  - [lessThanOrEqualTo](#lessthanorequalto)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
-  - [multipleOf](#multipleof)
-  - [nonNaN](#nonnan)
+  - [parseDate](#parsedate)
+  - [parseNumber](#parsenumber)
   - [pattern](#pattern)
   - [startsWith](#startswith)
+  - [trim](#trim)
   - [trimmed](#trimmed)
 
 ---
@@ -47,44 +41,6 @@ export declare const endsWith: <A extends string>(
 
 Added in v1.0.0
 
-## finite
-
-**Signature**
-
-```ts
-export declare const finite: <A extends number>(
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## greaterThan
-
-**Signature**
-
-```ts
-export declare const greaterThan: <A extends number>(
-  min: number,
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## greaterThanOrEqualTo
-
-**Signature**
-
-```ts
-export declare const greaterThanOrEqualTo: <A extends number>(
-  min: number,
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
 ## includes
 
 **Signature**
@@ -92,54 +48,6 @@ Added in v1.0.0
 ```ts
 export declare const includes: <A extends string>(
   searchString: string,
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## instanceOf
-
-**Signature**
-
-```ts
-export declare const instanceOf: new (...args: any) => any
-```
-
-Added in v1.0.0
-
-## int
-
-**Signature**
-
-```ts
-export declare const int: <A extends number>(
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## lessThan
-
-**Signature**
-
-```ts
-export declare const lessThan: <A extends number>(
-  max: number,
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## lessThanOrEqualTo
-
-**Signature**
-
-```ts
-export declare const lessThanOrEqualTo: <A extends number>(
-  max: number,
   annotationOptions?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
@@ -172,27 +80,28 @@ export declare const minLength: <A extends string>(
 
 Added in v1.0.0
 
-## multipleOf
+## parseDate
+
+Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 **Signature**
 
 ```ts
-export declare const multipleOf: <A extends number>(
-  divisor: number,
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
+export declare const parseDate: (self: Schema<string>) => Schema<Date>
 ```
 
 Added in v1.0.0
 
-## nonNaN
+## parseNumber
+
+Transforms a `string` into a `number` by parsing the string using `parseFloat`.
+
+The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
 **Signature**
 
 ```ts
-export declare const nonNaN: <A extends number>(
-  annotationOptions?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<A>
+export declare const parseNumber: (self: Schema<string>) => Schema<number>
 ```
 
 Added in v1.0.0
@@ -219,6 +128,18 @@ export declare const startsWith: <A extends string>(
   startsWith: string,
   annotationOptions?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## trim
+
+The `trim` parser allows removing whitespaces from the beginning and end of a string.
+
+**Signature**
+
+```ts
+export declare const trim: (self: Schema<string>) => Schema<string>
 ```
 
 Added in v1.0.0

@@ -1,10 +1,10 @@
 ---
-title: data/Date.ts
-nav_order: 9
+title: data/Object.ts
+nav_order: 13
 parent: Modules
 ---
 
-## Date overview
+## Object overview
 
 Added in v1.0.0
 
@@ -13,18 +13,18 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [date](#date)
+  - [instanceOf](#instanceof)
 
 ---
 
 # utils
 
-## date
+## instanceOf
 
 **Signature**
 
 ```ts
-export declare const date: Schema<Date>
+export declare const instanceOf: new (...args: any) => any
 ```
 
 Added in v1.0.0
