@@ -103,6 +103,7 @@ Added in v1.0.0
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [OptionalSchema (interface)](#optionalschema-interface)
   - [Spread (type alias)](#spread-type-alias)
+  - [getPropertySignatures](#getpropertysignatures)
 
 ---
 
@@ -1082,6 +1083,38 @@ export type Spread<A> = {
 } extends infer B
   ? B
   : never
+```
+
+Added in v1.0.0
+
+## getPropertySignatures
+
+Returns an object containing all property signatures of a given schema.
+
+```
+Schema<A> -> { [K in keyof A]: Schema<A[K]> }
+```
+
+**Signature**
+
+```ts
+export declare const getPropertySignatures: <A>(schema: Schema<A>) => { [K in keyof A]: Schema<A[K]> }
+```
+
+**Example**
+
+```ts
+import * as S from '@fp-ts/schema'
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+})
+
+const shape = S.getPropertySignatures(Person)
+
+assert.deepStrictEqual(shape.name, S.string)
+assert.deepStrictEqual(shape.age, S.number)
 ```
 
 Added in v1.0.0
