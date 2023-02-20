@@ -23,6 +23,7 @@ Added in v1.0.0
 - [combinators](#combinators)
   - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [array](#array)
+  - [brand](#brand)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
@@ -206,6 +207,35 @@ Added in v1.0.0
 
 ```ts
 export declare const array: <A>(item: Schema<A>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
+## brand
+
+Returns a nominal branded schema by applying a brand to a given schema.
+
+```
+Schema<A> + B -> Schema<A & Brand<B>>
+```
+
+**Signature**
+
+```ts
+export declare const brand: <B extends string, A>(
+  brand: B,
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<any>
+```
+
+**Example**
+
+```ts
+import * as S from '@fp-ts/schema'
+import { pipe } from '@fp-ts/core/Function'
+
+const Int = pipe(S.number, S.int(), S.brand('Int'))
+type Int = S.Infer<typeof Int> // number & Brand<"Int">
 ```
 
 Added in v1.0.0

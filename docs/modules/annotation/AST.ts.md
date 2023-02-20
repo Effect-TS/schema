@@ -13,6 +13,8 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
+  - [Brand (type alias)](#brand-type-alias)
+  - [BrandId](#brandid)
   - [Custom (type alias)](#custom-type-alias)
   - [CustomId](#customid)
   - [Description (type alias)](#description-type-alias)
@@ -33,6 +35,26 @@ Added in v1.0.0
 ---
 
 # utils
+
+## Brand (type alias)
+
+**Signature**
+
+```ts
+export type Brand = ReadonlyArray<string>
+```
+
+Added in v1.0.0
+
+## BrandId
+
+**Signature**
+
+```ts
+export declare const BrandId: '@fp-ts/schema/annotation/BrandId'
+```
+
+Added in v1.0.0
 
 ## Custom (type alias)
 
