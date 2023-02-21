@@ -19,7 +19,7 @@ importers:
       '@changesets/cli': ^2.26.0
       '@effect-ts/build-utils': 0.40.7
       '@effect-ts/core': ^0.60.5
-      '@effect/data': ~0.1.0
+      '@effect/data': ~0.1.2
       '@effect/language-service': ^0.0.19
       '@fp-ts/core': ~0.2.1
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
@@ -60,7 +60,7 @@ importers:
       vite: ^4.1.1
       vitest: 0.28.4
     dependencies:
-      '@effect/data': 0.1.0
+      '@effect/data': 0.1.2
       '@fp-ts/core': 0.2.1
       fast-check: 3.6.3
     devDependencies:
@@ -649,8 +649,8 @@ packages:
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
     dev: true
 
-  /@effect/data/0.1.0:
-    resolution: {integrity: sha512-p9/AYs06o7IVyKRUvzq73+XnzmYQIkflo+F/IDMJRzulOEdfSyl3+Tvkw0pXVeXqlcKxlTSdos1VYs2wbRFQDg==}
+  /@effect/data/0.1.2:
+    resolution: {integrity: sha512-X0zlbWN/po6LxMQRxRAdIJMiBNpp8ib7FpskVeDmTlJ2id+SrcFoE4R/QnW1YkD2WvnPH2s7AtNLT8Xwx7+GnQ==}
     dependencies:
       '@fp-ts/core': 0.2.1
     dev: false
