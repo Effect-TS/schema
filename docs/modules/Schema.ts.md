@@ -232,7 +232,7 @@ export declare const brand: <B extends string, A>(
 
 ```ts
 import * as S from '@fp-ts/schema'
-import { pipe } from '@fp-ts/core/Function'
+import { pipe } from '@effect/data/Function'
 
 const Int = pipe(S.number, S.int(), S.brand('Int'))
 type Int = S.Infer<typeof Int> // number & Brand<"Int">
