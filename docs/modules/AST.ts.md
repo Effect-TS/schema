@@ -36,6 +36,9 @@ Added in v1.0.0
   - [unknownKeyword](#unknownkeyword)
   - [voidKeyword](#voidkeyword)
 - [guards](#guards)
+  - [isAnyKeyword](#isanykeyword)
+  - [isBigIntKeyword](#isbigintkeyword)
+  - [isBooleanKeyword](#isbooleankeyword)
   - [isLazy](#islazy)
   - [isLiteral](#isliteral)
   - [isNumberKeyword](#isnumberkeyword)
@@ -49,6 +52,7 @@ Added in v1.0.0
   - [isTypeLiteral](#istypeliteral)
   - [isUnion](#isunion)
   - [isUniqueSymbol](#isuniquesymbol)
+  - [isUnknownKeyword](#isunknownkeyword)
 - [model](#model)
   - [AST (type alias)](#ast-type-alias)
   - [AnyKeyword (interface)](#anykeyword-interface)
@@ -349,6 +353,36 @@ Added in v1.0.0
 
 # guards
 
+## isAnyKeyword
+
+**Signature**
+
+```ts
+export declare const isAnyKeyword: (ast: AST) => ast is AnyKeyword
+```
+
+Added in v1.0.0
+
+## isBigIntKeyword
+
+**Signature**
+
+```ts
+export declare const isBigIntKeyword: (ast: AST) => ast is BigIntKeyword
+```
+
+Added in v1.0.0
+
+## isBooleanKeyword
+
+**Signature**
+
+```ts
+export declare const isBooleanKeyword: (ast: AST) => ast is BooleanKeyword
+```
+
+Added in v1.0.0
+
 ## isLazy
 
 **Signature**
@@ -475,6 +509,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isUniqueSymbol: (ast: AST) => ast is UniqueSymbol
+```
+
+Added in v1.0.0
+
+## isUnknownKeyword
+
+**Signature**
+
+```ts
+export declare const isUnknownKeyword: (ast: AST) => ast is UnknownKeyword
 ```
 
 Added in v1.0.0
