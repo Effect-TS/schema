@@ -2,8 +2,8 @@
  * @since 1.0.0
  */
 import * as B from "@effect/data/Brand"
-import type * as E from "@fp-ts/core/Either"
-import { pipe } from "@fp-ts/core/Function"
+import type * as E from "@effect/data/Either"
+import { pipe } from "@effect/data/Function"
 import * as I from "@fp-ts/schema/internal/common"
 import type * as S from "@fp-ts/schema/Schema"
 

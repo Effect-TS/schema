@@ -1,9 +1,9 @@
 /**
  * @since 1.0.0
  */
-import { pipe } from "@fp-ts/core/Function"
-import type { Option } from "@fp-ts/core/Option"
-import * as O from "@fp-ts/core/Option"
+import { pipe } from "@effect/data/Function"
+import type { Option } from "@effect/data/Option"
+import * as O from "@effect/data/Option"
 import { IdentifierId } from "@fp-ts/schema/annotation/AST"
 import * as H from "@fp-ts/schema/annotation/Hook"
 import * as A from "@fp-ts/schema/Arbitrary"

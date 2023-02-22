@@ -19,9 +19,8 @@ importers:
       '@changesets/cli': ^2.26.0
       '@effect-ts/build-utils': 0.40.7
       '@effect-ts/core': ^0.60.5
-      '@effect/data': ~0.1.2
+      '@effect/data': ~0.2.0
       '@effect/language-service': ^0.0.19
-      '@fp-ts/core': ~0.2.1
       '@repo-tooling/eslint-plugin-dprint': ^0.0.4
       '@types/benchmark': ^2.1.2
       '@types/chai': ^4.3.4
@@ -60,8 +59,7 @@ importers:
       vite: ^4.1.1
       vitest: 0.28.4
     dependencies:
-      '@effect/data': 0.1.2
-      '@fp-ts/core': 0.2.1
+      '@effect/data': 0.2.0
       fast-check: 3.6.3
     devDependencies:
       '@babel/cli': 7.20.7_@babel+core@7.20.12
@@ -649,10 +647,8 @@ packages:
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
     dev: true
 
-  /@effect/data/0.1.2:
-    resolution: {integrity: sha512-X0zlbWN/po6LxMQRxRAdIJMiBNpp8ib7FpskVeDmTlJ2id+SrcFoE4R/QnW1YkD2WvnPH2s7AtNLT8Xwx7+GnQ==}
-    dependencies:
-      '@fp-ts/core': 0.2.1
+  /@effect/data/0.2.0:
+    resolution: {integrity: sha512-1hSNjR0LX3zsGxCB8wykSNZ4OHXoA9NjeWlxgjmxcCOkYyMH+3exxJu/9GbkXt/35zaZE0KDFyMwfvrr20zRKw==}
     dev: false
 
   /@effect/language-service/0.0.19:
@@ -889,10 +885,6 @@ packages:
   /@fp-ts/core/0.0.11:
     resolution: {integrity: sha512-BCAJBYzghwoJpcUOARJ1tui50HoYJFlV2pJlVMlsEkDFhD8MTtq8xQVpZCRF66RmtkxtGBYINCQ+5H1lRaL35Q==}
     dev: true
-
-  /@fp-ts/core/0.2.1:
-    resolution: {integrity: sha512-gjp/LTCsxqe8KYvPOcMcsEXT+J6tKC4v1nNqK4RZsZcB6pMcQgrullh5Oa371O9WHSULivpgOvjWyeioFevg5g==}
-    dev: false
 
   /@fp-ts/data/0.0.41:
     resolution: {integrity: sha512-0S93kOQ91D7wp60q/PSVWvMsJjSWJutjt4qX/BvVNV7+fymuC2hTfW2HlE2OcMK11xCNiI6Rq2AkvyzoMhOlpg==}
@@ -5088,7 +5080,7 @@ packages:
       lazy-cache: 2.0.2
       list-item: 1.1.1
       markdown-link: 0.1.1
-      minimist: 1.2.7
+      minimist: 1.2.8
       mixin-deep: 1.3.2
       object.pick: 1.3.0
       remarkable: 1.7.4
@@ -5213,10 +5205,6 @@ packages:
       kind-of: 6.0.3
     dev: true
 
-  /minimist/1.2.7:
-    resolution: {integrity: sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==}
-    dev: true
-
   /minimist/1.2.8:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
     dev: true
@@ -5238,7 +5226,7 @@ packages:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
     dependencies:
-      minimist: 1.2.7
+      minimist: 1.2.8
     dev: true
 
   /mkdirp/1.0.4:
@@ -6624,7 +6612,7 @@ packages:
   /subarg/1.0.0:
     resolution: {integrity: sha512-RIrIdRY0X1xojthNcVtgT9sjpOGagEUKpZdgBUi054OEPFo282yg+zE+t1Rj3+RqKq2xStL7uUHhY+AjbC4BXg==}
     dependencies:
-      minimist: 1.2.7
+      minimist: 1.2.8
     dev: true
 
   /supports-color/5.5.0:

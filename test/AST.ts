@@ -1,5 +1,5 @@
-import { pipe } from "@fp-ts/core/Function"
-import * as O from "@fp-ts/core/Option"
+import { pipe } from "@effect/data/Function"
+import * as O from "@effect/data/Option"
 import * as S from "@fp-ts/schema"
 import * as AST from "@fp-ts/schema/AST"
 import { json } from "@fp-ts/schema/data/Json"

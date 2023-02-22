@@ -1,9 +1,9 @@
 /**
  * @since 1.0.0
  */
-import type { Either } from "@fp-ts/core/Either"
-import * as E from "@fp-ts/core/Either"
-import { pipe } from "@fp-ts/core/Function"
+import type { Either } from "@effect/data/Either"
+import * as E from "@effect/data/Either"
+import { pipe } from "@effect/data/Function"
 import { IdentifierId } from "@fp-ts/schema/annotation/AST"
 import * as H from "@fp-ts/schema/annotation/Hook"
 import * as A from "@fp-ts/schema/Arbitrary"
