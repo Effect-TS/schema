@@ -2,16 +2,16 @@
  * @since 1.0.0
  */
 
-import * as E from "@fp-ts/core/Either"
-import { pipe } from "@fp-ts/core/Function"
-import * as O from "@fp-ts/core/Option"
-import type { Predicate, Refinement } from "@fp-ts/core/Predicate"
-import type { NonEmptyReadonlyArray } from "@fp-ts/core/ReadonlyArray"
-import * as RA from "@fp-ts/core/ReadonlyArray"
+import type { Brand } from "@effect/data/Brand"
+import * as E from "@effect/data/Either"
+import { pipe } from "@effect/data/Function"
+import * as O from "@effect/data/Option"
+import type { Predicate, Refinement } from "@effect/data/Predicate"
+import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@fp-ts/schema/annotation/AST"
 import type { Arbitrary } from "@fp-ts/schema/Arbitrary"
 import * as AST from "@fp-ts/schema/AST"
-import type { Json, JsonArray, JsonObject } from "@fp-ts/schema/data/Json"
 import type { Parser } from "@fp-ts/schema/Parser"
 import * as PR from "@fp-ts/schema/ParseResult"
 import type { Pretty } from "@fp-ts/schema/Pretty"
@@ -30,27 +30,7 @@ export const mutableAppend = <A>(self: Array<A>, a: A): NonEmptyReadonlyArray<A>
 }
 
 /** @internal */
-export const isNonEmpty = RA.isNonEmpty
-
-// ---------------------------------------------
-// Refinements
-// ---------------------------------------------
-
-/** @internal */
-export const isUnknownObject = (u: unknown): u is { readonly [x: string | symbol]: unknown } =>
-  typeof u === "object" && u != null && !Array.isArray(u)
-
-const isJsonArray = (u: unknown): u is JsonArray => Array.isArray(u) && u.every(isJson)
-
-const isJsonObject = (u: unknown): u is JsonObject =>
-  isUnknownObject(u) && Object.keys(u).every((key) => isJson(u[key]))
-
-/** @internal */
-export const isJson = (u: unknown): u is Json =>
-  u === null || typeof u === "string" || (typeof u === "number" && !isNaN(u) && isFinite(u)) ||
-  typeof u === "boolean" ||
-  isJsonArray(u) ||
-  isJsonObject(u)
+export const isNonEmptyReadonlyArray = RA.isNonEmptyReadonlyArray
 
 // ---------------------------------------------
 // artifacts constructors
@@ -104,19 +84,7 @@ export const typeAlias = (
 export const annotations = (annotations: AST.Annotated["annotations"]) =>
   <A>(self: S.Schema<A>): S.Schema<A> => makeSchema(AST.mergeAnnotations(self.ast, annotations))
 
-/** @internal */
-export function filter<A, B extends A>(
-  refinement: Refinement<A, B>,
-  options?: S.AnnotationOptions<A>
-): (from: S.Schema<A>) => S.Schema<B>
-export function filter<A>(
-  predicate: Predicate<A>,
-  options?: S.AnnotationOptions<A>
-): (from: S.Schema<A>) => S.Schema<A>
-export function filter<A>(
-  predicate: Predicate<A>,
-  options?: S.AnnotationOptions<A>
-): (from: S.Schema<A>) => S.Schema<A> {
+const toAnnotations = <A>(options?: S.AnnotationOptions<A>): AST.Annotated["annotations"] => {
   const annotations: AST.Annotated["annotations"] = {}
   if (options?.id !== undefined) {
     annotations[A.IdId] = options?.id
@@ -145,8 +113,36 @@ export function filter<A>(
   if (options?.props !== undefined) {
     annotations[A.PropsId] = options?.props
   }
-  return (from) => makeSchema(AST.createRefinement(from.ast, predicate, annotations))
+  return annotations
 }
+
+/** @internal */
+export function filter<A, B extends A>(
+  refinement: Refinement<A, B>,
+  options?: S.AnnotationOptions<A>
+): (from: S.Schema<A>) => S.Schema<B>
+export function filter<A>(
+  predicate: Predicate<A>,
+  options?: S.AnnotationOptions<A>
+): (from: S.Schema<A>) => S.Schema<A>
+export function filter<A>(
+  predicate: Predicate<A>,
+  options?: S.AnnotationOptions<A>
+): (from: S.Schema<A>) => S.Schema<A> {
+  return (from) => makeSchema(AST.createRefinement(from.ast, predicate, toAnnotations(options)))
+}
+
+const getBrands = (ast: AST.AST): Array<string> =>
+  (ast.annotations[A.BrandId] as Array<string> | undefined) || []
+
+/** @internal */
+export const brand = <B extends string, A>(brand: B, options?: S.AnnotationOptions<A>) =>
+  (self: S.Schema<A>): S.Schema<A & Brand<B>> => {
+    const annotations = toAnnotations(options)
+    annotations[A.BrandId] = [...getBrands(self.ast), brand]
+    const ast = AST.mergeAnnotations(self.ast, annotations)
+    return makeSchema(ast)
+  }
 
 /** @internal */
 export const transformOrFail = <A, B>(
@@ -186,9 +182,6 @@ export const unknown: S.Schema<unknown> = makeSchema(AST.unknownKeyword)
 export const any: S.Schema<any> = makeSchema(AST.anyKeyword)
 
 /** @internal */
-export const isUndefined = (u: unknown): u is undefined => u === undefined
-
-/** @internal */
 export const _undefined: S.Schema<undefined> = makeSchema(AST.undefinedKeyword)
 
 /** @internal */
@@ -207,28 +200,13 @@ export const number: S.Schema<number> = makeSchema(AST.numberKeyword)
 export const boolean: S.Schema<boolean> = makeSchema(AST.booleanKeyword)
 
 /** @internal */
-export const isNever = (u: unknown): u is never => false
-
-/** @internal */
-export const isBigInt = (u: unknown): u is bigint => typeof u === "bigint"
-
-/** @internal */
 export const bigint: S.Schema<bigint> = makeSchema(AST.bigIntKeyword)
-
-/** @internal */
-export const isSymbol = (u: unknown): u is symbol => typeof u === "symbol"
 
 /** @internal */
 export const symbol: S.Schema<symbol> = makeSchema(AST.symbolKeyword)
 
 /** @internal */
 export const object: S.Schema<object> = makeSchema(AST.objectKeyword)
-
-/** @internal */
-export const isObject = (u: unknown): u is object => typeof u === "object" && u !== null
-
-/** @internal */
-export const isNotNull = (u: unknown): u is {} => u !== null
 
 /** @internal */
 export const union = <Members extends ReadonlyArray<S.Schema<any>>>(

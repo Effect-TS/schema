@@ -36,6 +36,9 @@ Added in v1.0.0
   - [unknownKeyword](#unknownkeyword)
   - [voidKeyword](#voidkeyword)
 - [guards](#guards)
+  - [isAnyKeyword](#isanykeyword)
+  - [isBigIntKeyword](#isbigintkeyword)
+  - [isBooleanKeyword](#isbooleankeyword)
   - [isLazy](#islazy)
   - [isLiteral](#isliteral)
   - [isNumberKeyword](#isnumberkeyword)
@@ -49,6 +52,7 @@ Added in v1.0.0
   - [isTypeLiteral](#istypeliteral)
   - [isUnion](#isunion)
   - [isUniqueSymbol](#isuniquesymbol)
+  - [isUnknownKeyword](#isunknownkeyword)
 - [model](#model)
   - [AST (type alias)](#ast-type-alias)
   - [AnyKeyword (interface)](#anykeyword-interface)
@@ -76,9 +80,11 @@ Added in v1.0.0
   - [VoidKeyword (interface)](#voidkeyword-interface)
 - [utils](#utils)
   - [Annotated (interface)](#annotated-interface)
+  - [Compiler (type alias)](#compiler-type-alias)
   - [Element (interface)](#element-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
   - [LiteralValue (type alias)](#literalvalue-type-alias)
+  - [Match (type alias)](#match-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
   - [appendElement](#appendelement)
@@ -88,6 +94,7 @@ Added in v1.0.0
   - [createPropertySignature](#createpropertysignature)
   - [createRecord](#createrecord)
   - [getAnnotation](#getannotation)
+  - [getCompiler](#getcompiler)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
@@ -346,6 +353,36 @@ Added in v1.0.0
 
 # guards
 
+## isAnyKeyword
+
+**Signature**
+
+```ts
+export declare const isAnyKeyword: (ast: AST) => ast is AnyKeyword
+```
+
+Added in v1.0.0
+
+## isBigIntKeyword
+
+**Signature**
+
+```ts
+export declare const isBigIntKeyword: (ast: AST) => ast is BigIntKeyword
+```
+
+Added in v1.0.0
+
+## isBooleanKeyword
+
+**Signature**
+
+```ts
+export declare const isBooleanKeyword: (ast: AST) => ast is BooleanKeyword
+```
+
+Added in v1.0.0
+
 ## isLazy
 
 **Signature**
@@ -472,6 +509,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isUniqueSymbol: (ast: AST) => ast is UniqueSymbol
+```
+
+Added in v1.0.0
+
+## isUnknownKeyword
+
+**Signature**
+
+```ts
+export declare const isUnknownKeyword: (ast: AST) => ast is UnknownKeyword
 ```
 
 Added in v1.0.0
@@ -821,6 +868,16 @@ export interface Annotated {
 
 Added in v1.0.0
 
+## Compiler (type alias)
+
+**Signature**
+
+```ts
+export type Compiler<A> = (ast: AST) => A
+```
+
+Added in v1.0.0
+
 ## Element (interface)
 
 **Signature**
@@ -854,6 +911,18 @@ Added in v1.0.0
 
 ```ts
 export type LiteralValue = string | number | boolean | null | bigint
+```
+
+Added in v1.0.0
+
+## Match (type alias)
+
+**Signature**
+
+```ts
+export type Match<A> = {
+  [K in AST['_tag']]: (ast: Extract<AST, { _tag: K }>, compile: Compiler<A>) => A
+}
 ```
 
 Added in v1.0.0
@@ -971,6 +1040,16 @@ Added in v1.0.0
 
 ```ts
 export declare const getAnnotation: <A>(key: PropertyKey) => (annotated: Annotated) => Option<A>
+```
+
+Added in v1.0.0
+
+## getCompiler
+
+**Signature**
+
+```ts
+export declare const getCompiler: <A>(match: Match<A>) => Compiler<A>
 ```
 
 Added in v1.0.0

@@ -401,7 +401,6 @@ S.bigint;
 S.boolean;
 S.symbol;
 S.object;
-S.json;
 S.date; // value must be a Date
 
 // empty types
@@ -472,6 +471,7 @@ pipe(S.number, S.greaterThan(5));
 pipe(S.number, S.greaterThanOrEqualTo(5));
 pipe(S.number, S.lessThan(5));
 pipe(S.number, S.lessThanOrEqualTo(5));
+pipe(S.number, S.between(-2, 2)); // -2 <= x <= 2
 
 pipe(S.number, S.int()); // value must be an integer
 
@@ -484,12 +484,29 @@ pipe(S.number, S.negative()); // < 0
 pipe(S.number, S.nonPositive()); // <= 0
 ```
 
+### Bigint filters
+
+```ts
+import * as B from "@fp-ts/schema/data/Bigint";
+
+pipe(S.bigint, B.greaterThan(5n));
+pipe(S.bigint, B.greaterThanOrEqualTo(5n));
+pipe(S.bigint, B.lessThan(5n));
+pipe(S.bigint, B.lessThanOrEqualTo(5n));
+pipe(S.bigint, B.between(-2n, 2n)); // -2n <= x <= 2n
+
+pipe(S.bigint, B.positive()); // > 0n
+pipe(S.bigint, B.nonNegative()); // >= 0n
+pipe(S.bigint, B.negative()); // < 0n
+pipe(S.bigint, B.nonPositive()); // <= 0n
+```
+
 ### Array filters
 
 ```ts
-pipe(S.array(S.number), A.maxItems(2)) // max array length
-pipe(S.array(S.number), A.minItems(2)) // min array length
-pipe(S.array(S.number), A.itemsCount(2)) // exact array length
+pipe(S.array(S.number), A.maxItems(2)); // max array length
+pipe(S.array(S.number), A.minItems(2)); // min array length
+pipe(S.array(S.number), A.itemsCount(2)); // exact array length
 ```
 
 ## Native enums
@@ -589,6 +606,25 @@ and it must be rewritten like this:
 S.struct({
   c: pipe(S.boolean, S.nullable, S.optional), // ok
 });
+```
+
+### Access the schema for a particular key
+
+The `getPropertySignatures` function takes a `Schema<A>` and returns a new object of type `{ [K in keyof A]: Schema<A[K]> }`. The new object has properties that are the same keys as those in the original object, and each of these properties is a schema for the corresponding property in the original object.
+
+```ts
+import * as S from "@fp-ts/schema";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
+
+// get the schema for each property of `Person`
+const shape = S.getPropertySignatures(Person);
+
+shape.name; // S.string
+shape.age; // S.number
 ```
 
 ## Pick

@@ -1,5 +1,6 @@
-import { pipe } from "@fp-ts/core/Function"
-import * as O from "@fp-ts/core/Option"
+import { pipe } from "@effect/data/Function"
+import * as O from "@effect/data/Option"
+import * as AST from "@fp-ts/schema/AST"
 import * as P from "@fp-ts/schema/Pretty"
 import * as S from "@fp-ts/schema/Schema"
 
@@ -51,7 +52,7 @@ describe.concurrent("Pretty", () => {
 
   it("symbol", () => {
     const pretty = P.pretty(S.symbol)
-    expect(pretty(Symbol.for("@fp-ts/core/test/a"))).toEqual("Symbol(@fp-ts/core/test/a)")
+    expect(pretty(Symbol.for("@effect/data/test/a"))).toEqual("Symbol(@effect/data/test/a)")
   })
 
   it("void", () => {
@@ -411,5 +412,17 @@ describe.concurrent("Pretty", () => {
     const pretty = P.pretty(schema)
     expect(pretty({ a: "a" })).toEqual(`{ "a": "a" }`)
     expect(pretty({ a: "a", b: "b", c: 1 })).toEqual(`{ "a": "a", "b": "b", "c": 1 }`)
+  })
+
+  it("should allow for custom compilers", () => {
+    const match: typeof P.match = {
+      ...P.match,
+      "BooleanKeyword": (ast) => P.make(S.make(ast), (b: boolean) => b ? "True" : "False")
+    }
+    const go = AST.getCompiler(match)
+    const pretty = <A>(schema: S.Schema<A>) => (a: A): string => go(schema.ast).pretty(a)
+    expect(pretty(S.boolean)(true)).toEqual(`True`)
+    const schema = S.tuple(S.string, S.boolean)
+    expect(pretty(schema)(["a", true])).toEqual(`["a", True]`)
   })
 })

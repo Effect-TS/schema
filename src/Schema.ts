@@ -2,10 +2,11 @@
  * @since 1.0.0
  */
 
-import { pipe } from "@fp-ts/core/Function"
-import type { Option } from "@fp-ts/core/Option"
-import type { Predicate, Refinement } from "@fp-ts/core/Predicate"
-import * as RA from "@fp-ts/core/ReadonlyArray"
+import type { Brand } from "@effect/data/Brand"
+import { pipe } from "@effect/data/Function"
+import type { Option } from "@effect/data/Option"
+import type { Predicate, Refinement } from "@effect/data/Predicate"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@fp-ts/schema/annotation/AST"
 import * as AST from "@fp-ts/schema/AST"
 import type { ParseOptions } from "@fp-ts/schema/AST"
@@ -278,6 +279,16 @@ export const greaterThanOrEqualTo: <A extends number>(
  * @category filters
  * @since 1.0.0
  */
+export const between: <A extends number>(
+  min: number,
+  max: number,
+  annotationOptions?: AnnotationOptions<A>
+) => (self: Schema<A>) => Schema<A> = N.between
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
 export const int: <A extends number>(
   annotationOptions?: AnnotationOptions<A>
 ) => (self: Schema<A>) => Schema<A> = N.int
@@ -520,6 +531,64 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
     make(AST.omit(self.ast, keys))
 
 /**
+ * Returns an object containing all property signatures of a given schema.
+ *
+ * ```
+ * Schema<A> -> { [K in keyof A]: Schema<A[K]> }
+ * ```
+ *
+ * @param schema - The schema to extract property signatures from.
+ *
+ * @example
+ * import * as S from "@fp-ts/schema"
+ *
+ * const Person = S.struct({
+ *   name: S.string,
+ *   age: S.number
+ * })
+ *
+ * const shape = S.getPropertySignatures(Person)
+ *
+ * assert.deepStrictEqual(shape.name, S.string)
+ * assert.deepStrictEqual(shape.age, S.number)
+ *
+ * @since 1.0.0
+ */
+export const getPropertySignatures = <A>(schema: Schema<A>): { [K in keyof A]: Schema<A[K]> } => {
+  const out: Record<PropertyKey, Schema<any>> = {}
+  const propertySignatures = AST._getPropertySignatures(schema.ast)
+  for (const propertySignature of propertySignatures) {
+    out[propertySignature.name] = make(propertySignature.type)
+  }
+  return out as any
+}
+
+/**
+ * Returns a nominal branded schema by applying a brand to a given schema.
+ *
+ * ```
+ * Schema<A> + B -> Schema<A & Brand<B>>
+ * ```
+ *
+ * @param self - The input schema to be combined with the brand.
+ * @param brand - The brand to apply.
+ *
+ * @example
+ * import * as S from "@fp-ts/schema"
+ * import { pipe } from "@effect/data/Function"
+ *
+ * const Int = pipe(S.number, S.int(), S.brand("Int"))
+ * type Int = S.Infer<typeof Int> // number & Brand<"Int">
+ *
+ * @category combinators
+ * @since 1.0.0
+ */
+export const brand: <B extends string, A>(
+  brand: B,
+  options?: AnnotationOptions<A>
+) => (self: Schema<A>) => Schema<A & Brand<B>> = I.brand
+
+/**
  * @category combinators
  * @since 1.0.0
  */
@@ -540,8 +609,8 @@ const isOverlappingPropertySignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral)
 const isOverlappingIndexSignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral): boolean =>
   x.indexSignatures.some((ix) =>
     y.indexSignatures.some((iy) => {
-      const bx = AST.getParameter(ix.parameter)
-      const by = AST.getParameter(iy.parameter)
+      const bx = AST._getParameter(ix.parameter)
+      const by = AST._getParameter(iy.parameter)
       // there cannot be two string index signatures or two symbol index signatures at the same time
       return (AST.isStringKeyword(bx) && AST.isStringKeyword(by)) ||
         (AST.isSymbolKeyword(bx) && AST.isSymbolKeyword(by))
@@ -805,9 +874,7 @@ export const symbol: Schema<symbol> = I.symbol
 export const object: Schema<object> = I.object
 
 /**
- * Transforms a `string` into a `string` with no leading or trailing whitespace.
- *
- * @category data
+ * @category primitives
  * @since 1.0.0
  */
 export const date: Schema<Date> = DataDate.date

@@ -2,8 +2,8 @@
  * @since 1.0.0
  */
 
-import { pipe } from "@fp-ts/core/Function"
 import * as A from "@fp-ts/schema/annotation/AST"
+import { pipe } from "@effect/data/Function"
 import * as H from "@fp-ts/schema/annotation/Hook"
 import { make } from "@fp-ts/schema/Arbitrary"
 import * as S from "@fp-ts/schema/Schema"

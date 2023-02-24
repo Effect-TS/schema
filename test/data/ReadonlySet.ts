@@ -1,4 +1,4 @@
-import { pipe } from "@fp-ts/core/Function"
+import { pipe } from "@effect/data/Function"
 import * as _ from "@fp-ts/schema/data/ReadonlySet"
 import { parseNumber } from "@fp-ts/schema/data/String"
 import * as P from "@fp-ts/schema/Parser"
@@ -47,6 +47,8 @@ describe.concurrent("ReadonlySet", () => {
     expect(is(new Set(["a", "b", "c"]))).toEqual(true)
 
     expect(is(new Set(["a", "b", 1]))).toEqual(false)
+    expect(is(null)).toEqual(false)
+    expect(is(undefined)).toEqual(false)
   })
 
   it("readonlySet. pretty", () => {

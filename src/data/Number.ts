@@ -2,7 +2,8 @@
  * @since 1.0.0
  */
 
-import { pipe } from "@fp-ts/core/Function"
+import { pipe } from "@effect/data/Function"
+import * as N from "@effect/data/Number"
 import * as I from "@fp-ts/schema/internal/common"
 import type { AnnotationOptions, Schema } from "@fp-ts/schema/Schema"
 
@@ -116,17 +117,6 @@ export const greaterThanOrEqualTo = <A extends number>(
       })
     )
 
-// https://stackoverflow.com/questions/3966484/why-does-modulus-operator-return-fractional-number-in-javascript/31711034#31711034
-// https://github.com/colinhacks/zod/blob/5616f6b505090ebb1775d1d5567d3ee7baa5519d/src/types.ts#L915
-function floatSafeRemainder(val: number, step: number) {
-  const valDecCount = (val.toString().split(".")[1] || "").length
-  const stepDecCount = (step.toString().split(".")[1] || "").length
-  const decCount = valDecCount > stepDecCount ? valDecCount : stepDecCount
-  const valInt = parseInt(val.toFixed(decCount).replace(".", ""))
-  const stepInt = parseInt(step.toFixed(decCount).replace(".", ""))
-  return (((valInt % stepInt) + stepInt) % stepInt) / Math.pow(10, decCount)
-}
-
 /**
  * @since 1.0.0
  */
@@ -137,10 +127,10 @@ export const multipleOf = <A extends number>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter((a): a is A => floatSafeRemainder(a, divisor) === 0, {
+      I.filter((a): a is A => N.remainder(a, divisor) === 0, {
         id: MultipleOfId,
         description: `a number divisible by ${divisor}`,
-        jsonSchema: { multipleOf: divisor < 0 ? -divisor : divisor }, // spec requires positive divisor
+        jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
         ...annotationOptions
       })
     )
@@ -189,6 +179,24 @@ export const lessThanOrEqualTo = <A extends number>(
         id: LessThanOrEqualToId,
         description: `a number less than or equal to ${max}`,
         jsonSchema: { maximum: max },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const between = <A extends number>(
+  min: number,
+  max: number,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter((a): a is A => a >= min && a <= max, {
+        description: `a number between ${min} and ${max}`,
+        jsonSchema: { maximum: max, minimum: max },
         ...annotationOptions
       })
     )

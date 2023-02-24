@@ -5,6 +5,17 @@
 /**
  * @since 1.0.0
  */
+
+export type Brand = ReadonlyArray<string>
+
+/**
+ * @since 1.0.0
+ */
+export const BrandId = "@fp-ts/schema/annotation/BrandId"
+
+/**
+ * @since 1.0.0
+ */
 export type Message<A> = (a: A) => string
 
 /**

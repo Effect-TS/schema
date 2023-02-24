@@ -1,4 +1,5 @@
-import { pipe } from "@fp-ts/core/Function"
+import { pipe } from "@effect/data/Function"
+import * as A from "@fp-ts/schema/annotation/AST"
 import * as AST from "@fp-ts/schema/AST"
 import * as P from "@fp-ts/schema/Parser"
 import * as S from "@fp-ts/schema/Schema"
@@ -8,6 +9,46 @@ describe.concurrent("Schema", () => {
     expect(S.transformOrFail).exist
     expect(S.date).exist
     expect(S.OptionalSchemaId).exist
+    expect(S.between).exist
+    expect(S.positive).exist
+    expect(S.negative).exist
+    expect(S.nonNegative).exist
+    expect(S.nonPositive).exist
+    expect(S.maxItems).exist
+    expect(S.minItems).exist
+    expect(S.itemsCount).exist
+  })
+
+  it("brand", () => {
+    // const Branded: S.Schema<number & Brand<"A"> & Brand<"B">>
+    const Branded = pipe(
+      S.number,
+      S.int(),
+      S.brand("A"),
+      S.brand("B", {
+        description: "a B brand"
+      })
+    )
+    expect(Branded.ast.annotations).toEqual({
+      [A.BrandId]: ["A", "B"],
+      [A.DescriptionId]: "a B brand",
+      [A.JSONSchemaId]: { type: "integer" }
+    })
+  })
+
+  it("getPropertySignatures", () => {
+    const Name = pipe(S.string, S.identifier("name"))
+    const Age = pipe(S.number, S.identifier("age"))
+    const schema = pipe(
+      S.struct({
+        name: Name,
+        age: Age
+      }),
+      S.filter(({ name }) => name === name.toLowerCase())
+    )
+    const shape = S.getPropertySignatures(schema)
+    expect(shape.name).toStrictEqual(Name)
+    expect(shape.age).toStrictEqual(Age)
   })
 
   it("id", () => {

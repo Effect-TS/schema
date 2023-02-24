@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 20
+nav_order: 25
 parent: Modules
 ---
 
@@ -23,6 +23,7 @@ Added in v1.0.0
 - [combinators](#combinators)
   - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [array](#array)
+  - [brand](#brand)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
@@ -52,20 +53,28 @@ Added in v1.0.0
 - [data](#data)
   - [date](#date)
 - [filters](#filters)
+  - [between](#between)
   - [endsWith](#endswith)
   - [finite](#finite)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
   - [includes](#includes)
   - [int](#int)
+  - [itemsCount](#itemscount)
   - [length](#length)
   - [lessThan](#lessthan)
   - [lessThanOrEqualTo](#lessthanorequalto)
+  - [maxItems](#maxitems)
   - [maxLength](#maxlength)
+  - [minItems](#minitems)
   - [minLength](#minlength)
+  - [negative](#negative)
   - [nonEmpty](#nonempty)
   - [nonNaN](#nonnan)
+  - [nonNegative](#nonnegative)
+  - [nonPositive](#nonpositive)
   - [pattern](#pattern)
+  - [positive](#positive)
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
 - [model](#model)
@@ -95,6 +104,7 @@ Added in v1.0.0
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [OptionalSchema (interface)](#optionalschema-interface)
   - [Spread (type alias)](#spread-type-alias)
+  - [getPropertySignatures](#getpropertysignatures)
 
 ---
 
@@ -197,6 +207,35 @@ Added in v1.0.0
 
 ```ts
 export declare const array: <A>(item: Schema<A>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
+## brand
+
+Returns a nominal branded schema by applying a brand to a given schema.
+
+```
+Schema<A> + B -> Schema<A & Brand<B>>
+```
+
+**Signature**
+
+```ts
+export declare const brand: <B extends string, A>(
+  brand: B,
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<any>
+```
+
+**Example**
+
+```ts
+import * as S from '@fp-ts/schema'
+import { pipe } from '@effect/data/Function'
+
+const Int = pipe(S.number, S.int(), S.brand('Int'))
+type Int = S.Infer<typeof Int> // number & Brand<"Int">
 ```
 
 Added in v1.0.0
@@ -525,6 +564,20 @@ Added in v1.0.0
 
 # filters
 
+## between
+
+**Signature**
+
+```ts
+export declare const between: <A extends number>(
+  min: number,
+  max: number,
+  annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## endsWith
 
 **Signature**
@@ -601,6 +654,19 @@ export declare const int: <A extends number>(
 
 Added in v1.0.0
 
+## itemsCount
+
+**Signature**
+
+```ts
+export declare const itemsCount: <A>(
+  n: number,
+  options?: AnnotationOptions<readonly A[]> | undefined
+) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
 ## length
 
 **Signature**
@@ -640,6 +706,19 @@ export declare const lessThanOrEqualTo: <A extends number>(
 
 Added in v1.0.0
 
+## maxItems
+
+**Signature**
+
+```ts
+export declare const maxItems: <A>(
+  n: number,
+  options?: AnnotationOptions<readonly A[]> | undefined
+) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
 ## maxLength
 
 **Signature**
@@ -653,6 +732,19 @@ export declare const maxLength: <A extends string>(
 
 Added in v1.0.0
 
+## minItems
+
+**Signature**
+
+```ts
+export declare const minItems: <A>(
+  n: number,
+  options?: AnnotationOptions<readonly A[]> | undefined
+) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
 ## minLength
 
 **Signature**
@@ -661,6 +753,18 @@ Added in v1.0.0
 export declare const minLength: <A extends string>(
   minLength: number,
   annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## negative
+
+**Signature**
+
+```ts
+export declare const negative: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -690,6 +794,30 @@ export declare const nonNaN: <A extends number>(
 
 Added in v1.0.0
 
+## nonNegative
+
+**Signature**
+
+```ts
+export declare const nonNegative: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## nonPositive
+
+**Signature**
+
+```ts
+export declare const nonPositive: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## pattern
 
 **Signature**
@@ -698,6 +826,18 @@ Added in v1.0.0
 export declare const pattern: <A extends string>(
   regex: RegExp,
   annotationOptions?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## positive
+
+**Signature**
+
+```ts
+export declare const positive: <A extends number>(
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -973,6 +1113,38 @@ export type Spread<A> = {
 } extends infer B
   ? B
   : never
+```
+
+Added in v1.0.0
+
+## getPropertySignatures
+
+Returns an object containing all property signatures of a given schema.
+
+```
+Schema<A> -> { [K in keyof A]: Schema<A[K]> }
+```
+
+**Signature**
+
+```ts
+export declare const getPropertySignatures: <A>(schema: Schema<A>) => { [K in keyof A]: Schema<A[K]> }
+```
+
+**Example**
+
+```ts
+import * as S from '@fp-ts/schema'
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+})
+
+const shape = S.getPropertySignatures(Person)
+
+assert.deepStrictEqual(shape.name, S.string)
+assert.deepStrictEqual(shape.age, S.number)
 ```
 
 Added in v1.0.0

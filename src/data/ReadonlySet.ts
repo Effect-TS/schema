@@ -1,7 +1,7 @@
 /**
  * @since 1.0.0
  */
-import { pipe } from "@fp-ts/core/Function"
+import { pipe } from "@effect/data/Function"
 import { IdentifierId } from "@fp-ts/schema/annotation/AST"
 import * as H from "@fp-ts/schema/annotation/Hook"
 import type { Arbitrary } from "@fp-ts/schema/Arbitrary"
@@ -11,8 +11,7 @@ import * as PR from "@fp-ts/schema/ParseResult"
 import type { Pretty } from "@fp-ts/schema/Pretty"
 import type { Schema } from "@fp-ts/schema/Schema"
 
-const isSet = (u: unknown): u is Set<unknown> =>
-  typeof u === "object" && typeof u !== null && u instanceof Set
+const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
 const parser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
   const items = P.decode(I.array(item))
