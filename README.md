@@ -246,7 +246,7 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 
 ```ts
 import * as S from "@fp-ts/schema";
-import { pipe } from "@fp-ts/data/Function";
+import { pipe } from "@effect/data/Function";
 import { parseNumber } from "@fp-ts/schema/data/parser";
 
 // Age is a schema that can decode a string to a number and encode a number to a string
@@ -530,10 +530,129 @@ S.nullable(S.string);
 
 ## Unions
 
+`@fp-ts/schema` includes a built-in `union` combinator for composing "OR" types.
+
 ```ts
 // $ExpectType Schema<string | number>
 S.union(S.string, S.number);
 ```
+
+### Discriminated unions
+
+TypeScript reference: https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions
+
+Discriminated unions in TypeScript are a way of modeling complex data structures that may take on different forms based on a specific set of conditions or properties. They allow you to define a type that represents multiple related shapes, where each shape is uniquely identified by a shared discriminant property.
+
+In a discriminated union, each variant of the union has a common property, called the discriminant. The discriminant is a literal type, which means it can only have a finite set of possible values. Based on the value of the discriminant property, TypeScript can infer which variant of the union is currently in use.
+
+Here is an example of a discriminated union in TypeScript:
+
+```ts
+type Circle = {
+  readonly kind: "circle";
+  readonly radius: number;
+};
+
+type Square = {
+  readonly kind: "square";
+  readonly sideLength: number;
+};
+
+type Shape = Circle | Square;
+```
+
+This code defines a discriminated union using the `@fp-ts/schema` library:
+
+```ts
+import * as S from "@fp-ts/schema";
+
+const Circle = S.struct({
+  kind: S.literal("circle"),
+  radius: S.number,
+});
+
+const Square = S.struct({
+  kind: S.literal("square"),
+  sideLength: S.number,
+});
+
+const Shape = S.union(Circle, Square);
+```
+
+The `literal` combinator is used to define the discriminant property with a specific string literal value.
+
+Two structs are defined for `Circle` and `Square`, each with their own properties. These structs represent the variants of the union.
+
+Finally, the `union` combinator is used to create a schema for the discriminated union `Shape`, which is a union of `Circle` and `Square`.
+
+### How to transform a simple union into a discriminated union
+
+If you're working on a TypeScript project and you've defined a simple union to represent a particular input, you may find yourself in a situation where you're not entirely happy with how it's set up. For example, let's say you've defined a `Shape` union as a combination of `Circle` and `Square` without any special property:
+
+```ts
+import * as S from "@fp-ts/schema";
+
+const Circle = S.struct({
+  radius: S.number,
+});
+
+const Square = S.struct({
+  sideLength: S.number,
+});
+
+const Shape = S.union(Circle, Square);
+```
+
+To make your code more manageable, you may want to transform the simple union into a discriminated union. This way, TypeScript will be able to automatically determine which member of the union you're working with based on the value of a specific property.
+
+To achieve this, you can add a special property to each member of the union, which will allow TypeScript to know which type it's dealing with at runtime. Here's how you can transform the `Shape` schema into another schema that represents a discriminated union:
+
+```ts
+import * as S from "@fp-ts/schema";
+import { pipe } from "@effect/data/Function";
+
+const Circle = S.struct({
+  radius: S.number,
+});
+
+const Square = S.struct({
+  sideLength: S.number,
+});
+
+const DiscriminatedShape = S.union(
+  pipe(
+    Circle,
+    S.transform(
+      pipe(Circle, S.extend(S.struct({ kind: S.literal("circle") }))), // Add a "kind" property with the literal value "circle" to Circle
+      (circle) => ({ ...circle, kind: "circle" as const }), // Add the discriminant property to Circle
+      ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
+    )
+  ),
+  pipe(
+    Square,
+    S.transform(
+      pipe(Square, S.extend(S.struct({ kind: S.literal("square") }))), // Add a "kind" property with the literal value "square" to Square
+      ),
+      (square) => ({ ...square, kind: "square" as const }), // Add the discriminant property to Square
+      ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
+    )
+  )
+);
+
+expect(S.decodeOrThrow(DiscriminatedShape)({ radius: 10 })).toEqual({
+  kind: "circle",
+  radius: 10,
+});
+
+expect(S.decodeOrThrow(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+  kind: "square",
+  sideLength: 10,
+});
+```
+
+In this example, we use the `extend` function to add a "kind" property with a literal value to each member of the union. Then we use `transform` to add the discriminant property and remove it afterwards. Finally, we use `union` to combine the transformed schemas into a discriminated union.
+
+However, when we use the schema to encode a value, we want the output to match the original input shape. Therefore, we must remove the discriminant property we added earlier from the encoded value to match the original shape of the input.
 
 ## Tuples
 
@@ -794,7 +913,7 @@ The `transformOrFail` combinator works in a similar way, but allows the transfor
 Here's an example of the `transformOrFail` combinator which converts a `string` into a `boolean`:
 
 ```ts
-import { pipe } from "@fp-ts/data/Function";
+import { pipe } from "@effect/data/Function";
 import * as PR from "@fp-ts/schema/ParseResult";
 import * as S from "@fp-ts/schema";
 import * as AST from "@fp-ts/schema/AST";
@@ -892,7 +1011,7 @@ In the example below, we define a schema for an object with a required `a` field
 
 ```ts
 import * as S from "@fp-ts/schema";
-import * as O from "@fp-ts/data/Option";
+import * as O from "@effect/data/Option";
 
 const schema = S.struct({
   a: S.string,
@@ -1010,7 +1129,7 @@ Then we can implement the body using the APIs exported by the `@fp-ts/schema/AST
 ```ts
 import * as S from "@fp-ts/schema";
 import * as AST from "@fp-ts/schema/AST";
-import * as O from "@fp-ts/data/Option";
+import * as O from "@effect/data/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
   const element = AST.createElement(
@@ -1055,7 +1174,7 @@ One of the fundamental requirements in the design of `@fp-ts/schema` is that it 
 Let's see some examples:
 
 ```ts
-import { pipe } from "@fp-ts/data/Function";
+import { pipe } from "@effect/data/Function";
 import * as S from "@fp-ts/schema";
 
 const Password = pipe(
@@ -1095,7 +1214,7 @@ Here's an example of how to add a `deprecated` annotation:
 ```ts
 import * as S from "@fp-ts/schema";
 import * as AST from "@fp-ts/schema/AST";
-import { pipe } from "@fp-ts/data/Function";
+import { pipe } from "@effect/data/Function";
 
 const DeprecatedId = "some/unique/identifier/for/the/custom/annotation";
 
@@ -1121,7 +1240,7 @@ console.log(schema);
 Annotations can be read using the `getAnnotation` helper, here's an example:
 
 ```ts
-import * as O from "@fp-ts/data/Option";
+import * as O from "@effect/data/Option";
 
 const isDeprecated = <A>(schema: S.Schema<A>): boolean =>
   pipe(
