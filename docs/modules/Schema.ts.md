@@ -23,6 +23,7 @@ Added in v1.0.0
 - [combinators](#combinators)
   - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [array](#array)
+  - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
   - [element](#element)
   - [extend](#extend)
@@ -50,8 +51,6 @@ Added in v1.0.0
   - [make](#make)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
-- [data](#data)
-  - [date](#date)
 - [filters](#filters)
   - [between](#between)
   - [endsWith](#endswith)
@@ -86,6 +85,7 @@ Added in v1.0.0
   - [any](#any)
   - [bigint](#bigint)
   - [boolean](#boolean)
+  - [date](#date)
   - [never](#never)
   - [null](#null)
   - [number](#number)
@@ -207,6 +207,42 @@ Added in v1.0.0
 
 ```ts
 export declare const array: <A>(item: Schema<A>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
+## attachPropertySignature
+
+Attaches a property signature with the specified key and value to the schema.
+This API is useful when you want to add a property to your schema which doesn't describe the shape of the input,
+but rather maps to another schema, for example when you want to add a discriminant to a simple union.
+
+**Signature**
+
+```ts
+export declare const attachPropertySignature: <K extends string | number | symbol, V extends AST.LiteralValue>(
+  key: K,
+  value: V
+) => <A extends object>(schema: Schema<A>) => Schema<Spread<A & { readonly [k in K]: V }>>
+```
+
+**Example**
+
+```ts
+import * as S from '@fp-ts/schema'
+import { pipe } from '@effect/data/Function'
+
+const Circle = S.struct({ radius: S.number })
+const Square = S.struct({ sideLength: S.number })
+const Shape = S.union(
+  pipe(Circle, S.attachPropertySignature('kind', 'circle')),
+  pipe(Square, S.attachPropertySignature('kind', 'square'))
+)
+
+assert.deepStrictEqual(S.decodeOrThrow(Shape)({ radius: 10 }), {
+  kind: 'circle',
+  radius: 10,
+})
 ```
 
 Added in v1.0.0
@@ -544,20 +580,6 @@ export declare const uniqueSymbol: <S extends symbol>(
   symbol: S,
   annotations?: Record<string | symbol, unknown> | undefined
 ) => Schema<S>
-```
-
-Added in v1.0.0
-
-# data
-
-## date
-
-Transforms a `string` into a `string` with no leading or trailing whitespace.
-
-**Signature**
-
-```ts
-export declare const date: Schema<Date>
 ```
 
 Added in v1.0.0
@@ -938,6 +960,16 @@ Added in v1.0.0
 
 ```ts
 export declare const boolean: Schema<boolean>
+```
+
+Added in v1.0.0
+
+## date
+
+**Signature**
+
+```ts
+export declare const date: Schema<Date>
 ```
 
 Added in v1.0.0
