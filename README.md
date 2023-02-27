@@ -632,7 +632,6 @@ const DiscriminatedShape = S.union(
     Square,
     S.transform(
       pipe(Square, S.extend(S.struct({ kind: S.literal("square") }))), // Add a "kind" property with the literal value "square" to Square
-      ),
       (square) => ({ ...square, kind: "square" as const }), // Add the discriminant property to Square
       ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
     )
@@ -653,6 +652,31 @@ expect(S.decodeOrThrow(DiscriminatedShape)({ sideLength: 10 })).toEqual({
 In this example, we use the `extend` function to add a "kind" property with a literal value to each member of the union. Then we use `transform` to add the discriminant property and remove it afterwards. Finally, we use `union` to combine the transformed schemas into a discriminated union.
 
 However, when we use the schema to encode a value, we want the output to match the original input shape. Therefore, we must remove the discriminant property we added earlier from the encoded value to match the original shape of the input.
+
+The previous solution works perfectly and shows how we can add and remove properties to our schema at will, making it easier to consume the result within our domain model. However, it requires a lot of boilerplate. Fortunately, there is an API called `attachPropertySignature` designed specifically for this use case, which allows us to achieve the same result with much less effort:
+
+```ts
+const Circle = S.struct({ radius: S.number });
+const Square = S.struct({ sideLength: S.number });
+const DiscriminatedShape = S.union(
+  pipe(Circle, S.attachPropertySignature("kind", "circle")),
+  pipe(Square, S.attachPropertySignature("kind", "square"))
+);
+
+// decoding
+expect(S.decodeOrThrow(DiscriminatedShape)({ radius: 10 })).toEqual({
+  kind: "circle",
+  radius: 10,
+});
+
+// encoding
+expect(
+  S.encodeOrThrow(DiscriminatedShape)({
+    kind: "circle",
+    radius: 10,
+  })
+).toEqual({ radius: 10 });
+```
 
 ## Tuples
 
