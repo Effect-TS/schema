@@ -833,6 +833,66 @@ describe.concurrent("Decoder", () => {
     )
   })
 
+  it("struct/ constructor", () => {
+    const schema = S.struct({ constructor: S.any })
+    Util.expectDecodingSuccess(
+      schema,
+      { constructor: "a" }
+    )
+    Util.expectDecodingFailure(
+      schema,
+      {},
+      "/constructor is missing"
+    )
+  })
+
+  it("struct/getters", () => {
+    const schema = S.struct({ name: S.string })
+    class WithName {
+      get name() {
+        return "Tim"
+      }
+    }
+    Util.expectDecodingSuccess(
+      schema,
+      new WithName(),
+      { name: "Tim" }
+    )
+  })
+
+  it("struct/getters unexpected", () => {
+    const schema = S.struct({ name: S.string })
+    class WithUnexpected {
+      get name() {
+        return "Tim"
+      }
+
+      unexpected = "fail"
+    }
+    Util.expectDecodingFailure(
+      schema,
+      new WithUnexpected(),
+      `/unexpected is unexpected`
+    )
+  })
+
+  it("struct/getters additional", () => {
+    const schema = S.struct({ name: S.string })
+    class WithUnexpected {
+      get name() {
+        return "Tim"
+      }
+      get ignore() {
+        return "ignore"
+      }
+    }
+    Util.expectDecodingSuccess(
+      schema,
+      new WithUnexpected(),
+      { name: "Tim" }
+    )
+  })
+
   it("union/ empty union", () => {
     const schema = S.union()
     Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")

@@ -306,6 +306,15 @@ export const getTemplateLiteralRegex = (ast: AST.TemplateLiteral): RegExp => {
 // ---------------------------------------------
 
 /** @internal */
+export const hasOwn = (o: object, prop: PropertyKey): boolean => {
+  if ("__proto__" in o && o.__proto__ !== Object.prototype) {
+    return Object.prototype.hasOwnProperty.call(o, prop) || hasOwn(o.__proto__ as object, prop)
+  }
+
+  return Object.prototype.hasOwnProperty.call(o, prop)
+}
+
+/** @internal */
 export const memoize = <A, B>(f: (a: A) => B): (a: A) => B => {
   const cache = new Map()
   return (a) => {
