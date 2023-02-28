@@ -482,6 +482,8 @@ pipe(S.number, S.positive()); // > 0
 pipe(S.number, S.nonNegative()); // >= 0
 pipe(S.number, S.negative()); // < 0
 pipe(S.number, S.nonPositive()); // <= 0
+
+pipe(S.number, S.clamp(-1, 1)); // restricts value to -1 <= x <= 1
 ```
 
 ### Bigint filters
@@ -499,6 +501,8 @@ pipe(S.bigint, B.positive()); // > 0n
 pipe(S.bigint, B.nonNegative()); // >= 0n
 pipe(S.bigint, B.negative()); // < 0n
 pipe(S.bigint, B.nonPositive()); // <= 0n
+
+pipe(S.bigint, B.clamp(-1n, 1n)); // restricts value to -1n <= x <= 1n
 ```
 
 ### Array filters
