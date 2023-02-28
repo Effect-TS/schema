@@ -382,7 +382,7 @@ const parserFor = <A>(
               // handle unexpected keys
               // ---------------------------------------------
               const isUnexpectedAllowed = options?.isUnexpectedAllowed
-              for (const key of I.ownKeys(input)) {
+              for (const key of Reflect.ownKeys(input)) {
                 if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
                   const e = PR.key(key, [PR.unexpected(input[key])])
                   if (!isUnexpectedAllowed) {
@@ -408,14 +408,40 @@ const parserFor = <A>(
       }
       case "Union": {
         const types = ast.types.map(go)
-        return make(I.makeSchema(ast), (u, options) => {
+        const searchTree = _getSearchTree(types, as)
+        const ownKeys = Reflect.ownKeys(searchTree.keys)
+        return make(I.makeSchema(ast), (input, options) => {
           const es: Array<PR.ParseError> = []
 
-          // ---------------------------------------------
-          // compute best output
-          // ---------------------------------------------
-          for (let i = 0; i < types.length; i++) {
-            const t = types[i].parse(u, options)
+          // look for a property only if the input is an object
+          if (isRecord(input)) {
+            for (let i = 0; i < ownKeys.length; i++) {
+              const name = ownKeys[i]
+              const buckets = searchTree.keys[name]
+              // for each property that should contain a literal, check if the input contains that property
+              if (Object.prototype.hasOwnProperty.call(input, name)) {
+                const literal = String(input[name])
+                // check that the value obtained from the input for the property corresponds to an existing bucket
+                if (Object.prototype.hasOwnProperty.call(buckets, literal)) {
+                  // retrive the minimal set of candidates for decoding
+                  const bucket = buckets[literal]
+                  for (let i = 0; i < bucket.length; i++) {
+                    const t = bucket[i].parse(input, options)
+                    if (PR.isSuccess(t)) {
+                      return t
+                    } else {
+                      es.push(PR.unionMember(t.left))
+                    }
+                  }
+                }
+              }
+            }
+          }
+          // if none of the schemas with at least one property with a literal value succeeded,
+          // proceed with those that have no literal at all
+          const otherwise = searchTree.otherwise
+          for (let i = 0; i < otherwise.length; i++) {
+            const t = otherwise[i].parse(input, options)
             if (PR.isSuccess(t)) {
               return t
             } else {
@@ -428,7 +454,7 @@ const parserFor = <A>(
           // ---------------------------------------------
           return I.isNonEmptyReadonlyArray(es) ?
             PR.failures(es) :
-            PR.failure(PR.type(AST.neverKeyword, u))
+            PR.failure(PR.type(AST.neverKeyword, input))
         })
       }
       case "Lazy": {
@@ -480,6 +506,72 @@ const parserFor = <A>(
   }
 
   return go(schema.ast)
+}
+
+/** @internal */
+export const _getFirstLiteral = (
+  ast: AST.AST,
+  as: "decoder" | "guard" | "encoder"
+): [PropertyKey, AST.LiteralValue] | null => {
+  switch (ast._tag) {
+    case "TypeAlias":
+      return _getFirstLiteral(ast.type, as)
+    case "TypeLiteral": {
+      for (const propertySignature of ast.propertySignatures) {
+        if (AST.isLiteral(propertySignature.type) && !propertySignature.isOptional) {
+          return [propertySignature.name, propertySignature.type.literal]
+        }
+      }
+      break
+    }
+    case "Refinement":
+      return _getFirstLiteral(ast.from, as)
+    case "Transform":
+      return as === "decoder" ?
+        _getFirstLiteral(ast.from, as) :
+        _getFirstLiteral(ast.to, as)
+  }
+  return null
+}
+
+/**
+ * The purpose of the algorithm is to narrow down the pool of possible candidates for decoding as much as possible.
+ *
+ * This function separates the schemas into two groups, `keys` and `otherwise`:
+ *
+ * - `keys`: the schema has at least one property with a literal value (note that it is sufficient to obtain a single
+ *   literal for the algorithm to work)
+ * - `otherwise`: the schema has no properties with a literal value
+ *
+ * If a schema has at least one property with a literal value, so it ends up in `keys`, first a namespace is created for
+ * the name of the property containing the literal, and then within this namespace a "bucket" is created for the literal
+ * value in which to store all the schemas that have the same property and literal value.
+ *
+ * @internal
+ */
+export const _getSearchTree = <A extends Schema<any>>(
+  schemas: ReadonlyArray<A>,
+  as: "decoder" | "guard" | "encoder"
+): {
+  keys: { [key: PropertyKey]: { [literal: string]: ReadonlyArray<A> } }
+  otherwise: ReadonlyArray<A>
+} => {
+  const keys: { [key: PropertyKey]: { [literal: string]: Array<A> } } = {}
+  const otherwise: Array<A> = []
+  for (let i = 0; i < schemas.length; i++) {
+    const schema = schemas[i]
+    const tag = _getFirstLiteral(schema.ast, as)
+    if (tag) {
+      const key = tag[0]
+      const literal = String(tag[1])
+      const buckets = keys[key] = keys[key] || {}
+      const bucket = buckets[literal] = buckets[literal] || []
+      bucket.push(schema)
+    } else {
+      otherwise.push(schema)
+    }
+  }
+  return { keys, otherwise }
 }
 
 const unknownArray = AST.createTuple([], O.some([AST.unknownKeyword]), true)

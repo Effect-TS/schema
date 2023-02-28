@@ -838,6 +838,14 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")
   })
 
+  it("union/ members with literals but the input doesn't have any", () => {
+    const schema = S.union(
+      S.struct({ a: S.literal("A"), c: S.string }),
+      S.struct({ b: S.literal("B"), d: S.number })
+    )
+    Util.expectDecodingFailure(schema, {}, "Expected never, actual {}")
+  })
+
   it("union/required property signatures: should return the best output", () => {
     const a = S.struct({ a: S.string })
     const ab = S.struct({ a: S.string, b: S.number })
