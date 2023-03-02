@@ -247,7 +247,7 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 ```ts
 import * as S from "@fp-ts/schema";
 import { pipe } from "@effect/data/Function";
-import { parseNumber } from "@fp-ts/schema/data/parser";
+import { parseNumber } from "@fp-ts/schema/data/String";
 
 // Age is a schema that can decode a string to a number and encode a number to a string
 const Age = pipe(S.string, parseNumber);
@@ -267,7 +267,7 @@ Note that during encoding, the number value `30` was converted to a string `"30"
 
 ## Formatting errors
 
-To format errors when a `decode` or an `encode` function fails, you can use the `format` function from the `@fp-ts/schema/formatter/Tree` module.
+To format errors when a `decode` or an `encode` function fails, you can use the `formatErrors` function from the `@fp-ts/schema/formatter/Tree` module.
 
 ```ts
 import * as S from "@fp-ts/schema";
@@ -482,8 +482,6 @@ pipe(S.number, S.positive()); // > 0
 pipe(S.number, S.nonNegative()); // >= 0
 pipe(S.number, S.negative()); // < 0
 pipe(S.number, S.nonPositive()); // <= 0
-
-pipe(S.number, S.clamp(-1, 1)); // restricts value to -1 <= x <= 1
 ```
 
 ### Bigint filters
@@ -501,8 +499,6 @@ pipe(S.bigint, B.positive()); // > 0n
 pipe(S.bigint, B.nonNegative()); // >= 0n
 pipe(S.bigint, B.negative()); // < 0n
 pipe(S.bigint, B.nonPositive()); // <= 0n
-
-pipe(S.bigint, B.clamp(-1n, 1n)); // restricts value to -1n <= x <= 1n
 ```
 
 ### Array filters
@@ -972,32 +968,9 @@ const transformedSchema: S.Schema<boolean> = pipe(
 );
 ```
 
-### parseNumber
+### String transformations
 
-Transforms a `string` into a `number` by parsing the string using `parseFloat`.
-
-The following special string values are supported: "NaN", "Infinity", "-Infinity".
-
-```ts
-import * as S from "@fp-ts/schema";
-import { parseNumber } from "@fp-ts/schema/data/parser";
-
-const schema = parseNumber(S.string);
-const decodeOrThrow = S.decodeOrThrow(schema);
-
-// success cases
-decodeOrThrow("1"); // 1
-decodeOrThrow("-1"); // -1
-decodeOrThrow("1.5"); // 1.5
-decodeOrThrow("NaN"); // NaN
-decodeOrThrow("Infinity"); // Infinity
-decodeOrThrow("-Infinity"); // -Infinity
-
-// failure cases
-decodeOrThrow("a"); // throws
-```
-
-### trim
+#### trim
 
 The `trim` parser allows removing whitespaces from the beginning and end of a string.
 
@@ -1015,13 +988,38 @@ decodeOrThrow(" a "); // "a"
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
 
-### parseDate
+#### parseNumber
+
+Transforms a `string` into a `number` by parsing the string using `parseFloat`.
+
+The following special string values are supported: "NaN", "Infinity", "-Infinity".
+
+```ts
+import * as S from "@fp-ts/schema";
+import { parseNumber } from "@fp-ts/schema/data/String";
+
+const schema = parseNumber(S.string);
+const decodeOrThrow = S.decodeOrThrow(schema);
+
+// success cases
+decodeOrThrow("1"); // 1
+decodeOrThrow("-1"); // -1
+decodeOrThrow("1.5"); // 1.5
+decodeOrThrow("NaN"); // NaN
+decodeOrThrow("Infinity"); // Infinity
+decodeOrThrow("-Infinity"); // -Infinity
+
+// failure cases
+decodeOrThrow("a"); // throws
+```
+
+#### parseDate
 
 Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 ```ts
 import * as S from "@fp-ts/schema";
-import { parseDate } from "@fp-ts/schema/data/parser";
+import { parseDate } from "@fp-ts/schema/data/String";
 
 const schema = parseDate(S.string);
 const decodeOrThrow = S.decodeOrThrow(schema);
@@ -1029,6 +1027,41 @@ const decodeOrThrow = S.decodeOrThrow(schema);
 decodeOrThrow("1970-01-01T00:00:00.000Z"); // new Date(0)
 
 decodeOrThrow("a"); // throws
+```
+
+### Number transformations
+
+#### clamp
+
+Clamps a `number` between a minimum and a maximum value.
+
+```ts
+import * as S from "@fp-ts/schema";
+
+const schema = pipe(S.number, S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
+
+const decodeOrThrow = S.decodeOrThrow(schema);
+decodeOrThrow(-3); // -1
+decodeOrThrow(0); // 0
+decodeOrThrow(3); // 1
+```
+
+### Bigint transformations
+
+#### clamp
+
+Clamps a `bigint` between a minimum and a maximum value.
+
+```ts
+import * as S from "@fp-ts/schema";
+import * as B from "@fp-ts/schema/data/Bigint";
+
+const schema = pipe(S.bigint, B.clamp(-1n, 1n)); // clamps the input to -1n <= x <= 1n
+
+const decodeOrThrow = S.decodeOrThrow(schema);
+decodeOrThrow(-3n); // -1n
+decodeOrThrow(0n); // 0n
+decodeOrThrow(3n); // 1n
 ```
 
 ## Option
