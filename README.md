@@ -24,17 +24,13 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 
 If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
 
-# Credits and sponsorship
+# Credits
 
 This library was inspired by the following projects:
 
 - [io-ts](https://github.com/gcanti/io-ts)
 - [zod](https://github.com/colinhacks/zod)
 - [zio-schema](https://github.com/zio/zio-schema)
-
-A huge thanks to my sponsors who made the development of `@effect/schema` possible.
-
-If you also want to **become a sponsor** to ensure this library continues to improve and receive maintenance, check out my [GitHub Sponsors profile](https://github.com/sponsors/gcanti?o=sd&sc=t)
 
 ## Requirements
 
@@ -847,7 +843,7 @@ class Test {
 }
 
 // $ExpectType Schema<Test>
-pipe(S.object, S.instanceOf(Test));
+S.instanceOf(Test);
 ```
 
 ## Recursive types
@@ -988,7 +984,9 @@ decodeOrThrow(" a "); // "a"
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
 
-#### parseNumber
+### Number transformations
+
+#### parseString
 
 Transforms a `string` into a `number` by parsing the string using `parseFloat`.
 
@@ -996,9 +994,9 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 
 ```ts
 import * as S from "@effect/schema";
-import { parseNumber } from "@effect/schema/data/String";
+import { parseString } from "@effect/schema/data/Number";
 
-const schema = parseNumber(S.string);
+const schema = parseString(S.string);
 const decodeOrThrow = S.decodeOrThrow(schema);
 
 // success cases
@@ -1012,24 +1010,6 @@ decodeOrThrow("-Infinity"); // -Infinity
 // failure cases
 decodeOrThrow("a"); // throws
 ```
-
-#### parseDate
-
-Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
-
-```ts
-import * as S from "@effect/schema";
-import { parseDate } from "@effect/schema/data/String";
-
-const schema = parseDate(S.string);
-const decodeOrThrow = S.decodeOrThrow(schema);
-
-decodeOrThrow("1970-01-01T00:00:00.000Z"); // new Date(0)
-
-decodeOrThrow("a"); // throws
-```
-
-### Number transformations
 
 #### clamp
 
@@ -1062,6 +1042,24 @@ const decodeOrThrow = S.decodeOrThrow(schema);
 decodeOrThrow(-3n); // -1n
 decodeOrThrow(0n); // 0n
 decodeOrThrow(3n); // 1n
+```
+
+### Date transformations
+
+#### parseString
+
+Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+
+```ts
+import * as S from "@effect/schema";
+import { parseString } from "@effect/schema/data/Date";
+
+const schema = parseString(S.string);
+const decodeOrThrow = S.decodeOrThrow(schema);
+
+decodeOrThrow("1970-01-01T00:00:00.000Z"); // new Date(0)
+
+decodeOrThrow("a"); // throws
 ```
 
 ## Option
@@ -1315,7 +1313,7 @@ console.log(isDeprecated(schema)); // true
 
 # Documentation
 
-- [API Reference](https://effect-ts.github.io/schema/)
+- [API Reference](https://fp-ts.github.io/schema/)
 
 # License
 
