@@ -13,12 +13,17 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
+  - [EndsWithTypeId](#endswithtypeid)
+  - [IncludesTypeId](#includestypeid)
+  - [PatternTypeId](#patterntypeid)
+  - [StartsWithTypeId](#startswithtypeid)
+  - [TrimmedTypeId](#trimmedtypeid)
+  - [UUID](#uuid)
+  - [UUIDTypeId](#uuidtypeid)
   - [endsWith](#endswith)
   - [includes](#includes)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
-  - [parseDate](#parsedate)
-  - [parseNumber](#parsenumber)
   - [pattern](#pattern)
   - [startsWith](#startswith)
   - [trim](#trim)
@@ -27,6 +32,76 @@ Added in v1.0.0
 ---
 
 # utils
+
+## EndsWithTypeId
+
+**Signature**
+
+```ts
+export declare const EndsWithTypeId: '@effect/schema/data/String/EndsWithTypeId'
+```
+
+Added in v1.0.0
+
+## IncludesTypeId
+
+**Signature**
+
+```ts
+export declare const IncludesTypeId: '@effect/schema/data/String/IncludesTypeId'
+```
+
+Added in v1.0.0
+
+## PatternTypeId
+
+**Signature**
+
+```ts
+export declare const PatternTypeId: '@effect/schema/data/String/PatternTypeId'
+```
+
+Added in v1.0.0
+
+## StartsWithTypeId
+
+**Signature**
+
+```ts
+export declare const StartsWithTypeId: '@effect/schema/data/String/StartsWithTypeId'
+```
+
+Added in v1.0.0
+
+## TrimmedTypeId
+
+**Signature**
+
+```ts
+export declare const TrimmedTypeId: '@effect/schema/data/String/TrimmedTypeId'
+```
+
+Added in v1.0.0
+
+## UUID
+
+**Signature**
+
+```ts
+export declare const UUID: Schema<string>
+```
+
+Added in v1.0.0
+
+## UUIDTypeId
+
+**Signature**
+
+```ts
+export declare const UUIDTypeId: '@effect/schema/data/String/UUIDTypeId'
+```
+
+Added in v1.0.0
 
 ## endsWith
 
@@ -76,32 +151,6 @@ export declare const minLength: <A extends string>(
   minLength: number,
   annotationOptions?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## parseDate
-
-Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
-
-**Signature**
-
-```ts
-export declare const parseDate: (self: Schema<string>) => Schema<Date>
-```
-
-Added in v1.0.0
-
-## parseNumber
-
-Transforms a `string` into a `number` by parsing the string using `parseFloat`.
-
-The following special string values are supported: "NaN", "Infinity", "-Infinity".
-
-**Signature**
-
-```ts
-export declare const parseNumber: (self: Schema<string>) => Schema<number>
 ```
 
 Added in v1.0.0

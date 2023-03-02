@@ -13,6 +13,19 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
+  - [BetweenTypeId](#betweentypeid)
+  - [FiniteTypeId](#finitetypeid)
+  - [GreaterThanOrEqualToTypeId](#greaterthanorequaltotypeid)
+  - [GreaterThanTypeId](#greaterthantypeid)
+  - [IntTypeId](#inttypeid)
+  - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
+  - [LessThanTypeId](#lessthantypeid)
+  - [MultipleOfTypeId](#multipleoftypeid)
+  - [NegativeTypeId](#negativetypeid)
+  - [NonNaNTypeId](#nonnantypeid)
+  - [NonNegativeTypeId](#nonnegativetypeid)
+  - [NonPositiveTypeId](#nonpositivetypeid)
+  - [PositiveTypeId](#positivetypeid)
   - [between](#between)
   - [clamp](#clamp)
   - [finite](#finite)
@@ -26,11 +39,142 @@ Added in v1.0.0
   - [nonNaN](#nonnan)
   - [nonNegative](#nonnegative)
   - [nonPositive](#nonpositive)
+  - [parseString](#parsestring)
   - [positive](#positive)
 
 ---
 
 # utils
+
+## BetweenTypeId
+
+**Signature**
+
+```ts
+export declare const BetweenTypeId: '@effect/schema/data/Number/BetweenTypeId'
+```
+
+Added in v1.0.0
+
+## FiniteTypeId
+
+**Signature**
+
+```ts
+export declare const FiniteTypeId: '@effect/schema/data/Number/FiniteTypeId'
+```
+
+Added in v1.0.0
+
+## GreaterThanOrEqualToTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanOrEqualToTypeId: '@effect/schema/data/Number/GreaterThanOrEqualToTypeId'
+```
+
+Added in v1.0.0
+
+## GreaterThanTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanTypeId: '@effect/schema/data/Number/GreaterThanTypeId'
+```
+
+Added in v1.0.0
+
+## IntTypeId
+
+**Signature**
+
+```ts
+export declare const IntTypeId: '@effect/schema/data/Number/IntTypeId'
+```
+
+Added in v1.0.0
+
+## LessThanOrEqualToTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanOrEqualToTypeId: '@effect/schema/data/Number/LessThanOrEqualToTypeId'
+```
+
+Added in v1.0.0
+
+## LessThanTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanTypeId: '@effect/schema/data/Number/LessThanTypeId'
+```
+
+Added in v1.0.0
+
+## MultipleOfTypeId
+
+**Signature**
+
+```ts
+export declare const MultipleOfTypeId: '@effect/schema/data/Number/MultipleOfTypeId'
+```
+
+Added in v1.0.0
+
+## NegativeTypeId
+
+**Signature**
+
+```ts
+export declare const NegativeTypeId: '@effect/schema/data/Number/NegativeTypeId'
+```
+
+Added in v1.0.0
+
+## NonNaNTypeId
+
+**Signature**
+
+```ts
+export declare const NonNaNTypeId: '@effect/schema/data/Number/NonNaNTypeId'
+```
+
+Added in v1.0.0
+
+## NonNegativeTypeId
+
+**Signature**
+
+```ts
+export declare const NonNegativeTypeId: '@effect/schema/data/Number/NonNegativeTypeId'
+```
+
+Added in v1.0.0
+
+## NonPositiveTypeId
+
+**Signature**
+
+```ts
+export declare const NonPositiveTypeId: '@effect/schema/data/Number/NonPositiveTypeId'
+```
+
+Added in v1.0.0
+
+## PositiveTypeId
+
+**Signature**
+
+```ts
+export declare const PositiveTypeId: '@effect/schema/data/Number/PositiveTypeId'
+```
+
+Added in v1.0.0
 
 ## between
 
@@ -191,6 +335,20 @@ Added in v1.0.0
 export declare const nonPositive: <A extends number>(
   annotationOptions?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## parseString
+
+Transforms a `string` into a `number` by parsing the string using `parseFloat`.
+
+The following special string values are supported: "NaN", "Infinity", "-Infinity".
+
+**Signature**
+
+```ts
+export declare const parseString: (self: Schema<string>) => Schema<number>
 ```
 
 Added in v1.0.0

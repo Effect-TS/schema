@@ -15,8 +15,6 @@ Added in v1.0.0
 - [utils](#utils)
   - [Brand (type alias)](#brand-type-alias)
   - [BrandId](#brandid)
-  - [Custom (type alias)](#custom-type-alias)
-  - [CustomId](#customid)
   - [Description (type alias)](#description-type-alias)
   - [DescriptionId](#descriptionid)
   - [Documentation (type alias)](#documentation-type-alias)
@@ -31,6 +29,8 @@ Added in v1.0.0
   - [MessageId](#messageid)
   - [Title (type alias)](#title-type-alias)
   - [TitleId](#titleid)
+  - [Type (type alias)](#type-type-alias)
+  - [TypeId](#typeid)
 
 ---
 
@@ -52,26 +52,6 @@ Added in v1.0.0
 
 ```ts
 export declare const BrandId: '@effect/schema/annotation/BrandId'
-```
-
-Added in v1.0.0
-
-## Custom (type alias)
-
-**Signature**
-
-```ts
-export type Custom = unknown
-```
-
-Added in v1.0.0
-
-## CustomId
-
-**Signature**
-
-```ts
-export declare const CustomId: '@effect/schema/annotation/CustomId'
 ```
 
 Added in v1.0.0
@@ -212,6 +192,26 @@ Added in v1.0.0
 
 ```ts
 export declare const TitleId: '@effect/schema/annotation/TitleId'
+```
+
+Added in v1.0.0
+
+## Type (type alias)
+
+**Signature**
+
+```ts
+export type Type = string | symbol
+```
+
+Added in v1.0.0
+
+## TypeId
+
+**Signature**
+
+```ts
+export declare const TypeId: '@effect/schema/annotation/TypeId'
 ```
 
 Added in v1.0.0

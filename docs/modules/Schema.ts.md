@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 25
+nav_order: 24
 parent: Modules
 ---
 
@@ -189,6 +189,7 @@ Added in v1.0.0
 
 ```ts
 export type AnnotationOptions<A> = {
+  typeId?: A.Type | { id: A.Type; params: unknown }
   message?: A.Message<A>
   identifier?: A.Identifier
   title?: A.Title
@@ -196,7 +197,6 @@ export type AnnotationOptions<A> = {
   examples?: A.Examples
   documentation?: A.Documentation
   jsonSchema?: A.JSONSchema
-  custom?: A.Custom
 }
 ```
 

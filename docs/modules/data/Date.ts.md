@@ -14,6 +14,7 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [date](#date)
+  - [parseString](#parsestring)
 
 ---
 
@@ -25,6 +26,18 @@ Added in v1.0.0
 
 ```ts
 export declare const date: Schema<Date>
+```
+
+Added in v1.0.0
+
+## parseString
+
+Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+
+**Signature**
+
+```ts
+export declare const parseString: (self: Schema<string>) => Schema<Date>
 ```
 
 Added in v1.0.0
