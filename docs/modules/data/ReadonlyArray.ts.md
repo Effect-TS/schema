@@ -13,10 +13,10 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [identifiers](#identifiers)
-  - [ItemsCountId](#itemscountid)
-  - [MaxItemsId](#maxitemsid)
   - [MinItemsId](#minitemsid)
 - [utils](#utils)
+  - [ItemsCountId](#itemscountid)
+  - [MaxItemsId](#maxitemsid)
   - [itemsCount](#itemscount)
   - [maxItems](#maxitems)
   - [minItems](#minitems)
@@ -24,6 +24,18 @@ Added in v1.0.0
 ---
 
 # identifiers
+
+## MinItemsId
+
+**Signature**
+
+```ts
+export declare const MinItemsId: '@effect/schema/ReadonlyArray/minItems'
+```
+
+Added in v1.0.0
+
+# utils
 
 ## ItemsCountId
 
@@ -44,18 +56,6 @@ export declare const MaxItemsId: '@effect/schema/ReadonlyArray/maxItems'
 ```
 
 Added in v1.0.0
-
-## MinItemsId
-
-**Signature**
-
-```ts
-export declare const MinItemsId: '@effect/schema/ReadonlyArray/minItems'
-```
-
-Added in v1.0.0
-
-# utils
 
 ## itemsCount
 

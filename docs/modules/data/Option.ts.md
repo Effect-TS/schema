@@ -13,22 +13,12 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [fromNullable](#fromnullable)
   - [option](#option)
+  - [parseNullable](#parsenullable)
 
 ---
 
 # utils
-
-## fromNullable
-
-**Signature**
-
-```ts
-export declare const fromNullable: <A>(value: Schema<A>) => Schema<Option<A>>
-```
-
-Added in v1.0.0
 
 ## option
 
@@ -36,6 +26,16 @@ Added in v1.0.0
 
 ```ts
 export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
+```
+
+Added in v1.0.0
+
+## parseNullable
+
+**Signature**
+
+```ts
+export declare const parseNullable: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0
