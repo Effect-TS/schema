@@ -1,5 +1,5 @@
 ---
-"@fp-ts/schema": patch
+"@effect/schema": patch
 ---
 
 refactor instanceOf (to a constructor)
