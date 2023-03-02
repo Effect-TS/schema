@@ -843,7 +843,7 @@ describe.concurrent("Decoder", () => {
       S.struct({ a: S.literal("A"), c: S.string }),
       S.struct({ b: S.literal("B"), d: S.number })
     )
-    Util.expectDecodingFailure(schema, {}, "Expected never, actual {}")
+    Util.expectDecodingFailure(schema, {}, "Expected type literal or type literal, actual {}")
   })
 
   it("union/required property signatures: should return the best output", () => {

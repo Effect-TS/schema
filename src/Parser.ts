@@ -454,7 +454,7 @@ const parserFor = <A>(
           // ---------------------------------------------
           return I.isNonEmptyReadonlyArray(es) ?
             PR.failures(es) :
-            PR.failure(PR.type(AST.neverKeyword, input))
+            PR.failure(PR.type(ast, input))
         })
       }
       case "Lazy": {
