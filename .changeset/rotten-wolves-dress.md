@@ -1,5 +1,5 @@
 ---
-"@fp-ts/schema": patch
+"@effect/schema": patch
 ---
 
 upgrade to latest effect/data
