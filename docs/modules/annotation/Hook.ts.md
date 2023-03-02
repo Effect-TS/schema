@@ -28,7 +28,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ArbitraryHookId: '@fp-ts/schema/annotation/ArbitraryHookId'
+export declare const ArbitraryHookId: '@effect/schema/annotation/ArbitraryHookId'
 ```
 
 Added in v1.0.0
@@ -50,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ParserHookId: '@fp-ts/schema/annotation/ParserHookId'
+export declare const ParserHookId: '@effect/schema/annotation/ParserHookId'
 ```
 
 Added in v1.0.0
@@ -60,7 +60,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PrettyHookId: '@fp-ts/schema/annotation/PrettyHookId'
+export declare const PrettyHookId: '@effect/schema/annotation/PrettyHookId'
 ```
 
 Added in v1.0.0

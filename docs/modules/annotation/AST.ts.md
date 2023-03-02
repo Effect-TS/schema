@@ -51,7 +51,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BrandId: '@fp-ts/schema/annotation/BrandId'
+export declare const BrandId: '@effect/schema/annotation/BrandId'
 ```
 
 Added in v1.0.0
@@ -71,7 +71,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const CustomId: '@fp-ts/schema/annotation/CustomId'
+export declare const CustomId: '@effect/schema/annotation/CustomId'
 ```
 
 Added in v1.0.0
@@ -91,7 +91,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const DescriptionId: '@fp-ts/schema/annotation/DescriptionId'
+export declare const DescriptionId: '@effect/schema/annotation/DescriptionId'
 ```
 
 Added in v1.0.0
@@ -111,7 +111,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const DocumentationId: '@fp-ts/schema/annotation/DocumentationId'
+export declare const DocumentationId: '@effect/schema/annotation/DocumentationId'
 ```
 
 Added in v1.0.0
@@ -131,7 +131,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ExamplesId: '@fp-ts/schema/annotation/ExamplesId'
+export declare const ExamplesId: '@effect/schema/annotation/ExamplesId'
 ```
 
 Added in v1.0.0
@@ -151,7 +151,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const IdentifierId: '@fp-ts/schema/annotation/IdentifierId'
+export declare const IdentifierId: '@effect/schema/annotation/IdentifierId'
 ```
 
 Added in v1.0.0
@@ -171,7 +171,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const JSONSchemaId: '@fp-ts/schema/annotation/JSONSchemaId'
+export declare const JSONSchemaId: '@effect/schema/annotation/JSONSchemaId'
 ```
 
 Added in v1.0.0
@@ -191,7 +191,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MessageId: '@fp-ts/schema/annotation/MessageId'
+export declare const MessageId: '@effect/schema/annotation/MessageId'
 ```
 
 Added in v1.0.0
@@ -211,7 +211,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const TitleId: '@fp-ts/schema/annotation/TitleId'
+export declare const TitleId: '@effect/schema/annotation/TitleId'
 ```
 
 Added in v1.0.0

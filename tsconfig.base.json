@@ -13,7 +13,9 @@
     "preserveSymlinks": true,
     "moduleResolution": "node",
     "noEmit": false,
-    "lib": ["ES2021"],
+    "lib": [
+      "ES2021"
+    ],
     "sourceMap": true,
     "declarationMap": true,
     "strict": true,
@@ -38,13 +40,29 @@
     "incremental": true,
     "removeComments": false,
     "paths": {
-      "@fp-ts/schema": ["./src/index.ts"],
-      "@fp-ts/schema/test/*": ["./test/*"],
-      "@fp-ts/schema/examples/*": ["./examples/*"],
-      "@fp-ts/schema/*": ["./src/*"]
+      "@effect/schema": [
+        "./src/index.ts"
+      ],
+      "@effect/schema/test/*": [
+        "./test/*"
+      ],
+      "@effect/schema/examples/*": [
+        "./examples/*"
+      ],
+      "@effect/schema/*": [
+        "./src/*"
+      ]
     },
-    "plugins": [{ "name": "@effect/language-service" }]
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ]
   },
   "include": [],
-  "exclude": ["node_modules", "build", "lib"]
+  "exclude": [
+    "node_modules",
+    "build",
+    "lib"
+  ]
 }

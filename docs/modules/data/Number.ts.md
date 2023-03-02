@@ -14,6 +14,7 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [between](#between)
+  - [clamp](#clamp)
   - [finite](#finite)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
@@ -41,6 +42,18 @@ export declare const between: <A extends number>(
   max: number,
   annotationOptions?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## clamp
+
+Clamps a number between a minimum and a maximum value.
+
+**Signature**
+
+```ts
+export declare const clamp: <A extends number>(min: number, max: number) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

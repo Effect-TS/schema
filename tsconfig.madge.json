@@ -4,9 +4,15 @@
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
-      "@fp-ts/schema": ["./build/esm/index.js"],
-      "@fp-ts/schema/*": ["./build/esm/*"]
+      "@effect/schema": [
+        "./build/esm/index.js"
+      ],
+      "@effect/schema/*": [
+        "./build/esm/*"
+      ]
     }
   },
-  "include": ["./build/esm/**/*.js"]
+  "include": [
+    "./build/esm/**/*.js"
+  ]
 }
