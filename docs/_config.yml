@@ -6,8 +6,8 @@ search_enabled: true
 # Aux links for the upper right navigation
 aux_links:
   "Docs":
-    - "//fp-ts.github.io/schema"
+    - "//effect-ts.github.io/schema"
   "API Reference":
-    - "//fp-ts.github.io/schema/docs/modules"
+    - "//effect-ts.github.io/schema/docs/modules"
   "GitHub":
-    - "//github.com/fp-ts/schema"
+    - "//github.com/effect-ts/schema"

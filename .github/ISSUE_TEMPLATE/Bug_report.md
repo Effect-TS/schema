@@ -1,6 +1,6 @@
 ---
 name: "\U0001F41B Bug report"
-about: Create a report to help make `@fp-ts/schema` better
+about: Create a report to help make `@effect/schema` better
 ---
 
 ## 🐛 Bug report
@@ -17,7 +17,7 @@ about: Create a report to help make `@fp-ts/schema` better
 
 ### Suggested solution(s)
 
-<!-- How could we solve this bug? What changes would need to made to `@fp-ts/schema`? -->
+<!-- How could we solve this bug? What changes would need to made to `@effect/schema`? -->
 
 ### Additional context
 
@@ -25,11 +25,11 @@ about: Create a report to help make `@fp-ts/schema` better
 
 ### Your environment
 
-Which versions of `@fp-ts/schema` are affected by this issue? Did this work in previous versions of `@fp-ts/schema`?
+Which versions of `@effect/schema` are affected by this issue? Did this work in previous versions of `@effect/schema`?
 
 <!-- PLEASE FILL THIS OUT -->
 
 | Software      | Version(s) |
 | ------------- | ---------- |
-| @fp-ts/schema |            |
+| @effect/schema |            |
 | TypeScript    |            |

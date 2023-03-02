@@ -14,6 +14,7 @@ Added in v1.0.0
 
 - [utils](#utils)
   - [between](#between)
+  - [clamp](#clamp)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
   - [lessThan](#lessthan)
@@ -37,6 +38,18 @@ export declare const between: <A extends bigint>(
   max: bigint,
   annotationOptions?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## clamp
+
+Clamps a bigint between a minimum and a maximum value.
+
+**Signature**
+
+```ts
+export declare const clamp: <A extends bigint>(min: bigint, max: bigint) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

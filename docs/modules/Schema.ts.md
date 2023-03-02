@@ -79,6 +79,7 @@ Added in v1.0.0
 - [model](#model)
   - [Schema (interface)](#schema-interface)
 - [parsers](#parsers)
+  - [clamp](#clamp)
   - [option](#option)
   - [trim](#trim)
 - [primitives](#primitives)
@@ -229,7 +230,7 @@ export declare const attachPropertySignature: <K extends string | number | symbo
 **Example**
 
 ```ts
-import * as S from '@fp-ts/schema'
+import * as S from '@effect/schema'
 import { pipe } from '@effect/data/Function'
 
 const Circle = S.struct({ radius: S.number })
@@ -267,7 +268,7 @@ export declare const brand: <B extends string, A>(
 **Example**
 
 ```ts
-import * as S from '@fp-ts/schema'
+import * as S from '@effect/schema'
 import { pipe } from '@effect/data/Function'
 
 const Int = pipe(S.number, S.int(), S.brand('Int'))
@@ -910,6 +911,22 @@ Added in v1.0.0
 
 # parsers
 
+## clamp
+
+Restricts the value to be within the range specified by the minimum and maximum values.
+
+**Signature**
+
+```ts
+export declare const clamp: <A extends number>(
+  min: number,
+  max: number,
+  options?: AnnotationOptions<A> | undefined
+) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 ## option
 
 **Signature**
@@ -1166,7 +1183,7 @@ export declare const getPropertySignatures: <A>(schema: Schema<A>) => { [K in ke
 **Example**
 
 ```ts
-import * as S from '@fp-ts/schema'
+import * as S from '@effect/schema'
 
 const Person = S.struct({
   name: S.string,

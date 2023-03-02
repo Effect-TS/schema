@@ -1,6 +1,6 @@
 ---
 name: "\U0001F680Feature request"
-about: Suggest an idea for `@fp-ts/schema`
+about: Suggest an idea for `@effect/schema`
 ---
 
 ## 🚀 Feature request
@@ -37,5 +37,5 @@ about: Suggest an idea for `@fp-ts/schema`
 
 | Software      | Version(s) |
 | ------------- | ---------- |
-| @fp-ts/schema |            |
+| @effect/schema |            |
 | TypeScript    |            |

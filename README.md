@@ -1,5 +1,5 @@
 <h3 align="center">
-  <a href="https://fp-ts.github.io/schema/">
+  <a href="https://effect-ts.github.io/schema/">
     <img src="./docs/example.png" width="500">
   </a>
 </h3>
@@ -9,20 +9,20 @@ Modeling the schema of data structures as first-class values
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@fp-ts/schema">
-    <img src="https://img.shields.io/npm/dm/@fp-ts/schema.svg" alt="npm downloads" height="20">
+  <a href="https://www.npmjs.com/package/@effect/schema">
+    <img src="https://img.shields.io/npm/dm/@effect/schema.svg" alt="npm downloads" height="20">
   </a>
 </p>
 
 # Introduction
 
-Welcome to the documentation for `@fp-ts/schema`, **a library for defining and using schemas** to validate and transform data in TypeScript.
+Welcome to the documentation for `@effect/schema`, **a library for defining and using schemas** to validate and transform data in TypeScript.
 
-`@fp-ts/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as **decoding** from `unknown`, **encoding** to `unknown`, **verifying** that a value conforms to a given `Schema`.
+`@effect/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as **decoding** from `unknown`, **encoding** to `unknown`, **verifying** that a value conforms to a given `Schema`.
 
-`@fp-ts/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
+`@effect/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
 
-If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/fp-ts/schema#basic-usage) section!
+If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
 
 # Credits and sponsorship
 
@@ -32,7 +32,7 @@ This library was inspired by the following projects:
 - [zod](https://github.com/colinhacks/zod)
 - [zio-schema](https://github.com/zio/zio-schema)
 
-A huge thanks to my sponsors who made the development of `@fp-ts/schema` possible.
+A huge thanks to my sponsors who made the development of `@effect/schema` possible.
 
 If you also want to **become a sponsor** to ensure this library continues to improve and receive maintenance, check out my [GitHub Sponsors profile](https://github.com/sponsors/gcanti?o=sd&sc=t)
 
@@ -58,15 +58,15 @@ If you also want to **become a sponsor** to ensure this library continues to imp
 To install the **alpha** version:
 
 ```
-npm install @fp-ts/schema
+npm install @effect/schema
 ```
 
 **Warning**. This package is primarily published to receive early feedback and for contributors, during this development phase we cannot guarantee the stability of the APIs, consider each release to contain breaking changes.
 
-Once you have installed the library, you can import the necessary types and functions from the `@fp-ts/schema` module.
+Once you have installed the library, you can import the necessary types and functions from the `@effect/schema` module.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 ```
 
 ## Defining a schema
@@ -76,7 +76,7 @@ To define a `Schema`, you can use the provided `struct` function to define a new
 For example, consider the following `Schema` that describes a person object with a `name` property of type `string` and an `age` property of type `number`:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Person = S.struct({
   name: S.string,
@@ -90,7 +90,7 @@ You can also use the `union` function to define a `Schema` that describes a valu
 const StringOrNumber = S.union(S.string, S.number);
 ```
 
-In addition to the provided `struct` and `union` functions, `@fp-ts/schema` also provides a number of other functions for defining `Schema`s, including functions for defining arrays, tuples, and records.
+In addition to the provided `struct` and `union` functions, `@effect/schema` also provides a number of other functions for defining `Schema`s, including functions for defining arrays, tuples, and records.
 
 ## Extracting the inferred type
 
@@ -110,10 +110,10 @@ interface Person {
 
 ## Decoding
 
-To use the `Schema` defined above to decode a value from `unknown`, you can use the `decode` function from the `@fp-ts/schema/Parser` module:
+To use the `Schema` defined above to decode a value from `unknown`, you can use the `decode` function from the `@effect/schema/Parser` module:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Person = S.struct({
   name: S.string,
@@ -163,7 +163,7 @@ However, you can use the `isUnexpectedAllowed` option to allow excess properties
 Here's an example of how you might use `isUnexpectedAllowed`:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Person = S.struct({
   name: S.string,
@@ -196,7 +196,7 @@ The `allErrors` option is a feature that allows you to receive all decoding erro
 Here's an example of how you might use `allErrors`:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Person = S.struct({
   name: S.string,
@@ -245,9 +245,9 @@ console.log(
 To use the `Schema` defined above to encode a value to `unknown`, you can use the `encode` function:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 import { pipe } from "@effect/data/Function";
-import { parseNumber } from "@fp-ts/schema/data/String";
+import { parseNumber } from "@effect/schema/data/String";
 
 // Age is a schema that can decode a string to a number and encode a number to a string
 const Age = pipe(S.string, parseNumber);
@@ -267,11 +267,11 @@ Note that during encoding, the number value `30` was converted to a string `"30"
 
 ## Formatting errors
 
-To format errors when a `decode` or an `encode` function fails, you can use the `formatErrors` function from the `@fp-ts/schema/formatter/Tree` module.
+To format errors when a `decode` or an `encode` function fails, you can use the `formatErrors` function from the `@effect/schema/formatter/Tree` module.
 
 ```ts
-import * as S from "@fp-ts/schema";
-import { formatErrors } from "@fp-ts/schema/formatter/Tree";
+import * as S from "@effect/schema";
+import { formatErrors } from "@effect/schema/formatter/Tree";
 
 const Person = S.struct({
   name: S.string,
@@ -293,10 +293,10 @@ Decoding failed:
 
 ## Assertions
 
-The `is` function provided by the `@fp-ts/schema/Parser` module represents a way of verifying that a value conforms to a given `Schema`. `is` is a refinement that takes a value of type `unknown` as an argument and returns a `boolean` indicating whether or not the value conforms to the `Schema`.
+The `is` function provided by the `@effect/schema/Parser` module represents a way of verifying that a value conforms to a given `Schema`. `is` is a refinement that takes a value of type `unknown` as an argument and returns a `boolean` indicating whether or not the value conforms to the `Schema`.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Person = S.struct({
   name: S.string,
@@ -314,7 +314,7 @@ console.log(isPerson({})); // false
 The `asserts` function takes a `Schema` and returns a function that takes an input value and checks if it matches the schema. If it does not match the schema, it throws an error with a comprehensive error message.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Person = S.struct({
   name: S.string,
@@ -343,11 +343,11 @@ assertsPerson({ name: "Alice", age: 30 });
 
 ## [fast-check](https://github.com/dubzzz/fast-check) arbitraries
 
-The `arbitrary` function provided by the `@fp-ts/schema/Arbitrary` module represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
+The `arbitrary` function provided by the `@effect/schema/Arbitrary` module represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
 
 ```ts
-import * as S from "@fp-ts/schema";
-import * as A from "@fp-ts/schema/Arbitrary";
+import * as S from "@effect/schema";
+import * as A from "@effect/schema/Arbitrary";
 import * as fc from "fast-check";
 
 const Person = S.struct({
@@ -368,13 +368,13 @@ console.log(fc.sample(PersonArbitrary, 2));
 
 ## Pretty print
 
-The `pretty` function provided by the `@fp-ts/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
+The `pretty` function provided by the `@effect/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
 
 You can use the `pretty` function to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
 
 ```ts
-import * as S from "@fp-ts/schema";
-import * as P from "@fp-ts/schema/Pretty";
+import * as S from "@effect/schema";
+import * as P from "@effect/schema/Pretty";
 
 const Person = S.struct({
   name: S.string,
@@ -392,7 +392,7 @@ console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "a
 ## Primitives
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 // primitive values
 S.string;
@@ -487,7 +487,7 @@ pipe(S.number, S.nonPositive()); // <= 0
 ### Bigint filters
 
 ```ts
-import * as B from "@fp-ts/schema/data/Bigint";
+import * as B from "@effect/schema/data/Bigint";
 
 pipe(S.bigint, B.greaterThan(5n));
 pipe(S.bigint, B.greaterThanOrEqualTo(5n));
@@ -530,7 +530,7 @@ S.nullable(S.string);
 
 ## Unions
 
-`@fp-ts/schema` includes a built-in `union` combinator for composing "OR" types.
+`@effect/schema` includes a built-in `union` combinator for composing "OR" types.
 
 ```ts
 // $ExpectType Schema<string | number>
@@ -561,10 +561,10 @@ type Square = {
 type Shape = Circle | Square;
 ```
 
-This code defines a discriminated union using the `@fp-ts/schema` library:
+This code defines a discriminated union using the `@effect/schema` library:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Circle = S.struct({
   kind: S.literal("circle"),
@@ -590,7 +590,7 @@ Finally, the `union` combinator is used to create a schema for the discriminated
 If you're working on a TypeScript project and you've defined a simple union to represent a particular input, you may find yourself in a situation where you're not entirely happy with how it's set up. For example, let's say you've defined a `Shape` union as a combination of `Circle` and `Square` without any special property:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Circle = S.struct({
   radius: S.number,
@@ -608,7 +608,7 @@ To make your code more manageable, you may want to transform the simple union in
 To achieve this, you can add a special property to each member of the union, which will allow TypeScript to know which type it's dealing with at runtime. Here's how you can transform the `Shape` schema into another schema that represents a discriminated union:
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 import { pipe } from "@effect/data/Function";
 
 const Circle = S.struct({
@@ -756,7 +756,7 @@ S.struct({
 The `getPropertySignatures` function takes a `Schema<A>` and returns a new object of type `{ [K in keyof A]: Schema<A[K]> }`. The new object has properties that are the same keys as those in the original object, and each of these properties is a schema for the corresponding property in the original object.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Person = S.struct({
   name: S.string,
@@ -904,12 +904,12 @@ const Operation: S.Schema<Operation> = S.lazy(() =>
 
 In some cases, we may need to transform the output of a schema to a different type. For instance, we may want to parse a string into a number, or we may want to transform a date string into a `Date` object.
 
-To perform these kinds of transformations, the `@fp-ts/schema` library provides the `transform` and `transformOrFail` combinators.
+To perform these kinds of transformations, the `@effect/schema` library provides the `transform` and `transformOrFail` combinators.
 
 The `transform` combinator takes a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to decode a value, the transformed schema will also fail.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 // define a schema for the string type
 const stringSchema: S.Schema<string> = S.string;
@@ -938,9 +938,9 @@ Here's an example of the `transformOrFail` combinator which converts a `string` 
 
 ```ts
 import { pipe } from "@effect/data/Function";
-import * as PR from "@fp-ts/schema/ParseResult";
-import * as S from "@fp-ts/schema";
-import * as AST from "@fp-ts/schema/AST";
+import * as PR from "@effect/schema/ParseResult";
+import * as S from "@effect/schema";
+import * as AST from "@effect/schema/AST";
 
 // define a schema for the string type
 const stringSchema: S.Schema<string> = S.string;
@@ -975,7 +975,7 @@ const transformedSchema: S.Schema<boolean> = pipe(
 The `trim` parser allows removing whitespaces from the beginning and end of a string.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const schema = S.trim(S.string);
 const decodeOrThrow = S.decodeOrThrow(schema);
@@ -995,8 +995,8 @@ Transforms a `string` into a `number` by parsing the string using `parseFloat`.
 The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
 ```ts
-import * as S from "@fp-ts/schema";
-import { parseNumber } from "@fp-ts/schema/data/String";
+import * as S from "@effect/schema";
+import { parseNumber } from "@effect/schema/data/String";
 
 const schema = parseNumber(S.string);
 const decodeOrThrow = S.decodeOrThrow(schema);
@@ -1018,8 +1018,8 @@ decodeOrThrow("a"); // throws
 Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 ```ts
-import * as S from "@fp-ts/schema";
-import { parseDate } from "@fp-ts/schema/data/String";
+import * as S from "@effect/schema";
+import { parseDate } from "@effect/schema/data/String";
 
 const schema = parseDate(S.string);
 const decodeOrThrow = S.decodeOrThrow(schema);
@@ -1036,7 +1036,7 @@ decodeOrThrow("a"); // throws
 Clamps a `number` between a minimum and a maximum value.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const schema = pipe(S.number, S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
@@ -1053,8 +1053,8 @@ decodeOrThrow(3); // 1
 Clamps a `bigint` between a minimum and a maximum value.
 
 ```ts
-import * as S from "@fp-ts/schema";
-import * as B from "@fp-ts/schema/data/Bigint";
+import * as S from "@effect/schema";
+import * as B from "@effect/schema/data/Bigint";
 
 const schema = pipe(S.bigint, B.clamp(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
@@ -1071,7 +1071,7 @@ The `option` combinator allows you to specify that a field in a schema may be ei
 In the example below, we define a schema for an object with a required `a` field of type `string` and an optional `b` field of type `number`. We use the `option` combinator to specify that the `b` field may be either a `number` or `null`.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 import * as O from "@effect/data/Option";
 
 const schema = S.struct({
@@ -1091,8 +1091,8 @@ decodeOrThrow({ a: "hello", b: 1 }); // { a: "hello", b: O.some(1) }
 In the following section, we demonstrate how to use the `fromValues` combinator to decode a `ReadonlySet` from an array of values.
 
 ```ts
-import * as S from "@fp-ts/schema";
-import { fromValues } from "@fp-ts/schema/data/ReadonlySet";
+import * as S from "@effect/schema";
+import { fromValues } from "@effect/schema/data/ReadonlySet";
 
 // define a schema for ReadonlySet with number values
 const schema = fromValues(S.number);
@@ -1106,8 +1106,8 @@ decodeOrThrow([1, 2, 3]); // new Set([1, 2, 3])
 In the following section, we demonstrate how to use the `fromEntries` combinator to decode a `ReadonlyMap` from an array of entries.
 
 ```ts
-import * as S from "@fp-ts/schema";
-import { fromEntries } from "@fp-ts/schema/data/ReadonlyMap";
+import * as S from "@effect/schema";
+import { fromEntries } from "@effect/schema/data/ReadonlyMap";
 
 // define the schema for ReadonlyMap with number keys and string values
 const schema = fromEntries(S.number, S.string);
@@ -1125,7 +1125,7 @@ decodeOrThrow([
 The easiest way to define a new data type is through the `filter` combinator.
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const LongString = pipe(
   S.string,
@@ -1180,16 +1180,16 @@ Say we want to define a `pair` schema constructor, which takes a `Schema<A>` as 
 First of all we need to define the signature of `pair`
 
 ```ts
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 declare const pair: <A>(schema: S.Schema<A>) => S.Schema<readonly [A, A]>;
 ```
 
-Then we can implement the body using the APIs exported by the `@fp-ts/schema/AST` module:
+Then we can implement the body using the APIs exported by the `@effect/schema/AST` module:
 
 ```ts
-import * as S from "@fp-ts/schema";
-import * as AST from "@fp-ts/schema/AST";
+import * as S from "@effect/schema";
+import * as AST from "@effect/schema/AST";
 import * as O from "@effect/data/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
@@ -1230,13 +1230,13 @@ export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
 
 ## Annotations
 
-One of the fundamental requirements in the design of `@fp-ts/schema` is that it is extensible and customizable. Customizations are achieved through "annotations". Each node contained in the AST of `@fp-ts/schema/AST` contains an `annotations: Record<string | symbol, unknown>` field that can be used to attach additional information to the schema.
+One of the fundamental requirements in the design of `@effect/schema` is that it is extensible and customizable. Customizations are achieved through "annotations". Each node contained in the AST of `@effect/schema/AST` contains an `annotations: Record<string | symbol, unknown>` field that can be used to attach additional information to the schema.
 
 Let's see some examples:
 
 ```ts
 import { pipe } from "@effect/data/Function";
-import * as S from "@fp-ts/schema";
+import * as S from "@effect/schema";
 
 const Password = pipe(
   // initial schema, a string
@@ -1273,8 +1273,8 @@ The example shows some built-in combinators to add meta information, but users c
 Here's an example of how to add a `deprecated` annotation:
 
 ```ts
-import * as S from "@fp-ts/schema";
-import * as AST from "@fp-ts/schema/AST";
+import * as S from "@effect/schema";
+import * as AST from "@effect/schema/AST";
 import { pipe } from "@effect/data/Function";
 
 const DeprecatedId = "some/unique/identifier/for/the/custom/annotation";
@@ -1290,7 +1290,7 @@ console.log(schema);
   ast: {
     _tag: 'StringKeyword',
     annotations: {
-      '@fp-ts/schema/annotation/TitleId': 'string',
+      '@effect/schema/annotation/TitleId': 'string',
       'some/unique/identifier/for/the/custom/annotation': true
     }
   }
@@ -1315,7 +1315,7 @@ console.log(isDeprecated(schema)); // true
 
 # Documentation
 
-- [API Reference](https://fp-ts.github.io/schema/)
+- [API Reference](https://effect-ts.github.io/schema/)
 
 # License
 

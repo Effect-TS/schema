@@ -30,7 +30,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ItemsCountId: '@fp-ts/schema/ReadonlyArray/itemsCount'
+export declare const ItemsCountId: '@effect/schema/ReadonlyArray/itemsCount'
 ```
 
 Added in v1.0.0
@@ -40,7 +40,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MaxItemsId: '@fp-ts/schema/ReadonlyArray/maxItems'
+export declare const MaxItemsId: '@effect/schema/ReadonlyArray/maxItems'
 ```
 
 Added in v1.0.0
@@ -50,7 +50,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MinItemsId: '@fp-ts/schema/ReadonlyArray/minItems'
+export declare const MinItemsId: '@effect/schema/ReadonlyArray/minItems'
 ```
 
 Added in v1.0.0
