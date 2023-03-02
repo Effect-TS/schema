@@ -1,5 +1,5 @@
-import * as P from "@fp-ts/schema/Parser"
-import * as t from "@fp-ts/schema/Schema"
+import * as P from "@effect/schema/Parser"
+import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 
 /*
