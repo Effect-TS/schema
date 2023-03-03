@@ -8,7 +8,7 @@ describe.concurrent("Parser", () => {
     expect(P._getLiterals(S.string.ast, "decoder")).toEqual([])
     // TypeLiteral
     expect(P._getLiterals(S.struct({ _tag: S.literal("a") }).ast, "decoder"))
-      .toEqual([["_tag", "a"]])
+      .toEqual([["_tag", AST.createLiteral("a")]])
     // Refinement
     expect(
       P._getLiterals(
@@ -18,14 +18,14 @@ describe.concurrent("Parser", () => {
         ).ast,
         "decoder"
       )
-    ).toEqual([["_tag", "a"]])
+    ).toEqual([["_tag", AST.createLiteral("a")]])
     // TypeAlias
     expect(
       P._getLiterals(
         S.typeAlias([], S.struct({ _tag: S.literal("a") })).ast,
         "decoder"
       )
-    ).toEqual([["_tag", "a"]])
+    ).toEqual([["_tag", AST.createLiteral("a")]])
 
     // Transform
     expect(
@@ -39,7 +39,7 @@ describe.concurrent("Parser", () => {
         pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")).ast,
         "encoder"
       )
-    ).toEqual([["kind", "circle"]])
+    ).toEqual([["kind", AST.createLiteral("circle")]])
   })
 
   it("_getSearchTree", () => {

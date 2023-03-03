@@ -528,16 +528,16 @@ const parserFor = <A>(
 export const _getLiterals = (
   ast: AST.AST,
   as: "decoder" | "guard" | "encoder"
-): ReadonlyArray<[PropertyKey, AST.LiteralValue]> => {
+): ReadonlyArray<[PropertyKey, AST.Literal]> => {
   switch (ast._tag) {
     case "TypeAlias":
       return _getLiterals(ast.type, as)
     case "TypeLiteral": {
-      const out: Array<[PropertyKey, AST.LiteralValue]> = []
+      const out: Array<[PropertyKey, AST.Literal]> = []
       for (let i = 0; i < ast.propertySignatures.length; i++) {
         const propertySignature = ast.propertySignatures[i]
         if (AST.isLiteral(propertySignature.type) && !propertySignature.isOptional) {
-          out.push([propertySignature.name, propertySignature.type.literal])
+          out.push([propertySignature.name, propertySignature.type])
         }
       }
       return out
@@ -592,7 +592,7 @@ export const _getSearchTree = <A extends Schema<any>>(
     if (tags.length > 0) {
       for (let j = 0; j < tags.length; j++) {
         const [key, literal] = tags[j]
-        const hash = String(literal)
+        const hash = String(literal.literal)
         keys[key] = keys[key] || { buckets: {}, literals: [] }
         const buckets = keys[key].buckets
         if (Object.prototype.hasOwnProperty.call(buckets, hash)) {
@@ -600,10 +600,10 @@ export const _getSearchTree = <A extends Schema<any>>(
             continue
           }
           buckets[hash].push(member)
-          keys[key].literals.push(AST.createLiteral(literal))
+          keys[key].literals.push(literal)
         } else {
           buckets[hash] = [member]
-          keys[key].literals.push(AST.createLiteral(literal))
+          keys[key].literals.push(literal)
           break
         }
       }

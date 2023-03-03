@@ -1,8 +1,8 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
+import * as S from "@effect/schema"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Decoder", () => {
