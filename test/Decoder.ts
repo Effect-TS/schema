@@ -840,10 +840,13 @@ describe.concurrent("Decoder", () => {
 
   it("union/ members with literals but the input doesn't have any", () => {
     const schema = S.union(
-      S.struct({ a: S.literal("A"), c: S.string }),
-      S.struct({ b: S.literal("B"), d: S.number })
+      S.struct({ a: S.literal(1), c: S.string }),
+      S.struct({ b: S.literal(2), d: S.number })
     )
-    Util.expectDecodingFailure(schema, {}, "Expected type literal or type literal, actual {}")
+    Util.expectDecodingFailure(schema, null, "Expected type literal, actual null")
+    Util.expectDecodingFailure(schema, {}, "/a is missing, /b is missing")
+    Util.expectDecodingFailure(schema, { a: null }, `/a Expected 1, actual null, /b is missing`)
+    Util.expectDecodingFailure(schema, { b: 3 }, `/a is missing, /b Expected 2, actual 3`)
   })
 
   it("union/required property signatures: should return the best output", () => {

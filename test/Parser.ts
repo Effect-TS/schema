@@ -1,5 +1,6 @@
 import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema"
+import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 
 describe.concurrent("Parser", () => {
@@ -51,7 +52,10 @@ describe.concurrent("Parser", () => {
       {
         keys: {
           _tag: {
-            a: [S.struct({ _tag: S.literal("a") })]
+            buckets: {
+              a: [S.struct({ _tag: S.literal("a") })]
+            },
+            literals: [AST.createLiteral("a")]
           }
         },
         otherwise: [S.number]
@@ -66,8 +70,11 @@ describe.concurrent("Parser", () => {
     ).toEqual({
       keys: {
         _tag: {
-          a: [S.struct({ _tag: S.literal("a") })],
-          b: [S.struct({ _tag: S.literal("b") })]
+          buckets: {
+            a: [S.struct({ _tag: S.literal("a") })],
+            b: [S.struct({ _tag: S.literal("b") })]
+          },
+          literals: [AST.createLiteral("a"), AST.createLiteral("b")]
         }
       },
       otherwise: []
@@ -81,10 +88,16 @@ describe.concurrent("Parser", () => {
     ).toEqual({
       keys: {
         a: {
-          A: [S.struct({ a: S.literal("A"), c: S.string })]
+          buckets: {
+            A: [S.struct({ a: S.literal("A"), c: S.string })]
+          },
+          literals: [AST.createLiteral("A")]
         },
         b: {
-          B: [S.struct({ b: S.literal("B"), d: S.number })]
+          buckets: {
+            B: [S.struct({ b: S.literal("B"), d: S.number })]
+          },
+          literals: [AST.createLiteral("B")]
         }
       },
       otherwise: []

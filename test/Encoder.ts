@@ -299,6 +299,15 @@ describe.concurrent("Encoder", () => {
     Util.expectEncodingSuccess(schema, { a: "a", c: 1 }, { a: "a", c: 1 })
   })
 
+  it("union/ forced empty union", () => {
+    const schema = S.make({
+      _tag: "Union",
+      types: [] as any,
+      annotations: {}
+    })
+    Util.expectEncodingFailure(schema, "a", `Expected never, actual "a"`)
+  })
+
   describe.concurrent("partial", () => {
     it("struct", () => {
       const schema = pipe(S.struct({ a: S.number }), S.partial)

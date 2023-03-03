@@ -33,10 +33,10 @@ decodeManual (good) x 250,389 ops/sec ±4.54% (73 runs sampled)
 decode (bad) x 15,118 ops/sec ±0.48% (83 runs sampled)
 decodeManual (bad) x 381,230 ops/sec ±6.87% (63 runs sampled)
 -- after --
-decode (good) x 427,338 ops/sec ±0.30% (90 runs sampled)
-decodeManual (good) x 267,706 ops/sec ±4.27% (75 runs sampled)
-decode (bad) x 636,999 ops/sec ±2.63% (88 runs sampled)
-decodeManual (bad) x 401,621 ops/sec ±5.90% (69 runs sampled)
+decode (good) x 469,868 ops/sec ±0.46% (90 runs sampled)
+decodeManual (good) x 262,868 ops/sec ±3.99% (73 runs sampled)
+decode (bad) x 805,680 ops/sec ±0.50% (90 runs sampled)
+decodeManual (bad) x 404,029 ops/sec ±5.83% (75 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
