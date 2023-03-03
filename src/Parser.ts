@@ -525,29 +525,31 @@ const parserFor = <A>(
 }
 
 /** @internal */
-export const _getFirstLiteral = (
+export const _getLiterals = (
   ast: AST.AST,
   as: "decoder" | "guard" | "encoder"
-): [PropertyKey, AST.LiteralValue] | null => {
+): ReadonlyArray<[PropertyKey, AST.LiteralValue]> => {
   switch (ast._tag) {
     case "TypeAlias":
-      return _getFirstLiteral(ast.type, as)
+      return _getLiterals(ast.type, as)
     case "TypeLiteral": {
-      for (const propertySignature of ast.propertySignatures) {
+      const out: Array<[PropertyKey, AST.LiteralValue]> = []
+      for (let i = 0; i < ast.propertySignatures.length; i++) {
+        const propertySignature = ast.propertySignatures[i]
         if (AST.isLiteral(propertySignature.type) && !propertySignature.isOptional) {
-          return [propertySignature.name, propertySignature.type.literal]
+          out.push([propertySignature.name, propertySignature.type.literal])
         }
       }
-      break
+      return out
     }
     case "Refinement":
-      return _getFirstLiteral(ast.from, as)
+      return _getLiterals(ast.from, as)
     case "Transform":
       return as === "decoder" ?
-        _getFirstLiteral(ast.from, as) :
-        _getFirstLiteral(ast.to, as)
+        _getLiterals(ast.from, as) :
+        _getLiterals(ast.to, as)
   }
-  return null
+  return []
 }
 
 /**
@@ -586,15 +588,25 @@ export const _getSearchTree = <A extends Schema<any>>(
   const otherwise: Array<A> = []
   for (let i = 0; i < members.length; i++) {
     const member = members[i]
-    const tag = _getFirstLiteral(member.ast, as)
-    if (tag) {
-      const [key, literal] = tag
-      const hash = String(literal)
-      keys[key] = keys[key] || { buckets: {}, literals: [] }
-      const buckets = keys[key].buckets
-      const bucket = buckets[hash] = buckets[hash] || []
-      bucket.push(member)
-      keys[key].literals.push(AST.createLiteral(literal))
+    const tags = _getLiterals(member.ast, as)
+    if (tags.length > 0) {
+      for (let j = 0; j < tags.length; j++) {
+        const [key, literal] = tags[j]
+        const hash = String(literal)
+        keys[key] = keys[key] || { buckets: {}, literals: [] }
+        const buckets = keys[key].buckets
+        if (Object.prototype.hasOwnProperty.call(buckets, hash)) {
+          if (j < tags.length - 1) {
+            continue
+          }
+          buckets[hash].push(member)
+          keys[key].literals.push(AST.createLiteral(literal))
+        } else {
+          buckets[hash] = [member]
+          keys[key].literals.push(AST.createLiteral(literal))
+          break
+        }
+      }
     } else {
       otherwise.push(member)
     }

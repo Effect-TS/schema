@@ -849,6 +849,26 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailure(schema, { b: 3 }, `/a is missing, /b Expected 2, actual 3`)
   })
 
+  it("union/ members with multiple tags", () => {
+    const schema = S.union(
+      S.struct({ category: S.literal("catA"), tag: S.literal("a") }),
+      S.struct({ category: S.literal("catA"), tag: S.literal("b") }),
+      S.struct({ category: S.literal("catA"), tag: S.literal("c") })
+    )
+    Util.expectDecodingFailure(schema, null, "Expected type literal, actual null")
+    Util.expectDecodingFailure(schema, {}, "/category is missing, /tag is missing")
+    Util.expectDecodingFailure(
+      schema,
+      { category: null },
+      `/category Expected "catA", actual null, /tag is missing`
+    )
+    Util.expectDecodingFailure(
+      schema,
+      { tag: "d" },
+      `/category is missing, /tag Expected "b" or "c", actual "d"`
+    )
+  })
+
   it("union/required property signatures: should return the best output", () => {
     const a = S.struct({ a: S.string })
     const ab = S.struct({ a: S.string, b: S.number })

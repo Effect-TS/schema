@@ -4,42 +4,42 @@ import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 
 describe.concurrent("Parser", () => {
-  it("_getFirstLiteral", () => {
-    expect(P._getFirstLiteral(S.string.ast, "decoder")).toEqual(null)
+  it("_getLiterals", () => {
+    expect(P._getLiterals(S.string.ast, "decoder")).toEqual([])
     // TypeLiteral
-    expect(P._getFirstLiteral(S.struct({ _tag: S.literal("a") }).ast, "decoder"))
-      .toEqual(["_tag", "a"])
+    expect(P._getLiterals(S.struct({ _tag: S.literal("a") }).ast, "decoder"))
+      .toEqual([["_tag", "a"]])
     // Refinement
     expect(
-      P._getFirstLiteral(
+      P._getLiterals(
         pipe(
           S.struct({ _tag: S.literal("a") }),
           S.filter(() => true)
         ).ast,
         "decoder"
       )
-    ).toEqual(["_tag", "a"])
+    ).toEqual([["_tag", "a"]])
     // TypeAlias
     expect(
-      P._getFirstLiteral(
+      P._getLiterals(
         S.typeAlias([], S.struct({ _tag: S.literal("a") })).ast,
         "decoder"
       )
-    ).toEqual(["_tag", "a"])
+    ).toEqual([["_tag", "a"]])
 
     // Transform
     expect(
-      P._getFirstLiteral(
+      P._getLiterals(
         pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")).ast,
         "decoder"
       )
-    ).toEqual(null)
+    ).toEqual([])
     expect(
-      P._getFirstLiteral(
+      P._getLiterals(
         pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")).ast,
         "encoder"
       )
-    ).toEqual(["kind", "circle"])
+    ).toEqual([["kind", "circle"]])
   })
 
   it("_getSearchTree", () => {
@@ -102,5 +102,50 @@ describe.concurrent("Parser", () => {
       },
       otherwise: []
     })
+
+    // should handle multiple tags
+    expect(
+      P._getSearchTree([
+        S.struct({ category: S.literal("catA"), tag: S.literal("a") }),
+        S.struct({ category: S.literal("catA"), tag: S.literal("b") }),
+        S.struct({ category: S.literal("catA"), tag: S.literal("c") })
+      ], "decoder")
+    ).toEqual({
+      keys: {
+        category: {
+          buckets: {
+            catA: [S.struct({ category: S.literal("catA"), tag: S.literal("a") })]
+          },
+          literals: [AST.createLiteral("catA")]
+        },
+        tag: {
+          buckets: {
+            b: [S.struct({ category: S.literal("catA"), tag: S.literal("b") })],
+            c: [S.struct({ category: S.literal("catA"), tag: S.literal("c") })]
+          },
+          literals: [AST.createLiteral("b"), AST.createLiteral("c")]
+        }
+      },
+      otherwise: []
+    })
+  })
+  expect(
+    P._getSearchTree([
+      S.struct({ tag: S.literal("a"), category: S.literal("catA") }),
+      S.struct({ tag: S.literal("b"), category: S.literal("catA") }),
+      S.struct({ tag: S.literal("c"), category: S.literal("catA") })
+    ], "decoder")
+  ).toEqual({
+    keys: {
+      tag: {
+        buckets: {
+          a: [S.struct({ tag: S.literal("a"), category: S.literal("catA") })],
+          b: [S.struct({ tag: S.literal("b"), category: S.literal("catA") })],
+          c: [S.struct({ tag: S.literal("c"), category: S.literal("catA") })]
+        },
+        literals: [AST.createLiteral("a"), AST.createLiteral("b"), AST.createLiteral("c")]
+      }
+    },
+    otherwise: []
   })
 })
