@@ -129,4 +129,45 @@ describe.concurrent("Parser", () => {
       otherwise: []
     })
   })
+
+  const schema = S.union(
+    S.struct({ type: S.literal("a"), value: S.string }),
+    S.struct({ type: S.literal("b"), value: S.string }),
+    S.struct({ type: S.literal("c"), value: S.string }),
+    S.struct({ type: S.string, value: S.string }),
+    S.struct({ type: S.literal(null), value: S.string }),
+    S.struct({ type: S.undefined, value: S.string }),
+    S.struct({ type: S.literal("d", "e"), value: S.string }),
+    S.struct({ type: S.struct({ nested: S.string }), value: S.string }),
+    S.struct({ type: S.array(S.number), value: S.string })
+  )
+  const types = (schema.ast as AST.Union).types
+  const schemas = types.map(S.make)
+  expect(
+    P._getSearchTree(schemas, "decoder")
+  ).toEqual({
+    keys: {
+      type: {
+        buckets: {
+          a: [S.struct({ type: S.literal("a"), value: S.string })],
+          b: [S.struct({ type: S.literal("b"), value: S.string })],
+          c: [S.struct({ type: S.literal("c"), value: S.string })],
+          null: [S.struct({ type: S.literal(null), value: S.string })]
+        },
+        ast: AST.createUnion([
+          AST.createLiteral("a"),
+          AST.createLiteral("b"),
+          AST.createLiteral("c"),
+          AST.createLiteral(null)
+        ])
+      }
+    },
+    otherwise: [
+      S.struct({ type: S.string, value: S.string }),
+      S.struct({ type: S.undefined, value: S.string }),
+      S.struct({ type: S.literal("d", "e"), value: S.string }),
+      S.struct({ type: S.struct({ nested: S.string }), value: S.string }),
+      S.struct({ type: S.array(S.number), value: S.string })
+    ]
+  })
 })
