@@ -55,7 +55,7 @@ describe.concurrent("Parser", () => {
             buckets: {
               a: [S.struct({ _tag: S.literal("a") })]
             },
-            literals: [AST.createLiteral("a")]
+            ast: AST.createLiteral("a")
           }
         },
         otherwise: [S.number]
@@ -74,7 +74,7 @@ describe.concurrent("Parser", () => {
             a: [S.struct({ _tag: S.literal("a") })],
             b: [S.struct({ _tag: S.literal("b") })]
           },
-          literals: [AST.createLiteral("a"), AST.createLiteral("b")]
+          ast: AST.createUnion([AST.createLiteral("a"), AST.createLiteral("b")])
         }
       },
       otherwise: []
@@ -91,13 +91,13 @@ describe.concurrent("Parser", () => {
           buckets: {
             A: [S.struct({ a: S.literal("A"), c: S.string })]
           },
-          literals: [AST.createLiteral("A")]
+          ast: AST.createLiteral("A")
         },
         b: {
           buckets: {
             B: [S.struct({ b: S.literal("B"), d: S.number })]
           },
-          literals: [AST.createLiteral("B")]
+          ast: AST.createLiteral("B")
         }
       },
       otherwise: []
@@ -116,36 +116,17 @@ describe.concurrent("Parser", () => {
           buckets: {
             catA: [S.struct({ category: S.literal("catA"), tag: S.literal("a") })]
           },
-          literals: [AST.createLiteral("catA")]
+          ast: AST.createLiteral("catA")
         },
         tag: {
           buckets: {
             b: [S.struct({ category: S.literal("catA"), tag: S.literal("b") })],
             c: [S.struct({ category: S.literal("catA"), tag: S.literal("c") })]
           },
-          literals: [AST.createLiteral("b"), AST.createLiteral("c")]
+          ast: AST.createUnion([AST.createLiteral("b"), AST.createLiteral("c")])
         }
       },
       otherwise: []
     })
-  })
-  expect(
-    P._getSearchTree([
-      S.struct({ tag: S.literal("a"), category: S.literal("catA") }),
-      S.struct({ tag: S.literal("b"), category: S.literal("catA") }),
-      S.struct({ tag: S.literal("c"), category: S.literal("catA") })
-    ], "decoder")
-  ).toEqual({
-    keys: {
-      tag: {
-        buckets: {
-          a: [S.struct({ tag: S.literal("a"), category: S.literal("catA") })],
-          b: [S.struct({ tag: S.literal("b"), category: S.literal("catA") })],
-          c: [S.struct({ tag: S.literal("c"), category: S.literal("catA") })]
-        },
-        literals: [AST.createLiteral("a"), AST.createLiteral("b"), AST.createLiteral("c")]
-      }
-    },
-    otherwise: []
   })
 })

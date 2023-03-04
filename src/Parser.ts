@@ -439,7 +439,7 @@ const parserFor = <A>(
                     es.push(
                       PR.key(name, [
                         PR.type(
-                          AST.createUnion(searchTree.keys[name].literals),
+                          searchTree.keys[name].ast,
                           input[name]
                         )
                       ])
@@ -573,8 +573,7 @@ export const _getSearchTree = <A extends Schema<any>>(
   keys: {
     readonly [key: PropertyKey]: {
       buckets: { [literal: string]: ReadonlyArray<A> }
-      // this is for error message
-      literals: ReadonlyArray<AST.Literal>
+      ast: AST.AST // this is for error messages
     }
   }
   otherwise: ReadonlyArray<A>
@@ -582,7 +581,7 @@ export const _getSearchTree = <A extends Schema<any>>(
   const keys: {
     [key: PropertyKey]: {
       buckets: { [literal: string]: Array<A> }
-      literals: Array<AST.Literal>
+      ast: AST.AST
     }
   } = {}
   const otherwise: Array<A> = []
@@ -593,17 +592,17 @@ export const _getSearchTree = <A extends Schema<any>>(
       for (let j = 0; j < tags.length; j++) {
         const [key, literal] = tags[j]
         const hash = String(literal.literal)
-        keys[key] = keys[key] || { buckets: {}, literals: [] }
+        keys[key] = keys[key] || { buckets: {}, ast: AST.neverKeyword }
         const buckets = keys[key].buckets
         if (Object.prototype.hasOwnProperty.call(buckets, hash)) {
           if (j < tags.length - 1) {
             continue
           }
           buckets[hash].push(member)
-          keys[key].literals.push(literal)
+          keys[key].ast = AST.createUnion([keys[key].ast, literal])
         } else {
           buckets[hash] = [member]
-          keys[key].literals.push(literal)
+          keys[key].ast = AST.createUnion([keys[key].ast, literal])
           break
         }
       }
