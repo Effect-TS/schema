@@ -505,6 +505,78 @@ pipe(S.array(S.number), A.minItems(2)); // min array length
 pipe(S.array(S.number), A.itemsCount(2)); // exact array length
 ```
 
+## Branded types
+
+TypeScript's type system is structural, which means that any two types that are structurally equivalent are considered the same. This can cause issues when types that are semantically different are treated as if they were the same.
+
+```ts
+type UserId = string
+type Username = string
+
+const getUser = (id: UserId) => { ... }
+
+const myUsername: Username = "gcanti"
+
+getUser(myUsername) // works fine
+```
+
+In the above example, `UserId` and `Username` are both aliases for the same type, `string`. This means that the `getUser` function can mistakenly accept a `Username` as a valid `UserId`, causing bugs and errors.
+
+To avoid these kinds of issues, the `@effect` ecosystem provides a way to create custom types with a unique identifier attached to them. These are known as "branded types".
+
+```ts
+import type * as B from "@effect/data/Brand"
+
+type UserId = string & B.Brand<"UserId">
+type Username = string
+
+const getUser = (id: UserId) => { ... }
+
+const myUsername: Username = "gcanti"
+
+getUser(myUsername) // error
+```
+
+By defining `UserId` as a branded type, the `getUser` function can accept only values of type `UserId`, and not plain strings or other types that are compatible with strings. This helps to prevent bugs caused by accidentally passing the wrong type of value to the function.
+
+There are two ways to define a schema for a branded type, depending on whether you:
+
+- want to define the schema from scratch
+- have already defined a branded type via `@effect/data/Brand` and want to reuse it to define a schema
+
+### Defining a schema from scratch
+
+To define a schema for a branded type from scratch, you can use the `brand` combinator exported by the `@effect/schema` module. Here's an example:
+
+```ts
+import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema"
+
+const UserIdSchema = pipe(S.string, S.brand("UserId"))
+type UserId = S.Infer<typeof UserIdSchema> // string & Brand<"UserId">
+```
+
+In the above example, `UserIdSchema` is a schema for the `UserId` branded type. The `brand` combinator takes a string argument that specifies the name of the brand to attach to the type.
+
+### Reusing an existing branded type
+
+If you have already defined a branded type using the `@effect/data/Brand` module, you can reuse it to define a schema using the `brand` combinator exported by the `@effect/schema/data/Brand` module. Here's an example:
+
+```ts
+import * as B from "@effect/data/Brand"
+
+// the existing branded type
+type UserId = string & B.Brand<"UserId">
+const UserId = B.nominal<UserId>()
+
+import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema"
+import { brand } from "@effect/schema/data/Brand"
+
+// Define a schema for the branded type
+const UserIdSchema = pipe(S.string, brand(UserId))
+```
+
 ## Native enums
 
 ```ts
