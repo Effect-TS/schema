@@ -77,6 +77,7 @@ Added in v1.0.0
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
 - [model](#model)
+  - [BrandSchema (interface)](#brandschema-interface)
   - [Schema (interface)](#schema-interface)
 - [parsers](#parsers)
   - [clamp](#clamp)
@@ -262,7 +263,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 export declare const brand: <B extends string, A>(
   brand: B,
   options?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => Schema<any>
+) => (self: Schema<A>) => BrandSchema<any>
 ```
 
 **Example**
@@ -481,8 +482,8 @@ using the provided decoding functions.
 ```ts
 export declare const transformOrFail: <A, B>(
   to: Schema<B>,
-  decode: (input: A, options?: AST.ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], B>,
-  encode: (input: B, options?: AST.ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], A>
+  decode: (input: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [ParseError, ...ParseError[]], B>,
+  encode: (input: B, options?: AST.ParseOptions | undefined) => E.Either<readonly [ParseError, ...ParseError[]], A>
 ) => (self: Schema<A>) => Schema<B>
 ```
 
@@ -895,6 +896,16 @@ export declare const trimmed: <A extends string>(
 Added in v1.0.0
 
 # model
+
+## BrandSchema (interface)
+
+**Signature**
+
+```ts
+export interface BrandSchema<A extends Brand<any>> extends Schema<A>, Brand.Constructor<A> {}
+```
+
+Added in v1.0.0
 
 ## Schema (interface)
 
