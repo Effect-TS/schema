@@ -72,6 +72,19 @@ describe.concurrent("Schema", () => {
     expect(Int.refine(1.2)).toEqual(false)
   })
 
+  it("brand/ composition", () => {
+    const int = <A extends number>(self: S.Schema<A>) => pipe(self, S.int(), S.brand("Int"))
+
+    const positive = <A extends number>(self: S.Schema<A>) =>
+      pipe(self, S.positive(), S.brand("Positive"))
+
+    const PositiveInt = pipe(S.number, int, positive)
+
+    expect(PositiveInt.refine(1)).toEqual(true)
+    expect(PositiveInt.refine(-1)).toEqual(false)
+    expect(PositiveInt.refine(1.2)).toEqual(false)
+  })
+
   it("getPropertySignatures", () => {
     const Name = pipe(S.string, S.identifier("name"))
     const Age = pipe(S.number, S.identifier("age"))
