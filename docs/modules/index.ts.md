@@ -21,6 +21,7 @@ Added in v1.0.0
   - [encodeOrThrow](#encodeorthrow)
   - [failure](#failure)
   - [failures](#failures)
+  - [getOption](#getoption)
   - [is](#is)
   - [isFailure](#isfailure)
   - [isSuccess](#issuccess)
@@ -114,6 +115,18 @@ Added in v1.0.0
 export declare const failures: (
   es: readonly [ParseError, ...ParseError[]]
 ) => Either<readonly [ParseError, ...ParseError[]], never>
+```
+
+Added in v1.0.0
+
+## getOption
+
+**Signature**
+
+```ts
+export declare const getOption: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: ParseOptions | undefined) => Option<A>
 ```
 
 Added in v1.0.0
