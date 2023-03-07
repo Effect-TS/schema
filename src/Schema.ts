@@ -776,6 +776,13 @@ export const transformEither: {
   ): Schema<B>
 } = I.transformEither
 
+/**
+  Create a new `Schema` by transforming the input and output of an existing `Schema`
+  using the provided decoding functions.
+
+  @category combinators
+  @since 1.0.0
+ */
 export const transformEffect: {
   <A, B>(
     to: Schema<B>,
