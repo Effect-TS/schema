@@ -4,13 +4,14 @@
 import * as D from "@effect/data/Data"
 import * as E from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
 import * as I from "@effect/schema/internal/common"
+import * as PE from "@effect/schema/ParseError"
 import * as P from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type { Schema } from "@effect/schema/Schema"
 
@@ -25,10 +26,10 @@ const parser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
 
   return I.makeParser(
     schema,
-    (u, options) =>
+    (u) =>
       !E.isEqual(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        pipe(decode(u, options), Effect.map(toData))
+        Effect.fail(RA.of(PE.type(schema.ast, u))) :
+        pipe(decode(u), Effect.map(toData))
   )
 }
 

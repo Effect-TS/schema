@@ -3,17 +3,22 @@
  */
 import { pipe } from "@effect/data/Function"
 import { isDate } from "@effect/data/Predicate"
+import * as RA from "@effect/data/ReadonlyArray"
+import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as I from "@effect/schema/internal/common"
+import * as PE from "@effect/schema/ParseError"
 import type * as P from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type { Schema } from "@effect/schema/Schema"
 
 const parser = (): P.Parser<Date> =>
-  I.makeParser(date, (u) => !isDate(u) ? PR.failure(PR.type(date.ast, u)) : PR.success(u))
+  I.makeParser(date, (u) =>
+    !isDate(u) ?
+      Effect.fail(RA.of(PE.type(date.ast, u))) :
+      Effect.succeed(u))
 
 const arbitrary = (): Arbitrary<Date> => I.makeArbitrary(date, (fc) => fc.date())
 
@@ -42,10 +47,10 @@ export const parseString = (self: Schema<string>): Schema<Date> => {
       (s) => {
         const n = Date.parse(s)
         return isNaN(n)
-          ? PR.failure(PR.type(schema.ast, s))
-          : PR.success(new Date(n))
+          ? Effect.fail(RA.of(PE.type(schema.ast, s)))
+          : Effect.succeed(new Date(n))
       },
-      (n) => PR.success(n.toISOString())
+      (n) => Effect.succeed(n.toISOString())
     )
   )
   return schema

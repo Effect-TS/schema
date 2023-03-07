@@ -7,13 +7,14 @@ import * as E from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
 import * as Hash from "@effect/data/Hash"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
 import * as I from "@effect/schema/internal/common"
+import * as PE from "@effect/schema/ParseError"
 import * as P from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type { Schema } from "@effect/schema/Schema"
 
@@ -23,12 +24,12 @@ const parser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E,
   const decodeRight = P.decode(right)
   return I.makeParser(
     schema,
-    (u, options) =>
+    (u) =>
       !E.isEither(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
+        Effect.fail(RA.of(PE.type(schema.ast, u))) :
         E.isLeft(u) ?
-        pipe(decodeLeft(u.left, options), Effect.map(E.left)) :
-        pipe(decodeRight(u.right, options), Effect.map(E.right))
+        pipe(decodeLeft(u.left), Effect.map(E.left)) :
+        pipe(decodeRight(u.right), Effect.map(E.right))
   )
 }
 

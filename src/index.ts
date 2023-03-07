@@ -15,6 +15,10 @@ export {
   /**
    * @since 1.0.0
    */
+  decodeOption,
+  /**
+   * @since 1.0.0
+   */
   decodeOrThrow,
   /**
    * @since 1.0.0
@@ -27,10 +31,6 @@ export {
   /**
    * @since 1.0.0
    */
-  getOption,
-  /**
-   * @since 1.0.0
-   */
   is
 } from "@effect/schema/Parser"
 
@@ -40,21 +40,6 @@ export type {
    */
   InferAsserts
 } from "@effect/schema/Parser"
-
-export {
-  /**
-   * @since 1.0.0
-   */
-  failure,
-  /**
-   * @since 1.0.0
-   */
-  failures,
-  /**
-   * @since 1.0.0
-   */
-  success
-} from "@effect/schema/ParseResult"
 
 export * from "@effect/schema/Schema"
 /* c8 ignore end */

@@ -7,7 +7,7 @@ import * as O from "@effect/data/Option"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as annotations from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
-import type * as PR from "@effect/schema/ParseResult"
+import type { ParseError } from "@effect/schema/ParseError"
 
 interface Forest<A> extends ReadonlyArray<Tree<A>> {}
 
@@ -24,7 +24,7 @@ const make = <A>(value: A, forest: Forest<A> = []): Tree<A> => ({
 /**
  * @since 1.0.0
  */
-export const formatErrors = (errors: NonEmptyReadonlyArray<PR.ParseError>): string =>
+export const formatErrors = (errors: NonEmptyReadonlyArray<ParseError>): string =>
   drawTree(make(`${errors.length} error(s) found`, errors.map(go)))
 
 const drawTree = (tree: Tree<string>): string => tree.value + draw("\n", tree.forest)
@@ -146,7 +146,7 @@ export const formatExpected = (ast: AST.AST): string => {
   }
 }
 
-const go = (e: PR.ParseError): Tree<string> => {
+const go = (e: ParseError): Tree<string> => {
   switch (e._tag) {
     case "Type":
       return make(

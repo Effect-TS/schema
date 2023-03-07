@@ -4,8 +4,10 @@
 
 import { pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
+import * as RA from "@effect/data/ReadonlyArray"
+import * as Effect from "@effect/io/Effect"
 import * as I from "@effect/schema/internal/common"
-import * as PR from "@effect/schema/ParseResult"
+import * as PE from "@effect/schema/ParseError"
 import type { AnnotationOptions, Schema } from "@effect/schema/Schema"
 
 /**
@@ -300,18 +302,18 @@ export const parseString = (self: Schema<string>): Schema<number> => {
       I.number,
       (s) => {
         if (s === "NaN") {
-          return PR.success(NaN)
+          return Effect.succeed(NaN)
         }
         if (s === "Infinity") {
-          return PR.success(Infinity)
+          return Effect.succeed(Infinity)
         }
         if (s === "-Infinity") {
-          return PR.success(-Infinity)
+          return Effect.succeed(-Infinity)
         }
         const n = parseFloat(s)
-        return isNaN(n) ? PR.failure(PR.type(schema.ast, s)) : PR.success(n)
+        return isNaN(n) ? Effect.fail(RA.of(PE.type(schema.ast, s))) : Effect.succeed(n)
       },
-      (n) => PR.success(String(n))
+      (n) => Effect.succeed(String(n))
     )
   )
   return schema

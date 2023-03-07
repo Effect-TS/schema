@@ -3,19 +3,21 @@
  */
 
 import * as E from "@effect/data/Either"
+import type { Either } from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { Option } from "@effect/data/Option"
 import * as P from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import * as H from "@effect/schema/annotation/Hook"
 import * as AST from "@effect/schema/AST"
-import type { ParseOptions } from "@effect/schema/AST"
+import { ParseOptions } from "@effect/schema/AST"
 import { formatErrors } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
-import * as PR from "@effect/schema/ParseResult"
-import type { ParseResult } from "@effect/schema/ParseResult"
+import * as PE from "@effect/schema/ParseError"
+import type { ParseError } from "@effect/schema/ParseError"
 import type { Infer, Schema } from "@effect/schema/Schema"
 
 /**
@@ -23,7 +25,9 @@ import type { Infer, Schema } from "@effect/schema/Schema"
  * @since 1.0.0
  */
 export interface Parser<A> extends Schema<A> {
-  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<A>
+  readonly parse: (
+    input: unknown
+  ) => Effect.Effect<AST.ParseOptions, NonEmptyReadonlyArray<ParseError>, A>
 }
 
 /**
@@ -36,17 +40,28 @@ export const make: <A>(schema: Schema<A>, parse: Parser<A>["parse"]) => Parser<A
  * @category decoding
  * @since 1.0.0
  */
-export const decode = <A>(
-  schema: Schema<A>
-): (input: unknown, options?: ParseOptions) => ParseResult<A> => parserFor(schema).parse
+export const decode = <A>(schema: Schema<A>) =>
+  (
+    input: unknown,
+    options?: ParseOptions
+  ): Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A> =>
+    parserForInternal(schema, input, "decoder", options)
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const getOption = <A>(schema: Schema<A>) =>
+export const decodeEither = <A>(schema: Schema<A>) =>
+  (input: unknown, options?: ParseOptions): Either<NonEmptyReadonlyArray<ParseError>, A> =>
+    Effect.runSyncEither(decode(schema)(input, options))
+
+/**
+ * @category decoding
+ * @since 1.0.0
+ */
+export const decodeOption = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): Option<A> =>
-    O.fromEither(Effect.runSyncEither(parserFor(schema).parse(input, options)))
+    O.fromEither(decodeEither(schema)(input, options))
 
 /**
  * @category decoding
@@ -54,7 +69,7 @@ export const getOption = <A>(schema: Schema<A>) =>
  */
 export const decodeOrThrow = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): A => {
-    const t = Effect.runSyncEither(parserFor(schema).parse(input, options))
+    const t = decodeEither(schema)(input, options)
     if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
@@ -67,7 +82,7 @@ export const decodeOrThrow = <A>(schema: Schema<A>) =>
  */
 export const is = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): input is A =>
-    !E.isLeft(Effect.runSyncEither(parserFor(schema, "guard").parse(input, options)))
+    E.isRight(Effect.runSyncEither(parserForInternal(schema, input, "guard", options)))
 
 /**
  * @since 1.0.0
@@ -83,7 +98,7 @@ export type InferAsserts<S extends Schema<any>> = (
  */
 export const asserts = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): asserts input is A => {
-    const t = Effect.runSyncEither(parserFor(schema, "guard").parse(input, options))
+    const t = Effect.runSyncEither(parserForInternal(schema, input, "guard", options))
     if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
@@ -93,9 +108,12 @@ export const asserts = <A>(schema: Schema<A>) =>
  * @category encoding
  * @since 1.0.0
  */
-export const encode = <A>(
-  schema: Schema<A>
-): (a: A, options?: ParseOptions) => ParseResult<unknown> => parserFor(schema, "encoder").parse
+export const encode = <A>(schema: Schema<A>) =>
+  (
+    input: unknown,
+    options?: ParseOptions
+  ): Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, unknown> =>
+    parserForInternal(schema, input, "encoder", options)
 
 /**
  * @category encoding
@@ -103,7 +121,7 @@ export const encode = <A>(
  */
 export const encodeOrThrow = <A>(schema: Schema<A>) =>
   (a: A, options?: ParseOptions): unknown => {
-    const t = Effect.runSyncEither(parserFor(schema, "encoder").parse(a, options))
+    const t = Effect.runSyncEither(encode(schema)(a, options))
     if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
@@ -113,6 +131,18 @@ export const encodeOrThrow = <A>(schema: Schema<A>) =>
 const getHook = AST.getAnnotation<H.Hook<Parser<any>>>(
   H.ParserHookId
 )
+
+const parserForInternal = <A>(
+  schema: Schema<A>,
+  input: unknown,
+  as: "decoder" | "guard" | "encoder" = "decoder",
+  options?: ParseOptions
+): Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A> =>
+  Effect.provideService(
+    parserFor(schema, as).parse(input),
+    AST.ParseOptions,
+    Object.assign({}, AST.defaultParseOptions, options ?? {})
+  )
 
 const parserFor = <A>(
   schema: Schema<A>,
@@ -146,7 +176,7 @@ const parserFor = <A>(
         return I.fromRefinement(I.makeSchema(ast), P.isNever)
       case "UnknownKeyword":
       case "AnyKeyword":
-        return make(I.makeSchema(ast), PR.success)
+        return make(I.makeSchema(ast), Effect.succeed)
       case "StringKeyword":
         return I.fromRefinement(I.makeSchema(ast), P.isString)
       case "NumberKeyword":
@@ -173,14 +203,15 @@ const parserFor = <A>(
         const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
         return make(
           I.makeSchema(ast),
-          (input: unknown, options) =>
+          (input: unknown) =>
             Effect.gen(function*($) {
+              const options = yield* $(Effect.service(ParseOptions))
               if (!Array.isArray(input)) {
-                return yield* $(PR.failure(PR.type(unknownArray, input)))
+                return yield* $(Effect.fail(RA.of(PE.type(unknownArray, input))))
               }
               const output: Array<any> = []
-              const es: Array<PR.ParseError> = []
-              const allErrors = options?.allErrors
+              const es: Array<ParseError> = []
+              const allErrors = options.allErrors
               let i = 0
               // ---------------------------------------------
               // handle elements
@@ -190,25 +221,25 @@ const parserFor = <A>(
                   // the input element is missing...
                   if (!ast.elements[i].isOptional) {
                     // ...but the element is required
-                    const e = PR.index(i, [PR.missing])
+                    const e = PE.index(i, [PE.missing])
                     if (allErrors) {
                       es.push(e)
                       continue
                     } else {
-                      return yield* $(PR.failure(e))
+                      return yield* $(Effect.fail(RA.of(e)))
                     }
                   }
                 } else {
                   const parser = elements[i]
-                  const t = yield* $(Effect.either(parser.parse(input[i], options)))
+                  const t = yield* $(Effect.either(parser.parse(input[i])))
                   if (E.isLeft(t)) {
                     // the input element is present but is not valid
-                    const e = PR.index(i, t.left)
+                    const e = PE.index(i, t.left)
                     if (allErrors) {
                       es.push(e)
                       continue
                     } else {
-                      return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      return yield* $(Effect.fail(I.mutableAppend(es, e)))
                     }
                   }
                   output.push(t.right)
@@ -221,14 +252,14 @@ const parserFor = <A>(
                 const head = RA.headNonEmpty(rest.value)
                 const tail = RA.tailNonEmpty(rest.value)
                 for (; i < input.length - tail.length; i++) {
-                  const t = yield* $(Effect.either(head.parse(input[i], options)))
+                  const t = yield* $(Effect.either(head.parse(input[i])))
                   if (E.isLeft(t)) {
-                    const e = PR.index(i, t.left)
+                    const e = PE.index(i, t.left)
                     if (allErrors) {
                       es.push(e)
                       continue
                     } else {
-                      return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      return yield* $(Effect.fail(I.mutableAppend(es, e)))
                     }
                   } else {
                     output.push(t.right)
@@ -241,17 +272,17 @@ const parserFor = <A>(
                   i += j
                   if (input.length < i + 1) {
                     // the input element is missing and the element is required, bail out
-                    return yield* $(PR.failures(I.mutableAppend(es, PR.index(i, [PR.missing]))))
+                    return yield* $(Effect.fail(I.mutableAppend(es, PE.index(i, [PE.missing]))))
                   } else {
-                    const t = yield* $(Effect.either(tail[j].parse(input[i], options)))
+                    const t = yield* $(Effect.either(tail[j].parse(input[i])))
                     if (E.isLeft(t)) {
                       // the input element is present but is not valid
-                      const e = PR.index(i, t.left)
+                      const e = PE.index(i, t.left)
                       if (allErrors) {
                         es.push(e)
                         continue
                       } else {
-                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                        return yield* $(Effect.fail(I.mutableAppend(es, e)))
                       }
                     }
                     output.push(t.right)
@@ -261,27 +292,26 @@ const parserFor = <A>(
                 // ---------------------------------------------
                 // handle unexpected indexes
                 // ---------------------------------------------
-                const isUnexpectedAllowed = options?.isUnexpectedAllowed
+                const isUnexpectedAllowed = options.isUnexpectedAllowed
                 for (; i < input.length; i++) {
-                  const e = PR.index(i, [PR.unexpected(input[i])])
+                  const e = PE.index(i, [PE.unexpected(input[i])])
                   if (!isUnexpectedAllowed) {
                     if (allErrors) {
                       es.push(e)
                       continue
                     } else {
-                      return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      return yield* $(Effect.fail(I.mutableAppend(es, e)))
                     }
                   }
                 }
               }
-
               // ---------------------------------------------
               // compute output
               // ---------------------------------------------
               return yield* $(
                 I.isNonEmptyReadonlyArray(es) ?
-                  PR.failures(es) :
-                  PR.success(output)
+                  Effect.fail(es) :
+                  Effect.succeed(output)
               )
             })
         )
@@ -296,15 +326,16 @@ const parserFor = <A>(
         )
         return make(
           I.makeSchema(ast),
-          (input: unknown, options) =>
+          (input: unknown) =>
             Effect.gen(function*($) {
+              const options = yield* $(Effect.service(ParseOptions))
               if (!P.isRecord(input)) {
-                return yield* $(PR.failure(PR.type(unknownRecord, input)))
+                return yield* $(Effect.fail(RA.of(PE.type(unknownRecord, input))))
               }
               const output: any = {}
               const expectedKeys: any = {}
-              const es: Array<PR.ParseError> = []
-              const allErrors = options?.allErrors
+              const es: Array<ParseError> = []
+              const allErrors = options.allErrors
               // ---------------------------------------------
               // handle property signatures
               // ---------------------------------------------
@@ -315,24 +346,24 @@ const parserFor = <A>(
                 expectedKeys[name] = null
                 if (!Object.prototype.hasOwnProperty.call(input, name)) {
                   if (!ps.isOptional) {
-                    const e = PR.key(name, [PR.missing])
+                    const e = PE.key(name, [PE.missing])
                     if (allErrors) {
                       es.push(e)
                       continue
                     } else {
-                      return yield* $(PR.failure(e))
+                      return yield* $(Effect.fail(RA.of(e)))
                     }
                   }
                 } else {
-                  const t = yield* $(Effect.either(parser.parse(input[name], options)))
+                  const t = yield* $(Effect.either(parser.parse(input[name])))
                   if (E.isLeft(t)) {
                     // the input key is present but is not valid
-                    const e = PR.key(name, t.left)
+                    const e = PE.key(name, t.left)
                     if (allErrors) {
                       es.push(e)
                       continue
                     } else {
-                      return yield* $(PR.failures(I.mutableAppend(es, e)))
+                      return yield* $(Effect.fail(I.mutableAppend(es, e)))
                     }
                   }
                   output[name] = t.right
@@ -353,27 +384,27 @@ const parserFor = <A>(
                     // ---------------------------------------------
                     // handle keys
                     // ---------------------------------------------
-                    let t = yield* $(Effect.either(parameter.parse(key, options)))
+                    let t = yield* $(Effect.either(parameter.parse(key)))
                     if (E.isLeft(t)) {
-                      const e = PR.key(key, t.left)
+                      const e = PE.key(key, t.left)
                       if (allErrors) {
                         es.push(e)
                         continue
                       } else {
-                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                        return yield* $(Effect.fail(I.mutableAppend(es, e)))
                       }
                     }
                     // ---------------------------------------------
                     // handle values
                     // ---------------------------------------------
-                    t = yield* $(Effect.either(type.parse(input[key], options)))
+                    t = yield* $(Effect.either(type.parse(input[key])))
                     if (E.isLeft(t)) {
-                      const e = PR.key(key, t.left)
+                      const e = PE.key(key, t.left)
                       if (allErrors) {
                         es.push(e)
                         continue
                       } else {
-                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                        return yield* $(Effect.fail(I.mutableAppend(es, e)))
                       }
                     } else {
                       output[key] = t.right
@@ -387,13 +418,13 @@ const parserFor = <A>(
                 const isUnexpectedAllowed = options?.isUnexpectedAllowed
                 for (const key of Reflect.ownKeys(input)) {
                   if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
-                    const e = PR.key(key, [PR.unexpected(input[key])])
+                    const e = PE.key(key, [PE.unexpected(input[key])])
                     if (!isUnexpectedAllowed) {
                       if (allErrors) {
                         es.push(e)
                         continue
                       } else {
-                        return yield* $(PR.failures(I.mutableAppend(es, e)))
+                        return yield* $(Effect.fail(I.mutableAppend(es, e)))
                       }
                     }
                   }
@@ -404,8 +435,8 @@ const parserFor = <A>(
               // ---------------------------------------------
               return yield* $(
                 I.isNonEmptyReadonlyArray(es) ?
-                  PR.failures(es) :
-                  PR.success(output)
+                  Effect.fail(es) :
+                  Effect.succeed(output)
               )
             })
         )
@@ -416,9 +447,9 @@ const parserFor = <A>(
         const ownKeys = Reflect.ownKeys(searchTree.keys)
         const len = ownKeys.length
         const otherwise = searchTree.otherwise
-        return make(I.makeSchema(ast), (input, options) =>
+        return make(I.makeSchema(ast), (input) =>
           Effect.gen(function*($) {
-            const es: Array<PR.ParseError> = []
+            const es: Array<ParseError> = []
             if (len > 0) {
               // if there is at least one key then input must be an object
               if (P.isRecord(input)) {
@@ -433,17 +464,17 @@ const parserFor = <A>(
                       // retrive the minimal set of candidates for decoding
                       const bucket = buckets[literal]
                       for (let i = 0; i < bucket.length; i++) {
-                        const t = yield* $(Effect.either(bucket[i].parse(input, options)))
+                        const t = yield* $(Effect.either(bucket[i].parse(input)))
                         if (E.isRight(t)) {
                           return t.right
                         } else {
-                          es.push(PR.unionMember(t.left))
+                          es.push(PE.unionMember(t.left))
                         }
                       }
                     } else {
                       es.push(
-                        PR.key(name, [
-                          PR.type(
+                        PE.key(name, [
+                          PE.type(
                             searchTree.keys[name].ast,
                             input[name]
                           )
@@ -451,31 +482,30 @@ const parserFor = <A>(
                       )
                     }
                   } else {
-                    es.push(PR.key(name, [PR.missing]))
+                    es.push(PE.key(name, [PE.missing]))
                   }
                 }
               } else {
-                es.push(PR.type(unknownRecord, input))
+                es.push(PE.type(unknownRecord, input))
               }
             }
             // if none of the schemas with at least one property with a literal value succeeded,
             // proceed with those that have no literal at all
             for (let i = 0; i < otherwise.length; i++) {
-              const t = yield* $(Effect.either(otherwise[i].parse(input, options)))
+              const t = yield* $(Effect.either(otherwise[i].parse(input)))
               if (E.isRight(t)) {
                 return t.right
               } else {
-                es.push(PR.unionMember(t.left))
+                es.push(PE.unionMember(t.left))
               }
             }
-
             // ---------------------------------------------
             // compute output
             // ---------------------------------------------
             return yield* $(
               I.isNonEmptyReadonlyArray(es) ?
-                PR.failures(es) :
-                PR.failure(PR.type(AST.neverKeyword, input))
+                Effect.fail(es) :
+                Effect.fail(RA.of(PE.type(AST.neverKeyword, input)))
             )
           }))
       }
@@ -483,25 +513,23 @@ const parserFor = <A>(
         const f = () => go(ast.f())
         const get = I.memoize<void, Parser<any>>(f)
         const schema = I.lazy(f)
-        return make(schema, (a, options) => get().parse(a, options))
+        return make(schema, (a) => get().parse(a))
       }
       case "Refinement": {
         const type = go(ast.from)
         const checkRefinement = (a: unknown) =>
-          ast.refinement(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
-
+          ast.refinement(a) ? Effect.succeed(a) : Effect.fail(RA.of(PE.type(ast, a)))
         switch (as) {
           case "guard":
           case "decoder":
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(type.parse(u, options), Effect.flatMap(checkRefinement))
+              (u) => Effect.flatMap(type.parse(u), checkRefinement)
             )
           case "encoder":
             return make(
               I.makeSchema(ast),
-              (u, options) =>
-                pipe(checkRefinement(u), Effect.flatMap((a) => type.parse(a, options)))
+              (u) => Effect.flatMap(checkRefinement(u), (a) => type.parse(a))
             )
         }
       }
@@ -511,11 +539,7 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(ast),
-              (u, options) =>
-                Effect.flatMap(
-                  from.parse(u, options),
-                  (a) => ast.decode(a, options)
-                )
+              (u) => Effect.flatMap(from.parse(u), (a) => ast.decode(a))
             )
           }
           case "guard":
@@ -524,15 +548,13 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode)),
-              (a, options) =>
-                pipe(ast.encode(a, options), Effect.flatMap((a) => from.parse(a, options)))
+              (a) => Effect.flatMap(ast.encode(a), (a) => from.parse(a))
             )
           }
         }
       }
     }
   }
-
   return go(schema.ast)
 }
 

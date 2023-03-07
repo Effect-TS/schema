@@ -9,10 +9,10 @@ import { pipe } from "@effect/data/Function"
 import type { Option } from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import * as A from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
-import type { ParseOptions } from "@effect/schema/AST"
 import * as DataDate from "@effect/schema/data/Date"
 import * as N from "@effect/schema/data/Number"
 import * as DataObject from "@effect/schema/data/Object"
@@ -21,8 +21,8 @@ import * as SRA from "@effect/schema/data/ReadonlyArray"
 import * as S from "@effect/schema/data/String"
 import { formatErrors } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
+import type { ParseError } from "@effect/schema/ParseError"
 import * as P from "@effect/schema/Parser"
-import type { ParseResult } from "@effect/schema/ParseResult"
 
 /**
  * @category model
@@ -604,7 +604,7 @@ export const brand = <B extends string, A>(
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema: Schema<A & Brand<B>> = make(ast)
     const decodeOrThrow = P.decodeOrThrow(schema)
-    const getOption = P.getOption(schema)
+    const getOption = P.decodeOption(schema)
     const decode = P.decode(schema)
     const is = P.is(schema)
     const out: any = Object.assign((input: unknown) => decodeOrThrow(input), {
@@ -740,8 +740,14 @@ export function filter<A>(
  */
 export const transformOrFail: <A, B>(
   to: Schema<B>,
-  decode: (input: A, options?: ParseOptions) => ParseResult<B>,
-  encode: (input: B, options?: ParseOptions) => ParseResult<A>
+  decode: (
+    input: A,
+    options?: AST.ParseOptions | undefined
+  ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, B>,
+  encode: (
+    input: B,
+    options?: AST.ParseOptions | undefined
+  ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
 ) => (self: Schema<A>) => Schema<B> = I.transformOrFail
 
 /**

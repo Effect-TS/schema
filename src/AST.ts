@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+import * as Context from "@effect/data/Context"
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
@@ -9,10 +10,12 @@ import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
 import type { Predicate } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import { isString } from "@effect/data/String"
 import * as Order from "@effect/data/typeclass/Order"
+import type { Effect } from "@effect/io/Effect"
 import { TitleId } from "@effect/schema/annotation/AST"
-import type { ParseResult } from "@effect/schema/ParseResult"
+import type { ParseError } from "@effect/schema/ParseError"
 
 // -------------------------------------------------------------------------------------
 // model
@@ -660,6 +663,21 @@ export interface ParseOptions {
 }
 
 /**
+ * @category context
+ * @since 1.0.0
+ */
+export const ParseOptions = Context.Tag<ParseOptions>()
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const defaultParseOptions: ParseOptions = {
+  isUnexpectedAllowed: false,
+  allErrors: false
+}
+
+/**
  * @category model
  * @since 1.0.0
  */
@@ -667,8 +685,14 @@ export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly decode: (
+    input: any,
+    options?: ParseOptions
+  ) => Effect<never, NonEmptyReadonlyArray<ParseError>, any>
+  readonly encode: (
+    input: any,
+    options?: ParseOptions
+  ) => Effect<never, NonEmptyReadonlyArray<ParseError>, any>
 }
 
 /**

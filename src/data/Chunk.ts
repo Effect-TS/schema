@@ -4,13 +4,14 @@
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
 import { pipe } from "@effect/data/Function"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
 import * as I from "@effect/schema/internal/common"
+import * as PE from "@effect/schema/ParseError"
 import * as P from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type { Schema } from "@effect/schema/Schema"
 
@@ -19,10 +20,10 @@ const parser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
   const schema = chunk(item)
   return I.makeParser(
     schema,
-    (u, options) =>
+    (u) =>
       !C.isChunk(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        pipe(C.toReadonlyArray(u), (us) => items(us, options), Effect.map(C.fromIterable))
+        Effect.fail(RA.of(PE.type(schema.ast, u))) :
+        pipe(C.toReadonlyArray(u), items, Effect.map(C.fromIterable))
   )
 }
 

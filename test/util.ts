@@ -9,8 +9,8 @@ import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/formatter/Tree"
+import type { ParseError } from "@effect/schema/ParseError"
 import * as P from "@effect/schema/Parser"
-import type * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
 import * as fc from "fast-check"
 
@@ -74,13 +74,13 @@ export const expectEncodingFailure = <A>(
   expect(t).toStrictEqual(E.left(message))
 }
 
-const formatAll = (errors: NonEmptyReadonlyArray<PR.ParseError>): string => {
+const formatAll = (errors: NonEmptyReadonlyArray<ParseError>): string => {
   return pipe(errors, RA.map(formatDecodeError), RA.join(", "))
 }
 
 const getMessage = AST.getAnnotation<annotations.Message<unknown>>(annotations.MessageId)
 
-const formatDecodeError = (e: PR.ParseError): string => {
+const formatDecodeError = (e: ParseError): string => {
   switch (e._tag) {
     case "Type":
       return pipe(

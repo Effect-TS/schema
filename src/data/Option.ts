@@ -7,14 +7,15 @@ import { pipe } from "@effect/data/Function"
 import * as Hash from "@effect/data/Hash"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
+import * as PE from "@effect/schema/ParseError"
 import * as P from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type { Infer, Schema, Spread } from "@effect/schema/Schema"
 
@@ -23,12 +24,12 @@ const parser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
   const decodeValue = P.decode(value)
   return I.makeParser(
     schema,
-    (u, options) =>
+    (u) =>
       !O.isOption(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
+        Effect.fail(RA.of(PE.type(schema.ast, u))) :
         O.isNone(u) ?
-        PR.success(O.none()) :
-        pipe(decodeValue(u.value, options), Effect.map(O.some))
+        Effect.succeed(O.none()) :
+        Effect.map(decodeValue(u.value), O.some)
   )
 }
 

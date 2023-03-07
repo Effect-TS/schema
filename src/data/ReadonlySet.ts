@@ -3,13 +3,14 @@
  */
 
 import { pipe } from "@effect/data/Function"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as I from "@effect/schema/internal/common"
+import * as PE from "@effect/schema/ParseError"
 import * as P from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type { Schema } from "@effect/schema/Schema"
 
@@ -20,13 +21,12 @@ const parser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
   const schema = readonlySet(item)
   return I.makeParser(
     schema,
-    (u, options) =>
+    (u) =>
       !isSet(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        pipe(
-          Array.from(u.values()),
-          (us) => items(us, options),
-          Effect.map((as) => new Set(as))
+        Effect.fail(RA.of(PE.type(schema.ast, u))) :
+        Effect.map(
+          items(Array.from(u.values())),
+          (as) => new Set(as)
         )
   )
 }
