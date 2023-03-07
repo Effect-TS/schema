@@ -829,7 +829,7 @@ export const transformEffect: {
  *   pipe(Square, S.attachPropertySignature("kind", "square"))
  * )
  *
- * assert.deepStrictEqual(S.decodeOrThrow(Shape)({ radius: 10 }), {
+ * assert.deepStrictEqual(S.decode(Shape)({ radius: 10 }), {
  *   kind: "circle",
  *   radius: 10
  * })
