@@ -303,11 +303,11 @@ const parserFor = <A>(
             // handle property signatures
             // ---------------------------------------------
             for (let i = 0; i < propertySignaturesTypes.length; i++) {
-              const ps = ast.propertySignatures[i]
+              const ps: AST.PropertySignature = ast.propertySignatures[i]
               const parser = propertySignaturesTypes[i]
               const name = ps.name
               expectedKeys[name] = null
-              if (!Object.prototype.hasOwnProperty.call(input, name)) {
+              if (!(name in input)) {
                 if (!ps.isOptional) {
                   const e = PR.key(name, [PR.missing])
                   if (allErrors) {
@@ -420,7 +420,7 @@ const parserFor = <A>(
                 const name = ownKeys[i]
                 const buckets = searchTree.keys[name].buckets
                 // for each property that should contain a literal, check if the input contains that property
-                if (Object.prototype.hasOwnProperty.call(input, name)) {
+                if (name in input) {
                   const literal = String(input[name])
                   // check that the value obtained from the input for the property corresponds to an existing bucket
                   if (Object.prototype.hasOwnProperty.call(buckets, literal)) {

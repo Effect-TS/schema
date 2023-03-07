@@ -139,6 +139,27 @@ describe.concurrent("Pretty", () => {
     )
   })
 
+  it("struct/ should support getters and prototype chain", () => {
+    class A {
+      get a() {
+        return "a"
+      }
+      b = 1
+    }
+    expect(P.pretty(S.struct({ a: S.optional(S.string), b: S.number }))(new A())).toEqual(
+      `{ "a": "a", "b": 1 }`
+    )
+    class B extends A {
+      get c() {
+        return 2
+      }
+    }
+    expect(P.pretty(S.struct({ a: S.optional(S.string), b: S.number, c: S.number }))(new B()))
+      .toEqual(
+        `{ "a": "a", "b": 1, "c": 2 }`
+      )
+  })
+
   it("record(string, string)", () => {
     const schema = S.record(S.string, S.string)
     const pretty = P.pretty(schema)

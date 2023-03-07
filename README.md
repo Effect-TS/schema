@@ -152,7 +152,7 @@ Decoding failed:
 
 ### Excess properties
 
-When using a `Schema` to decode a value, any properties that are not specified in the `Schema` will result in a decoding error. This is because the `Schema` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
+When using a `Schema` to decode a value, any **own properties** that are not specified in the `Schema` will result in a decoding error. This is because the `Schema` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
 
 However, you can use the `isUnexpectedAllowed` option to allow excess properties while decoding. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
 
@@ -549,11 +549,11 @@ There are two ways to define a schema for a branded type, depending on whether y
 To define a schema for a branded type from scratch, you can use the `brand` combinator exported by the `@effect/schema` module. Here's an example:
 
 ```ts
-import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema"
+import { pipe } from "@effect/data/Function";
+import * as S from "@effect/schema";
 
-const UserIdSchema = pipe(S.string, S.brand("UserId"))
-type UserId = S.Infer<typeof UserIdSchema> // string & Brand<"UserId">
+const UserIdSchema = pipe(S.string, S.brand("UserId"));
+type UserId = S.Infer<typeof UserIdSchema>; // string & Brand<"UserId">
 ```
 
 In the above example, `UserIdSchema` is a schema for the `UserId` branded type. The `brand` combinator takes a string argument that specifies the name of the brand to attach to the type.
@@ -563,18 +563,18 @@ In the above example, `UserIdSchema` is a schema for the `UserId` branded type. 
 If you have already defined a branded type using the `@effect/data/Brand` module, you can reuse it to define a schema using the `brand` combinator exported by the `@effect/schema/data/Brand` module. Here's an example:
 
 ```ts
-import * as B from "@effect/data/Brand"
+import * as B from "@effect/data/Brand";
 
 // the existing branded type
-type UserId = string & B.Brand<"UserId">
-const UserId = B.nominal<UserId>()
+type UserId = string & B.Brand<"UserId">;
+const UserId = B.nominal<UserId>();
 
-import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema"
-import { brand } from "@effect/schema/data/Brand"
+import { pipe } from "@effect/data/Function";
+import * as S from "@effect/schema";
+import { brand } from "@effect/schema/data/Brand";
 
 // Define a schema for the branded type
-const UserIdSchema = pipe(S.string, brand(UserId))
+const UserIdSchema = pipe(S.string, brand(UserId));
 ```
 
 ## Native enums

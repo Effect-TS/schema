@@ -665,6 +665,30 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingSuccess(schema, {})
   })
 
+  it("struct/ should support getters and prototype chain", () => {
+    class A {
+      get a() {
+        return "a"
+      }
+      b = 1
+    }
+    Util.expectDecodingSuccess(S.struct({ a: S.string, b: S.number }), new A(), { a: "a", b: 1 })
+    Util.expectDecodingFailure(S.struct({ a: S.string }), new A(), "/b is unexpected")
+    class B extends A {
+      get c() {
+        return 2
+      }
+    }
+    Util.expectDecodingSuccess(S.struct({ a: S.string, b: S.number, c: S.number }), new B(), {
+      a: "a",
+      b: 1,
+      c: 2
+    })
+    Util.expectDecodingSuccess(S.struct({ b: S.number }), new B(), { b: 1 })
+    // unexpected keys only in own properties
+    Util.expectDecodingSuccess(S.struct({ b: S.number, c: S.number }), new B(), { b: 1, c: 2 })
+  })
+
   it("struct/extend record(string, string)", () => {
     const schema = pipe(
       S.struct({ a: S.string }),
