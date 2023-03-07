@@ -20,8 +20,8 @@ import type { Schema } from "@effect/schema/Schema"
 
 const parser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
   const schema = either(left, right)
-  const decodeLeft = P.decode(left)
-  const decodeRight = P.decode(right)
+  const decodeLeft = P.decodeEffect(left)
+  const decodeRight = P.decodeEffect(right)
   return I.makeParser(
     schema,
     (u) =>

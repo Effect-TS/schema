@@ -8,7 +8,7 @@ describe.concurrent("Decoder", () => {
   it("exports", () => {
     expect(P.make).exist
     expect(P.decode).exist
-    expect(P.decodeOrThrow).exist
+    expect(P.decode).exist
   })
 
   it("asserts", () => {
@@ -25,11 +25,11 @@ describe.concurrent("Decoder", () => {
       name: S.string,
       age: S.number
     })
-    expect(P.decodeOrThrow(schema)({ name: "Alice", age: 30 })).toEqual({
+    expect(P.decode(schema)({ name: "Alice", age: 30 })).toEqual({
       name: "Alice",
       age: 30
     })
-    expect(() => P.decodeOrThrow(schema)({})).toThrowError(
+    expect(() => P.decode(schema)({})).toThrowError(
       new Error(`1 error(s) found
 └─ key "name"
    └─ is missing`)

@@ -21,9 +21,8 @@ const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a:
 const parser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: P.Parser<A>
 ): P.Parser<D.Data<A>> => {
-  const decode = P.decode(item)
+  const decode = P.decodeEffect(item)
   const schema = data(item)
-
   return I.makeParser(
     schema,
     (u) =>
@@ -68,9 +67,6 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
 export const fromStructure = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
 ): Schema<D.Data<A>> =>
-  pipe(
-    item,
-    I.transform(data(item), toData, (a) =>
-      // @ts-expect-error
-      Array.isArray(a) ? Array.from(a) : Object.assign({}, a))
-  )
+  I.transform(item, data(item), toData, (a) =>
+    // @ts-expect-error
+    Array.isArray(a) ? Array.from(a) : Object.assign({}, a))

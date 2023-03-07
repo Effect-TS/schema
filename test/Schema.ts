@@ -8,7 +8,9 @@ import * as P from "@effect/schema/Parser"
 
 describe.concurrent("Schema", () => {
   it("exports", () => {
-    expect(S.transformOrFail).exist
+    expect(S.transform).exist
+    expect(S.transformEither).exist
+    expect(S.transformEffect).exist
     expect(S.date).exist
     expect(S.OptionalSchemaId).exist
     expect(S.between).exist
@@ -528,22 +530,22 @@ describe.concurrent("Schema", () => {
       pipe(Square, S.attachPropertySignature("kind", "square"))
     )
 
-    expect(S.decodeOrThrow(DiscriminatedShape)({ radius: 10 })).toEqual({
+    expect(S.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
       kind: "circle",
       radius: 10
     })
     expect(
-      S.encodeOrThrow(DiscriminatedShape)({
+      S.encode(DiscriminatedShape)({
         kind: "circle",
         radius: 10
       })
     ).toEqual({ radius: 10 })
-    expect(S.decodeOrThrow(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+    expect(S.decode(DiscriminatedShape)({ sideLength: 10 })).toEqual({
       kind: "square",
       sideLength: 10
     })
     expect(
-      S.encodeOrThrow(DiscriminatedShape)({
+      S.encode(DiscriminatedShape)({
         kind: "square",
         sideLength: 10
       })

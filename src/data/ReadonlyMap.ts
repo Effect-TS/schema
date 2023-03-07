@@ -20,7 +20,7 @@ const parser = <K, V>(
   key: P.Parser<K>,
   value: P.Parser<V>
 ): P.Parser<ReadonlyMap<K, V>> => {
-  const items = P.decode(I.array(I.tuple(key, value)))
+  const items = P.decodeEffect(I.array(I.tuple(key, value)))
   const schema = readonlyMap(key, value)
   return I.makeParser(
     schema,

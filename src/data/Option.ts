@@ -21,7 +21,7 @@ import type { Infer, Schema, Spread } from "@effect/schema/Schema"
 
 const parser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
   const schema = option(value)
-  const decodeValue = P.decode(value)
+  const decodeValue = P.decodeEffect(value)
   return I.makeParser(
     schema,
     (u) =>

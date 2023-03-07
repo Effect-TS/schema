@@ -49,8 +49,8 @@ describe.concurrent("Option", () => {
     Util.expectDecodingSuccess(schema, null, O.none())
     Util.expectDecodingSuccess(schema, "1", O.some(1))
 
-    expect(O.isOption(S.decodeOrThrow(schema)(null))).toEqual(true)
-    expect(O.isOption(S.decodeOrThrow(schema)("1"))).toEqual(true)
+    expect(O.isOption(S.decode(schema)(null))).toEqual(true)
+    expect(O.isOption(S.decode(schema)("1"))).toEqual(true)
 
     Util.expectDecodingFailureTree(
       schema,

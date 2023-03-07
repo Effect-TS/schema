@@ -15,11 +15,15 @@ export {
   /**
    * @since 1.0.0
    */
-  decodeOption,
+  decodeEffect,
   /**
    * @since 1.0.0
    */
-  decodeOrThrow,
+  decodeEither,
+  /**
+   * @since 1.0.0
+   */
+  decodeOption,
   /**
    * @since 1.0.0
    */
@@ -27,7 +31,15 @@ export {
   /**
    * @since 1.0.0
    */
-  encodeOrThrow,
+  encodeEffect,
+  /**
+   * @since 1.0.0
+   */
+  encodeEither,
+  /**
+   * @since 1.0.0
+   */
+  encodeOption,
   /**
    * @since 1.0.0
    */

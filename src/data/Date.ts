@@ -42,7 +42,7 @@ export const date: Schema<Date> = I.typeAlias([], I.struct({}), {
 export const parseString = (self: Schema<string>): Schema<Date> => {
   const schema: Schema<Date> = pipe(
     self,
-    I.transformOrFail(
+    I.transformEffect(
       date,
       (s) => {
         const n = Date.parse(s)

@@ -10,7 +10,7 @@ import type { Option } from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
-import * as Effect from "@effect/io/Effect"
+import type * as Effect from "@effect/io/Effect"
 import * as A from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
 import * as DataDate from "@effect/schema/data/Date"
@@ -603,17 +603,17 @@ export const brand = <B extends string, A>(
     annotations[A.BrandId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema: Schema<A & Brand<B>> = make(ast)
-    const decodeOrThrow = P.decodeOrThrow(schema)
-    const getOption = P.decodeOption(schema)
     const decode = P.decode(schema)
+    const decodeOption = P.decodeOption(schema)
+    const decodeEither = P.decodeEither(schema)
     const is = P.is(schema)
-    const out: any = Object.assign((input: unknown) => decodeOrThrow(input), {
+    const out: any = Object.assign((input: unknown) => decode(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
       ast,
-      option: (input: unknown) => getOption(input),
+      option: (input: unknown) => decodeOption(input),
       either: (input: unknown) =>
         E.mapLeft(
-          Effect.runSyncEither(decode(input)),
+          decodeEither(input),
           (errors) => [{ meta: input, message: formatErrors(errors) }]
         ),
       refine: (input: unknown): input is A & Brand<B> => is(input)
@@ -733,35 +733,74 @@ export function filter<A>(
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
-  using the provided decoding functions.
-
-  @category combinators
-  @since 1.0.0
- */
-export const transformOrFail: <A, B>(
-  to: Schema<B>,
-  decode: (
-    input: A,
-    options?: AST.ParseOptions | undefined
-  ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, B>,
-  encode: (
-    input: B,
-    options?: AST.ParseOptions | undefined
-  ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
-) => (self: Schema<A>) => Schema<B> = I.transformOrFail
-
-/**
-  Create a new `Schema` by transforming the input and output of an existing `Schema`
   using the provided mapping functions.
 
   @category combinators
   @since 1.0.0
 */
-export const transform: <A, B>(
-  to: Schema<B>,
-  f: (a: A) => B,
-  g: (b: B) => A
-) => (self: Schema<A>) => Schema<B> = I.transform
+export const transform: {
+  <A, B>(to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): (self: Schema<A>) => Schema<B>
+  <A, B>(self: Schema<A>, to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): Schema<B>
+} = I.transform
+
+/**
+  Create a new `Schema` by transforming the input and output of an existing `Schema`
+  using the provided decoding functions.
+
+  @category combinators
+  @since 1.0.0
+ */
+export const transformEither: {
+  <A, B>(
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<NonEmptyReadonlyArray<ParseError>, A>
+  ): (self: Schema<A>) => Schema<B>
+  <A, B>(
+    self: Schema<A>,
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<NonEmptyReadonlyArray<ParseError>, A>
+  ): Schema<B>
+} = I.transformEither
+
+export const transformEffect: {
+  <A, B>(
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions | undefined
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions | undefined
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
+  ): (self: Schema<A>) => Schema<B>
+  <A, B>(
+    self: Schema<A>,
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions | undefined
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions | undefined
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
+  ): Schema<B>
+} = I.transformEffect
 
 /**
  * Attaches a property signature with the specified key and value to the schema.

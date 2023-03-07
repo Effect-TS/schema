@@ -17,7 +17,7 @@ import type { Schema } from "@effect/schema/Schema"
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
 const parser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
-  const items = P.decode(I.array(item))
+  const items = P.decodeEffect(I.array(item))
   const schema = readonlySet(item)
   return I.makeParser(
     schema,

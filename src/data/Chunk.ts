@@ -16,7 +16,7 @@ import type { Pretty } from "@effect/schema/Pretty"
 import type { Schema } from "@effect/schema/Schema"
 
 const parser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
-  const items = P.decode(I.array(item))
+  const items = P.decodeEffect(I.array(item))
   const schema = chunk(item)
   return I.makeParser(
     schema,

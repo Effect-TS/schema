@@ -2,7 +2,8 @@
  * @since 1.0.0
  */
 
-import { pipe } from "@effect/data/Function"
+import type { Either } from "@effect/data/Either"
+import { dual } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
@@ -143,23 +144,88 @@ export function filter<A>(
 }
 
 /** @internal */
-export const transformOrFail = <A, B>(
-  to: Schema<B>,
-  decode: (
-    input: A,
-    options?: AST.ParseOptions
-  ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, B>,
-  encode: (
-    input: B,
-    options?: AST.ParseOptions
-  ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
-) =>
-  (self: Schema<A>): Schema<B> => makeSchema(AST.createTransform(self.ast, to.ast, decode, encode))
+export const transform = dual<
+  <A, B>(
+    to: Schema<B>,
+    ab: (a: A) => B,
+    ba: (b: B) => A
+  ) => (self: Schema<A>) => Schema<B>,
+  <A, B>(
+    self: Schema<A>,
+    to: Schema<B>,
+    ab: (a: A) => B,
+    ba: (b: B) => A
+  ) => Schema<B>
+>(
+  4,
+  (self, to, ab, ba) =>
+    transformEffect(self, to, (a) => Effect.succeed(ab(a)), (b) => Effect.succeed(ba(b)))
+)
 
 /** @internal */
-export const transform = <A, B>(to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A) =>
-  (self: Schema<A>): Schema<B> =>
-    pipe(self, transformOrFail(to, (a) => Effect.succeed(ab(a)), (b) => Effect.succeed(ba(b))))
+export const transformEither = dual<
+  <A, B>(
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions
+    ) => Either<NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions
+    ) => Either<NonEmptyReadonlyArray<ParseError>, A>
+  ) => (self: Schema<A>) => Schema<B>,
+  <A, B>(
+    self: Schema<A>,
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions
+    ) => Either<NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions
+    ) => Either<NonEmptyReadonlyArray<ParseError>, A>
+  ) => Schema<B>
+>(
+  4,
+  (self, to, decode, encode) =>
+    transformEffect(
+      self,
+      to,
+      (a, options) => Effect.fromEither(decode(a, options)),
+      (b, options) => Effect.fromEither(encode(b, options))
+    )
+)
+
+export const transformEffect = dual<
+  <A, B>(
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
+  ) => (self: Schema<A>) => Schema<B>,
+  <A, B>(
+    self: Schema<A>,
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions
+    ) => Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
+  ) => Schema<B>
+>(
+  4,
+  (self, to, decode, encode) => makeSchema(AST.createTransform(self.ast, to.ast, decode, encode))
+)
 
 const makeLiteral = <Literal extends AST.LiteralValue>(value: Literal): Schema<Literal> =>
   makeSchema(AST.createLiteral(value))

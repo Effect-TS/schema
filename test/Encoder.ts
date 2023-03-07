@@ -15,13 +15,13 @@ describe.concurrent("Encoder", () => {
   it("exports", () => {
     expect(E.make).exist
     expect(E.encode).exist
-    expect(E.encodeOrThrow).exist
+    expect(E.encode).exist
   })
 
   it("encodeOrThrow", () => {
     const schema = NumberFromString
-    expect(E.encodeOrThrow(schema)(1)).toEqual("1")
-    expect(() => E.encodeOrThrow(schema)(10)).toThrowError(
+    expect(E.encode(schema)(1)).toEqual("1")
+    expect(() => E.encode(schema)(10)).toThrowError(
       new Error(`1 error(s) found
 └─ Expected a string at most 1 character(s) long, actual "10"`)
     )

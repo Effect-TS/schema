@@ -298,7 +298,7 @@ export const clamp = <A extends number>(min: number, max: number) =>
 export const parseString = (self: Schema<string>): Schema<number> => {
   const schema: Schema<number> = pipe(
     self,
-    I.transformOrFail(
+    I.transformEffect(
       I.number,
       (s) => {
         if (s === "NaN") {

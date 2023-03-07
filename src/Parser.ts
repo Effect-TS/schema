@@ -41,11 +41,13 @@ export const make: <A>(schema: Schema<A>, parse: Parser<A>["parse"]) => Parser<A
  * @since 1.0.0
  */
 export const decode = <A>(schema: Schema<A>) =>
-  (
-    input: unknown,
-    options?: ParseOptions
-  ): Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A> =>
-    parserForInternal(schema, input, "decoder", options)
+  (input: unknown, options?: ParseOptions): A => {
+    const t = decodeEither(schema)(input, options)
+    if (E.isLeft(t)) {
+      throw new Error(formatErrors(t.left))
+    }
+    return t.right
+  }
 
 /**
  * @category decoding
@@ -53,7 +55,7 @@ export const decode = <A>(schema: Schema<A>) =>
  */
 export const decodeEither = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): Either<NonEmptyReadonlyArray<ParseError>, A> =>
-    Effect.runSyncEither(decode(schema)(input, options))
+    Effect.runSyncEither(decodeEffect(schema)(input, options))
 
 /**
  * @category decoding
@@ -67,14 +69,51 @@ export const decodeOption = <A>(schema: Schema<A>) =>
  * @category decoding
  * @since 1.0.0
  */
-export const decodeOrThrow = <A>(schema: Schema<A>) =>
-  (input: unknown, options?: ParseOptions): A => {
-    const t = decodeEither(schema)(input, options)
+export const decodeEffect = <A>(schema: Schema<A>) =>
+  (
+    input: unknown,
+    options?: ParseOptions
+  ): Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A> =>
+    parserForInternal(schema, input, "decoder", options)
+
+/**
+ * @category encoding
+ * @since 1.0.0
+ */
+export const encode = <A>(schema: Schema<A>) =>
+  (a: A, options?: ParseOptions): unknown => {
+    const t = Effect.runSyncEither(encodeEffect(schema)(a, options))
     if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
     return t.right
   }
+
+/**
+ * @category encoding
+ * @since 1.0.0
+ */
+export const encodeEither = <A>(schema: Schema<A>) =>
+  (a: A, options?: ParseOptions): Either<NonEmptyReadonlyArray<ParseError>, unknown> =>
+    Effect.runSyncEither(encodeEffect(schema)(a, options))
+
+/**
+ * @category encoding
+ * @since 1.0.0
+ */
+export const encodeOption = <A>(schema: Schema<A>) =>
+  (a: A, options?: ParseOptions): Option<unknown> => O.fromEither(encodeEither(schema)(a, options))
+
+/**
+ * @category encoding
+ * @since 1.0.0
+ */
+export const encodeEffect = <A>(schema: Schema<A>) =>
+  (
+    input: unknown,
+    options?: ParseOptions
+  ): Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, unknown> =>
+    parserForInternal(schema, input, "encoder", options)
 
 /**
  * @category assertions
@@ -102,30 +141,6 @@ export const asserts = <A>(schema: Schema<A>) =>
     if (E.isLeft(t)) {
       throw new Error(formatErrors(t.left))
     }
-  }
-
-/**
- * @category encoding
- * @since 1.0.0
- */
-export const encode = <A>(schema: Schema<A>) =>
-  (
-    input: unknown,
-    options?: ParseOptions
-  ): Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, unknown> =>
-    parserForInternal(schema, input, "encoder", options)
-
-/**
- * @category encoding
- * @since 1.0.0
- */
-export const encodeOrThrow = <A>(schema: Schema<A>) =>
-  (a: A, options?: ParseOptions): unknown => {
-    const t = Effect.runSyncEither(encode(schema)(a, options))
-    if (E.isLeft(t)) {
-      throw new Error(formatErrors(t.left))
-    }
-    return t.right
   }
 
 const getHook = AST.getAnnotation<H.Hook<Parser<any>>>(
@@ -539,7 +554,11 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(ast),
-              (u) => Effect.flatMap(from.parse(u), (a) => ast.decode(a))
+              (u) =>
+                Effect.flatMap(
+                  Effect.service(ParseOptions),
+                  (options) => Effect.flatMap(from.parse(u), (a) => ast.decode(a, options))
+                )
             )
           }
           case "guard":
@@ -548,7 +567,11 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode)),
-              (a) => Effect.flatMap(ast.encode(a), (a) => from.parse(a))
+              (a) =>
+                Effect.flatMap(
+                  Effect.service(ParseOptions),
+                  (options) => Effect.flatMap(ast.encode(a, options), (a) => from.parse(a))
+                )
             )
           }
         }
