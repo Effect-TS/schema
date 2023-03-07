@@ -1385,7 +1385,7 @@ console.log(isDeprecated(schema)); // true
 
 # Documentation
 
-- [API Reference](https://fp-ts.github.io/schema/)
+- [API Reference](https://effect-ts.github.io/schema/)
 
 # License
 
