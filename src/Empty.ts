@@ -52,7 +52,18 @@ export const match: AST.Match<Empty<any>> = {
   Literal: (ast) => make(I.makeSchema(ast), () => ast.literal),
   SymbolKeyword: constant(""),
   UniqueSymbol: (ast) => make(I.makeSchema(ast), () => JSON.stringify(ast.symbol.toString())),
-  TemplateLiteral: constant(""),
+  TemplateLiteral: (ast) => {
+    return make(
+      I.makeSchema(ast),
+      () => {
+        const components = [ast.head]
+        for (const span of ast.spans) {
+          components.push(span.literal)
+        }
+        return components.join("")
+      }
+    )
+  },
   UndefinedKeyword: constant(undefined),
   UnknownKeyword: constant(undefined),
   AnyKeyword: constant(undefined),

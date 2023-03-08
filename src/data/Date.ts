@@ -6,6 +6,7 @@ import { isDate } from "@effect/data/Predicate"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
+import type { Empty } from "@effect/schema/Empty"
 import * as I from "@effect/schema/internal/common"
 import type * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
@@ -17,6 +18,8 @@ const parser = (): P.Parser<Date> =>
 
 const arbitrary = (): Arbitrary<Date> => I.makeArbitrary(date, (fc) => fc.date())
 
+const empty = (): Empty<Date> => I.makeEmpty(date, () => new Date(0))
+
 const pretty = (): Pretty<Date> => I.makePretty(date, (date) => `new Date(${JSON.stringify(date)})`)
 
 /**
@@ -26,7 +29,8 @@ export const date: Schema<Date> = I.typeAlias([], I.struct({}), {
   [IdentifierId]: "Date",
   [H.ParserHookId]: H.hook(parser),
   [H.PrettyHookId]: H.hook(pretty),
-  [H.ArbitraryHookId]: H.hook(arbitrary)
+  [H.ArbitraryHookId]: H.hook(arbitrary),
+  [H.EmptyHookId]: H.hook(empty)
 })
 
 /**

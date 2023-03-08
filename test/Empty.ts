@@ -11,6 +11,11 @@ describe("Empty", () => {
     expect(empty).toBe(false)
   })
 
+  it("date", () => {
+    const empty = _.empty(S.date)
+    expect(empty).toEqual(new Date(0))
+  })
+
   it("string", () => {
     const empty = _.empty(S.string)
     expect(empty).toBe("")
@@ -19,6 +24,13 @@ describe("Empty", () => {
   it("number", () => {
     const empty = _.empty(S.number)
     expect(empty).toBe(0)
+  })
+
+  it("template literal", () => {
+    const schema = S.templateLiteral(S.literal("a"), S.string, S.literal("b"))
+    const empty = _.empty(schema)
+
+    expect(empty).toBe("ab")
   })
 
   it("transform", () => {
