@@ -42,7 +42,7 @@ const arbitrary = <E, A>(
   )
 }
 
-export const empty = <E, A>(
+const empty = <E, A>(
   left: Empty.Empty<E>,
   right: Empty.Empty<A>
 ): Empty.Empty<Either<E, A>> => {
