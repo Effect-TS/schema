@@ -30,3 +30,8 @@ export const ParserHookId = "@effect/schema/annotation/ParserHookId"
  * @since 1.0.0
  */
 export const PrettyHookId = "@effect/schema/annotation/PrettyHookId"
+
+/**
+ * @since 1.0.0
+ */
+export const EmptyHookId = "@effect/schema/annotation/EmptyHookId"

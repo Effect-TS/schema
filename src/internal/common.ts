@@ -11,6 +11,7 @@ import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/annotation/AST"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
+import type { Empty } from "@effect/schema/Empty"
 import type { Parser } from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
@@ -40,6 +41,12 @@ export const makeArbitrary = <A>(
   schema: S.Schema<A>,
   arbitrary: Arbitrary<A>["arbitrary"]
 ): Arbitrary<A> => ({ ast: schema.ast, arbitrary }) as any
+
+/** @internal */
+export const makeEmpty = <A>(
+  schema: S.Schema<A>,
+  empty: Empty<A>["empty"]
+): Empty<A> => ({ ast: schema.ast, empty }) as any
 
 /** @internal */
 export const makeParser = <A>(
