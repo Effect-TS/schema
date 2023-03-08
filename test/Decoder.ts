@@ -81,6 +81,52 @@ describe.concurrent("Decoder", () => {
     Util.expectEncodingSuccess(schema, { a: "a", b: O.some(1) }, { a: "a", b: 1 })
   })
 
+  it("parseOptional", () => {
+    const parseOptional = <K extends PropertyKey, V>(key: K, value: S.Schema<V>) =>
+      <A extends object>(
+        schema: S.Schema<A>
+      ): S.Schema<S.Spread<A & { readonly [k in K]: O.Option<V> }>> => {
+        const from = pipe(
+          schema,
+          S.extend(S.struct({ [key]: S.optional(S.union(S.undefined, S.null, value)) }))
+        )
+        const to = pipe(schema, S.extend(S.struct({ [key]: S.option(value) })))
+        return pipe(
+          from,
+          S.transform(to, (o: any) => ({ ...o, [key]: O.fromNullable(o[key]) }), (o) => {
+            const { [key]: option, ...rest } = o
+            if (O.isSome(option)) {
+              rest[key] = option.value
+            }
+            return rest
+          })
+        )
+      }
+
+    const schema = pipe(S.struct({ a: S.string }), parseOptional("b", S.number))
+
+    Util.expectDecodingSuccess(schema, { a: "a" }, { a: "a", b: O.none() })
+    Util.expectDecodingSuccess(schema, { a: "a", b: undefined }, { a: "a", b: O.none() })
+    Util.expectDecodingSuccess(schema, { a: "a", b: null }, { a: "a", b: O.none() })
+    Util.expectDecodingSuccess(schema, { a: "a", b: 1 }, { a: "a", b: O.some(1) })
+
+    Util.expectDecodingFailureTree(
+      schema,
+      { a: "a", b: "b" },
+      `1 error(s) found
+└─ key "b"
+   ├─ union member
+   │  └─ Expected undefined, actual "b"
+   ├─ union member
+   │  └─ Expected null, actual "b"
+   └─ union member
+      └─ Expected number, actual "b"`
+    )
+
+    Util.expectEncodingSuccess(schema, { a: "a", b: O.none() }, { a: "a" })
+    Util.expectEncodingSuccess(schema, { a: "a", b: O.some(1) }, { a: "a", b: 1 })
+  })
+
   it("type alias without annotations", () => {
     const schema = S.typeAlias([], S.string)
     Util.expectDecodingSuccess(schema, "a", "a")
