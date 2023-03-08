@@ -9,6 +9,7 @@ import * as Hash from "@effect/data/Hash"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
+import * as Empty from "@effect/schema/Empty"
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
@@ -38,6 +39,16 @@ const arbitrary = <E, A>(
   return A.make(
     either(left, right),
     (fc) => struct(fc).map(E.match((e) => E.left(e), (a) => E.right(a)))
+  )
+}
+
+export const empty = <E, A>(
+  left: Empty.Empty<E>,
+  right: Empty.Empty<A>
+): Empty.Empty<Either<E, A>> => {
+  return Empty.make(
+    either(left, right),
+    () => E.left(left.empty())
   )
 }
 
@@ -83,5 +94,6 @@ export const either = <E, A>(
     [IdentifierId]: "Either",
     [H.ParserHookId]: H.hook(parser),
     [H.PrettyHookId]: H.hook(pretty),
-    [H.ArbitraryHookId]: H.hook(arbitrary)
+    [H.ArbitraryHookId]: H.hook(arbitrary),
+    [H.EmptyHookId]: H.hook(empty)
   })

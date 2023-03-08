@@ -1,21 +1,23 @@
+import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
-import * as E from "@effect/schema/Empty"
+import { either } from "@effect/schema/data/Either"
+import * as _ from "@effect/schema/Empty"
 import * as S from "@effect/schema/Schema"
 
 describe("Empty", () => {
   it("boolean", () => {
-    const empty = E.empty(S.boolean)
+    const empty = _.empty(S.boolean)
     expect(empty).toBe(false)
   })
 
   it("string", () => {
-    const empty = E.empty(S.string)
+    const empty = _.empty(S.string)
     expect(empty).toBe("")
   })
 
   it("number", () => {
-    const empty = E.empty(S.number)
+    const empty = _.empty(S.number)
     expect(empty).toBe(0)
   })
 
@@ -24,35 +26,46 @@ describe("Empty", () => {
       S.string,
       S.transform(S.tuple(S.string), (s) => [s], ([s]) => s)
     )
-    const empty = E.empty(schema)
+    const empty = _.empty(schema)
 
     expect(empty).toEqual([""])
   })
 
   it("option", () => {
     const schema = S.option(S.string)
-    const empty = E.empty(schema)
+    const empty = _.empty(schema)
 
     expect(empty).toEqual(O.none())
   })
 
+  it("either", () => {
+    const schemaStr = either(S.string, S.number)
+    const emptyStr = _.empty(schemaStr)
+
+    const schemaNum = either(S.number, S.number)
+    const emptyNum = _.empty(schemaNum)
+
+    expect(emptyStr).toEqual(E.left(""))
+    expect(emptyNum).toEqual(E.left(0))
+  })
+
   it("bigint", () => {
-    const empty = E.empty(S.bigint)
+    const empty = _.empty(S.bigint)
     expect(empty).toBe(0n)
   })
 
   it("array", () => {
-    const empty = E.empty(S.array(S.string))
+    const empty = _.empty(S.array(S.string))
     expect(empty).toEqual([])
   })
 
   it("tuple", () => {
-    const empty = E.empty(S.tuple(S.string, S.number))
+    const empty = _.empty(S.tuple(S.string, S.number))
     expect(empty).toEqual(["", 0])
   })
 
   it("record", () => {
-    const empty = E.empty(S.record(S.string, S.number))
+    const empty = _.empty(S.record(S.string, S.number))
     expect(empty).toEqual({})
   })
 
@@ -63,25 +76,25 @@ describe("Empty", () => {
       c: S.array(S.number),
       d: S.optional(S.boolean)
     })
-    const empty = E.empty(schema)
+    const empty = _.empty(schema)
 
     expect(empty).toEqual({ a: "", b: 0, c: [] })
   })
 
   it("struct - partial", () => {
     const schema = S.partial(S.struct({ a: S.string, b: S.number }))
-    const empty = E.empty(schema)
+    const empty = _.empty(schema)
 
     expect(empty).toEqual({})
   })
 
   it("object", () => {
-    const empty = E.empty(S.object)
+    const empty = _.empty(S.object)
     expect(empty).toEqual({})
   })
 
   it("literal", () => {
-    const empty = E.empty(S.literal(1))
+    const empty = _.empty(S.literal(1))
     expect(empty).toBe(1)
   })
 
@@ -91,13 +104,13 @@ describe("Empty", () => {
       b = "b"
     }
 
-    const empty = E.empty(S.enums(e))
+    const empty = _.empty(S.enums(e))
     expect(empty).toBe(e.a)
   })
 
   it("union", () => {
     const schema = S.union(S.number, S.string)
-    const empty = E.empty(schema)
+    const empty = _.empty(schema)
 
     expect(empty).toEqual(0)
   })
@@ -108,22 +121,22 @@ describe("Empty", () => {
       S.struct({ type: S.literal("b"), b: S.number })
     )
 
-    const empty = E.empty(schema)
+    const empty = _.empty(schema)
     expect(empty).toEqual({ type: "a", a: "" })
   })
 
   it("void", () => {
-    const empty = E.empty(S.void)
+    const empty = _.empty(S.void)
     expect(empty).toBeUndefined()
   })
 
   it("any", () => {
-    const empty = E.empty(S.any)
+    const empty = _.empty(S.any)
     expect(empty).toBeUndefined()
   })
 
   it("unknown", () => {
-    const empty = E.empty(S.undefined)
+    const empty = _.empty(S.undefined)
     expect(empty).toBeUndefined()
   })
 })
