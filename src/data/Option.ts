@@ -9,6 +9,7 @@ import * as O from "@effect/data/Option"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import * as A from "@effect/schema/Arbitrary"
+import type { Empty } from "@effect/schema/Empty"
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
@@ -46,6 +47,12 @@ const pretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
     )
   )
 
+const empty = <A>(value: Empty<A>): Empty<Option<A>> =>
+  I.makeEmpty(
+    option(value),
+    O.none
+  )
+
 const inline = <A>(value: Schema<A>): Schema<Option<A>> =>
   I.union(
     I.struct({
@@ -72,7 +79,8 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> => {
       [IdentifierId]: "Option",
       [H.ParserHookId]: H.hook(parser),
       [H.PrettyHookId]: H.hook(pretty),
-      [H.ArbitraryHookId]: H.hook(arbitrary)
+      [H.ArbitraryHookId]: H.hook(arbitrary),
+      [H.EmptyHookId]: H.hook(empty)
     }
   )
 }

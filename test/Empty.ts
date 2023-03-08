@@ -1,4 +1,5 @@
 import { pipe } from "@effect/data/Function"
+import * as O from "@effect/data/Option"
 import * as E from "@effect/schema/Empty"
 import * as S from "@effect/schema/Schema"
 
@@ -26,6 +27,13 @@ describe("Empty", () => {
     const empty = E.empty(schema)
 
     expect(empty).toEqual([""])
+  })
+
+  it("option", () => {
+    const schema = S.option(S.string)
+    const empty = E.empty(schema)
+
+    expect(empty).toEqual(O.none())
   })
 
   it("bigint", () => {
