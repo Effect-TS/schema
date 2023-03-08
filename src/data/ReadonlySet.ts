@@ -5,6 +5,7 @@ import { pipe } from "@effect/data/Function"
 import { IdentifierId } from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
+import type { Empty } from "@effect/schema/Empty"
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
@@ -32,6 +33,9 @@ const parser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
 const arbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
   I.makeArbitrary(readonlySet(item), (fc) => fc.array(item.arbitrary(fc)).map((as) => new Set(as)))
 
+const empty = <A>(item: Empty<A>): Empty<ReadonlySet<A>> =>
+  I.makeEmpty(readonlySet(item), () => new Set())
+
 const pretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
   I.makePretty(
     readonlySet(item),
@@ -51,7 +55,8 @@ export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
       [IdentifierId]: "ReadonlySet",
       [H.ParserHookId]: H.hook(parser),
       [H.PrettyHookId]: H.hook(pretty),
-      [H.ArbitraryHookId]: H.hook(arbitrary)
+      [H.ArbitraryHookId]: H.hook(arbitrary),
+      [H.EmptyHookId]: H.hook(empty)
     }
   )
 

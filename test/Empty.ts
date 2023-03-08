@@ -2,6 +2,7 @@ import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import { either } from "@effect/schema/data/Either"
+import * as RS from "@effect/schema/data/ReadonlySet"
 import * as _ from "@effect/schema/Empty"
 import * as S from "@effect/schema/Schema"
 
@@ -9,6 +10,11 @@ describe("Empty", () => {
   it("boolean", () => {
     const empty = _.empty(S.boolean)
     expect(empty).toBe(false)
+  })
+
+  it("set", () => {
+    const empty = _.empty(RS.readonlySet(S.number))
+    expect(empty).toEqual(new Set())
   })
 
   it("date", () => {
@@ -72,7 +78,8 @@ describe("Empty", () => {
   })
 
   it("tuple", () => {
-    const empty = _.empty(S.tuple(S.string, S.number))
+    const schema = pipe(S.tuple(S.string, S.number), S.rest(S.boolean))
+    const empty = _.empty(schema)
     expect(empty).toEqual(["", 0])
   })
 
@@ -82,15 +89,20 @@ describe("Empty", () => {
   })
 
   it("struct", () => {
-    const schema = S.struct({
-      a: S.string,
-      b: S.number,
-      c: S.array(S.number),
-      d: S.optional(S.boolean)
-    })
+    const schema = pipe(
+      S.struct({
+        a: S.string,
+        b: S.number,
+        c: S.array(S.number),
+        d: S.optional(S.boolean),
+        e: S.struct({
+          f: S.tuple(S.number, S.literal("literal"))
+        })
+      })
+    )
     const empty = _.empty(schema)
 
-    expect(empty).toEqual({ a: "", b: 0, c: [] })
+    expect(empty).toEqual({ a: "", b: 0, c: [], e: { f: [0, "literal"] } })
   })
 
   it("struct - partial", () => {
