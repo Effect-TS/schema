@@ -503,6 +503,7 @@ export interface PropertySignature extends Annotated {
   readonly type: AST
   readonly isOptional: boolean
   readonly isReadonly: boolean
+  readonly parseOptional: boolean
 }
 
 /**
@@ -513,8 +514,9 @@ export const createPropertySignature = (
   type: AST,
   isOptional: boolean,
   isReadonly: boolean,
+  parseOptional = false,
   annotations: Annotated["annotations"] = {}
-): PropertySignature => ({ name, type, isOptional, isReadonly, annotations })
+): PropertySignature => ({ name, type, isOptional, isReadonly, parseOptional, annotations })
 
 /**
  * @since 1.0.0
@@ -842,7 +844,14 @@ export const partial = (ast: AST): AST => {
     case "TypeLiteral":
       return createTypeLiteral(
         ast.propertySignatures.map((f) =>
-          createPropertySignature(f.name, f.type, true, f.isReadonly, f.annotations)
+          createPropertySignature(
+            f.name,
+            f.type,
+            true,
+            f.isReadonly,
+            f.parseOptional,
+            f.annotations
+          )
         ),
         ast.indexSignatures
       )

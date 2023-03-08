@@ -839,7 +839,7 @@ describe.concurrent("TypeScript", () => {
     it("property signatures", () => {
       const schema = S.make(AST.createTypeLiteral(
         [
-          AST.createPropertySignature("a", AST.stringKeyword, false, true, {
+          AST.createPropertySignature("a", AST.stringKeyword, false, true, false, {
             [annotations.DocumentationId]: "description"
           })
         ],

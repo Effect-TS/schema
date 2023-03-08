@@ -214,10 +214,21 @@ const OptionalSchemaId = Symbol.for("@effect/schema/Schema/OptionalSchema")
 const isOptionalSchema = <A>(schema: object): schema is S.OptionalSchema<A> =>
   schema["_id"] === OptionalSchemaId
 
+const ParseOptionalSchemaId = Symbol.for("@effect/schema/Schema/ParseOptionalSchema")
+
+const isParseOptionalSchema = (schema: object): boolean => schema["_id"] === ParseOptionalSchemaId
+
 /** @internal */
 export const optional = <A>(schema: S.Schema<A>): S.OptionalSchema<A> => {
   const out: any = makeSchema(schema.ast)
   out["_id"] = OptionalSchemaId
+  return out
+}
+
+/** @internal */
+export const parseOptional = <A>(schema: S.Schema<A>): S.Schema<A> => {
+  const out: any = makeSchema(schema.ast)
+  out["_id"] = ParseOptionalSchemaId
   return out
 }
 
@@ -234,14 +245,17 @@ export const struct = <
 > =>
   makeSchema(
     AST.createTypeLiteral(
-      Reflect.ownKeys(fields).map((key) =>
-        AST.createPropertySignature(
+      Reflect.ownKeys(fields).map((key) => {
+        const isParseOptional = isParseOptionalSchema(fields[key])
+        const isOptional = isParseOptional || isOptionalSchema(fields[key])
+        return AST.createPropertySignature(
           key,
           (fields[key] as any).ast,
-          isOptionalSchema(fields[key]),
-          true
+          isOptional,
+          true,
+          isParseOptional
         )
-      ),
+      }),
       []
     )
   )

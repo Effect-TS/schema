@@ -85,3 +85,13 @@ export const parseNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
     I.union(I._undefined, I.nullable(value)),
     I.transform(option(value), O.fromNullable, O.getOrNull)
   )
+
+/**
+ * @since 1.0.0
+ */
+export const optionFromOptional = <A>(value: Schema<A>): Schema<Option<A>> =>
+  pipe(
+    value,
+    parseNullable,
+    I.parseOptional
+  )

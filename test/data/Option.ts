@@ -70,4 +70,20 @@ describe.concurrent("Option", () => {
     Util.expectEncodingSuccess(schema, O.none(), null)
     Util.expectEncodingSuccess(schema, O.some(1), "1")
   })
+
+  it("optionFromOptional. Decoder", () => {
+    const schema = S.struct({
+      a: _.optionFromOptional(S.number)
+    })
+    Util.expectDecodingSuccess(schema, {}, { a: O.none() })
+    Util.expectDecodingSuccess(schema, { a: 1 }, { a: O.some(1) })
+  })
+
+  it("optionFromOptional. Encoder", () => {
+    const schema = S.struct({
+      a: _.optionFromOptional(S.number)
+    })
+    Util.expectEncodingSuccess(schema, { a: O.none() }, { a: null })
+    Util.expectEncodingSuccess(schema, { a: O.some(1) }, { a: 1 })
+  })
 })

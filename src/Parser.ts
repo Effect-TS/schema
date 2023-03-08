@@ -307,7 +307,7 @@ const parserFor = <A>(
               const parser = propertySignaturesTypes[i]
               const name = ps.name
               expectedKeys[name] = null
-              if (!Object.prototype.hasOwnProperty.call(input, name)) {
+              if (!Object.prototype.hasOwnProperty.call(input, name) && !ps.parseOptional) {
                 if (!ps.isOptional) {
                   const e = PR.key(name, [PR.missing])
                   if (allErrors) {

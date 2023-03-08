@@ -499,6 +499,12 @@ export interface OptionalSchema<A> {
 export const optional: <A>(schema: Schema<A>) => OptionalSchema<A> = I.optional
 
 /**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const parseOptional: <A>(schema: Schema<A>) => Schema<A> = I.parseOptional
+
+/**
  * @since 1.0.0
  */
 export type OptionalKeys<T> = {
