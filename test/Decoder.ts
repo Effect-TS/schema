@@ -1,7 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as S from "@effect/schema"
-import type { ParseOptions } from "@effect/schema/AST"
+import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 import * as Util from "@effect/schema/test/util"
 
@@ -125,6 +125,113 @@ describe.concurrent("Decoder", () => {
 
     Util.expectEncodingSuccess(schema, { a: "a", b: O.none() }, { a: "a" })
     Util.expectEncodingSuccess(schema, { a: "a", b: O.some(1) }, { a: "a", b: 1 })
+
+    // ----------------------------
+    // custom struct combinator
+    // ----------------------------
+
+    const ParseOptionalSchemaId = Symbol.for("@effect/schema/Schema/ParseOptionalSchema")
+
+    const isParseOptionalSchema = (schema: object): boolean =>
+      schema["_id"] === ParseOptionalSchemaId
+
+    const parseOptionalSchema = <A>(schema: S.Schema<A>): S.Schema<O.Option<A>> => {
+      const out: any = S.make(schema.ast)
+      out["_id"] = ParseOptionalSchemaId
+      return out
+    }
+
+    const struct: typeof S.struct = (fields) => {
+      const parseOptionalKeys: ReadonlyArray<PropertyKey> = Reflect.ownKeys(fields).filter((key) =>
+        isParseOptionalSchema(fields[key])
+      )
+      const original = S.struct(fields)
+      if (parseOptionalKeys.length === 0) {
+        return original
+      }
+      const propertySignatures = (original.ast as AST.TypeLiteral).propertySignatures
+      const from = S.make<any>(AST.createTypeLiteral(
+        propertySignatures.map((p) =>
+          parseOptionalKeys.includes(p.name) ?
+            AST.createPropertySignature(
+              p.name,
+              AST.createUnion([AST.undefinedKeyword, AST.createLiteral(null), p.type]),
+              true,
+              p.isReadonly
+            ) :
+            p
+        ),
+        []
+      ))
+      const to = S.make<any>(AST.createTypeLiteral(
+        propertySignatures.map((p) =>
+          parseOptionalKeys.includes(p.name) ?
+            AST.createPropertySignature(
+              p.name,
+              S.option(S.make(p.type)).ast,
+              p.isOptional,
+              p.isReadonly
+            ) :
+            p
+        ),
+        []
+      ))
+      const out = pipe(
+        from,
+        S.transform(
+          to,
+          (o: any) => {
+            const out = { ...o }
+            for (const key of parseOptionalKeys) {
+              out[key] = O.fromNullable(o[key])
+            }
+            return out
+          },
+          (o) => {
+            const out = { ...o }
+            for (const key of parseOptionalKeys) {
+              if (O.isSome(o[key])) {
+                out[key] = o[key].value
+              } else {
+                delete out[key]
+              }
+            }
+            return out
+          }
+        )
+      )
+      return out
+    }
+
+    // ----------------------------
+    // example
+    // ----------------------------
+
+    const schema2 = struct({
+      a: S.string,
+      b: parseOptionalSchema(S.number)
+    })
+
+    Util.expectDecodingSuccess(schema2, { a: "a" }, { a: "a", b: O.none() })
+    Util.expectDecodingSuccess(schema2, { a: "a", b: undefined }, { a: "a", b: O.none() })
+    Util.expectDecodingSuccess(schema2, { a: "a", b: null }, { a: "a", b: O.none() })
+    Util.expectDecodingSuccess(schema2, { a: "a", b: 1 }, { a: "a", b: O.some(1) })
+
+    Util.expectDecodingFailureTree(
+      schema2,
+      { a: "a", b: "b" },
+      `1 error(s) found
+└─ key "b"
+   ├─ union member
+   │  └─ Expected undefined, actual "b"
+   ├─ union member
+   │  └─ Expected null, actual "b"
+   └─ union member
+      └─ Expected number, actual "b"`
+    )
+
+    Util.expectEncodingSuccess(schema2, { a: "a", b: O.none() }, { a: "a" })
+    Util.expectEncodingSuccess(schema2, { a: "a", b: O.some(1) }, { a: "a", b: 1 })
   })
 
   it("type alias without annotations", () => {
@@ -1204,7 +1311,7 @@ describe.concurrent("Decoder", () => {
   // isUnexpectedAllowed option
   // ---------------------------------------------
 
-  const isUnexpectedAllowed: ParseOptions = {
+  const isUnexpectedAllowed: AST.ParseOptions = {
     isUnexpectedAllowed: true
   }
 
@@ -1295,7 +1402,7 @@ describe.concurrent("Decoder", () => {
   // allErrors option
   // ---------------------------------------------
 
-  const allErrors: ParseOptions = {
+  const allErrors: AST.ParseOptions = {
     allErrors: true
   }
 
