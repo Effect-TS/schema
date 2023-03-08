@@ -2,7 +2,6 @@
  * @since 1.0.0
  */
 
-import * as Context from "@effect/data/Context"
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
@@ -661,12 +660,6 @@ export interface ParseOptions {
   readonly isUnexpectedAllowed?: boolean
   readonly allErrors?: boolean
 }
-
-/**
- * @category context
- * @since 1.0.0
- */
-export const ParseOptions = Context.Tag<ParseOptions>()
 
 /**
  * @category constructors

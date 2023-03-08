@@ -3,17 +3,17 @@
  */
 
 import type { Either } from "@effect/data/Either"
-import { dual } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as RA from "@effect/data/ReadonlyArray"
+import * as Debug from "@effect/io/Debug"
 import * as Effect from "@effect/io/Effect"
 import * as A from "@effect/schema/annotation/AST"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
-import * as PE from "@effect/schema/ParseError"
 import type { ParseError } from "@effect/schema/ParseError"
+import * as PE from "@effect/schema/ParseError"
 import type { Parser } from "@effect/schema/Parser"
 import type { Pretty } from "@effect/schema/Pretty"
 import type {
@@ -45,20 +45,24 @@ export const makeArbitrary = <A>(
 ): Arbitrary<A> => ({ ast: schema.ast, arbitrary }) as any
 
 /** @internal */
-export const makeParser = <A>(
-  schema: Schema<A>,
-  parse: Parser<A>["parse"]
-): Parser<A> => ({ ast: schema.ast, parse }) as any
+export const makeParser = Debug.untracedMethod((restore) =>
+  <A>(
+    schema: Schema<A>,
+    parse: Parser<A>["parse"]
+  ): Parser<A> => ({ ast: schema.ast, parse: restore(parse) }) as any
+)
 
 /** @internal */
-export const fromRefinement = <A>(
-  schema: Schema<A>,
-  refinement: (u: unknown) => u is A
-): Parser<A> =>
-  makeParser(
-    schema,
-    (u) => refinement(u) ? Effect.succeed(u) : Effect.fail(RA.of(PE.type(schema.ast, u)))
-  )
+export const fromRefinement = Debug.untracedMethod((restore) =>
+  <A>(
+    schema: Schema<A>,
+    refinement: (u: unknown) => u is A
+  ): Parser<A> =>
+    makeParser(
+      schema,
+      (u) => restore(refinement)(u) ? Effect.succeed(u) : Effect.fail(RA.of(PE.type(schema.ast, u)))
+    )
+)
 
 /** @internal */
 export const makePretty = <A>(
@@ -144,7 +148,7 @@ export function filter<A>(
 }
 
 /** @internal */
-export const transform = dual<
+export const transform = Debug.untracedDual<
   <A, B>(
     to: Schema<B>,
     ab: (a: A) => B,
@@ -158,12 +162,18 @@ export const transform = dual<
   ) => Schema<B>
 >(
   4,
-  (self, to, ab, ba) =>
-    transformEffect(self, to, (a) => Effect.succeed(ab(a)), (b) => Effect.succeed(ba(b)))
+  (restore) =>
+    (self, to, ab, ba) =>
+      transformEffect(
+        self,
+        to,
+        (a) => Effect.succeed(restore(ab)(a)),
+        (b) => Effect.succeed(restore(ba)(b))
+      )
 )
 
 /** @internal */
-export const transformEither = dual<
+export const transformEither = Debug.untracedDual<
   <A, B>(
     to: Schema<B>,
     decode: (
@@ -189,16 +199,17 @@ export const transformEither = dual<
   ) => Schema<B>
 >(
   4,
-  (self, to, decode, encode) =>
-    transformEffect(
-      self,
-      to,
-      (a, options) => Effect.fromEither(decode(a, options)),
-      (b, options) => Effect.fromEither(encode(b, options))
-    )
+  (restore) =>
+    (self, to, decode, encode) =>
+      transformEffect(
+        self,
+        to,
+        (a, options) => Effect.fromEither(restore(decode)(a, options)),
+        (b, options) => Effect.fromEither(restore(encode)(b, options))
+      )
 )
 
-export const transformEffect = dual<
+export const transformEffect = Debug.untracedDual<
   <A, B>(
     to: Schema<B>,
     decode: (
@@ -224,7 +235,9 @@ export const transformEffect = dual<
   ) => Schema<B>
 >(
   4,
-  (self, to, decode, encode) => makeSchema(AST.createTransform(self.ast, to.ast, decode, encode))
+  (restore) =>
+    (self, to, decode, encode) =>
+      makeSchema(AST.createTransform(self.ast, to.ast, restore(decode), restore(encode)))
 )
 
 const makeLiteral = <Literal extends AST.LiteralValue>(value: Literal): Schema<Literal> =>

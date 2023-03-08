@@ -4,7 +4,6 @@ import { isNumber } from "@effect/data/Number"
 import { isRecord } from "@effect/data/Predicate"
 import { isString } from "@effect/data/String"
 import * as Effect from "@effect/io/Effect"
-import { ParseOptions } from "@effect/schema/AST"
 import type { Json, JsonArray, JsonObject } from "@effect/schema/data/Json"
 import { json } from "@effect/schema/data/Json"
 import * as _ from "@effect/schema/formatter/Tree"
@@ -30,8 +29,7 @@ describe.concurrent("Tree", () => {
       (u): u is string | number => isString(u) || isNumber(u)
     )
     const result = pipe(
-      parser.parse(null),
-      Effect.provideService(ParseOptions, {}),
+      parser.parse(null, {}),
       Effect.runSyncEither
     )
     expect(E.mapLeft(result, _.formatErrors)).toEqual(
@@ -54,8 +52,7 @@ describe.concurrent("Tree", () => {
 
     const parser = I.fromRefinement(json, isJson)
     const result = pipe(
-      parser.parse(undefined),
-      Effect.provideService(ParseOptions, {}),
+      parser.parse(undefined, {}),
       Effect.runSyncEither
     )
     expect(E.mapLeft(result, _.formatErrors)).toEqual(
