@@ -1,3 +1,4 @@
+import { pipe } from "@effect/data/Function"
 import * as E from "@effect/schema/Empty"
 import * as S from "@effect/schema/Schema"
 
@@ -15,6 +16,16 @@ describe("Empty", () => {
   it("number", () => {
     const empty = E.empty(S.number)
     expect(empty).toBe(0)
+  })
+
+  it("transform", () => {
+    const schema: S.Schema<readonly [string]> = pipe(
+      S.string,
+      S.transform(S.tuple(S.string), (s) => [s], ([s]) => s)
+    )
+    const empty = E.empty(schema)
+
+    expect(empty).toEqual([""])
   })
 
   it("bigint", () => {
