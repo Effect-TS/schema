@@ -573,10 +573,9 @@ const UserId = B.nominal<UserId>();
 
 import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema";
-import { brand } from "@effect/schema/data/Brand";
 
 // Define a schema for the branded type
-const UserIdSchema = pipe(S.string, brand(UserId));
+const UserIdSchema = pipe(S.string, S.fromBrand(UserId));
 ```
 
 ## Native enums

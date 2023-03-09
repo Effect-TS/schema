@@ -966,7 +966,7 @@ export const clamp: <A extends number>(
 ) => (self: Schema<A>) => Schema<A> = N.clamp
 
 // ---------------------------------------------
-// Bigint
+// data/Bigint
 // ---------------------------------------------
 
 /**
@@ -984,7 +984,7 @@ export const greaterThanBigint = <A extends bigint>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter((a): a is A => a > min, {
+      filter((a): a is A => a > min, {
         typeId: GreaterThanBigintTypeId,
         description: `a bigint greater than ${min}n`,
         jsonSchema: { exclusiveMinimum: min },
@@ -1007,7 +1007,7 @@ export const greaterThanOrEqualToBigint = <A extends bigint>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter((a): a is A => a >= min, {
+      filter((a): a is A => a >= min, {
         typeId: GreaterThanOrEqualToBigintTypeId,
         description: `a bigint greater than or equal to ${min}n`,
         jsonSchema: { minimum: min },
@@ -1030,7 +1030,7 @@ export const lessThanBigint = <A extends bigint>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter((a): a is A => a < max, {
+      filter((a): a is A => a < max, {
         typeId: LessThanBigintTypeId,
         description: `a bigint less than ${max}n`,
         jsonSchema: { exclusiveMaximum: max },
@@ -1053,7 +1053,7 @@ export const lessThanOrEqualToBigint = <A extends bigint>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter((a): a is A => a <= max, {
+      filter((a): a is A => a <= max, {
         typeId: LessThanOrEqualToBigintTypeId,
         description: `a bigint less than or equal to ${max}n`,
         jsonSchema: { maximum: max },
@@ -1077,7 +1077,7 @@ export const betweenBigint = <A extends bigint>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter((a): a is A => a >= min && a <= max, {
+      filter((a): a is A => a >= min && a <= max, {
         typeId: BetweenBigintTypeId,
         description: `a bigint between ${min}n and ${max}n`,
         jsonSchema: { maximum: max, minimum: min },
@@ -1162,9 +1162,40 @@ export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.transform(
+      transform(
         pipe(self, betweenBigint(min, max)),
         (self) => B.clamp(self, min, max) as A,
         (self) => B.clamp(self, min, max) as A
+      )
+    )
+
+// ---------------------------------------------
+// data/Brand
+// ---------------------------------------------
+
+/**
+ * @since 1.0.0
+ */
+export const BrandTypeId = "@effect/schema/BrandTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const fromBrand = <C extends Brand<string>>(
+  constructor: Brand.Constructor<C>,
+  annotationOptions?: AnnotationOptions<Brand.Unbranded<C>>
+) =>
+  <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> =>
+    pipe(
+      self,
+      filter<A, A & C>(
+        (x): x is A & C => constructor.refine(x),
+        {
+          typeId: BrandTypeId,
+          message: (a) =>
+            (constructor.either(a) as E.Left<Brand.BrandErrors>).left.map((v) => v.message)
+              .join(", "),
+          ...annotationOptions
+        }
       )
     )

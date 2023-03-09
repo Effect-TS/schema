@@ -1,7 +1,6 @@
 import * as B from "@effect/data/Brand"
 import { pipe } from "@effect/data/Function"
-import * as _ from "@effect/schema/data/Brand"
-import * as S from "@effect/schema/Schema"
+import * as S from "@effect/schema"
 import * as Util from "@effect/schema/test/util"
 
 type Int = number & B.Brand<"Int">
@@ -23,17 +22,13 @@ type Eur = number & B.Brand<"Eur">
 const Eur = B.nominal<Eur>()
 
 describe.concurrent("Brand", () => {
-  it("exports", () => {
-    expect(_.BrandTypeId).exist
-  })
-
   it("property tests", () => {
-    Util.property(_.brand(Int)(S.number)) // refined
-    Util.property(_.brand(Eur)(S.number)) // nominal
+    Util.property(S.fromBrand(Int)(S.number)) // refined
+    Util.property(S.fromBrand(Eur)(S.number)) // nominal
   })
 
   it("refined", () => {
-    const schema = pipe(S.number, _.brand(B.all(Positive, Int)))
+    const schema = pipe(S.number, S.fromBrand(B.all(Positive, Int)))
 
     Util.expectDecodingFailure(
       schema,
