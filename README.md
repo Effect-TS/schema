@@ -1065,7 +1065,7 @@ decodeOrThrow(" a "); // "a"
 
 ### Number transformations
 
-#### parseString
+#### numberFromString
 
 Transforms a `string` into a `number` by parsing the string using `parseFloat`.
 
@@ -1073,9 +1073,8 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 
 ```ts
 import * as S from "@effect/schema";
-import { parseString } from "@effect/schema/data/Number";
 
-const schema = parseString(S.string);
+const schema = S.numberFromString(S.string);
 const decodeOrThrow = S.decodeOrThrow(schema);
 
 // success cases
@@ -1125,15 +1124,14 @@ decodeOrThrow(3n); // 1n
 
 ### Date transformations
 
-#### parseString
+#### dateFromString
 
 Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 ```ts
 import * as S from "@effect/schema";
-import { parseString } from "@effect/schema/data/Date";
 
-const schema = parseString(S.string);
+const schema = S.dateFromString(S.string);
 const decodeOrThrow = S.decodeOrThrow(schema);
 
 decodeOrThrow("1970-01-01T00:00:00.000Z"); // new Date(0)

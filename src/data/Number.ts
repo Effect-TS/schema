@@ -2,289 +2,170 @@
  * @since 1.0.0
  */
 
-import { pipe } from "@effect/data/Function"
-import * as N from "@effect/data/Number"
-import * as I from "@effect/schema/internal/common"
-import * as PR from "@effect/schema/ParseResult"
-import type { AnnotationOptions, Schema } from "@effect/schema/Schema"
+import * as S from "@effect/schema"
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const FiniteTypeId = "@effect/schema/data/Number/FiniteTypeId"
+export const FiniteTypeId = S.FiniteTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const finite = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => Number.isFinite(a), {
-        typeId: FiniteTypeId,
-        description: "a finite number",
-        ...annotationOptions
-      })
-    )
+export const finite = S.finite
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+export const GreaterThanTypeId = S.GreaterThanTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const GreaterThanTypeId = "@effect/schema/data/Number/GreaterThanTypeId"
+export const greaterThan = S.greaterThan
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const greaterThan = <A extends number>(
-  min: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a > min, {
-        typeId: GreaterThanTypeId,
-        description: `a number greater than ${min}`,
-        jsonSchema: { exclusiveMinimum: min },
-        ...annotationOptions
-      })
-    )
+export const GreaterThanOrEqualToTypeId = S.GreaterThanOrEqualToTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const GreaterThanOrEqualToTypeId = "@effect/schema/data/Number/GreaterThanOrEqualToTypeId"
+export const greaterThanOrEqualTo = S.greaterThanOrEqualTo
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const greaterThanOrEqualTo = <A extends number>(
-  min: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a >= min, {
-        typeId: GreaterThanOrEqualToTypeId,
-        description: `a number greater than or equal to ${min}`,
-        jsonSchema: { minimum: min },
-        ...annotationOptions
-      })
-    )
+export const MultipleOfTypeId = S.MultipleOfTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const MultipleOfTypeId = "@effect/schema/data/Number/MultipleOfTypeId"
+export const multipleOf = S.multipleOf
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const multipleOf = <A extends number>(
-  divisor: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => N.remainder(a, divisor) === 0, {
-        typeId: MultipleOfTypeId,
-        description: `a number divisible by ${divisor}`,
-        jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
-        ...annotationOptions
-      })
-    )
+export const IntTypeId = S.IntTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const IntTypeId = "@effect/schema/data/Number/IntTypeId"
+export const int = S.int
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const int = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => Number.isInteger(a), {
-        typeId: IntTypeId,
-        description: "integer",
-        jsonSchema: { type: "integer" },
-        ...annotationOptions
-      })
-    )
+export const LessThanTypeId = S.LessThanTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const LessThanTypeId = "@effect/schema/data/Number/LessThanTypeId"
+export const lessThan = S.lessThan
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const lessThan = <A extends number>(max: number, annotationOptions?: AnnotationOptions<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a < max, {
-        typeId: LessThanTypeId,
-        description: `a number less than ${max}`,
-        jsonSchema: { exclusiveMaximum: max },
-        ...annotationOptions
-      })
-    )
+export const LessThanOrEqualToTypeId = S.LessThanOrEqualToTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const LessThanOrEqualToTypeId = "@effect/schema/data/Number/LessThanOrEqualToTypeId"
+export const lessThanOrEqualTo = S.lessThanOrEqualTo
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const lessThanOrEqualTo = <A extends number>(
-  max: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a <= max, {
-        typeId: LessThanOrEqualToTypeId,
-        description: `a number less than or equal to ${max}`,
-        jsonSchema: { maximum: max },
-        ...annotationOptions
-      })
-    )
+export const BetweenTypeId = S.BrandTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const BetweenTypeId = "@effect/schema/data/Number/BetweenTypeId"
+export const between = S.between
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const between = <A extends number>(
-  min: number,
-  max: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a >= min && a <= max, {
-        typeId: BetweenTypeId,
-        description: `a number between ${min} and ${max}`,
-        jsonSchema: { maximum: max, minimum: min },
-        ...annotationOptions
-      })
-    )
+export const NonNaNTypeId = S.NonNaNTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const NonNaNTypeId = "@effect/schema/data/Number/NonNaNTypeId"
+export const nonNaN = S.nonNaN
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const nonNaN = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => !Number.isNaN(a), {
-        typeId: NonNaNTypeId,
-        description: "a number NaN excluded",
-        ...annotationOptions
-      })
-    )
+export const PositiveTypeId = S.PositiveTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const PositiveTypeId = "@effect/schema/data/Number/PositiveTypeId"
+export const positive = S.positive
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const positive = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThan(0, {
-    typeId: PositiveTypeId,
-    description: "a positive number",
-    ...annotationOptions
-  })
+export const NegativeTypeId = S.NegativeTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const NegativeTypeId = "@effect/schema/data/Number/NegativeTypeId"
+export const negative = S.negative
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const negative = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThan(0, {
-    typeId: NegativeTypeId,
-    description: "a negative number",
-    ...annotationOptions
-  })
+export const NonNegativeTypeId = S.NonNegativeTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const NonNegativeTypeId = "@effect/schema/data/Number/NonNegativeTypeId"
+export const nonNegative = S.nonNegative
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const nonNegative = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThanOrEqualTo(0, {
-    typeId: NonNegativeTypeId,
-    description: "a non-negative number",
-    ...annotationOptions
-  })
+export const NonPositiveTypeId = S.NonPositiveTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const NonPositiveTypeId = "@effect/schema/data/Number/NonPositiveTypeId"
-
-/**
- * @since 1.0.0
- */
-export const nonPositive = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThanOrEqualTo(0, {
-    typeId: NonPositiveTypeId,
-    description: "a non-positive number",
-    ...annotationOptions
-  })
+export const nonPositive = S.nonPositive
 
 /**
  * Clamps a number between a minimum and a maximum value.
  *
  * @since 1.0.0
+ * @deprecated
  */
-export const clamp = <A extends number>(min: number, max: number) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.transform(
-        pipe(self, between<A>(min, max)),
-        (self) => N.clamp(self, min, max) as A,
-        (self) => N.clamp(self, min, max) as A
-      )
-    )
+export const clamp = S.clamp
 
 /**
   Transforms a `string` into a `number` by parsing the string using `parseFloat`.
@@ -292,27 +173,6 @@ export const clamp = <A extends number>(min: number, max: number) =>
   The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
   @since 1.0.0
+  @deprecated
 */
-export const parseString = (self: Schema<string>): Schema<number> => {
-  const schema: Schema<number> = pipe(
-    self,
-    I.transformOrFail(
-      I.number,
-      (s) => {
-        if (s === "NaN") {
-          return PR.success(NaN)
-        }
-        if (s === "Infinity") {
-          return PR.success(Infinity)
-        }
-        if (s === "-Infinity") {
-          return PR.success(-Infinity)
-        }
-        const n = parseFloat(s)
-        return isNaN(n) ? PR.failure(PR.type(schema.ast, s)) : PR.success(n)
-      },
-      (n) => PR.success(String(n))
-    )
-  )
-  return schema
-}
+export const parseString = S.numberFromString
