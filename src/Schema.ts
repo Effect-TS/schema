@@ -19,7 +19,7 @@ import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
-import type { Arbitrary } from "@effect/schema/Arbitrary"
+import { Arbitrary } from "@effect/schema/Arbitrary"
 import * as Arb from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -1402,15 +1402,15 @@ const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E,
   )
 
 const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>): Schema<Either<E, A>> =>
-  I.union(
-    I.struct({
-      _tag: I.literal("Left"),
+  union(
+    struct({
+      _tag: literal("Left"),
       left,
       [Equal.symbol]: I.any,
       [Hash.symbol]: I.any
     }),
-    I.struct({
-      _tag: I.literal("Right"),
+    struct({
+      _tag: literal("Right"),
       right,
       [Equal.symbol]: I.any,
       [Hash.symbol]: I.any
@@ -1424,9 +1424,51 @@ export const either = <E, A>(
   left: Schema<E>,
   right: Schema<A>
 ): Schema<Either<E, A>> =>
-  I.typeAlias([left, right], eitherInline(left, right), {
+  typeAlias([left, right], eitherInline(left, right), {
     [A.IdentifierId]: "Either",
     [H.ParserHookId]: H.hook(eitherParser),
     [H.PrettyHookId]: H.hook(eitherPretty),
     [H.ArbitraryHookId]: H.hook(eitherArbitrary)
   })
+
+// ---------------------------------------------
+// data/Json
+// ---------------------------------------------
+
+/**
+ * @since 1.0.0
+ */
+export type JsonArray = ReadonlyArray<Json>
+
+/**
+ * @since 1.0.0
+ */
+export type JsonObject = { readonly [key: string]: Json }
+
+/**
+ * @since 1.0.0
+ */
+export type Json =
+  | null
+  | boolean
+  | number
+  | string
+  | JsonArray
+  | JsonObject
+
+/**
+ * @since 1.0.0
+ */
+export const json: Schema<Json> = lazy(() =>
+  union(
+    _null,
+    string,
+    number,
+    boolean,
+    array(json),
+    record(string, json)
+  ), {
+  [H.ArbitraryHookId]: H.hook(() => Arbitrary)
+})
+
+const Arbitrary = I.makeArbitrary<Json>(json, (fc) => fc.jsonValue().map((json) => json as Json))
