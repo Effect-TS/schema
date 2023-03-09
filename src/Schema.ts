@@ -7,7 +7,9 @@ import type { Brand } from "@effect/data/Brand"
 import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
+import * as D from "@effect/data/Data"
 import * as E from "@effect/data/Either"
+import * as Equal from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
 import type { Option } from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
@@ -1254,3 +1256,67 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
  */
 export const chunkFromValues = <A>(item: Schema<A>): Schema<Chunk<A>> =>
   pipe(I.array(item), I.transform(chunk(item), C.fromIterable, C.toReadonlyArray))
+
+// ---------------------------------------------
+// data/Data
+// ---------------------------------------------
+
+const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): D.Data<A> =>
+  Array.isArray(a) ? D.array(a) : D.struct(a)
+
+const dataParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: P.Parser<A>
+): P.Parser<D.Data<A>> => {
+  const decode = P.decode(item)
+  const schema = data(item)
+
+  return I.makeParser(
+    schema,
+    (u, options) =>
+      !Equal.isEqual(u) ?
+        PR.failure(PR.type(schema.ast, u)) :
+        pipe(decode(u, options), I.map(toData))
+  )
+}
+
+const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: Arbitrary<A>
+): Arbitrary<D.Data<A>> => I.makeArbitrary(data(item), (fc) => item.arbitrary(fc).map(toData))
+
+const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: Pretty<A>
+): Pretty<D.Data<A>> =>
+  I.makePretty(
+    data(item),
+    (d) => `Data(${item.pretty(d)})`
+  )
+
+/**
+ * @since 1.0.0
+ */
+export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: Schema<A>
+): Schema<D.Data<A>> =>
+  I.typeAlias(
+    [item],
+    item,
+    {
+      [A.IdentifierId]: "Data",
+      [H.ParserHookId]: H.hook(dataParser),
+      [H.PrettyHookId]: H.hook(dataPretty),
+      [H.ArbitraryHookId]: H.hook(dataArbitrary)
+    }
+  )
+
+/**
+ * @since 1.0.0
+ */
+export const fromStructure = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: Schema<A>
+): Schema<D.Data<A>> =>
+  pipe(
+    item,
+    I.transform(data(item), toData, (a) =>
+      // @ts-expect-error
+      Array.isArray(a) ? Array.from(a) : Object.assign({}, a))
+  )
