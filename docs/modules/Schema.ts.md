@@ -13,7 +13,6 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [annotations](#annotations)
-  - [annotations](#annotations-1)
   - [description](#description)
   - [documentation](#documentation)
   - [examples](#examples)
@@ -21,19 +20,20 @@ Added in v1.0.0
   - [message](#message)
   - [title](#title)
 - [combinators](#combinators)
-  - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
+  - [annotations](#annotations-1)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
+  - [data](#data)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
+  - [fromBrand](#frombrand)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
   - [omit](#omit)
-  - [optional](#optional)
   - [optionalElement](#optionalelement)
   - [partial](#partial)
   - [pick](#pick)
@@ -52,7 +52,6 @@ Added in v1.0.0
   - [date](#date)
   - [either](#either)
   - [enums](#enums)
-  - [fromBrand](#frombrand)
   - [instanceOf](#instanceof)
   - [json](#json)
   - [literal](#literal)
@@ -96,8 +95,6 @@ Added in v1.0.0
   - [positiveBigint](#positivebigint)
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
-- [identifiers](#identifiers)
-  - [MinItemsTypeId](#minitemstypeid)
 - [model](#model)
   - [BrandSchema (interface)](#brandschema-interface)
   - [Schema (interface)](#schema-interface)
@@ -109,6 +106,7 @@ Added in v1.0.0
   - [fromStructure](#fromstructure)
   - [numberFromString](#numberfromstring)
   - [optionFromNullable](#optionfromnullable)
+  - [optionsFromOptionals](#optionsfromoptionals)
   - [readonlyMapFromEntries](#readonlymapfromentries)
   - [readonlySetFromValues](#readonlysetfromvalues)
   - [trim](#trim)
@@ -126,10 +124,8 @@ Added in v1.0.0
   - [undefined](#undefined)
   - [unknown](#unknown)
   - [void](#void)
-- [symbol](#symbol-1)
-  - [OptionalSchemaId](#optionalschemaid)
-  - [OptionalSchemaId (type alias)](#optionalschemaid-type-alias)
 - [utils](#utils)
+  - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
   - [BetweenTypeId](#betweentypeid)
   - [BrandTypeId](#brandtypeid)
@@ -153,6 +149,7 @@ Added in v1.0.0
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
   - [LessThanTypeId](#lessthantypeid)
   - [MaxItemsTypeId](#maxitemstypeid)
+  - [MinItemsTypeId](#minitemstypeid)
   - [MultipleOfTypeId](#multipleoftypeid)
   - [NegativeBigintTypeId](#negativebiginttypeid)
   - [NegativeTypeId](#negativetypeid)
@@ -163,6 +160,8 @@ Added in v1.0.0
   - [NonPositiveTypeId](#nonpositivetypeid)
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [OptionalSchema (interface)](#optionalschema-interface)
+  - [OptionalSchemaId](#optionalschemaid)
+  - [OptionalSchemaId (type alias)](#optionalschemaid-type-alias)
   - [PatternTypeId](#patterntypeid)
   - [PositiveBigintTypeId](#positivebiginttypeid)
   - [PositiveTypeId](#positivetypeid)
@@ -170,23 +169,12 @@ Added in v1.0.0
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
   - [UUIDTypeId](#uuidtypeid)
-  - [data](#data)
   - [getPropertySignatures](#getpropertysignatures)
-  - [optionsFromOptionals](#optionsfromoptionals)
+  - [optional](#optional)
 
 ---
 
 # annotations
-
-## annotations
-
-**Signature**
-
-```ts
-export declare const annotations: (annotations: AST.Annotated['annotations']) => <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
 
 ## description
 
@@ -250,21 +238,12 @@ Added in v1.0.0
 
 # combinators
 
-## AnnotationOptions (type alias)
+## annotations
 
 **Signature**
 
 ```ts
-export type AnnotationOptions<A> = {
-  typeId?: A.Type | { id: A.Type; params: unknown }
-  message?: A.Message<A>
-  identifier?: A.Identifier
-  title?: A.Title
-  description?: A.Description
-  examples?: A.Examples
-  documentation?: A.Documentation
-  jsonSchema?: A.JSONSchema
-}
+export declare const annotations: (annotations: AST.Annotated['annotations']) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -344,6 +323,18 @@ type Int = S.Infer<typeof Int> // number & Brand<"Int">
 
 Added in v1.0.0
 
+## data
+
+**Signature**
+
+```ts
+export declare const data: <A extends readonly any[] | Readonly<Record<string, any>>>(
+  item: Schema<A>
+) => Schema<D.Data<A>>
+```
+
+Added in v1.0.0
+
 ## element
 
 **Signature**
@@ -379,6 +370,19 @@ export declare function filter<A>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## fromBrand
+
+**Signature**
+
+```ts
+export declare const fromBrand: <C extends any>(
+  constructor: any,
+  annotationOptions?: AnnotationOptions<any> | undefined
+) => <A extends any>(self: Schema<A>) => Schema<A & C>
 ```
 
 Added in v1.0.0
@@ -434,16 +438,6 @@ Added in v1.0.0
 export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => (self: Schema<A>) => Schema<{ readonly [P in Exclude<keyof A, Keys[number]>]: A[P] }>
-```
-
-Added in v1.0.0
-
-## optional
-
-**Signature**
-
-```ts
-export declare const optional: <A>(schema: Schema<A>) => OptionalSchema<A>
 ```
 
 Added in v1.0.0
@@ -661,19 +655,6 @@ Added in v1.0.0
 
 ```ts
 export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Schema<A[keyof A]>
-```
-
-Added in v1.0.0
-
-## fromBrand
-
-**Signature**
-
-```ts
-export declare const fromBrand: <C extends any>(
-  constructor: any,
-  annotationOptions?: AnnotationOptions<any> | undefined
-) => <A extends any>(self: Schema<A>) => Schema<A & C>
 ```
 
 Added in v1.0.0
@@ -1203,18 +1184,6 @@ export declare const trimmed: <A extends string>(
 
 Added in v1.0.0
 
-# identifiers
-
-## MinItemsTypeId
-
-**Signature**
-
-```ts
-export declare const MinItemsTypeId: '@effect/schema/MinItemsTypeId'
-```
-
-Added in v1.0.0
-
 # model
 
 ## BrandSchema (interface)
@@ -1320,6 +1289,20 @@ Added in v1.0.0
 
 ```ts
 export declare const optionFromNullable: <A>(value: Schema<A>) => Schema<Option<A>>
+```
+
+Added in v1.0.0
+
+## optionsFromOptionals
+
+**Signature**
+
+```ts
+export declare const optionsFromOptionals: <Fields extends Record<string | number | symbol, Schema<any>>>(
+  fields: Fields
+) => <A extends object>(
+  schema: Schema<A>
+) => Schema<Spread<A & { readonly [K in keyof Fields]: Option<Infer<Fields[K]>> }>>
 ```
 
 Added in v1.0.0
@@ -1488,29 +1471,26 @@ export declare const void: Schema<void>
 
 Added in v1.0.0
 
-# symbol
-
-## OptionalSchemaId
-
-**Signature**
-
-```ts
-export declare const OptionalSchemaId: typeof OptionalSchemaId
-```
-
-Added in v1.0.0
-
-## OptionalSchemaId (type alias)
-
-**Signature**
-
-```ts
-export type OptionalSchemaId = typeof OptionalSchemaId
-```
-
-Added in v1.0.0
-
 # utils
+
+## AnnotationOptions (type alias)
+
+**Signature**
+
+```ts
+export type AnnotationOptions<A> = {
+  typeId?: A.Type | { id: A.Type; params: unknown }
+  message?: A.Message<A>
+  identifier?: A.Identifier
+  title?: A.Title
+  description?: A.Description
+  examples?: A.Examples
+  documentation?: A.Documentation
+  jsonSchema?: A.JSONSchema
+}
+```
+
+Added in v1.0.0
 
 ## BetweenBigintTypeId
 
@@ -1744,6 +1724,16 @@ export declare const MaxItemsTypeId: '@effect/schema/MaxItemsTypeId'
 
 Added in v1.0.0
 
+## MinItemsTypeId
+
+**Signature**
+
+```ts
+export declare const MinItemsTypeId: '@effect/schema/MinItemsTypeId'
+```
+
+Added in v1.0.0
+
 ## MultipleOfTypeId
 
 **Signature**
@@ -1849,6 +1839,26 @@ export interface OptionalSchema<A> {
 
 Added in v1.0.0
 
+## OptionalSchemaId
+
+**Signature**
+
+```ts
+export declare const OptionalSchemaId: typeof OptionalSchemaId
+```
+
+Added in v1.0.0
+
+## OptionalSchemaId (type alias)
+
+**Signature**
+
+```ts
+export type OptionalSchemaId = typeof OptionalSchemaId
+```
+
+Added in v1.0.0
+
 ## PatternTypeId
 
 **Signature**
@@ -1923,18 +1933,6 @@ export declare const UUIDTypeId: '@effect/schema/UUIDTypeId'
 
 Added in v1.0.0
 
-## data
-
-**Signature**
-
-```ts
-export declare const data: <A extends readonly any[] | Readonly<Record<string, any>>>(
-  item: Schema<A>
-) => Schema<D.Data<A>>
-```
-
-Added in v1.0.0
-
 ## getPropertySignatures
 
 Returns an object containing all property signatures of a given schema.
@@ -1967,16 +1965,12 @@ assert.deepStrictEqual(shape.age, S.number)
 
 Added in v1.0.0
 
-## optionsFromOptionals
+## optional
 
 **Signature**
 
 ```ts
-export declare const optionsFromOptionals: <Fields extends Record<string | number | symbol, Schema<any>>>(
-  fields: Fields
-) => <A extends object>(
-  schema: Schema<A>
-) => Schema<Spread<A & { readonly [K in keyof Fields]: Option<Infer<Fields[K]>> }>>
+export declare const optional: <A>(schema: Schema<A>) => OptionalSchema<A>
 ```
 
 Added in v1.0.0

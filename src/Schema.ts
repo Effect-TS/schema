@@ -269,13 +269,11 @@ export type Spread<A> = {
 } extends infer B ? B : never
 
 /**
- * @category symbol
  * @since 1.0.0
  */
 export const OptionalSchemaId = Symbol.for("@effect/schema/Schema/OptionalSchema")
 
 /**
- * @category symbol
  * @since 1.0.0
  */
 export type OptionalSchemaId = typeof OptionalSchemaId
@@ -292,7 +290,6 @@ const isOptionalSchema = <A>(schema: object): schema is OptionalSchema<A> =>
   schema["_id"] === OptionalSchemaId
 
 /**
- * @category combinators
  * @since 1.0.0
  */
 export const optional = <A>(schema: Schema<A>): OptionalSchema<A> => {
@@ -510,7 +507,6 @@ export const lazy: <A>(
 ) => Schema<A> = I.lazy
 
 /**
- * @category combinators
  * @since 1.0.0
  */
 export type AnnotationOptions<A> = {
@@ -655,7 +651,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
 // ---------------------------------------------
 
 /**
- * @category annotations
+ * @category combinators
  * @since 1.0.0
  */
 export const annotations = (annotations: AST.Annotated["annotations"]) =>
@@ -1010,7 +1006,7 @@ export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
 export const BrandTypeId = "@effect/schema/BrandTypeId"
 
 /**
- * @category constructors
+ * @category combinators
  * @since 1.0.0
  */
 export const fromBrand = <C extends Brand<string>>(
@@ -1118,7 +1114,7 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
   )
 
 /**
- * @constructors
+ * @category combinators
  * @since 1.0.0
  */
 export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
@@ -1750,6 +1746,7 @@ export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
 export const option = optionFromNullable
 
 /**
+ * @category parsers
  * @since 1.0.0
  */
 export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<any>>>(
@@ -1814,7 +1811,6 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
 // ---------------------------------------------
 
 /**
- * @category identifiers
  * @since 1.0.0
  */
 export const MinItemsTypeId = "@effect/schema/MinItemsTypeId"
