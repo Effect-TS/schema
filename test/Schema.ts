@@ -34,7 +34,7 @@ describe.concurrent("Schema", () => {
       })
     )
     expect(Branded.ast.annotations).toEqual({
-      [A.TypeId]: "@effect/schema/data/Number/IntTypeId",
+      [A.TypeId]: "@effect/schema/IntTypeId",
       [A.BrandId]: ["A", "B"],
       [A.DescriptionId]: "a B brand",
       [A.JSONSchemaId]: { type: "integer" }

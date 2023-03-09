@@ -24,7 +24,6 @@ import { Arbitrary } from "@effect/schema/Arbitrary"
 import * as Arb from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as DataObject from "@effect/schema/data/Object"
 import * as DataOption from "@effect/schema/data/Option"
 import * as SRA from "@effect/schema/data/ReadonlyArray"
 import * as S from "@effect/schema/data/String"
@@ -90,15 +89,6 @@ export const enums = <A extends { [x: string]: string | number }>(
       ).map((key) => [key, enums[key]])
     )
   )
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const instanceOf: <A extends abstract new(...args: any) => any>(
-  constructor: A,
-  annotationOptions?: AnnotationOptions<object>
-) => Schema<InstanceType<A>> = DataObject.instanceOf
 
 /**
  * @since 1.0.0
@@ -866,6 +856,7 @@ export const option: <A>(value: Schema<A>) => Schema<Option<A>> = DataOption.par
 export const GreaterThanBigintTypeId = "@effect/schema/GreaterThanBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const greaterThanBigint = <A extends bigint>(
@@ -889,6 +880,7 @@ export const greaterThanBigint = <A extends bigint>(
 export const GreaterThanOrEqualToBigintTypeId = "@effect/schema/GreaterThanOrEqualToBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const greaterThanOrEqualToBigint = <A extends bigint>(
@@ -912,6 +904,7 @@ export const greaterThanOrEqualToBigint = <A extends bigint>(
 export const LessThanBigintTypeId = "@effect/schema/LessThanBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const lessThanBigint = <A extends bigint>(
@@ -935,6 +928,7 @@ export const lessThanBigint = <A extends bigint>(
 export const LessThanOrEqualToBigintTypeId = "@effect/schema/LessThanOrEqualToBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const lessThanOrEqualToBigint = <A extends bigint>(
@@ -958,6 +952,7 @@ export const lessThanOrEqualToBigint = <A extends bigint>(
 export const BetweenBigintTypeId = "@effect/schema/BetweenBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const betweenBigint = <A extends bigint>(
@@ -982,6 +977,7 @@ export const betweenBigint = <A extends bigint>(
 export const PositiveBigintTypeId = "@effect/schema/PositiveBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const positiveBigint = <A extends bigint>(
@@ -999,6 +995,7 @@ export const positiveBigint = <A extends bigint>(
 export const NegativeBigintTypeId = "@effect/schema/NegativeBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const negativeBigint = <A extends bigint>(
@@ -1016,6 +1013,7 @@ export const negativeBigint = <A extends bigint>(
 export const NonNegativeBigintTypeId = "@effect/schema/NonNegativeBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const nonNegativeBigint = <A extends bigint>(
@@ -1033,6 +1031,7 @@ export const nonNegativeBigint = <A extends bigint>(
 export const NonPositiveBigintTypeId = "@effect/schema/NonPositiveBigintTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const nonPositiveBigint = <A extends bigint>(
@@ -1047,6 +1046,7 @@ export const nonPositiveBigint = <A extends bigint>(
 /**
  * Clamps a bigint between a minimum and a maximum value.
  *
+ * @category parsers
  * @since 1.0.0
  */
 export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
@@ -1070,6 +1070,7 @@ export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
 export const BrandTypeId = "@effect/schema/BrandTypeId"
 
 /**
+ * @category constructors
  * @since 1.0.0
  */
 export const fromBrand = <C extends Brand<string>>(
@@ -1117,6 +1118,7 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
   )
 
 /**
+ * @category constructors
  * @since 1.0.0
  */
 export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
@@ -1135,6 +1137,7 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
   )
 
 /**
+ * @category parsers
  * @since 1.0.0
  */
 export const chunkFromValues = <A>(item: Schema<A>): Schema<Chunk<A>> =>
@@ -1175,6 +1178,7 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
   )
 
 /**
+ * @constructors
  * @since 1.0.0
  */
 export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
@@ -1192,6 +1196,7 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
   )
 
 /**
+ * @category parsers
  * @since 1.0.0
  */
 export const fromStructure = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
@@ -1217,6 +1222,7 @@ const datePretty = (): Pretty<Date> =>
   I.makePretty(date, (date) => `new Date(${JSON.stringify(date)})`)
 
 /**
+ * @category constructors
  * @since 1.0.0
  */
 export const date: Schema<Date> = typeAlias([], I.struct({}), {
@@ -1229,6 +1235,7 @@ export const date: Schema<Date> = typeAlias([], I.struct({}), {
 /**
   Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
+  @category parsers
   @since 1.0.0
 */
 export const dateFromString = (self: Schema<string>): Schema<Date> => {
@@ -1304,6 +1311,7 @@ const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>): Schema<Either<E,
   )
 
 /**
+ * @category constructors
  * @since 1.0.0
  */
 export const either = <E, A>(
@@ -1343,6 +1351,7 @@ export type Json =
   | JsonObject
 
 /**
+ * @category constructors
  * @since 1.0.0
  */
 export const json: Schema<Json> = lazy(() =>
@@ -1369,6 +1378,7 @@ const Arbitrary = I.makeArbitrary<Json>(json, (fc) => fc.jsonValue().map((json) 
 export const FiniteTypeId = "@effect/schema/FiniteTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const finite = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
@@ -1388,6 +1398,7 @@ export const finite = <A extends number>(annotationOptions?: AnnotationOptions<A
 export const GreaterThanTypeId = "@effect/schema/GreaterThanTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const greaterThan = <A extends number>(
@@ -1411,6 +1422,7 @@ export const greaterThan = <A extends number>(
 export const GreaterThanOrEqualToTypeId = "@effect/schema/GreaterThanOrEqualToTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const greaterThanOrEqualTo = <A extends number>(
@@ -1434,6 +1446,7 @@ export const greaterThanOrEqualTo = <A extends number>(
 export const MultipleOfTypeId = "@effect/schema/MultipleOfTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const multipleOf = <A extends number>(
@@ -1457,6 +1470,7 @@ export const multipleOf = <A extends number>(
 export const IntTypeId = "@effect/schema/IntTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const int = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
@@ -1477,6 +1491,7 @@ export const int = <A extends number>(annotationOptions?: AnnotationOptions<A>) 
 export const LessThanTypeId = "@effect/schema/LessThanTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const lessThan = <A extends number>(max: number, annotationOptions?: AnnotationOptions<A>) =>
@@ -1497,6 +1512,7 @@ export const lessThan = <A extends number>(max: number, annotationOptions?: Anno
 export const LessThanOrEqualToTypeId = "@effect/schema/LessThanOrEqualToTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const lessThanOrEqualTo = <A extends number>(
@@ -1520,6 +1536,7 @@ export const lessThanOrEqualTo = <A extends number>(
 export const BetweenTypeId = "@effect/schema/BetweenTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const between = <A extends number>(
@@ -1544,6 +1561,7 @@ export const between = <A extends number>(
 export const NonNaNTypeId = "@effect/schema/NonNaNTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const nonNaN = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
@@ -1563,6 +1581,7 @@ export const nonNaN = <A extends number>(annotationOptions?: AnnotationOptions<A
 export const PositiveTypeId = "@effect/schema/PositiveTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const positive = <A extends number>(
@@ -1580,6 +1599,7 @@ export const positive = <A extends number>(
 export const NegativeTypeId = "@effect/schema/NegativeTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const negative = <A extends number>(
@@ -1597,6 +1617,7 @@ export const negative = <A extends number>(
 export const NonNegativeTypeId = "@effect/schema/NonNegativeTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const nonNegative = <A extends number>(
@@ -1614,6 +1635,7 @@ export const nonNegative = <A extends number>(
 export const NonPositiveTypeId = "@effect/schema/NonPositiveTypeId"
 
 /**
+ * @category filters
  * @since 1.0.0
  */
 export const nonPositive = <A extends number>(
@@ -1628,6 +1650,7 @@ export const nonPositive = <A extends number>(
 /**
  * Clamps a number between a minimum and a maximum value.
  *
+ * @category parsers
  * @since 1.0.0
  */
 export const clamp = <A extends number>(min: number, max: number) =>
@@ -1646,6 +1669,7 @@ export const clamp = <A extends number>(min: number, max: number) =>
 
   The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
+  @category parsers
   @since 1.0.0
 */
 export const numberFromString = (self: Schema<string>): Schema<number> => {
@@ -1671,3 +1695,32 @@ export const numberFromString = (self: Schema<string>): Schema<number> => {
   )
   return schema
 }
+
+// ---------------------------------------------
+// data/Object
+// ---------------------------------------------
+
+/**
+ * @since 1.0.0
+ */
+export const InstanceOfTypeId = "@effect/schema/InstanceOfTypeId"
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const instanceOf = <A extends abstract new(...args: any) => any>(
+  constructor: A,
+  annotationOptions?: AnnotationOptions<object>
+): Schema<InstanceType<A>> =>
+  pipe(
+    object,
+    filter(
+      (a): a is InstanceType<A> => a instanceof constructor,
+      {
+        typeId: { id: InstanceOfTypeId, params: { constructor } },
+        description: `an instance of ${constructor.name}`,
+        ...annotationOptions
+      }
+    )
+  )

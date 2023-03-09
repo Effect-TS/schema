@@ -1,16 +1,11 @@
-import * as O from "@effect/schema/data/Object"
+import * as S from "@effect/schema"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 const schema = S.instanceOf(Set)
 
 describe.concurrent("Object", () => {
-  it("exports", () => {
-    expect(O.InstanceOfTypeId).exist
-  })
-
   describe.concurrent("instanceOf", () => {
     it("Guard", () => {
       const is = P.is(schema)
