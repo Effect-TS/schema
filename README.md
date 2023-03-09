@@ -1242,14 +1242,13 @@ decodeOrThrow([1, 2, 3]); // new Set([1, 2, 3])
 
 ## ReadonlyMap
 
-In the following section, we demonstrate how to use the `fromEntries` combinator to decode a `ReadonlyMap` from an array of entries.
+In the following section, we demonstrate how to use the `readonlyMapFromEntries` combinator to decode a `ReadonlyMap` from an array of entries.
 
 ```ts
 import * as S from "@effect/schema";
-import { fromEntries } from "@effect/schema/data/ReadonlyMap";
 
 // define the schema for ReadonlyMap with number keys and string values
-const schema = fromEntries(S.number, S.string);
+const schema = S.readonlyMapFromEntries(S.number, S.string);
 const decodeOrThrow = P.decodeOrThrow(schema);
 
 decodeOrThrow([

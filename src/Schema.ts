@@ -1911,3 +1911,83 @@ export const itemsCount = <A>(
         ...annotationOptions
       })
     )
+
+// ---------------------------------------------
+// data/ReadonlyMap
+// ---------------------------------------------
+
+const isMap = (u: unknown): u is Map<unknown, unknown> => u instanceof Map
+
+const readonlyMapParser = <K, V>(
+  key: P.Parser<K>,
+  value: P.Parser<V>
+): P.Parser<ReadonlyMap<K, V>> => {
+  const items = P.decode(I.array(I.tuple(key, value)))
+  const schema = readonlyMap(key, value)
+  return I.makeParser(
+    schema,
+    (u, options) =>
+      !isMap(u) ?
+        PR.failure(PR.type(schema.ast, u)) :
+        pipe(
+          Array.from(u.entries()),
+          (us) => items(us, options),
+          I.map((as) => new Map(as))
+        )
+  )
+}
+
+const readonlyMapArbitrary = <K, V>(
+  key: Arbitrary<K>,
+  value: Arbitrary<V>
+): Arbitrary<ReadonlyMap<K, V>> =>
+  I.makeArbitrary(
+    readonlyMapFromEntries(key, value),
+    (fc) => fc.array(fc.tuple(key.arbitrary(fc), value.arbitrary(fc))).map((as) => new Map(as))
+  )
+
+const readonlyMapPretty = <K, V>(key: Pretty<K>, value: Pretty<V>): Pretty<ReadonlyMap<K, V>> =>
+  I.makePretty(
+    readonlyMapFromEntries(key, value),
+    (map) =>
+      `new Map([${
+        Array.from(map.entries())
+          .map(([k, v]) => `[${key.pretty(k)}, ${value.pretty(v)}]`)
+          .join(", ")
+      }])`
+  )
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const readonlyMap = <K, V>(key: Schema<K>, value: Schema<V>): Schema<ReadonlyMap<K, V>> =>
+  typeAlias(
+    [key, value],
+    struct({
+      size: I.number
+    }),
+    {
+      [A.IdentifierId]: "ReadonlyMap",
+      [H.ParserHookId]: H.hook(readonlyMapParser),
+      [H.PrettyHookId]: H.hook(readonlyMapPretty),
+      [H.ArbitraryHookId]: H.hook(readonlyMapArbitrary)
+    }
+  )
+
+/**
+ * @category parsers
+ * @since 1.0.0
+ */
+export const readonlyMapFromEntries = <K, V>(
+  key: Schema<K>,
+  value: Schema<V>
+): Schema<ReadonlyMap<K, V>> =>
+  pipe(
+    array(tuple(key, value)),
+    transform(
+      readonlyMap(key, value),
+      (as) => new Map(as),
+      (map) => Array.from(map.entries())
+    )
+  )
