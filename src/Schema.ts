@@ -9,8 +9,10 @@ import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
 import * as D from "@effect/data/Data"
 import * as E from "@effect/data/Either"
+import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
+import * as Hash from "@effect/data/Hash"
 import type { Option } from "@effect/data/Option"
 import { isDate } from "@effect/data/Predicate"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
@@ -18,6 +20,7 @@ import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
+import * as Arb from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as N from "@effect/schema/data/Number"
@@ -1358,3 +1361,72 @@ export const dateFromString = (self: Schema<string>): Schema<Date> => {
   )
   return schema
 }
+
+// ---------------------------------------------
+// data/Either
+// ---------------------------------------------
+
+const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
+  const schema = either(left, right)
+  const decodeLeft = P.decode(left)
+  const decodeRight = P.decode(right)
+  return I.makeParser(
+    schema,
+    (u, options) =>
+      !E.isEither(u) ?
+        PR.failure(PR.type(schema.ast, u)) :
+        E.isLeft(u) ?
+        pipe(decodeLeft(u.left, options), I.map(E.left)) :
+        pipe(decodeRight(u.right, options), I.map(E.right))
+  )
+}
+
+const eitherArbitrary = <E, A>(
+  left: Arbitrary<E>,
+  right: Arbitrary<A>
+): Arbitrary<Either<E, A>> => {
+  const struct = Arb.arbitrary(eitherInline(left, right))
+  return I.makeArbitrary(
+    either(left, right),
+    (fc) => struct(fc).map(E.match((e) => E.left(e), (a) => E.right(a)))
+  )
+}
+
+const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
+  I.makePretty(
+    either(left, right),
+    E.match(
+      (e) => `left(${left.pretty(e)})`,
+      (a) => `right(${right.pretty(a)})`
+    )
+  )
+
+const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>): Schema<Either<E, A>> =>
+  I.union(
+    I.struct({
+      _tag: I.literal("Left"),
+      left,
+      [Equal.symbol]: I.any,
+      [Hash.symbol]: I.any
+    }),
+    I.struct({
+      _tag: I.literal("Right"),
+      right,
+      [Equal.symbol]: I.any,
+      [Hash.symbol]: I.any
+    })
+  )
+
+/**
+ * @since 1.0.0
+ */
+export const either = <E, A>(
+  left: Schema<E>,
+  right: Schema<A>
+): Schema<Either<E, A>> =>
+  I.typeAlias([left, right], eitherInline(left, right), {
+    [A.IdentifierId]: "Either",
+    [H.ParserHookId]: H.hook(eitherParser),
+    [H.PrettyHookId]: H.hook(eitherPretty),
+    [H.ArbitraryHookId]: H.hook(eitherArbitrary)
+  })
