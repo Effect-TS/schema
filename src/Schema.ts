@@ -5,12 +5,16 @@
 import * as B from "@effect/data/Bigint"
 import type { Brand } from "@effect/data/Brand"
 import { RefinedConstructorsTypeId } from "@effect/data/Brand"
+import type { Chunk } from "@effect/data/Chunk"
+import * as C from "@effect/data/Chunk"
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import type { Option } from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/annotation/AST"
+import * as H from "@effect/schema/annotation/Hook"
+import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as DataDate from "@effect/schema/data/Date"
@@ -23,6 +27,8 @@ import { formatErrors } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import type { ParseResult } from "@effect/schema/ParseResult"
+import * as PR from "@effect/schema/ParseResult"
+import type { Pretty } from "@effect/schema/Pretty"
 
 /**
  * @category model
@@ -1199,3 +1205,52 @@ export const fromBrand = <C extends Brand<string>>(
         }
       )
     )
+
+// ---------------------------------------------
+// data/Chunk
+// ---------------------------------------------
+
+const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
+  const items = P.decode(I.array(item))
+  const schema = chunk(item)
+  return I.makeParser(
+    schema,
+    (u, options) =>
+      !C.isChunk(u) ?
+        PR.failure(PR.type(schema.ast, u)) :
+        pipe(C.toReadonlyArray(u), (us) => items(us, options), I.map(C.fromIterable))
+  )
+}
+
+const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
+  I.makeArbitrary(chunk(item), (fc) => fc.array(item.arbitrary(fc)).map(C.fromIterable))
+
+const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
+  I.makePretty(
+    chunk(item),
+    (c) => `Chunk(${C.toReadonlyArray(c).map(item.pretty).join(", ")})`
+  )
+
+/**
+ * @since 1.0.0
+ */
+export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
+  I.typeAlias(
+    [item],
+    I.struct({
+      _id: I.uniqueSymbol(Symbol.for("@effect/data/Chunk")),
+      length: I.number
+    }),
+    {
+      [A.IdentifierId]: "Chunk",
+      [H.ParserHookId]: H.hook(chunkParser),
+      [H.PrettyHookId]: H.hook(chunkPretty),
+      [H.ArbitraryHookId]: H.hook(chunkArbitrary)
+    }
+  )
+
+/**
+ * @since 1.0.0
+ */
+export const chunkFromValues = <A>(item: Schema<A>): Schema<Chunk<A>> =>
+  pipe(I.array(item), I.transform(chunk(item), C.fromIterable, C.toReadonlyArray))
