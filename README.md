@@ -1164,7 +1164,7 @@ const schema: Schema<{
 */
 const schema = S.struct({
   a: S.string,
-  b: S.option(S.number),
+  b: S.optionFromNullable(S.number),
 });
 
 // decoding
@@ -1195,7 +1195,6 @@ Here's an example that demonstrates how to use the `parseOptionals` combinator:
 
 ```ts
 import * as S from "@effect/schema";
-import { parseOptionals } from "@effect/schema/data/Option";
 
 /*
 const schema: Schema<{
@@ -1203,7 +1202,10 @@ const schema: Schema<{
     readonly b: Option<number>;
 }>
 */
-const schema = pipe(S.struct({ a: S.string }), parseOptionals({ b: S.number }));
+const schema = pipe(
+  S.struct({ a: S.string }),
+  S.optionsFromOptionals({ b: S.number })
+);
 
 // decoding
 const decodeOrThrow = S.decodeOrThrow(schema);

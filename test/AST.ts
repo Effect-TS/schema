@@ -53,7 +53,7 @@ describe.concurrent("AST", () => {
   })
 
   it("getWeight/transform/ should return the weight of type", () => {
-    expect(AST._getWeight(S.option(S.number).ast)).toEqual(7)
+    expect(AST._getWeight(S._option(S.number).ast)).toEqual(7)
   })
 
   it("getWeight/union/ should return the sum of the members weight", () => {

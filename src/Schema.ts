@@ -15,6 +15,7 @@ import { pipe } from "@effect/data/Function"
 import * as Hash from "@effect/data/Hash"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
+import * as O from "@effect/data/Option"
 import { isDate } from "@effect/data/Predicate"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
@@ -24,7 +25,6 @@ import { Arbitrary } from "@effect/schema/Arbitrary"
 import * as Arb from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as DataOption from "@effect/schema/data/Option"
 import * as SRA from "@effect/schema/data/ReadonlyArray"
 import * as S from "@effect/schema/data/String"
 import { formatErrors } from "@effect/schema/formatter/Tree"
@@ -839,12 +839,6 @@ export const object: Schema<object> = I.object
  * @since 1.0.0
  */
 export const trim = (item: Schema<string>): Schema<string> => S.trim(item)
-
-/**
- * @category parsers
- * @since 1.0.0
- */
-export const option: <A>(value: Schema<A>) => Schema<Option<A>> = DataOption.parseNullable
 
 // ---------------------------------------------
 // data/Bigint
@@ -1724,3 +1718,147 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
       }
     )
   )
+
+// ---------------------------------------------
+// data/Option
+// ---------------------------------------------
+
+const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
+  const schema = _option(value)
+  const decodeValue = P.decode(value)
+  return I.makeParser(
+    schema,
+    (u, options) =>
+      !O.isOption(u) ?
+        PR.failure(PR.type(schema.ast, u)) :
+        O.isNone(u) ?
+        PR.success(O.none()) :
+        pipe(decodeValue(u.value, options), I.map(O.some))
+  )
+}
+
+const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => {
+  const struct = Arb.arbitrary(inline(value))
+  return I.makeArbitrary(
+    _option(value),
+    (fc) => struct(fc).map(O.match(() => O.none(), (value) => O.some(value)))
+  )
+}
+
+const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
+  I.makePretty(
+    _option(value),
+    O.match(
+      () => "none()",
+      (a) => `some(${value.pretty(a)})`
+    )
+  )
+
+const inline = <A>(value: Schema<A>): Schema<Option<A>> =>
+  union(
+    struct({
+      _tag: literal("None"),
+      [Equal.symbol]: I.any,
+      [Hash.symbol]: I.any
+    }),
+    struct({
+      _tag: literal("Some"),
+      value,
+      [Equal.symbol]: I.any,
+      [Hash.symbol]: I.any
+    })
+  )
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const _option = <A>(value: Schema<A>): Schema<Option<A>> => {
+  return typeAlias(
+    [value],
+    inline(value),
+    {
+      [A.IdentifierId]: "Option",
+      [H.ParserHookId]: H.hook(optionParser),
+      [H.PrettyHookId]: H.hook(optionPretty),
+      [H.ArbitraryHookId]: H.hook(optionArbitrary)
+    }
+  )
+}
+
+/**
+ * @category parsers
+ * @since 1.0.0
+ */
+export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
+  pipe(
+    union(_undefined, nullable(value)),
+    transform(_option(value), O.fromNullable, O.getOrNull)
+  )
+
+/**
+ * @category parsers
+ * @since 1.0.0
+ * @deprecated
+ */
+export const option = optionFromNullable
+
+/**
+ * @since 1.0.0
+ */
+export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<any>>>(
+  fields: Fields
+) =>
+  <A extends object>(
+    schema: Schema<A>
+  ): Schema<Spread<A & { readonly [K in keyof Fields]: Option<Infer<Fields[K]>> }>> => {
+    if (AST.isTypeLiteral(schema.ast)) {
+      const propertySignatures = schema.ast.propertySignatures
+      const ownKeys = Reflect.ownKeys(fields)
+      const from = AST.createTypeLiteral(
+        propertySignatures.concat(
+          ownKeys.map((key) =>
+            AST.createPropertySignature(
+              key,
+              AST.createUnion([_undefined.ast, _null.ast, fields[key].ast]),
+              true,
+              true
+            )
+          )
+        ),
+        schema.ast.indexSignatures
+      )
+      const to = AST.createTypeLiteral(
+        propertySignatures.concat(
+          ownKeys.map((key) =>
+            AST.createPropertySignature(
+              key,
+              _option(fields[key]).ast,
+              true,
+              true
+            )
+          )
+        ),
+        schema.ast.indexSignatures
+      )
+      const out = AST.createTransform(from, to, (o: any) => {
+        const out = { ...o }
+        for (const key of ownKeys) {
+          out[key] = O.fromNullable(o[key])
+        }
+        return PR.success(out)
+      }, (o) => {
+        const out = { ...o }
+        for (const key of ownKeys) {
+          if (O.isSome(o[key])) {
+            out[key] = o[key].value
+          } else {
+            delete out[key]
+          }
+        }
+        return PR.success(out)
+      })
+      return make(out)
+    }
+    throw new Error("`parseOptional` can only handle type literals")
+  }
