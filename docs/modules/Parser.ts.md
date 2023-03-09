@@ -69,7 +69,7 @@ export declare const make: <A>(
   parse: (
     input: unknown,
     options?: AST.ParseOptions | undefined
-  ) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+  ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ) => Parser<A>
 ```
 
@@ -84,7 +84,10 @@ Added in v1.0.0
 ```ts
 export declare const decode: <A>(
   schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (
+  input: unknown,
+  options?: AST.ParseOptions | undefined
+) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
 Added in v1.0.0

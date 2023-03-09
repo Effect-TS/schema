@@ -2,11 +2,13 @@
  * @since 1.0.0
  */
 
+import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { Option } from "@effect/data/Option"
 import * as P from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as H from "@effect/schema/annotation/Hook"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -163,7 +165,7 @@ const parserFor = <A>(
           (u): u is any => ast.enums.some(([_, value]) => value === u)
         )
       case "TemplateLiteral": {
-        const regex = I.getTemplateLiteralRegex(ast)
+        const regex = getTemplateLiteralRegex(ast)
         return I.fromRefinement(I.makeSchema(ast), (u): u is any => P.isString(u) && regex.test(u))
       }
       case "Tuple": {
@@ -205,7 +207,7 @@ const parserFor = <A>(
                     es.push(e)
                     continue
                   } else {
-                    return PR.failures(I.mutableAppend(es, e))
+                    return PR.failures(mutableAppend(es, e))
                   }
                 }
                 output.push(t.right)
@@ -225,7 +227,7 @@ const parserFor = <A>(
                     es.push(e)
                     continue
                   } else {
-                    return PR.failures(I.mutableAppend(es, e))
+                    return PR.failures(mutableAppend(es, e))
                   }
                 } else {
                   output.push(t.right)
@@ -238,7 +240,7 @@ const parserFor = <A>(
                 i += j
                 if (input.length < i + 1) {
                   // the input element is missing and the element is required, bail out
-                  return PR.failures(I.mutableAppend(es, PR.index(i, [PR.missing])))
+                  return PR.failures(mutableAppend(es, PR.index(i, [PR.missing])))
                 } else {
                   const t = tail[j].parse(input[i], options)
                   if (PR.isFailure(t)) {
@@ -248,7 +250,7 @@ const parserFor = <A>(
                       es.push(e)
                       continue
                     } else {
-                      return PR.failures(I.mutableAppend(es, e))
+                      return PR.failures(mutableAppend(es, e))
                     }
                   }
                   output.push(t.right)
@@ -266,7 +268,7 @@ const parserFor = <A>(
                     es.push(e)
                     continue
                   } else {
-                    return PR.failures(I.mutableAppend(es, e))
+                    return PR.failures(mutableAppend(es, e))
                   }
                 }
               }
@@ -275,7 +277,7 @@ const parserFor = <A>(
             // ---------------------------------------------
             // compute output
             // ---------------------------------------------
-            return I.isNonEmptyReadonlyArray(es) ?
+            return RA.isNonEmptyReadonlyArray(es) ?
               PR.failures(es) :
               PR.success(output)
           }
@@ -326,7 +328,7 @@ const parserFor = <A>(
                     es.push(e)
                     continue
                   } else {
-                    return PR.failures(I.mutableAppend(es, e))
+                    return PR.failures(mutableAppend(es, e))
                   }
                 }
                 output[name] = t.right
@@ -355,7 +357,7 @@ const parserFor = <A>(
                       es.push(e)
                       continue
                     } else {
-                      return PR.failures(I.mutableAppend(es, e))
+                      return PR.failures(mutableAppend(es, e))
                     }
                   }
                   // ---------------------------------------------
@@ -368,7 +370,7 @@ const parserFor = <A>(
                       es.push(e)
                       continue
                     } else {
-                      return PR.failures(I.mutableAppend(es, e))
+                      return PR.failures(mutableAppend(es, e))
                     }
                   } else {
                     output[key] = t.right
@@ -388,7 +390,7 @@ const parserFor = <A>(
                       es.push(e)
                       continue
                     } else {
-                      return PR.failures(I.mutableAppend(es, e))
+                      return PR.failures(mutableAppend(es, e))
                     }
                   }
                 }
@@ -398,7 +400,7 @@ const parserFor = <A>(
             // ---------------------------------------------
             // compute output
             // ---------------------------------------------
-            return I.isNonEmptyReadonlyArray(es) ?
+            return RA.isNonEmptyReadonlyArray(es) ?
               PR.failures(es) :
               PR.success(output)
           }
@@ -466,7 +468,7 @@ const parserFor = <A>(
           // ---------------------------------------------
           // compute output
           // ---------------------------------------------
-          return I.isNonEmptyReadonlyArray(es) ?
+          return RA.isNonEmptyReadonlyArray(es) ?
             PR.failures(es) :
             PR.failure(PR.type(AST.neverKeyword, input))
         })
@@ -487,12 +489,12 @@ const parserFor = <A>(
           case "decoder":
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(type.parse(u, options), I.flatMap(checkRefinement))
+              (u, options) => pipe(type.parse(u, options), E.flatMap(checkRefinement))
             )
           case "encoder":
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(checkRefinement(u), I.flatMap((a) => type.parse(a, options)))
+              (u, options) => pipe(checkRefinement(u), E.flatMap((a) => type.parse(a, options)))
             )
         }
       }
@@ -502,7 +504,7 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(from.parse(u, options), I.flatMap((a) => ast.decode(a, options)))
+              (u, options) => pipe(from.parse(u, options), E.flatMap((a) => ast.decode(a, options)))
             )
           }
           case "guard":
@@ -511,7 +513,7 @@ const parserFor = <A>(
             const from = go(ast.from)
             return make(
               I.makeSchema(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode)),
-              (a, options) => pipe(ast.encode(a, options), I.flatMap((a) => from.parse(a, options)))
+              (a, options) => pipe(ast.encode(a, options), E.flatMap((a) => from.parse(a, options)))
             )
           }
         }
@@ -617,3 +619,22 @@ const unknownRecord = AST.createTypeLiteral([], [
   AST.createIndexSignature(AST.stringKeyword, AST.unknownKeyword, true),
   AST.createIndexSignature(AST.symbolKeyword, AST.unknownKeyword, true)
 ])
+
+const mutableAppend = <A>(self: Array<A>, a: A): NonEmptyReadonlyArray<A> => {
+  self.push(a)
+  return self as any
+}
+
+const getTemplateLiteralRegex = (ast: AST.TemplateLiteral): RegExp => {
+  let pattern = `^${ast.head}`
+  for (const span of ast.spans) {
+    if (AST.isStringKeyword(span.type)) {
+      pattern += ".*"
+    } else if (AST.isNumberKeyword(span.type)) {
+      pattern += "-?\\d+(\\.\\d+)?"
+    }
+    pattern += span.literal
+  }
+  pattern += "$"
+  return new RegExp(pattern)
+}

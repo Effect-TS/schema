@@ -152,7 +152,7 @@ export const match: AST.Match<Pretty<any>> = {
           }
         }
 
-        return I.isNonEmptyReadonlyArray(output) ? "{ " + output.join(", ") + " }" : "{}"
+        return RA.isNonEmptyReadonlyArray(output) ? "{ " + output.join(", ") + " }" : "{}"
       }
     )
   },

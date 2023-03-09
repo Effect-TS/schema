@@ -9,7 +9,6 @@ import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/formatter/Tree"
-import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import * as fc from "fast-check"
@@ -21,7 +20,7 @@ export const property = <A>(schema: Schema<A>) => {
     if (!is(a)) {
       return false
     }
-    const roundtrip = pipe(a, P.encode(schema), I.flatMap(P.decode(schema)))
+    const roundtrip = pipe(a, P.encode(schema), E.flatMap(P.decode(schema)))
     if (PR.isFailure(roundtrip)) {
       return false
     }

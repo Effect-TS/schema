@@ -533,7 +533,11 @@ using the provided mapping functions.
 **Signature**
 
 ```ts
-export declare const transform: <A, B>(to: Schema<B>, f: (a: A) => B, g: (b: B) => A) => (self: Schema<A>) => Schema<B>
+export declare const transform: <A, B>(
+  to: Schema<B>,
+  ab: (a: A) => B,
+  ba: (b: B) => A
+) => (self: Schema<A>) => Schema<B>
 ```
 
 Added in v1.0.0

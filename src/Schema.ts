@@ -56,22 +56,25 @@ export type Infer<S extends { readonly A: (_: any) => any }> = Parameters<S["A"]
  */
 export const make: <A>(ast: AST.AST) => Schema<A> = I.makeSchema
 
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const literal: <Literals extends ReadonlyArray<AST.LiteralValue>>(
-  ...literals: Literals
-) => Schema<Literals[number]> = I.literal
+const makeLiteral = <Literal extends AST.LiteralValue>(value: Literal): Schema<Literal> =>
+  make(AST.createLiteral(value))
 
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const uniqueSymbol: <S extends symbol>(
+export const literal = <Literals extends ReadonlyArray<AST.LiteralValue>>(
+  ...literals: Literals
+): Schema<Literals[number]> => union(...literals.map((literal) => makeLiteral(literal)))
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const uniqueSymbol = <S extends symbol>(
   symbol: S,
   annotations?: AST.Annotated["annotations"]
-) => Schema<S> = I.uniqueSymbol
+): Schema<S> => make(AST.createUniqueSymbol(symbol, annotations))
 
 /**
  * @category constructors
@@ -161,11 +164,16 @@ const getTemplateLiterals = (
   @category combinators
   @since 1.0.0
 */
-export const typeAlias: (
+export const typeAlias = (
   typeParameters: ReadonlyArray<Schema<any>>,
   type: Schema<any>,
   annotations?: AST.Annotated["annotations"]
-) => Schema<any> = I.typeAlias
+): Schema<any> =>
+  make(AST.createTypeAlias(
+    typeParameters.map((tp) => tp.ast),
+    type.ast,
+    annotations
+  ))
 
 // ---------------------------------------------
 // combinators
@@ -175,15 +183,15 @@ export const typeAlias: (
  * @category combinators
  * @since 1.0.0
  */
-export const union: <Members extends ReadonlyArray<Schema<any>>>(
+export const union = <Members extends ReadonlyArray<Schema<any>>>(
   ...members: Members
-) => Schema<Infer<Members[number]>> = I.union
+): Schema<Infer<Members[number]>> => make(AST.createUnion(members.map((m) => m.ast)))
 
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const nullable: <A>(self: Schema<A>) => Schema<A | null> = I.nullable
+export const nullable = <A>(self: Schema<A>): Schema<A | null> => union(_null, self)
 
 /**
  * @category combinators
@@ -195,9 +203,12 @@ export const keyof = <A>(schema: Schema<A>): Schema<keyof A> => make(AST.keyof(s
  * @category combinators
  * @since 1.0.0
  */
-export const tuple: <Elements extends ReadonlyArray<Schema<any>>>(
+export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
   ...elements: Elements
-) => Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> = I.tuple
+): Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> =>
+  make(
+    AST.createTuple(elements.map((schema) => AST.createElement(schema.ast, false)), O.none(), true)
+  )
 
 /**
  * @category combinators
@@ -239,7 +250,8 @@ export const optionalElement = <E>(element: Schema<E>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const array: <A>(item: Schema<A>) => Schema<ReadonlyArray<A>> = I.array
+export const array = <A>(item: Schema<A>): Schema<ReadonlyArray<A>> =>
+  make(AST.createTuple([], O.some([item.ast]), true))
 
 /**
  * @category combinators
@@ -276,11 +288,18 @@ export interface OptionalSchema<A> {
   readonly _id: OptionalSchemaId
 }
 
+const isOptionalSchema = <A>(schema: object): schema is OptionalSchema<A> =>
+  schema["_id"] === OptionalSchemaId
+
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const optional: <A>(schema: Schema<A>) => OptionalSchema<A> = I.optional
+export const optional = <A>(schema: Schema<A>): OptionalSchema<A> => {
+  const out: any = make(schema.ast)
+  out["_id"] = OptionalSchemaId
+  return out
+}
 
 /**
  * @since 1.0.0
@@ -293,14 +312,27 @@ export type OptionalKeys<T> = {
  * @category combinators
  * @since 1.0.0
  */
-export const struct: <Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any>>>(
+export const struct = <Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any>>>(
   fields: Fields
-) => Schema<
+): Schema<
   Spread<
     & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: Infer<Fields[K]> }
     & { readonly [K in OptionalKeys<Fields>]?: Infer<Fields[K]> }
   >
-> = I.struct
+> =>
+  make(
+    AST.createTypeLiteral(
+      Reflect.ownKeys(fields).map((key) =>
+        AST.createPropertySignature(
+          key,
+          (fields[key] as any).ast,
+          isOptionalSchema(fields[key]),
+          true
+        )
+      ),
+      []
+    )
+  )
 
 /**
  * @category combinators
@@ -382,7 +414,7 @@ export const brand = <B extends string, A>(
   options?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): BrandSchema<A & Brand<B>> => {
-    const annotations = I.toAnnotations(options)
+    const annotations = toAnnotations(options)
     annotations[A.BrandId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema: Schema<A & Brand<B>> = make(ast)
@@ -414,10 +446,10 @@ export const partial = <A>(self: Schema<A>): Schema<Partial<A>> => make(AST.part
  * @category combinators
  * @since 1.0.0
  */
-export const record: <K extends string | symbol, V>(
+export const record = <K extends string | symbol, V>(
   key: Schema<K>,
   value: Schema<V>
-) => Schema<{ readonly [k in K]: V }> = I.record
+): Schema<{ readonly [k in K]: V }> => make(AST.createRecord(key.ast, value.ast, true))
 
 const isOverlappingPropertySignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral): boolean =>
   x.propertySignatures.some((px) => y.propertySignatures.some((py) => px.name === py.name))
@@ -492,6 +524,43 @@ export type AnnotationOptions<A> = {
   jsonSchema?: A.JSONSchema
 }
 
+const toAnnotations = <A>(
+  options?: AnnotationOptions<A>
+): AST.Annotated["annotations"] => {
+  const annotations: AST.Annotated["annotations"] = {}
+  if (options?.typeId !== undefined) {
+    const typeId = options?.typeId
+    if (typeof typeId === "object") {
+      annotations[A.TypeId] = typeId.id
+      annotations[typeId.id] = typeId.params
+    } else {
+      annotations[A.TypeId] = typeId
+    }
+  }
+  if (options?.message !== undefined) {
+    annotations[A.MessageId] = options?.message
+  }
+  if (options?.identifier !== undefined) {
+    annotations[A.IdentifierId] = options?.identifier
+  }
+  if (options?.title !== undefined) {
+    annotations[A.TitleId] = options?.title
+  }
+  if (options?.description !== undefined) {
+    annotations[A.DescriptionId] = options?.description
+  }
+  if (options?.examples !== undefined) {
+    annotations[A.ExamplesId] = options?.examples
+  }
+  if (options?.documentation !== undefined) {
+    annotations[A.DocumentationId] = options?.documentation
+  }
+  if (options?.jsonSchema !== undefined) {
+    annotations[A.JSONSchemaId] = options?.jsonSchema
+  }
+  return annotations
+}
+
 /**
  * @category combinators
  * @since 1.0.0
@@ -508,7 +577,7 @@ export function filter<A>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> {
-  return I.filter(predicate, options)
+  return (from) => make(AST.createRefinement(from.ast, predicate, toAnnotations(options)))
 }
 
 /**
@@ -518,11 +587,11 @@ export function filter<A>(
   @category combinators
   @since 1.0.0
  */
-export const transformOrFail: <A, B>(
+export const transformOrFail = <A, B>(
   to: Schema<B>,
   decode: (input: A, options?: ParseOptions) => ParseResult<B>,
   encode: (input: B, options?: ParseOptions) => ParseResult<A>
-) => (self: Schema<A>) => Schema<B> = I.transformOrFail
+) => (self: Schema<A>): Schema<B> => make(AST.createTransform(self.ast, to.ast, decode, encode))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -531,11 +600,13 @@ export const transformOrFail: <A, B>(
   @category combinators
   @since 1.0.0
 */
-export const transform: <A, B>(
+export const transform = <A, B>(
   to: Schema<B>,
-  f: (a: A) => B,
-  g: (b: B) => A
-) => (self: Schema<A>) => Schema<B> = I.transform
+  ab: (a: A) => B,
+  ba: (b: B) => A
+) =>
+  (self: Schema<A>): Schema<B> =>
+    pipe(self, transformOrFail(to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b))))
 
 /**
  * Attaches a property signature with the specified key and value to the schema.
@@ -587,9 +658,8 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
  * @category annotations
  * @since 1.0.0
  */
-export const annotations: (
-  annotations: AST.Annotated["annotations"]
-) => <A>(self: Schema<A>) => Schema<A> = I.annotations
+export const annotations = (annotations: AST.Annotated["annotations"]) =>
+  <A>(self: Schema<A>): Schema<A> => make(AST.mergeAnnotations(self.ast, annotations))
 
 /**
  * @category annotations
@@ -638,11 +708,11 @@ export const documentation = (documentation: A.Documentation) =>
 // data
 // ---------------------------------------------
 
-const _undefined: Schema<undefined> = I._undefined
+const _undefined: Schema<undefined> = make(AST.undefinedKeyword)
 
-const _void: Schema<void> = I._void
+const _void: Schema<void> = make(AST.voidKeyword)
 
-const _null: Schema<null> = I._null
+const _null: Schema<null> = make(AST.createLiteral(null))
 
 export {
   /**
@@ -666,55 +736,55 @@ export {
  * @category primitives
  * @since 1.0.0
  */
-export const never: Schema<never> = I.never
+export const never: Schema<never> = make(AST.neverKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const unknown: Schema<unknown> = I.unknown
+export const unknown: Schema<unknown> = make(AST.unknownKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const any: Schema<any> = I.any
+export const any: Schema<any> = make(AST.anyKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const string: Schema<string> = I.string
+export const string: Schema<string> = make(AST.stringKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const number: Schema<number> = I.number
+export const number: Schema<number> = make(AST.numberKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const boolean: Schema<boolean> = I.boolean
+export const boolean: Schema<boolean> = make(AST.booleanKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const bigint: Schema<bigint> = I.bigint
+export const bigint: Schema<bigint> = make(AST.bigIntKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const symbol: Schema<symbol> = I.symbol
+export const symbol: Schema<symbol> = make(AST.symbolKeyword)
 
 /**
  * @category primitives
  * @since 1.0.0
  */
-export const object: Schema<object> = I.object
+export const object: Schema<object> = make(AST.objectKeyword)
 
 // ---------------------------------------------
 // data/Bigint
@@ -967,14 +1037,14 @@ export const fromBrand = <C extends Brand<string>>(
 // ---------------------------------------------
 
 const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
-  const items = P.decode(I.array(item))
+  const items = P.decode(array(item))
   const schema = chunk(item)
   return I.makeParser(
     schema,
     (u, options) =>
       !C.isChunk(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(C.toReadonlyArray(u), (us) => items(us, options), I.map(C.fromIterable))
+        pipe(C.toReadonlyArray(u), (us) => items(us, options), E.map(C.fromIterable))
   )
 }
 
@@ -1031,7 +1101,7 @@ const dataParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
     (u, options) =>
       !Equal.isEqual(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(decode(u, options), I.map(toData))
+        pipe(decode(u, options), E.map(toData))
   )
 }
 
@@ -1095,7 +1165,7 @@ const datePretty = (): Pretty<Date> =>
  * @category constructors
  * @since 1.0.0
  */
-export const date: Schema<Date> = typeAlias([], I.struct({}), {
+export const date: Schema<Date> = typeAlias([], struct({}), {
   [A.IdentifierId]: "Date",
   [H.ParserHookId]: H.hook(dateParser),
   [H.PrettyHookId]: H.hook(datePretty),
@@ -1139,8 +1209,8 @@ const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Eit
       !E.isEither(u) ?
         PR.failure(PR.type(schema.ast, u)) :
         E.isLeft(u) ?
-        pipe(decodeLeft(u.left, options), I.map(E.left)) :
-        pipe(decodeRight(u.right, options), I.map(E.right))
+        pipe(decodeLeft(u.left, options), E.map(E.left)) :
+        pipe(decodeRight(u.right, options), E.map(E.right))
   )
 }
 
@@ -1169,14 +1239,14 @@ const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>): Schema<Either<E,
     struct({
       _tag: literal("Left"),
       left,
-      [Equal.symbol]: I.any,
-      [Hash.symbol]: I.any
+      [Equal.symbol]: any,
+      [Hash.symbol]: any
     }),
     struct({
       _tag: literal("Right"),
       right,
-      [Equal.symbol]: I.any,
-      [Hash.symbol]: I.any
+      [Equal.symbol]: any,
+      [Hash.symbol]: any
     })
   )
 
@@ -1609,7 +1679,7 @@ const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
         PR.failure(PR.type(schema.ast, u)) :
         O.isNone(u) ?
         PR.success(O.none()) :
-        pipe(decodeValue(u.value, options), I.map(O.some))
+        pipe(decodeValue(u.value, options), E.map(O.some))
   )
 }
 
@@ -1634,14 +1704,14 @@ const inline = <A>(value: Schema<A>): Schema<Option<A>> =>
   union(
     struct({
       _tag: literal("None"),
-      [Equal.symbol]: I.any,
-      [Hash.symbol]: I.any
+      [Equal.symbol]: any,
+      [Hash.symbol]: any
     }),
     struct({
       _tag: literal("Some"),
       value,
-      [Equal.symbol]: I.any,
-      [Hash.symbol]: I.any
+      [Equal.symbol]: any,
+      [Hash.symbol]: any
     })
   )
 
@@ -1826,7 +1896,7 @@ const readonlyMapParser = <K, V>(
   key: P.Parser<K>,
   value: P.Parser<V>
 ): P.Parser<ReadonlyMap<K, V>> => {
-  const items = P.decode(I.array(I.tuple(key, value)))
+  const items = P.decode(array(tuple(key, value)))
   const schema = readonlyMap(key, value)
   return I.makeParser(
     schema,
@@ -1836,7 +1906,7 @@ const readonlyMapParser = <K, V>(
         pipe(
           Array.from(u.entries()),
           (us) => items(us, options),
-          I.map((as) => new Map(as))
+          E.map((as) => new Map(as))
         )
   )
 }
@@ -1869,7 +1939,7 @@ export const readonlyMap = <K, V>(key: Schema<K>, value: Schema<V>): Schema<Read
   typeAlias(
     [key, value],
     struct({
-      size: I.number
+      size: number
     }),
     {
       [A.IdentifierId]: "ReadonlyMap",
@@ -1903,7 +1973,7 @@ export const readonlyMapFromEntries = <K, V>(
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
 const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
-  const items = P.decode(I.array(item))
+  const items = P.decode(array(item))
   const schema = readonlySet(item)
   return I.makeParser(
     schema,
@@ -1913,7 +1983,7 @@ const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
         pipe(
           Array.from(u.values()),
           (us) => items(us, options),
-          I.map((as) => new Set(as))
+          E.map((as) => new Set(as))
         )
   )
 }
@@ -1935,7 +2005,7 @@ export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
   typeAlias(
     [item],
     struct({
-      size: I.number
+      size: number
     }),
     {
       [A.IdentifierId]: "ReadonlySet",
@@ -1976,7 +2046,7 @@ export const trimmed = <A extends string>(annotationOptions?: AnnotationOptions<
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter((a): a is A => trimmedRegex.test(a), {
+      filter((a): a is A => trimmedRegex.test(a), {
         typeId: TrimmedTypeId,
         description: "a string with no leading or trailing whitespace",
         jsonSchema: {
@@ -1998,7 +2068,7 @@ export const maxLength = <A extends string>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter(
+      filter(
         (a): a is A => a.length <= maxLength,
         {
           description: `a string at most ${maxLength} character(s) long`,
@@ -2019,7 +2089,7 @@ export const minLength = <A extends string>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter(
+      filter(
         (a): a is A => a.length >= minLength,
         {
           description: `a string at least ${minLength} character(s) long`,
@@ -2046,7 +2116,7 @@ export const pattern = <A extends string>(
     const pattern = regex.source
     return pipe(
       self,
-      I.filter(
+      filter(
         (a): a is A => {
           // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
           regex.lastIndex = 0
@@ -2078,7 +2148,7 @@ export const startsWith = <A extends string>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter(
+      filter(
         (a): a is A => a.startsWith(startsWith),
         {
           typeId: { id: StartsWithTypeId, params: { startsWith } },
@@ -2105,7 +2175,7 @@ export const endsWith = <A extends string>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter(
+      filter(
         (a): a is A => a.endsWith(endsWith),
         {
           typeId: { id: EndsWithTypeId, params: { endsWith } },
@@ -2132,7 +2202,7 @@ export const includes = <A extends string>(
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
-      I.filter(
+      filter(
         (a): a is A => a.includes(searchString),
         {
           typeId: { id: IncludesTypeId, params: { includes: searchString } },
@@ -2152,7 +2222,7 @@ export const includes = <A extends string>(
 export const trim = (self: Schema<string>): Schema<string> =>
   pipe(
     self,
-    I.transform(
+    transform(
       pipe(self, trimmed()),
       (s) => s.trim(),
       (s) => s.trim()
@@ -2171,11 +2241,11 @@ const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
  * @since 1.0.0
  */
 export const UUID: Schema<string> = pipe(
-  I.string,
+  string,
   pattern(uuidRegex, {
     typeId: UUIDTypeId
   }),
-  I.annotations({
+  annotations({
     [H.ArbitraryHookId]: H.hook(() => I.makeArbitrary(UUID, (fc) => fc.uuid()))
   })
 )
