@@ -1,12 +1,10 @@
 import * as E from "@effect/data/Either"
-import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema"
-import { parseString } from "@effect/schema/data/Number"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
 import * as Util from "@effect/schema/test/util"
 
-const NumberFromString = pipe(S.string, parseString)
+const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("Either", () => {
   it("either. property tests", () => {

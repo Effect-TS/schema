@@ -1,7 +1,7 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema"
 import * as A from "@effect/schema/Arbitrary"
 import * as P from "@effect/schema/Parser"
-import * as S from "@effect/schema/Schema"
 import * as fc from "fast-check"
 
 export const property = <A>(schema: S.Schema<A>) => {

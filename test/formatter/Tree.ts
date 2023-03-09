@@ -3,11 +3,9 @@ import { pipe } from "@effect/data/Function"
 import { isNumber } from "@effect/data/Number"
 import { isRecord } from "@effect/data/Predicate"
 import { isString } from "@effect/data/String"
-import type { Json, JsonArray, JsonObject } from "@effect/schema/data/Json"
-import { json } from "@effect/schema/data/Json"
+import * as S from "@effect/schema"
 import * as _ from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Tree", () => {
@@ -32,18 +30,18 @@ describe.concurrent("Tree", () => {
   })
 
   it("formatErrors/ lazy", () => {
-    const isJsonArray = (u: unknown): u is JsonArray => Array.isArray(u) && u.every(isJson)
+    const isJsonArray = (u: unknown): u is S.JsonArray => Array.isArray(u) && u.every(isJson)
 
-    const isJsonObject = (u: unknown): u is JsonObject =>
+    const isJsonObject = (u: unknown): u is S.JsonObject =>
       isRecord(u) && Object.keys(u).every((key) => isJson(u[key]))
 
-    const isJson = (u: unknown): u is Json =>
+    const isJson = (u: unknown): u is S.Json =>
       u === null || typeof u === "string" || (typeof u === "number" && !isNaN(u) && isFinite(u)) ||
       typeof u === "boolean" ||
       isJsonArray(u) ||
       isJsonObject(u)
 
-    const parser = I.fromRefinement(json, isJson)
+    const parser = I.fromRefinement(S.json, isJson)
     expect(pipe(parser.parse(undefined), E.mapLeft(_.formatErrors))).toEqual(
       E.left(`1 error(s) found
 └─ Expected <anonymous Lazy schema>, actual undefined`)

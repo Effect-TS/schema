@@ -1,8 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
-import * as DataOption from "@effect/schema/data/Option"
+import * as S from "@effect/schema"
 import * as P from "@effect/schema/Parser"
-import * as S from "@effect/schema/Schema"
 
 describe.concurrent("is", () => {
   it("templateLiteral. a", () => {
@@ -704,7 +703,7 @@ describe.concurrent("is", () => {
 
   describe.concurrent("partial", () => {
     it("type alias", () => {
-      const schema = S.partial(DataOption.option(S.number))
+      const schema = S.partial(S.optionFromNullable(S.number))
       const is = P.is(schema)
       expect(is(O.none())).toEqual(true)
       expect(is(O.some(1))).toEqual(true)

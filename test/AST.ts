@@ -2,8 +2,6 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as S from "@effect/schema"
 import * as AST from "@effect/schema/AST"
-import { json } from "@effect/schema/data/Json"
-import * as DataOption from "@effect/schema/data/Option"
 
 describe.concurrent("AST", () => {
   it("exports", () => {
@@ -17,7 +15,7 @@ describe.concurrent("AST", () => {
   })
 
   it("isTypeAlias", () => {
-    expect(AST.isTypeAlias(DataOption.option(S.number).ast)).toEqual(true)
+    expect(AST.isTypeAlias(S._option(S.number).ast)).toEqual(true)
     expect(AST.isTypeAlias(S.number.ast)).toEqual(false)
   })
 
@@ -27,7 +25,7 @@ describe.concurrent("AST", () => {
   })
 
   it("isLazy", () => {
-    expect(AST.isLazy(json.ast)).toEqual(true)
+    expect(AST.isLazy(S.json.ast)).toEqual(true)
     expect(AST.isLazy(S.number.ast)).toEqual(false)
   })
 
@@ -174,7 +172,7 @@ describe.concurrent("AST", () => {
   })
 
   it("keyof/ lazy", () => {
-    expect(AST.keyof(json.ast)).toEqual(S.never.ast)
+    expect(AST.keyof(S.json.ast)).toEqual(S.never.ast)
   })
 
   it("keyof/union/ symbol keys", () => {
@@ -386,7 +384,7 @@ describe.concurrent("AST", () => {
   })
 
   it("getPropertySignatures/ type alias", () => {
-    const schema = DataOption.parseNullable(S.number)
+    const schema = S.optionFromNullable(S.number)
     expect(AST._getPropertySignatures(schema.ast)).toEqual([
       AST.createPropertySignature(
         "_tag",

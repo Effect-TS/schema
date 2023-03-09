@@ -3,6 +3,7 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
+import type { Schema } from "@effect/schema"
 import * as annotations from "@effect/schema/annotation/AST"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
@@ -11,7 +12,6 @@ import { formatActual, formatErrors, formatExpected } from "@effect/schema/forma
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
-import type { Schema } from "@effect/schema/Schema"
 import * as fc from "fast-check"
 
 export const property = <A>(schema: Schema<A>) => {

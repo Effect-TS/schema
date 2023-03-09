@@ -2,14 +2,13 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import { isRecord } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import type { Schema } from "@effect/schema"
+import * as S from "@effect/schema"
 import type { JSONSchema } from "@effect/schema/annotation/AST"
 import { JSONSchemaId } from "@effect/schema/annotation/AST"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
-import type { Json, JsonArray, JsonObject } from "@effect/schema/data/Json"
 import * as P from "@effect/schema/Parser"
-import type { Schema } from "@effect/schema/Schema"
-import * as S from "@effect/schema/Schema"
 import Ajv from "ajv"
 import * as fc from "fast-check"
 
@@ -81,12 +80,12 @@ export type JsonSchema7Type =
   | JsonSchema7AllOfType
   | JsonSchema7ObjectType
 
-const isJsonArray = (u: unknown): u is JsonArray => Array.isArray(u) && u.every(isJson)
+const isJsonArray = (u: unknown): u is S.JsonArray => Array.isArray(u) && u.every(isJson)
 
-const isJsonObject = (u: unknown): u is JsonObject =>
+const isJsonObject = (u: unknown): u is S.JsonObject =>
   isRecord(u) && Object.keys(u).every((key) => isJson(u[key]))
 
-export const isJson = (u: unknown): u is Json =>
+export const isJson = (u: unknown): u is S.Json =>
   u === null || typeof u === "string" || (typeof u === "number" && !isNaN(u) && isFinite(u)) ||
   typeof u === "boolean" ||
   isJsonArray(u) ||

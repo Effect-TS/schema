@@ -1,7 +1,6 @@
-import * as _ from "@effect/schema/data/String"
+import * as S from "@effect/schema"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("includes", () => {
@@ -10,7 +9,7 @@ describe.concurrent("includes", () => {
   })
 
   it("Guard", () => {
-    const is = P.is(_.includes("a")(S.string))
+    const is = P.is(S.includes("a")(S.string))
     expect(is("")).toEqual(false)
     expect(is("a")).toEqual(true)
     expect(is("aa")).toEqual(true)
@@ -19,7 +18,7 @@ describe.concurrent("includes", () => {
   })
 
   it("Decoder", () => {
-    const schema = _.includes("a")(S.string)
+    const schema = S.includes("a")(S.string)
     Util.expectDecodingSuccess(schema, "a")
     Util.expectDecodingSuccess(schema, "aa")
     Util.expectDecodingSuccess(schema, "bac")
@@ -32,7 +31,7 @@ describe.concurrent("includes", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.pretty(_.includes("a")(S.string))
+    const pretty = Pretty.pretty(S.includes("a")(S.string))
     expect(pretty("a")).toEqual(`"a"`)
   })
 })

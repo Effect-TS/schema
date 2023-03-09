@@ -1,11 +1,10 @@
 import { pipe } from "@effect/data/Function"
-import * as _ from "@effect/schema/data/Number"
+import * as S from "@effect/schema"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
-const schema = pipe(S.number, _.int())
+const schema = pipe(S.number, S.int())
 
 describe.concurrent("int", () => {
   it("property tests", () => {
