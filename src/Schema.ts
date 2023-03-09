@@ -25,7 +25,6 @@ import { Arbitrary } from "@effect/schema/Arbitrary"
 import * as Arb from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as SRA from "@effect/schema/data/ReadonlyArray"
 import * as S from "@effect/schema/data/String"
 import { formatErrors } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
@@ -255,33 +254,6 @@ export const pattern: <A extends string>(
 export const trimmed: <A extends string>(
   annotationOptions?: AnnotationOptions<A>
 ) => (self: Schema<A>) => Schema<A> = S.trimmed
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const maxItems: <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) => (self: Schema<ReadonlyArray<A>>) => Schema<ReadonlyArray<A>> = SRA.maxItems
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const minItems: <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) => (self: Schema<ReadonlyArray<A>>) => Schema<ReadonlyArray<A>> = SRA.minItems
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const itemsCount: <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) => (self: Schema<ReadonlyArray<A>>) => Schema<ReadonlyArray<A>> = SRA.itemsCount
 
 // ---------------------------------------------
 // combinators
@@ -1862,3 +1834,80 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
     }
     throw new Error("`parseOptional` can only handle type literals")
   }
+
+// ---------------------------------------------
+// data/ReadonlyArray
+// ---------------------------------------------
+
+/**
+ * @category identifiers
+ * @since 1.0.0
+ */
+export const MinItemsTypeId = "@effect/schema/MinItemsTypeId"
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const minItems = <A>(
+  n: number,
+  annotationOptions?: AnnotationOptions<ReadonlyArray<A>>
+) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    pipe(
+      self,
+      filter((a): a is ReadonlyArray<A> => a.length >= n, {
+        typeId: MinItemsTypeId,
+        description: `an array of at least ${n} items`,
+        jsonSchema: { minItems: n },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const MaxItemsTypeId = "@effect/schema/MaxItemsTypeId"
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const maxItems = <A>(
+  n: number,
+  annotationOptions?: AnnotationOptions<ReadonlyArray<A>>
+) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    pipe(
+      self,
+      filter((a): a is ReadonlyArray<A> => a.length <= n, {
+        typeId: MaxItemsTypeId,
+        description: `an array of at most ${n} items`,
+        jsonSchema: { maxItems: n },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const ItemsCountTypeId = "@effect/schema/ItemsCountTypeId"
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const itemsCount = <A>(
+  n: number,
+  annotationOptions?: AnnotationOptions<ReadonlyArray<A>>
+) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    pipe(
+      self,
+      filter((a): a is ReadonlyArray<A> => a.length === n, {
+        typeId: ItemsCountTypeId,
+        description: `an array of exactly ${n} items`,
+        jsonSchema: { minItems: n, maxItems: n },
+        ...annotationOptions
+      })
+    )
