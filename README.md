@@ -1023,7 +1023,7 @@ const decode = (s: string): PR.ParseResult<boolean> =>
     : s === "false"
     ? PR.success(false)
     : PR.failure(
-        PR.type(AST.union([AST.literal("true"), AST.literal("false")]), s)
+        PR.type(AST.createUnion([AST.createLiteral("true"), AST.createLiteral("false")]), s)
       );
 
 // define a function that converts a boolean into a string
