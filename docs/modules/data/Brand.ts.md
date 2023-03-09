@@ -13,24 +13,24 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [BrandTypeId](#brandtypeid)
-  - [brand](#brand)
+  - [~~BrandTypeId~~](#brandtypeid)
+  - [~~brand~~](#brand)
 
 ---
 
 # utils
 
-## BrandTypeId
+## ~~BrandTypeId~~
 
 **Signature**
 
 ```ts
-export declare const BrandTypeId: '@effect/schema/data/Brand/BrandTypeId'
+export declare const BrandTypeId: '@effect/schema/BrandTypeId'
 ```
 
 Added in v1.0.0
 
-## brand
+## ~~brand~~
 
 **Signature**
 

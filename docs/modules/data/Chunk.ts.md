@@ -13,29 +13,29 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [chunk](#chunk)
-  - [fromValues](#fromvalues)
+  - [~~chunk~~](#chunk)
+  - [~~fromValues~~](#fromvalues)
 
 ---
 
 # utils
 
-## chunk
+## ~~chunk~~
 
 **Signature**
 
 ```ts
-export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const chunk: <A>(item: S.Schema<A>) => S.Schema<Chunk<A>>
 ```
 
 Added in v1.0.0
 
-## fromValues
+## ~~fromValues~~
 
 **Signature**
 
 ```ts
-export declare const fromValues: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const fromValues: <A>(item: S.Schema<A>) => S.Schema<Chunk<A>>
 ```
 
 Added in v1.0.0

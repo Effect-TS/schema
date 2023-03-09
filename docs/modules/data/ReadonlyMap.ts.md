@@ -13,29 +13,29 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [fromEntries](#fromentries)
-  - [readonlyMap](#readonlymap)
+  - [~~fromEntries~~](#fromentries)
+  - [~~readonlyMap~~](#readonlymap)
 
 ---
 
 # utils
 
-## fromEntries
+## ~~fromEntries~~
 
 **Signature**
 
 ```ts
-export declare const fromEntries: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
+export declare const fromEntries: <K, V>(key: S.Schema<K>, value: S.Schema<V>) => S.Schema<ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
 
-## readonlyMap
+## ~~readonlyMap~~
 
 **Signature**
 
 ```ts
-export declare const readonlyMap: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
+export declare const readonlyMap: <K, V>(key: S.Schema<K>, value: S.Schema<V>) => S.Schema<ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0

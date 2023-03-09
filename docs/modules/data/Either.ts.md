@@ -13,18 +13,18 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [either](#either)
+  - [~~either~~](#either)
 
 ---
 
 # utils
 
-## either
+## ~~either~~
 
 **Signature**
 
 ```ts
-export declare const either: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<Either<E, A>>
+export declare const either: <E, A>(left: S.Schema<E>, right: S.Schema<A>) => S.Schema<Either<E, A>>
 ```
 
 Added in v1.0.0

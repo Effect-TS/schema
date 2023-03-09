@@ -13,33 +13,33 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [utils](#utils)
-  - [data](#data)
-  - [fromStructure](#fromstructure)
+  - [~~data~~](#data)
+  - [~~fromStructure~~](#fromstructure)
 
 ---
 
 # utils
 
-## data
+## ~~data~~
 
 **Signature**
 
 ```ts
 export declare const data: <A extends readonly any[] | Readonly<Record<string, any>>>(
-  item: Schema<A>
-) => Schema<D.Data<A>>
+  item: S.Schema<A>
+) => S.Schema<Data<A>>
 ```
 
 Added in v1.0.0
 
-## fromStructure
+## ~~fromStructure~~
 
 **Signature**
 
 ```ts
 export declare const fromStructure: <A extends readonly any[] | Readonly<Record<string, any>>>(
-  item: Schema<A>
-) => Schema<D.Data<A>>
+  item: S.Schema<A>
+) => S.Schema<Data<A>>
 ```
 
 Added in v1.0.0
