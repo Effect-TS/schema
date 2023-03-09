@@ -549,11 +549,11 @@ There are two ways to define a schema for a branded type, depending on whether y
 To define a schema for a branded type from scratch, you can use the `brand` combinator exported by the `@effect/schema` module. Here's an example:
 
 ```ts
-import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema"
+import { pipe } from "@effect/data/Function";
+import * as S from "@effect/schema";
 
-const UserIdSchema = pipe(S.string, S.brand("UserId"))
-type UserId = S.Infer<typeof UserIdSchema> // string & Brand<"UserId">
+const UserIdSchema = pipe(S.string, S.brand("UserId"));
+type UserId = S.Infer<typeof UserIdSchema>; // string & Brand<"UserId">
 ```
 
 In the above example, `UserIdSchema` is a schema for the `UserId` branded type. The `brand` combinator takes a string argument that specifies the name of the brand to attach to the type.
@@ -563,18 +563,18 @@ In the above example, `UserIdSchema` is a schema for the `UserId` branded type. 
 If you have already defined a branded type using the `@effect/data/Brand` module, you can reuse it to define a schema using the `brand` combinator exported by the `@effect/schema/data/Brand` module. Here's an example:
 
 ```ts
-import * as B from "@effect/data/Brand"
+import * as B from "@effect/data/Brand";
 
 // the existing branded type
-type UserId = string & B.Brand<"UserId">
-const UserId = B.nominal<UserId>()
+type UserId = string & B.Brand<"UserId">;
+const UserId = B.nominal<UserId>();
 
-import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema"
-import { brand } from "@effect/schema/data/Brand"
+import { pipe } from "@effect/data/Function";
+import * as S from "@effect/schema";
+import { brand } from "@effect/schema/data/Brand";
 
 // Define a schema for the branded type
-const UserIdSchema = pipe(S.string, brand(UserId))
+const UserIdSchema = pipe(S.string, brand(UserId));
 ```
 
 ## Native enums
@@ -1023,7 +1023,13 @@ const decode = (s: string): PR.ParseResult<boolean> =>
     : s === "false"
     ? PR.success(false)
     : PR.failure(
-        PR.type(AST.createUnion([AST.createLiteral("true"), AST.createLiteral("false")]), s)
+        PR.type(
+          AST.createUnion([
+            AST.createLiteral("true"),
+            AST.createLiteral("false"),
+          ]),
+          s
+        )
       );
 
 // define a function that converts a boolean into a string
@@ -1136,25 +1142,87 @@ decodeOrThrow("a"); // throws
 
 ## Option
 
-The `option` combinator allows you to specify that a field in a schema may be either an optional value or `null`. This is useful when working with JSON data that may contain `null` values for optional fields.
+### Decoding from nullable fields
 
-In the example below, we define a schema for an object with a required `a` field of type `string` and an optional `b` field of type `number`. We use the `option` combinator to specify that the `b` field may be either a `number` or `null`.
+The `option` combinator in `@effect/schema` allows you to specify that a field in a schema is of type `Option<A>` and can be decoded from a required nullable field `A | undefined | null`. This is particularly useful when working with JSON data that may contain `null` values for optional fields.
+
+When decoding a nullable field, the `option` combinator follows these conversion rules:
+
+- `undefined` and `null` decode to `None`
+- `A` decodes to `Some<A>`
+
+Here's an example that demonstrates how to use the `option` combinator:
 
 ```ts
 import * as S from "@effect/schema";
 import * as O from "@effect/data/Option";
 
+/*
+const schema: Schema<{
+    readonly a: string;
+    readonly b: Option<number>;
+}>
+*/
 const schema = S.struct({
   a: S.string,
-  // define a schema for Option with number values
   b: S.option(S.number),
 });
+
+// decoding
 const decodeOrThrow = S.decodeOrThrow(schema);
+decodeOrThrow({ a: "hello", b: undefined }); // { a: "hello", b: none() }
+decodeOrThrow({ a: "hello", b: null }); // { a: "hello", b: none() }
+decodeOrThrow({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
-decodeOrThrow({ a: "hello", b: null }); // { a: "hello", b: O.none }
+decodeOrThrow({ a: "hello" }); // throws key "b" is missing
 
-decodeOrThrow({ a: "hello", b: 1 }); // { a: "hello", b: O.some(1) }
+// encoding
+const encodeOrThrow = S.encodeOrThrow(schema);
+
+encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
+encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
 ```
+
+### Decoding from optional fields
+
+When working with optional fields that contain values of type `A`, it is possible to decode them into an `Option<A>` by using the `parseOptionals` combinator.
+
+When decoding a nullable field, the `parseOptionals` combinator follows these conversion rules:
+
+- `undefined`, `null` and an absent value decode to `None`
+- `A` decodes to `Some<A>`
+
+Here's an example that demonstrates how to use the `parseOptionals` combinator:
+
+```ts
+import * as S from "@effect/schema";
+import { parseOptionals } from "@effect/schema/data/Option";
+
+/*
+const schema: Schema<{
+    readonly a: string;
+    readonly b: Option<number>;
+}>
+*/
+const schema = pipe(S.struct({ a: S.string }), parseOptionals({ b: S.number }));
+
+// decoding
+const decodeOrThrow = S.decodeOrThrow(schema);
+decodeOrThrow({ a: "hello" }); // { a: "hello", b: none() }
+decodeOrThrow({ a: "hello", b: undefined }); // { a: "hello", b: none() }
+decodeOrThrow({ a: "hello", b: null }); // { a: "hello", b: none() }
+decodeOrThrow({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
+
+// encoding
+const encodeOrThrow = S.encodeOrThrow(schema);
+
+encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello' }
+encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
+```
+
+In the above example, the `parseOptionals` combinator is used to decode the optional field `b` with values of type `number` into an `Option<number>`. When decoding, `undefined`, `null` and absent values will be decoded as `none()`, and any other value will be decoded as `some(value)`.
+
+To use `parseOptionals`, you should first define your base schema and then apply the `parseOptionals` combinator to add the fields that you want to decode into an `Option`.
 
 ## ReadonlySet
 
