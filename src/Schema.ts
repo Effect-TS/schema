@@ -1991,3 +1991,59 @@ export const readonlyMapFromEntries = <K, V>(
       (map) => Array.from(map.entries())
     )
   )
+
+// ---------------------------------------------
+// data/ReadonlySet
+// ---------------------------------------------
+
+const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
+
+const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
+  const items = P.decode(I.array(item))
+  const schema = readonlySet(item)
+  return I.makeParser(
+    schema,
+    (u, options) =>
+      !isSet(u) ?
+        PR.failure(PR.type(schema.ast, u)) :
+        pipe(
+          Array.from(u.values()),
+          (us) => items(us, options),
+          I.map((as) => new Set(as))
+        )
+  )
+}
+
+const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
+  I.makeArbitrary(readonlySet(item), (fc) => fc.array(item.arbitrary(fc)).map((as) => new Set(as)))
+
+const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
+  I.makePretty(
+    readonlySet(item),
+    (set) => `new Set([${Array.from(set.values()).map((a) => item.pretty(a)).join(", ")}])`
+  )
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
+  typeAlias(
+    [item],
+    struct({
+      size: I.number
+    }),
+    {
+      [A.IdentifierId]: "ReadonlySet",
+      [H.ParserHookId]: H.hook(readonlySetParser),
+      [H.PrettyHookId]: H.hook(readonlySetPretty),
+      [H.ArbitraryHookId]: H.hook(readonlySetArbitrary)
+    }
+  )
+
+/**
+ * @category parsers
+ * @since 1.0.0
+ */
+export const readonlySetFromValues = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
+  pipe(array(item), transform(readonlySet(item), (as) => new Set(as), (set) => Array.from(set)))

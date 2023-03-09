@@ -1227,14 +1227,13 @@ To use `parseOptionals`, you should first define your base schema and then apply
 
 ## ReadonlySet
 
-In the following section, we demonstrate how to use the `fromValues` combinator to decode a `ReadonlySet` from an array of values.
+In the following section, we demonstrate how to use the `readonlySetFromValues` combinator to decode a `ReadonlySet` from an array of values.
 
 ```ts
 import * as S from "@effect/schema";
-import { fromValues } from "@effect/schema/data/ReadonlySet";
 
 // define a schema for ReadonlySet with number values
-const schema = fromValues(S.number);
+const schema = S.readonlySetFromValues(S.number);
 const decodeOrThrow = P.decodeOrThrow(schema);
 
 decodeOrThrow([1, 2, 3]); // new Set([1, 2, 3])
