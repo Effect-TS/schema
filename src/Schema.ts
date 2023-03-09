@@ -12,6 +12,7 @@ import * as E from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
 import type { Option } from "@effect/data/Option"
+import { isDate } from "@effect/data/Predicate"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/annotation/AST"
@@ -19,7 +20,6 @@ import * as H from "@effect/schema/annotation/Hook"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as DataDate from "@effect/schema/data/Date"
 import * as N from "@effect/schema/data/Number"
 import * as DataObject from "@effect/schema/data/Object"
 import * as DataOption from "@effect/schema/data/Option"
@@ -942,12 +942,6 @@ export const symbol: Schema<symbol> = I.symbol
 export const object: Schema<object> = I.object
 
 /**
- * @category primitives
- * @since 1.0.0
- */
-export const date: Schema<Date> = DataDate.date
-
-/**
  * Transforms a `string` into a `string` with no leading or trailing whitespace.
  *
  * @category parsers
@@ -1237,11 +1231,11 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
  * @since 1.0.0
  */
 export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
-  I.typeAlias(
+  typeAlias(
     [item],
-    I.struct({
-      _id: I.uniqueSymbol(Symbol.for("@effect/data/Chunk")),
-      length: I.number
+    struct({
+      _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
+      length: number
     }),
     {
       [A.IdentifierId]: "Chunk",
@@ -1255,7 +1249,7 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
  * @since 1.0.0
  */
 export const chunkFromValues = <A>(item: Schema<A>): Schema<Chunk<A>> =>
-  pipe(I.array(item), I.transform(chunk(item), C.fromIterable, C.toReadonlyArray))
+  pipe(array(item), transform(chunk(item), C.fromIterable, C.toReadonlyArray))
 
 // ---------------------------------------------
 // data/Data
@@ -1297,7 +1291,7 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
 export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
 ): Schema<D.Data<A>> =>
-  I.typeAlias(
+  typeAlias(
     [item],
     item,
     {
@@ -1316,7 +1310,51 @@ export const fromStructure = <A extends Readonly<Record<string, any>> | Readonly
 ): Schema<D.Data<A>> =>
   pipe(
     item,
-    I.transform(data(item), toData, (a) =>
+    transform(data(item), toData, (a) =>
       // @ts-expect-error
       Array.isArray(a) ? Array.from(a) : Object.assign({}, a))
   )
+
+// ---------------------------------------------
+// data/Date
+// ---------------------------------------------
+
+const dateParser = (): P.Parser<Date> =>
+  I.makeParser(date, (u) => !isDate(u) ? PR.failure(PR.type(date.ast, u)) : PR.success(u))
+
+const dateArbitrary = (): Arbitrary<Date> => I.makeArbitrary(date, (fc) => fc.date())
+
+const datePretty = (): Pretty<Date> =>
+  I.makePretty(date, (date) => `new Date(${JSON.stringify(date)})`)
+
+/**
+ * @since 1.0.0
+ */
+export const date: Schema<Date> = typeAlias([], I.struct({}), {
+  [A.IdentifierId]: "Date",
+  [H.ParserHookId]: H.hook(dateParser),
+  [H.PrettyHookId]: H.hook(datePretty),
+  [H.ArbitraryHookId]: H.hook(dateArbitrary)
+})
+
+/**
+  Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+
+  @since 1.0.0
+*/
+export const dateFromString = (self: Schema<string>): Schema<Date> => {
+  const schema: Schema<Date> = pipe(
+    self,
+    transformOrFail(
+      date,
+      (s) => {
+        const n = Date.parse(s)
+        return isNaN(n)
+          ? PR.failure(PR.type(schema.ast, s))
+          : PR.success(new Date(n))
+      },
+      (n) => PR.success(n.toISOString())
+    )
+  )
+  return schema
+}
