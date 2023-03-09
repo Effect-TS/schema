@@ -2,222 +2,96 @@
  * @since 1.0.0
  */
 
-import { pipe } from "@effect/data/Function"
-import * as H from "@effect/schema/annotation/Hook"
-import * as I from "@effect/schema/internal/common"
-import type { AnnotationOptions, Schema } from "@effect/schema/Schema"
+import * as S from "@effect/schema"
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const TrimmedTypeId = "@effect/schema/data/String/TrimmedTypeId"
-
-const trimmedRegex = /^\S.*\S$|^\S$|^$/
-
-/**
- * Verifies that a string contains no leading or trailing whitespaces.
- *
- * Note. This combinator does not make any transformations, it only validates.
- * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
- *
- * @since 1.0.0
- */
-export const trimmed = <A extends string>(annotationOptions?: AnnotationOptions<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => trimmedRegex.test(a), {
-        typeId: TrimmedTypeId,
-        description: "a string with no leading or trailing whitespace",
-        jsonSchema: {
-          type: "string",
-          pattern: trimmedRegex.source
-        },
-        ...annotationOptions
-      })
-    )
+export const TrimmedTypeId = S.TrimmedTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const maxLength = <A extends string>(
-  maxLength: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter(
-        (a): a is A => a.length <= maxLength,
-        {
-          description: `a string at most ${maxLength} character(s) long`,
-          jsonSchema: { maxLength },
-          ...annotationOptions
-        }
-      )
-    )
+export const trimmed = S.trimmed
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const minLength = <A extends string>(
-  minLength: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter(
-        (a): a is A => a.length >= minLength,
-        {
-          description: `a string at least ${minLength} character(s) long`,
-          jsonSchema: { minLength },
-          ...annotationOptions
-        }
-      )
-    )
+export const maxLength = S.maxLength
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const PatternTypeId = "@effect/schema/data/String/PatternTypeId"
+export const minLength = S.minLength
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const pattern = <A extends string>(
-  regex: RegExp,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> => {
-    const pattern = regex.source
-    return pipe(
-      self,
-      I.filter(
-        (a): a is A => {
-          // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
-          regex.lastIndex = 0
-          return regex.test(a)
-        },
-        {
-          typeId: { id: PatternTypeId, params: { regex } },
-          description: `a string matching the pattern ${pattern}`,
-          jsonSchema: { pattern },
-          ...annotationOptions
-        }
-      )
-    )
-  }
+export const PatternTypeId = S.PositiveTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const StartsWithTypeId = "@effect/schema/data/String/StartsWithTypeId"
+export const pattern = S.pattern
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const startsWith = <A extends string>(
-  startsWith: string,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter(
-        (a): a is A => a.startsWith(startsWith),
-        {
-          typeId: { id: StartsWithTypeId, params: { startsWith } },
-          description: `a string starting with ${JSON.stringify(startsWith)}`,
-          jsonSchema: { pattern: `^${startsWith}` },
-          ...annotationOptions
-        }
-      )
-    )
+export const StartsWithTypeId = S.StartsWithTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const EndsWithTypeId = "@effect/schema/data/String/EndsWithTypeId"
+export const startsWith = S.startsWith
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const endsWith = <A extends string>(
-  endsWith: string,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter(
-        (a): a is A => a.endsWith(endsWith),
-        {
-          typeId: { id: EndsWithTypeId, params: { endsWith } },
-          description: `a string ending with ${JSON.stringify(endsWith)}`,
-          jsonSchema: { pattern: `^.*${endsWith}$` },
-          ...annotationOptions
-        }
-      )
-    )
+export const EndsWithTypeId = S.EndsWithTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const IncludesTypeId = "@effect/schema/data/String/IncludesTypeId"
+export const endsWith = S.endsWith
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const includes = <A extends string>(
-  searchString: string,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter(
-        (a): a is A => a.includes(searchString),
-        {
-          typeId: { id: IncludesTypeId, params: { includes: searchString } },
-          description: `a string including ${JSON.stringify(searchString)}`,
-          jsonSchema: { pattern: `.*${searchString}.*` },
-          ...annotationOptions
-        }
-      )
-    )
+export const IncludesTypeId = S.IncludesTypeId
+
+/**
+ * @since 1.0.0
+ * @deprecated
+ */
+export const includes = S.includes
 
 /**
  * The `trim` parser allows removing whitespaces from the beginning and end of a string.
  *
  * @since 1.0.0
+ * @deprecated
  */
-export const trim = (self: Schema<string>): Schema<string> =>
-  pipe(
-    self,
-    I.transform(
-      pipe(self, trimmed()),
-      (s) => s.trim(),
-      (s) => s.trim()
-    )
-  )
+export const trim = S.trim
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const UUIDTypeId = "@effect/schema/data/String/UUIDTypeId"
-
-const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i
+export const UUIDTypeId = S.UUIDTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const UUID: Schema<string> = pipe(
-  I.string,
-  pattern(uuidRegex, {
-    typeId: UUIDTypeId
-  }),
-  I.annotations({
-    [H.ArbitraryHookId]: H.hook(() => I.makeArbitrary(UUID, (fc) => fc.uuid()))
-  })
-)
+export const UUID = S.UUID

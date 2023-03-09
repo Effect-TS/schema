@@ -411,6 +411,9 @@ S.unknown;
 // never type
 // allows no values
 S.never;
+
+S.json;
+S.UUID;
 ```
 
 ## Literals

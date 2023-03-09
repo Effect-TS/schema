@@ -25,7 +25,6 @@ import { Arbitrary } from "@effect/schema/Arbitrary"
 import * as Arb from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as S from "@effect/schema/data/String"
 import { formatErrors } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
@@ -167,93 +166,6 @@ export const typeAlias: (
   type: Schema<any>,
   annotations?: AST.Annotated["annotations"]
 ) => Schema<any> = I.typeAlias
-
-// ---------------------------------------------
-// filters
-// ---------------------------------------------
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const minLength: <A extends string>(
-  minLength: number,
-  annotationOptions?: AnnotationOptions<A>
-) => (self: Schema<A>) => Schema<A> = S.minLength
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const maxLength: <A extends string>(
-  maxLength: number,
-  annotationOptions?: AnnotationOptions<A>
-) => (self: Schema<A>) => Schema<A> = S.maxLength
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const length = <A extends string>(
-  length: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> => minLength(length, annotationOptions)(maxLength<A>(length)(self))
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const nonEmpty = <A extends string>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> => minLength(1, annotationOptions)
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const startsWith: <A extends string>(
-  startsWith: string,
-  annotationOptions?: AnnotationOptions<A>
-) => (self: Schema<A>) => Schema<A> = S.startsWith
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const endsWith: <A extends string>(
-  endsWith: string,
-  annotationOptions?: AnnotationOptions<A>
-) => (self: Schema<A>) => Schema<A> = S.endsWith
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const includes: <A extends string>(
-  searchString: string,
-  annotationOptions?: AnnotationOptions<A>
-) => (self: Schema<A>) => Schema<A> = S.includes
-
-/**
- * @category filters
- * @since 1.0.0
- */
-export const pattern: <A extends string>(
-  regex: RegExp,
-  annotationOptions?: AnnotationOptions<A>
-) => (self: Schema<A>) => Schema<A> = S.pattern
-
-/**
- * Note. This combinator does not make any transformations, it only validates.
- * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
- *
- * @category filters
- * @since 1.0.0
- */
-export const trimmed: <A extends string>(
-  annotationOptions?: AnnotationOptions<A>
-) => (self: Schema<A>) => Schema<A> = S.trimmed
 
 // ---------------------------------------------
 // combinators
@@ -803,14 +715,6 @@ export const symbol: Schema<symbol> = I.symbol
  * @since 1.0.0
  */
 export const object: Schema<object> = I.object
-
-/**
- * Transforms a `string` into a `string` with no leading or trailing whitespace.
- *
- * @category parsers
- * @since 1.0.0
- */
-export const trim = (item: Schema<string>): Schema<string> => S.trim(item)
 
 // ---------------------------------------------
 // data/Bigint
@@ -2047,3 +1951,249 @@ export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
  */
 export const readonlySetFromValues = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
   pipe(array(item), transform(readonlySet(item), (as) => new Set(as), (set) => Array.from(set)))
+
+// ---------------------------------------------
+// data/String
+// ---------------------------------------------
+
+/**
+ * @since 1.0.0
+ */
+export const TrimmedTypeId = "@effect/schema/TrimmedTypeId"
+
+const trimmedRegex = /^\S.*\S$|^\S$|^$/
+
+/**
+ * Verifies that a string contains no leading or trailing whitespaces.
+ *
+ * Note. This combinator does not make any transformations, it only validates.
+ * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+ *
+ * @category filters
+ * @since 1.0.0
+ */
+export const trimmed = <A extends string>(annotationOptions?: AnnotationOptions<A>) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter((a): a is A => trimmedRegex.test(a), {
+        typeId: TrimmedTypeId,
+        description: "a string with no leading or trailing whitespace",
+        jsonSchema: {
+          type: "string",
+          pattern: trimmedRegex.source
+        },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const maxLength = <A extends string>(
+  maxLength: number,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter(
+        (a): a is A => a.length <= maxLength,
+        {
+          description: `a string at most ${maxLength} character(s) long`,
+          jsonSchema: { maxLength },
+          ...annotationOptions
+        }
+      )
+    )
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const minLength = <A extends string>(
+  minLength: number,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter(
+        (a): a is A => a.length >= minLength,
+        {
+          description: `a string at least ${minLength} character(s) long`,
+          jsonSchema: { minLength },
+          ...annotationOptions
+        }
+      )
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const PatternTypeId = "@effect/schema/PatternTypeId"
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const pattern = <A extends string>(
+  regex: RegExp,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> => {
+    const pattern = regex.source
+    return pipe(
+      self,
+      I.filter(
+        (a): a is A => {
+          // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
+          regex.lastIndex = 0
+          return regex.test(a)
+        },
+        {
+          typeId: { id: PatternTypeId, params: { regex } },
+          description: `a string matching the pattern ${pattern}`,
+          jsonSchema: { pattern },
+          ...annotationOptions
+        }
+      )
+    )
+  }
+
+/**
+ * @since 1.0.0
+ */
+export const StartsWithTypeId = "@effect/schema/StartsWithTypeId"
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const startsWith = <A extends string>(
+  startsWith: string,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter(
+        (a): a is A => a.startsWith(startsWith),
+        {
+          typeId: { id: StartsWithTypeId, params: { startsWith } },
+          description: `a string starting with ${JSON.stringify(startsWith)}`,
+          jsonSchema: { pattern: `^${startsWith}` },
+          ...annotationOptions
+        }
+      )
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const EndsWithTypeId = "@effect/schema/EndsWithTypeId"
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const endsWith = <A extends string>(
+  endsWith: string,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter(
+        (a): a is A => a.endsWith(endsWith),
+        {
+          typeId: { id: EndsWithTypeId, params: { endsWith } },
+          description: `a string ending with ${JSON.stringify(endsWith)}`,
+          jsonSchema: { pattern: `^.*${endsWith}$` },
+          ...annotationOptions
+        }
+      )
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const IncludesTypeId = "@effect/schema/IncludesTypeId"
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const includes = <A extends string>(
+  searchString: string,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter(
+        (a): a is A => a.includes(searchString),
+        {
+          typeId: { id: IncludesTypeId, params: { includes: searchString } },
+          description: `a string including ${JSON.stringify(searchString)}`,
+          jsonSchema: { pattern: `.*${searchString}.*` },
+          ...annotationOptions
+        }
+      )
+    )
+
+/**
+ * The `trim` parser allows removing whitespaces from the beginning and end of a string.
+ *
+ * @category parsers
+ * @since 1.0.0
+ */
+export const trim = (self: Schema<string>): Schema<string> =>
+  pipe(
+    self,
+    I.transform(
+      pipe(self, trimmed()),
+      (s) => s.trim(),
+      (s) => s.trim()
+    )
+  )
+
+/**
+ * @since 1.0.0
+ */
+export const UUIDTypeId = "@effect/schema/UUIDTypeId"
+
+const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const UUID: Schema<string> = pipe(
+  I.string,
+  pattern(uuidRegex, {
+    typeId: UUIDTypeId
+  }),
+  I.annotations({
+    [H.ArbitraryHookId]: H.hook(() => I.makeArbitrary(UUID, (fc) => fc.uuid()))
+  })
+)
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const length = <A extends string>(
+  length: number,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> => minLength(length, annotationOptions)(maxLength<A>(length)(self))
+
+/**
+ * @category filters
+ * @since 1.0.0
+ */
+export const nonEmpty = <A extends string>(
+  annotationOptions?: AnnotationOptions<A>
+): (self: Schema<A>) => Schema<A> => minLength(1, annotationOptions)
