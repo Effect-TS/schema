@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+import * as B from "@effect/data/Bigint"
 import type { Brand } from "@effect/data/Brand"
 import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import * as E from "@effect/data/Either"
@@ -963,3 +964,207 @@ export const clamp: <A extends number>(
   max: number,
   options?: AnnotationOptions<A>
 ) => (self: Schema<A>) => Schema<A> = N.clamp
+
+// ---------------------------------------------
+// Bigint
+// ---------------------------------------------
+
+/**
+ * @since 1.0.0
+ */
+export const GreaterThanBigintTypeId = "@effect/schema/GreaterThanBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const greaterThanBigint = <A extends bigint>(
+  min: bigint,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter((a): a is A => a > min, {
+        typeId: GreaterThanBigintTypeId,
+        description: `a bigint greater than ${min}n`,
+        jsonSchema: { exclusiveMinimum: min },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const GreaterThanOrEqualToBigintTypeId = "@effect/schema/GreaterThanOrEqualToBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const greaterThanOrEqualToBigint = <A extends bigint>(
+  min: bigint,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter((a): a is A => a >= min, {
+        typeId: GreaterThanOrEqualToBigintTypeId,
+        description: `a bigint greater than or equal to ${min}n`,
+        jsonSchema: { minimum: min },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const LessThanBigintTypeId = "@effect/schema/LessThanBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const lessThanBigint = <A extends bigint>(
+  max: bigint,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter((a): a is A => a < max, {
+        typeId: LessThanBigintTypeId,
+        description: `a bigint less than ${max}n`,
+        jsonSchema: { exclusiveMaximum: max },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const LessThanOrEqualToBigintTypeId = "@effect/schema/LessThanOrEqualToBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const lessThanOrEqualToBigint = <A extends bigint>(
+  max: bigint,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter((a): a is A => a <= max, {
+        typeId: LessThanOrEqualToBigintTypeId,
+        description: `a bigint less than or equal to ${max}n`,
+        jsonSchema: { maximum: max },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const BetweenBigintTypeId = "@effect/schema/BetweenBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const betweenBigint = <A extends bigint>(
+  min: bigint,
+  max: bigint,
+  annotationOptions?: AnnotationOptions<A>
+) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.filter((a): a is A => a >= min && a <= max, {
+        typeId: BetweenBigintTypeId,
+        description: `a bigint between ${min}n and ${max}n`,
+        jsonSchema: { maximum: max, minimum: min },
+        ...annotationOptions
+      })
+    )
+
+/**
+ * @since 1.0.0
+ */
+export const PositiveBigintTypeId = "@effect/schema/PositiveBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const positiveBigint = <A extends bigint>(
+  annotationOptions?: AnnotationOptions<A>
+): (self: Schema<A>) => Schema<A> =>
+  greaterThanBigint(0n, {
+    typeId: PositiveBigintTypeId,
+    description: "a positive bigint",
+    ...annotationOptions
+  })
+
+/**
+ * @since 1.0.0
+ */
+export const NegativeBigintTypeId = "@effect/schema/NegativeBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const negativeBigint = <A extends bigint>(
+  annotationOptions?: AnnotationOptions<A>
+): (self: Schema<A>) => Schema<A> =>
+  lessThanBigint(0n, {
+    typeId: NegativeBigintTypeId,
+    description: "a negative bigint",
+    ...annotationOptions
+  })
+
+/**
+ * @since 1.0.0
+ */
+export const NonNegativeBigintTypeId = "@effect/schema/NonNegativeBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const nonNegativeBigint = <A extends bigint>(
+  annotationOptions?: AnnotationOptions<A>
+): (self: Schema<A>) => Schema<A> =>
+  greaterThanOrEqualToBigint(0n, {
+    typeId: NonNegativeBigintTypeId,
+    description: "a non-negative bigint",
+    ...annotationOptions
+  })
+
+/**
+ * @since 1.0.0
+ */
+export const NonPositiveBigintTypeId = "@effect/schema/NonPositiveBigintTypeId"
+
+/**
+ * @since 1.0.0
+ */
+export const nonPositiveBigint = <A extends bigint>(
+  annotationOptions?: AnnotationOptions<A>
+): (self: Schema<A>) => Schema<A> =>
+  lessThanOrEqualToBigint(0n, {
+    typeId: NonPositiveBigintTypeId,
+    description: "a non-positive bigint",
+    ...annotationOptions
+  })
+
+/**
+ * Clamps a bigint between a minimum and a maximum value.
+ *
+ * @since 1.0.0
+ */
+export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
+  (self: Schema<A>): Schema<A> =>
+    pipe(
+      self,
+      I.transform(
+        pipe(self, betweenBigint(min, max)),
+        (self) => B.clamp(self, min, max) as A,
+        (self) => B.clamp(self, min, max) as A
+      )
+    )

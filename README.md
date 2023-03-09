@@ -483,26 +483,28 @@ pipe(S.number, S.nonPositive()); // <= 0
 ### Bigint filters
 
 ```ts
-import * as B from "@effect/schema/data/Bigint";
+import * as S from "@effect/schema";
 
-pipe(S.bigint, B.greaterThan(5n));
-pipe(S.bigint, B.greaterThanOrEqualTo(5n));
-pipe(S.bigint, B.lessThan(5n));
-pipe(S.bigint, B.lessThanOrEqualTo(5n));
-pipe(S.bigint, B.between(-2n, 2n)); // -2n <= x <= 2n
+pipe(S.bigint, S.greaterThanBigint(5n));
+pipe(S.bigint, S.greaterThanOrEqualToBigint(5n));
+pipe(S.bigint, S.lessThanBigint(5n));
+pipe(S.bigint, S.lessThanOrEqualToBigint(5n));
+pipe(S.bigint, S.betweenBigint(-2n, 2n)); // -2n <= x <= 2n
 
-pipe(S.bigint, B.positive()); // > 0n
-pipe(S.bigint, B.nonNegative()); // >= 0n
-pipe(S.bigint, B.negative()); // < 0n
-pipe(S.bigint, B.nonPositive()); // <= 0n
+pipe(S.bigint, S.positiveBigint()); // > 0n
+pipe(S.bigint, S.nonNegativeBigint()); // >= 0n
+pipe(S.bigint, S.negativeBigint()); // < 0n
+pipe(S.bigint, S.nonPositiveBigint()); // <= 0n
 ```
 
 ### Array filters
 
 ```ts
-pipe(S.array(S.number), A.maxItems(2)); // max array length
-pipe(S.array(S.number), A.minItems(2)); // min array length
-pipe(S.array(S.number), A.itemsCount(2)); // exact array length
+import * as S from "@effect/schema";
+
+pipe(S.array(S.number), S.maxItems(2)); // max array length
+pipe(S.array(S.number), S.minItems(2)); // min array length
+pipe(S.array(S.number), S.itemsCount(2)); // exact array length
 ```
 
 ## Branded types

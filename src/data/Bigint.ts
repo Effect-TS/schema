@@ -2,204 +2,118 @@
  * @since 1.0.0
  */
 
-import * as B from "@effect/data/Bigint"
-import { pipe } from "@effect/data/Function"
-import * as I from "@effect/schema/internal/common"
-import type { AnnotationOptions, Schema } from "@effect/schema/Schema"
+import * as S from "@effect/schema"
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const GreaterThanTypeId = "@effect/schema/data/Bigint/GreaterThanTypeId"
+export const GreaterThanTypeId = S.GreaterThanBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const greaterThan = <A extends bigint>(
-  min: bigint,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a > min, {
-        typeId: GreaterThanTypeId,
-        description: `a bigint greater than ${min}n`,
-        jsonSchema: { exclusiveMinimum: min },
-        ...annotationOptions
-      })
-    )
+export const greaterThan = S.greaterThanBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const GreaterThanOrEqualToTypeId = "@effect/schema/data/Bigint/GreaterThanOrEqualToTypeId"
+export const GreaterThanOrEqualToTypeId = S.GreaterThanOrEqualToBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const greaterThanOrEqualTo = <A extends bigint>(
-  min: bigint,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a >= min, {
-        typeId: GreaterThanOrEqualToTypeId,
-        description: `a bigint greater than or equal to ${min}n`,
-        jsonSchema: { minimum: min },
-        ...annotationOptions
-      })
-    )
+export const greaterThanOrEqualTo = S.greaterThanOrEqualToBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const LessThanTypeId = "@effect/schema/data/Bigint/LessThanTypeId"
+export const LessThanTypeId = S.LessThanBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const lessThan = <A extends bigint>(max: bigint, annotationOptions?: AnnotationOptions<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a < max, {
-        typeId: LessThanTypeId,
-        description: `a bigint less than ${max}n`,
-        jsonSchema: { exclusiveMaximum: max },
-        ...annotationOptions
-      })
-    )
+export const lessThan = S.lessThanBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const LessThanOrEqualToTypeId = "@effect/schema/data/Bigint/LessThanOrEqualToTypeId"
+export const LessThanOrEqualToTypeId = S.LessThanOrEqualToBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const lessThanOrEqualTo = <A extends bigint>(
-  max: bigint,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a <= max, {
-        typeId: LessThanOrEqualToTypeId,
-        description: `a bigint less than or equal to ${max}n`,
-        jsonSchema: { maximum: max },
-        ...annotationOptions
-      })
-    )
+export const lessThanOrEqualTo = S.lessThanOrEqualToBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const BetweenTypeId = "@effect/schema/data/Bigint/BetweenTypeId"
+export const BetweenTypeId = S.BetweenBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const between = <A extends bigint>(
-  min: bigint,
-  max: bigint,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.filter((a): a is A => a >= min && a <= max, {
-        typeId: BetweenTypeId,
-        description: `a bigint between ${min}n and ${max}n`,
-        jsonSchema: { maximum: max, minimum: min },
-        ...annotationOptions
-      })
-    )
+export const between = S.betweenBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const PositiveTypeId = "@effect/schema/data/Bigint/PositiveTypeId"
+export const PositiveTypeId = S.PositiveBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const positive = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThan(0n, {
-    typeId: PositiveTypeId,
-    description: "a positive bigint",
-    ...annotationOptions
-  })
+export const positive = S.positiveBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const NegativeTypeId = "@effect/schema/data/Bigint/NegativeTypeId"
+export const NegativeTypeId = S.NegativeBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const negative = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThan(0n, {
-    typeId: NegativeTypeId,
-    description: "a negative bigint",
-    ...annotationOptions
-  })
+export const negative = S.negativeBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const NonNegativeTypeId = "@effect/schema/data/Bigint/NonNegativeTypeId"
+export const NonNegativeTypeId = S.NonNegativeBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const nonNegative = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThanOrEqualTo(0n, {
-    typeId: NonNegativeTypeId,
-    description: "a non-negative bigint",
-    ...annotationOptions
-  })
+export const nonNegative = S.nonNegativeBigint
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const NonPositiveTypeId = "@effect/schema/data/Bigint/NonPositiveTypeId"
+export const NonPositiveTypeId = S.NonPositiveBigintTypeId
 
 /**
  * @since 1.0.0
+ * @deprecated
  */
-export const nonPositive = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThanOrEqualTo(0n, {
-    typeId: NonPositiveTypeId,
-    description: "a non-positive bigint",
-    ...annotationOptions
-  })
+export const nonPositive = S.nonPositiveBigint
 
 /**
- * Clamps a bigint between a minimum and a maximum value.
- *
  * @since 1.0.0
+ * @deprecated
  */
-export const clamp = <A extends bigint>(min: bigint, max: bigint) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      I.transform(
-        pipe(self, between(min, max)),
-        (self) => B.clamp(self, min, max) as A,
-        (self) => B.clamp(self, min, max) as A
-      )
-    )
+export const clamp = S.clampBigint
