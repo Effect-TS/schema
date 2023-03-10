@@ -5,20 +5,21 @@ import * as Pretty from "@effect/schema/Pretty"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Data", () => {
-  it("data. keyof", () => {
-    expect(S.keyof(S.data(S.struct({ a: S.string, b: S.string }))))
+  it("dataGuard. keyof", () => {
+    expect(S.keyof(S.dataGuard(S.struct({ a: S.string, b: S.string }))))
       .toEqual(S.union(S.literal("a"), S.literal("b")))
 
-    expect(S.keyof(S.data(S.array(S.string))))
+    expect(S.keyof(S.dataGuard(S.array(S.string))))
       .toEqual(S.never)
   })
 
-  it("data. property tests", () => {
-    Util.property(S.data(S.struct({ a: S.string, b: S.number })))
+  it("dataGuard. property tests", () => {
+    Util.property(S.dataGuard(S.struct({ a: S.string, b: S.number })))
+    Util.property(S.dataGuard(S.array(S.number)))
   })
 
-  it("data. decoder", () => {
-    const schema = S.data(S.struct({ a: S.string, b: S.number }))
+  it("dataGuard. decoder", () => {
+    const schema = S.dataGuard(S.struct({ a: S.string, b: S.number }))
     Util.expectDecodingSuccess(
       schema,
       Data.struct({ a: "ok", b: 0 }),
@@ -36,8 +37,8 @@ describe.concurrent("Data", () => {
     )
   })
 
-  it("data. encoder", () => {
-    const schema = S.data(S.struct({ a: S.string, b: S.number }))
+  it("dataGuard. encoder", () => {
+    const schema = S.dataGuard(S.struct({ a: S.string, b: S.number }))
     Util.expectEncodingSuccess(
       schema,
       Data.struct({ a: "ok", b: 0 }),
@@ -45,26 +46,27 @@ describe.concurrent("Data", () => {
     )
   })
 
-  it("data. guard", () => {
-    const schema = S.data(S.struct({ a: S.string, b: S.number }))
+  it("dataGuard. guard", () => {
+    const schema = S.dataGuard(S.struct({ a: S.string, b: S.number }))
     const is = P.is(schema)
     expect(is(Data.struct({ a: "ok", b: 0 }))).toEqual(true)
     expect(is({ a: "ok", b: 0 })).toEqual(false)
     expect(is(Data.struct({ a: "ok", b: "no" }))).toEqual(false)
   })
 
-  it("data. pretty", () => {
-    const schema = S.data(S.struct({ a: S.string, b: S.number }))
+  it("dataGuard. pretty", () => {
+    const schema = S.dataGuard(S.struct({ a: S.string, b: S.number }))
     const pretty = Pretty.pretty(schema)
     expect(pretty(Data.struct({ a: "ok", b: 0 }))).toEqual("Data({ \"a\": \"ok\", \"b\": 0 })")
   })
 
-  it("fromStructure. property tests", () => {
-    Util.property(S.fromStructure(S.struct({ a: S.string, b: S.number })))
+  it("data. property tests", () => {
+    Util.property(S.data(S.struct({ a: S.string, b: S.number })))
+    Util.property(S.data(S.array(S.number)))
   })
 
-  it("fromStructure. decoder", () => {
-    const schema = S.fromStructure(S.struct({ a: S.string, b: S.number }))
+  it("data. decoder", () => {
+    const schema = S.data(S.struct({ a: S.string, b: S.number }))
     Util.expectDecodingSuccess(
       schema,
       { a: "ok", b: 0 },
@@ -77,8 +79,8 @@ describe.concurrent("Data", () => {
     )
   })
 
-  it("fromStructure. encoder", () => {
-    const schema = S.fromStructure(S.struct({ a: S.string, b: S.number }))
+  it("data. encoder", () => {
+    const schema = S.data(S.struct({ a: S.string, b: S.number }))
     Util.expectEncodingSuccess(schema, Data.struct({ a: "ok", b: 0 }), { a: "ok", b: 0 })
   })
 })

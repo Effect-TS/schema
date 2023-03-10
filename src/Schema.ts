@@ -1086,30 +1086,29 @@ export const chunkFromValues = <A>(item: Schema<A>): Schema<Chunk<A>> =>
 const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): D.Data<A> =>
   Array.isArray(a) ? D.array(a) : D.struct(a)
 
-const dataParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+const dataGuardParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: P.Parser<A>
 ): P.Parser<D.Data<A>> => {
   const decode = P.decode(item)
-  const schema = data(item)
-
+  const schema = dataGuard(item)
   return I.makeParser(
     schema,
     (u, options) =>
       !Equal.isEqual(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(decode(u, options), E.map(toData))
+        E.map(decode(u, options), toData)
   )
 }
 
-const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+const dataGuardArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Arbitrary<A>
-): Arbitrary<D.Data<A>> => I.makeArbitrary(data(item), (fc) => item.arbitrary(fc).map(toData))
+): Arbitrary<D.Data<A>> => I.makeArbitrary(dataGuard(item), (fc) => item.arbitrary(fc).map(toData))
 
-const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+const dataGuardPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Pretty<A>
 ): Pretty<D.Data<A>> =>
   I.makePretty(
-    data(item),
+    dataGuard(item),
     (d) => `Data(${item.pretty(d)})`
   )
 
@@ -1117,7 +1116,7 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
  * @category combinators
  * @since 1.0.0
  */
-export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+export const dataGuard = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
 ): Schema<D.Data<A>> =>
   typeAlias(
@@ -1125,9 +1124,9 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
     item,
     {
       [A.IdentifierId]: "Data",
-      [H.ParserHookId]: H.hook(dataParser),
-      [H.PrettyHookId]: H.hook(dataPretty),
-      [H.ArbitraryHookId]: H.hook(dataArbitrary)
+      [H.ParserHookId]: H.hook(dataGuardParser),
+      [H.PrettyHookId]: H.hook(dataGuardPretty),
+      [H.ArbitraryHookId]: H.hook(dataGuardArbitrary)
     }
   )
 
@@ -1135,12 +1134,12 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
  * @category parsers
  * @since 1.0.0
  */
-export const fromStructure = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
 ): Schema<D.Data<A>> =>
   pipe(
     item,
-    transform(data(item), toData, (a) =>
+    transform(dataGuard(item), toData, (a) =>
       // @ts-expect-error
       Array.isArray(a) ? Array.from(a) : Object.assign({}, a))
   )
