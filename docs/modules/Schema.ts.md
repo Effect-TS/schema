@@ -104,6 +104,7 @@ Added in v1.0.0
   - [clampBigint](#clampbigint)
   - [data](#data)
   - [dateFromString](#datefromstring)
+  - [either](#either)
   - [numberFromString](#numberfromstring)
   - [option](#option)
   - [optionFromNullable](#optionfromnullable)
@@ -1273,6 +1274,16 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 ```ts
 export declare const dateFromString: (self: Schema<string>) => Schema<Date>
+```
+
+Added in v1.0.0
+
+## either
+
+**Signature**
+
+```ts
+export declare const either: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>
 ```
 
 Added in v1.0.0

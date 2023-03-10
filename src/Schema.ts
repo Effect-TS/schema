@@ -1299,6 +1299,26 @@ export const eitherFromSelf = <E, A>(
     [I.ArbitraryHookId]: eitherArbitrary
   })
 
+/**
+ * @category parsers
+ * @since 1.0.0
+ */
+export const either = <E, A>(
+  left: Schema<E>,
+  right: Schema<A>
+): Schema<Either<E, A>> =>
+  pipe(
+    eitherInline(left, right),
+    transform(
+      eitherFromSelf(left, right),
+      (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
+      E.match(
+        (left) => ({ _tag: "Left" as const, left }),
+        (right) => ({ _tag: "Right" as const, right })
+      )
+    )
+  )
+
 // ---------------------------------------------
 // data/Json
 // ---------------------------------------------
