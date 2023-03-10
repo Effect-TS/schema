@@ -7,10 +7,10 @@ import * as S from "@effect/schema"
  * @since 1.0.0
  * @deprecated
  */
-export const readonlyMap = S.readonlyMap
+export const readonlyMap = S.readonlyMapGuard
 
 /**
  * @since 1.0.0
  * @deprecated
  */
-export const fromEntries = S.readonlyMapFromEntries
+export const fromEntries = S.readonlyMap

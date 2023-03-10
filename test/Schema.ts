@@ -32,6 +32,18 @@ describe.concurrent("Schema", () => {
     expect(S.NonNegativeTypeId).exist
     expect(S.NonPositiveTypeId).exist
     expect(S.InstanceOfTypeId).exist
+    expect(S.MinItemsTypeId).exist
+    expect(S.MaxItemsTypeId).exist
+    expect(S.ItemsCountTypeId).exist
+    expect(S.TrimmedTypeId).exist
+    expect(S.PatternTypeId).exist
+    expect(S.StartsWithTypeId).exist
+    expect(S.EndsWithTypeId).exist
+    expect(S.IncludesTypeId).exist
+    expect(S.UUIDTypeId).exist
+
+    expect(S.OptionalSchemaId).exist
+    expect(S.nullable).exist
   })
 
   it("brand/ annotations", () => {

@@ -6,16 +6,16 @@ import * as Util from "@effect/schema/test/util"
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("ReadonlyMap", () => {
-  it("readonlySet. keyof", () => {
-    expect(S.keyof(S.readonlyMap(S.number, S.string))).toEqual(S.literal("size"))
+  it("readonlyMapGuard. keyof", () => {
+    expect(S.keyof(S.readonlyMapGuard(S.number, S.string))).toEqual(S.literal("size"))
   })
 
-  it("readonlyMap. property tests", () => {
-    Util.property(S.readonlyMap(S.number, S.string))
+  it("readonlyMapGuard. property tests", () => {
+    Util.property(S.readonlyMapGuard(S.number, S.string))
   })
 
-  it("readonlyMap. decoder", () => {
-    const schema = S.readonlyMap(NumberFromString, S.string)
+  it("readonlyMapGuard. decoder", () => {
+    const schema = S.readonlyMapGuard(NumberFromString, S.string)
     Util.expectDecodingSuccess(schema, new Map(), new Map())
     Util.expectDecodingSuccess(
       schema,
@@ -35,8 +35,8 @@ describe.concurrent("ReadonlyMap", () => {
     )
   })
 
-  it("readonlyMap. encoder", () => {
-    const schema = S.readonlyMap(NumberFromString, S.string)
+  it("readonlyMapGuard. encoder", () => {
+    const schema = S.readonlyMapGuard(NumberFromString, S.string)
     Util.expectEncodingSuccess(schema, new Map(), new Map())
     Util.expectEncodingSuccess(
       schema,
@@ -45,8 +45,8 @@ describe.concurrent("ReadonlyMap", () => {
     )
   })
 
-  it("readonlyMap. guard", () => {
-    const schema = S.readonlyMap(S.number, S.string)
+  it("readonlyMapGuard. guard", () => {
+    const schema = S.readonlyMapGuard(S.number, S.string)
     const is = P.is(schema)
     expect(is(new Map())).toEqual(true)
     expect(is(new Map([[1, "a"], [2, "b"], [3, "c"]]))).toEqual(true)
@@ -60,8 +60,8 @@ describe.concurrent("ReadonlyMap", () => {
     expect(is(new Map<number, string | number>([[1, "a"], [2, "b"], [3, 1]]))).toEqual(false)
   })
 
-  it("readonlyMap. pretty", () => {
-    const schema = S.readonlyMap(S.number, S.string)
+  it("readonlyMapGuard. pretty", () => {
+    const schema = S.readonlyMapGuard(S.number, S.string)
     const pretty = Pretty.pretty(schema)
     expect(pretty(new Map())).toEqual("new Map([])")
     expect(pretty(new Map([[1, "a"], [2, "b"]]))).toEqual(
@@ -69,12 +69,12 @@ describe.concurrent("ReadonlyMap", () => {
     )
   })
 
-  it("readonlyMapFromEntries. property tests", () => {
-    Util.property(S.readonlyMapFromEntries(S.number, S.string))
+  it("readonlyMap. property tests", () => {
+    Util.property(S.readonlyMap(S.number, S.string))
   })
 
-  it("readonlyMapFromEntries. decoder", () => {
-    const schema = S.readonlyMapFromEntries(S.number, S.string)
+  it("readonlyMap. decoder", () => {
+    const schema = S.readonlyMap(S.number, S.string)
     Util.expectDecodingSuccess(schema, [], new Map())
     Util.expectDecodingSuccess(
       schema,
@@ -94,8 +94,8 @@ describe.concurrent("ReadonlyMap", () => {
     )
   })
 
-  it("readonlyMapFromEntries. encoder", () => {
-    const schema = S.readonlyMapFromEntries(S.number, S.string)
+  it("readonlyMap. encoder", () => {
+    const schema = S.readonlyMap(S.number, S.string)
     Util.expectEncodingSuccess(schema, new Map(), [])
     Util.expectEncodingSuccess(schema, new Map([[1, "a"], [2, "b"], [3, "c"]]), [[1, "a"], [
       2,

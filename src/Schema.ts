@@ -45,6 +45,7 @@ export interface Schema<A> {
  */
 export type Infer<S extends { readonly A: (_: any) => any }> = Parameters<S["A"]>[0]
 
+/* c8 ignore start */
 export {
   /**
    * @since 1.0.0
@@ -82,6 +83,7 @@ export type {
    */
   InferAsserts
 } from "@effect/schema/Parser"
+/* c8 ignore end */
 
 // ---------------------------------------------
 // constructors
@@ -1910,12 +1912,12 @@ export const itemsCount = <A>(
 
 const isMap = (u: unknown): u is Map<unknown, unknown> => u instanceof Map
 
-const readonlyMapParser = <K, V>(
+const readonlyMapGuardParser = <K, V>(
   key: P.Parser<K>,
   value: P.Parser<V>
 ): P.Parser<ReadonlyMap<K, V>> => {
   const items = P.decode(array(tuple(key, value)))
-  const schema = readonlyMap(key, value)
+  const schema = readonlyMapGuard(key, value)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -1925,18 +1927,21 @@ const readonlyMapParser = <K, V>(
   )
 }
 
-const readonlyMapArbitrary = <K, V>(
+const readonlyMapGuardArbitrary = <K, V>(
   key: Arbitrary<K>,
   value: Arbitrary<V>
 ): Arbitrary<ReadonlyMap<K, V>> =>
   I.makeArbitrary(
-    readonlyMapFromEntries(key, value),
+    readonlyMap(key, value),
     (fc) => fc.array(fc.tuple(key.arbitrary(fc), value.arbitrary(fc))).map((as) => new Map(as))
   )
 
-const readonlyMapPretty = <K, V>(key: Pretty<K>, value: Pretty<V>): Pretty<ReadonlyMap<K, V>> =>
+const readonlyMapGuardPretty = <K, V>(
+  key: Pretty<K>,
+  value: Pretty<V>
+): Pretty<ReadonlyMap<K, V>> =>
   I.makePretty(
-    readonlyMapFromEntries(key, value),
+    readonlyMap(key, value),
     (map) =>
       `new Map([${
         Array.from(map.entries())
@@ -1949,7 +1954,10 @@ const readonlyMapPretty = <K, V>(key: Pretty<K>, value: Pretty<V>): Pretty<Reado
  * @category constructors
  * @since 1.0.0
  */
-export const readonlyMap = <K, V>(key: Schema<K>, value: Schema<V>): Schema<ReadonlyMap<K, V>> =>
+export const readonlyMapGuard = <K, V>(
+  key: Schema<K>,
+  value: Schema<V>
+): Schema<ReadonlyMap<K, V>> =>
   typeAlias(
     [key, value],
     struct({
@@ -1957,9 +1965,9 @@ export const readonlyMap = <K, V>(key: Schema<K>, value: Schema<V>): Schema<Read
     }),
     {
       [A.IdentifierId]: "ReadonlyMap",
-      [H.ParserHookId]: H.hook(readonlyMapParser),
-      [H.PrettyHookId]: H.hook(readonlyMapPretty),
-      [H.ArbitraryHookId]: H.hook(readonlyMapArbitrary)
+      [H.ParserHookId]: H.hook(readonlyMapGuardParser),
+      [H.PrettyHookId]: H.hook(readonlyMapGuardPretty),
+      [H.ArbitraryHookId]: H.hook(readonlyMapGuardArbitrary)
     }
   )
 
@@ -1967,14 +1975,14 @@ export const readonlyMap = <K, V>(key: Schema<K>, value: Schema<V>): Schema<Read
  * @category parsers
  * @since 1.0.0
  */
-export const readonlyMapFromEntries = <K, V>(
+export const readonlyMap = <K, V>(
   key: Schema<K>,
   value: Schema<V>
 ): Schema<ReadonlyMap<K, V>> =>
   pipe(
     array(tuple(key, value)),
     transform(
-      readonlyMap(key, value),
+      readonlyMapGuard(key, value),
       (as) => new Map(as),
       (map) => Array.from(map.entries())
     )
