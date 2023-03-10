@@ -7,7 +7,7 @@ import * as S from "@effect/schema"
  * @since 1.0.0
  * @deprecated
  */
-export const option = S._option
+export const option = S.optionGuard
 
 /**
  * @since 1.0.0

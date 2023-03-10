@@ -15,7 +15,7 @@ describe.concurrent("AST", () => {
   })
 
   it("isTypeAlias", () => {
-    expect(AST.isTypeAlias(S._option(S.number).ast)).toEqual(true)
+    expect(AST.isTypeAlias(S.optionGuard(S.number).ast)).toEqual(true)
     expect(AST.isTypeAlias(S.number.ast)).toEqual(false)
   })
 
@@ -51,7 +51,7 @@ describe.concurrent("AST", () => {
   })
 
   it("getWeight/transform/ should return the weight of type", () => {
-    expect(AST._getWeight(S._option(S.number).ast)).toEqual(7)
+    expect(AST._getWeight(S.optionGuard(S.number).ast)).toEqual(3)
   })
 
   it("getWeight/union/ should return the sum of the members weight", () => {
@@ -389,18 +389,6 @@ describe.concurrent("AST", () => {
       AST.createPropertySignature(
         "_tag",
         S.union(S.literal("Some"), S.literal("None")).ast,
-        false,
-        true
-      ),
-      AST.createPropertySignature(
-        Symbol.for("@effect/data/Equal"),
-        S.any.ast,
-        false,
-        true
-      ),
-      AST.createPropertySignature(
-        Symbol.for("@effect/data/Hash"),
-        S.any.ast,
         false,
         true
       )

@@ -809,7 +809,7 @@ describe.concurrent("TypeScript", () => {
   })
 
   it("Option", () => {
-    const schema = S._option(S.struct({ a: S.string }))
+    const schema = S.optionGuard(S.struct({ a: S.string }))
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual([`Option<{
     readonly a: string;

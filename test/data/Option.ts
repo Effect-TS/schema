@@ -8,12 +8,12 @@ import * as Util from "@effect/schema/test/util"
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("Option", () => {
-  it("optionFromNullable. property tests", () => {
-    Util.property(S.optionFromNullable(NumberFromString))
+  it("optionGuard. property tests", () => {
+    Util.property(S.optionGuard(NumberFromString))
   })
 
-  it("option. Guard", () => {
-    const schema = S._option(S.number)
+  it("optionGuard. Guard", () => {
+    const schema = S.optionGuard(S.number)
     const is = P.is(schema)
     expect(is(O.none())).toEqual(true)
     expect(is(O.some(1))).toEqual(true)
@@ -24,24 +24,24 @@ describe.concurrent("Option", () => {
     expect(is({ _tag: "Some", value: 1 })).toEqual(false)
   })
 
-  it("option. Decoder", () => {
-    const schema = S._option(NumberFromString)
+  it("optionGuard. Decoder", () => {
+    const schema = S.optionGuard(NumberFromString)
     Util.expectDecodingSuccess(schema, O.none(), O.none())
     Util.expectDecodingSuccess(schema, O.some("1"), O.some(1))
   })
 
-  it("option. Pretty", () => {
-    const schema = S._option(S.number)
+  it("optionGuard. Pretty", () => {
+    const schema = S.optionGuard(S.number)
     const pretty = Pretty.pretty(schema)
     expect(pretty(O.none())).toEqual("none()")
     expect(pretty(O.some(1))).toEqual("some(1)")
   })
 
-  it("parseNullable. property tests", () => {
+  it("optionFromNullable. property tests", () => {
     Util.property(S.optionFromNullable(S.number))
   })
 
-  it("parseNullable. Decoder", () => {
+  it("optionFromNullable. Decoder", () => {
     const schema = S.optionFromNullable(NumberFromString)
     Util.expectDecodingSuccess(schema, undefined, O.none())
     Util.expectDecodingSuccess(schema, null, O.none())
@@ -63,13 +63,13 @@ describe.concurrent("Option", () => {
     )
   })
 
-  it("parseNullable. Encoder", () => {
+  it("optionFromNullable. Encoder", () => {
     const schema = S.optionFromNullable(NumberFromString)
     Util.expectEncodingSuccess(schema, O.none(), null)
     Util.expectEncodingSuccess(schema, O.some(1), "1")
   })
 
-  it("parseOptionals", () => {
+  it("optionsFromOptionals", () => {
     expect(() => pipe(S.object, S.optionsFromOptionals({ "b": S.number }))).toThrowError(
       new Error("`parseOptional` can only handle type literals")
     )

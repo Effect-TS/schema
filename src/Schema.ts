@@ -12,7 +12,6 @@ import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
 import { pipe } from "@effect/data/Function"
-import * as Hash from "@effect/data/Hash"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
@@ -1699,8 +1698,8 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
 // data/Option
 // ---------------------------------------------
 
-const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
-  const schema = _option(value)
+const optionGuardParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
+  const schema = optionGuard(value)
   const decodeValue = P.decode(value)
   return I.makeParser(
     schema,
@@ -1713,35 +1712,31 @@ const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
   )
 }
 
-const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => {
-  const struct = Arb.arbitrary(inline(value))
+const optionGuardArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => {
+  const struct = Arb.arbitrary(optionInline(value))
   return I.makeArbitrary(
-    _option(value),
-    (fc) => struct(fc).map(O.match(() => O.none(), (value) => O.some(value)))
+    optionGuard(value),
+    (fc) => struct(fc).map((a) => a._tag === "None" ? O.none() : O.some(a.value))
   )
 }
 
-const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
+const optionGuardPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
   I.makePretty(
-    _option(value),
+    optionGuard(value),
     O.match(
       () => "none()",
       (a) => `some(${value.pretty(a)})`
     )
   )
 
-const inline = <A>(value: Schema<A>): Schema<Option<A>> =>
+const optionInline = <A>(value: Schema<A>) =>
   union(
     struct({
-      _tag: literal("None"),
-      [Equal.symbol]: any,
-      [Hash.symbol]: any
+      _tag: literal("None")
     }),
     struct({
       _tag: literal("Some"),
-      value,
-      [Equal.symbol]: any,
-      [Hash.symbol]: any
+      value
     })
   )
 
@@ -1749,15 +1744,15 @@ const inline = <A>(value: Schema<A>): Schema<Option<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const _option = <A>(value: Schema<A>): Schema<Option<A>> => {
+export const optionGuard = <A>(value: Schema<A>): Schema<Option<A>> => {
   return typeAlias(
     [value],
-    inline(value),
+    optionInline(value),
     {
       [A.IdentifierId]: "Option",
-      [H.ParserHookId]: H.hook(optionParser),
-      [H.PrettyHookId]: H.hook(optionPretty),
-      [H.ArbitraryHookId]: H.hook(optionArbitrary)
+      [H.ParserHookId]: H.hook(optionGuardParser),
+      [H.PrettyHookId]: H.hook(optionGuardPretty),
+      [H.ArbitraryHookId]: H.hook(optionGuardArbitrary)
     }
   )
 }
@@ -1769,15 +1764,8 @@ export const _option = <A>(value: Schema<A>): Schema<Option<A>> => {
 export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
   pipe(
     union(_undefined, nullable(value)),
-    transform(_option(value), O.fromNullable, O.getOrNull)
+    transform(optionGuard(value), O.fromNullable, O.getOrNull)
   )
-
-/**
- * @category parsers
- * @since 1.0.0
- * @deprecated
- */
-export const option = optionFromNullable
 
 /**
  * @category parsers
@@ -1810,7 +1798,7 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
           ownKeys.map((key) =>
             AST.createPropertySignature(
               key,
-              _option(fields[key]).ast,
+              optionGuard(fields[key]).ast,
               true,
               true
             )
