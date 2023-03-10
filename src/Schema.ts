@@ -18,7 +18,6 @@ import * as O from "@effect/data/Option"
 import { isDate } from "@effect/data/Predicate"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
-import * as H from "@effect/schema/annotation/Hook"
 import { Arbitrary } from "@effect/schema/Arbitrary"
 import * as Arb from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
@@ -1108,9 +1107,9 @@ export const chunkGuard = <A>(item: Schema<A>): Schema<Chunk<A>> =>
     }),
     {
       [AST.IdentifierAnnotationId]: "Chunk",
-      [H.ParserHookId]: H.hook(chunkGuardParser),
-      [H.PrettyHookId]: H.hook(chunkGuardPretty),
-      [H.ArbitraryHookId]: H.hook(chunkGuardArbitrary)
+      [I.ParserHookId]: chunkGuardParser,
+      [I.PrettyHookId]: chunkGuardPretty,
+      [I.ArbitraryHookId]: chunkGuardArbitrary
     }
   )
 
@@ -1166,9 +1165,9 @@ export const dataGuard = <A extends Readonly<Record<string, any>> | ReadonlyArra
     item,
     {
       [AST.IdentifierAnnotationId]: "Data",
-      [H.ParserHookId]: H.hook(dataGuardParser),
-      [H.PrettyHookId]: H.hook(dataGuardPretty),
-      [H.ArbitraryHookId]: H.hook(dataGuardArbitrary)
+      [I.ParserHookId]: dataGuardParser,
+      [I.PrettyHookId]: dataGuardPretty,
+      [I.ArbitraryHookId]: dataGuardArbitrary
     }
   )
 
@@ -1204,9 +1203,9 @@ const datePretty = (): Pretty<Date> =>
  */
 export const date: Schema<Date> = typeAlias([], struct({}), {
   [AST.IdentifierAnnotationId]: "Date",
-  [H.ParserHookId]: H.hook(dateParser),
-  [H.PrettyHookId]: H.hook(datePretty),
-  [H.ArbitraryHookId]: H.hook(dateArbitrary)
+  [I.ParserHookId]: dateParser,
+  [I.PrettyHookId]: datePretty,
+  [I.ArbitraryHookId]: dateArbitrary
 })
 
 /**
@@ -1294,9 +1293,9 @@ export const eitherGuard = <E, A>(
 ): Schema<Either<E, A>> =>
   typeAlias([left, right], eitherInline(left, right), {
     [AST.IdentifierAnnotationId]: "Either",
-    [H.ParserHookId]: H.hook(eitherGuardParser),
-    [H.PrettyHookId]: H.hook(eitherGuardPretty),
-    [H.ArbitraryHookId]: H.hook(eitherGuardArbitrary)
+    [I.ParserHookId]: eitherGuardParser,
+    [I.PrettyHookId]: eitherGuardPretty,
+    [I.ArbitraryHookId]: eitherGuardArbitrary
   })
 
 // ---------------------------------------------
@@ -1337,7 +1336,7 @@ export const json: Schema<Json> = lazy(() =>
     array(json),
     record(string, json)
   ), {
-  [H.ArbitraryHookId]: H.hook(() => Arbitrary)
+  [I.ArbitraryHookId]: () => Arbitrary
 })
 
 const Arbitrary = I.makeArbitrary<Json>(json, (fc) => fc.jsonValue().map((json) => json as Json))
@@ -1755,9 +1754,9 @@ export const optionGuard = <A>(value: Schema<A>): Schema<Option<A>> => {
     optionInline(value),
     {
       [AST.IdentifierAnnotationId]: "Option",
-      [H.ParserHookId]: H.hook(optionGuardParser),
-      [H.PrettyHookId]: H.hook(optionGuardPretty),
-      [H.ArbitraryHookId]: H.hook(optionGuardArbitrary)
+      [I.ParserHookId]: optionGuardParser,
+      [I.PrettyHookId]: optionGuardPretty,
+      [I.ArbitraryHookId]: optionGuardArbitrary
     }
   )
 }
@@ -1968,9 +1967,9 @@ export const readonlyMapGuard = <K, V>(
     }),
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
-      [H.ParserHookId]: H.hook(readonlyMapGuardParser),
-      [H.PrettyHookId]: H.hook(readonlyMapGuardPretty),
-      [H.ArbitraryHookId]: H.hook(readonlyMapGuardArbitrary)
+      [I.ParserHookId]: readonlyMapGuardParser,
+      [I.PrettyHookId]: readonlyMapGuardPretty,
+      [I.ArbitraryHookId]: readonlyMapGuardArbitrary
     }
   )
 
@@ -2033,9 +2032,9 @@ export const readonlySetGuard = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
     }),
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
-      [H.ParserHookId]: H.hook(readonlySetGuardParser),
-      [H.PrettyHookId]: H.hook(readonlySetGuardPretty),
-      [H.ArbitraryHookId]: H.hook(readonlySetGuardArbitrary)
+      [I.ParserHookId]: readonlySetGuardParser,
+      [I.PrettyHookId]: readonlySetGuardPretty,
+      [I.ArbitraryHookId]: readonlySetGuardArbitrary
     }
   )
 
@@ -2273,7 +2272,7 @@ export const UUID: Schema<string> = pipe(
     typeId: UUIDTypeId
   }),
   annotations({
-    [H.ArbitraryHookId]: H.hook(() => I.makeArbitrary(UUID, (fc) => fc.uuid()))
+    [I.ArbitraryHookId]: () => I.makeArbitrary(UUID, (fc) => fc.uuid())
   })
 )
 

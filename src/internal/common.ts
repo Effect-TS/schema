@@ -39,6 +39,19 @@ export const makePretty = <A>(
 ): Pretty<A> => ({ ast: schema.ast, pretty }) as any
 
 // ---------------------------------------------
+// hooks
+// ---------------------------------------------
+
+/** @internal */
+export const ArbitraryHookId = "@effect/schema/ArbitraryHookId"
+
+/** @internal */
+export const ParserHookId = "@effect/schema/ParserHookId"
+
+/** @internal */
+export const PrettyHookId = "@effect/schema/PrettyHookId"
+
+// ---------------------------------------------
 // Schema APIs
 // ---------------------------------------------
 

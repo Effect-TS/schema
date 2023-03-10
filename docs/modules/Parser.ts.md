@@ -1,6 +1,6 @@
 ---
 title: Parser.ts
-nav_order: 5
+nav_order: 4
 parent: Modules
 ---
 
@@ -24,6 +24,8 @@ Added in v1.0.0
 - [encoding](#encoding)
   - [encode](#encode)
   - [encodeOrThrow](#encodeorthrow)
+- [hooks](#hooks)
+  - [ParserHookId](#parserhookid)
 - [model](#model)
   - [Parser (interface)](#parser-interface)
 - [utils](#utils)
@@ -136,6 +138,18 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
+```
+
+Added in v1.0.0
+
+# hooks
+
+## ParserHookId
+
+**Signature**
+
+```ts
+export declare const ParserHookId: '@effect/schema/ParserHookId'
 ```
 
 Added in v1.0.0

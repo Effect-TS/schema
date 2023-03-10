@@ -9,7 +9,6 @@ import type { Option } from "@effect/data/Option"
 import * as P from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
-import * as H from "@effect/schema/annotation/Hook"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
 import { formatErrors } from "@effect/schema/formatter/Tree"
@@ -31,6 +30,12 @@ export interface Parser<A> extends Schema<A> {
  * @since 1.0.0
  */
 export const make: <A>(schema: Schema<A>, parse: Parser<A>["parse"]) => Parser<A> = I.makeParser
+
+/**
+ * @category hooks
+ * @since 1.0.0
+ */
+export const ParserHookId = I.ParserHookId
 
 /**
  * @category decoding
@@ -110,8 +115,8 @@ export const encodeOrThrow = <A>(schema: Schema<A>) =>
     return t.right
   }
 
-const getHook = AST.getAnnotation<H.Hook<Parser<any>>>(
-  H.ParserHookId
+const getHook = AST.getAnnotation<(...args: ReadonlyArray<Parser<any>>) => Parser<any>>(
+  ParserHookId
 )
 
 const parserFor = <A>(
@@ -125,7 +130,7 @@ const parserFor = <A>(
           getHook(ast),
           O.match(
             () => go(ast.type),
-            ({ handler }) => handler(...ast.typeParameters.map(go))
+            (handler) => handler(...ast.typeParameters.map(go))
           )
         )
       case "Literal":

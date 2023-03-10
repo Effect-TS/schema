@@ -1,6 +1,6 @@
 ---
 title: Pretty.ts
-nav_order: 7
+nav_order: 6
 parent: Modules
 ---
 
@@ -14,6 +14,8 @@ Added in v1.0.0
 
 - [constructors](#constructors)
   - [make](#make)
+- [hooks](#hooks)
+  - [PrettyHookId](#prettyhookid)
 - [model](#model)
   - [Pretty (interface)](#pretty-interface)
 - [prettify](#prettify)
@@ -31,6 +33,18 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <A>(schema: Schema<A>, pretty: (a: A) => string) => Pretty<A>
+```
+
+Added in v1.0.0
+
+# hooks
+
+## PrettyHookId
+
+**Signature**
+
+```ts
+export declare const PrettyHookId: '@effect/schema/PrettyHookId'
 ```
 
 Added in v1.0.0

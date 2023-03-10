@@ -4,7 +4,6 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
-import * as H from "@effect/schema/annotation/Hook"
 import * as AST from "@effect/schema/AST"
 import { formatActual } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
@@ -25,8 +24,14 @@ export interface Pretty<A> extends Schema<A> {
  */
 export const make: <A>(schema: Schema<A>, pretty: Pretty<A>["pretty"]) => Pretty<A> = I.makePretty
 
-const getHook = AST.getAnnotation<H.Hook<Pretty<any>>>(
-  H.PrettyHookId
+/**
+ * @category hooks
+ * @since 1.0.0
+ */
+export const PrettyHookId = I.PrettyHookId
+
+const getHook = AST.getAnnotation<(...args: ReadonlyArray<Pretty<any>>) => Pretty<any>>(
+  PrettyHookId
 )
 
 const toString = (ast: AST.AST) => make(I.makeSchema(ast), (a) => String(a))
@@ -44,7 +49,7 @@ export const match: AST.Match<Pretty<any>> = {
       getHook(ast),
       O.match(
         () => go(ast.type),
-        ({ handler }) => handler(...ast.typeParameters.map(go))
+        (handler) => handler(...ast.typeParameters.map(go))
       )
     ),
   "VoidKeyword": (ast) => make(I.makeSchema(ast), () => "void(0)"),

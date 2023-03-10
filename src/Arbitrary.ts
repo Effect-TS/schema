@@ -5,7 +5,6 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
-import * as TAH from "@effect/schema/annotation/Hook"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import type { Schema } from "@effect/schema/Schema"
@@ -27,6 +26,12 @@ export const make: <A>(schema: Schema<A>, arbitrary: Arbitrary<A>["arbitrary"]) 
   I.makeArbitrary
 
 /**
+ * @category hooks
+ * @since 1.0.0
+ */
+export const ArbitraryHookId = I.ArbitraryHookId
+
+/**
  * @category arbitrary
  * @since 1.0.0
  */
@@ -46,9 +51,9 @@ const record = <K extends PropertyKey, V>(
     return out
   })
 
-const getHook = AST.getAnnotation<TAH.Hook<Arbitrary<any>>>(
-  TAH.ArbitraryHookId
-)
+const getHook = AST.getAnnotation<
+  (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+>(ArbitraryHookId)
 
 const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
   const go = (ast: AST.AST): Arbitrary<any> => {
@@ -58,7 +63,7 @@ const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
           getHook(ast),
           O.match(
             () => go(ast.type),
-            ({ handler }) => handler(...ast.typeParameters.map(go))
+            (handler) => handler(...ast.typeParameters.map(go))
           )
         )
       case "Literal":
@@ -191,7 +196,7 @@ const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
                 (fc) => fc.constant(null).chain(() => get().arbitrary(fc))
               )
             },
-            ({ handler }) => handler()
+            (handler) => handler()
           )
         )
       case "Enums": {
@@ -213,7 +218,7 @@ const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
                 I.makeSchema(ast),
                 (fc) => from.arbitrary(fc).filter((a) => ast.refinement(a))
               ),
-            ({ handler }) => handler(from)
+            (handler) => handler(from)
           )
         )
       }
