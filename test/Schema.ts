@@ -550,7 +550,7 @@ describe.concurrent("Schema", () => {
       pipe(Square, S.attachPropertySignature("kind", "square"))
     )
 
-    expect(S.decodeOrThrow(DiscriminatedShape)({ radius: 10 })).toEqual({
+    expect(S.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
       kind: "circle",
       radius: 10
     })
@@ -560,7 +560,7 @@ describe.concurrent("Schema", () => {
         radius: 10
       })
     ).toEqual({ radius: 10 })
-    expect(S.decodeOrThrow(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+    expect(S.decode(DiscriminatedShape)({ sideLength: 10 })).toEqual({
       kind: "square",
       sideLength: 10
     })

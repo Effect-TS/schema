@@ -131,12 +131,12 @@ if (S.isFailure(result2)) {
 
 The `decodePerson` function returns a value of type `ParseResult<A>`, which is a type alias for `Either<NonEmptyReadonlyArray<ParseError>, A>`, where `NonEmptyReadonlyArray<ParseError>` represents a list of errors that occurred during the decoding process and `A` is the inferred type of the data described by the `Schema`. A successful decode will result in a `Right`, containing the decoded data. A `Right` value indicates that the decode was successful and no errors occurred. In the case of a failed decode, the result will be a `Left` value containing a list of `ParseError`s.
 
-The `decodeOrThrow` function is used to decode a value and throw an error if the decoding fails.
+The `decode` function is used to decode a value and throw an error if the decoding fails.
 It is useful when you want to ensure that the value being decoded is in the correct format, and want to throw an error if it is not.
 
 ```ts
 try {
-  const person = P.decodeOrThrow(Person)({});
+  const person = S.decode(Person)({});
   console.log(person);
 } catch (e) {
   console.error("Decoding failed:");
@@ -709,12 +709,12 @@ const DiscriminatedShape = S.union(
   )
 );
 
-expect(S.decodeOrThrow(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(S.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
-expect(S.decodeOrThrow(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+expect(S.decode(DiscriminatedShape)({ sideLength: 10 })).toEqual({
   kind: "square",
   sideLength: 10,
 });
@@ -735,7 +735,7 @@ const DiscriminatedShape = S.union(
 );
 
 // decoding
-expect(S.decodeOrThrow(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(S.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
@@ -1055,12 +1055,12 @@ The `trim` parser allows removing whitespaces from the beginning and end of a st
 import * as S from "@effect/schema/Schema";
 
 const schema = S.trim(S.string);
-const decodeOrThrow = S.decodeOrThrow(schema);
+const decode = S.decode(schema);
 
-decodeOrThrow("a"); // "a"
-decodeOrThrow(" a"); // "a"
-decodeOrThrow("a "); // "a"
-decodeOrThrow(" a "); // "a"
+decode("a"); // "a"
+decode(" a"); // "a"
+decode("a "); // "a"
+decode(" a "); // "a"
 ```
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
@@ -1077,18 +1077,18 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 import * as S from "@effect/schema/Schema";
 
 const schema = S.numberFromString(S.string);
-const decodeOrThrow = S.decodeOrThrow(schema);
+const decode = S.decode(schema);
 
 // success cases
-decodeOrThrow("1"); // 1
-decodeOrThrow("-1"); // -1
-decodeOrThrow("1.5"); // 1.5
-decodeOrThrow("NaN"); // NaN
-decodeOrThrow("Infinity"); // Infinity
-decodeOrThrow("-Infinity"); // -Infinity
+decode("1"); // 1
+decode("-1"); // -1
+decode("1.5"); // 1.5
+decode("NaN"); // NaN
+decode("Infinity"); // Infinity
+decode("-Infinity"); // -Infinity
 
 // failure cases
-decodeOrThrow("a"); // throws
+decode("a"); // throws
 ```
 
 #### clamp
@@ -1100,10 +1100,10 @@ import * as S from "@effect/schema/Schema";
 
 const schema = pipe(S.number, S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
-const decodeOrThrow = S.decodeOrThrow(schema);
-decodeOrThrow(-3); // -1
-decodeOrThrow(0); // 0
-decodeOrThrow(3); // 1
+const decode = S.decode(schema);
+decode(-3); // -1
+decode(0); // 0
+decode(3); // 1
 ```
 
 ### Bigint transformations
@@ -1117,10 +1117,10 @@ import * as S from "@effect/schema/Schema";
 
 const schema = pipe(S.bigint, S.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
-const decodeOrThrow = S.decodeOrThrow(schema);
-decodeOrThrow(-3n); // -1n
-decodeOrThrow(0n); // 0n
-decodeOrThrow(3n); // 1n
+const decode = S.decode(schema);
+decode(-3n); // -1n
+decode(0n); // 0n
+decode(3n); // 1n
 ```
 
 ### Date transformations
@@ -1133,11 +1133,11 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 import * as S from "@effect/schema/Schema";
 
 const schema = S.dateFromString(S.string);
-const decodeOrThrow = S.decodeOrThrow(schema);
+const decode = S.decode(schema);
 
-decodeOrThrow("1970-01-01T00:00:00.000Z"); // new Date(0)
+decode("1970-01-01T00:00:00.000Z"); // new Date(0)
 
-decodeOrThrow("a"); // throws
+decode("a"); // throws
 ```
 
 ## Option
@@ -1169,12 +1169,12 @@ const schema = S.struct({
 });
 
 // decoding
-const decodeOrThrow = S.decodeOrThrow(schema);
-decodeOrThrow({ a: "hello", b: undefined }); // { a: "hello", b: none() }
-decodeOrThrow({ a: "hello", b: null }); // { a: "hello", b: none() }
-decodeOrThrow({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
+const decode = S.decode(schema);
+decode({ a: "hello", b: undefined }); // { a: "hello", b: none() }
+decode({ a: "hello", b: null }); // { a: "hello", b: none() }
+decode({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
-decodeOrThrow({ a: "hello" }); // throws key "b" is missing
+decode({ a: "hello" }); // throws key "b" is missing
 
 // encoding
 const encodeOrThrow = S.encodeOrThrow(schema);
@@ -1209,11 +1209,11 @@ const schema = pipe(
 );
 
 // decoding
-const decodeOrThrow = S.decodeOrThrow(schema);
-decodeOrThrow({ a: "hello" }); // { a: "hello", b: none() }
-decodeOrThrow({ a: "hello", b: undefined }); // { a: "hello", b: none() }
-decodeOrThrow({ a: "hello", b: null }); // { a: "hello", b: none() }
-decodeOrThrow({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
+const decode = S.decode(schema);
+decode({ a: "hello" }); // { a: "hello", b: none() }
+decode({ a: "hello", b: undefined }); // { a: "hello", b: none() }
+decode({ a: "hello", b: null }); // { a: "hello", b: none() }
+decode({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
 // encoding
 const encodeOrThrow = S.encodeOrThrow(schema);
@@ -1235,9 +1235,9 @@ import * as S from "@effect/schema/Schema";
 
 // define a schema for ReadonlySet with number values
 const schema = S.readonlySet(S.number);
-const decodeOrThrow = P.decodeOrThrow(schema);
+const decode = S.decode(schema);
 
-decodeOrThrow([1, 2, 3]); // new Set([1, 2, 3])
+decode([1, 2, 3]); // new Set([1, 2, 3])
 ```
 
 ## ReadonlyMap
@@ -1249,9 +1249,9 @@ import * as S from "@effect/schema/Schema";
 
 // define the schema for ReadonlyMap with number keys and string values
 const schema = S.readonlyMap(S.number, S.string);
-const decodeOrThrow = P.decodeOrThrow(schema);
+const decode = S.decode(schema);
 
-decodeOrThrow([
+decode([
   [1, "a"],
   [2, "b"],
   [3, "c"],
@@ -1272,7 +1272,7 @@ const LongString = pipe(
   })
 );
 
-console.log(S.decodeOrThrow(LongString)("a"));
+console.log(S.decode(LongString)("a"));
 /*
 1 error(s) found
 └─ Expected a string at least 10 characters long, actual "a"

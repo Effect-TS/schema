@@ -173,8 +173,8 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [asserts](#asserts)
   - [decode](#decode)
+  - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
-  - [decodeOrThrow](#decodeorthrow)
   - [encode](#encode)
   - [encodeOrThrow](#encodeorthrow)
   - [getPropertySignatures](#getpropertysignatures)
@@ -295,7 +295,7 @@ const Shape = S.union(
   pipe(Square, S.attachPropertySignature('kind', 'square'))
 )
 
-assert.deepStrictEqual(S.decodeOrThrow(Shape)({ radius: 10 }), {
+assert.deepStrictEqual(S.decode(Shape)({ radius: 10 }), {
   kind: 'circle',
   radius: 10,
 })
@@ -1979,7 +1979,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <A>(
+export declare const decode: <A>(schema: Schema<A>) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+## decodeEither
+
+**Signature**
+
+```ts
+export declare const decodeEither: <A>(
   schema: Schema<A>
 ) => (
   input: unknown,
@@ -1997,18 +2007,6 @@ Added in v1.0.0
 export declare const decodeOption: <A>(
   schema: Schema<A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
-```
-
-Added in v1.0.0
-
-## decodeOrThrow
-
-**Signature**
-
-```ts
-export declare const decodeOrThrow: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0

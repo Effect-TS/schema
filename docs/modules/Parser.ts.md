@@ -18,9 +18,9 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [make](#make)
 - [decoding](#decoding)
+  - [decode](#decode)
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
-  - [decodeOrThrow](#decodeorthrow)
 - [encoding](#encoding)
   - [encode](#encode)
   - [encodeOrThrow](#encodeorthrow)
@@ -79,6 +79,16 @@ Added in v1.0.0
 
 # decoding
 
+## decode
+
+**Signature**
+
+```ts
+export declare const decode: <A>(schema: Schema<A>) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
 ## decodeEither
 
 **Signature**
@@ -102,18 +112,6 @@ Added in v1.0.0
 export declare const decodeOption: <A>(
   schema: Schema<A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
-```
-
-Added in v1.0.0
-
-## decodeOrThrow
-
-**Signature**
-
-```ts
-export declare const decodeOrThrow: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0

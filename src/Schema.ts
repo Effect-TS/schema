@@ -52,15 +52,15 @@ export {
   /**
    * @since 1.0.0
    */
-  decodeEither as decode,
+  decode,
+  /**
+   * @since 1.0.0
+   */
+  decodeEither,
   /**
    * @since 1.0.0
    */
   decodeOption,
-  /**
-   * @since 1.0.0
-   */
-  decodeOrThrow,
   /**
    * @since 1.0.0
    */
@@ -452,11 +452,11 @@ export const brand = <B extends string, A>(
     annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema: Schema<A & Brand<B>> = make(ast)
-    const decodeOrThrow = P.decodeOrThrow(schema)
+    const decode = P.decode(schema)
     const decodeOption = P.decodeOption(schema)
     const decodeEither = P.decodeEither(schema)
     const is = P.is(schema)
-    const out: any = Object.assign((input: unknown) => decodeOrThrow(input), {
+    const out: any = Object.assign((input: unknown) => decode(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
       ast,
       option: (input: unknown) => decodeOption(input),
@@ -664,7 +664,7 @@ export const transform = <A, B>(
  *   pipe(Square, S.attachPropertySignature("kind", "square"))
  * )
  *
- * assert.deepStrictEqual(S.decodeOrThrow(Shape)({ radius: 10 }), {
+ * assert.deepStrictEqual(S.decode(Shape)({ radius: 10 }), {
  *   kind: "circle",
  *   radius: 10
  * })

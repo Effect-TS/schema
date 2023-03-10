@@ -57,7 +57,7 @@ export const decodeOption = <A>(schema: Schema<A>) =>
  * @category decoding
  * @since 1.0.0
  */
-export const decodeOrThrow = <A>(schema: Schema<A>) =>
+export const decode = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): A => {
     const t = parserFor(schema).parse(input, options)
     if (PR.isFailure(t)) {
