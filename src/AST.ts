@@ -11,7 +11,6 @@ import type { Predicate } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import { isString } from "@effect/data/String"
 import * as Order from "@effect/data/typeclass/Order"
-import { TitleId } from "@effect/schema/annotation/AST"
 import type { ParseResult } from "@effect/schema/ParseResult"
 
 // -------------------------------------------------------------------------------------
@@ -45,6 +44,122 @@ export type AST =
   | Lazy
   | Refinement
   | Transform
+
+// ---------------------------------------------
+// annotations
+// ---------------------------------------------
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type BrandAnnotation = ReadonlyArray<string>
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const BrandAnnotationId = "@effect/schema/BrandAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type TypeAnnotation = string | symbol
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const TypeAnnotationId = "@effect/schema/TypeAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type MessageAnnotation<A> = (a: A) => string
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const MessageAnnotationId = "@effect/schema/MessageAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type IdentifierAnnotation = string
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const IdentifierAnnotationId = "@effect/schema/IdentifierAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type TitleAnnotation = string
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const TitleAnnotationId = "@effect/schema/TitleAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type DescriptionAnnotation = string
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const DescriptionAnnotationId = "@effect/schema/DescriptionAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type ExamplesAnnotation = ReadonlyArray<unknown>
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const ExamplesAnnotationId = "@effect/schema/ExamplesAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type JSONSchemaAnnotation = object
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const JSONSchemaAnnotationId = "@effect/schema/JSONSchemaAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type DocumentationAnnotation = string
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const DocumentationAnnotationId = "@effect/schema/DocumentationAnnotationId"
+
+// ---------------------------------------------
+// models
+// ---------------------------------------------
 
 /**
  * @since 1.0.0
@@ -155,7 +270,7 @@ export interface UndefinedKeyword extends Annotated {
 export const undefinedKeyword: UndefinedKeyword = {
   _tag: "UndefinedKeyword",
   annotations: {
-    [TitleId]: "undefined"
+    [TitleAnnotationId]: "undefined"
   }
 }
 
@@ -174,7 +289,7 @@ export interface VoidKeyword extends Annotated {
 export const voidKeyword: VoidKeyword = {
   _tag: "VoidKeyword",
   annotations: {
-    [TitleId]: "void"
+    [TitleAnnotationId]: "void"
   }
 }
 
@@ -193,7 +308,7 @@ export interface NeverKeyword extends Annotated {
 export const neverKeyword: NeverKeyword = {
   _tag: "NeverKeyword",
   annotations: {
-    [TitleId]: "never"
+    [TitleAnnotationId]: "never"
   }
 }
 
@@ -212,7 +327,7 @@ export interface UnknownKeyword extends Annotated {
 export const unknownKeyword: UnknownKeyword = {
   _tag: "UnknownKeyword",
   annotations: {
-    [TitleId]: "unknown"
+    [TitleAnnotationId]: "unknown"
   }
 }
 
@@ -237,7 +352,7 @@ export interface AnyKeyword extends Annotated {
 export const anyKeyword: AnyKeyword = {
   _tag: "AnyKeyword",
   annotations: {
-    [TitleId]: "any"
+    [TitleAnnotationId]: "any"
   }
 }
 
@@ -262,7 +377,7 @@ export interface StringKeyword extends Annotated {
 export const stringKeyword: StringKeyword = {
   _tag: "StringKeyword",
   annotations: {
-    [TitleId]: "string"
+    [TitleAnnotationId]: "string"
   }
 }
 
@@ -287,7 +402,7 @@ export interface NumberKeyword extends Annotated {
 export const numberKeyword: NumberKeyword = {
   _tag: "NumberKeyword",
   annotations: {
-    [TitleId]: "number"
+    [TitleAnnotationId]: "number"
   }
 }
 
@@ -312,7 +427,7 @@ export interface BooleanKeyword extends Annotated {
 export const booleanKeyword: BooleanKeyword = {
   _tag: "BooleanKeyword",
   annotations: {
-    [TitleId]: "boolean"
+    [TitleAnnotationId]: "boolean"
   }
 }
 
@@ -337,7 +452,7 @@ export interface BigIntKeyword extends Annotated {
 export const bigIntKeyword: BigIntKeyword = {
   _tag: "BigIntKeyword",
   annotations: {
-    [TitleId]: "bigint"
+    [TitleAnnotationId]: "bigint"
   }
 }
 
@@ -362,7 +477,7 @@ export interface SymbolKeyword extends Annotated {
 export const symbolKeyword: SymbolKeyword = {
   _tag: "SymbolKeyword",
   annotations: {
-    [TitleId]: "symbol"
+    [TitleAnnotationId]: "symbol"
   }
 }
 
@@ -387,7 +502,7 @@ export interface ObjectKeyword extends Annotated {
 export const objectKeyword: ObjectKeyword = {
   _tag: "ObjectKeyword",
   annotations: {
-    [TitleId]: "object"
+    [TitleAnnotationId]: "object"
   }
 }
 

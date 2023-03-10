@@ -3,7 +3,6 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
-import * as annotations from "@effect/schema/annotation/AST"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -72,7 +71,7 @@ const formatAll = (errors: NonEmptyReadonlyArray<PR.ParseError>): string => {
   return pipe(errors, RA.map(formatDecodeError), RA.join(", "))
 }
 
-const getMessage = AST.getAnnotation<annotations.Message<unknown>>(annotations.MessageId)
+const getMessage = AST.getAnnotation<AST.MessageAnnotation<unknown>>(AST.MessageAnnotationId)
 
 const formatDecodeError = (e: PR.ParseError): string => {
   switch (e._tag) {

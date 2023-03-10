@@ -2,8 +2,6 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import { isRecord } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
-import type { JSONSchema } from "@effect/schema/annotation/AST"
-import { JSONSchemaId } from "@effect/schema/annotation/AST"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
@@ -91,8 +89,8 @@ export const isJson = (u: unknown): u is S.Json =>
   isJsonArray(u) ||
   isJsonObject(u)
 
-const getJSONSchemaAnnotation = AST.getAnnotation<JSONSchema>(
-  JSONSchemaId
+const getJSONSchemaAnnotation = AST.getAnnotation<AST.JSONSchemaAnnotation>(
+  AST.JSONSchemaAnnotationId
 )
 
 const jsonSchemaFor = <A>(schema: Schema<A>): JsonSchema7Type => {

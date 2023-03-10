@@ -5,7 +5,6 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
-import * as annotations from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
 import type * as PR from "@effect/schema/ParseResult"
 
@@ -78,20 +77,20 @@ const formatTemplateLiteralSpan = (span: AST.TemplateLiteralSpan): string => {
 const formatTemplateLiteral = (ast: AST.TemplateLiteral): string =>
   ast.head + ast.spans.map((span) => formatTemplateLiteralSpan(span) + span.literal).join("")
 
-const getMessage = AST.getAnnotation<annotations.Message<unknown>>(
-  annotations.MessageId
+const getMessage = AST.getAnnotation<AST.MessageAnnotation<unknown>>(
+  AST.MessageAnnotationId
 )
 
-const getTitle = AST.getAnnotation<annotations.Title>(
-  annotations.TitleId
+const getTitle = AST.getAnnotation<AST.TitleAnnotation>(
+  AST.TitleAnnotationId
 )
 
-const getIdentifier = AST.getAnnotation<annotations.Identifier>(
-  annotations.IdentifierId
+const getIdentifier = AST.getAnnotation<AST.IdentifierAnnotation>(
+  AST.IdentifierAnnotationId
 )
 
-const getDescription = AST.getAnnotation<annotations.Description>(
-  annotations.DescriptionId
+const getDescription = AST.getAnnotation<AST.DescriptionAnnotation>(
+  AST.DescriptionAnnotationId
 )
 
 const getExpected = (ast: AST.AST): O.Option<string> =>

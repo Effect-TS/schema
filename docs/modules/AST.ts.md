@@ -1,6 +1,6 @@
 ---
 title: AST.ts
-nav_order: 4
+nav_order: 3
 parent: Modules
 ---
 
@@ -12,6 +12,25 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [annotations](#annotations)
+  - [BrandAnnotation (type alias)](#brandannotation-type-alias)
+  - [BrandAnnotationId](#brandannotationid)
+  - [DescriptionAnnotation (type alias)](#descriptionannotation-type-alias)
+  - [DescriptionAnnotationId](#descriptionannotationid)
+  - [DocumentationAnnotation (type alias)](#documentationannotation-type-alias)
+  - [DocumentationAnnotationId](#documentationannotationid)
+  - [ExamplesAnnotation (type alias)](#examplesannotation-type-alias)
+  - [ExamplesAnnotationId](#examplesannotationid)
+  - [IdentifierAnnotation (type alias)](#identifierannotation-type-alias)
+  - [IdentifierAnnotationId](#identifierannotationid)
+  - [JSONSchemaAnnotation (type alias)](#jsonschemaannotation-type-alias)
+  - [JSONSchemaAnnotationId](#jsonschemaannotationid)
+  - [MessageAnnotation (type alias)](#messageannotation-type-alias)
+  - [MessageAnnotationId](#messageannotationid)
+  - [TitleAnnotation (type alias)](#titleannotation-type-alias)
+  - [TitleAnnotationId](#titleannotationid)
+  - [TypeAnnotation (type alias)](#typeannotation-type-alias)
+  - [TypeAnnotationId](#typeannotationid)
 - [constructors](#constructors)
   - [anyKeyword](#anykeyword)
   - [bigIntKeyword](#bigintkeyword)
@@ -103,6 +122,188 @@ Added in v1.0.0
   - [setAnnotation](#setannotation)
 
 ---
+
+# annotations
+
+## BrandAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type BrandAnnotation = ReadonlyArray<string>
+```
+
+Added in v1.0.0
+
+## BrandAnnotationId
+
+**Signature**
+
+```ts
+export declare const BrandAnnotationId: '@effect/schema/BrandAnnotationId'
+```
+
+Added in v1.0.0
+
+## DescriptionAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type DescriptionAnnotation = string
+```
+
+Added in v1.0.0
+
+## DescriptionAnnotationId
+
+**Signature**
+
+```ts
+export declare const DescriptionAnnotationId: '@effect/schema/DescriptionAnnotationId'
+```
+
+Added in v1.0.0
+
+## DocumentationAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type DocumentationAnnotation = string
+```
+
+Added in v1.0.0
+
+## DocumentationAnnotationId
+
+**Signature**
+
+```ts
+export declare const DocumentationAnnotationId: '@effect/schema/DocumentationAnnotationId'
+```
+
+Added in v1.0.0
+
+## ExamplesAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type ExamplesAnnotation = ReadonlyArray<unknown>
+```
+
+Added in v1.0.0
+
+## ExamplesAnnotationId
+
+**Signature**
+
+```ts
+export declare const ExamplesAnnotationId: '@effect/schema/ExamplesAnnotationId'
+```
+
+Added in v1.0.0
+
+## IdentifierAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type IdentifierAnnotation = string
+```
+
+Added in v1.0.0
+
+## IdentifierAnnotationId
+
+**Signature**
+
+```ts
+export declare const IdentifierAnnotationId: '@effect/schema/IdentifierAnnotationId'
+```
+
+Added in v1.0.0
+
+## JSONSchemaAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type JSONSchemaAnnotation = object
+```
+
+Added in v1.0.0
+
+## JSONSchemaAnnotationId
+
+**Signature**
+
+```ts
+export declare const JSONSchemaAnnotationId: '@effect/schema/JSONSchemaAnnotationId'
+```
+
+Added in v1.0.0
+
+## MessageAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type MessageAnnotation<A> = (a: A) => string
+```
+
+Added in v1.0.0
+
+## MessageAnnotationId
+
+**Signature**
+
+```ts
+export declare const MessageAnnotationId: '@effect/schema/MessageAnnotationId'
+```
+
+Added in v1.0.0
+
+## TitleAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type TitleAnnotation = string
+```
+
+Added in v1.0.0
+
+## TitleAnnotationId
+
+**Signature**
+
+```ts
+export declare const TitleAnnotationId: '@effect/schema/TitleAnnotationId'
+```
+
+Added in v1.0.0
+
+## TypeAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type TypeAnnotation = string | symbol
+```
+
+Added in v1.0.0
+
+## TypeAnnotationId
+
+**Signature**
+
+```ts
+export declare const TypeAnnotationId: '@effect/schema/TypeAnnotationId'
+```
+
+Added in v1.0.0
 
 # constructors
 

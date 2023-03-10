@@ -1,7 +1,6 @@
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
-import * as A from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
@@ -57,10 +56,10 @@ describe.concurrent("Schema", () => {
       })
     )
     expect(Branded.ast.annotations).toEqual({
-      [A.TypeId]: "@effect/schema/IntTypeId",
-      [A.BrandId]: ["A", "B"],
-      [A.DescriptionId]: "a B brand",
-      [A.JSONSchemaId]: { type: "integer" }
+      [AST.TypeAnnotationId]: "@effect/schema/IntTypeId",
+      [AST.BrandAnnotationId]: ["A", "B"],
+      [AST.DescriptionAnnotationId]: "a B brand",
+      [AST.JSONSchemaAnnotationId]: { type: "integer" }
     })
   })
 
@@ -125,28 +124,28 @@ describe.concurrent("Schema", () => {
 
   it("title", () => {
     expect(pipe(S.string, S.title("MyString")).ast.annotations).toEqual({
-      "@effect/schema/annotation/TitleId": "MyString"
+      [AST.TitleAnnotationId]: "MyString"
     })
   })
 
   it("description", () => {
     expect(pipe(S.string, S.description("description")).ast.annotations).toEqual({
-      "@effect/schema/annotation/DescriptionId": "description",
-      "@effect/schema/annotation/TitleId": "string"
+      [AST.DescriptionAnnotationId]: "description",
+      [AST.TitleAnnotationId]: "string"
     })
   })
 
   it("examples", () => {
     expect(pipe(S.string, S.examples(["example"])).ast.annotations).toEqual({
-      "@effect/schema/annotation/ExamplesId": ["example"],
-      "@effect/schema/annotation/TitleId": "string"
+      [AST.ExamplesAnnotationId]: ["example"],
+      [AST.TitleAnnotationId]: "string"
     })
   })
 
   it("documentation", () => {
     expect(pipe(S.string, S.documentation("documentation")).ast.annotations).toEqual({
-      "@effect/schema/annotation/DocumentationId": "documentation",
-      "@effect/schema/annotation/TitleId": "string"
+      [AST.DocumentationAnnotationId]: "documentation",
+      [AST.TitleAnnotationId]: "string"
     })
   })
 
@@ -493,7 +492,7 @@ describe.concurrent("Schema", () => {
     })
   })
 
-  it("filter/ annotationOptions", () => {
+  it("filter/ annotation options", () => {
     const schema = pipe(
       S.string,
       S.filter((s): s is string => s.length === 1, {
@@ -507,18 +506,18 @@ describe.concurrent("Schema", () => {
       })
     )
     expect(schema.ast.annotations).toEqual({
-      [A.TypeId]: "Char",
-      "@effect/schema/annotation/DescriptionId": "description",
-      "@effect/schema/annotation/DocumentationId": "documentation",
-      "@effect/schema/annotation/ExamplesId": [
+      [AST.TypeAnnotationId]: "Char",
+      [AST.DescriptionAnnotationId]: "description",
+      [AST.DocumentationAnnotationId]: "documentation",
+      [AST.ExamplesAnnotationId]: [
         "examples"
       ],
-      "@effect/schema/annotation/IdentifierId": "identifier",
-      "@effect/schema/annotation/JSONSchemaId": {
+      [AST.IdentifierAnnotationId]: "identifier",
+      [AST.JSONSchemaAnnotationId]: {
         "maxLength": 1,
         "minLength": 1
       },
-      "@effect/schema/annotation/TitleId": "title"
+      [AST.TitleAnnotationId]: "title"
     })
   })
 

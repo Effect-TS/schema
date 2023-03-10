@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 9
+nav_order: 8
 parent: Modules
 ---
 
@@ -188,7 +188,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const description: (description: A.Description) => <A>(self: Schema<A>) => Schema<A>
+export declare const description: (description: AST.DescriptionAnnotation) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -198,7 +198,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const documentation: (documentation: A.Documentation) => <A>(self: Schema<A>) => Schema<A>
+export declare const documentation: (documentation: AST.DocumentationAnnotation) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -208,7 +208,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const examples: (examples: A.Examples) => <A>(self: Schema<A>) => Schema<A>
+export declare const examples: (examples: AST.ExamplesAnnotation) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -218,7 +218,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const identifier: (identifier: A.Identifier) => <A>(self: Schema<A>) => Schema<A>
+export declare const identifier: (identifier: AST.IdentifierAnnotation) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -228,7 +228,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const message: (message: A.Message<unknown>) => <A>(self: Schema<A>) => Schema<A>
+export declare const message: (message: AST.MessageAnnotation<unknown>) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -238,7 +238,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const title: (title: A.Title) => <A>(self: Schema<A>) => Schema<A>
+export declare const title: (title: AST.TitleAnnotation) => <A>(self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -1476,14 +1476,14 @@ Added in v1.0.0
 
 ```ts
 export type AnnotationOptions<A> = {
-  typeId?: A.Type | { id: A.Type; params: unknown }
-  message?: A.Message<A>
-  identifier?: A.Identifier
-  title?: A.Title
-  description?: A.Description
-  examples?: A.Examples
-  documentation?: A.Documentation
-  jsonSchema?: A.JSONSchema
+  typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  message?: AST.MessageAnnotation<A>
+  identifier?: AST.IdentifierAnnotation
+  title?: AST.TitleAnnotation
+  description?: AST.DescriptionAnnotation
+  examples?: AST.ExamplesAnnotation
+  documentation?: AST.DocumentationAnnotation
+  jsonSchema?: AST.JSONSchemaAnnotation
 }
 ```
 

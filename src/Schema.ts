@@ -18,7 +18,6 @@ import * as O from "@effect/data/Option"
 import { isDate } from "@effect/data/Predicate"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
-import * as A from "@effect/schema/annotation/AST"
 import * as H from "@effect/schema/annotation/Hook"
 import { Arbitrary } from "@effect/schema/Arbitrary"
 import * as Arb from "@effect/schema/Arbitrary"
@@ -451,7 +450,7 @@ export const brand = <B extends string, A>(
 ) =>
   (self: Schema<A>): BrandSchema<A & Brand<B>> => {
     const annotations = toAnnotations(options)
-    annotations[A.BrandId] = [...getBrands(self.ast), brand]
+    annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema: Schema<A & Brand<B>> = make(ast)
     const decodeOrThrow = P.decodeOrThrow(schema)
@@ -470,7 +469,7 @@ export const brand = <B extends string, A>(
   }
 
 const getBrands = (ast: AST.AST): Array<string> =>
-  (ast.annotations[A.BrandId] as Array<string> | undefined) || []
+  (ast.annotations[AST.BrandAnnotationId] as Array<string> | undefined) || []
 
 /**
  * @category combinators
@@ -549,14 +548,14 @@ export const lazy: <A>(
  * @since 1.0.0
  */
 export type AnnotationOptions<A> = {
-  typeId?: A.Type | { id: A.Type; params: unknown }
-  message?: A.Message<A>
-  identifier?: A.Identifier
-  title?: A.Title
-  description?: A.Description
-  examples?: A.Examples
-  documentation?: A.Documentation
-  jsonSchema?: A.JSONSchema
+  typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  message?: AST.MessageAnnotation<A>
+  identifier?: AST.IdentifierAnnotation
+  title?: AST.TitleAnnotation
+  description?: AST.DescriptionAnnotation
+  examples?: AST.ExamplesAnnotation
+  documentation?: AST.DocumentationAnnotation
+  jsonSchema?: AST.JSONSchemaAnnotation
 }
 
 const toAnnotations = <A>(
@@ -566,32 +565,32 @@ const toAnnotations = <A>(
   if (options?.typeId !== undefined) {
     const typeId = options?.typeId
     if (typeof typeId === "object") {
-      annotations[A.TypeId] = typeId.id
+      annotations[AST.TypeAnnotationId] = typeId.id
       annotations[typeId.id] = typeId.params
     } else {
-      annotations[A.TypeId] = typeId
+      annotations[AST.TypeAnnotationId] = typeId
     }
   }
   if (options?.message !== undefined) {
-    annotations[A.MessageId] = options?.message
+    annotations[AST.MessageAnnotationId] = options?.message
   }
   if (options?.identifier !== undefined) {
-    annotations[A.IdentifierId] = options?.identifier
+    annotations[AST.IdentifierAnnotationId] = options?.identifier
   }
   if (options?.title !== undefined) {
-    annotations[A.TitleId] = options?.title
+    annotations[AST.TitleAnnotationId] = options?.title
   }
   if (options?.description !== undefined) {
-    annotations[A.DescriptionId] = options?.description
+    annotations[AST.DescriptionAnnotationId] = options?.description
   }
   if (options?.examples !== undefined) {
-    annotations[A.ExamplesId] = options?.examples
+    annotations[AST.ExamplesAnnotationId] = options?.examples
   }
   if (options?.documentation !== undefined) {
-    annotations[A.DocumentationId] = options?.documentation
+    annotations[AST.DocumentationAnnotationId] = options?.documentation
   }
   if (options?.jsonSchema !== undefined) {
-    annotations[A.JSONSchemaId] = options?.jsonSchema
+    annotations[AST.JSONSchemaAnnotationId] = options?.jsonSchema
   }
   return annotations
 }
@@ -700,44 +699,48 @@ export const annotations = (annotations: AST.Annotated["annotations"]) =>
  * @category annotations
  * @since 1.0.0
  */
-export const message = (message: A.Message<unknown>) =>
-  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, A.MessageId, message))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const identifier = (identifier: A.Identifier) =>
-  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, A.IdentifierId, identifier))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const title = (title: A.Title) =>
-  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, A.TitleId, title))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const description = (description: A.Description) =>
-  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, A.DescriptionId, description))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const examples = (examples: A.Examples) =>
-  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, A.ExamplesId, examples))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const documentation = (documentation: A.Documentation) =>
+export const message = (message: AST.MessageAnnotation<unknown>) =>
   <A>(self: Schema<A>): Schema<A> =>
-    make(AST.setAnnotation(self.ast, A.DocumentationId, documentation))
+    make(AST.setAnnotation(self.ast, AST.MessageAnnotationId, message))
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const identifier = (identifier: AST.IdentifierAnnotation) =>
+  <A>(self: Schema<A>): Schema<A> =>
+    make(AST.setAnnotation(self.ast, AST.IdentifierAnnotationId, identifier))
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const title = (title: AST.TitleAnnotation) =>
+  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, AST.TitleAnnotationId, title))
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const description = (description: AST.DescriptionAnnotation) =>
+  <A>(self: Schema<A>): Schema<A> =>
+    make(AST.setAnnotation(self.ast, AST.DescriptionAnnotationId, description))
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const examples = (examples: AST.ExamplesAnnotation) =>
+  <A>(self: Schema<A>): Schema<A> =>
+    make(AST.setAnnotation(self.ast, AST.ExamplesAnnotationId, examples))
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const documentation = (documentation: AST.DocumentationAnnotation) =>
+  <A>(self: Schema<A>): Schema<A> =>
+    make(AST.setAnnotation(self.ast, AST.DocumentationAnnotationId, documentation))
 
 // ---------------------------------------------
 // data
@@ -1104,7 +1107,7 @@ export const chunkGuard = <A>(item: Schema<A>): Schema<Chunk<A>> =>
       length: number
     }),
     {
-      [A.IdentifierId]: "Chunk",
+      [AST.IdentifierAnnotationId]: "Chunk",
       [H.ParserHookId]: H.hook(chunkGuardParser),
       [H.PrettyHookId]: H.hook(chunkGuardPretty),
       [H.ArbitraryHookId]: H.hook(chunkGuardArbitrary)
@@ -1162,7 +1165,7 @@ export const dataGuard = <A extends Readonly<Record<string, any>> | ReadonlyArra
     [item],
     item,
     {
-      [A.IdentifierId]: "Data",
+      [AST.IdentifierAnnotationId]: "Data",
       [H.ParserHookId]: H.hook(dataGuardParser),
       [H.PrettyHookId]: H.hook(dataGuardPretty),
       [H.ArbitraryHookId]: H.hook(dataGuardArbitrary)
@@ -1200,7 +1203,7 @@ const datePretty = (): Pretty<Date> =>
  * @since 1.0.0
  */
 export const date: Schema<Date> = typeAlias([], struct({}), {
-  [A.IdentifierId]: "Date",
+  [AST.IdentifierAnnotationId]: "Date",
   [H.ParserHookId]: H.hook(dateParser),
   [H.PrettyHookId]: H.hook(datePretty),
   [H.ArbitraryHookId]: H.hook(dateArbitrary)
@@ -1290,7 +1293,7 @@ export const eitherGuard = <E, A>(
   right: Schema<A>
 ): Schema<Either<E, A>> =>
   typeAlias([left, right], eitherInline(left, right), {
-    [A.IdentifierId]: "Either",
+    [AST.IdentifierAnnotationId]: "Either",
     [H.ParserHookId]: H.hook(eitherGuardParser),
     [H.PrettyHookId]: H.hook(eitherGuardPretty),
     [H.ArbitraryHookId]: H.hook(eitherGuardArbitrary)
@@ -1751,7 +1754,7 @@ export const optionGuard = <A>(value: Schema<A>): Schema<Option<A>> => {
     [value],
     optionInline(value),
     {
-      [A.IdentifierId]: "Option",
+      [AST.IdentifierAnnotationId]: "Option",
       [H.ParserHookId]: H.hook(optionGuardParser),
       [H.PrettyHookId]: H.hook(optionGuardPretty),
       [H.ArbitraryHookId]: H.hook(optionGuardArbitrary)
@@ -1964,7 +1967,7 @@ export const readonlyMapGuard = <K, V>(
       size: number
     }),
     {
-      [A.IdentifierId]: "ReadonlyMap",
+      [AST.IdentifierAnnotationId]: "ReadonlyMap",
       [H.ParserHookId]: H.hook(readonlyMapGuardParser),
       [H.PrettyHookId]: H.hook(readonlyMapGuardPretty),
       [H.ArbitraryHookId]: H.hook(readonlyMapGuardArbitrary)
@@ -2029,7 +2032,7 @@ export const readonlySetGuard = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
       size: number
     }),
     {
-      [A.IdentifierId]: "ReadonlySet",
+      [AST.IdentifierAnnotationId]: "ReadonlySet",
       [H.ParserHookId]: H.hook(readonlySetGuardParser),
       [H.PrettyHookId]: H.hook(readonlySetGuardPretty),
       [H.ArbitraryHookId]: H.hook(readonlySetGuardArbitrary)
