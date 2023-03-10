@@ -3,12 +3,12 @@ import { pipe } from "@effect/data/Function"
 import { isNumber } from "@effect/data/Number"
 import { isRecord } from "@effect/data/Predicate"
 import { isString } from "@effect/data/String"
-import * as _ from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as _ from "@effect/schema/TreeFormatter"
 
-describe.concurrent("Tree", () => {
+describe.concurrent("TreeFormatter", () => {
   it("formatErrors/ Unexpected", () => {
     const schema = S.struct({ a: S.string })
     Util.expectDecodingFailureTree(

@@ -5,10 +5,10 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as AST from "@effect/schema/AST"
-import { formatActual } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import type { Schema } from "@effect/schema/Schema"
+import { formatActual } from "@effect/schema/TreeFormatter"
 
 /**
  * @category model

@@ -263,11 +263,11 @@ Note that during encoding, the number value `30` was converted to a string `"30"
 
 ## Formatting errors
 
-To format errors when a `decode` or an `encode` function fails, you can use the `formatErrors` function from the `@effect/schema/formatter/Tree` module.
+To format errors when a `decode` or an `encode` function fails, you can use the `formatErrors` function from the `@effect/schema/TreeFormatter` module.
 
 ```ts
 import * as S from "@effect/schema";
-import { formatErrors } from "@effect/schema/formatter/Tree";
+import { formatErrors } from "@effect/schema/TreeFormatter";
 
 const Person = S.struct({
   name: S.string,

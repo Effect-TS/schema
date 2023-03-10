@@ -1,10 +1,10 @@
 ---
-title: formatter/Tree.ts
-nav_order: 3
+title: TreeFormatter.ts
+nav_order: 7
 parent: Modules
 ---
 
-## Tree overview
+## TreeFormatter overview
 
 Added in v1.0.0
 

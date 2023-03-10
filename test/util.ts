@@ -6,10 +6,10 @@ import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import { formatActual, formatErrors, formatExpected } from "@effect/schema/formatter/Tree"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
+import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
 import * as fc from "fast-check"
 
 export const property = <A>(schema: Schema<A>) => {

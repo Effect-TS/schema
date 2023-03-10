@@ -11,11 +11,11 @@ import * as RA from "@effect/data/ReadonlyArray"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import { formatErrors } from "@effect/schema/formatter/Tree"
 import * as I from "@effect/schema/internal/common"
 import * as PR from "@effect/schema/ParseResult"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import type { Infer, Schema } from "@effect/schema/Schema"
+import { formatErrors } from "@effect/schema/TreeFormatter"
 
 /**
  * @category model
