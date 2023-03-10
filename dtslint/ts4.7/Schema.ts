@@ -237,7 +237,7 @@ pipe(
 //
 
 // $ExpectType Schema<Option<number>>
-S.option(S.number)
+S.optionGuard(S.number)
 
 //
 // instanceOf
