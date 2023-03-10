@@ -7,16 +7,18 @@ import * as Util from "@effect/schema/test/util"
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("Chunk", () => {
-  it("chunkGuard. keyof", () => {
-    expect(S.keyof(S.chunkGuard(S.string))).toEqual(S.union(S.literal("_id"), S.literal("length")))
+  it("chunkFromSelf. keyof", () => {
+    expect(S.keyof(S.chunkFromSelf(S.string))).toEqual(
+      S.union(S.literal("_id"), S.literal("length"))
+    )
   })
 
-  it("chunkGuard. property tests", () => {
-    Util.property(S.chunkGuard(S.number))
+  it("chunkFromSelf. property tests", () => {
+    Util.property(S.chunkFromSelf(S.number))
   })
 
-  it("chunkGuard. decoder", () => {
-    const schema = S.chunkGuard(NumberFromString)
+  it("chunkFromSelf. decoder", () => {
+    const schema = S.chunkFromSelf(NumberFromString)
     Util.expectDecodingSuccess(schema, C.empty(), C.empty())
     Util.expectDecodingSuccess(schema, C.fromIterable(["1", "2", "3"]), C.fromIterable([1, 2, 3]))
 
@@ -32,14 +34,14 @@ describe.concurrent("Chunk", () => {
     )
   })
 
-  it("chunkGuard. encoder", () => {
-    const schema = S.chunkGuard(NumberFromString)
+  it("chunkFromSelf. encoder", () => {
+    const schema = S.chunkFromSelf(NumberFromString)
     Util.expectEncodingSuccess(schema, C.empty(), C.empty())
     Util.expectEncodingSuccess(schema, C.fromIterable([1, 2, 3]), C.fromIterable(["1", "2", "3"]))
   })
 
-  it("chunkGuard. guard", () => {
-    const schema = S.chunkGuard(S.string)
+  it("chunkFromSelf. guard", () => {
+    const schema = S.chunkFromSelf(S.string)
     const is = P.is(schema)
     expect(is(C.empty())).toEqual(true)
     expect(is(C.fromIterable(["a", "b", "c"]))).toEqual(true)
@@ -48,8 +50,8 @@ describe.concurrent("Chunk", () => {
     expect(is({ _id: Symbol.for("@effect/schema/test/FakeChunk") })).toEqual(false)
   })
 
-  it("chunkGuard. pretty", () => {
-    const schema = S.chunkGuard(S.string)
+  it("chunkFromSelf. pretty", () => {
+    const schema = S.chunkFromSelf(S.string)
     const pretty = Pretty.pretty(schema)
     expect(pretty(C.empty())).toEqual("Chunk()")
     expect(pretty(C.fromIterable(["a", "b"]))).toEqual(

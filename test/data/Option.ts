@@ -8,12 +8,12 @@ import * as Util from "@effect/schema/test/util"
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("Option", () => {
-  it("optionGuard. property tests", () => {
-    Util.property(S.optionGuard(NumberFromString))
+  it("optionFromSelf. property tests", () => {
+    Util.property(S.optionFromSelf(NumberFromString))
   })
 
-  it("optionGuard. Guard", () => {
-    const schema = S.optionGuard(S.number)
+  it("optionFromSelf. Guard", () => {
+    const schema = S.optionFromSelf(S.number)
     const is = P.is(schema)
     expect(is(O.none())).toEqual(true)
     expect(is(O.some(1))).toEqual(true)
@@ -24,14 +24,14 @@ describe.concurrent("Option", () => {
     expect(is({ _tag: "Some", value: 1 })).toEqual(false)
   })
 
-  it("optionGuard. Decoder", () => {
-    const schema = S.optionGuard(NumberFromString)
+  it("optionFromSelf. Decoder", () => {
+    const schema = S.optionFromSelf(NumberFromString)
     Util.expectDecodingSuccess(schema, O.none(), O.none())
     Util.expectDecodingSuccess(schema, O.some("1"), O.some(1))
   })
 
-  it("optionGuard. Pretty", () => {
-    const schema = S.optionGuard(S.number)
+  it("optionFromSelf. Pretty", () => {
+    const schema = S.optionFromSelf(S.number)
     const pretty = Pretty.pretty(schema)
     expect(pretty(O.none())).toEqual("none()")
     expect(pretty(O.some(1))).toEqual("some(1)")

@@ -1073,9 +1073,9 @@ export const fromBrand = <C extends Brand<string>>(
 // data/Chunk
 // ---------------------------------------------
 
-const chunkGuardParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
+const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
   const items = P.decode(array(item))
-  const schema = chunkGuard(item)
+  const schema = chunkFromSelf(item)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -1085,12 +1085,12 @@ const chunkGuardParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
   )
 }
 
-const chunkGuardArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
-  I.makeArbitrary(chunkGuard(item), (fc) => fc.array(item.arbitrary(fc)).map(C.fromIterable))
+const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
+  I.makeArbitrary(chunkFromSelf(item), (fc) => fc.array(item.arbitrary(fc)).map(C.fromIterable))
 
-const chunkGuardPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
+const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
   I.makePretty(
-    chunkGuard(item),
+    chunkFromSelf(item),
     (c) => `Chunk(${C.toReadonlyArray(c).map(item.pretty).join(", ")})`
   )
 
@@ -1098,7 +1098,7 @@ const chunkGuardPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const chunkGuard = <A>(item: Schema<A>): Schema<Chunk<A>> =>
+export const chunkFromSelf = <A>(item: Schema<A>): Schema<Chunk<A>> =>
   typeAlias(
     [item],
     struct({
@@ -1107,9 +1107,9 @@ export const chunkGuard = <A>(item: Schema<A>): Schema<Chunk<A>> =>
     }),
     {
       [AST.IdentifierAnnotationId]: "Chunk",
-      [I.ParserHookId]: chunkGuardParser,
-      [I.PrettyHookId]: chunkGuardPretty,
-      [I.ArbitraryHookId]: chunkGuardArbitrary
+      [I.ParserHookId]: chunkParser,
+      [I.PrettyHookId]: chunkPretty,
+      [I.ArbitraryHookId]: chunkArbitrary
     }
   )
 
@@ -1118,7 +1118,7 @@ export const chunkGuard = <A>(item: Schema<A>): Schema<Chunk<A>> =>
  * @since 1.0.0
  */
 export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
-  pipe(array(item), transform(chunkGuard(item), C.fromIterable, C.toReadonlyArray))
+  pipe(array(item), transform(chunkFromSelf(item), C.fromIterable, C.toReadonlyArray))
 
 // ---------------------------------------------
 // data/Data
@@ -1127,11 +1127,11 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
 const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): D.Data<A> =>
   Array.isArray(a) ? D.array(a) : D.struct(a)
 
-const dataGuardParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+const dataParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: P.Parser<A>
 ): P.Parser<D.Data<A>> => {
   const decode = P.decode(item)
-  const schema = dataGuard(item)
+  const schema = dataFromSelf(item)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -1141,15 +1141,16 @@ const dataGuardParser = <A extends Readonly<Record<string, any>> | ReadonlyArray
   )
 }
 
-const dataGuardArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Arbitrary<A>
-): Arbitrary<D.Data<A>> => I.makeArbitrary(dataGuard(item), (fc) => item.arbitrary(fc).map(toData))
+): Arbitrary<D.Data<A>> =>
+  I.makeArbitrary(dataFromSelf(item), (fc) => item.arbitrary(fc).map(toData))
 
-const dataGuardPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Pretty<A>
 ): Pretty<D.Data<A>> =>
   I.makePretty(
-    dataGuard(item),
+    dataFromSelf(item),
     (d) => `Data(${item.pretty(d)})`
   )
 
@@ -1157,7 +1158,7 @@ const dataGuardPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray
  * @category combinators
  * @since 1.0.0
  */
-export const dataGuard = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+export const dataFromSelf = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
 ): Schema<D.Data<A>> =>
   typeAlias(
@@ -1165,9 +1166,9 @@ export const dataGuard = <A extends Readonly<Record<string, any>> | ReadonlyArra
     item,
     {
       [AST.IdentifierAnnotationId]: "Data",
-      [I.ParserHookId]: dataGuardParser,
-      [I.PrettyHookId]: dataGuardPretty,
-      [I.ArbitraryHookId]: dataGuardArbitrary
+      [I.ParserHookId]: dataParser,
+      [I.PrettyHookId]: dataPretty,
+      [I.ArbitraryHookId]: dataArbitrary
     }
   )
 
@@ -1180,7 +1181,7 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
 ): Schema<D.Data<A>> =>
   pipe(
     item,
-    transform(dataGuard(item), toData, (a) =>
+    transform(dataFromSelf(item), toData, (a) =>
       // @ts-expect-error
       Array.isArray(a) ? Array.from(a) : Object.assign({}, a))
   )
@@ -1235,8 +1236,8 @@ export const dateFromString = (self: Schema<string>): Schema<Date> => {
 // data/Either
 // ---------------------------------------------
 
-const eitherGuardParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
-  const schema = eitherGuard(left, right)
+const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
+  const schema = eitherFromSelf(left, right)
   const decodeLeft = P.decode(left)
   const decodeRight = P.decode(right)
   return I.makeParser(
@@ -1250,11 +1251,11 @@ const eitherGuardParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parse
   )
 }
 
-const eitherGuardArbitrary = <E, A>(
+const eitherArbitrary = <E, A>(
   left: Arbitrary<E>,
   right: Arbitrary<A>
 ): Arbitrary<Either<E, A>> => {
-  const schema = eitherGuard(left, right)
+  const schema = eitherFromSelf(left, right)
   const arbitrary = Arb.arbitrary(eitherInline(left, right))
   return I.makeArbitrary(
     schema,
@@ -1262,9 +1263,9 @@ const eitherGuardArbitrary = <E, A>(
   )
 }
 
-const eitherGuardPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
+const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
   I.makePretty(
-    eitherGuard(left, right),
+    eitherFromSelf(left, right),
     E.match(
       (e) => `left(${left.pretty(e)})`,
       (a) => `right(${right.pretty(a)})`
@@ -1287,15 +1288,15 @@ const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
  * @category constructors
  * @since 1.0.0
  */
-export const eitherGuard = <E, A>(
+export const eitherFromSelf = <E, A>(
   left: Schema<E>,
   right: Schema<A>
 ): Schema<Either<E, A>> =>
   typeAlias([left, right], eitherInline(left, right), {
     [AST.IdentifierAnnotationId]: "Either",
-    [I.ParserHookId]: eitherGuardParser,
-    [I.PrettyHookId]: eitherGuardPretty,
-    [I.ArbitraryHookId]: eitherGuardArbitrary
+    [I.ParserHookId]: eitherParser,
+    [I.PrettyHookId]: eitherPretty,
+    [I.ArbitraryHookId]: eitherArbitrary
   })
 
 // ---------------------------------------------
@@ -1702,8 +1703,8 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
 // data/Option
 // ---------------------------------------------
 
-const optionGuardParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
-  const schema = optionGuard(value)
+const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
+  const schema = optionFromSelf(value)
   const decodeValue = P.decode(value)
   return I.makeParser(
     schema,
@@ -1716,17 +1717,17 @@ const optionGuardParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
   )
 }
 
-const optionGuardArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => {
+const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => {
   const struct = Arb.arbitrary(optionInline(value))
   return I.makeArbitrary(
-    optionGuard(value),
+    optionFromSelf(value),
     (fc) => struct(fc).map((a) => a._tag === "None" ? O.none() : O.some(a.value))
   )
 }
 
-const optionGuardPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
+const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
   I.makePretty(
-    optionGuard(value),
+    optionFromSelf(value),
     O.match(
       () => "none()",
       (a) => `some(${value.pretty(a)})`
@@ -1748,15 +1749,15 @@ const optionInline = <A>(value: Schema<A>) =>
  * @category constructors
  * @since 1.0.0
  */
-export const optionGuard = <A>(value: Schema<A>): Schema<Option<A>> => {
+export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
   return typeAlias(
     [value],
     optionInline(value),
     {
       [AST.IdentifierAnnotationId]: "Option",
-      [I.ParserHookId]: optionGuardParser,
-      [I.PrettyHookId]: optionGuardPretty,
-      [I.ArbitraryHookId]: optionGuardArbitrary
+      [I.ParserHookId]: optionParser,
+      [I.PrettyHookId]: optionPretty,
+      [I.ArbitraryHookId]: optionArbitrary
     }
   )
 }
@@ -1768,7 +1769,7 @@ export const optionGuard = <A>(value: Schema<A>): Schema<Option<A>> => {
 export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
   pipe(
     union(_undefined, nullable(value)),
-    transform(optionGuard(value), O.fromNullable, O.getOrNull)
+    transform(optionFromSelf(value), O.fromNullable, O.getOrNull)
   )
 
 /**
@@ -1802,7 +1803,7 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
           ownKeys.map((key) =>
             AST.createPropertySignature(
               key,
-              optionGuard(fields[key]).ast,
+              optionFromSelf(fields[key]).ast,
               true,
               true
             )
@@ -1914,12 +1915,12 @@ export const itemsCount = <A>(
 
 const isMap = (u: unknown): u is Map<unknown, unknown> => u instanceof Map
 
-const readonlyMapGuardParser = <K, V>(
+const readonlyMapParser = <K, V>(
   key: P.Parser<K>,
   value: P.Parser<V>
 ): P.Parser<ReadonlyMap<K, V>> => {
   const items = P.decode(array(tuple(key, value)))
-  const schema = readonlyMapGuard(key, value)
+  const schema = readonlyMapFromSelf(key, value)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -1929,21 +1930,21 @@ const readonlyMapGuardParser = <K, V>(
   )
 }
 
-const readonlyMapGuardArbitrary = <K, V>(
+const readonlyMapArbitrary = <K, V>(
   key: Arbitrary<K>,
   value: Arbitrary<V>
 ): Arbitrary<ReadonlyMap<K, V>> =>
   I.makeArbitrary(
-    readonlyMap(key, value),
+    readonlyMapFromSelf(key, value),
     (fc) => fc.array(fc.tuple(key.arbitrary(fc), value.arbitrary(fc))).map((as) => new Map(as))
   )
 
-const readonlyMapGuardPretty = <K, V>(
+const readonlyMapPretty = <K, V>(
   key: Pretty<K>,
   value: Pretty<V>
 ): Pretty<ReadonlyMap<K, V>> =>
   I.makePretty(
-    readonlyMap(key, value),
+    readonlyMapFromSelf(key, value),
     (map) =>
       `new Map([${
         Array.from(map.entries())
@@ -1956,7 +1957,7 @@ const readonlyMapGuardPretty = <K, V>(
  * @category constructors
  * @since 1.0.0
  */
-export const readonlyMapGuard = <K, V>(
+export const readonlyMapFromSelf = <K, V>(
   key: Schema<K>,
   value: Schema<V>
 ): Schema<ReadonlyMap<K, V>> =>
@@ -1967,9 +1968,9 @@ export const readonlyMapGuard = <K, V>(
     }),
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
-      [I.ParserHookId]: readonlyMapGuardParser,
-      [I.PrettyHookId]: readonlyMapGuardPretty,
-      [I.ArbitraryHookId]: readonlyMapGuardArbitrary
+      [I.ParserHookId]: readonlyMapParser,
+      [I.PrettyHookId]: readonlyMapPretty,
+      [I.ArbitraryHookId]: readonlyMapArbitrary
     }
   )
 
@@ -1984,7 +1985,7 @@ export const readonlyMap = <K, V>(
   pipe(
     array(tuple(key, value)),
     transform(
-      readonlyMapGuard(key, value),
+      readonlyMapFromSelf(key, value),
       (as) => new Map(as),
       (map) => Array.from(map.entries())
     )
@@ -1996,9 +1997,9 @@ export const readonlyMap = <K, V>(
 
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
-const readonlySetGuardParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
+const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
   const items = P.decode(array(item))
-  const schema = readonlySetGuard(item)
+  const schema = readonlySetFromSelf(item)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -2008,15 +2009,15 @@ const readonlySetGuardParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> 
   )
 }
 
-const readonlySetGuardArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
+const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
   I.makeArbitrary(
-    readonlySetGuard(item),
+    readonlySetFromSelf(item),
     (fc) => fc.array(item.arbitrary(fc)).map((as) => new Set(as))
   )
 
-const readonlySetGuardPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
+const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
   I.makePretty(
-    readonlySetGuard(item),
+    readonlySetFromSelf(item),
     (set) => `new Set([${Array.from(set.values()).map((a) => item.pretty(a)).join(", ")}])`
   )
 
@@ -2024,7 +2025,7 @@ const readonlySetGuardPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const readonlySetGuard = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
+export const readonlySetFromSelf = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
   typeAlias(
     [item],
     struct({
@@ -2032,9 +2033,9 @@ export const readonlySetGuard = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
     }),
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
-      [I.ParserHookId]: readonlySetGuardParser,
-      [I.PrettyHookId]: readonlySetGuardPretty,
-      [I.ArbitraryHookId]: readonlySetGuardArbitrary
+      [I.ParserHookId]: readonlySetParser,
+      [I.PrettyHookId]: readonlySetPretty,
+      [I.ArbitraryHookId]: readonlySetArbitrary
     }
   )
 
@@ -2045,7 +2046,7 @@ export const readonlySetGuard = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
 export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
   pipe(
     array(item),
-    transform(readonlySetGuard(item), (as) => new Set(as), (set) => Array.from(set))
+    transform(readonlySetFromSelf(item), (as) => new Set(as), (set) => Array.from(set))
   )
 
 // ---------------------------------------------

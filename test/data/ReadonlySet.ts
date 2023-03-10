@@ -6,16 +6,16 @@ import * as Util from "@effect/schema/test/util"
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("ReadonlySet", () => {
-  it("readonlySetGuard. keyof", () => {
-    expect(S.keyof(S.readonlySetGuard(S.number))).toEqual(S.literal("size"))
+  it("readonlySetFromSelf. keyof", () => {
+    expect(S.keyof(S.readonlySetFromSelf(S.number))).toEqual(S.literal("size"))
   })
 
-  it("readonlySetGuard. property tests", () => {
-    Util.property(S.readonlySetGuard(S.number))
+  it("readonlySetFromSelf. property tests", () => {
+    Util.property(S.readonlySetFromSelf(S.number))
   })
 
-  it("readonlySetGuard. decoder", () => {
-    const schema = S.readonlySetGuard(NumberFromString)
+  it("readonlySetFromSelf. decoder", () => {
+    const schema = S.readonlySetFromSelf(NumberFromString)
     Util.expectDecodingSuccess(schema, new Set(), new Set())
     Util.expectDecodingSuccess(schema, new Set(["1", "2", "3"]), new Set([1, 2, 3]))
 
@@ -31,14 +31,14 @@ describe.concurrent("ReadonlySet", () => {
     )
   })
 
-  it("readonlySetGuard. encoder", () => {
-    const schema = S.readonlySetGuard(NumberFromString)
+  it("readonlySetFromSelf. encoder", () => {
+    const schema = S.readonlySetFromSelf(NumberFromString)
     Util.expectEncodingSuccess(schema, new Set(), new Set())
     Util.expectEncodingSuccess(schema, new Set([1, 2, 3]), new Set(["1", "2", "3"]))
   })
 
-  it("readonlySetGuard. guard", () => {
-    const schema = S.readonlySetGuard(S.string)
+  it("readonlySetFromSelf. guard", () => {
+    const schema = S.readonlySetFromSelf(S.string)
     const is = P.is(schema)
     expect(is(new Set())).toEqual(true)
     expect(is(new Set(["a", "b", "c"]))).toEqual(true)
@@ -48,8 +48,8 @@ describe.concurrent("ReadonlySet", () => {
     expect(is(undefined)).toEqual(false)
   })
 
-  it("readonlySetGuard. pretty", () => {
-    const schema = S.readonlySetGuard(S.string)
+  it("readonlySetFromSelf. pretty", () => {
+    const schema = S.readonlySetFromSelf(S.string)
     const pretty = Pretty.pretty(schema)
     expect(pretty(new Set())).toEqual("new Set([])")
     expect(pretty(new Set(["a", "b"]))).toEqual(

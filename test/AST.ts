@@ -15,7 +15,7 @@ describe.concurrent("AST", () => {
   })
 
   it("isTypeAlias", () => {
-    expect(AST.isTypeAlias(S.optionGuard(S.number).ast)).toEqual(true)
+    expect(AST.isTypeAlias(S.optionFromSelf(S.number).ast)).toEqual(true)
     expect(AST.isTypeAlias(S.number.ast)).toEqual(false)
   })
 
@@ -51,7 +51,7 @@ describe.concurrent("AST", () => {
   })
 
   it("getWeight/transform/ should return the weight of type", () => {
-    expect(AST._getWeight(S.optionGuard(S.number).ast)).toEqual(3)
+    expect(AST._getWeight(S.optionFromSelf(S.number).ast)).toEqual(3)
   })
 
   it("getWeight/union/ should return the sum of the members weight", () => {

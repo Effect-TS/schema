@@ -24,7 +24,7 @@ Added in v1.0.0
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
-  - [dataGuard](#dataguard)
+  - [dataFromSelf](#datafromself)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
@@ -47,17 +47,17 @@ Added in v1.0.0
   - [union](#union)
 - [constructors](#constructors)
   - [UUID](#uuid)
-  - [chunkGuard](#chunkguard)
+  - [chunkFromSelf](#chunkfromself)
   - [date](#date)
-  - [eitherGuard](#eitherguard)
+  - [eitherFromSelf](#eitherfromself)
   - [enums](#enums)
   - [instanceOf](#instanceof)
   - [json](#json)
   - [literal](#literal)
   - [make](#make)
-  - [optionGuard](#optionguard)
-  - [readonlyMapGuard](#readonlymapguard)
-  - [readonlySetGuard](#readonlysetguard)
+  - [optionFromSelf](#optionfromself)
+  - [readonlyMapFromSelf](#readonlymapfromself)
+  - [readonlySetFromSelf](#readonlysetfromself)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [filters](#filters)
@@ -330,12 +330,12 @@ type Int = S.Infer<typeof Int> // number & Brand<"Int">
 
 Added in v1.0.0
 
-## dataGuard
+## dataFromSelf
 
 **Signature**
 
 ```ts
-export declare const dataGuard: <A extends readonly any[] | Readonly<Record<string, any>>>(
+export declare const dataFromSelf: <A extends readonly any[] | Readonly<Record<string, any>>>(
   item: Schema<A>
 ) => Schema<D.Data<A>>
 ```
@@ -616,12 +616,12 @@ export declare const UUID: Schema<string>
 
 Added in v1.0.0
 
-## chunkGuard
+## chunkFromSelf
 
 **Signature**
 
 ```ts
-export declare const chunkGuard: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const chunkFromSelf: <A>(item: Schema<A>) => Schema<Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -636,12 +636,12 @@ export declare const date: Schema<Date>
 
 Added in v1.0.0
 
-## eitherGuard
+## eitherFromSelf
 
 **Signature**
 
 ```ts
-export declare const eitherGuard: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>
+export declare const eitherFromSelf: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -698,32 +698,32 @@ export declare const make: <A>(ast: AST.AST) => Schema<A>
 
 Added in v1.0.0
 
-## optionGuard
+## optionFromSelf
 
 **Signature**
 
 ```ts
-export declare const optionGuard: <A>(value: Schema<A>) => Schema<Option<A>>
+export declare const optionFromSelf: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0
 
-## readonlyMapGuard
+## readonlyMapFromSelf
 
 **Signature**
 
 ```ts
-export declare const readonlyMapGuard: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
+export declare const readonlyMapFromSelf: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
 
-## readonlySetGuard
+## readonlySetFromSelf
 
 **Signature**
 
 ```ts
-export declare const readonlySetGuard: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
+export declare const readonlySetFromSelf: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
