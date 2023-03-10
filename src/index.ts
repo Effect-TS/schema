@@ -7,44 +7,6 @@ export {
   /**
    * @since 1.0.0
    */
-  asserts,
-  /**
-   * @since 1.0.0
-   */
-  decode,
-  /**
-   * @since 1.0.0
-   */
-  decodeOrThrow,
-  /**
-   * @since 1.0.0
-   */
-  encode,
-  /**
-   * @since 1.0.0
-   */
-  encodeOrThrow,
-  /**
-   * @since 1.0.0
-   */
-  getOption,
-  /**
-   * @since 1.0.0
-   */
-  is
-} from "@effect/schema/Parser"
-
-export type {
-  /**
-   * @since 1.0.0
-   */
-  InferAsserts
-} from "@effect/schema/Parser"
-
-export {
-  /**
-   * @since 1.0.0
-   */
   failure,
   /**
    * @since 1.0.0

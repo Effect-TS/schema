@@ -8,19 +8,30 @@ import * as P from "@effect/schema/Parser"
 
 describe.concurrent("Schema", () => {
   it("exports", () => {
-    expect(S.transformOrFail).exist
-    expect(S.date).exist
-    expect(S.OptionalSchemaId).exist
-    expect(S.between).exist
-    expect(S.positive).exist
-    expect(S.negative).exist
-    expect(S.nonNegative).exist
-    expect(S.nonPositive).exist
-    expect(S.clamp).exist
-    expect(S.maxItems).exist
-    expect(S.minItems).exist
-    expect(S.itemsCount).exist
-    expect(S.annotations).exist
+    expect(S.GreaterThanBigintTypeId).exist
+    expect(S.GreaterThanOrEqualToBigintTypeId).exist
+    expect(S.LessThanBigintTypeId).exist
+    expect(S.LessThanOrEqualToBigintTypeId).exist
+    expect(S.BetweenBigintTypeId).exist
+    expect(S.PositiveBigintTypeId).exist
+    expect(S.NegativeBigintTypeId).exist
+    expect(S.NonNegativeBigintTypeId).exist
+    expect(S.NonPositiveBigintTypeId).exist
+    expect(S.BrandTypeId).exist
+    expect(S.FiniteTypeId).exist
+    expect(S.GreaterThanTypeId).exist
+    expect(S.GreaterThanOrEqualToTypeId).exist
+    expect(S.MultipleOfTypeId).exist
+    expect(S.IntTypeId).exist
+    expect(S.LessThanTypeId).exist
+    expect(S.LessThanOrEqualToTypeId).exist
+    expect(S.BetweenTypeId).exist
+    expect(S.NonNaNTypeId).exist
+    expect(S.PositiveTypeId).exist
+    expect(S.NegativeTypeId).exist
+    expect(S.NonNegativeTypeId).exist
+    expect(S.NonPositiveTypeId).exist
+    expect(S.InstanceOfTypeId).exist
   })
 
   it("brand/ annotations", () => {

@@ -46,6 +46,44 @@ export interface Schema<A> {
  */
 export type Infer<S extends { readonly A: (_: any) => any }> = Parameters<S["A"]>[0]
 
+export {
+  /**
+   * @since 1.0.0
+   */
+  asserts,
+  /**
+   * @since 1.0.0
+   */
+  decode,
+  /**
+   * @since 1.0.0
+   */
+  decodeOrThrow,
+  /**
+   * @since 1.0.0
+   */
+  encode,
+  /**
+   * @since 1.0.0
+   */
+  encodeOrThrow,
+  /**
+   * @since 1.0.0
+   */
+  getOption,
+  /**
+   * @since 1.0.0
+   */
+  is
+} from "@effect/schema/Parser"
+
+export type {
+  /**
+   * @since 1.0.0
+   */
+  InferAsserts
+} from "@effect/schema/Parser"
+
 // ---------------------------------------------
 // constructors
 // ---------------------------------------------
@@ -1040,7 +1078,7 @@ const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
     (u, options) =>
       !C.isChunk(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(C.toReadonlyArray(u), (us) => items(us, options), E.map(C.fromIterable))
+        E.map(items(C.toReadonlyArray(u), options), C.fromIterable)
   )
 }
 
@@ -1204,8 +1242,8 @@ const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Eit
       !E.isEither(u) ?
         PR.failure(PR.type(schema.ast, u)) :
         E.isLeft(u) ?
-        pipe(decodeLeft(u.left, options), E.map(E.left)) :
-        pipe(decodeRight(u.right, options), E.map(E.right))
+        E.map(decodeLeft(u.left, options), E.left) :
+        E.map(decodeRight(u.right, options), E.right)
   )
 }
 
@@ -1674,7 +1712,7 @@ const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
         PR.failure(PR.type(schema.ast, u)) :
         O.isNone(u) ?
         PR.success(O.none()) :
-        pipe(decodeValue(u.value, options), E.map(O.some))
+        E.map(decodeValue(u.value, options), O.some)
   )
 }
 
@@ -1898,11 +1936,7 @@ const readonlyMapParser = <K, V>(
     (u, options) =>
       !isMap(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(
-          Array.from(u.entries()),
-          (us) => items(us, options),
-          E.map((as) => new Map(as))
-        )
+        E.map(items(Array.from(u.entries()), options), (as) => new Map(as))
   )
 }
 
@@ -1975,11 +2009,7 @@ const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
     (u, options) =>
       !isSet(u) ?
         PR.failure(PR.type(schema.ast, u)) :
-        pipe(
-          Array.from(u.values()),
-          (us) => items(us, options),
-          E.map((as) => new Set(as))
-        )
+        E.map(items(Array.from(u.values()), options), (as) => new Set(as))
   )
 }
 
