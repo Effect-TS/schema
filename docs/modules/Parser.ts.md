@@ -18,7 +18,7 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [make](#make)
 - [decoding](#decoding)
-  - [decode](#decode)
+  - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
   - [decodeOrThrow](#decodeorthrow)
 - [encoding](#encoding)
@@ -79,12 +79,12 @@ Added in v1.0.0
 
 # decoding
 
-## decode
+## decodeEither
 
 **Signature**
 
 ```ts
-export declare const decode: <A>(
+export declare const decodeEither: <A>(
   schema: Schema<A>
 ) => (
   input: unknown,

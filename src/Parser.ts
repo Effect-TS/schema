@@ -41,7 +41,7 @@ export const ParserHookId = I.ParserHookId
  * @category decoding
  * @since 1.0.0
  */
-export const decode = <A>(
+export const decodeEither = <A>(
   schema: Schema<A>
 ): (input: unknown, options?: ParseOptions) => ParseResult<A> => parserFor(schema).parse
 

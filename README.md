@@ -116,7 +116,7 @@ const Person = S.struct({
   age: S.number,
 });
 
-const decodePerson = S.decode(Person);
+const decodePerson = S.decodeEither(Person);
 
 const result1 = decodePerson({ name: "Alice", age: 30 });
 if (S.isSuccess(result1)) {
@@ -168,7 +168,7 @@ const Person = S.struct({
 
 console.log(
   "%o",
-  S.decode(Person)(
+  S.decodeEither(Person)(
     {
       name: "Bob",
       age: 40,
@@ -201,7 +201,7 @@ const Person = S.struct({
 
 console.log(
   "%o",
-  S.decode(Person)(
+  S.decodeEither(Person)(
     {
       name: "Bob",
       age: "abc",
@@ -273,7 +273,7 @@ const Person = S.struct({
   age: S.number,
 });
 
-const result = S.decode(Person)({});
+const result = S.decodeEither(Person)({});
 if (S.isFailure(result)) {
   console.error("Decoding failed:");
   console.error(formatErrors(result.left));

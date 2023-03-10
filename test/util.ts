@@ -19,7 +19,7 @@ export const property = <A>(schema: Schema<A>) => {
     if (!is(a)) {
       return false
     }
-    const roundtrip = pipe(a, P.encode(schema), E.flatMap(P.decode(schema)))
+    const roundtrip = pipe(a, P.encode(schema), E.flatMap(P.decodeEither(schema)))
     if (PR.isFailure(roundtrip)) {
       return false
     }
@@ -33,7 +33,7 @@ export const expectDecodingSuccess = <A>(
   a: A = u as any,
   options?: ParseOptions
 ) => {
-  const t = P.decode(schema)(u, options)
+  const t = P.decodeEither(schema)(u, options)
   expect(t).toStrictEqual(E.right(a))
 }
 
@@ -43,7 +43,7 @@ export const expectDecodingFailure = <A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(P.decode(schema)(u, options), E.mapLeft(formatAll))
+  const t = pipe(P.decodeEither(schema)(u, options), E.mapLeft(formatAll))
   expect(t).toStrictEqual(E.left(message))
 }
 
@@ -97,7 +97,7 @@ const formatDecodeError = (e: PR.ParseError): string => {
 }
 
 export const expectDecodingFailureTree = <A>(schema: Schema<A>, u: unknown, message: string) => {
-  const t = pipe(P.decode(schema)(u), E.mapLeft(formatErrors))
+  const t = pipe(P.decodeEither(schema)(u), E.mapLeft(formatErrors))
   expect(E.isLeft(t)).toEqual(true)
   expect(t).toEqual(E.left(message))
 }

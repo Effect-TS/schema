@@ -7,7 +7,7 @@ import * as Util from "@effect/schema/test/util"
 describe.concurrent("Decoder", () => {
   it("exports", () => {
     expect(P.make).exist
-    expect(P.decode).exist
+    expect(P.decodeEither).exist
     expect(P.decodeOrThrow).exist
   })
 

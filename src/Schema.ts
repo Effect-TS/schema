@@ -52,7 +52,7 @@ export {
   /**
    * @since 1.0.0
    */
-  decode,
+  decodeEither as decode,
   /**
    * @since 1.0.0
    */
@@ -454,14 +454,17 @@ export const brand = <B extends string, A>(
     const schema: Schema<A & Brand<B>> = make(ast)
     const decodeOrThrow = P.decodeOrThrow(schema)
     const decodeOption = P.decodeOption(schema)
-    const decode = P.decode(schema)
+    const decodeEither = P.decodeEither(schema)
     const is = P.is(schema)
     const out: any = Object.assign((input: unknown) => decodeOrThrow(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
       ast,
       option: (input: unknown) => decodeOption(input),
       either: (input: unknown) =>
-        E.mapLeft(decode(input), (errors) => [{ meta: input, message: formatErrors(errors) }]),
+        E.mapLeft(
+          decodeEither(input),
+          (errors) => [{ meta: input, message: formatErrors(errors) }]
+        ),
       refine: (input: unknown): input is A & Brand<B> => is(input)
     })
     return out
@@ -1074,7 +1077,7 @@ export const fromBrand = <C extends Brand<string>>(
 // ---------------------------------------------
 
 const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
-  const items = P.decode(array(item))
+  const items = P.decodeEither(array(item))
   const schema = chunkFromSelf(item)
   return I.makeParser(
     schema,
@@ -1130,7 +1133,7 @@ const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a:
 const dataParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: P.Parser<A>
 ): P.Parser<D.Data<A>> => {
-  const decode = P.decode(item)
+  const decode = P.decodeEither(item)
   const schema = dataFromSelf(item)
   return I.makeParser(
     schema,
@@ -1238,8 +1241,8 @@ export const dateFromString = (self: Schema<string>): Schema<Date> => {
 
 const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
   const schema = eitherFromSelf(left, right)
-  const decodeLeft = P.decode(left)
-  const decodeRight = P.decode(right)
+  const decodeLeft = P.decodeEither(left)
+  const decodeRight = P.decodeEither(right)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -1725,7 +1728,7 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
 
 const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
   const schema = optionFromSelf(value)
-  const decodeValue = P.decode(value)
+  const decodeValue = P.decodeEither(value)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -1953,7 +1956,7 @@ const readonlyMapParser = <K, V>(
   key: P.Parser<K>,
   value: P.Parser<V>
 ): P.Parser<ReadonlyMap<K, V>> => {
-  const items = P.decode(array(tuple(key, value)))
+  const items = P.decodeEither(array(tuple(key, value)))
   const schema = readonlyMapFromSelf(key, value)
   return I.makeParser(
     schema,
@@ -2032,7 +2035,7 @@ export const readonlyMap = <K, V>(
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
 const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
-  const items = P.decode(array(item))
+  const items = P.decodeEither(array(item))
   const schema = readonlySetFromSelf(item)
   return I.makeParser(
     schema,
