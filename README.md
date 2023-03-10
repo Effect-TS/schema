@@ -975,7 +975,7 @@ const Operation: S.Schema<Operation> = S.lazy(() =>
 
 In some cases, we may need to transform the output of a schema to a different type. For instance, we may want to parse a string into a number, or we may want to transform a date string into a `Date` object.
 
-To perform these kinds of transformations, the `@effect/schema` library provides the `transform` and `transformOrFail` combinators.
+To perform these kinds of transformations, the `@effect/schema` library provides the `transform` and `transformEither` combinators.
 
 The `transform` combinator takes a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to decode a value, the transformed schema will also fail.
 
@@ -1003,9 +1003,9 @@ const transformedSchema: S.Schema<[string]> = pipe(
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
 
-The `transformOrFail` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
+The `transformEither` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
 
-Here's an example of the `transformOrFail` combinator which converts a `string` into a `boolean`:
+Here's an example of the `transformEither` combinator which converts a `string` into a `boolean`:
 
 ```ts
 import { pipe } from "@effect/data/Function";
@@ -1038,10 +1038,10 @@ const decode = (s: string): PR.ParseResult<boolean> =>
 // define a function that converts a boolean into a string
 const encode = (b: boolean): ParseResult<string> => PR.success(String(b));
 
-// use the transformOrFail combinator to convert the string schema into the boolean schema
+// use the transformEither combinator to convert the string schema into the boolean schema
 const transformedSchema: S.Schema<boolean> = pipe(
   stringSchema,
-  S.transformOrFail(booleanSchema, decode, encode)
+  S.transformEither(booleanSchema, decode, encode)
 );
 ```
 

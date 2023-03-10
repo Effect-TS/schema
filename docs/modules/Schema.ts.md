@@ -41,7 +41,7 @@ Added in v1.0.0
   - [rest](#rest)
   - [struct](#struct)
   - [transform](#transform)
-  - [transformOrFail](#transformorfail)
+  - [transformEither](#transformeither)
   - [tuple](#tuple)
   - [typeAlias](#typealias)
   - [union](#union)
@@ -545,7 +545,7 @@ export declare const transform: <A, B>(
 
 Added in v1.0.0
 
-## transformOrFail
+## transformEither
 
 Create a new `Schema` by transforming the input and output of an existing `Schema`
 using the provided decoding functions.
@@ -553,7 +553,7 @@ using the provided decoding functions.
 **Signature**
 
 ```ts
-export declare const transformOrFail: <A, B>(
+export declare const transformEither: <A, B>(
   to: Schema<B>,
   decode: (
     input: A,

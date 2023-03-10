@@ -620,7 +620,7 @@ export function filter<A>(
   @category combinators
   @since 1.0.0
  */
-export const transformOrFail = <A, B>(
+export const transformEither = <A, B>(
   to: Schema<B>,
   decode: (input: A, options?: ParseOptions) => ParseResult<B>,
   encode: (input: B, options?: ParseOptions) => ParseResult<A>
@@ -639,7 +639,7 @@ export const transform = <A, B>(
   ba: (b: B) => A
 ) =>
   (self: Schema<A>): Schema<B> =>
-    pipe(self, transformOrFail(to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b))))
+    pipe(self, transformEither(to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b))))
 
 /**
  * Attaches a property signature with the specified key and value to the schema.
@@ -1218,7 +1218,7 @@ export const date: Schema<Date> = typeAlias([], struct({}), {
 export const dateFromString = (self: Schema<string>): Schema<Date> => {
   const schema: Schema<Date> = pipe(
     self,
-    transformOrFail(
+    transformEither(
       date,
       (s) => {
         const n = Date.parse(s)
@@ -1669,7 +1669,7 @@ export const clamp = <A extends number>(min: number, max: number) =>
 export const numberFromString = (self: Schema<string>): Schema<number> => {
   const schema: Schema<number> = pipe(
     self,
-    transformOrFail(
+    transformEither(
       number,
       (s) => {
         if (s === "NaN") {
