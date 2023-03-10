@@ -20,8 +20,8 @@ index c0f282ca9e3ddd93e44a62e1d05c1cc45b9f5c6a..616f7f6223459e0621522279ea7fc1cf
 +                  "noUnusedParameters": false,
 +                  "noFallthroughCasesInSwitch": true,
 +                  "moduleResolution": "node",
-+                  "target": "es2015",
-+                  "lib": ["es2015"],
++                  "target": "ES2021",
++                  "lib": ["ES2021"],
 +                  "paths": {
 +                    "@effect/schema": ["../../src/index.ts"],
 +                    "@effect/schema/test/*": ["../../test/*"],

@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 24
+nav_order: 9
 parent: Modules
 ---
 
@@ -24,7 +24,7 @@ Added in v1.0.0
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
-  - [data](#data)
+  - [dataGuard](#dataguard)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
@@ -47,17 +47,17 @@ Added in v1.0.0
   - [union](#union)
 - [constructors](#constructors)
   - [UUID](#uuid)
-  - [\_option](#_option)
-  - [chunk](#chunk)
+  - [chunkGuard](#chunkguard)
   - [date](#date)
-  - [either](#either)
+  - [eitherGuard](#eitherguard)
   - [enums](#enums)
   - [instanceOf](#instanceof)
   - [json](#json)
   - [literal](#literal)
   - [make](#make)
-  - [readonlyMap](#readonlymap)
-  - [readonlySet](#readonlyset)
+  - [optionGuard](#optionguard)
+  - [readonlyMapGuard](#readonlymapguard)
+  - [readonlySetGuard](#readonlysetguard)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [filters](#filters)
@@ -99,18 +99,17 @@ Added in v1.0.0
   - [BrandSchema (interface)](#brandschema-interface)
   - [Schema (interface)](#schema-interface)
 - [parsers](#parsers)
-  - [chunkFromValues](#chunkfromvalues)
+  - [chunk](#chunk)
   - [clamp](#clamp)
   - [clampBigint](#clampbigint)
+  - [data](#data)
   - [dateFromString](#datefromstring)
-  - [fromStructure](#fromstructure)
   - [numberFromString](#numberfromstring)
   - [optionFromNullable](#optionfromnullable)
   - [optionsFromOptionals](#optionsfromoptionals)
-  - [readonlyMapFromEntries](#readonlymapfromentries)
-  - [readonlySetFromValues](#readonlysetfromvalues)
+  - [readonlyMap](#readonlymap)
+  - [readonlySet](#readonlyset)
   - [trim](#trim)
-  - [~~option~~](#option)
 - [primitives](#primitives)
   - [any](#any)
   - [bigint](#bigint)
@@ -137,6 +136,7 @@ Added in v1.0.0
   - [GreaterThanTypeId](#greaterthantypeid)
   - [IncludesTypeId](#includestypeid)
   - [Infer (type alias)](#infer-type-alias)
+  - [InferAsserts](#inferasserts)
   - [InstanceOfTypeId](#instanceoftypeid)
   - [IntTypeId](#inttypeid)
   - [ItemsCountTypeId](#itemscounttypeid)
@@ -169,7 +169,14 @@ Added in v1.0.0
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
   - [UUIDTypeId](#uuidtypeid)
+  - [asserts](#asserts)
+  - [decode](#decode)
+  - [decodeOrThrow](#decodeorthrow)
+  - [encode](#encode)
+  - [encodeOrThrow](#encodeorthrow)
+  - [getOption](#getoption)
   - [getPropertySignatures](#getpropertysignatures)
+  - [is](#is)
   - [optional](#optional)
 
 ---
@@ -276,7 +283,7 @@ export declare const attachPropertySignature: <K extends string | number | symbo
 **Example**
 
 ```ts
-import * as S from '@effect/schema'
+import * as S from '@effect/schema/Schema'
 import { pipe } from '@effect/data/Function'
 
 const Circle = S.struct({ radius: S.number })
@@ -314,7 +321,7 @@ export declare const brand: <B extends string, A>(
 **Example**
 
 ```ts
-import * as S from '@effect/schema'
+import * as S from '@effect/schema/Schema'
 import { pipe } from '@effect/data/Function'
 
 const Int = pipe(S.number, S.int(), S.brand('Int'))
@@ -323,12 +330,12 @@ type Int = S.Infer<typeof Int> // number & Brand<"Int">
 
 Added in v1.0.0
 
-## data
+## dataGuard
 
 **Signature**
 
 ```ts
-export declare const data: <A extends readonly any[] | Readonly<Record<string, any>>>(
+export declare const dataGuard: <A extends readonly any[] | Readonly<Record<string, any>>>(
   item: Schema<A>
 ) => Schema<D.Data<A>>
 ```
@@ -609,22 +616,12 @@ export declare const UUID: Schema<string>
 
 Added in v1.0.0
 
-## \_option
+## chunkGuard
 
 **Signature**
 
 ```ts
-export declare const _option: <A>(value: Schema<A>) => Schema<Option<A>>
-```
-
-Added in v1.0.0
-
-## chunk
-
-**Signature**
-
-```ts
-export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const chunkGuard: <A>(item: Schema<A>) => Schema<Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -639,12 +636,12 @@ export declare const date: Schema<Date>
 
 Added in v1.0.0
 
-## either
+## eitherGuard
 
 **Signature**
 
 ```ts
-export declare const either: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>
+export declare const eitherGuard: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -701,22 +698,32 @@ export declare const make: <A>(ast: AST.AST) => Schema<A>
 
 Added in v1.0.0
 
-## readonlyMap
+## optionGuard
 
 **Signature**
 
 ```ts
-export declare const readonlyMap: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
+export declare const optionGuard: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0
 
-## readonlySet
+## readonlyMapGuard
 
 **Signature**
 
 ```ts
-export declare const readonlySet: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
+export declare const readonlyMapGuard: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
+```
+
+Added in v1.0.0
+
+## readonlySetGuard
+
+**Signature**
+
+```ts
+export declare const readonlySetGuard: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -1211,12 +1218,12 @@ Added in v1.0.0
 
 # parsers
 
-## chunkFromValues
+## chunk
 
 **Signature**
 
 ```ts
-export declare const chunkFromValues: <A>(item: Schema<A>) => Schema<Chunk<A>>
+export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -1245,6 +1252,18 @@ export declare const clampBigint: <A extends bigint>(min: bigint, max: bigint) =
 
 Added in v1.0.0
 
+## data
+
+**Signature**
+
+```ts
+export declare const data: <A extends readonly any[] | Readonly<Record<string, any>>>(
+  item: Schema<A>
+) => Schema<D.Data<A>>
+```
+
+Added in v1.0.0
+
 ## dateFromString
 
 Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
@@ -1253,18 +1272,6 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 ```ts
 export declare const dateFromString: (self: Schema<string>) => Schema<Date>
-```
-
-Added in v1.0.0
-
-## fromStructure
-
-**Signature**
-
-```ts
-export declare const fromStructure: <A extends readonly any[] | Readonly<Record<string, any>>>(
-  item: Schema<A>
-) => Schema<D.Data<A>>
 ```
 
 Added in v1.0.0
@@ -1307,22 +1314,22 @@ export declare const optionsFromOptionals: <Fields extends Record<string | numbe
 
 Added in v1.0.0
 
-## readonlyMapFromEntries
+## readonlyMap
 
 **Signature**
 
 ```ts
-export declare const readonlyMapFromEntries: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
+export declare const readonlyMap: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
 
-## readonlySetFromValues
+## readonlySet
 
 **Signature**
 
 ```ts
-export declare const readonlySetFromValues: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
+export declare const readonlySet: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -1335,16 +1342,6 @@ The `trim` parser allows removing whitespaces from the beginning and end of a st
 
 ```ts
 export declare const trim: (self: Schema<string>) => Schema<string>
-```
-
-Added in v1.0.0
-
-## ~~option~~
-
-**Signature**
-
-```ts
-export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0
@@ -1598,6 +1595,16 @@ Added in v1.0.0
 
 ```ts
 export type Infer<S extends { readonly A: (_: any) => any }> = Parameters<S['A']>[0]
+```
+
+Added in v1.0.0
+
+## InferAsserts
+
+**Signature**
+
+```ts
+export declare const InferAsserts: P.InferAsserts<S>
 ```
 
 Added in v1.0.0
@@ -1933,6 +1940,79 @@ export declare const UUIDTypeId: '@effect/schema/UUIDTypeId'
 
 Added in v1.0.0
 
+## asserts
+
+**Signature**
+
+```ts
+export declare const asserts: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
+```
+
+Added in v1.0.0
+
+## decode
+
+**Signature**
+
+```ts
+export declare const decode: <A>(
+  schema: Schema<A>
+) => (
+  input: unknown,
+  options?: AST.ParseOptions | undefined
+) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+```
+
+Added in v1.0.0
+
+## decodeOrThrow
+
+**Signature**
+
+```ts
+export declare const decodeOrThrow: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+## encode
+
+**Signature**
+
+```ts
+export declare const encode: <A>(
+  schema: Schema<A>
+) => (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], unknown>
+```
+
+Added in v1.0.0
+
+## encodeOrThrow
+
+**Signature**
+
+```ts
+export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
+```
+
+Added in v1.0.0
+
+## getOption
+
+**Signature**
+
+```ts
+export declare const getOption: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
+```
+
+Added in v1.0.0
+
 ## getPropertySignatures
 
 Returns an object containing all property signatures of a given schema.
@@ -1950,7 +2030,7 @@ export declare const getPropertySignatures: <A>(schema: Schema<A>) => { [K in ke
 **Example**
 
 ```ts
-import * as S from '@effect/schema'
+import * as S from '@effect/schema/Schema'
 
 const Person = S.struct({
   name: S.string,
@@ -1961,6 +2041,18 @@ const shape = S.getPropertySignatures(Person)
 
 assert.deepStrictEqual(shape.name, S.string)
 assert.deepStrictEqual(shape.age, S.number)
+```
+
+Added in v1.0.0
+
+## is
+
+**Signature**
+
+```ts
+export declare const is: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
 ```
 
 Added in v1.0.0

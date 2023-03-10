@@ -326,7 +326,7 @@ export interface OptionalSchema<A> {
 }
 
 const isOptionalSchema = <A>(schema: object): schema is OptionalSchema<A> =>
-  schema["_id"] === OptionalSchemaId
+  "_id" in schema && schema["_id"] === OptionalSchemaId
 
 /**
  * @since 1.0.0
@@ -396,7 +396,7 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  * @param schema - The schema to extract property signatures from.
  *
  * @example
- * import * as S from "@effect/schema"
+ * import * as S from "@effect/schema/Schema"
  *
  * const Person = S.struct({
  *   name: S.string,
@@ -436,7 +436,7 @@ export interface BrandSchema<A extends Brand<any>> extends Schema<A>, Brand.Cons
  * @param brand - The brand to apply.
  *
  * @example
- * import * as S from "@effect/schema"
+ * import * as S from "@effect/schema/Schema"
  * import { pipe } from "@effect/data/Function"
  *
  * const Int = pipe(S.number, S.int(), S.brand("Int"))
@@ -653,7 +653,7 @@ export const transform = <A, B>(
  * @param value - The value of the property to add to the schema.
  *
  * @example
- * import * as S from "@effect/schema"
+ * import * as S from "@effect/schema/Schema"
  * import { pipe } from "@effect/data/Function"
  *
  * const Circle = S.struct({ radius: S.number })

@@ -1,5 +1,5 @@
-import * as S from "@effect/schema"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("trim", () => {

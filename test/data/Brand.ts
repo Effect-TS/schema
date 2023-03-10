@@ -1,6 +1,6 @@
 import * as B from "@effect/data/Brand"
 import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 type Int = number & B.Brand<"Int">

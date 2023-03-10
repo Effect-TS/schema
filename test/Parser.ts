@@ -1,7 +1,7 @@
 import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 
 describe.concurrent("Parser", () => {
   it("_getLiterals", () => {

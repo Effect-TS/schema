@@ -1,7 +1,7 @@
 import * as C from "@effect/data/Chunk"
-import * as S from "@effect/schema"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 const NumberFromString = S.numberFromString(S.string)

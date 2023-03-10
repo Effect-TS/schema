@@ -1,7 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
-import * as S from "@effect/schema"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 
 describe.concurrent("is", () => {
   it("templateLiteral. a", () => {

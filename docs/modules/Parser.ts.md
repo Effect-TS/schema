@@ -1,6 +1,6 @@
 ---
 title: Parser.ts
-nav_order: 21
+nav_order: 6
 parent: Modules
 ---
 

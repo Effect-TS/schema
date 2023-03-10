@@ -1,5 +1,5 @@
 import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("ReadonlyArray", () => {

@@ -4,9 +4,9 @@ import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
 import type * as applicative from "@effect/data/typeclass/Applicative"
 import * as covariant from "@effect/data/typeclass/Covariant"
-import * as S from "@effect/schema"
 import * as annotations from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
+import * as S from "@effect/schema/Schema"
 import ts from "typescript"
 
 const printNode = (node: ts.Node, printerOptions?: ts.PrinterOptions): string => {

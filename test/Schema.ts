@@ -1,10 +1,10 @@
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
-import * as S from "@effect/schema"
 import * as A from "@effect/schema/annotation/AST"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 
 describe.concurrent("Schema", () => {
   it("exports", () => {
