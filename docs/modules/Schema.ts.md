@@ -105,6 +105,7 @@ Added in v1.0.0
   - [data](#data)
   - [dateFromString](#datefromstring)
   - [numberFromString](#numberfromstring)
+  - [option](#option)
   - [optionFromNullable](#optionfromnullable)
   - [optionsFromOptionals](#optionsfromoptionals)
   - [readonlyMap](#readonlymap)
@@ -1286,6 +1287,16 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 
 ```ts
 export declare const numberFromString: (self: Schema<string>) => Schema<number>
+```
+
+Added in v1.0.0
+
+## option
+
+**Signature**
+
+```ts
+export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0

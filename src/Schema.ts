@@ -1766,6 +1766,20 @@ export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
  * @category parsers
  * @since 1.0.0
  */
+export const option = <A>(value: Schema<A>): Schema<Option<A>> =>
+  pipe(
+    optionInline(value),
+    transform(
+      optionFromSelf(value),
+      (a) => a._tag === "None" ? O.none() : O.some(a.value),
+      O.match(() => ({ _tag: "None" as const }), (value) => ({ _tag: "Some" as const, value }))
+    )
+  )
+
+/**
+ * @category parsers
+ * @since 1.0.0
+ */
 export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
   pipe(
     union(_undefined, nullable(value)),

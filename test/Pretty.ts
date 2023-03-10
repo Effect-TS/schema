@@ -8,6 +8,7 @@ describe.concurrent("Pretty", () => {
   it("exports", () => {
     expect(P.make).exist
     expect(P.pretty).exist
+    expect(P.PrettyHookId).exist
   })
 
   it("templateLiteral. a${string}b", () => {

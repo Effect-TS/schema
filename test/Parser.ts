@@ -4,6 +4,10 @@ import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("Parser", () => {
+  it("exports", () => {
+    expect(P.ParserHookId).exist
+  })
+
   it("_getLiterals", () => {
     expect(P._getLiterals(S.string.ast, "decoder")).toEqual([])
     // TypeLiteral

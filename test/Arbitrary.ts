@@ -14,6 +14,7 @@ describe.concurrent("Arbitrary", () => {
   it("exports", () => {
     expect(A.make).exist
     expect(A.arbitrary).exist
+    expect(A.ArbitraryHookId).exist
   })
 
   it("type alias without annotations", () => {
