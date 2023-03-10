@@ -1070,9 +1070,9 @@ export const fromBrand = <C extends Brand<string>>(
 // data/Chunk
 // ---------------------------------------------
 
-const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
+const chunkGuardParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
   const items = P.decode(array(item))
-  const schema = chunk(item)
+  const schema = chunkGuard(item)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -1082,12 +1082,12 @@ const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
   )
 }
 
-const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
-  I.makeArbitrary(chunk(item), (fc) => fc.array(item.arbitrary(fc)).map(C.fromIterable))
+const chunkGuardArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
+  I.makeArbitrary(chunkGuard(item), (fc) => fc.array(item.arbitrary(fc)).map(C.fromIterable))
 
-const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
+const chunkGuardPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
   I.makePretty(
-    chunk(item),
+    chunkGuard(item),
     (c) => `Chunk(${C.toReadonlyArray(c).map(item.pretty).join(", ")})`
   )
 
@@ -1095,7 +1095,7 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
+export const chunkGuard = <A>(item: Schema<A>): Schema<Chunk<A>> =>
   typeAlias(
     [item],
     struct({
@@ -1104,9 +1104,9 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
     }),
     {
       [A.IdentifierId]: "Chunk",
-      [H.ParserHookId]: H.hook(chunkParser),
-      [H.PrettyHookId]: H.hook(chunkPretty),
-      [H.ArbitraryHookId]: H.hook(chunkArbitrary)
+      [H.ParserHookId]: H.hook(chunkGuardParser),
+      [H.PrettyHookId]: H.hook(chunkGuardPretty),
+      [H.ArbitraryHookId]: H.hook(chunkGuardArbitrary)
     }
   )
 
@@ -1114,8 +1114,8 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
  * @category parsers
  * @since 1.0.0
  */
-export const chunkFromValues = <A>(item: Schema<A>): Schema<Chunk<A>> =>
-  pipe(array(item), transform(chunk(item), C.fromIterable, C.toReadonlyArray))
+export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
+  pipe(array(item), transform(chunkGuard(item), C.fromIterable, C.toReadonlyArray))
 
 // ---------------------------------------------
 // data/Data

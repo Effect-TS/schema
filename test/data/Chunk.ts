@@ -7,16 +7,16 @@ import * as Util from "@effect/schema/test/util"
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("Chunk", () => {
-  it("chunk. keyof", () => {
-    expect(S.keyof(S.chunk(S.string))).toEqual(S.union(S.literal("_id"), S.literal("length")))
+  it("chunkGuard. keyof", () => {
+    expect(S.keyof(S.chunkGuard(S.string))).toEqual(S.union(S.literal("_id"), S.literal("length")))
   })
 
-  it("chunk. property tests", () => {
-    Util.property(S.chunk(S.number))
+  it("chunkGuard. property tests", () => {
+    Util.property(S.chunkGuard(S.number))
   })
 
-  it("chunk. decoder", () => {
-    const schema = S.chunk(NumberFromString)
+  it("chunkGuard. decoder", () => {
+    const schema = S.chunkGuard(NumberFromString)
     Util.expectDecodingSuccess(schema, C.empty(), C.empty())
     Util.expectDecodingSuccess(schema, C.fromIterable(["1", "2", "3"]), C.fromIterable([1, 2, 3]))
 
@@ -32,14 +32,14 @@ describe.concurrent("Chunk", () => {
     )
   })
 
-  it("chunk. encoder", () => {
-    const schema = S.chunk(NumberFromString)
+  it("chunkGuard. encoder", () => {
+    const schema = S.chunkGuard(NumberFromString)
     Util.expectEncodingSuccess(schema, C.empty(), C.empty())
     Util.expectEncodingSuccess(schema, C.fromIterable([1, 2, 3]), C.fromIterable(["1", "2", "3"]))
   })
 
-  it("chunk. guard", () => {
-    const schema = S.chunk(S.string)
+  it("chunkGuard. guard", () => {
+    const schema = S.chunkGuard(S.string)
     const is = P.is(schema)
     expect(is(C.empty())).toEqual(true)
     expect(is(C.fromIterable(["a", "b", "c"]))).toEqual(true)
@@ -48,8 +48,8 @@ describe.concurrent("Chunk", () => {
     expect(is({ _id: Symbol.for("@effect/schema/test/FakeChunk") })).toEqual(false)
   })
 
-  it("chunk. pretty", () => {
-    const schema = S.chunk(S.string)
+  it("chunkGuard. pretty", () => {
+    const schema = S.chunkGuard(S.string)
     const pretty = Pretty.pretty(schema)
     expect(pretty(C.empty())).toEqual("Chunk()")
     expect(pretty(C.fromIterable(["a", "b"]))).toEqual(
@@ -57,12 +57,12 @@ describe.concurrent("Chunk", () => {
     )
   })
 
-  it("chunkFromValues. property tests", () => {
-    Util.property(S.chunkFromValues(S.number))
+  it("chunk. property tests", () => {
+    Util.property(S.chunk(S.number))
   })
 
-  it("chunkFromValues. decoder", () => {
-    const schema = S.chunkFromValues(S.number)
+  it("chunk. decoder", () => {
+    const schema = S.chunk(S.number)
     Util.expectDecodingSuccess(schema, [], C.empty())
     Util.expectDecodingSuccess(schema, [1, 2, 3], C.fromIterable([1, 2, 3]))
 
@@ -74,8 +74,8 @@ describe.concurrent("Chunk", () => {
     Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })
 
-  it("chunkFromValues. encoder", () => {
-    const schema = S.chunkFromValues(S.number)
+  it("chunk. encoder", () => {
+    const schema = S.chunk(S.number)
     Util.expectEncodingSuccess(schema, C.empty(), [])
     Util.expectEncodingSuccess(schema, C.fromIterable([1, 2, 3]), [1, 2, 3])
   })
