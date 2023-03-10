@@ -555,7 +555,7 @@ describe.concurrent("Schema", () => {
       radius: 10
     })
     expect(
-      S.encodeOrThrow(DiscriminatedShape)({
+      S.encode(DiscriminatedShape)({
         kind: "circle",
         radius: 10
       })
@@ -565,7 +565,7 @@ describe.concurrent("Schema", () => {
       sideLength: 10
     })
     expect(
-      S.encodeOrThrow(DiscriminatedShape)({
+      S.encode(DiscriminatedShape)({
         kind: "square",
         sideLength: 10
       })

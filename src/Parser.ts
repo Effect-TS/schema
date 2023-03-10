@@ -106,7 +106,7 @@ export const encodeEither = <A>(
  * @category encoding
  * @since 1.0.0
  */
-export const encodeOrThrow = <A>(schema: Schema<A>) =>
+export const encode = <A>(schema: Schema<A>) =>
   (a: A, options?: ParseOptions): unknown => {
     const t = parserFor(schema, "encoder").parse(a, options)
     if (PR.isFailure(t)) {

@@ -22,8 +22,8 @@ Added in v1.0.0
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
 - [encoding](#encoding)
+  - [encode](#encode)
   - [encodeEither](#encodeeither)
-  - [encodeOrThrow](#encodeorthrow)
 - [hooks](#hooks)
   - [ParserHookId](#parserhookid)
 - [model](#model)
@@ -118,6 +118,16 @@ Added in v1.0.0
 
 # encoding
 
+## encode
+
+**Signature**
+
+```ts
+export declare const encode: <A>(schema: Schema<A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
+```
+
+Added in v1.0.0
+
 ## encodeEither
 
 **Signature**
@@ -126,16 +136,6 @@ Added in v1.0.0
 export declare const encodeEither: <A>(
   schema: Schema<A>
 ) => (a: A, options?: AST.ParseOptions | undefined) => ParseResult<unknown>
-```
-
-Added in v1.0.0
-
-## encodeOrThrow
-
-**Signature**
-
-```ts
-export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
 ```
 
 Added in v1.0.0

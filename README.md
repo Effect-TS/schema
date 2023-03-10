@@ -742,7 +742,7 @@ expect(S.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
 
 // encoding
 expect(
-  S.encodeOrThrow(DiscriminatedShape)({
+  S.encode(DiscriminatedShape)({
     kind: "circle",
     radius: 10,
   })
@@ -1177,7 +1177,7 @@ decode({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 decode({ a: "hello" }); // throws key "b" is missing
 
 // encoding
-const encodeOrThrow = S.encodeOrThrow(schema);
+const encodeOrThrow = S.encode(schema);
 
 encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
 encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
@@ -1216,7 +1216,7 @@ decode({ a: "hello", b: null }); // { a: "hello", b: none() }
 decode({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
 // encoding
-const encodeOrThrow = S.encodeOrThrow(schema);
+const encodeOrThrow = S.encode(schema);
 
 encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello' }
 encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }

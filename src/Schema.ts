@@ -64,11 +64,11 @@ export {
   /**
    * @since 1.0.0
    */
-  encodeEither,
+  encode,
   /**
    * @since 1.0.0
    */
-  encodeOrThrow,
+  encodeEither,
   /**
    * @since 1.0.0
    */
