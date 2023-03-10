@@ -19,7 +19,7 @@ export const property = <A>(schema: Schema<A>) => {
     if (!is(a)) {
       return false
     }
-    const roundtrip = pipe(a, P.encode(schema), E.flatMap(P.decodeEither(schema)))
+    const roundtrip = pipe(a, P.encodeEither(schema), E.flatMap(P.decodeEither(schema)))
     if (PR.isFailure(roundtrip)) {
       return false
     }
@@ -53,7 +53,7 @@ export const expectEncodingSuccess = <A>(
   o: unknown,
   options?: ParseOptions
 ) => {
-  const t = P.encode(schema)(a, options)
+  const t = P.encodeEither(schema)(a, options)
   expect(t).toStrictEqual(E.right(o))
 }
 
@@ -63,7 +63,7 @@ export const expectEncodingFailure = <A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(P.encode(schema)(a, options), E.mapLeft(formatAll))
+  const t = pipe(P.encodeEither(schema)(a, options), E.mapLeft(formatAll))
   expect(t).toStrictEqual(E.left(message))
 }
 

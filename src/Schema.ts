@@ -64,7 +64,7 @@ export {
   /**
    * @since 1.0.0
    */
-  encode,
+  encodeEither,
   /**
    * @since 1.0.0
    */

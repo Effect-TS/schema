@@ -252,7 +252,7 @@ const Person = S.struct({
   age: Age,
 });
 
-const encoded = S.encode(Person)({ name: "Alice", age: 30 });
+const encoded = S.encodeEither(Person)({ name: "Alice", age: 30 });
 if (S.isSuccess(encoded)) {
   console.log(encoded.right); // { name: "Alice", age: "30" }
 }

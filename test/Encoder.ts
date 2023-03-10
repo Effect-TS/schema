@@ -13,7 +13,7 @@ const MustChar = pipe(S.string, S.maxLength(1))
 describe.concurrent("Encoder", () => {
   it("exports", () => {
     expect(E.make).exist
-    expect(E.encode).exist
+    expect(E.encodeEither).exist
     expect(E.encodeOrThrow).exist
   })
 

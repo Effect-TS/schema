@@ -22,7 +22,7 @@ Added in v1.0.0
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
 - [encoding](#encoding)
-  - [encode](#encode)
+  - [encodeEither](#encodeeither)
   - [encodeOrThrow](#encodeorthrow)
 - [hooks](#hooks)
   - [ParserHookId](#parserhookid)
@@ -118,12 +118,12 @@ Added in v1.0.0
 
 # encoding
 
-## encode
+## encodeEither
 
 **Signature**
 
 ```ts
-export declare const encode: <A>(
+export declare const encodeEither: <A>(
   schema: Schema<A>
 ) => (a: A, options?: AST.ParseOptions | undefined) => ParseResult<unknown>
 ```

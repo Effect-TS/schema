@@ -175,7 +175,7 @@ Added in v1.0.0
   - [decode](#decode)
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
-  - [encode](#encode)
+  - [encodeEither](#encodeeither)
   - [encodeOrThrow](#encodeorthrow)
   - [getPropertySignatures](#getpropertysignatures)
   - [is](#is)
@@ -2011,12 +2011,12 @@ export declare const decodeOption: <A>(
 
 Added in v1.0.0
 
-## encode
+## encodeEither
 
 **Signature**
 
 ```ts
-export declare const encode: <A>(
+export declare const encodeEither: <A>(
   schema: Schema<A>
 ) => (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], unknown>
 ```
