@@ -1232,8 +1232,8 @@ export const dateFromString = (self: Schema<string>): Schema<Date> => {
 // data/Either
 // ---------------------------------------------
 
-const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
-  const schema = either(left, right)
+const eitherGuardParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
+  const schema = eitherGuard(left, right)
   const decodeLeft = P.decode(left)
   const decodeRight = P.decode(right)
   return I.makeParser(
@@ -1247,39 +1247,36 @@ const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Eit
   )
 }
 
-const eitherArbitrary = <E, A>(
+const eitherGuardArbitrary = <E, A>(
   left: Arbitrary<E>,
   right: Arbitrary<A>
 ): Arbitrary<Either<E, A>> => {
-  const struct = Arb.arbitrary(eitherInline(left, right))
+  const schema = eitherGuard(left, right)
+  const arbitrary = Arb.arbitrary(eitherInline(left, right))
   return I.makeArbitrary(
-    either(left, right),
-    (fc) => struct(fc).map(E.match((e) => E.left(e), (a) => E.right(a)))
+    schema,
+    (fc) => arbitrary(fc).map((a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right))
   )
 }
 
-const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
+const eitherGuardPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
   I.makePretty(
-    either(left, right),
+    eitherGuard(left, right),
     E.match(
       (e) => `left(${left.pretty(e)})`,
       (a) => `right(${right.pretty(a)})`
     )
   )
 
-const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>): Schema<Either<E, A>> =>
+const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
   union(
     struct({
       _tag: literal("Left"),
-      left,
-      [Equal.symbol]: any,
-      [Hash.symbol]: any
+      left
     }),
     struct({
       _tag: literal("Right"),
-      right,
-      [Equal.symbol]: any,
-      [Hash.symbol]: any
+      right
     })
   )
 
@@ -1287,15 +1284,15 @@ const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>): Schema<Either<E,
  * @category constructors
  * @since 1.0.0
  */
-export const either = <E, A>(
+export const eitherGuard = <E, A>(
   left: Schema<E>,
   right: Schema<A>
 ): Schema<Either<E, A>> =>
   typeAlias([left, right], eitherInline(left, right), {
     [A.IdentifierId]: "Either",
-    [H.ParserHookId]: H.hook(eitherParser),
-    [H.PrettyHookId]: H.hook(eitherPretty),
-    [H.ArbitraryHookId]: H.hook(eitherArbitrary)
+    [H.ParserHookId]: H.hook(eitherGuardParser),
+    [H.PrettyHookId]: H.hook(eitherGuardPretty),
+    [H.ArbitraryHookId]: H.hook(eitherGuardArbitrary)
   })
 
 // ---------------------------------------------
