@@ -6,16 +6,16 @@ import * as Util from "@effect/schema/test/util"
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("ReadonlySet", () => {
-  it("readonlySet. keyof", () => {
-    expect(S.keyof(S.readonlySet(S.number))).toEqual(S.literal("size"))
+  it("readonlySetGuard. keyof", () => {
+    expect(S.keyof(S.readonlySetGuard(S.number))).toEqual(S.literal("size"))
   })
 
-  it("readonlySet. property tests", () => {
-    Util.property(S.readonlySet(S.number))
+  it("readonlySetGuard. property tests", () => {
+    Util.property(S.readonlySetGuard(S.number))
   })
 
-  it("readonlySet. decoder", () => {
-    const schema = S.readonlySet(NumberFromString)
+  it("readonlySetGuard. decoder", () => {
+    const schema = S.readonlySetGuard(NumberFromString)
     Util.expectDecodingSuccess(schema, new Set(), new Set())
     Util.expectDecodingSuccess(schema, new Set(["1", "2", "3"]), new Set([1, 2, 3]))
 
@@ -31,14 +31,14 @@ describe.concurrent("ReadonlySet", () => {
     )
   })
 
-  it("readonlySet. encoder", () => {
-    const schema = S.readonlySet(NumberFromString)
+  it("readonlySetGuard. encoder", () => {
+    const schema = S.readonlySetGuard(NumberFromString)
     Util.expectEncodingSuccess(schema, new Set(), new Set())
     Util.expectEncodingSuccess(schema, new Set([1, 2, 3]), new Set(["1", "2", "3"]))
   })
 
-  it("readonlySet. guard", () => {
-    const schema = S.readonlySet(S.string)
+  it("readonlySetGuard. guard", () => {
+    const schema = S.readonlySetGuard(S.string)
     const is = P.is(schema)
     expect(is(new Set())).toEqual(true)
     expect(is(new Set(["a", "b", "c"]))).toEqual(true)
@@ -48,8 +48,8 @@ describe.concurrent("ReadonlySet", () => {
     expect(is(undefined)).toEqual(false)
   })
 
-  it("readonlySet. pretty", () => {
-    const schema = S.readonlySet(S.string)
+  it("readonlySetGuard. pretty", () => {
+    const schema = S.readonlySetGuard(S.string)
     const pretty = Pretty.pretty(schema)
     expect(pretty(new Set())).toEqual("new Set([])")
     expect(pretty(new Set(["a", "b"]))).toEqual(
@@ -57,12 +57,12 @@ describe.concurrent("ReadonlySet", () => {
     )
   })
 
-  it("readonlySetFromValues. property tests", () => {
-    Util.property(S.readonlySetFromValues(S.number))
+  it("readonlySet. property tests", () => {
+    Util.property(S.readonlySet(S.number))
   })
 
-  it("readonlySetFromValues. decoder", () => {
-    const schema = S.readonlySetFromValues(S.number)
+  it("readonlySet. decoder", () => {
+    const schema = S.readonlySet(S.number)
     Util.expectDecodingSuccess(schema, [], new Set([]))
     Util.expectDecodingSuccess(schema, [1, 2, 3], new Set([1, 2, 3]))
 
@@ -74,8 +74,8 @@ describe.concurrent("ReadonlySet", () => {
     Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })
 
-  it("readonlySetFromValues. encoder", () => {
-    const schema = S.readonlySetFromValues(S.number)
+  it("readonlySet. encoder", () => {
+    const schema = S.readonlySet(S.number)
     Util.expectEncodingSuccess(schema, new Set(), [])
     Util.expectEncodingSuccess(schema, new Set([1, 2, 3]), [1, 2, 3])
   })

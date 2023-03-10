@@ -1994,9 +1994,9 @@ export const readonlyMap = <K, V>(
 
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
-const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
+const readonlySetGuardParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
   const items = P.decode(array(item))
-  const schema = readonlySet(item)
+  const schema = readonlySetGuard(item)
   return I.makeParser(
     schema,
     (u, options) =>
@@ -2006,12 +2006,15 @@ const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
   )
 }
 
-const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
-  I.makeArbitrary(readonlySet(item), (fc) => fc.array(item.arbitrary(fc)).map((as) => new Set(as)))
+const readonlySetGuardArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
+  I.makeArbitrary(
+    readonlySetGuard(item),
+    (fc) => fc.array(item.arbitrary(fc)).map((as) => new Set(as))
+  )
 
-const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
+const readonlySetGuardPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
   I.makePretty(
-    readonlySet(item),
+    readonlySetGuard(item),
     (set) => `new Set([${Array.from(set.values()).map((a) => item.pretty(a)).join(", ")}])`
   )
 
@@ -2019,7 +2022,7 @@ const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
+export const readonlySetGuard = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
   typeAlias(
     [item],
     struct({
@@ -2027,9 +2030,9 @@ export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
     }),
     {
       [A.IdentifierId]: "ReadonlySet",
-      [H.ParserHookId]: H.hook(readonlySetParser),
-      [H.PrettyHookId]: H.hook(readonlySetPretty),
-      [H.ArbitraryHookId]: H.hook(readonlySetArbitrary)
+      [H.ParserHookId]: H.hook(readonlySetGuardParser),
+      [H.PrettyHookId]: H.hook(readonlySetGuardPretty),
+      [H.ArbitraryHookId]: H.hook(readonlySetGuardArbitrary)
     }
   )
 
@@ -2037,8 +2040,11 @@ export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
  * @category parsers
  * @since 1.0.0
  */
-export const readonlySetFromValues = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
-  pipe(array(item), transform(readonlySet(item), (as) => new Set(as), (set) => Array.from(set)))
+export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
+  pipe(
+    array(item),
+    transform(readonlySetGuard(item), (as) => new Set(as), (set) => Array.from(set))
+  )
 
 // ---------------------------------------------
 // data/String
