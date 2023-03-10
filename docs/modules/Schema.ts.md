@@ -173,10 +173,10 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [asserts](#asserts)
   - [decode](#decode)
+  - [decodeOption](#decodeoption)
   - [decodeOrThrow](#decodeorthrow)
   - [encode](#encode)
   - [encodeOrThrow](#encodeorthrow)
-  - [getOption](#getoption)
   - [getPropertySignatures](#getpropertysignatures)
   - [is](#is)
   - [optional](#optional)
@@ -1989,6 +1989,18 @@ export declare const decode: <A>(
 
 Added in v1.0.0
 
+## decodeOption
+
+**Signature**
+
+```ts
+export declare const decodeOption: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
+```
+
+Added in v1.0.0
+
 ## decodeOrThrow
 
 **Signature**
@@ -2019,18 +2031,6 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
-```
-
-Added in v1.0.0
-
-## getOption
-
-**Signature**
-
-```ts
-export declare const getOption: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
 ```
 
 Added in v1.0.0

@@ -49,7 +49,7 @@ export const decode = <A>(
  * @category decoding
  * @since 1.0.0
  */
-export const getOption = <A>(schema: Schema<A>) =>
+export const decodeOption = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): Option<A> =>
     O.fromEither(parserFor(schema).parse(input, options))
 

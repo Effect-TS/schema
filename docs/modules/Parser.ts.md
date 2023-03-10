@@ -19,8 +19,8 @@ Added in v1.0.0
   - [make](#make)
 - [decoding](#decoding)
   - [decode](#decode)
+  - [decodeOption](#decodeoption)
   - [decodeOrThrow](#decodeorthrow)
-  - [getOption](#getoption)
 - [encoding](#encoding)
   - [encode](#encode)
   - [encodeOrThrow](#encodeorthrow)
@@ -94,6 +94,18 @@ export declare const decode: <A>(
 
 Added in v1.0.0
 
+## decodeOption
+
+**Signature**
+
+```ts
+export declare const decodeOption: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
+```
+
+Added in v1.0.0
+
 ## decodeOrThrow
 
 **Signature**
@@ -102,18 +114,6 @@ Added in v1.0.0
 export declare const decodeOrThrow: <A>(
   schema: Schema<A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
-## getOption
-
-**Signature**
-
-```ts
-export declare const getOption: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
 Added in v1.0.0

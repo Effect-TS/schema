@@ -56,6 +56,10 @@ export {
   /**
    * @since 1.0.0
    */
+  decodeOption,
+  /**
+   * @since 1.0.0
+   */
   decodeOrThrow,
   /**
    * @since 1.0.0
@@ -65,10 +69,6 @@ export {
    * @since 1.0.0
    */
   encodeOrThrow,
-  /**
-   * @since 1.0.0
-   */
-  getOption,
   /**
    * @since 1.0.0
    */
@@ -453,13 +453,13 @@ export const brand = <B extends string, A>(
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema: Schema<A & Brand<B>> = make(ast)
     const decodeOrThrow = P.decodeOrThrow(schema)
-    const getOption = P.getOption(schema)
+    const decodeOption = P.decodeOption(schema)
     const decode = P.decode(schema)
     const is = P.is(schema)
     const out: any = Object.assign((input: unknown) => decodeOrThrow(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
       ast,
-      option: (input: unknown) => getOption(input),
+      option: (input: unknown) => decodeOption(input),
       either: (input: unknown) =>
         E.mapLeft(decode(input), (errors) => [{ meta: input, message: formatErrors(errors) }]),
       refine: (input: unknown): input is A & Brand<B> => is(input)
