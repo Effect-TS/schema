@@ -1,6 +1,6 @@
 import * as RA from "@effect/data/ReadonlyArray"
-import * as S from "@effect/schema"
 import type { ParseResult } from "@effect/schema/ParseResult"
+import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 
 /*
@@ -51,7 +51,7 @@ const members = RA.makeBy(n, (i) =>
   }))
 const schema = S.union(...members)
 
-const decode = S.decode(schema)
+const decodeEither = S.decodeEither(schema)
 
 const decodeManual = (input: unknown): ParseResult<{
   readonly kind: number
@@ -63,9 +63,9 @@ const decodeManual = (input: unknown): ParseResult<{
     typeof input === "object" && input !== null && "kind" in input && typeof input.kind === "number"
   ) {
     const kind = input.kind
-    return S.decode(members[kind])(input)
+    return S.decodeEither(members[kind])(input)
   }
-  return decode(input)
+  return decodeEither(input)
 }
 
 const good = {
@@ -86,14 +86,14 @@ const bad = {
 // console.log(decode(bad))
 
 suite
-  .add("decode (good)", function() {
-    decode(good)
+  .add("decodeEither (good)", function() {
+    decodeEither(good)
   })
   .add("decodeManual (good)", function() {
     decodeManual(good)
   })
-  .add("decode (bad)", function() {
-    decode(bad)
+  .add("decodeEither (bad)", function() {
+    decodeEither(bad)
   })
   .add("decodeManual (bad)", function() {
     decodeManual(bad)

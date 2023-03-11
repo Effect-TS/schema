@@ -37,7 +37,7 @@ export const make: <A>(schema: Schema<A>, parse: Parser<A>["parse"]) => Parser<A
  */
 export const ParserHookId = I.ParserHookId
 
-const parse = <A>(schema: Schema<A>, kind: ParserKind) => {
+const parse = (schema: Schema<any>, kind: ParserKind) => {
   const parse = parserFor(schema, kind).parse
   return (input: unknown, options?: ParseOptions): any => {
     const t = parse(input, options)
@@ -48,14 +48,14 @@ const parse = <A>(schema: Schema<A>, kind: ParserKind) => {
   }
 }
 
-const parseOption = <A>(schema: Schema<A>, kind: ParserKind) => {
+const parseOption = (schema: Schema<any>, kind: ParserKind) => {
   const parse = parserFor(schema, kind).parse
   return (input: unknown, options?: ParseOptions): Option<any> =>
     O.fromEither(parse(input, options))
 }
 
-const parseEither = <A>(
-  schema: Schema<A>,
+const parseEither = (
+  schema: Schema<any>,
   kind: ParserKind
 ): (input: unknown, options?: ParseOptions) => ParseResult<any> => parserFor(schema, kind).parse
 
@@ -159,10 +159,7 @@ const getHook = AST.getAnnotation<(...args: ReadonlyArray<Parser<any>>) => Parse
 
 type ParserKind = "decoding" | "validation" | "encoding"
 
-const parserFor = <A>(
-  schema: Schema<A>,
-  as: ParserKind
-): Parser<A> => {
+const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
   const go = (ast: AST.AST): Parser<any> => {
     switch (ast._tag) {
       case "TypeAlias":

@@ -619,7 +619,7 @@ const toAnnotations = <A>(
  */
 export function filter<A, B extends A>(
   refinement: Refinement<A, B>,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<B>
 export function filter<A>(
   predicate: Predicate<A>,
@@ -857,7 +857,7 @@ export const GreaterThanBigintTypeId = "@effect/schema/GreaterThanBigintTypeId"
  */
 export const greaterThanBigint = <A extends bigint>(
   min: bigint,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -866,7 +866,7 @@ export const greaterThanBigint = <A extends bigint>(
         typeId: GreaterThanBigintTypeId,
         description: `a bigint greater than ${min}n`,
         jsonSchema: { exclusiveMinimum: min },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -881,7 +881,7 @@ export const GreaterThanOrEqualToBigintTypeId = "@effect/schema/GreaterThanOrEqu
  */
 export const greaterThanOrEqualToBigint = <A extends bigint>(
   min: bigint,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -890,7 +890,7 @@ export const greaterThanOrEqualToBigint = <A extends bigint>(
         typeId: GreaterThanOrEqualToBigintTypeId,
         description: `a bigint greater than or equal to ${min}n`,
         jsonSchema: { minimum: min },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -905,7 +905,7 @@ export const LessThanBigintTypeId = "@effect/schema/LessThanBigintTypeId"
  */
 export const lessThanBigint = <A extends bigint>(
   max: bigint,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -914,7 +914,7 @@ export const lessThanBigint = <A extends bigint>(
         typeId: LessThanBigintTypeId,
         description: `a bigint less than ${max}n`,
         jsonSchema: { exclusiveMaximum: max },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -929,7 +929,7 @@ export const LessThanOrEqualToBigintTypeId = "@effect/schema/LessThanOrEqualToBi
  */
 export const lessThanOrEqualToBigint = <A extends bigint>(
   max: bigint,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -938,7 +938,7 @@ export const lessThanOrEqualToBigint = <A extends bigint>(
         typeId: LessThanOrEqualToBigintTypeId,
         description: `a bigint less than or equal to ${max}n`,
         jsonSchema: { maximum: max },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -954,7 +954,7 @@ export const BetweenBigintTypeId = "@effect/schema/BetweenBigintTypeId"
 export const betweenBigint = <A extends bigint>(
   min: bigint,
   max: bigint,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -963,7 +963,7 @@ export const betweenBigint = <A extends bigint>(
         typeId: BetweenBigintTypeId,
         description: `a bigint between ${min}n and ${max}n`,
         jsonSchema: { maximum: max, minimum: min },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -977,12 +977,12 @@ export const PositiveBigintTypeId = "@effect/schema/PositiveBigintTypeId"
  * @since 1.0.0
  */
 export const positiveBigint = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   greaterThanBigint(0n, {
     typeId: PositiveBigintTypeId,
     description: "a positive bigint",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -995,12 +995,12 @@ export const NegativeBigintTypeId = "@effect/schema/NegativeBigintTypeId"
  * @since 1.0.0
  */
 export const negativeBigint = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   lessThanBigint(0n, {
     typeId: NegativeBigintTypeId,
     description: "a negative bigint",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -1013,12 +1013,12 @@ export const NonNegativeBigintTypeId = "@effect/schema/NonNegativeBigintTypeId"
  * @since 1.0.0
  */
 export const nonNegativeBigint = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   greaterThanOrEqualToBigint(0n, {
     typeId: NonNegativeBigintTypeId,
     description: "a non-negative bigint",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -1031,12 +1031,12 @@ export const NonPositiveBigintTypeId = "@effect/schema/NonPositiveBigintTypeId"
  * @since 1.0.0
  */
 export const nonPositiveBigint = <A extends bigint>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   lessThanOrEqualToBigint(0n, {
     typeId: NonPositiveBigintTypeId,
     description: "a non-positive bigint",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -1071,7 +1071,7 @@ export const BrandTypeId = "@effect/schema/BrandTypeId"
  */
 export const fromBrand = <C extends Brand<string>>(
   constructor: Brand.Constructor<C>,
-  annotationOptions?: AnnotationOptions<Brand.Unbranded<C>>
+  option?: AnnotationOptions<Brand.Unbranded<C>>
 ) =>
   <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> =>
     pipe(
@@ -1083,7 +1083,7 @@ export const fromBrand = <C extends Brand<string>>(
           message: (a) =>
             (constructor.either(a) as E.Left<Brand.BrandErrors>).left.map((v) => v.message)
               .join(", "),
-          ...annotationOptions
+          ...option
         }
       )
     )
@@ -1092,7 +1092,7 @@ export const fromBrand = <C extends Brand<string>>(
 // data/Chunk
 // ---------------------------------------------
 
-const chunkParser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
+const chunkParser = <A>(item: Schema<A>): P.Parser<Chunk<A>> => {
   const items = P.decodeEither(array(item))
   const schema = chunkFromSelf(item)
   return I.makeParser(
@@ -1147,7 +1147,7 @@ const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a:
   Array.isArray(a) ? D.array(a) : D.struct(a)
 
 const dataParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: P.Parser<A>
+  item: Schema<A>
 ): P.Parser<D.Data<A>> => {
   const decode = P.decodeEither(item)
   const schema = dataFromSelf(item)
@@ -1255,7 +1255,7 @@ export const dateFromString = (self: Schema<string>): Schema<Date> => {
 // data/Either
 // ---------------------------------------------
 
-const eitherParser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E, A>> => {
+const eitherParser = <E, A>(left: Schema<E>, right: Schema<A>): P.Parser<Either<E, A>> => {
   const schema = eitherFromSelf(left, right)
   const decodeLeft = P.decodeEither(left)
   const decodeRight = P.decodeEither(right)
@@ -1394,14 +1394,14 @@ export const FiniteTypeId = "@effect/schema/FiniteTypeId"
  * @category filters
  * @since 1.0.0
  */
-export const finite = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
+export const finite = <A extends number>(option?: AnnotationOptions<A>) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
       filter((a): a is A => Number.isFinite(a), {
         typeId: FiniteTypeId,
         description: "a finite number",
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1416,7 +1416,7 @@ export const GreaterThanTypeId = "@effect/schema/GreaterThanTypeId"
  */
 export const greaterThan = <A extends number>(
   min: number,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -1425,7 +1425,7 @@ export const greaterThan = <A extends number>(
         typeId: GreaterThanTypeId,
         description: `a number greater than ${min}`,
         jsonSchema: { exclusiveMinimum: min },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1440,7 +1440,7 @@ export const GreaterThanOrEqualToTypeId = "@effect/schema/GreaterThanOrEqualToTy
  */
 export const greaterThanOrEqualTo = <A extends number>(
   min: number,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -1449,7 +1449,7 @@ export const greaterThanOrEqualTo = <A extends number>(
         typeId: GreaterThanOrEqualToTypeId,
         description: `a number greater than or equal to ${min}`,
         jsonSchema: { minimum: min },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1464,7 +1464,7 @@ export const MultipleOfTypeId = "@effect/schema/MultipleOfTypeId"
  */
 export const multipleOf = <A extends number>(
   divisor: number,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -1473,7 +1473,7 @@ export const multipleOf = <A extends number>(
         typeId: MultipleOfTypeId,
         description: `a number divisible by ${divisor}`,
         jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1486,7 +1486,7 @@ export const IntTypeId = "@effect/schema/IntTypeId"
  * @category filters
  * @since 1.0.0
  */
-export const int = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
+export const int = <A extends number>(option?: AnnotationOptions<A>) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
@@ -1494,7 +1494,7 @@ export const int = <A extends number>(annotationOptions?: AnnotationOptions<A>) 
         typeId: IntTypeId,
         description: "integer",
         jsonSchema: { type: "integer" },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1507,7 +1507,7 @@ export const LessThanTypeId = "@effect/schema/LessThanTypeId"
  * @category filters
  * @since 1.0.0
  */
-export const lessThan = <A extends number>(max: number, annotationOptions?: AnnotationOptions<A>) =>
+export const lessThan = <A extends number>(max: number, option?: AnnotationOptions<A>) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
@@ -1515,7 +1515,7 @@ export const lessThan = <A extends number>(max: number, annotationOptions?: Anno
         typeId: LessThanTypeId,
         description: `a number less than ${max}`,
         jsonSchema: { exclusiveMaximum: max },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1530,7 +1530,7 @@ export const LessThanOrEqualToTypeId = "@effect/schema/LessThanOrEqualToTypeId"
  */
 export const lessThanOrEqualTo = <A extends number>(
   max: number,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -1539,7 +1539,7 @@ export const lessThanOrEqualTo = <A extends number>(
         typeId: LessThanOrEqualToTypeId,
         description: `a number less than or equal to ${max}`,
         jsonSchema: { maximum: max },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1555,7 +1555,7 @@ export const BetweenTypeId = "@effect/schema/BetweenTypeId"
 export const between = <A extends number>(
   min: number,
   max: number,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -1564,7 +1564,7 @@ export const between = <A extends number>(
         typeId: BetweenTypeId,
         description: `a number between ${min} and ${max}`,
         jsonSchema: { maximum: max, minimum: min },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1577,14 +1577,14 @@ export const NonNaNTypeId = "@effect/schema/NonNaNTypeId"
  * @category filters
  * @since 1.0.0
  */
-export const nonNaN = <A extends number>(annotationOptions?: AnnotationOptions<A>) =>
+export const nonNaN = <A extends number>(option?: AnnotationOptions<A>) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
       filter((a): a is A => !Number.isNaN(a), {
         typeId: NonNaNTypeId,
         description: "a number NaN excluded",
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1598,12 +1598,12 @@ export const PositiveTypeId = "@effect/schema/PositiveTypeId"
  * @since 1.0.0
  */
 export const positive = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   greaterThan(0, {
     typeId: PositiveTypeId,
     description: "a positive number",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -1616,12 +1616,12 @@ export const NegativeTypeId = "@effect/schema/NegativeTypeId"
  * @since 1.0.0
  */
 export const negative = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   lessThan(0, {
     typeId: NegativeTypeId,
     description: "a negative number",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -1634,12 +1634,12 @@ export const NonNegativeTypeId = "@effect/schema/NonNegativeTypeId"
  * @since 1.0.0
  */
 export const nonNegative = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   greaterThanOrEqualTo(0, {
     typeId: NonNegativeTypeId,
     description: "a non-negative number",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -1652,12 +1652,12 @@ export const NonPositiveTypeId = "@effect/schema/NonPositiveTypeId"
  * @since 1.0.0
  */
 export const nonPositive = <A extends number>(
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> =>
   lessThanOrEqualTo(0, {
     typeId: NonPositiveTypeId,
     description: "a non-positive number",
-    ...annotationOptions
+    ...option
   })
 
 /**
@@ -1724,7 +1724,7 @@ export const InstanceOfTypeId = "@effect/schema/InstanceOfTypeId"
  */
 export const instanceOf = <A extends abstract new(...args: any) => any>(
   constructor: A,
-  annotationOptions?: AnnotationOptions<object>
+  option?: AnnotationOptions<object>
 ): Schema<InstanceType<A>> =>
   pipe(
     object,
@@ -1733,7 +1733,7 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
       {
         typeId: { id: InstanceOfTypeId, params: { constructor } },
         description: `an instance of ${constructor.name}`,
-        ...annotationOptions
+        ...option
       }
     )
   )
@@ -1742,7 +1742,7 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
 // data/Option
 // ---------------------------------------------
 
-const optionParser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
+const optionParser = <A>(value: Schema<A>): P.Parser<Option<A>> => {
   const schema = optionFromSelf(value)
   const decodeValue = P.decodeEither(value)
   return I.makeParser(
@@ -1901,7 +1901,7 @@ export const MinItemsTypeId = "@effect/schema/MinItemsTypeId"
  */
 export const minItems = <A>(
   n: number,
-  annotationOptions?: AnnotationOptions<ReadonlyArray<A>>
+  option?: AnnotationOptions<ReadonlyArray<A>>
 ) =>
   (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
     pipe(
@@ -1910,7 +1910,7 @@ export const minItems = <A>(
         typeId: MinItemsTypeId,
         description: `an array of at least ${n} items`,
         jsonSchema: { minItems: n },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1925,7 +1925,7 @@ export const MaxItemsTypeId = "@effect/schema/MaxItemsTypeId"
  */
 export const maxItems = <A>(
   n: number,
-  annotationOptions?: AnnotationOptions<ReadonlyArray<A>>
+  option?: AnnotationOptions<ReadonlyArray<A>>
 ) =>
   (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
     pipe(
@@ -1934,7 +1934,7 @@ export const maxItems = <A>(
         typeId: MaxItemsTypeId,
         description: `an array of at most ${n} items`,
         jsonSchema: { maxItems: n },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1949,7 +1949,7 @@ export const ItemsCountTypeId = "@effect/schema/ItemsCountTypeId"
  */
 export const itemsCount = <A>(
   n: number,
-  annotationOptions?: AnnotationOptions<ReadonlyArray<A>>
+  option?: AnnotationOptions<ReadonlyArray<A>>
 ) =>
   (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
     pipe(
@@ -1958,7 +1958,7 @@ export const itemsCount = <A>(
         typeId: ItemsCountTypeId,
         description: `an array of exactly ${n} items`,
         jsonSchema: { minItems: n, maxItems: n },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -1969,8 +1969,8 @@ export const itemsCount = <A>(
 const isMap = (u: unknown): u is Map<unknown, unknown> => u instanceof Map
 
 const readonlyMapParser = <K, V>(
-  key: P.Parser<K>,
-  value: P.Parser<V>
+  key: Schema<K>,
+  value: Schema<V>
 ): P.Parser<ReadonlyMap<K, V>> => {
   const items = P.decodeEither(array(tuple(key, value)))
   const schema = readonlyMapFromSelf(key, value)
@@ -2050,7 +2050,7 @@ export const readonlyMap = <K, V>(
 
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
-const readonlySetParser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
+const readonlySetParser = <A>(item: Schema<A>): P.Parser<ReadonlySet<A>> => {
   const items = P.decodeEither(array(item))
   const schema = readonlySetFromSelf(item)
   return I.makeParser(
@@ -2122,7 +2122,7 @@ const trimmedRegex = /^\S.*\S$|^\S$|^$/
  * @category filters
  * @since 1.0.0
  */
-export const trimmed = <A extends string>(annotationOptions?: AnnotationOptions<A>) =>
+export const trimmed = <A extends string>(option?: AnnotationOptions<A>) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
       self,
@@ -2133,7 +2133,7 @@ export const trimmed = <A extends string>(annotationOptions?: AnnotationOptions<
           type: "string",
           pattern: trimmedRegex.source
         },
-        ...annotationOptions
+        ...option
       })
     )
 
@@ -2143,7 +2143,7 @@ export const trimmed = <A extends string>(annotationOptions?: AnnotationOptions<
  */
 export const maxLength = <A extends string>(
   maxLength: number,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -2153,7 +2153,7 @@ export const maxLength = <A extends string>(
         {
           description: `a string at most ${maxLength} character(s) long`,
           jsonSchema: { maxLength },
-          ...annotationOptions
+          ...option
         }
       )
     )
@@ -2164,7 +2164,7 @@ export const maxLength = <A extends string>(
  */
 export const minLength = <A extends string>(
   minLength: number,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -2174,7 +2174,7 @@ export const minLength = <A extends string>(
         {
           description: `a string at least ${minLength} character(s) long`,
           jsonSchema: { minLength },
-          ...annotationOptions
+          ...option
         }
       )
     )
@@ -2190,7 +2190,7 @@ export const PatternTypeId = "@effect/schema/PatternTypeId"
  */
 export const pattern = <A extends string>(
   regex: RegExp,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> => {
     const pattern = regex.source
@@ -2206,7 +2206,7 @@ export const pattern = <A extends string>(
           typeId: { id: PatternTypeId, params: { regex } },
           description: `a string matching the pattern ${pattern}`,
           jsonSchema: { pattern },
-          ...annotationOptions
+          ...option
         }
       )
     )
@@ -2223,7 +2223,7 @@ export const StartsWithTypeId = "@effect/schema/StartsWithTypeId"
  */
 export const startsWith = <A extends string>(
   startsWith: string,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -2234,7 +2234,7 @@ export const startsWith = <A extends string>(
           typeId: { id: StartsWithTypeId, params: { startsWith } },
           description: `a string starting with ${JSON.stringify(startsWith)}`,
           jsonSchema: { pattern: `^${startsWith}` },
-          ...annotationOptions
+          ...option
         }
       )
     )
@@ -2250,7 +2250,7 @@ export const EndsWithTypeId = "@effect/schema/EndsWithTypeId"
  */
 export const endsWith = <A extends string>(
   endsWith: string,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -2261,7 +2261,7 @@ export const endsWith = <A extends string>(
           typeId: { id: EndsWithTypeId, params: { endsWith } },
           description: `a string ending with ${JSON.stringify(endsWith)}`,
           jsonSchema: { pattern: `^.*${endsWith}$` },
-          ...annotationOptions
+          ...option
         }
       )
     )
@@ -2277,7 +2277,7 @@ export const IncludesTypeId = "@effect/schema/IncludesTypeId"
  */
 export const includes = <A extends string>(
   searchString: string,
-  annotationOptions?: AnnotationOptions<A>
+  option?: AnnotationOptions<A>
 ) =>
   (self: Schema<A>): Schema<A> =>
     pipe(
@@ -2288,7 +2288,7 @@ export const includes = <A extends string>(
           typeId: { id: IncludesTypeId, params: { includes: searchString } },
           description: `a string including ${JSON.stringify(searchString)}`,
           jsonSchema: { pattern: `.*${searchString}.*` },
-          ...annotationOptions
+          ...option
         }
       )
     )
@@ -2336,14 +2336,13 @@ export const UUID: Schema<string> = pipe(
  */
 export const length = <A extends string>(
   length: number,
-  annotationOptions?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> => minLength(length, annotationOptions)(maxLength<A>(length)(self))
+  option?: AnnotationOptions<A>
+) => (self: Schema<A>): Schema<A> => minLength(length, option)(maxLength<A>(length)(self))
 
 /**
  * @category filters
  * @since 1.0.0
  */
 export const nonEmpty = <A extends string>(
-  annotationOptions?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> => minLength(1, annotationOptions)
+  option?: AnnotationOptions<A>
+): (self: Schema<A>) => Schema<A> => minLength(1, option)

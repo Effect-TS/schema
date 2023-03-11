@@ -58,8 +58,7 @@ const Ship = t.struct({
 
 export const T = t.union(Asteroid, Planet, Ship)
 
-export const decode = P.decode(T)
-export const is = P.is(T)
+export const decodeEither = P.decodeEither(T)
 
 const good = {
   type: "ship",
@@ -107,18 +106,12 @@ const bad = {
 // console.log(decode(bad))
 
 suite
-  .add("decode (good)", function() {
-    decode(good)
+  .add("decodeEither (good)", function() {
+    decodeEither(good)
   })
-  .add("decode (bad)", function() {
-    decode(bad)
+  .add("decodeEither (bad)", function() {
+    decodeEither(bad)
   })
-  // .add("is (good)", function() {
-  //   is(good)
-  // })
-  // .add("is (bad)", function() {
-  //   is(bad)
-  // })
   .on("cycle", function(event: any) {
     console.log(String(event.target))
   })
