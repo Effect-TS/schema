@@ -72,6 +72,10 @@ export {
   /**
    * @since 1.0.0
    */
+  encodeOption,
+  /**
+   * @since 1.0.0
+   */
   is
 } from "@effect/schema/Parser"
 

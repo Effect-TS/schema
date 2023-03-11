@@ -12,9 +12,6 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [assertions](#assertions)
-  - [asserts](#asserts)
-  - [is](#is)
 - [constructors](#constructors)
   - [make](#make)
 - [decoding](#decoding)
@@ -24,40 +21,18 @@ Added in v1.0.0
 - [encoding](#encoding)
   - [encode](#encode)
   - [encodeEither](#encodeeither)
+  - [encodeOption](#encodeoption)
 - [hooks](#hooks)
   - [ParserHookId](#parserhookid)
 - [model](#model)
   - [Parser (interface)](#parser-interface)
 - [utils](#utils)
   - [InferAsserts (type alias)](#inferasserts-type-alias)
+- [validating](#validating)
+  - [asserts](#asserts)
+  - [is](#is)
 
 ---
-
-# assertions
-
-## asserts
-
-**Signature**
-
-```ts
-export declare const asserts: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
-```
-
-Added in v1.0.0
-
-## is
-
-**Signature**
-
-```ts
-export declare const is: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
-```
-
-Added in v1.0.0
 
 # constructors
 
@@ -140,6 +115,18 @@ export declare const encodeEither: <A>(
 
 Added in v1.0.0
 
+## encodeOption
+
+**Signature**
+
+```ts
+export declare const encodeOption: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
+```
+
+Added in v1.0.0
+
 # hooks
 
 ## ParserHookId
@@ -174,6 +161,32 @@ Added in v1.0.0
 
 ```ts
 export type InferAsserts<S extends Schema<any>> = (input: unknown, options?: ParseOptions) => asserts input is Infer<S>
+```
+
+Added in v1.0.0
+
+# validating
+
+## asserts
+
+**Signature**
+
+```ts
+export declare const asserts: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
+```
+
+Added in v1.0.0
+
+## is
+
+**Signature**
+
+```ts
+export declare const is: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
 ```
 
 Added in v1.0.0

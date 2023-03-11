@@ -67,7 +67,7 @@ export const decode = <A>(schema: Schema<A>) =>
   }
 
 /**
- * @category assertions
+ * @category validating
  * @since 1.0.0
  */
 export const is = <A>(schema: Schema<A>) =>
@@ -83,7 +83,7 @@ export type InferAsserts<S extends Schema<any>> = (
 ) => asserts input is Infer<S>
 
 /**
- * @category assertions
+ * @category validating
  * @since 1.0.0
  */
 export const asserts = <A>(schema: Schema<A>) =>
@@ -101,6 +101,14 @@ export const asserts = <A>(schema: Schema<A>) =>
 export const encodeEither = <A>(
   schema: Schema<A>
 ): (a: A, options?: ParseOptions) => ParseResult<unknown> => parserFor(schema, "encoder").parse
+
+/**
+ * @category encoding
+ * @since 1.0.0
+ */
+export const encodeOption = <A>(schema: Schema<A>) =>
+  (input: unknown, options?: ParseOptions): Option<A> =>
+    O.fromEither(parserFor(schema, "encoder").parse(input, options))
 
 /**
  * @category encoding

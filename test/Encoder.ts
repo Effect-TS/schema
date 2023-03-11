@@ -1,6 +1,7 @@
 import { pipe } from "@effect/data/Function"
+import * as O from "@effect/data/Option"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as E from "@effect/schema/Parser"
+import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
@@ -11,19 +12,19 @@ const NumberFromString = pipe(S.string, S.maxLength(1), S.numberFromString)
 const MustChar = pipe(S.string, S.maxLength(1))
 
 describe.concurrent("Encoder", () => {
-  it("exports", () => {
-    expect(E.make).exist
-    expect(E.encodeEither).exist
-    expect(E.encode).exist
-  })
-
   it("encode", () => {
     const schema = NumberFromString
-    expect(E.encode(schema)(1)).toEqual("1")
-    expect(() => E.encode(schema)(10)).toThrowError(
+    expect(P.encode(schema)(1)).toEqual("1")
+    expect(() => P.encode(schema)(10)).toThrowError(
       new Error(`1 error(s) found
 └─ Expected a string at most 1 character(s) long, actual "10"`)
     )
+  })
+
+  it("encodeOption", () => {
+    const schema = pipe(S.string, S.maxLength(1), S.numberFromString)
+    expect(P.encodeOption(schema)(1)).toEqual(O.some("1"))
+    expect(P.encodeOption(schema)(10)).toEqual(O.none())
   })
 
   it("never", () => {
