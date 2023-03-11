@@ -37,42 +37,58 @@ export const make: <A>(schema: Schema<A>, parse: Parser<A>["parse"]) => Parser<A
  */
 export const ParserHookId = I.ParserHookId
 
+const parse = <A>(schema: Schema<A>, kind: ParserKind) => {
+  const parse = parserFor(schema, kind).parse
+  return (input: unknown, options?: ParseOptions): any => {
+    const t = parse(input, options)
+    if (PR.isFailure(t)) {
+      throw new Error(formatErrors(t.left))
+    }
+    return t.right
+  }
+}
+
+const parseOption = <A>(schema: Schema<A>, kind: ParserKind) => {
+  const parse = parserFor(schema, kind).parse
+  return (input: unknown, options?: ParseOptions): Option<any> =>
+    O.fromEither(parse(input, options))
+}
+
+const parseEither = <A>(
+  schema: Schema<A>,
+  kind: ParserKind
+): (input: unknown, options?: ParseOptions) => ParseResult<any> => parserFor(schema, kind).parse
+
 /**
  * @category decoding
  * @since 1.0.0
  */
 export const decodeEither = <A>(
   schema: Schema<A>
-): (input: unknown, options?: ParseOptions) => ParseResult<A> => parserFor(schema).parse
+): (input: unknown, options?: ParseOptions) => ParseResult<A> => parseEither(schema, "decoding")
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decodeOption = <A>(schema: Schema<A>) =>
-  (input: unknown, options?: ParseOptions): Option<A> =>
-    O.fromEither(parserFor(schema).parse(input, options))
+export const decodeOption = <A>(
+  schema: Schema<A>
+): (input: unknown, options?: ParseOptions) => Option<A> => parseOption(schema, "decoding")
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decode = <A>(schema: Schema<A>) =>
-  (input: unknown, options?: ParseOptions): A => {
-    const t = parserFor(schema).parse(input, options)
-    if (PR.isFailure(t)) {
-      throw new Error(formatErrors(t.left))
-    }
-    return t.right
-  }
+export const decode = <A>(schema: Schema<A>): (input: unknown, options?: ParseOptions) => A =>
+  parse(schema, "decoding")
 
 /**
- * @category validating
+ * @category validation
  * @since 1.0.0
  */
 export const is = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): input is A =>
-    !PR.isFailure(parserFor(schema, "guard").parse(input, options))
+    E.isRight(parseEither(schema, "validation")(input, options))
 
 /**
  * @since 1.0.0
@@ -83,16 +99,36 @@ export type InferAsserts<S extends Schema<any>> = (
 ) => asserts input is Infer<S>
 
 /**
- * @category validating
+ * @category validation
  * @since 1.0.0
  */
 export const asserts = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): asserts input is A => {
-    const t = parserFor(schema, "guard").parse(input, options)
-    if (PR.isFailure(t)) {
-      throw new Error(formatErrors(t.left))
-    }
+    parse(schema, "validation")(input, options)
   }
+
+/**
+ * @category validation
+ * @since 1.0.0
+ */
+export const validateEither = <A>(
+  schema: Schema<A>
+): (input: unknown, options?: ParseOptions) => ParseResult<A> => parseEither(schema, "validation")
+
+/**
+ * @category validation
+ * @since 1.0.0
+ */
+export const validateOption = <A>(
+  schema: Schema<A>
+): (input: unknown, options?: ParseOptions) => Option<A> => parseOption(schema, "validation")
+
+/**
+ * @category validation
+ * @since 1.0.0
+ */
+export const validate = <A>(schema: Schema<A>): (input: unknown, options?: ParseOptions) => A =>
+  parse(schema, "validation")
 
 /**
  * @category encoding
@@ -100,36 +136,32 @@ export const asserts = <A>(schema: Schema<A>) =>
  */
 export const encodeEither = <A>(
   schema: Schema<A>
-): (a: A, options?: ParseOptions) => ParseResult<unknown> => parserFor(schema, "encoder").parse
+): (a: A, options?: ParseOptions) => ParseResult<unknown> => parseEither(schema, "encoding")
 
 /**
  * @category encoding
  * @since 1.0.0
  */
-export const encodeOption = <A>(schema: Schema<A>) =>
-  (input: unknown, options?: ParseOptions): Option<A> =>
-    O.fromEither(parserFor(schema, "encoder").parse(input, options))
+export const encodeOption = <A>(
+  schema: Schema<A>
+): (input: unknown, options?: ParseOptions) => Option<unknown> => parseOption(schema, "encoding")
 
 /**
  * @category encoding
  * @since 1.0.0
  */
-export const encode = <A>(schema: Schema<A>) =>
-  (a: A, options?: ParseOptions): unknown => {
-    const t = parserFor(schema, "encoder").parse(a, options)
-    if (PR.isFailure(t)) {
-      throw new Error(formatErrors(t.left))
-    }
-    return t.right
-  }
+export const encode = <A>(schema: Schema<A>): (a: A, options?: ParseOptions) => unknown =>
+  parse(schema, "encoding")
 
 const getHook = AST.getAnnotation<(...args: ReadonlyArray<Parser<any>>) => Parser<any>>(
   ParserHookId
 )
 
+type ParserKind = "decoding" | "validation" | "encoding"
+
 const parserFor = <A>(
   schema: Schema<A>,
-  as: "decoder" | "guard" | "encoder" = "decoder"
+  as: ParserKind
 ): Parser<A> => {
   const go = (ast: AST.AST): Parser<any> => {
     switch (ast._tag) {
@@ -498,13 +530,13 @@ const parserFor = <A>(
           ast.refinement(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
 
         switch (as) {
-          case "guard":
-          case "decoder":
+          case "validation":
+          case "decoding":
             return make(
               I.makeSchema(ast),
               (u, options) => pipe(type.parse(u, options), E.flatMap(checkRefinement))
             )
-          case "encoder":
+          case "encoding":
             return make(
               I.makeSchema(ast),
               (u, options) => pipe(checkRefinement(u), E.flatMap((a) => type.parse(a, options)))
@@ -513,16 +545,16 @@ const parserFor = <A>(
       }
       case "Transform": {
         switch (as) {
-          case "decoder": {
+          case "decoding": {
             const from = go(ast.from)
             return make(
               I.makeSchema(ast),
               (u, options) => pipe(from.parse(u, options), E.flatMap((a) => ast.decode(a, options)))
             )
           }
-          case "guard":
+          case "validation":
             return go(ast.to)
-          case "encoder": {
+          case "encoding": {
             const from = go(ast.from)
             return make(
               I.makeSchema(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode)),
@@ -540,7 +572,7 @@ const parserFor = <A>(
 /** @internal */
 export const _getLiterals = (
   ast: AST.AST,
-  as: "decoder" | "guard" | "encoder"
+  as: ParserKind
 ): ReadonlyArray<[PropertyKey, AST.Literal]> => {
   switch (ast._tag) {
     case "TypeAlias":
@@ -558,7 +590,7 @@ export const _getLiterals = (
     case "Refinement":
       return _getLiterals(ast.from, as)
     case "Transform":
-      return as === "decoder" ?
+      return as === "decoding" ?
         _getLiterals(ast.from, as) :
         _getLiterals(ast.to, as)
   }
@@ -581,7 +613,7 @@ export const _getLiterals = (
  */
 export const _getSearchTree = <A extends Schema<any>>(
   members: ReadonlyArray<A>,
-  as: "decoder" | "guard" | "encoder"
+  as: ParserKind
 ): {
   keys: {
     readonly [key: PropertyKey]: {

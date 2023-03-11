@@ -181,6 +181,9 @@ Added in v1.0.0
   - [getPropertySignatures](#getpropertysignatures)
   - [is](#is)
   - [optional](#optional)
+  - [validate](#validate)
+  - [validateEither](#validateeither)
+  - [validateOption](#validateoption)
 
 ---
 
@@ -2041,7 +2044,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeOption: <A>(
   schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<unknown>
 ```
 
 Added in v1.0.0
@@ -2096,6 +2099,43 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: <A>(schema: Schema<A>) => OptionalSchema<A>
+```
+
+Added in v1.0.0
+
+## validate
+
+**Signature**
+
+```ts
+export declare const validate: <A>(schema: Schema<A>) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+## validateEither
+
+**Signature**
+
+```ts
+export declare const validateEither: <A>(
+  schema: Schema<A>
+) => (
+  input: unknown,
+  options?: AST.ParseOptions | undefined
+) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+```
+
+Added in v1.0.0
+
+## validateOption
+
+**Signature**
+
+```ts
+export declare const validateOption: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
 ```
 
 Added in v1.0.0

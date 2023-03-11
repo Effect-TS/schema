@@ -28,9 +28,12 @@ Added in v1.0.0
   - [Parser (interface)](#parser-interface)
 - [utils](#utils)
   - [InferAsserts (type alias)](#inferasserts-type-alias)
-- [validating](#validating)
+- [validation](#validation)
   - [asserts](#asserts)
   - [is](#is)
+  - [validate](#validate)
+  - [validateEither](#validateeither)
+  - [validateOption](#validateoption)
 
 ---
 
@@ -122,7 +125,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeOption: <A>(
   schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<unknown>
 ```
 
 Added in v1.0.0
@@ -165,7 +168,7 @@ export type InferAsserts<S extends Schema<any>> = (input: unknown, options?: Par
 
 Added in v1.0.0
 
-# validating
+# validation
 
 ## asserts
 
@@ -187,6 +190,43 @@ Added in v1.0.0
 export declare const is: <A>(
   schema: Schema<A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
+```
+
+Added in v1.0.0
+
+## validate
+
+**Signature**
+
+```ts
+export declare const validate: <A>(schema: Schema<A>) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+## validateEither
+
+**Signature**
+
+```ts
+export declare const validateEither: <A>(
+  schema: Schema<A>
+) => (
+  input: unknown,
+  options?: AST.ParseOptions | undefined
+) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+```
+
+Added in v1.0.0
+
+## validateOption
+
+**Signature**
+
+```ts
+export declare const validateOption: <A>(
+  schema: Schema<A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
 Added in v1.0.0

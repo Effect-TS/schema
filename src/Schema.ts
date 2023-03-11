@@ -76,7 +76,19 @@ export {
   /**
    * @since 1.0.0
    */
-  is
+  is,
+  /**
+   * @since 1.0.0
+   */
+  validate,
+  /**
+   * @since 1.0.0
+   */
+  validateEither,
+  /**
+   * @since 1.0.0
+   */
+  validateOption
 } from "@effect/schema/Parser"
 
 export type {
