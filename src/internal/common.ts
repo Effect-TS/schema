@@ -5,7 +5,6 @@
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { Parser } from "@effect/schema/Parser"
-import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import type * as S from "@effect/schema/Schema"
 
@@ -24,13 +23,6 @@ export const makeParser = <A>(
   schema: S.Schema<A>,
   parse: Parser<A>["parse"]
 ): Parser<A> => ({ ast: schema.ast, parse }) as any
-
-/** @internal */
-export const fromRefinement = <A>(
-  schema: S.Schema<A>,
-  refinement: (u: unknown) => u is A
-): Parser<A> =>
-  makeParser(schema, (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(schema.ast, u)))
 
 /** @internal */
 export const makePretty = <A>(

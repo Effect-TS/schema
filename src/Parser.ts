@@ -171,44 +171,44 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
           )
         )
       case "Literal":
-        return I.fromRefinement(
+        return fromRefinement(
           I.makeSchema(ast),
           (u): u is typeof ast.literal => u === ast.literal
         )
       case "UniqueSymbol":
-        return I.fromRefinement(
+        return fromRefinement(
           I.makeSchema(ast),
           (u): u is typeof ast.symbol => u === ast.symbol
         )
       case "UndefinedKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isUndefined)
+        return fromRefinement(I.makeSchema(ast), P.isUndefined)
       case "VoidKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isUndefined)
+        return fromRefinement(I.makeSchema(ast), P.isUndefined)
       case "NeverKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isNever)
+        return fromRefinement(I.makeSchema(ast), P.isNever)
       case "UnknownKeyword":
       case "AnyKeyword":
         return make(I.makeSchema(ast), PR.success)
       case "StringKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isString)
+        return fromRefinement(I.makeSchema(ast), P.isString)
       case "NumberKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isNumber)
+        return fromRefinement(I.makeSchema(ast), P.isNumber)
       case "BooleanKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isBoolean)
+        return fromRefinement(I.makeSchema(ast), P.isBoolean)
       case "BigIntKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isBigint)
+        return fromRefinement(I.makeSchema(ast), P.isBigint)
       case "SymbolKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isSymbol)
+        return fromRefinement(I.makeSchema(ast), P.isSymbol)
       case "ObjectKeyword":
-        return I.fromRefinement(I.makeSchema(ast), P.isObject)
+        return fromRefinement(I.makeSchema(ast), P.isObject)
       case "Enums":
-        return I.fromRefinement(
+        return fromRefinement(
           I.makeSchema(ast),
           (u): u is any => ast.enums.some(([_, value]) => value === u)
         )
       case "TemplateLiteral": {
         const regex = getTemplateLiteralRegex(ast)
-        return I.fromRefinement(I.makeSchema(ast), (u): u is any => P.isString(u) && regex.test(u))
+        return fromRefinement(I.makeSchema(ast), (u): u is any => P.isString(u) && regex.test(u))
       }
       case "Tuple": {
         const elements = ast.elements.map((e) => go(e.type))
@@ -327,7 +327,7 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
       }
       case "TypeLiteral": {
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
-          return I.fromRefinement(I.makeSchema(ast), P.isNotNullable)
+          return fromRefinement(I.makeSchema(ast), P.isNotNullable)
         }
         const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
         const indexSignatures = ast.indexSignatures.map((is) =>
@@ -565,6 +565,13 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
 
   return go(schema.ast)
 }
+
+/** @internal */
+export const fromRefinement = <A>(
+  schema: Schema<A>,
+  refinement: (u: unknown) => u is A
+): Parser<A> =>
+  I.makeParser(schema, (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(schema.ast, u)))
 
 /** @internal */
 export const _getLiterals = (

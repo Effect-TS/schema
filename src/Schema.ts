@@ -1788,8 +1788,8 @@ const optionInline = <A>(value: Schema<A>) =>
  * @category constructors
  * @since 1.0.0
  */
-export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
-  return typeAlias(
+export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> =>
+  typeAlias(
     [value],
     optionInline(value),
     {
@@ -1799,7 +1799,6 @@ export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
       [I.ArbitraryHookId]: optionArbitrary
     }
   )
-}
 
 /**
  * @category parsers
