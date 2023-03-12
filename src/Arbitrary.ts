@@ -59,7 +59,7 @@ const getHook = AST.getAnnotation<
 const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
   const go = (ast: AST.AST): Arbitrary<any> => {
     switch (ast._tag) {
-      case "TypeAlias":
+      case "Declaration":
         return pipe(
           getHook(ast),
           O.match(

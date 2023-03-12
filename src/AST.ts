@@ -21,7 +21,7 @@ import type { ParseResult } from "@effect/schema/ParseResult"
  * @since 1.0.0
  */
 export type AST =
-  | TypeAlias
+  | Declaration
   | Literal
   | UniqueSymbol
   | UndefinedKeyword
@@ -180,8 +180,8 @@ export const getAnnotation = <A>(key: PropertyKey) =>
  * @category model
  * @since 1.0.0
  */
-export interface TypeAlias extends Annotated {
-  readonly _tag: "TypeAlias"
+export interface Declaration extends Annotated {
+  readonly _tag: "Declaration"
   readonly typeParameters: ReadonlyArray<AST>
   readonly type: AST
   readonly decode: (
@@ -193,20 +193,20 @@ export interface TypeAlias extends Annotated {
  * @category constructors
  * @since 1.0.0
  */
-export const createTypeAlias = (
+export const createDeclaration = (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
   decode: (
     ...typeParameters: ReadonlyArray<AST>
   ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
   annotations: Annotated["annotations"] = {}
-): TypeAlias => ({ _tag: "TypeAlias", typeParameters, type, decode, annotations })
+): Declaration => ({ _tag: "Declaration", typeParameters, type, decode, annotations })
 
 /**
  * @category guards
  * @since 1.0.0
  */
-export const isTypeAlias = (ast: AST): ast is TypeAlias => ast._tag === "TypeAlias"
+export const isTypeAlias = (ast: AST): ast is Declaration => ast._tag === "Declaration"
 
 /**
  * @since 1.0.0
@@ -893,7 +893,7 @@ export const createRecord = (key: AST, value: AST, isReadonly: boolean): TypeLit
   const indexSignatures: Array<IndexSignature> = []
   const go = (key: AST): void => {
     switch (key._tag) {
-      case "TypeAlias":
+      case "Declaration":
         go(key.type)
         break
       case "NeverKeyword":
@@ -948,7 +948,7 @@ export const omit = (ast: AST, keys: ReadonlyArray<PropertyKey>): TypeLiteral =>
  */
 export const partial = (ast: AST): AST => {
   switch (ast._tag) {
-    case "TypeAlias":
+    case "Declaration":
       return partial(ast.type)
     case "Tuple":
       return createTuple(
@@ -1010,7 +1010,7 @@ export const getCompiler = <A>(match: Match<A>): Compiler<A> => {
 /** @internal */
 export const _getCardinality = (ast: AST): number => {
   switch (ast._tag) {
-    case "TypeAlias":
+    case "Declaration":
       return _getCardinality(ast.type)
     case "NeverKeyword":
       return 0
@@ -1047,7 +1047,7 @@ const sortByCardinalityAsc = RA.sort(
 /** @internal */
 export const _getWeight = (ast: AST): number => {
   switch (ast._tag) {
-    case "TypeAlias":
+    case "Declaration":
       return _getWeight(ast.type)
     case "Tuple":
       return ast.elements.length + (O.isSome(ast.rest) ? ast.rest.value.length : 0)
@@ -1115,7 +1115,7 @@ export const _getParameter = (
 
 const _keyof = (ast: AST): ReadonlyArray<AST> => {
   switch (ast._tag) {
-    case "TypeAlias":
+    case "Declaration":
       return _keyof(ast.type)
     case "NeverKeyword":
     case "AnyKeyword":
@@ -1147,7 +1147,7 @@ export const _getPropertySignatures = (
   ast: AST
 ): ReadonlyArray<PropertySignature> => {
   switch (ast._tag) {
-    case "TypeAlias":
+    case "Declaration":
       return _getPropertySignatures(ast.type)
     case "Tuple":
       return ast.elements.map((element, i) =>

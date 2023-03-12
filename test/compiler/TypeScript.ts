@@ -126,7 +126,7 @@ const getDocumentationAnnotation = AST.getAnnotation<AST.DocumentationAnnotation
 const typeScriptFor = <A>(schema: S.Schema<A>): TypeScript<A> => {
   const go = (ast: AST.AST): TypeScript<any> => {
     switch (ast._tag) {
-      case "TypeAlias":
+      case "Declaration":
         return pipe(
           getIdentifier(ast),
           O.match(

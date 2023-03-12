@@ -44,7 +44,7 @@ const format = (ast: AST.AST) => make(I.makeSchema(ast), formatActual)
  * @since 1.0.0
  */
 export const match: AST.Match<Pretty<any>> = {
-  "TypeAlias": (ast, go) =>
+  "Declaration": (ast, go) =>
     pipe(
       getHook(ast),
       O.match(

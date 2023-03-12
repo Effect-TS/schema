@@ -96,7 +96,7 @@ const getJSONSchemaAnnotation = AST.getAnnotation<AST.JSONSchemaAnnotation>(
 const jsonSchemaFor = <A>(schema: Schema<A>): JsonSchema7Type => {
   const go = (ast: AST.AST): JsonSchema7Type => {
     switch (ast._tag) {
-      case "TypeAlias":
+      case "Declaration":
         return pipe(
           getJSONSchemaAnnotation(ast),
           O.match(

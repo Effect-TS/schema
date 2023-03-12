@@ -22,8 +22,6 @@ Added in v1.0.0
   - [encode](#encode)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
-- [hooks](#hooks)
-  - [ParserHookId](#parserhookid)
 - [model](#model)
   - [Parser (interface)](#parser-interface)
 - [utils](#utils)
@@ -126,18 +124,6 @@ Added in v1.0.0
 export declare const encodeOption: <A>(
   schema: Schema<A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<unknown>
-```
-
-Added in v1.0.0
-
-# hooks
-
-## ParserHookId
-
-**Signature**
-
-```ts
-export declare const ParserHookId: '@effect/schema/ParserHookId'
 ```
 
 Added in v1.0.0

@@ -49,7 +49,7 @@ describe.concurrent("Parser", () => {
     // TypeAlias
     expect(
       P._getLiterals(
-        S.typeAlias(
+        S.declare(
           [],
           S.struct({ _tag: S.literal("a") }),
           () => P.decodeEither(S.struct({ _tag: S.literal("a") }))

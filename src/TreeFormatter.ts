@@ -135,7 +135,7 @@ export const formatExpected = (ast: AST.AST): string => {
         getExpected(ast),
         O.getOrElse(() => "<anonymous Lazy schema>")
       )
-    case "TypeAlias":
+    case "Declaration":
       return pipe(
         getExpected(ast),
         O.getOrElse(() => "<anonymous TypeAlias schema>")

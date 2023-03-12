@@ -25,6 +25,7 @@ Added in v1.0.0
   - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
   - [dataFromSelf](#datafromself)
+  - [declare](#declare)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
@@ -43,7 +44,6 @@ Added in v1.0.0
   - [transform](#transform)
   - [transformEither](#transformeither)
   - [tuple](#tuple)
-  - [typeAlias](#typealias)
   - [union](#union)
 - [constructors](#constructors)
   - [UUID](#uuid)
@@ -348,6 +348,23 @@ export declare const dataFromSelf: <A extends readonly any[] | Readonly<Record<s
 
 Added in v1.0.0
 
+## declare
+
+**Signature**
+
+```ts
+export declare const declare: (
+  typeParameters: ReadonlyArray<Schema<any>>,
+  type: Schema<any>,
+  decode: (
+    ...typeParameters: ReadonlyArray<Schema<any>>
+  ) => (input: unknown, options?: AST.ParseOptions | undefined) => ParseResult<any>,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => Schema<any>
+```
+
+Added in v1.0.0
+
 ## element
 
 **Signature**
@@ -377,7 +394,7 @@ Added in v1.0.0
 ```ts
 export declare function filter<A, B extends A>(
   refinement: Refinement<A, B>,
-  option?: AnnotationOptions<A>
+  options?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<B>
 export declare function filter<A>(
   predicate: Predicate<A>,
@@ -394,7 +411,7 @@ Added in v1.0.0
 ```ts
 export declare const fromBrand: <C extends any>(
   constructor: any,
-  option?: AnnotationOptions<any> | undefined
+  options?: AnnotationOptions<any> | undefined
 ) => <A extends any>(self: Schema<A>) => Schema<A & C>
 ```
 
@@ -584,20 +601,6 @@ export declare const tuple: <Elements extends readonly Schema<any>[]>(
 
 Added in v1.0.0
 
-## typeAlias
-
-**Signature**
-
-```ts
-export declare const typeAlias: (
-  typeParameters: ReadonlyArray<Schema<any>>,
-  type: Schema<any>,
-  annotations?: Record<string | symbol, unknown> | undefined
-) => Schema<any>
-```
-
-Added in v1.0.0
-
 ## union
 
 **Signature**
@@ -769,7 +772,7 @@ Added in v1.0.0
 export declare const between: <A extends number>(
   min: number,
   max: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -783,7 +786,7 @@ Added in v1.0.0
 export declare const betweenBigint: <A extends bigint>(
   min: bigint,
   max: bigint,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -796,7 +799,7 @@ Added in v1.0.0
 ```ts
 export declare const endsWith: <A extends string>(
   endsWith: string,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -808,7 +811,7 @@ Added in v1.0.0
 
 ```ts
 export declare const finite: <A extends number>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -821,7 +824,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThan: <A extends number>(
   min: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -834,7 +837,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThanBigint: <A extends bigint>(
   min: bigint,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -847,7 +850,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThanOrEqualTo: <A extends number>(
   min: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -860,7 +863,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThanOrEqualToBigint: <A extends bigint>(
   min: bigint,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -873,7 +876,7 @@ Added in v1.0.0
 ```ts
 export declare const includes: <A extends string>(
   searchString: string,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -885,7 +888,7 @@ Added in v1.0.0
 
 ```ts
 export declare const int: <A extends number>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -898,7 +901,7 @@ Added in v1.0.0
 ```ts
 export declare const itemsCount: <A>(
   n: number,
-  option?: AnnotationOptions<readonly A[]> | undefined
+  options?: AnnotationOptions<readonly A[]> | undefined
 ) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
 ```
 
@@ -911,7 +914,7 @@ Added in v1.0.0
 ```ts
 export declare const length: <A extends string>(
   length: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -924,7 +927,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThan: <A extends number>(
   max: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -937,7 +940,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThanBigint: <A extends bigint>(
   max: bigint,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -950,7 +953,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThanOrEqualTo: <A extends number>(
   max: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -963,7 +966,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThanOrEqualToBigint: <A extends bigint>(
   max: bigint,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -976,7 +979,7 @@ Added in v1.0.0
 ```ts
 export declare const maxItems: <A>(
   n: number,
-  option?: AnnotationOptions<readonly A[]> | undefined
+  options?: AnnotationOptions<readonly A[]> | undefined
 ) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
 ```
 
@@ -989,7 +992,7 @@ Added in v1.0.0
 ```ts
 export declare const maxLength: <A extends string>(
   maxLength: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1002,7 +1005,7 @@ Added in v1.0.0
 ```ts
 export declare const minItems: <A>(
   n: number,
-  option?: AnnotationOptions<readonly A[]> | undefined
+  options?: AnnotationOptions<readonly A[]> | undefined
 ) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
 ```
 
@@ -1015,7 +1018,7 @@ Added in v1.0.0
 ```ts
 export declare const minLength: <A extends string>(
   minLength: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1028,7 +1031,7 @@ Added in v1.0.0
 ```ts
 export declare const multipleOf: <A extends number>(
   divisor: number,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1040,7 +1043,7 @@ Added in v1.0.0
 
 ```ts
 export declare const negative: <A extends number>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1052,7 +1055,7 @@ Added in v1.0.0
 
 ```ts
 export declare const negativeBigint: <A extends bigint>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1064,7 +1067,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonEmpty: <A extends string>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1076,7 +1079,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNaN: <A extends number>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1088,7 +1091,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNegative: <A extends number>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1100,7 +1103,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNegativeBigint: <A extends bigint>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1112,7 +1115,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonPositive: <A extends number>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1124,7 +1127,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonPositiveBigint: <A extends bigint>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1137,7 +1140,7 @@ Added in v1.0.0
 ```ts
 export declare const pattern: <A extends string>(
   regex: RegExp,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1149,7 +1152,7 @@ Added in v1.0.0
 
 ```ts
 export declare const positive: <A extends number>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1161,7 +1164,7 @@ Added in v1.0.0
 
 ```ts
 export declare const positiveBigint: <A extends bigint>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1174,7 +1177,7 @@ Added in v1.0.0
 ```ts
 export declare const startsWith: <A extends string>(
   startsWith: string,
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1191,7 +1194,7 @@ If what you were looking for was a combinator to trim strings, then check out th
 
 ```ts
 export declare const trimmed: <A extends string>(
-  option?: AnnotationOptions<A> | undefined
+  options?: AnnotationOptions<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 

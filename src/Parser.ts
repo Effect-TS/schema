@@ -152,7 +152,7 @@ type ParserKind = "decoding" | "validation" | "encoding"
 const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
   const go = (ast: AST.AST): Parser<any> => {
     switch (ast._tag) {
-      case "TypeAlias":
+      case "Declaration":
         return make(I.makeSchema(ast), ast.decode(...ast.typeParameters.map((p) => go(p).ast)))
       case "Literal":
         return fromRefinement(
@@ -560,7 +560,7 @@ export const _getLiterals = (
   as: ParserKind
 ): ReadonlyArray<[PropertyKey, AST.Literal]> => {
   switch (ast._tag) {
-    case "TypeAlias":
+    case "Declaration":
       return _getLiterals(ast.type, as)
     case "TypeLiteral": {
       const out: Array<[PropertyKey, AST.Literal]> = []

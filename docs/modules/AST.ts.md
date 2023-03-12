@@ -35,6 +35,7 @@ Added in v1.0.0
   - [anyKeyword](#anykeyword)
   - [bigIntKeyword](#bigintkeyword)
   - [booleanKeyword](#booleankeyword)
+  - [createDeclaration](#createdeclaration)
   - [createEnums](#createenums)
   - [createLazy](#createlazy)
   - [createLiteral](#createliteral)
@@ -42,7 +43,6 @@ Added in v1.0.0
   - [createTemplateLiteral](#createtemplateliteral)
   - [createTransform](#createtransform)
   - [createTuple](#createtuple)
-  - [createTypeAlias](#createtypealias)
   - [createTypeLiteral](#createtypeliteral)
   - [createUnion](#createunion)
   - [createUniqueSymbol](#createuniquesymbol)
@@ -77,6 +77,7 @@ Added in v1.0.0
   - [AnyKeyword (interface)](#anykeyword-interface)
   - [BigIntKeyword (interface)](#bigintkeyword-interface)
   - [BooleanKeyword (interface)](#booleankeyword-interface)
+  - [Declaration (interface)](#declaration-interface)
   - [Enums (interface)](#enums-interface)
   - [Lazy (interface)](#lazy-interface)
   - [Literal (interface)](#literal-interface)
@@ -90,7 +91,6 @@ Added in v1.0.0
   - [TemplateLiteral (interface)](#templateliteral-interface)
   - [Transform (interface)](#transform-interface)
   - [Tuple (interface)](#tuple-interface)
-  - [TypeAlias (interface)](#typealias-interface)
   - [TypeLiteral (interface)](#typeliteral-interface)
   - [UndefinedKeyword (interface)](#undefinedkeyword-interface)
   - [Union (interface)](#union-interface)
@@ -337,6 +337,23 @@ export declare const booleanKeyword: BooleanKeyword
 
 Added in v1.0.0
 
+## createDeclaration
+
+**Signature**
+
+```ts
+export declare const createDeclaration: (
+  typeParameters: ReadonlyArray<AST>,
+  type: AST,
+  decode: (
+    ...typeParameters: ReadonlyArray<AST>
+  ) => (input: unknown, options?: ParseOptions | undefined) => ParseResult<any>,
+  annotations?: Annotated['annotations']
+) => Declaration
+```
+
+Added in v1.0.0
+
 ## createEnums
 
 **Signature**
@@ -374,7 +391,7 @@ Added in v1.0.0
 ```ts
 export declare const createRefinement: (
   from: AST,
-  refinement: Predicate<any>,
+  decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>,
   annotations?: Annotated['annotations']
 ) => Refinement
 ```
@@ -420,20 +437,6 @@ export declare const createTuple: (
   isReadonly: boolean,
   annotations?: Annotated['annotations']
 ) => Tuple
-```
-
-Added in v1.0.0
-
-## createTypeAlias
-
-**Signature**
-
-```ts
-export declare const createTypeAlias: (
-  typeParameters: ReadonlyArray<AST>,
-  type: AST,
-  annotations?: Annotated['annotations']
-) => TypeAlias
 ```
 
 Added in v1.0.0
@@ -679,7 +682,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isTypeAlias: (ast: AST) => ast is TypeAlias
+export declare const isTypeAlias: (ast: AST) => ast is Declaration
 ```
 
 Added in v1.0.0
@@ -732,7 +735,7 @@ Added in v1.0.0
 
 ```ts
 export type AST =
-  | TypeAlias
+  | Declaration
   | Literal
   | UniqueSymbol
   | UndefinedKeyword
@@ -789,6 +792,21 @@ Added in v1.0.0
 ```ts
 export interface BooleanKeyword extends Annotated {
   readonly _tag: 'BooleanKeyword'
+}
+```
+
+Added in v1.0.0
+
+## Declaration (interface)
+
+**Signature**
+
+```ts
+export interface Declaration extends Annotated {
+  readonly _tag: 'Declaration'
+  readonly typeParameters: ReadonlyArray<AST>
+  readonly type: AST
+  readonly decode: (...typeParameters: ReadonlyArray<AST>) => (input: any, options?: ParseOptions) => ParseResult<any>
 }
 ```
 
@@ -890,7 +908,7 @@ Added in v1.0.0
 export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
-  readonly refinement: Predicate<any>
+  readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
 }
 ```
 
@@ -960,20 +978,6 @@ export interface Tuple extends Annotated {
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
-}
-```
-
-Added in v1.0.0
-
-## TypeAlias (interface)
-
-**Signature**
-
-```ts
-export interface TypeAlias extends Annotated {
-  readonly _tag: 'TypeAlias'
-  readonly typeParameters: ReadonlyArray<AST>
-  readonly type: AST
 }
 ```
 
@@ -1278,7 +1282,15 @@ export declare const mergeAnnotations: (
   ast: AST,
   annotations: Annotated['annotations']
 ) =>
-  | { annotations: { [x: string]: unknown }; _tag: 'TypeAlias'; typeParameters: readonly AST[]; type: AST }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Declaration'
+      typeParameters: readonly AST[]
+      type: AST
+      decode: (
+        ...typeParameters: readonly AST[]
+      ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
   | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
@@ -1314,7 +1326,12 @@ export declare const mergeAnnotations: (
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Refinement'
+      from: AST
+      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Transform'
@@ -1375,7 +1392,15 @@ export declare const setAnnotation: (
   id: PropertyKey,
   value: unknown
 ) =>
-  | { annotations: { [x: string]: unknown }; _tag: 'TypeAlias'; typeParameters: readonly AST[]; type: AST }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Declaration'
+      typeParameters: readonly AST[]
+      type: AST
+      decode: (
+        ...typeParameters: readonly AST[]
+      ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
   | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
@@ -1411,7 +1436,12 @@ export declare const setAnnotation: (
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Refinement'
+      from: AST
+      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Transform'

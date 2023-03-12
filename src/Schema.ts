@@ -217,7 +217,7 @@ const getTemplateLiterals = (
   @category combinators
   @since 1.0.0
 */
-export const typeAlias = (
+export const declare = (
   typeParameters: ReadonlyArray<Schema<any>>,
   type: Schema<any>,
   decode: (
@@ -225,7 +225,7 @@ export const typeAlias = (
   ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
   annotations?: AST.Annotated["annotations"]
 ): Schema<any> =>
-  make(AST.createTypeAlias(
+  make(AST.createDeclaration(
     typeParameters.map((tp) => tp.ast),
     type.ast,
     (...typeParameters) => decode(...typeParameters.map(make)),
@@ -1117,7 +1117,7 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
  * @since 1.0.0
  */
 export const chunkFromSelf = <A>(item: Schema<A>): Schema<Chunk<A>> => {
-  const schema = typeAlias(
+  const schema = declare(
     [item],
     struct({
       _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
@@ -1173,7 +1173,7 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
 export const dataFromSelf = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
 ): Schema<D.Data<A>> => {
-  const schema = typeAlias(
+  const schema = declare(
     [item],
     item,
     <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
@@ -1221,7 +1221,7 @@ const datePretty = (): Pretty<Date> =>
  * @category constructors
  * @since 1.0.0
  */
-export const date: Schema<Date> = typeAlias(
+export const date: Schema<Date> = declare(
   [],
   struct({}),
   () => (u) => !isDate(u) ? PR.failure(PR.type(date.ast, u)) : PR.success(u),
@@ -1300,7 +1300,7 @@ export const eitherFromSelf = <E, A>(
   left: Schema<E>,
   right: Schema<A>
 ): Schema<Either<E, A>> => {
-  const schema = typeAlias(
+  const schema = declare(
     [left, right],
     eitherInline(left, right),
     <E, A>(
@@ -1782,7 +1782,7 @@ const optionInline = <A>(value: Schema<A>) =>
  * @since 1.0.0
  */
 export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
-  const schema = typeAlias(
+  const schema = declare(
     [value],
     optionInline(value),
     <A>(value: Schema<A>) => {
@@ -2001,7 +2001,7 @@ export const readonlyMapFromSelf = <K, V>(
   key: Schema<K>,
   value: Schema<V>
 ): Schema<ReadonlyMap<K, V>> => {
-  const schema = typeAlias(
+  const schema = declare(
     [key, value],
     struct({
       size: number
@@ -2065,7 +2065,7 @@ const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
  * @since 1.0.0
  */
 export const readonlySetFromSelf = <A>(item: Schema<A>): Schema<ReadonlySet<A>> => {
-  const schema = typeAlias(
+  const schema = declare(
     [item],
     struct({
       size: number
