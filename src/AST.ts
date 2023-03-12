@@ -7,7 +7,6 @@ import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
-import type { Predicate } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import { isString } from "@effect/data/String"
 import * as Order from "@effect/data/typeclass/Order"
@@ -746,7 +745,7 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
 export interface Refinement extends Annotated {
   readonly _tag: "Refinement"
   readonly from: AST
-  readonly refinement: Predicate<any>
+  readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
 }
 
 /**
@@ -755,9 +754,9 @@ export interface Refinement extends Annotated {
  */
 export const createRefinement = (
   from: AST,
-  refinement: Predicate<any>,
+  decode: (input: any, options?: ParseOptions) => ParseResult<any>,
   annotations: Annotated["annotations"] = {}
-): Refinement => ({ _tag: "Refinement", from, refinement, annotations })
+): Refinement => ({ _tag: "Refinement", from, decode, annotations })
 
 /**
  * @category guards

@@ -523,20 +523,17 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
       }
       case "Refinement": {
         const type = go(ast.from)
-        const checkRefinement = (a: unknown) =>
-          ast.refinement(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
-
         switch (as) {
           case "validation":
           case "decoding":
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(type.parse(u, options), E.flatMap(checkRefinement))
+              (u, options) => pipe(type.parse(u, options), E.flatMap((a) => ast.decode(a, options)))
             )
           case "encoding":
             return make(
               I.makeSchema(ast),
-              (u, options) => pipe(checkRefinement(u), E.flatMap((a) => type.parse(a, options)))
+              (u, options) => pipe(ast.decode(u, options), E.flatMap((a) => type.parse(a, options)))
             )
         }
       }

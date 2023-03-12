@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
@@ -216,7 +217,7 @@ const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
             () =>
               make(
                 I.makeSchema(ast),
-                (fc) => from.arbitrary(fc).filter((a) => ast.refinement(a))
+                (fc) => from.arbitrary(fc).filter((a) => E.isRight(ast.decode(a)))
               ),
             (handler) => handler(from)
           )
