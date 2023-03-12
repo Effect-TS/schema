@@ -7,10 +7,6 @@ import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("Parser", () => {
-  it("exports", () => {
-    expect(P.ParserHookId).exist
-  })
-
   it("validate", () => {
     const schema = pipe(S.string, S.maxLength(1), S.numberFromString)
     expect(P.validate(schema)(1)).toEqual(1)
@@ -53,7 +49,11 @@ describe.concurrent("Parser", () => {
     // TypeAlias
     expect(
       P._getLiterals(
-        S.typeAlias([], S.struct({ _tag: S.literal("a") })).ast,
+        S.typeAlias(
+          [],
+          S.struct({ _tag: S.literal("a") }),
+          () => P.decodeEither(S.struct({ _tag: S.literal("a") }))
+        ).ast,
         "decoding"
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])

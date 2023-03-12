@@ -184,6 +184,9 @@ export interface TypeAlias extends Annotated {
   readonly _tag: "TypeAlias"
   readonly typeParameters: ReadonlyArray<AST>
   readonly type: AST
+  readonly decode: (
+    ...typeParameters: ReadonlyArray<AST>
+  ) => (input: any, options?: ParseOptions) => ParseResult<any>
 }
 
 /**
@@ -193,8 +196,11 @@ export interface TypeAlias extends Annotated {
 export const createTypeAlias = (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
+  decode: (
+    ...typeParameters: ReadonlyArray<AST>
+  ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
   annotations: Annotated["annotations"] = {}
-): TypeAlias => ({ _tag: "TypeAlias", typeParameters, type, annotations })
+): TypeAlias => ({ _tag: "TypeAlias", typeParameters, type, decode, annotations })
 
 /**
  * @category guards

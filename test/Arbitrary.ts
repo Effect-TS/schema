@@ -17,11 +17,6 @@ describe.concurrent("Arbitrary", () => {
     expect(A.ArbitraryHookId).exist
   })
 
-  it("type alias without annotations", () => {
-    const schema = S.typeAlias([], S.string)
-    property(schema)
-  })
-
   it("templateLiteral. a", () => {
     const schema = S.templateLiteral(S.literal("a"))
     property(schema)

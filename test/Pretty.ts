@@ -1,5 +1,4 @@
 import { pipe } from "@effect/data/Function"
-import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
@@ -372,19 +371,6 @@ describe.concurrent("Pretty", () => {
     expect(pretty({ a: "a", as: [] })).toEqual(
       `{ "a": "a", "as": [] }`
     )
-  })
-
-  it("TypeAlias", () => {
-    const schema: S.Schema<O.Option<number>> = S.typeAlias(
-      [],
-      S.union(
-        S.struct({ _tag: S.literal("None") }),
-        S.struct({ _tag: S.literal("Some"), value: S.number })
-      )
-    )
-    const pretty = P.pretty(schema)
-    expect(pretty(O.none())).toEqual(`{ "_tag": "None" }`)
-    expect(pretty(O.some(1))).toEqual(`{ "_tag": "Some", "value": 1 }`)
   })
 
   describe.concurrent("partial", () => {

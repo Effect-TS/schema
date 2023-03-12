@@ -36,13 +36,6 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("type alias without annotations", () => {
-    const schema = S.typeAlias([], S.string)
-    Util.expectDecodingSuccess(schema, "a", "a")
-
-    Util.expectDecodingFailure(schema, 1, `Expected string, actual 1`)
-  })
-
   it("annotations/message refinement", () => {
     const schema = pipe(
       // initial schema, a string

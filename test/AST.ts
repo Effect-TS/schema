@@ -82,13 +82,6 @@ describe.concurrent("AST", () => {
       .toEqual(AST.createUnion([AST.stringKeyword, AST.numberKeyword]))
   })
 
-  it("createRecord/ TypeAlias", () => {
-    const string = AST.createTypeAlias([], AST.stringKeyword)
-    expect(AST.createRecord(string, AST.numberKeyword, true)).toEqual(AST.createTypeLiteral([], [
-      AST.createIndexSignature(AST.stringKeyword, AST.numberKeyword, true)
-    ]))
-  })
-
   it("createRecord/ numeric literal", () => {
     expect(AST.createRecord(AST.createLiteral(1), AST.numberKeyword, true)).toEqual(
       AST.createTypeLiteral([AST.createPropertySignature(1, AST.numberKeyword, false, true)], [])

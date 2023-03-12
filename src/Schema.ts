@@ -220,11 +220,15 @@ const getTemplateLiterals = (
 export const typeAlias = (
   typeParameters: ReadonlyArray<Schema<any>>,
   type: Schema<any>,
+  decode: (
+    ...typeParameters: ReadonlyArray<Schema<any>>
+  ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
   annotations?: AST.Annotated["annotations"]
 ): Schema<any> =>
   make(AST.createTypeAlias(
     typeParameters.map((tp) => tp.ast),
     type.ast,
+    (...typeParameters) => decode(...typeParameters.map(make)),
     annotations
   ))
 
@@ -1099,18 +1103,6 @@ export const fromBrand = <C extends Brand<string>>(
 // data/Chunk
 // ---------------------------------------------
 
-const chunkParser = <A>(item: Schema<A>): P.Parser<Chunk<A>> => {
-  const items = P.decodeEither(array(item))
-  const schema = chunkFromSelf(item)
-  return I.makeParser(
-    schema,
-    (u, options) =>
-      !C.isChunk(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        E.map(items(C.toReadonlyArray(u), options), C.fromIterable)
-  )
-}
-
 const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
   I.makeArbitrary(chunkFromSelf(item), (fc) => fc.array(item.arbitrary(fc)).map(C.fromIterable))
 
@@ -1124,20 +1116,28 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const chunkFromSelf = <A>(item: Schema<A>): Schema<Chunk<A>> =>
-  typeAlias(
+export const chunkFromSelf = <A>(item: Schema<A>): Schema<Chunk<A>> => {
+  const schema = typeAlias(
     [item],
     struct({
       _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
       length: number
     }),
+    <A>(item: Schema<A>) => {
+      const items = P.decodeEither(array(item))
+      return (u, options) =>
+        !C.isChunk(u) ?
+          PR.failure(PR.type(schema.ast, u)) :
+          E.map(items(C.toReadonlyArray(u), options), C.fromIterable)
+    },
     {
       [AST.IdentifierAnnotationId]: "Chunk",
-      [I.ParserHookId]: chunkParser,
       [I.PrettyHookId]: chunkPretty,
       [I.ArbitraryHookId]: chunkArbitrary
     }
   )
+  return schema
+}
 
 /**
  * @category parsers
@@ -1152,20 +1152,6 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
 
 const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): D.Data<A> =>
   Array.isArray(a) ? D.array(a) : D.struct(a)
-
-const dataParser = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: Schema<A>
-): P.Parser<D.Data<A>> => {
-  const decode = P.decodeEither(item)
-  const schema = dataFromSelf(item)
-  return I.makeParser(
-    schema,
-    (u, options) =>
-      !Equal.isEqual(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        E.map(decode(u, options), toData)
-  )
-}
 
 const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Arbitrary<A>
@@ -1186,17 +1172,27 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
  */
 export const dataFromSelf = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
-): Schema<D.Data<A>> =>
-  typeAlias(
+): Schema<D.Data<A>> => {
+  const schema = typeAlias(
     [item],
     item,
+    <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+      item: Schema<A>
+    ) => {
+      const decode = P.decodeEither(item)
+      return (u, options) =>
+        !Equal.isEqual(u) ?
+          PR.failure(PR.type(schema.ast, u)) :
+          E.map(decode(u, options), toData)
+    },
     {
       [AST.IdentifierAnnotationId]: "Data",
-      [I.ParserHookId]: dataParser,
       [I.PrettyHookId]: dataPretty,
       [I.ArbitraryHookId]: dataArbitrary
     }
   )
+  return schema
+}
 
 /**
  * @category parsers
@@ -1216,9 +1212,6 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
 // data/Date
 // ---------------------------------------------
 
-const dateParser = (): P.Parser<Date> =>
-  I.makeParser(date, (u) => !isDate(u) ? PR.failure(PR.type(date.ast, u)) : PR.success(u))
-
 const dateArbitrary = (): Arbitrary<Date> => I.makeArbitrary(date, (fc) => fc.date())
 
 const datePretty = (): Pretty<Date> =>
@@ -1228,12 +1221,16 @@ const datePretty = (): Pretty<Date> =>
  * @category constructors
  * @since 1.0.0
  */
-export const date: Schema<Date> = typeAlias([], struct({}), {
-  [AST.IdentifierAnnotationId]: "Date",
-  [I.ParserHookId]: dateParser,
-  [I.PrettyHookId]: datePretty,
-  [I.ArbitraryHookId]: dateArbitrary
-})
+export const date: Schema<Date> = typeAlias(
+  [],
+  struct({}),
+  () => (u) => !isDate(u) ? PR.failure(PR.type(date.ast, u)) : PR.success(u),
+  {
+    [AST.IdentifierAnnotationId]: "Date",
+    [I.PrettyHookId]: datePretty,
+    [I.ArbitraryHookId]: dateArbitrary
+  }
+)
 
 /**
   Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
@@ -1261,21 +1258,6 @@ export const dateFromString = (self: Schema<string>): Schema<Date> => {
 // ---------------------------------------------
 // data/Either
 // ---------------------------------------------
-
-const eitherParser = <E, A>(left: Schema<E>, right: Schema<A>): P.Parser<Either<E, A>> => {
-  const schema = eitherFromSelf(left, right)
-  const decodeLeft = P.decodeEither(left)
-  const decodeRight = P.decodeEither(right)
-  return I.makeParser(
-    schema,
-    (u, options) =>
-      !E.isEither(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        E.isLeft(u) ?
-        E.map(decodeLeft(u.left, options), E.left) :
-        E.map(decodeRight(u.right, options), E.right)
-  )
-}
 
 const eitherArbitrary = <E, A>(
   left: Arbitrary<E>,
@@ -1317,13 +1299,31 @@ const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
 export const eitherFromSelf = <E, A>(
   left: Schema<E>,
   right: Schema<A>
-): Schema<Either<E, A>> =>
-  typeAlias([left, right], eitherInline(left, right), {
-    [AST.IdentifierAnnotationId]: "Either",
-    [I.ParserHookId]: eitherParser,
-    [I.PrettyHookId]: eitherPretty,
-    [I.ArbitraryHookId]: eitherArbitrary
-  })
+): Schema<Either<E, A>> => {
+  const schema = typeAlias(
+    [left, right],
+    eitherInline(left, right),
+    <E, A>(
+      left: Schema<E>,
+      right: Schema<A>
+    ) => {
+      const decodeLeft = P.decodeEither(left)
+      const decodeRight = P.decodeEither(right)
+      return (u, options) =>
+        !E.isEither(u) ?
+          PR.failure(PR.type(schema.ast, u)) :
+          E.isLeft(u) ?
+          E.map(decodeLeft(u.left, options), E.left) :
+          E.map(decodeRight(u.right, options), E.right)
+    },
+    {
+      [AST.IdentifierAnnotationId]: "Either",
+      [I.PrettyHookId]: eitherPretty,
+      [I.ArbitraryHookId]: eitherArbitrary
+    }
+  )
+  return schema
+}
 
 /**
  * @category parsers
@@ -1749,20 +1749,6 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
 // data/Option
 // ---------------------------------------------
 
-const optionParser = <A>(value: Schema<A>): P.Parser<Option<A>> => {
-  const schema = optionFromSelf(value)
-  const decodeValue = P.decodeEither(value)
-  return I.makeParser(
-    schema,
-    (u, options) =>
-      !O.isOption(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        O.isNone(u) ?
-        PR.success(O.none()) :
-        E.map(decodeValue(u.value, options), O.some)
-  )
-}
-
 const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => {
   const struct = Arb.arbitrary(optionInline(value))
   return I.makeArbitrary(
@@ -1795,17 +1781,27 @@ const optionInline = <A>(value: Schema<A>) =>
  * @category constructors
  * @since 1.0.0
  */
-export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> =>
-  typeAlias(
+export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
+  const schema = typeAlias(
     [value],
     optionInline(value),
+    <A>(value: Schema<A>) => {
+      const decodeValue = P.decodeEither(value)
+      return (u, options) =>
+        !O.isOption(u) ?
+          PR.failure(PR.type(schema.ast, u)) :
+          O.isNone(u) ?
+          PR.success(O.none()) :
+          E.map(decodeValue(u.value, options), O.some)
+    },
     {
       [AST.IdentifierAnnotationId]: "Option",
-      [I.ParserHookId]: optionParser,
       [I.PrettyHookId]: optionPretty,
       [I.ArbitraryHookId]: optionArbitrary
     }
   )
+  return schema
+}
 
 /**
  * @category parsers
@@ -1974,21 +1970,6 @@ export const itemsCount = <A>(
 
 const isMap = (u: unknown): u is Map<unknown, unknown> => u instanceof Map
 
-const readonlyMapParser = <K, V>(
-  key: Schema<K>,
-  value: Schema<V>
-): P.Parser<ReadonlyMap<K, V>> => {
-  const items = P.decodeEither(array(tuple(key, value)))
-  const schema = readonlyMapFromSelf(key, value)
-  return I.makeParser(
-    schema,
-    (u, options) =>
-      !isMap(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        E.map(items(Array.from(u.entries()), options), (as) => new Map(as))
-  )
-}
-
 const readonlyMapArbitrary = <K, V>(
   key: Arbitrary<K>,
   value: Arbitrary<V>
@@ -2019,19 +2000,30 @@ const readonlyMapPretty = <K, V>(
 export const readonlyMapFromSelf = <K, V>(
   key: Schema<K>,
   value: Schema<V>
-): Schema<ReadonlyMap<K, V>> =>
-  typeAlias(
+): Schema<ReadonlyMap<K, V>> => {
+  const schema = typeAlias(
     [key, value],
     struct({
       size: number
     }),
+    <K, V>(
+      key: Schema<K>,
+      value: Schema<V>
+    ) => {
+      const items = P.decodeEither(array(tuple(key, value)))
+      return (u, options) =>
+        !isMap(u) ?
+          PR.failure(PR.type(schema.ast, u)) :
+          E.map(items(Array.from(u.entries()), options), (as) => new Map(as))
+    },
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
-      [I.ParserHookId]: readonlyMapParser,
       [I.PrettyHookId]: readonlyMapPretty,
       [I.ArbitraryHookId]: readonlyMapArbitrary
     }
   )
+  return schema
+}
 
 /**
  * @category parsers
@@ -2056,18 +2048,6 @@ export const readonlyMap = <K, V>(
 
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
-const readonlySetParser = <A>(item: Schema<A>): P.Parser<ReadonlySet<A>> => {
-  const items = P.decodeEither(array(item))
-  const schema = readonlySetFromSelf(item)
-  return I.makeParser(
-    schema,
-    (u, options) =>
-      !isSet(u) ?
-        PR.failure(PR.type(schema.ast, u)) :
-        E.map(items(Array.from(u.values()), options), (as) => new Set(as))
-  )
-}
-
 const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
   I.makeArbitrary(
     readonlySetFromSelf(item),
@@ -2084,19 +2064,27 @@ const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const readonlySetFromSelf = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
-  typeAlias(
+export const readonlySetFromSelf = <A>(item: Schema<A>): Schema<ReadonlySet<A>> => {
+  const schema = typeAlias(
     [item],
     struct({
       size: number
     }),
+    <A>(item: Schema<A>) => {
+      const items = P.decodeEither(array(item))
+      return (u, options) =>
+        !isSet(u) ?
+          PR.failure(PR.type(schema.ast, u)) :
+          E.map(items(Array.from(u.values()), options), (as) => new Set(as))
+    },
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
-      [I.ParserHookId]: readonlySetParser,
       [I.PrettyHookId]: readonlySetPretty,
       [I.ArbitraryHookId]: readonlySetArbitrary
     }
   )
+  return schema
+}
 
 /**
  * @category parsers

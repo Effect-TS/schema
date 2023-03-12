@@ -31,12 +31,6 @@ export interface Parser<A> extends Schema<A> {
  */
 export const make: <A>(schema: Schema<A>, parse: Parser<A>["parse"]) => Parser<A> = I.makeParser
 
-/**
- * @category hooks
- * @since 1.0.0
- */
-export const ParserHookId = I.ParserHookId
-
 const parse = (schema: Schema<any>, kind: ParserKind) => {
   const parse = parserFor(schema, kind).parse
   return (input: unknown, options?: ParseOptions): any => {
@@ -153,23 +147,13 @@ export const encodeOption = <A>(
 export const encode = <A>(schema: Schema<A>): (a: A, options?: ParseOptions) => unknown =>
   parse(schema, "encoding")
 
-const getHook = AST.getAnnotation<(...args: ReadonlyArray<Parser<any>>) => Parser<any>>(
-  ParserHookId
-)
-
 type ParserKind = "decoding" | "validation" | "encoding"
 
 const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
   const go = (ast: AST.AST): Parser<any> => {
     switch (ast._tag) {
       case "TypeAlias":
-        return pipe(
-          getHook(ast),
-          O.match(
-            () => go(ast.type),
-            (handler) => handler(...ast.typeParameters.map(go))
-          )
-        )
+        return make(I.makeSchema(ast), ast.decode(...ast.typeParameters.map((p) => go(p).ast)))
       case "Literal":
         return fromRefinement(
           I.makeSchema(ast),

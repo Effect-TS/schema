@@ -38,9 +38,6 @@ export const makePretty = <A>(
 export const ArbitraryHookId = "@effect/schema/ArbitraryHookId"
 
 /** @internal */
-export const ParserHookId = "@effect/schema/ParserHookId"
-
-/** @internal */
 export const PrettyHookId = "@effect/schema/PrettyHookId"
 
 // ---------------------------------------------
