@@ -90,12 +90,12 @@ In addition to the provided `struct` and `union` functions, `@effect/schema/Sche
 
 ## Extracting the inferred type
 
-Once you have defined a `Schema`, you can use the `Infer` type to extract the inferred type of the data described by the `Schema`.
+Once you have defined a `Schema`, you can use the `To` type to extract the inferred type of the data described by the `Schema`.
 
 For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
 
 ```ts
-interface Person extends S.Infer<typeof Person> {}
+interface Person extends S.To<typeof Person> {}
 /*
 interface Person {
   readonly name: string;
@@ -317,7 +317,7 @@ const Person = S.struct({
 });
 
 // const assertsPerson: (input: unknown) => asserts input is Person
-const assertsPerson: S.InferAsserts<typeof Person> = P.asserts(Person);
+const assertsPerson: S.ToAsserts<typeof Person> = P.asserts(Person);
 
 try {
   assertsPerson({ name: "Alice", age: "30" });
@@ -557,7 +557,7 @@ import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserIdSchema = pipe(S.string, S.brand("UserId"));
-type UserId = S.Infer<typeof UserIdSchema>; // string & Brand<"UserId">
+type UserId = S.To<typeof UserIdSchema>; // string & Brand<"UserId">
 ```
 
 In the above example, `UserIdSchema` is a schema for the `UserId` branded type. The `brand` combinator takes a string argument that specifies the name of the brand to attach to the type.
@@ -1356,7 +1356,7 @@ Please note that the `S.tuple` API is a convenient utility provided by the libra
 ```ts
 export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
   ...elements: Elements
-): Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> =>
+): Schema<{ readonly [K in keyof Elements]: To<Elements[K]> }> =>
   makeSchema(
     AST.createTuple(
       elements.map((schema) => AST.createElement(schema.ast, false)),

@@ -33,15 +33,21 @@ import { formatErrors } from "@effect/schema/TreeFormatter"
  * @category model
  * @since 1.0.0
  */
-export interface Schema<A> {
-  readonly A: (_: A) => A
+export interface Schema<From, To = From> {
+  readonly From: (_: From) => From
+  readonly To: (_: To) => To
   readonly ast: AST.AST
 }
 
 /**
  * @since 1.0.0
  */
-export type Infer<S extends { readonly A: (_: any) => any }> = Parameters<S["A"]>[0]
+export type From<S extends { readonly From: (_: any) => any }> = Parameters<S["From"]>[0]
+
+/**
+ * @since 1.0.0
+ */
+export type To<S extends { readonly To: (_: any) => any }> = Parameters<S["To"]>[0]
 
 /* c8 ignore start */
 export {
@@ -95,7 +101,7 @@ export type {
   /**
    * @since 1.0.0
    */
-  InferAsserts
+  ToAsserts
 } from "@effect/schema/Parser"
 /* c8 ignore end */
 
@@ -158,7 +164,7 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
  */
 export const templateLiteral = <T extends [Schema<any>, ...Array<Schema<any>>]>(
   ...[head, ...tail]: T
-): Schema<Join<{ [K in keyof T]: Infer<T[K]> }>> => {
+): Schema<Join<{ [K in keyof T]: To<T[K]> }>> => {
   let types: ReadonlyArray<AST.TemplateLiteral | AST.Literal> = getTemplateLiterals(head.ast)
   for (const span of tail) {
     types = pipe(
@@ -242,7 +248,7 @@ export const declare = (
  */
 export const union = <Members extends ReadonlyArray<Schema<any>>>(
   ...members: Members
-): Schema<Infer<Members[number]>> => make(AST.createUnion(members.map((m) => m.ast)))
+): Schema<To<Members[number]>> => make(AST.createUnion(members.map((m) => m.ast)))
 
 /**
  * @category combinators
@@ -262,7 +268,7 @@ export const keyof = <A>(schema: Schema<A>): Schema<keyof A> => make(AST.keyof(s
  */
 export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
   ...elements: Elements
-): Schema<{ readonly [K in keyof Elements]: Infer<Elements[K]> }> =>
+): Schema<{ readonly [K in keyof Elements]: To<Elements[K]> }> =>
   make(
     AST.createTuple(elements.map((schema) => AST.createElement(schema.ast, false)), O.none(), true)
   )
@@ -338,8 +344,8 @@ export type OptionalSchemaId = typeof OptionalSchemaId
 /**
  * @since 1.0.0
  */
-export interface OptionalSchema<A> {
-  readonly A: (_: A) => A
+export interface OptionalSchema<To> {
+  readonly To: (_: To) => To
   readonly _id: OptionalSchemaId
 }
 
@@ -370,8 +376,8 @@ export const struct = <Fields extends Record<PropertyKey, Schema<any> | Optional
   fields: Fields
 ): Schema<
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: Infer<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields>]?: Infer<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> }
+    & { readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> }
   >
 > =>
   make(
@@ -441,7 +447,7 @@ export const getPropertySignatures = <A>(schema: Schema<A>): { [K in keyof A]: S
  * @category model
  * @since 1.0.0
  */
-export interface BrandSchema<A extends Brand<any>> extends Schema<A>, Brand.Constructor<A> {}
+export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Constructor<To> {}
 
 /**
  * Returns a nominal branded schema by applying a brand to a given schema.
@@ -458,7 +464,7 @@ export interface BrandSchema<A extends Brand<any>> extends Schema<A>, Brand.Cons
  * import { pipe } from "@effect/data/Function"
  *
  * const Int = pipe(S.number, S.int(), S.brand("Int"))
- * type Int = S.Infer<typeof Int> // number & Brand<"Int">
+ * type Int = S.To<typeof Int> // number & Brand<"Int">
  *
  * @category combinators
  * @since 1.0.0
@@ -1833,7 +1839,7 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
 ) =>
   <A extends object>(
     schema: Schema<A>
-  ): Schema<Spread<A & { readonly [K in keyof Fields]: Option<Infer<Fields[K]>> }>> => {
+  ): Schema<Spread<A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> }>> => {
     if (AST.isTypeLiteral(schema.ast)) {
       const propertySignatures = schema.ast.propertySignatures
       const ownKeys = Reflect.ownKeys(fields)

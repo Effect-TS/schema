@@ -447,9 +447,9 @@ describe.concurrent("Schema", () => {
         fields: Fields
       ): S.Schema<
         S.Spread<
-          & { readonly [K in RequiredKeys<Fields>]: S.Infer<Fields[K]> }
+          & { readonly [K in RequiredKeys<Fields>]: S.To<Fields[K]> }
           & {
-            readonly [K in OptionalKeys<Fields> as K extends `${infer S}?` ? S : K]+?: S.Infer<
+            readonly [K in OptionalKeys<Fields> as K extends `${infer S}?` ? S : K]+?: S.To<
               Fields[K]
             >
           }

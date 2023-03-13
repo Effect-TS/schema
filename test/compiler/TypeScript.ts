@@ -60,7 +60,7 @@ const Applicative: applicative.Applicative<WriterLambda> = {
   of: (a) => [a, []]
 }
 
-interface TypeScript<A> extends S.Schema<A> {
+interface TypeScript<To> extends S.Schema<To> {
   readonly nodes: Writer<ts.TypeNode>
 }
 

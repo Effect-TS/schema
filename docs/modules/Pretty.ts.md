@@ -32,7 +32,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <A>(schema: Schema<A>, pretty: (a: A) => string) => Pretty<A>
+export declare const make: <A>(schema: Schema<A, A>, pretty: (a: A) => string) => Pretty<A>
 ```
 
 Added in v1.0.0
@@ -56,8 +56,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Pretty<A> extends Schema<A> {
-  readonly pretty: (a: A) => string
+export interface Pretty<To> extends Schema<To> {
+  readonly pretty: (a: To) => string
 }
 ```
 
@@ -70,7 +70,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const pretty: <A>(schema: Schema<A>) => (a: A) => string
+export declare const pretty: <A>(schema: Schema<A, A>) => (a: A) => string
 ```
 
 Added in v1.0.0

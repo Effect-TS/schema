@@ -14,15 +14,15 @@ import type { ParseOptions } from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import * as PR from "@effect/schema/ParseResult"
 import type { ParseResult } from "@effect/schema/ParseResult"
-import type { Infer, Schema } from "@effect/schema/Schema"
+import type { Schema, To } from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 /**
  * @category model
  * @since 1.0.0
  */
-export interface Parser<A> extends Schema<A> {
-  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<A>
+export interface Parser<To> extends Schema<To> {
+  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<To>
 }
 
 /**
@@ -87,10 +87,10 @@ export const is = <A>(schema: Schema<A>) =>
 /**
  * @since 1.0.0
  */
-export type InferAsserts<S extends Schema<any>> = (
+export type ToAsserts<S extends Schema<any>> = (
   input: unknown,
   options?: ParseOptions
-) => asserts input is Infer<S>
+) => asserts input is To<S>
 
 /**
  * @category validation
