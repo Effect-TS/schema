@@ -11,7 +11,7 @@ import * as D from "@effect/data/Data"
 import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
-import { pipe } from "@effect/data/Function"
+import { dual, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
@@ -663,13 +663,14 @@ export const transformEither = <A, B>(
   @category combinators
   @since 1.0.0
 */
-export const transform = <A, B>(
-  to: Schema<B>,
-  ab: (a: A) => B,
-  ba: (b: B) => A
-) =>
-  (self: Schema<A>): Schema<B> =>
+export const transform: {
+  <B, A>(to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): (self: Schema<A>) => Schema<B>
+  <A, B>(self: Schema<A>, to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): Schema<B>
+} = dual(
+  4,
+  <A, B>(self: Schema<A>, to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): Schema<B> =>
     pipe(self, transformEither(to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b))))
+)
 
 /**
  * Attaches a property signature with the specified key and value to the schema.
@@ -704,13 +705,11 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   value: V
 ) =>
   <A extends object>(schema: Schema<A>): Schema<Spread<A & { readonly [k in K]: V }>> =>
-    pipe(
+    transform<A, any>(
       schema,
-      transform<A, any>(
-        pipe(schema, extend(struct({ [key]: literal(value) }))),
-        (a) => ({ ...a, [key]: value }),
-        ({ [key]: _key, ...rest }) => rest
-      )
+      pipe(schema, extend(struct({ [key]: literal(value) }))),
+      (a) => ({ ...a, [key]: value }),
+      ({ [key]: _key, ...rest }) => rest
     )
 
 // ---------------------------------------------
@@ -1058,13 +1057,11 @@ export const nonPositiveBigint = <A extends bigint>(
  */
 export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
   (self: Schema<A>): Schema<A> =>
-    pipe(
+    transform(
       self,
-      transform(
-        pipe(self, betweenBigint(min, max)),
-        (self) => B.clamp(self, min, max) as A,
-        (self) => B.clamp(self, min, max) as A
-      )
+      pipe(self, betweenBigint(min, max)),
+      (self) => B.clamp(self, min, max) as A,
+      (self) => B.clamp(self, min, max) as A
     )
 
 // ---------------------------------------------
@@ -1144,7 +1141,7 @@ export const chunkFromSelf = <A>(item: Schema<A>): Schema<Chunk<A>> => {
  * @since 1.0.0
  */
 export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
-  pipe(array(item), transform(chunkFromSelf(item), C.fromIterable, C.toReadonlyArray))
+  transform(array(item), chunkFromSelf(item), C.fromIterable, C.toReadonlyArray)
 
 // ---------------------------------------------
 // data/Data
@@ -1201,11 +1198,11 @@ export const dataFromSelf = <A extends Readonly<Record<string, any>> | ReadonlyA
 export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
 ): Schema<D.Data<A>> =>
-  pipe(
+  transform<A, D.Data<A>>(
     item,
-    transform(dataFromSelf(item), toData, (a) =>
-      // @ts-expect-error
-      Array.isArray(a) ? Array.from(a) : Object.assign({}, a))
+    dataFromSelf(item),
+    toData,
+    (a) => Array.isArray(a) ? Array.from(a) : Object.assign({}, a) as any
   )
 
 // ---------------------------------------------
@@ -1333,15 +1330,13 @@ export const either = <E, A>(
   left: Schema<E>,
   right: Schema<A>
 ): Schema<Either<E, A>> =>
-  pipe(
+  transform(
     eitherInline(left, right),
-    transform(
-      eitherFromSelf(left, right),
-      (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
-      E.match(
-        (left) => ({ _tag: "Left" as const, left }),
-        (right) => ({ _tag: "Right" as const, right })
-      )
+    eitherFromSelf(left, right),
+    (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
+    E.match(
+      (left) => ({ _tag: "Left" as const, left }),
+      (right) => ({ _tag: "Right" as const, right })
     )
   )
 
@@ -1675,13 +1670,11 @@ export const nonPositive = <A extends number>(
  */
 export const clamp = <A extends number>(min: number, max: number) =>
   (self: Schema<A>): Schema<A> =>
-    pipe(
+    transform(
       self,
-      transform(
-        pipe(self, between<A>(min, max)),
-        (self) => N.clamp(self, min, max) as A,
-        (self) => N.clamp(self, min, max) as A
-      )
+      pipe(self, between<A>(min, max)),
+      (self) => N.clamp(self, min, max) as A,
+      (self) => N.clamp(self, min, max) as A
     )
 
 /**
@@ -1808,13 +1801,11 @@ export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
  * @since 1.0.0
  */
 export const option = <A>(value: Schema<A>): Schema<Option<A>> =>
-  pipe(
+  transform(
     optionInline(value),
-    transform(
-      optionFromSelf(value),
-      (a) => a._tag === "None" ? O.none() : O.some(a.value),
-      O.match(() => ({ _tag: "None" as const }), (value) => ({ _tag: "Some" as const, value }))
-    )
+    optionFromSelf(value),
+    (a) => a._tag === "None" ? O.none() : O.some(a.value),
+    O.match(() => ({ _tag: "None" as const }), (value) => ({ _tag: "Some" as const, value }))
   )
 
 /**
@@ -1822,10 +1813,7 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> =>
  * @since 1.0.0
  */
 export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
-  pipe(
-    union(_undefined, nullable(value)),
-    transform(optionFromSelf(value), O.fromNullable, O.getOrNull)
-  )
+  transform(union(_undefined, _null, value), optionFromSelf(value), O.fromNullable, O.getOrNull)
 
 /**
  * @category parsers
@@ -2033,13 +2021,11 @@ export const readonlyMap = <K, V>(
   key: Schema<K>,
   value: Schema<V>
 ): Schema<ReadonlyMap<K, V>> =>
-  pipe(
+  transform(
     array(tuple(key, value)),
-    transform(
-      readonlyMapFromSelf(key, value),
-      (as) => new Map(as),
-      (map) => Array.from(map.entries())
-    )
+    readonlyMapFromSelf(key, value),
+    (as) => new Map(as),
+    (map) => Array.from(map.entries())
   )
 
 // ---------------------------------------------
@@ -2091,9 +2077,11 @@ export const readonlySetFromSelf = <A>(item: Schema<A>): Schema<ReadonlySet<A>> 
  * @since 1.0.0
  */
 export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
-  pipe(
+  transform(
     array(item),
-    transform(readonlySetFromSelf(item), (as) => new Set(as), (set) => Array.from(set))
+    readonlySetFromSelf(item),
+    (as) => new Set(as),
+    (set) => Array.from(set)
   )
 
 // ---------------------------------------------
@@ -2294,13 +2282,11 @@ export const includes = <A extends string>(
  * @since 1.0.0
  */
 export const trim = (self: Schema<string>): Schema<string> =>
-  pipe(
+  transform(
     self,
-    transform(
-      pipe(self, trimmed()),
-      (s) => s.trim(),
-      (s) => s.trim()
-    )
+    pipe(self, trimmed()),
+    (s) => s.trim(),
+    (s) => s.trim()
   )
 
 /**
