@@ -557,11 +557,10 @@ using the provided mapping functions.
 **Signature**
 
 ```ts
-export declare const transform: <A, B>(
-  to: Schema<B>,
-  ab: (a: A) => B,
-  ba: (b: B) => A
-) => (self: Schema<A>) => Schema<B>
+export declare const transform: {
+  <B, A>(to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): (self: Schema<A>) => Schema<B>
+  <A, B>(self: Schema<A>, to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): Schema<B>
+}
 ```
 
 Added in v1.0.0
@@ -574,17 +573,31 @@ using the provided decoding functions.
 **Signature**
 
 ```ts
-export declare const transformEither: <A, B>(
-  to: Schema<B>,
-  decode: (
-    input: A,
-    options?: AST.ParseOptions | undefined
-  ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
-  encode: (
-    input: B,
-    options?: AST.ParseOptions | undefined
-  ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-) => (self: Schema<A>) => Schema<B>
+export declare const transformEither: {
+  <B, A>(
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+  ): (self: Schema<A>) => Schema<B>
+  <A, B>(
+    self: Schema<A>,
+    to: Schema<B>,
+    decode: (
+      input: A,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
+    encode: (
+      input: B,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+  ): Schema<B>
+}
 ```
 
 Added in v1.0.0

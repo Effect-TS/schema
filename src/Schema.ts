@@ -650,11 +650,24 @@ export function filter<A>(
   @category combinators
   @since 1.0.0
  */
-export const transformEither = <A, B>(
+export const transformEither: {
+  <B, A>(
+    to: Schema<B>,
+    decode: (input: A, options?: ParseOptions) => ParseResult<B>,
+    encode: (input: B, options?: ParseOptions) => ParseResult<A>
+  ): (self: Schema<A>) => Schema<B>
+  <A, B>(
+    self: Schema<A>,
+    to: Schema<B>,
+    decode: (input: A, options?: ParseOptions) => ParseResult<B>,
+    encode: (input: B, options?: ParseOptions) => ParseResult<A>
+  ): Schema<B>
+} = dual(4, <A, B>(
+  self: Schema<A>,
   to: Schema<B>,
   decode: (input: A, options?: ParseOptions) => ParseResult<B>,
   encode: (input: B, options?: ParseOptions) => ParseResult<A>
-) => (self: Schema<A>): Schema<B> => make(AST.createTransform(self.ast, to.ast, decode, encode))
+): Schema<B> => make(AST.createTransform(self.ast, to.ast, decode, encode)))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -669,7 +682,7 @@ export const transform: {
 } = dual(
   4,
   <A, B>(self: Schema<A>, to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): Schema<B> =>
-    pipe(self, transformEither(to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b))))
+    transformEither(self, to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b)))
 )
 
 /**
@@ -1236,18 +1249,16 @@ export const date: Schema<Date> = declare(
   @since 1.0.0
 */
 export const dateFromString = (self: Schema<string>): Schema<Date> => {
-  const schema: Schema<Date> = pipe(
+  const schema: Schema<Date> = transformEither(
     self,
-    transformEither(
-      date,
-      (s) => {
-        const n = Date.parse(s)
-        return isNaN(n)
-          ? PR.failure(PR.type(schema.ast, s))
-          : PR.success(new Date(n))
-      },
-      (n) => PR.success(n.toISOString())
-    )
+    date,
+    (s) => {
+      const n = Date.parse(s)
+      return isNaN(n)
+        ? PR.failure(PR.type(schema.ast, s))
+        : PR.success(new Date(n))
+    },
+    (n) => PR.success(n.toISOString())
   )
   return schema
 }
@@ -1686,25 +1697,23 @@ export const clamp = <A extends number>(min: number, max: number) =>
   @since 1.0.0
 */
 export const numberFromString = (self: Schema<string>): Schema<number> => {
-  const schema: Schema<number> = pipe(
+  const schema: Schema<number> = transformEither(
     self,
-    transformEither(
-      number,
-      (s) => {
-        if (s === "NaN") {
-          return PR.success(NaN)
-        }
-        if (s === "Infinity") {
-          return PR.success(Infinity)
-        }
-        if (s === "-Infinity") {
-          return PR.success(-Infinity)
-        }
-        const n = parseFloat(s)
-        return isNaN(n) ? PR.failure(PR.type(schema.ast, s)) : PR.success(n)
-      },
-      (n) => PR.success(String(n))
-    )
+    number,
+    (s) => {
+      if (s === "NaN") {
+        return PR.success(NaN)
+      }
+      if (s === "Infinity") {
+        return PR.success(Infinity)
+      }
+      if (s === "-Infinity") {
+        return PR.success(-Infinity)
+      }
+      const n = parseFloat(s)
+      return isNaN(n) ? PR.failure(PR.type(schema.ast, s)) : PR.success(n)
+    },
+    (n) => PR.success(String(n))
   )
   return schema
 }
