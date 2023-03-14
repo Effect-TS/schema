@@ -24,7 +24,7 @@ const make = <A>(value: A, forest: Forest<A> = []): Tree<A> => ({
  * @since 1.0.0
  */
 export const formatErrors = (errors: NonEmptyReadonlyArray<PR.ParseError>): string =>
-  drawTree(make(`${errors.length} error(s) found`, errors.map(go)))
+  drawTree(make(`error(s) found`, errors.map(go)))
 
 const drawTree = (tree: Tree<string>): string => tree.value + draw("\n", tree.forest)
 

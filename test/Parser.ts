@@ -12,7 +12,7 @@ describe.concurrent("Parser", () => {
     expect(P.validate(schema)(1)).toEqual(1)
     expect(P.validate(schema)(10)).toEqual(10)
     expect(() => P.validate(schema)("a")).toThrowError(
-      new Error(`1 error(s) found
+      new Error(`error(s) found
 └─ Expected number, actual "a"`)
     )
   })

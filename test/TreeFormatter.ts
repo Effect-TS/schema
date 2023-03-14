@@ -8,7 +8,7 @@ describe.concurrent("TreeFormatter", () => {
     Util.expectDecodingFailureTree(
       schema,
       { a: "a", b: 1 },
-      `1 error(s) found
+      `error(s) found
 └─ key "b"
    └─ is unexpected`
     )

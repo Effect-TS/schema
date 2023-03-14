@@ -74,7 +74,7 @@ describe.concurrent("Option", () => {
       Util.expectDecodingFailureTree(
         schema,
         {},
-        `3 error(s) found
+        `error(s) found
 ├─ union member
 │  └─ Expected undefined, actual {}
 ├─ union member
@@ -105,7 +105,7 @@ describe.concurrent("Option", () => {
     Util.expectDecodingFailureTree(
       schema,
       { a: "a", b: "b" },
-      `1 error(s) found
+      `error(s) found
 └─ key "b"
    ├─ union member
    │  └─ Expected undefined, actual "b"

@@ -9,7 +9,7 @@ describe.concurrent("Decoder", () => {
     const schema = S.string
     expect(P.asserts(schema)("a")).toEqual(undefined)
     expect(() => P.asserts(schema)(1)).toThrowError(
-      new Error(`1 error(s) found
+      new Error(`error(s) found
 └─ Expected string, actual 1`)
     )
   })
@@ -24,7 +24,7 @@ describe.concurrent("Decoder", () => {
       age: 30
     })
     expect(() => P.decode(schema)({})).toThrowError(
-      new Error(`1 error(s) found
+      new Error(`error(s) found
 └─ key "name"
    └─ is missing`)
     )
@@ -190,7 +190,7 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailureTree(
       schema,
       "_id",
-      `4 error(s) found
+      `error(s) found
 ├─ union member
 │  └─ Expected "welcome_email_id", actual "_id"
 ├─ union member
@@ -283,7 +283,7 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailureTree(
       schema,
       null,
-      `2 error(s) found
+      `error(s) found
 ├─ union member
 │  └─ Expected 1, actual null
 └─ union member
@@ -941,7 +941,7 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailureTree(
       schema,
       ["a"],
-      `1 error(s) found
+      `error(s) found
 └─ index 0
    ├─ union member
    │  └─ Expected number, actual "a"
@@ -960,7 +960,7 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailureTree(
       schema,
       ["a"],
-      `2 error(s) found
+      `error(s) found
 ├─ union member
 │  └─ index 0
 │     ├─ union member

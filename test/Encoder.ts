@@ -16,7 +16,7 @@ describe.concurrent("Encoder", () => {
     const schema = NumberFromString
     expect(P.encode(schema)(1)).toEqual("1")
     expect(() => P.encode(schema)(10)).toThrowError(
-      new Error(`1 error(s) found
+      new Error(`error(s) found
 └─ Expected a string at most 1 character(s) long, actual "10"`)
     )
   })

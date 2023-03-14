@@ -67,7 +67,7 @@ describe.concurrent("Schema", () => {
     const Int = pipe(S.number, S.int(), S.brand("Int"))
     expect(Int(1)).toEqual(1)
     expect(() => Int(1.2)).toThrowError(
-      new Error(`1 error(s) found
+      new Error(`error(s) found
 └─ Expected integer, actual 1.2`)
     )
   })
@@ -83,7 +83,7 @@ describe.concurrent("Schema", () => {
     expect(Int.either(1)).toEqual(E.right(1))
     expect(Int.either(1.2)).toEqual(E.left([{
       meta: 1.2,
-      message: `1 error(s) found
+      message: `error(s) found
 └─ Expected integer, actual 1.2`
     }]))
   })
