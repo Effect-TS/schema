@@ -136,7 +136,7 @@ interface Parser {
   (input: unknown, options?: ParseOptions): ParseResult<any>
 }
 
-const go = (ast: AST.AST): Parser => {
+const go = I.memoize((ast: AST.AST): Parser => {
   switch (ast._tag) {
     case "Declaration":
       return ast.decode(...ast.typeParameters)
@@ -408,6 +408,10 @@ const go = (ast: AST.AST): Parser => {
       const ownKeys = Reflect.ownKeys(searchTree.keys)
       const len = ownKeys.length
       const otherwise = searchTree.otherwise
+      const map = new Map()
+      for (let i = 0; i < ast.types.length; i++) {
+        map.set(ast.types[i], go(ast.types[i]))
+      }
       return (input, options) => {
         const es: Array<PR.ParseError> = []
 
@@ -425,7 +429,7 @@ const go = (ast: AST.AST): Parser => {
                   // retrive the minimal set of candidates for decoding
                   const bucket = buckets[literal]
                   for (let i = 0; i < bucket.length; i++) {
-                    const t = go(bucket[i])(input, options) // TODO
+                    const t = map.get(bucket[i])(input, options)
                     if (PR.isSuccess(t)) {
                       return t
                     } else {
@@ -453,7 +457,7 @@ const go = (ast: AST.AST): Parser => {
         // if none of the schemas with at least one property with a literal value succeeded,
         // proceed with those that have no literal at all
         for (let i = 0; i < otherwise.length; i++) {
-          const t = go(otherwise[i])(input, options) // TODO
+          const t = map.get(otherwise[i])(input, options)
           if (PR.isSuccess(t)) {
             return t
           } else {
@@ -487,7 +491,7 @@ const go = (ast: AST.AST): Parser => {
         (u, options) => pipe(from(u, options), E.flatMap((a) => ast.decode(a, options)))
     }
   }
-}
+})
 
 const fromRefinement = <A>(ast: AST.AST, refinement: (u: unknown) => u is A): Parser =>
   (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(ast, u))
