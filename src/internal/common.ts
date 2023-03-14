@@ -45,7 +45,7 @@ export const PrettyHookId = "@effect/schema/PrettyHookId"
 // ---------------------------------------------
 
 /** @internal */
-export const makeSchema = <A>(ast: AST.AST): S.Schema<A> => ({ ast }) as any
+export const makeSchema = <I, A>(ast: AST.AST): S.Schema<I, A> => ({ ast }) as any
 
 /** @internal */
 export const lazy = <A>(

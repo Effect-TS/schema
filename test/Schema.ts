@@ -95,9 +95,9 @@ describe.concurrent("Schema", () => {
   })
 
   it("brand/ composition", () => {
-    const int = <A extends number>(self: S.Schema<A>) => pipe(self, S.int(), S.brand("Int"))
+    const int = <I, A extends number>(self: S.Schema<I, A>) => pipe(self, S.int(), S.brand("Int"))
 
-    const positive = <A extends number>(self: S.Schema<A>) =>
+    const positive = <I, A extends number>(self: S.Schema<I, A>) =>
       pipe(self, S.positive(), S.brand("Positive"))
 
     const PositiveInt = pipe(S.number, int, positive)

@@ -113,7 +113,7 @@ export type {
  * @category constructors
  * @since 1.0.0
  */
-export const make: <A>(ast: AST.AST) => Schema<A> = I.makeSchema
+export const make: <I, A>(ast: AST.AST) => Schema<I, A> = I.makeSchema
 
 const makeLiteral = <Literal extends AST.LiteralValue>(value: Literal): Schema<Literal> =>
   make(AST.createLiteral(value))
@@ -248,19 +248,21 @@ export const declare = (
  */
 export const union = <Members extends ReadonlyArray<Schema<any>>>(
   ...members: Members
-): Schema<To<Members[number]>> => make(AST.createUnion(members.map((m) => m.ast)))
+): Schema<From<Members[number]>, To<Members[number]>> =>
+  make(AST.createUnion(members.map((m) => m.ast)))
 
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const nullable = <A>(self: Schema<A>): Schema<A | null> => union(_null, self)
+export const nullable = <From, To>(self: Schema<From, To>): Schema<From | null, To | null> =>
+  union(_null, self)
 
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const keyof = <A>(schema: Schema<A>): Schema<keyof A> => make(AST.keyof(schema.ast))
+export const keyof = <I, A>(schema: Schema<I, A>): Schema<keyof A> => make(AST.keyof(schema.ast))
 
 /**
  * @category combinators
@@ -268,7 +270,10 @@ export const keyof = <A>(schema: Schema<A>): Schema<keyof A> => make(AST.keyof(s
  */
 export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
   ...elements: Elements
-): Schema<{ readonly [K in keyof Elements]: To<Elements[K]> }> =>
+): Schema<
+  { readonly [K in keyof Elements]: From<Elements[K]> },
+  { readonly [K in keyof Elements]: To<Elements[K]> }
+> =>
   make(
     AST.createTuple(elements.map((schema) => AST.createElement(schema.ast, false)), O.none(), true)
   )
@@ -277,8 +282,10 @@ export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
  * @category combinators
  * @since 1.0.0
  */
-export const rest = <R>(rest: Schema<R>) =>
-  <A extends ReadonlyArray<any>>(self: Schema<A>): Schema<readonly [...A, ...Array<R>]> => {
+export const rest = <IR, R>(rest: Schema<IR, R>) =>
+  <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
+    self: Schema<I, A>
+  ): Schema<readonly [...I, ...Array<IR>], readonly [...A, ...Array<R>]> => {
     if (AST.isTuple(self.ast)) {
       return make(AST.appendRestElement(self.ast, rest.ast))
     }
@@ -289,8 +296,10 @@ export const rest = <R>(rest: Schema<R>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const element = <E>(element: Schema<E>) =>
-  <A extends ReadonlyArray<any>>(self: Schema<A>): Schema<readonly [...A, E]> => {
+export const element = <IE, E>(element: Schema<IE, E>) =>
+  <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
+    self: Schema<I, A>
+  ): Schema<readonly [...I, IE], readonly [...A, E]> => {
     if (AST.isTuple(self.ast)) {
       return make(AST.appendElement(self.ast, AST.createElement(element.ast, false)))
     }
@@ -301,8 +310,10 @@ export const element = <E>(element: Schema<E>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const optionalElement = <E>(element: Schema<E>) =>
-  <A extends ReadonlyArray<any>>(self: Schema<A>): Schema<readonly [...A, E?]> => {
+export const optionalElement = <IE, E>(element: Schema<IE, E>) =>
+  <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
+    self: Schema<I, A>
+  ): Schema<readonly [...I, IE?], readonly [...A, E?]> => {
     if (AST.isTuple(self.ast)) {
       return make(AST.appendElement(self.ast, AST.createElement(element.ast, true)))
     }
@@ -313,16 +324,16 @@ export const optionalElement = <E>(element: Schema<E>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const array = <A>(item: Schema<A>): Schema<ReadonlyArray<A>> =>
+export const array = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, ReadonlyArray<A>> =>
   make(AST.createTuple([], O.some([item.ast]), true))
 
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const nonEmptyArray = <A>(
-  item: Schema<A>
-): Schema<readonly [A, ...Array<A>]> => pipe(tuple(item), rest(item))
+export const nonEmptyArray = <I, A>(
+  item: Schema<I, A>
+): Schema<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => pipe(tuple(item), rest(item))
 
 /**
  * @since 1.0.0
@@ -344,18 +355,19 @@ export type OptionalSchemaId = typeof OptionalSchemaId
 /**
  * @since 1.0.0
  */
-export interface OptionalSchema<To> {
+export interface OptionalSchema<From, To = From> {
+  readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly _id: OptionalSchemaId
 }
 
-const isOptionalSchema = <A>(schema: object): schema is OptionalSchema<A> =>
+const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> =>
   "_id" in schema && schema["_id"] === OptionalSchemaId
 
 /**
  * @since 1.0.0
  */
-export const optional = <A>(schema: Schema<A>): OptionalSchema<A> => {
+export const optional = <I, A>(schema: Schema<I, A>): OptionalSchema<I, A> => {
   const out: any = make(schema.ast)
   out["_id"] = OptionalSchemaId
   return out
@@ -375,6 +387,10 @@ export type OptionalKeys<T> = {
 export const struct = <Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any>>>(
   fields: Fields
 ): Schema<
+  Spread<
+    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> }
+    & { readonly [K in OptionalKeys<Fields>]?: From<Fields[K]> }
+  >,
   Spread<
     & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> }
@@ -399,7 +415,9 @@ export const struct = <Fields extends Record<PropertyKey, Schema<any> | Optional
  * @since 1.0.0
  */
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (self: Schema<A>): Schema<{ readonly [P in Keys[number]]: A[P] }> =>
+  <I extends Record<keyof A, any>>(
+    self: Schema<I, A>
+  ): Schema<{ readonly [P in Keys[number]]: I[P] }, { readonly [P in Keys[number]]: A[P] }> =>
     make(AST.pick(self.ast, keys))
 
 /**
@@ -407,8 +425,12 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  * @since 1.0.0
  */
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (self: Schema<A>): Schema<{ readonly [P in Exclude<keyof A, Keys[number]>]: A[P] }> =>
-    make(AST.omit(self.ast, keys))
+  <I extends Record<keyof A, any>>(
+    self: Schema<I, A>
+  ): Schema<
+    { readonly [P in Exclude<keyof A, Keys[number]>]: I[P] },
+    { readonly [P in Exclude<keyof A, Keys[number]>]: A[P] }
+  > => make(AST.omit(self.ast, keys))
 
 /**
  * Returns an object containing all property signatures of a given schema.
@@ -434,7 +456,9 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  *
  * @since 1.0.0
  */
-export const getPropertySignatures = <A>(schema: Schema<A>): { [K in keyof A]: Schema<A[K]> } => {
+export const getPropertySignatures = <I extends Record<keyof A, any>, A>(
+  schema: Schema<I, A>
+): { [K in keyof A]: Schema<I[K], A[K]> } => {
   const out: Record<PropertyKey, Schema<any>> = {}
   const propertySignatures = AST._getPropertySignatures(schema.ast)
   for (const propertySignature of propertySignatures) {
@@ -447,7 +471,9 @@ export const getPropertySignatures = <A>(schema: Schema<A>): { [K in keyof A]: S
  * @category model
  * @since 1.0.0
  */
-export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Constructor<To> {}
+export interface BrandSchema<From, To extends Brand<any>>
+  extends Schema<From, To>, Brand.Constructor<To>
+{}
 
 /**
  * Returns a nominal branded schema by applying a brand to a given schema.
@@ -473,7 +499,7 @@ export const brand = <B extends string, A>(
   brand: B,
   options?: AnnotationOptions<A>
 ) =>
-  (self: Schema<A>): BrandSchema<A & Brand<B>> => {
+  <I>(self: Schema<I, A>): BrandSchema<I, A & Brand<B>> => {
     const annotations = toAnnotations(options)
     annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
@@ -503,16 +529,18 @@ const getBrands = (ast: AST.AST): Array<string> =>
  * @category combinators
  * @since 1.0.0
  */
-export const partial = <A>(self: Schema<A>): Schema<Partial<A>> => make(AST.partial(self.ast))
+export const partial = <I, A>(self: Schema<I, A>): Schema<Partial<I>, Partial<A>> =>
+  make(AST.partial(self.ast))
 
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const record = <K extends string | symbol, V>(
+export const record = <K extends string | symbol, I, A>(
   key: Schema<K>,
-  value: Schema<V>
-): Schema<{ readonly [k in K]: V }> => make(AST.createRecord(key.ast, value.ast, true))
+  value: Schema<I, A>
+): Schema<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
+  make(AST.createRecord(key.ast, value.ast, true))
 
 const isOverlappingPropertySignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral): boolean =>
   x.propertySignatures.some((px) => y.propertySignatures.some((py) => px.name === py.name))
@@ -554,8 +582,8 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
  * @category combinators
  * @since 1.0.0
  */
-export const extend = <B>(that: Schema<B>) =>
-  <A>(self: Schema<A>): Schema<Spread<A & B>> =>
+export const extend = <IB, B>(that: Schema<IB, B>) =>
+  <I, A>(self: Schema<I, A>): Schema<Spread<I & IB>, Spread<A & B>> =>
     make(
       intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -630,15 +658,15 @@ const toAnnotations = <A>(
 export function filter<A, B extends A>(
   refinement: Refinement<A, B>,
   options?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<B>
+): <I>(self: Schema<I, A>) => Schema<I, B>
 export function filter<A>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A>
+): <I>(self: Schema<I, A>) => Schema<I, A>
 export function filter<A>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> {
+): <I>(self: Schema<I, A>) => Schema<I, A> {
   return (from) => {
     const ast = AST.createRefinement(
       from.ast,
@@ -1100,7 +1128,7 @@ export const fromBrand = <C extends Brand<string>>(
   constructor: Brand.Constructor<C>,
   options?: AnnotationOptions<Brand.Unbranded<C>>
 ) =>
-  <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> =>
+  <I, A extends Brand.Unbranded<C>>(self: Schema<I, A>): Schema<I, A & C> =>
     pipe(
       self,
       filter<A, A & C>(
@@ -1437,7 +1465,7 @@ export const greaterThan = <A extends number>(
   min: number,
   options?: AnnotationOptions<A>
 ) =>
-  (self: Schema<A>): Schema<A> =>
+  <I>(self: Schema<I, A>): Schema<I, A> =>
     pipe(
       self,
       filter((a): a is A => a > min, {
@@ -1506,7 +1534,7 @@ export const IntTypeId = "@effect/schema/IntTypeId"
  * @since 1.0.0
  */
 export const int = <A extends number>(options?: AnnotationOptions<A>) =>
-  (self: Schema<A>): Schema<A> =>
+  <I>(self: Schema<I, A>): Schema<I, A> =>
     pipe(
       self,
       filter((a): a is A => Number.isInteger(a), {
@@ -1618,7 +1646,7 @@ export const PositiveTypeId = "@effect/schema/PositiveTypeId"
  */
 export const positive = <A extends number>(
   options?: AnnotationOptions<A>
-): (self: Schema<A>) => Schema<A> =>
+): <I>(self: Schema<I, A>) => Schema<I, A> =>
   greaterThan(0, {
     typeId: PositiveTypeId,
     description: "a positive number",
@@ -1740,7 +1768,7 @@ export const InstanceOfTypeId = "@effect/schema/InstanceOfTypeId"
 export const instanceOf = <A extends abstract new(...args: any) => any>(
   constructor: A,
   options?: AnnotationOptions<object>
-): Schema<InstanceType<A>> =>
+): Schema<object, InstanceType<A>> =>
   pipe(
     object,
     filter(

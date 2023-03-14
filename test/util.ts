@@ -12,7 +12,7 @@ import type { Schema } from "@effect/schema/Schema"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
 import * as fc from "fast-check"
 
-export const property = <A>(schema: Schema<A>) => {
+export const property = <I, A>(schema: Schema<I, A>) => {
   const arbitrary = A.arbitrary(schema)
   const is = P.is(schema)
   fc.assert(fc.property(arbitrary(fc), (a) => {
@@ -27,8 +27,8 @@ export const property = <A>(schema: Schema<A>) => {
   }))
 }
 
-export const expectDecodingSuccess = <A>(
-  schema: Schema<A>,
+export const expectDecodingSuccess = <I, A>(
+  schema: Schema<I, A>,
   u: unknown,
   a: A = u as any,
   options?: ParseOptions
@@ -37,8 +37,8 @@ export const expectDecodingSuccess = <A>(
   expect(t).toStrictEqual(E.right(a))
 }
 
-export const expectDecodingFailure = <A>(
-  schema: Schema<A>,
+export const expectDecodingFailure = <I, A>(
+  schema: Schema<I, A>,
   u: unknown,
   message: string,
   options?: ParseOptions

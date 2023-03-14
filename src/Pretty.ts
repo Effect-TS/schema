@@ -184,7 +184,8 @@ const compile = AST.getCompiler(match)
  * @category prettify
  * @since 1.0.0
  */
-export const pretty = <A>(schema: Schema<A>) => (a: A): string => compile(schema.ast).pretty(a)
+export const pretty = <I, A>(schema: Schema<I, A>) =>
+  (a: A): string => compile(schema.ast).pretty(a)
 
 const getPrettyPropertyKey = (name: PropertyKey): string =>
   typeof name === "string" ? JSON.stringify(name) : String(name)

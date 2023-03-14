@@ -36,7 +36,7 @@ export const ArbitraryHookId = I.ArbitraryHookId
  * @category arbitrary
  * @since 1.0.0
  */
-export const arbitrary = <A>(schema: Schema<A>) =>
+export const arbitrary = <I, A>(schema: Schema<I, A>) =>
   (fc: typeof FastCheck): FastCheck.Arbitrary<A> => arbitraryFor(schema).arbitrary(fc)
 
 const record = <K extends PropertyKey, V>(
@@ -56,7 +56,7 @@ const getHook = AST.getAnnotation<
   (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
 >(ArbitraryHookId)
 
-const arbitraryFor = <A>(schema: Schema<A>): Arbitrary<A> => {
+const arbitraryFor = <I, A>(schema: Schema<I, A>): Arbitrary<A> => {
   const go = (ast: AST.AST): Arbitrary<any> => {
     switch (ast._tag) {
       case "Declaration":

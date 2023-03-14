@@ -57,8 +57,8 @@ const parseEither = (
  * @category decoding
  * @since 1.0.0
  */
-export const decodeEither = <A>(
-  schema: Schema<A>
+export const decodeEither = <I, A>(
+  schema: Schema<I, A>
 ): (input: unknown, options?: ParseOptions) => ParseResult<A> => parseEither(schema, "decoding")
 
 /**
@@ -80,7 +80,7 @@ export const decode = <A>(schema: Schema<A>): (input: unknown, options?: ParseOp
  * @category validation
  * @since 1.0.0
  */
-export const is = <A>(schema: Schema<A>) =>
+export const is = <I, A>(schema: Schema<I, A>) =>
   (input: unknown, options?: ParseOptions): input is A =>
     E.isRight(parseEither(schema, "validation")(input, options))
 
@@ -128,23 +128,23 @@ export const validate = <A>(schema: Schema<A>): (input: unknown, options?: Parse
  * @category encoding
  * @since 1.0.0
  */
-export const encodeEither = <A>(
-  schema: Schema<A>
-): (a: A, options?: ParseOptions) => ParseResult<unknown> => parseEither(schema, "encoding")
+export const encodeEither = <I, A>(
+  schema: Schema<I, A>
+): (a: A, options?: ParseOptions) => ParseResult<I> => parseEither(schema, "encoding")
 
 /**
  * @category encoding
  * @since 1.0.0
  */
-export const encodeOption = <A>(
-  schema: Schema<A>
-): (input: unknown, options?: ParseOptions) => Option<unknown> => parseOption(schema, "encoding")
+export const encodeOption = <I, A>(
+  schema: Schema<I, A>
+): (input: A, options?: ParseOptions) => Option<I> => parseOption(schema, "encoding")
 
 /**
  * @category encoding
  * @since 1.0.0
  */
-export const encode = <A>(schema: Schema<A>): (a: A, options?: ParseOptions) => unknown =>
+export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOptions) => I =>
   parse(schema, "encoding")
 
 type ParserKind = "decoding" | "validation" | "encoding"
