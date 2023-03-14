@@ -147,7 +147,7 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
   const go = (ast: AST.AST): Parser<any> => {
     switch (ast._tag) {
       case "Declaration":
-        return make(I.makeSchema(ast), ast.decode(...ast.typeParameters.map((p) => go(p).ast)))
+        return make(I.makeSchema(ast), ast.decode(...ast.typeParameters))
       case "Literal":
         return fromRefinement(
           I.makeSchema(ast),
@@ -501,44 +501,37 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
       }
       case "Refinement": {
         const type = go(ast.from)
-        switch (as) {
-          case "validation":
-          case "decoding":
-            return make(
-              I.makeSchema(ast),
-              (u, options) => pipe(type.parse(u, options), E.flatMap((a) => ast.decode(a, options)))
-            )
-          case "encoding":
-            return make(
-              I.makeSchema(ast),
-              (u, options) => pipe(ast.decode(u, options), E.flatMap((a) => type.parse(a, options)))
-            )
-        }
+        return ast.isReversed ?
+          make(
+            I.makeSchema(ast),
+            (u, options) => pipe(ast.decode(u, options), E.flatMap((a) => type.parse(a, options)))
+          ) :
+          make(
+            I.makeSchema(ast),
+            (u, options) => pipe(type.parse(u, options), E.flatMap((a) => ast.decode(a, options)))
+          )
       }
       case "Transform": {
-        switch (as) {
-          case "decoding": {
-            const from = go(ast.from)
-            return make(
-              I.makeSchema(ast),
-              (u, options) => pipe(from.parse(u, options), E.flatMap((a) => ast.decode(a, options)))
-            )
-          }
-          case "validation":
-            return go(ast.to)
-          case "encoding": {
-            const from = go(ast.from)
-            return make(
-              I.makeSchema(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode)),
-              (a, options) => pipe(ast.encode(a, options), E.flatMap((a) => from.parse(a, options)))
-            )
-          }
-        }
+        const from = go(ast.from)
+        return ast.isReversed ?
+          make(
+            I.makeSchema(ast),
+            (a, options) => pipe(ast.encode(a, options), E.flatMap((a) => from.parse(a, options)))
+          ) :
+          make(
+            I.makeSchema(ast),
+            (u, options) => pipe(from.parse(u, options), E.flatMap((a) => ast.decode(a, options)))
+          )
       }
     }
   }
 
-  return go(schema.ast)
+  const ast = as === "decoding" ?
+    schema.ast :
+    as === "validation" ?
+    AST.to(schema.ast) :
+    AST.reverse(schema.ast)
+  return go(ast)
 }
 
 const fromRefinement = <A>(
@@ -565,8 +558,9 @@ export const _getLiterals = (
       return out
     }
     case "Refinement":
-    case "Transform":
       return _getLiterals(ast.from)
+    case "Transform":
+      return ast.isReversed ? _getLiterals(ast.to) : _getLiterals(ast.from)
   }
   return []
 }

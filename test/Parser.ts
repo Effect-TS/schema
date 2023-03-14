@@ -63,13 +63,13 @@ describe.concurrent("Parser", () => {
       )
     ).toEqual([])
     // simulate encoding
-    const ast: AST.Transform = pipe(
-      S.struct({ radius: S.number }),
-      S.attachPropertySignature("kind", "circle")
-    ).ast as any
-    expect(
-      P._getLiterals(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode))
-    ).toEqual([["kind", AST.createLiteral("circle")]])
+    const ast = AST.reverse(
+      pipe(
+        S.struct({ radius: S.number }),
+        S.attachPropertySignature("kind", "circle")
+      ).ast
+    )
+    expect(P._getLiterals(ast)).toEqual([["kind", AST.createLiteral("circle")]])
   })
 
   it("_getSearchTree", () => {

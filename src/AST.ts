@@ -752,6 +752,7 @@ export interface Refinement extends Annotated {
   readonly _tag: "Refinement"
   readonly from: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly isReversed: boolean
 }
 
 /**
@@ -761,8 +762,9 @@ export interface Refinement extends Annotated {
 export const createRefinement = (
   from: AST,
   decode: (input: any, options?: ParseOptions) => ParseResult<any>,
+  isReversed: boolean,
   annotations: Annotated["annotations"] = {}
-): Refinement => ({ _tag: "Refinement", from, decode, annotations })
+): Refinement => ({ _tag: "Refinement", from, decode, isReversed, annotations })
 
 /**
  * @category guards
@@ -789,6 +791,7 @@ export interface Transform extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly isReversed: boolean
 }
 
 /**
@@ -799,8 +802,17 @@ export const createTransform = (
   from: AST,
   to: AST,
   decode: Transform["decode"],
-  encode: Transform["encode"]
-): Transform => ({ _tag: "Transform", from, to, decode, encode, annotations: {} })
+  encode: Transform["encode"],
+  isReversed: boolean
+): Transform => ({
+  _tag: "Transform",
+  from,
+  to,
+  decode,
+  encode,
+  isReversed,
+  annotations: {}
+})
 
 /**
  * @category guards
@@ -1028,7 +1040,7 @@ export const to = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => to(ast.f()), ast.annotations)
     case "Refinement":
-      return createRefinement(to(ast.from), ast.decode, ast.annotations)
+      return createRefinement(to(ast.from), ast.decode, false, ast.annotations)
     case "Transform":
       return to(ast.to)
   }
@@ -1101,9 +1113,9 @@ export const reverse = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => reverse(ast.f()), ast.annotations)
     case "Refinement":
-      return createTransform(to(ast.from), reverse(ast.from), ast.decode, ast.decode)
+      return createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
     case "Transform":
-      return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
+      return createTransform(reverse(ast.from), ast.to, ast.decode, ast.encode, !ast.isReversed)
   }
   return ast
 }

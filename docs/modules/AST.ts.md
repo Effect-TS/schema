@@ -112,6 +112,7 @@ Added in v1.0.0
   - [createIndexSignature](#createindexsignature)
   - [createPropertySignature](#createpropertysignature)
   - [createRecord](#createrecord)
+  - [from](#from)
   - [getAnnotation](#getannotation)
   - [getCompiler](#getcompiler)
   - [keyof](#keyof)
@@ -119,7 +120,9 @@ Added in v1.0.0
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
+  - [reverse](#reverse)
   - [setAnnotation](#setannotation)
+  - [to](#to)
 
 ---
 
@@ -392,6 +395,7 @@ Added in v1.0.0
 export declare const createRefinement: (
   from: AST,
   decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>,
+  isReversed: boolean,
   annotations?: Annotated['annotations']
 ) => Refinement
 ```
@@ -420,7 +424,8 @@ export declare const createTransform: (
   from: AST,
   to: AST,
   decode: Transform['decode'],
-  encode: Transform['encode']
+  encode: Transform['encode'],
+  isReversed: boolean
 ) => Transform
 ```
 
@@ -909,6 +914,7 @@ export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly isReversed: boolean
 }
 ```
 
@@ -963,6 +969,7 @@ export interface Transform extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly isReversed: boolean
 }
 ```
 
@@ -1239,6 +1246,16 @@ export declare const createRecord: (key: AST, value: AST, isReadonly: boolean) =
 
 Added in v1.0.0
 
+## from
+
+**Signature**
+
+```ts
+export declare const from: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
 ## getAnnotation
 
 **Signature**
@@ -1331,6 +1348,7 @@ export declare const mergeAnnotations: (
       _tag: 'Refinement'
       from: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1339,6 +1357,7 @@ export declare const mergeAnnotations: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
     }
 ```
 
@@ -1376,6 +1395,16 @@ Equivalent at runtime to the built-in TypeScript utility type `Pick`.
 
 ```ts
 export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## reverse
+
+**Signature**
+
+```ts
+export declare const reverse: (ast: AST) => AST
 ```
 
 Added in v1.0.0
@@ -1441,6 +1470,7 @@ export declare const setAnnotation: (
       _tag: 'Refinement'
       from: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1449,7 +1479,18 @@ export declare const setAnnotation: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
     }
+```
+
+Added in v1.0.0
+
+## to
+
+**Signature**
+
+```ts
+export declare const to: (ast: AST) => AST
 ```
 
 Added in v1.0.0

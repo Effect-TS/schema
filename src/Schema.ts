@@ -671,6 +671,7 @@ export function filter<A>(
     const ast = AST.createRefinement(
       from.ast,
       (a: A) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
+      false,
       toAnnotations(options)
     )
     return make(ast)
@@ -701,7 +702,7 @@ export const transformEither: {
   to: Schema<any, B>,
   decode: (input: A, options?: ParseOptions) => ParseResult<B>,
   encode: (input: B, options?: ParseOptions) => ParseResult<A>
-): Schema<I, B> => make(AST.createTransform(self.ast, to.ast, decode, encode)))
+): Schema<I, B> => make(AST.createTransform(self.ast, to.ast, decode, encode, false)))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -1932,7 +1933,7 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
           }
         }
         return PR.success(out)
-      })
+      }, false)
       return make(out)
     }
     throw new Error("`parseOptional` can only handle type literals")
