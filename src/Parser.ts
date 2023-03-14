@@ -29,7 +29,8 @@ export interface Parser<To> extends Schema<To> {
  * @category constructors
  * @since 1.0.0
  */
-export const make: <A>(schema: Schema<A>, parse: Parser<A>["parse"]) => Parser<A> = I.makeParser
+export const make = <A>(schema: Schema<A>, parse: Parser<A>["parse"]): Parser<A> =>
+  ({ ast: schema.ast, parse }) as any
 
 const parse = (schema: Schema<any>, kind: ParserKind) => {
   const parse = parserFor(schema, kind).parse
@@ -548,12 +549,11 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
   return go(schema.ast)
 }
 
-/** @internal */
-export const fromRefinement = <A>(
+const fromRefinement = <A>(
   schema: Schema<A>,
   refinement: (u: unknown) => u is A
 ): Parser<A> =>
-  I.makeParser(schema, (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(schema.ast, u)))
+  make(schema, (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(schema.ast, u)))
 
 /** @internal */
 export const _getLiterals = (

@@ -4,7 +4,6 @@
 
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
-import type { Parser } from "@effect/schema/Parser"
 import type { Pretty } from "@effect/schema/Pretty"
 import type * as S from "@effect/schema/Schema"
 
@@ -17,12 +16,6 @@ export const makeArbitrary = <A>(
   schema: S.Schema<A>,
   arbitrary: Arbitrary<A>["arbitrary"]
 ): Arbitrary<A> => ({ ast: schema.ast, arbitrary }) as any
-
-/** @internal */
-export const makeParser = <A>(
-  schema: S.Schema<A>,
-  parse: Parser<A>["parse"]
-): Parser<A> => ({ ast: schema.ast, parse }) as any
 
 /** @internal */
 export const makePretty = <A>(
