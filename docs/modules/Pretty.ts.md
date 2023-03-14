@@ -56,7 +56,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Pretty<To> extends Schema<To> {
+export interface Pretty<To> extends Schema<any, To> {
   readonly pretty: (a: To) => string
 }
 ```
@@ -70,7 +70,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const pretty: <A>(schema: Schema<A, A>) => (a: A) => string
+export declare const pretty: <I, A>(schema: Schema<I, A>) => (a: A) => string
 ```
 
 Added in v1.0.0

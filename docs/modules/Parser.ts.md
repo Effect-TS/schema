@@ -60,7 +60,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <A>(schema: Schema<A, A>) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const decode: <I, A>(
+  schema: Schema<I, A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -70,8 +72,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeEither: <A>(
-  schema: Schema<A, A>
+export declare const decodeEither: <I, A>(
+  schema: Schema<I, A>
 ) => (
   input: unknown,
   options?: AST.ParseOptions | undefined
@@ -85,8 +87,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeOption: <A>(
-  schema: Schema<A, A>
+export declare const decodeOption: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
@@ -99,7 +101,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encode: <A>(schema: Schema<A, A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
+export declare const encode: <I, A>(schema: Schema<I, A>) => (a: A, options?: AST.ParseOptions | undefined) => I
 ```
 
 Added in v1.0.0
@@ -109,9 +111,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encodeEither: <A>(
-  schema: Schema<A, A>
-) => (a: A, options?: AST.ParseOptions | undefined) => ParseResult<unknown>
+export declare const encodeEither: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], I>
 ```
 
 Added in v1.0.0
@@ -121,9 +123,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encodeOption: <A>(
-  schema: Schema<A, A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<unknown>
+export declare const encodeOption: <I, A>(
+  schema: Schema<I, A>
+) => (input: A, options?: AST.ParseOptions | undefined) => O.Option<I>
 ```
 
 Added in v1.0.0
@@ -173,8 +175,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <A>(
-  schema: Schema<A, A>
+export declare const is: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
 ```
 
@@ -185,8 +187,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validate: <A>(
-  schema: Schema<A, A>
+export declare const validate: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
@@ -197,8 +199,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateEither: <A>(
-  schema: Schema<A, A>
+export declare const validateEither: <I, A>(
+  schema: Schema<I, A>
 ) => (
   input: unknown,
   options?: AST.ParseOptions | undefined
@@ -212,8 +214,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateOption: <A>(
-  schema: Schema<A, A>
+export declare const validateOption: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 

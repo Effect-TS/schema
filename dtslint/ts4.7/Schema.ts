@@ -349,11 +349,24 @@ const lazy2: S.Schema<LazyFrom2, LazyTo2> = S.lazy(() =>
 )
 
 // ---------------------------------------------
-// Option
+// optionFromSelf
 // ---------------------------------------------
 
 // $ExpectType Schema<Option<number>, Option<number>>
 S.optionFromSelf(S.number)
+
+// $ExpectType Schema<Option<string>, Option<number>>
+S.optionFromSelf(NumberFromString)
+
+// ---------------------------------------------
+// optionsFromOptionals
+// ---------------------------------------------
+
+// $ExpectType Schema<{ readonly a: string; readonly b?: number; }, { readonly a: string; readonly b: Option<number>; }>
+pipe(S.struct({ a: S.string }), S.optionsFromOptionals({ b: S.number }))
+
+// $ExpectType Schema<{ readonly a: string; readonly b?: string; }, { readonly a: string; readonly b: Option<number>; }>
+pipe(S.struct({ a: S.string }), S.optionsFromOptionals({ b: NumberFromString }))
 
 // ---------------------------------------------
 // instanceOf
@@ -386,3 +399,6 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"))
 
 // $ExpectType Schema<{ readonly radius: number; }, { readonly radius: number; readonly kind: "circle"; }>
 pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle"))
+
+// $ExpectType Schema<{ readonly radius: string; }, { readonly radius: number; readonly kind: "circle"; }>
+pipe(S.struct({ radius: NumberFromString }), S.attachPropertySignature("kind", "circle"))
