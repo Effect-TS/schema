@@ -5,12 +5,6 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Decoder", () => {
-  it("exports", () => {
-    expect(P.make).exist
-    expect(P.decodeEither).exist
-    expect(P.decode).exist
-  })
-
   it("asserts", () => {
     const schema = S.string
     expect(P.asserts(schema)("a")).toEqual(undefined)

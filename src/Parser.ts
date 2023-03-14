@@ -17,21 +17,6 @@ import type { ParseResult } from "@effect/schema/ParseResult"
 import type { Schema, To } from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
-/**
- * @category model
- * @since 1.0.0
- */
-export interface Parser<To> extends Schema<To> {
-  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<To>
-}
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const make = <A>(schema: Schema<A>, parse: Parser<A>["parse"]): Parser<A> =>
-  ({ ast: schema.ast, parse }) as any
-
 const parse = (schema: Schema<any>, kind: ParserKind) => {
   const parse = parserFor(schema, kind).parse
   return (input: unknown, options?: ParseOptions): any => {
@@ -150,6 +135,13 @@ export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOption
   parse(schema, "encoding")
 
 type ParserKind = "decoding" | "validation" | "encoding"
+
+interface Parser<To> extends Schema<To> {
+  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<To>
+}
+
+const make = <A>(schema: Schema<A>, parse: Parser<A>["parse"]): Parser<A> =>
+  ({ ast: schema.ast, parse }) as any
 
 const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
   const go = (ast: AST.AST): Parser<any> => {

@@ -12,8 +12,6 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [constructors](#constructors)
-  - [make](#make)
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeEither](#decodeeither)
@@ -22,8 +20,6 @@ Added in v1.0.0
   - [encode](#encode)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
-- [model](#model)
-  - [Parser (interface)](#parser-interface)
 - [utils](#utils)
   - [ToAsserts (type alias)](#toasserts-type-alias)
 - [validation](#validation)
@@ -34,24 +30,6 @@ Added in v1.0.0
   - [validateOption](#validateoption)
 
 ---
-
-# constructors
-
-## make
-
-**Signature**
-
-```ts
-export declare const make: <A>(
-  schema: Schema<A, A>,
-  parse: (
-    input: unknown,
-    options?: AST.ParseOptions | undefined
-  ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-) => Parser<A>
-```
-
-Added in v1.0.0
 
 # decoding
 
@@ -126,20 +104,6 @@ Added in v1.0.0
 export declare const encodeOption: <I, A>(
   schema: Schema<I, A>
 ) => (input: A, options?: AST.ParseOptions | undefined) => O.Option<I>
-```
-
-Added in v1.0.0
-
-# model
-
-## Parser (interface)
-
-**Signature**
-
-```ts
-export interface Parser<To> extends Schema<To> {
-  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<To>
-}
 ```
 
 Added in v1.0.0
