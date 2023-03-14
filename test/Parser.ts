@@ -73,36 +73,36 @@ describe.concurrent("Parser", () => {
   })
 
   it("_getSearchTree", () => {
-    expect(P._getSearchTree([S.string, S.number])).toEqual({
+    expect(P._getSearchTree([S.string.ast, S.number.ast])).toEqual({
       keys: {},
-      otherwise: [S.string, S.number]
+      otherwise: [S.string.ast, S.number.ast]
     })
 
-    expect(P._getSearchTree([S.struct({ _tag: S.literal("a") }), S.number])).toEqual(
+    expect(P._getSearchTree([S.struct({ _tag: S.literal("a") }).ast, S.number.ast])).toEqual(
       {
         keys: {
           _tag: {
             buckets: {
-              a: [S.struct({ _tag: S.literal("a") })]
+              a: [S.struct({ _tag: S.literal("a") }).ast]
             },
             ast: AST.createLiteral("a")
           }
         },
-        otherwise: [S.number]
+        otherwise: [S.number.ast]
       }
     )
 
     expect(
       P._getSearchTree([
-        S.struct({ _tag: S.literal("a") }),
-        S.struct({ _tag: S.literal("b") })
+        S.struct({ _tag: S.literal("a") }).ast,
+        S.struct({ _tag: S.literal("b") }).ast
       ])
     ).toEqual({
       keys: {
         _tag: {
           buckets: {
-            a: [S.struct({ _tag: S.literal("a") })],
-            b: [S.struct({ _tag: S.literal("b") })]
+            a: [S.struct({ _tag: S.literal("a") }).ast],
+            b: [S.struct({ _tag: S.literal("b") }).ast]
           },
           ast: AST.createUnion([AST.createLiteral("a"), AST.createLiteral("b")])
         }
@@ -112,20 +112,20 @@ describe.concurrent("Parser", () => {
 
     expect(
       P._getSearchTree([
-        S.struct({ a: S.literal("A"), c: S.string }),
-        S.struct({ b: S.literal("B"), d: S.number })
+        S.struct({ a: S.literal("A"), c: S.string }).ast,
+        S.struct({ b: S.literal("B"), d: S.number }).ast
       ])
     ).toEqual({
       keys: {
         a: {
           buckets: {
-            A: [S.struct({ a: S.literal("A"), c: S.string })]
+            A: [S.struct({ a: S.literal("A"), c: S.string }).ast]
           },
           ast: AST.createLiteral("A")
         },
         b: {
           buckets: {
-            B: [S.struct({ b: S.literal("B"), d: S.number })]
+            B: [S.struct({ b: S.literal("B"), d: S.number }).ast]
           },
           ast: AST.createLiteral("B")
         }
@@ -136,22 +136,22 @@ describe.concurrent("Parser", () => {
     // should handle multiple tags
     expect(
       P._getSearchTree([
-        S.struct({ category: S.literal("catA"), tag: S.literal("a") }),
-        S.struct({ category: S.literal("catA"), tag: S.literal("b") }),
-        S.struct({ category: S.literal("catA"), tag: S.literal("c") })
+        S.struct({ category: S.literal("catA"), tag: S.literal("a") }).ast,
+        S.struct({ category: S.literal("catA"), tag: S.literal("b") }).ast,
+        S.struct({ category: S.literal("catA"), tag: S.literal("c") }).ast
       ])
     ).toEqual({
       keys: {
         category: {
           buckets: {
-            catA: [S.struct({ category: S.literal("catA"), tag: S.literal("a") })]
+            catA: [S.struct({ category: S.literal("catA"), tag: S.literal("a") }).ast]
           },
           ast: AST.createLiteral("catA")
         },
         tag: {
           buckets: {
-            b: [S.struct({ category: S.literal("catA"), tag: S.literal("b") })],
-            c: [S.struct({ category: S.literal("catA"), tag: S.literal("c") })]
+            b: [S.struct({ category: S.literal("catA"), tag: S.literal("b") }).ast],
+            c: [S.struct({ category: S.literal("catA"), tag: S.literal("c") }).ast]
           },
           ast: AST.createUnion([AST.createLiteral("b"), AST.createLiteral("c")])
         }
@@ -172,17 +172,16 @@ describe.concurrent("Parser", () => {
     S.struct({ type: S.array(S.number), value: S.string })
   )
   const types = (schema.ast as AST.Union).types
-  const schemas = types.map(S.make)
   expect(
-    P._getSearchTree(schemas)
+    P._getSearchTree(types)
   ).toEqual({
     keys: {
       type: {
         buckets: {
-          a: [S.struct({ type: S.literal("a"), value: S.string })],
-          b: [S.struct({ type: S.literal("b"), value: S.string })],
-          c: [S.struct({ type: S.literal("c"), value: S.string })],
-          null: [S.struct({ type: S.literal(null), value: S.string })]
+          a: [S.struct({ type: S.literal("a"), value: S.string }).ast],
+          b: [S.struct({ type: S.literal("b"), value: S.string }).ast],
+          c: [S.struct({ type: S.literal("c"), value: S.string }).ast],
+          null: [S.struct({ type: S.literal(null), value: S.string }).ast]
         },
         ast: AST.createUnion([
           AST.createLiteral("a"),
@@ -193,11 +192,11 @@ describe.concurrent("Parser", () => {
       }
     },
     otherwise: [
-      S.struct({ type: S.string, value: S.string }),
-      S.struct({ type: S.undefined, value: S.string }),
-      S.struct({ type: S.literal("d", "e"), value: S.string }),
-      S.struct({ type: S.struct({ nested: S.string }), value: S.string }),
-      S.struct({ type: S.array(S.number), value: S.string })
+      S.struct({ type: S.string, value: S.string }).ast,
+      S.struct({ type: S.undefined, value: S.string }).ast,
+      S.struct({ type: S.literal("d", "e"), value: S.string }).ast,
+      S.struct({ type: S.struct({ nested: S.string }), value: S.string }).ast,
+      S.struct({ type: S.array(S.number), value: S.string }).ast
     ]
   })
 })
