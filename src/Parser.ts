@@ -428,7 +428,7 @@ const parserFor = (schema: Schema<any>, as: ParserKind): Parser<any> => {
       }
       case "Union": {
         const types = ast.types.map(go)
-        const searchTree = _getSearchTree(types, as)
+        const searchTree = _getSearchTree(types)
         const ownKeys = Reflect.ownKeys(searchTree.keys)
         const len = ownKeys.length
         const otherwise = searchTree.otherwise
@@ -549,12 +549,11 @@ const fromRefinement = <A>(
 
 /** @internal */
 export const _getLiterals = (
-  ast: AST.AST,
-  as: ParserKind
+  ast: AST.AST
 ): ReadonlyArray<[PropertyKey, AST.Literal]> => {
   switch (ast._tag) {
     case "Declaration":
-      return _getLiterals(ast.type, as)
+      return _getLiterals(ast.type)
     case "TypeLiteral": {
       const out: Array<[PropertyKey, AST.Literal]> = []
       for (let i = 0; i < ast.propertySignatures.length; i++) {
@@ -566,11 +565,8 @@ export const _getLiterals = (
       return out
     }
     case "Refinement":
-      return _getLiterals(ast.from, as)
     case "Transform":
-      return as === "decoding" ?
-        _getLiterals(ast.from, as) :
-        _getLiterals(ast.to, as)
+      return _getLiterals(ast.from)
   }
   return []
 }
@@ -590,8 +586,7 @@ export const _getLiterals = (
  * @internal
  */
 export const _getSearchTree = <A extends Schema<any>>(
-  members: ReadonlyArray<A>,
-  as: ParserKind
+  members: ReadonlyArray<A>
 ): {
   keys: {
     readonly [key: PropertyKey]: {
@@ -610,7 +605,7 @@ export const _getSearchTree = <A extends Schema<any>>(
   const otherwise: Array<A> = []
   for (let i = 0; i < members.length; i++) {
     const member = members[i]
-    const tags = _getLiterals(member.ast, as)
+    const tags = _getLiterals(member.ast)
     if (tags.length > 0) {
       for (let j = 0; j < tags.length; j++) {
         const [key, literal] = tags[j]

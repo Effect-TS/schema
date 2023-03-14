@@ -32,9 +32,9 @@ describe.concurrent("Parser", () => {
   })
 
   it("_getLiterals", () => {
-    expect(P._getLiterals(S.string.ast, "decoding")).toEqual([])
+    expect(P._getLiterals(S.string.ast)).toEqual([])
     // TypeLiteral
-    expect(P._getLiterals(S.struct({ _tag: S.literal("a") }).ast, "decoding"))
+    expect(P._getLiterals(S.struct({ _tag: S.literal("a") }).ast))
       .toEqual([["_tag", AST.createLiteral("a")]])
     // Refinement
     expect(
@@ -42,8 +42,7 @@ describe.concurrent("Parser", () => {
         pipe(
           S.struct({ _tag: S.literal("a") }),
           S.filter(() => true)
-        ).ast,
-        "decoding"
+        ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])
     // TypeAlias
@@ -53,33 +52,33 @@ describe.concurrent("Parser", () => {
           [],
           S.struct({ _tag: S.literal("a") }),
           () => P.decodeEither(S.struct({ _tag: S.literal("a") }))
-        ).ast,
-        "decoding"
+        ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])
 
     // Transform
     expect(
       P._getLiterals(
-        pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")).ast,
-        "decoding"
+        pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")).ast
       )
     ).toEqual([])
+    // simulate encoding
+    const ast: AST.Transform = pipe(
+      S.struct({ radius: S.number }),
+      S.attachPropertySignature("kind", "circle")
+    ).ast as any
     expect(
-      P._getLiterals(
-        pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")).ast,
-        "encoding"
-      )
+      P._getLiterals(AST.createTransform(ast.to, ast.from, ast.encode, ast.decode))
     ).toEqual([["kind", AST.createLiteral("circle")]])
   })
 
   it("_getSearchTree", () => {
-    expect(P._getSearchTree([S.string, S.number], "decoding")).toEqual({
+    expect(P._getSearchTree([S.string, S.number])).toEqual({
       keys: {},
       otherwise: [S.string, S.number]
     })
 
-    expect(P._getSearchTree([S.struct({ _tag: S.literal("a") }), S.number], "decoding")).toEqual(
+    expect(P._getSearchTree([S.struct({ _tag: S.literal("a") }), S.number])).toEqual(
       {
         keys: {
           _tag: {
@@ -97,7 +96,7 @@ describe.concurrent("Parser", () => {
       P._getSearchTree([
         S.struct({ _tag: S.literal("a") }),
         S.struct({ _tag: S.literal("b") })
-      ], "decoding")
+      ])
     ).toEqual({
       keys: {
         _tag: {
@@ -115,7 +114,7 @@ describe.concurrent("Parser", () => {
       P._getSearchTree([
         S.struct({ a: S.literal("A"), c: S.string }),
         S.struct({ b: S.literal("B"), d: S.number })
-      ], "decoding")
+      ])
     ).toEqual({
       keys: {
         a: {
@@ -140,7 +139,7 @@ describe.concurrent("Parser", () => {
         S.struct({ category: S.literal("catA"), tag: S.literal("a") }),
         S.struct({ category: S.literal("catA"), tag: S.literal("b") }),
         S.struct({ category: S.literal("catA"), tag: S.literal("c") })
-      ], "decoding")
+      ])
     ).toEqual({
       keys: {
         category: {
@@ -175,7 +174,7 @@ describe.concurrent("Parser", () => {
   const types = (schema.ast as AST.Union).types
   const schemas = types.map(S.make)
   expect(
-    P._getSearchTree(schemas, "decoding")
+    P._getSearchTree(schemas)
   ).toEqual({
     keys: {
       type: {
