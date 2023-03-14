@@ -2,13 +2,15 @@
  * @since 1.0.0
  */
 
-import type { Either } from "@effect/data/Either"
+import * as Either from "@effect/data/Either"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as RA from "@effect/data/ReadonlyArray"
+import { failureOption } from "@effect/io/Cause"
 import * as Debug from "@effect/io/Debug"
 import * as Effect from "@effect/io/Effect"
+import { isExit } from "@effect/io/Exit"
 import * as A from "@effect/schema/annotation/AST"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
@@ -30,6 +32,67 @@ export const mutableAppend = <A>(self: Array<A>, a: A): NonEmptyReadonlyArray<A>
   self.push(a)
   return self as any
 }
+
+const untrace = <E, A>(self: Effect.Effect<never, E, A>): Effect.Effect<never, E, A> =>
+  self["_tag"] === "Traced" ? self["i0"] : self
+
+/** @internal */
+export const either = <E, A>(self: Effect.Effect<never, E, A>): Either.Either<E, A> => {
+  const untraced = untrace(self)
+  if (isExit(untraced)) {
+    if (untraced._tag === "Success") {
+      return Either.right(untraced.value as A)
+    } else {
+      const failure = failureOption(untraced.cause)
+      if (failure._tag === "Some") {
+        return Either.left(failure.value as E)
+      }
+    }
+  }
+  throw void 0
+}
+
+/** @internal */
+export const map = Debug.untracedMethod(() =>
+  <E, A, B>(
+    self: Effect.Effect<never, E, A>,
+    f: (a: A) => B
+  ): Effect.Effect<never, E, B> => {
+    try {
+      const result = Either.map(either(self), f)
+      if (result._tag === "Right") {
+        return Effect.succeed(result.right)
+      } else {
+        return Effect.fail(result.left)
+      }
+    } catch {
+      return Effect.map(self, f)
+    }
+  }
+)
+
+/** @internal */
+export const flatMap = Debug.untracedMethod(() =>
+  <E, A, E2, B>(
+    self: Effect.Effect<never, E, A>,
+    f: (a: A) => Effect.Effect<never, E2, B>
+  ): Effect.Effect<never, E | E2, B> => {
+    try {
+      const result = Either.map(either(self), f)
+      if (result._tag === "Right") {
+        try {
+          return Effect.fromEither(either(result.right))
+        } catch {
+          return result.right
+        }
+      } else {
+        return Effect.fail(result.left)
+      }
+    } catch {
+      return Effect.flatMap(self, f)
+    }
+  }
+)
 
 /** @internal */
 export const isNonEmptyReadonlyArray = RA.isNonEmptyReadonlyArray
@@ -179,11 +242,11 @@ export const transformEither = Debug.untracedDual<
     decode: (
       input: A,
       options?: AST.ParseOptions
-    ) => Either<NonEmptyReadonlyArray<ParseError>, B>,
+    ) => Either.Either<NonEmptyReadonlyArray<ParseError>, B>,
     encode: (
       input: B,
       options?: AST.ParseOptions
-    ) => Either<NonEmptyReadonlyArray<ParseError>, A>
+    ) => Either.Either<NonEmptyReadonlyArray<ParseError>, A>
   ) => (self: Schema<A>) => Schema<B>,
   <A, B>(
     self: Schema<A>,
@@ -191,11 +254,11 @@ export const transformEither = Debug.untracedDual<
     decode: (
       input: A,
       options?: AST.ParseOptions
-    ) => Either<NonEmptyReadonlyArray<ParseError>, B>,
+    ) => Either.Either<NonEmptyReadonlyArray<ParseError>, B>,
     encode: (
       input: B,
       options?: AST.ParseOptions
-    ) => Either<NonEmptyReadonlyArray<ParseError>, A>
+    ) => Either.Either<NonEmptyReadonlyArray<ParseError>, A>
   ) => Schema<B>
 >(
   4,

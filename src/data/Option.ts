@@ -29,7 +29,7 @@ const parser = <A>(value: P.Parser<A>): P.Parser<Option<A>> => {
         Effect.fail(RA.of(PE.type(schema.ast, u))) :
         O.isNone(u) ?
         Effect.succeed(O.none()) :
-        Effect.map(decodeValue(u.value), O.some)
+        I.map(decodeValue(u.value), O.some)
   )
 }
 
@@ -133,7 +133,7 @@ export const parseOptionals = <Fields extends Record<PropertyKey, Schema<any>>>(
         for (const key of ownKeys) {
           out[key] = O.fromNullable(o[key])
         }
-        return PR.success(out)
+        return Effect.succeed(out)
       }, (o) => {
         const out = { ...o }
         for (const key of ownKeys) {
@@ -143,7 +143,7 @@ export const parseOptionals = <Fields extends Record<PropertyKey, Schema<any>>>(
             delete out[key]
           }
         }
-        return PR.success(out)
+        return Effect.succeed(out)
       })
       return I.makeSchema(out)
     }

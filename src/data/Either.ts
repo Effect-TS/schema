@@ -28,8 +28,8 @@ const parser = <E, A>(left: P.Parser<E>, right: P.Parser<A>): P.Parser<Either<E,
       !E.isEither(u) ?
         Effect.fail(RA.of(PE.type(schema.ast, u))) :
         E.isLeft(u) ?
-        pipe(decodeLeft(u.left), Effect.map(E.left)) :
-        pipe(decodeRight(u.right), Effect.map(E.right))
+        pipe(I.map(decodeLeft(u.left), E.left)) :
+        I.map(decodeRight(u.right), E.right)
   )
 }
 

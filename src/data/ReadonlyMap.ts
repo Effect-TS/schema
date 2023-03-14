@@ -27,7 +27,7 @@ const parser = <K, V>(
     (u) =>
       !isMap(u) ?
         Effect.fail(RA.of(PE.type(schema.ast, u))) :
-        Effect.map(
+        I.map(
           items(Array.from(u.entries())),
           (as) => new Map(as)
         )

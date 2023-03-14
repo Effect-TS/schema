@@ -23,7 +23,7 @@ const parser = <A>(item: P.Parser<A>): P.Parser<Chunk<A>> => {
     (u) =>
       !C.isChunk(u) ?
         Effect.fail(RA.of(PE.type(schema.ast, u))) :
-        pipe(C.toReadonlyArray(u), items, Effect.map(C.fromIterable))
+        I.map(pipe(C.toReadonlyArray(u), items), C.fromIterable)
   )
 }
 

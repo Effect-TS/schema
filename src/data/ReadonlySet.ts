@@ -24,10 +24,7 @@ const parser = <A>(item: P.Parser<A>): P.Parser<ReadonlySet<A>> => {
     (u) =>
       !isSet(u) ?
         Effect.fail(RA.of(PE.type(schema.ast, u))) :
-        Effect.map(
-          items(Array.from(u.values())),
-          (as) => new Set(as)
-        )
+        I.map(items(Array.from(u.values())), (as) => new Set(as))
   )
 }
 
