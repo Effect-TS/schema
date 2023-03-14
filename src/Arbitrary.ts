@@ -15,7 +15,7 @@ import type * as FastCheck from "fast-check"
  * @category model
  * @since 1.0.0
  */
-export interface Arbitrary<To> extends Schema<To> {
+export interface Arbitrary<To> extends Schema<any, To> {
   readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<To>
 }
 

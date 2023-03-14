@@ -595,10 +595,10 @@ export const extend = <IB, B>(that: Schema<IB, B>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const lazy: <A>(
-  f: () => Schema<A>,
+export const lazy: <I, A = I>(
+  f: () => Schema<I, A>,
   annotations?: AST.Annotated["annotations"]
-) => Schema<A> = I.lazy
+) => Schema<I, A> = I.lazy
 
 /**
  * @since 1.0.0
@@ -686,22 +686,22 @@ export function filter<A>(
  */
 export const transformEither: {
   <B, A>(
-    to: Schema<B>,
+    to: Schema<any, B>,
     decode: (input: A, options?: ParseOptions) => ParseResult<B>,
     encode: (input: B, options?: ParseOptions) => ParseResult<A>
-  ): (self: Schema<A>) => Schema<B>
-  <A, B>(
-    self: Schema<A>,
-    to: Schema<B>,
+  ): <I>(self: Schema<I, A>) => Schema<I, B>
+  <I, A, B>(
+    self: Schema<I, A>,
+    to: Schema<any, B>,
     decode: (input: A, options?: ParseOptions) => ParseResult<B>,
     encode: (input: B, options?: ParseOptions) => ParseResult<A>
-  ): Schema<B>
-} = dual(4, <A, B>(
-  self: Schema<A>,
-  to: Schema<B>,
+  ): Schema<I, B>
+} = dual(4, <I, A, B>(
+  self: Schema<I, A>,
+  to: Schema<any, B>,
   decode: (input: A, options?: ParseOptions) => ParseResult<B>,
   encode: (input: B, options?: ParseOptions) => ParseResult<A>
-): Schema<B> => make(AST.createTransform(self.ast, to.ast, decode, encode)))
+): Schema<I, B> => make(AST.createTransform(self.ast, to.ast, decode, encode)))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -711,12 +711,20 @@ export const transformEither: {
   @since 1.0.0
 */
 export const transform: {
-  <B, A>(to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): (self: Schema<A>) => Schema<B>
-  <A, B>(self: Schema<A>, to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): Schema<B>
+  <B, A>(
+    to: Schema<any, B>,
+    ab: (a: A) => B,
+    ba: (b: B) => A
+  ): <I>(self: Schema<I, A>) => Schema<I, B>
+  <I, A, B>(self: Schema<I, A>, to: Schema<any, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
 } = dual(
   4,
-  <A, B>(self: Schema<A>, to: Schema<B>, ab: (a: A) => B, ba: (b: B) => A): Schema<B> =>
-    transformEither(self, to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b)))
+  <I, A, B>(
+    self: Schema<I, A>,
+    to: Schema<any, B>,
+    ab: (a: A) => B,
+    ba: (b: B) => A
+  ): Schema<I, B> => transformEither(self, to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b)))
 )
 
 /**
@@ -751,8 +759,8 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   key: K,
   value: V
 ) =>
-  <A extends object>(schema: Schema<A>): Schema<Spread<A & { readonly [k in K]: V }>> =>
-    transform<A, any>(
+  <I, A extends object>(schema: Schema<I, A>): Schema<I, Spread<A & { readonly [k in K]: V }>> =>
+    transform<I, A, any>(
       schema,
       pipe(schema, extend(struct({ [key]: literal(value) }))),
       (a) => ({ ...a, [key]: value }),
@@ -1160,7 +1168,7 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const chunkFromSelf = <A>(item: Schema<A>): Schema<Chunk<A>> => {
+export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<A>> => {
   const schema = declare(
     [item],
     struct({
@@ -1187,7 +1195,7 @@ export const chunkFromSelf = <A>(item: Schema<A>): Schema<Chunk<A>> => {
  * @category parsers
  * @since 1.0.0
  */
-export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
+export const chunk = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, Chunk<A>> =>
   transform(array(item), chunkFromSelf(item), C.fromIterable, C.toReadonlyArray)
 
 // ---------------------------------------------
@@ -1214,9 +1222,9 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
  * @category combinators
  * @since 1.0.0
  */
-export const dataFromSelf = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: Schema<A>
-): Schema<D.Data<A>> => {
+export const dataFromSelf = <I, A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: Schema<I, A>
+): Schema<I, D.Data<A>> => {
   const schema = declare(
     [item],
     item,
@@ -1242,10 +1250,10 @@ export const dataFromSelf = <A extends Readonly<Record<string, any>> | ReadonlyA
  * @category parsers
  * @since 1.0.0
  */
-export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: Schema<A>
-): Schema<D.Data<A>> =>
-  transform<A, D.Data<A>>(
+export const data = <I, A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: Schema<I, A>
+): Schema<I, D.Data<A>> =>
+  transform(
     item,
     dataFromSelf(item),
     toData,
@@ -1282,8 +1290,8 @@ export const date: Schema<Date> = declare(
   @category parsers
   @since 1.0.0
 */
-export const dateFromString = (self: Schema<string>): Schema<Date> => {
-  const schema: Schema<Date> = transformEither(
+export const dateFromString = <I>(self: Schema<I, string>): Schema<I, Date> => {
+  const schema: Schema<I, Date> = transformEither(
     self,
     date,
     (s) => {
@@ -1322,7 +1330,7 @@ const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E,
     )
   )
 
-const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
+const eitherInline = <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) =>
   union(
     struct({
       _tag: literal("Left"),
@@ -1338,10 +1346,10 @@ const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
  * @category constructors
  * @since 1.0.0
  */
-export const eitherFromSelf = <E, A>(
-  left: Schema<E>,
-  right: Schema<A>
-): Schema<Either<E, A>> => {
+export const eitherFromSelf = <IE, E, IA, A>(
+  left: Schema<IE, E>,
+  right: Schema<IA, A>
+): Schema<Either<IE, IA>, Either<E, A>> => {
   const schema = declare(
     [left, right],
     eitherInline(left, right),
@@ -1371,10 +1379,13 @@ export const eitherFromSelf = <E, A>(
  * @category parsers
  * @since 1.0.0
  */
-export const either = <E, A>(
-  left: Schema<E>,
-  right: Schema<A>
-): Schema<Either<E, A>> =>
+export const either = <IE, E, IA, A>(
+  left: Schema<IE, E>,
+  right: Schema<IA, A>
+): Schema<
+  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
+  Either<E, A>
+> =>
   transform(
     eitherInline(left, right),
     eitherFromSelf(left, right),
@@ -1730,8 +1741,8 @@ export const clamp = <A extends number>(min: number, max: number) =>
   @category parsers
   @since 1.0.0
 */
-export const numberFromString = (self: Schema<string>): Schema<number> => {
-  const schema: Schema<number> = transformEither(
+export const numberFromString = <I>(self: Schema<I, string>): Schema<I, number> => {
+  const schema: Schema<I, number> = transformEither(
     self,
     number,
     (s) => {
@@ -1802,7 +1813,7 @@ const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
     )
   )
 
-const optionInline = <A>(value: Schema<A>) =>
+const optionInline = <I, A>(value: Schema<I, A>) =>
   union(
     struct({
       _tag: literal("None")
@@ -1817,7 +1828,7 @@ const optionInline = <A>(value: Schema<A>) =>
  * @category constructors
  * @since 1.0.0
  */
-export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
+export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Option<A>> => {
   const schema = declare(
     [value],
     optionInline(value),
@@ -1843,7 +1854,9 @@ export const optionFromSelf = <A>(value: Schema<A>): Schema<Option<A>> => {
  * @category parsers
  * @since 1.0.0
  */
-export const option = <A>(value: Schema<A>): Schema<Option<A>> =>
+export const option = <I, A>(
+  value: Schema<I, A>
+): Schema<{ readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I }, Option<A>> =>
   transform(
     optionInline(value),
     optionFromSelf(value),
@@ -1855,7 +1868,9 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> =>
  * @category parsers
  * @since 1.0.0
  */
-export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
+export const optionFromNullable = <I, A>(
+  value: Schema<I, A>
+): Schema<I | null | undefined, Option<A>> =>
   transform(union(_undefined, _null, value), optionFromSelf(value), O.fromNullable, O.getOrNull)
 
 /**
@@ -1865,9 +1880,12 @@ export const optionFromNullable = <A>(value: Schema<A>): Schema<Option<A>> =>
 export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<any>>>(
   fields: Fields
 ) =>
-  <A extends object>(
-    schema: Schema<A>
-  ): Schema<Spread<A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> }>> => {
+  <I, A extends object>(
+    schema: Schema<I, A>
+  ): Schema<
+    Spread<I & { readonly [K in keyof Fields]?: To<Fields[K]> }>,
+    Spread<A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> }>
+  > => {
     if (AST.isTypeLiteral(schema.ast)) {
       const propertySignatures = schema.ast.propertySignatures
       const ownKeys = Reflect.ownKeys(fields)
@@ -2028,10 +2046,10 @@ const readonlyMapPretty = <K, V>(
  * @category constructors
  * @since 1.0.0
  */
-export const readonlyMapFromSelf = <K, V>(
-  key: Schema<K>,
-  value: Schema<V>
-): Schema<ReadonlyMap<K, V>> => {
+export const readonlyMapFromSelf = <IK, K, IV, V>(
+  key: Schema<IK, K>,
+  value: Schema<IV, V>
+): Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> => {
   const schema = declare(
     [key, value],
     struct({
@@ -2060,10 +2078,10 @@ export const readonlyMapFromSelf = <K, V>(
  * @category parsers
  * @since 1.0.0
  */
-export const readonlyMap = <K, V>(
-  key: Schema<K>,
-  value: Schema<V>
-): Schema<ReadonlyMap<K, V>> =>
+export const readonlyMap = <IK, K, IV, V>(
+  key: Schema<IK, K>,
+  value: Schema<IV, V>
+): Schema<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
   transform(
     array(tuple(key, value)),
     readonlyMapFromSelf(key, value),
@@ -2093,7 +2111,9 @@ const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const readonlySetFromSelf = <A>(item: Schema<A>): Schema<ReadonlySet<A>> => {
+export const readonlySetFromSelf = <I, A>(
+  item: Schema<I, A>
+): Schema<ReadonlySet<I>, ReadonlySet<A>> => {
   const schema = declare(
     [item],
     struct({
@@ -2119,7 +2139,7 @@ export const readonlySetFromSelf = <A>(item: Schema<A>): Schema<ReadonlySet<A>> 
  * @category parsers
  * @since 1.0.0
  */
-export const readonlySet = <A>(item: Schema<A>): Schema<ReadonlySet<A>> =>
+export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, ReadonlySet<A>> =>
   transform(
     array(item),
     readonlySetFromSelf(item),

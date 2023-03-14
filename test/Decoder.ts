@@ -836,7 +836,7 @@ describe.concurrent("Decoder", () => {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const schema: S.Schema<A> = S.lazy<A>(() =>
+    const schema: S.Schema<A> = S.lazy(() =>
       S.struct({
         a: S.string,
         as: S.array(schema)

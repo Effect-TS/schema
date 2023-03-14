@@ -343,7 +343,11 @@ describe.concurrent("Encoder", () => {
       readonly a: number
       readonly as: ReadonlyArray<A>
     }
-    const schema: S.Schema<A> = S.lazy<A>(() =>
+    interface FromA {
+      readonly a: string
+      readonly as: ReadonlyArray<FromA>
+    }
+    const schema: S.Schema<FromA, A> = S.lazy<FromA, A>(() =>
       S.struct({
         a: NumberFromString,
         as: S.array(schema)

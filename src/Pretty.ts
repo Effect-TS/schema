@@ -14,7 +14,7 @@ import { formatActual } from "@effect/schema/TreeFormatter"
  * @category model
  * @since 1.0.0
  */
-export interface Pretty<To> extends Schema<To> {
+export interface Pretty<To> extends Schema<any, To> {
   readonly pretty: (a: To) => string
 }
 

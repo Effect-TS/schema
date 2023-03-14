@@ -48,10 +48,10 @@ export const PrettyHookId = "@effect/schema/PrettyHookId"
 export const makeSchema = <I, A>(ast: AST.AST): S.Schema<I, A> => ({ ast }) as any
 
 /** @internal */
-export const lazy = <A>(
-  f: () => S.Schema<A>,
+export const lazy = <I, A>(
+  f: () => S.Schema<I, A>,
   annotations?: AST.Annotated["annotations"]
-): S.Schema<A> => makeSchema(AST.createLazy(() => f().ast, annotations))
+): S.Schema<I, A> => makeSchema(AST.createLazy(() => f().ast, annotations))
 
 /** @internal */
 export const getKeysForIndexSignature = (

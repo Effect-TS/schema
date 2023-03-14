@@ -322,6 +322,32 @@ pipe(
 // lazy
 // ---------------------------------------------
 
+interface LazyTo1 {
+  readonly a: number
+  readonly as: ReadonlyArray<LazyTo1>
+}
+const lazy1: S.Schema<LazyTo1> = S.lazy(() =>
+  S.struct({
+    a: S.number,
+    as: S.array(lazy1)
+  })
+)
+
+interface LazyFrom2 {
+  readonly a: string
+  readonly as: ReadonlyArray<LazyFrom2>
+}
+interface LazyTo2 {
+  readonly a: number
+  readonly as: ReadonlyArray<LazyTo2>
+}
+const lazy2: S.Schema<LazyFrom2, LazyTo2> = S.lazy(() =>
+  S.struct({
+    a: NumberFromString,
+    as: S.array(lazy2)
+  })
+)
+
 // ---------------------------------------------
 // Option
 // ---------------------------------------------
@@ -358,5 +384,5 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"))
 // attachPropertySignature
 // ---------------------------------------------
 
-// $ExpectType Schema<{ readonly radius: number; readonly kind: "circle"; }, { readonly radius: number; readonly kind: "circle"; }>
+// $ExpectType Schema<{ readonly radius: number; }, { readonly radius: number; readonly kind: "circle"; }>
 pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle"))

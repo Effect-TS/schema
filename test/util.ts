@@ -47,8 +47,8 @@ export const expectDecodingFailure = <I, A>(
   expect(t).toStrictEqual(E.left(message))
 }
 
-export const expectEncodingSuccess = <A>(
-  schema: Schema<A>,
+export const expectEncodingSuccess = <I, A>(
+  schema: Schema<I, A>,
   a: A,
   o: unknown,
   options?: ParseOptions
@@ -57,8 +57,8 @@ export const expectEncodingSuccess = <A>(
   expect(t).toStrictEqual(E.right(o))
 }
 
-export const expectEncodingFailure = <A>(
-  schema: Schema<A>,
+export const expectEncodingFailure = <I, A>(
+  schema: Schema<I, A>,
   a: A,
   message: string,
   options?: ParseOptions
@@ -96,7 +96,11 @@ const formatDecodeError = (e: PR.ParseError): string => {
   }
 }
 
-export const expectDecodingFailureTree = <A>(schema: Schema<A>, u: unknown, message: string) => {
+export const expectDecodingFailureTree = <I, A>(
+  schema: Schema<I, A>,
+  u: unknown,
+  message: string
+) => {
   const t = pipe(P.decodeEither(schema)(u), E.mapLeft(formatErrors))
   expect(E.isLeft(t)).toEqual(true)
   expect(t).toEqual(E.left(message))
