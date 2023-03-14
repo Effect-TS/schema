@@ -1003,6 +1003,111 @@ export const getCompiler = <A>(match: Match<A>): Compiler<A> => {
   return compile
 }
 
+/**
+ * @since 1.0.0
+ */
+export const to = (ast: AST): AST => {
+  switch (ast._tag) {
+    case "Declaration":
+      return createDeclaration(ast.typeParameters.map(to), ast.type, ast.decode, ast.annotations)
+    case "Tuple":
+      return createTuple(
+        ast.elements.map((e) => ({ ...e, type: to(e.type) })),
+        O.map(ast.rest, RA.mapNonEmpty(to)),
+        ast.isReadonly,
+        ast.annotations
+      )
+    case "TypeLiteral":
+      return createTypeLiteral(
+        ast.propertySignatures.map((p) => ({ ...p, type: to(p.type) })),
+        ast.indexSignatures.map((is) => ({ ...is, type: to(is.type) })),
+        ast.annotations
+      )
+    case "Union":
+      return createUnion(ast.types.map(to), ast.annotations)
+    case "Lazy":
+      return createLazy(() => to(ast.f()), ast.annotations)
+    case "Refinement":
+      return createRefinement(to(ast.from), ast.decode, ast.annotations)
+    case "Transform":
+      return to(ast.to)
+  }
+  return ast
+}
+
+/**
+ * @since 1.0.0
+ */
+export const from = (ast: AST): AST => {
+  switch (ast._tag) {
+    case "Declaration":
+      return createDeclaration(
+        ast.typeParameters.map(from),
+        ast.type,
+        ast.decode,
+        ast.annotations
+      )
+    case "Tuple":
+      return createTuple(
+        ast.elements.map((e) => ({ ...e, type: from(e.type) })),
+        O.map(ast.rest, RA.mapNonEmpty(from)),
+        ast.isReadonly,
+        ast.annotations
+      )
+    case "TypeLiteral":
+      return createTypeLiteral(
+        ast.propertySignatures.map((p) => ({ ...p, type: from(p.type) })),
+        ast.indexSignatures.map((is) => ({ ...is, type: from(is.type) })),
+        ast.annotations
+      )
+    case "Union":
+      return createUnion(ast.types.map(from), ast.annotations)
+    case "Lazy":
+      return createLazy(() => from(ast.f()), ast.annotations)
+    case "Refinement":
+    case "Transform":
+      return from(ast.from)
+  }
+  return ast
+}
+
+/**
+ * @since 1.0.0
+ */
+export const reverse = (ast: AST): AST => {
+  switch (ast._tag) {
+    case "Declaration":
+      return createDeclaration(
+        ast.typeParameters.map(reverse),
+        ast.type,
+        ast.decode,
+        ast.annotations
+      )
+    case "Tuple":
+      return createTuple(
+        ast.elements.map((e) => ({ ...e, type: reverse(e.type) })),
+        O.map(ast.rest, RA.mapNonEmpty(reverse)),
+        ast.isReadonly,
+        ast.annotations
+      )
+    case "TypeLiteral":
+      return createTypeLiteral(
+        ast.propertySignatures.map((p) => ({ ...p, type: reverse(p.type) })),
+        ast.indexSignatures.map((is) => ({ ...is, type: reverse(is.type) })),
+        ast.annotations
+      )
+    case "Union":
+      return createUnion(ast.types.map(reverse), ast.annotations)
+    case "Lazy":
+      return createLazy(() => reverse(ast.f()), ast.annotations)
+    case "Refinement":
+      return createTransform(to(ast.from), reverse(ast.from), ast.decode, ast.decode)
+    case "Transform":
+      return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
+  }
+  return ast
+}
+
 // -------------------------------------------------------------------------------------
 // internal
 // -------------------------------------------------------------------------------------
