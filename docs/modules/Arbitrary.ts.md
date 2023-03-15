@@ -29,7 +29,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+export declare const from: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<I>
 ```
 
 Added in v1.0.0

@@ -39,7 +39,7 @@ export const to = <I, A>(
  */
 export const from = <I, A>(
   schema: Schema<I, A>
-): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(AST.getFrom(schema.ast))
+): (fc: typeof FastCheck) => FastCheck.Arbitrary<I> => go(AST.getFrom(schema.ast))
 
 const record = <K extends PropertyKey, V>(
   fc: typeof FastCheck,

@@ -9,6 +9,18 @@ describe.concurrent("Pretty", () => {
     expect(P.PrettyHookId).exist
   })
 
+  it("to", () => {
+    const schema = S.numberFromString(S.string)
+    const pretty = P.to(schema)
+    expect(pretty(1)).toEqual(`1`)
+  })
+
+  it("from", () => {
+    const schema = S.numberFromString(S.string)
+    const pretty = P.from(schema)
+    expect(pretty("a")).toEqual(`"a"`)
+  })
+
   it("templateLiteral. a${string}b", () => {
     const schema = S.templateLiteral(S.literal("a"), S.string, S.literal("b"))
     const pretty = P.to(schema)
