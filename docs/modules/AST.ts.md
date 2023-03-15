@@ -425,7 +425,8 @@ export declare const createTransform: (
   to: AST,
   decode: Transform['decode'],
   encode: Transform['encode'],
-  isReversed: boolean
+  isReversed: boolean,
+  annotations?: Annotated['annotations']
 ) => Transform
 ```
 

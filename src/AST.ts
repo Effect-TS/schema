@@ -803,7 +803,8 @@ export const createTransform = (
   to: AST,
   decode: Transform["decode"],
   encode: Transform["encode"],
-  isReversed: boolean
+  isReversed: boolean,
+  annotations: Annotated["annotations"] = {}
 ): Transform => ({
   _tag: "Transform",
   from,
@@ -811,7 +812,7 @@ export const createTransform = (
   decode,
   encode,
   isReversed,
-  annotations: {}
+  annotations
 })
 
 /**
