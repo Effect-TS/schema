@@ -187,6 +187,18 @@ describe.concurrent("AST", () => {
     )).toEqual(S.symbol.ast)
   })
 
+  it("keyof/ refinement", () => {
+    expect(AST.keyof(pipe(S.struct({ a: S.number }), S.filter(({ a }) => a > 0)).ast)).toEqual(
+      S.literal("a").ast
+    )
+  })
+
+  it("keyof/ transform", () => {
+    expect(AST.keyof(S.numberFromString(S.string).ast)).toEqual(
+      AST.neverKeyword
+    )
+  })
+
   it("partial/refinement", () => {
     const schema = pipe(
       S.struct({ a: S.string, b: S.string }),

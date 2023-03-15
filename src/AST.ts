@@ -907,9 +907,6 @@ export const createRecord = (key: AST, value: AST, isReadonly: boolean): TypeLit
   const indexSignatures: Array<IndexSignature> = []
   const go = (key: AST): void => {
     switch (key._tag) {
-      case "Declaration":
-        go(key.type)
-        break
       case "NeverKeyword":
         break
       case "StringKeyword":
@@ -962,8 +959,6 @@ export const omit = (ast: AST, keys: ReadonlyArray<PropertyKey>): TypeLiteral =>
  */
 export const partial = (ast: AST): AST => {
   switch (ast._tag) {
-    case "Declaration":
-      return partial(ast.type)
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(e.type, true)),

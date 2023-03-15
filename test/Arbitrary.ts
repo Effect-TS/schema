@@ -26,7 +26,30 @@ describe.concurrent("Arbitrary", () => {
   })
 
   it("from", () => {
-    const schema = S.numberFromString(S.string)
+    const NumberFromString = S.numberFromString(S.string)
+    const schema = S.struct({
+      a: NumberFromString,
+      b: S.tuple(NumberFromString),
+      c: S.union(NumberFromString, S.boolean),
+      d: pipe(NumberFromString, S.positive()),
+      e: S.optionFromSelf(NumberFromString)
+    })
+    propertyFrom(schema)
+  })
+
+  it("from/ lazy", () => {
+    const NumberFromString = S.numberFromString(S.string)
+    interface I {
+      readonly a: string | I
+    }
+    interface A {
+      readonly a: number | A
+    }
+    const schema: S.Schema<I, A> = S.lazy(() =>
+      S.struct({
+        a: S.union(NumberFromString, schema)
+      })
+    )
     propertyFrom(schema)
   })
 
