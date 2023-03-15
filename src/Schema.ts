@@ -33,20 +33,20 @@ import { formatErrors } from "@effect/schema/TreeFormatter"
  * @since 1.0.0
  */
 export interface Schema<From, To = From> {
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
+  readonly From: (_: never) => From
+  readonly To: (_: never) => To
   readonly ast: AST.AST
 }
 
 /**
  * @since 1.0.0
  */
-export type From<S extends { readonly From: (_: any) => any }> = Parameters<S["From"]>[0]
+export type From<S> = S extends { readonly From: (_: never) => infer A } ? A : never
 
 /**
  * @since 1.0.0
  */
-export type To<S extends { readonly To: (_: any) => any }> = Parameters<S["To"]>[0]
+export type To<S> = S extends { readonly To: (_: never) => infer A } ? A : never
 
 /**
  * @since 1.0.0

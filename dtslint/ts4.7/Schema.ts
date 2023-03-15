@@ -402,3 +402,19 @@ pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")
 
 // $ExpectType Schema<{ readonly radius: string; }, { readonly radius: number; readonly kind: "circle"; }>
 pipe(S.struct({ radius: NumberFromString }), S.attachPropertySignature("kind", "circle"))
+
+// ---------------------------------------------
+// extends
+// ---------------------------------------------
+
+// $ExpectType true
+export type FromJsonStruct = S.Schema<{ readonly a: string; readonly b?: boolean; }, { readonly a: Date; readonly b?: boolean; }> extends S.Schema<S.Json, any> ? true : false
+
+// $ExpectType false
+export type BadFromJsonStruct = S.Schema<{ readonly a: Date; }> extends S.Schema<S.Json, any> ? true : false
+
+// $ExpectType true
+export type ToDateStruct = S.Schema<{ readonly a: Date; }> extends S.Schema<any, { readonly a: Date; }> ? true : false
+
+// $ExpectType false
+export type BadToDateStruct = S.Schema<{ readonly a: Date; }, { readonly a: string }> extends S.Schema<any, { readonly a: Date; }> ? true : false
