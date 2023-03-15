@@ -1,6 +1,6 @@
 ---
 title: Arbitrary.ts
-nav_order: 3
+nav_order: 1
 parent: Modules
 ---
 
@@ -13,9 +13,10 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [arbitrary](#arbitrary)
-  - [arbitrary](#arbitrary-1)
-- [constructors](#constructors)
-  - [make](#make)
+  - [from](#from)
+  - [to](#to)
+- [hooks](#hooks)
+  - [ArbitraryHookId](#arbitraryhookid)
 - [model](#model)
   - [Arbitrary (interface)](#arbitrary-interface)
 
@@ -23,27 +24,34 @@ Added in v1.0.0
 
 # arbitrary
 
-## arbitrary
+## from
 
 **Signature**
 
 ```ts
-export declare const arbitrary: <A>(schema: Schema<A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+export declare const from: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<I>
 ```
 
 Added in v1.0.0
 
-# constructors
-
-## make
+## to
 
 **Signature**
 
 ```ts
-export declare const make: <A>(
-  schema: Schema<A>,
-  arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
-) => Arbitrary<A>
+export declare const to: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+```
+
+Added in v1.0.0
+
+# hooks
+
+## ArbitraryHookId
+
+**Signature**
+
+```ts
+export declare const ArbitraryHookId: '@effect/schema/ArbitraryHookId'
 ```
 
 Added in v1.0.0
@@ -55,8 +63,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Arbitrary<A> extends Schema<A> {
-  readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+export interface Arbitrary<A> {
+  (fc: typeof FastCheck): FastCheck.Arbitrary<A>
 }
 ```
 

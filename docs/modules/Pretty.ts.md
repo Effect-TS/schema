@@ -1,6 +1,6 @@
 ---
 title: Pretty.ts
-nav_order: 23
+nav_order: 5
 parent: Modules
 ---
 
@@ -12,25 +12,26 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [constructors](#constructors)
-  - [make](#make)
+- [hooks](#hooks)
+  - [PrettyHookId](#prettyhookid)
 - [model](#model)
   - [Pretty (interface)](#pretty-interface)
 - [prettify](#prettify)
-  - [pretty](#pretty)
+  - [from](#from)
+  - [to](#to)
 - [utils](#utils)
   - [match](#match)
 
 ---
 
-# constructors
+# hooks
 
-## make
+## PrettyHookId
 
 **Signature**
 
 ```ts
-export declare const make: <A>(schema: Schema<A>, pretty: (a: A) => string) => Pretty<A>
+export declare const PrettyHookId: '@effect/schema/PrettyHookId'
 ```
 
 Added in v1.0.0
@@ -42,8 +43,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Pretty<A> extends Schema<A> {
-  readonly pretty: (a: A) => string
+export interface Pretty<To> {
+  (a: To): string
 }
 ```
 
@@ -51,12 +52,22 @@ Added in v1.0.0
 
 # prettify
 
-## pretty
+## from
 
 **Signature**
 
 ```ts
-export declare const pretty: <A>(schema: Schema<A>) => (a: A) => string
+export declare const from: <I, A>(schema: Schema<I, A>) => (i: I) => string
+```
+
+Added in v1.0.0
+
+## to
+
+**Signature**
+
+```ts
+export declare const to: <I, A>(schema: Schema<I, A>) => (a: A) => string
 ```
 
 Added in v1.0.0

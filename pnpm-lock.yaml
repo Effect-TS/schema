@@ -2,135 +2,107 @@ lockfileVersion: 5.4
 
 patchedDependencies:
   docs-ts@0.6.10:
-    hash: qgxp5iqdybhc5hkiqui66b5afi
+    hash: ju4qkqb2pmjymigxurmwcxugyi
     path: patches/docs-ts@0.6.10.patch
 
-importers:
+specifiers:
+  '@babel/cli': ^7.21.0
+  '@babel/core': ^7.21.0
+  '@babel/plugin-transform-modules-commonjs': ^7.21.2
+  '@changesets/changelog-github': ^0.4.8
+  '@changesets/cli': ^2.26.0
+  '@effect-ts/build-utils': ^0.40.7
+  '@effect-ts/core': ^0.60.5
+  '@effect/data': ~0.4.1
+  '@effect/language-service': ^0.0.19
+  '@repo-tooling/eslint-plugin-dprint': ^0.0.4
+  '@types/benchmark': ^2.1.2
+  '@types/chai': ^4.3.4
+  '@types/glob': ^8.1.0
+  '@types/jest': ^29.4.0
+  '@types/node': ^18.14.4
+  '@types/prettier': 2.7.2
+  '@types/rimraf': 3.0.2
+  '@typescript-eslint/eslint-plugin': ^5.54.0
+  '@typescript-eslint/parser': ^5.54.0
+  '@vitest/coverage-c8': ^0.29.2
+  ajv: ^8.12.0
+  babel-plugin-annotate-pure-calls: ^0.4.0
+  benchmark: ^2.1.4
+  concurrently: ^7.6.0
+  cpx: ^1.5.0
+  docs-ts: 0.6.10
+  dtslint: github:gcanti/dtslint
+  eslint: ^8.35.0
+  eslint-import-resolver-typescript: ^3.5.3
+  eslint-plugin-codegen: 0.17.0
+  eslint-plugin-deprecation: ^1.3.3
+  eslint-plugin-import: ^2.27.5
+  eslint-plugin-simple-import-sort: ^10.0.0
+  eslint-plugin-sort-destructure-keys: ^1.5.0
+  fast-check: ^3.7.0
+  glob: ^9.1.2
+  madge: ^6.0.0
+  picocolors: ^1.0.0
+  prettier: ^2.8.4
+  rimraf: 3.0.2
+  ts-node: ^10.9.1
+  tslint: ^6.1.3
+  typescript: ^4.9.5
+  ultra-runner: ^3.10.5
+  vite: ^4.1.4
+  vitest: 0.29.2
+publishDirectory: dist
 
-  .:
-    specifiers:
-      '@babel/cli': ^7.21.0
-      '@babel/core': ^7.21.0
-      '@babel/plugin-transform-modules-commonjs': ^7.21.2
-      '@changesets/changelog-github': ^0.4.8
-      '@changesets/cli': ^2.26.0
-      '@effect-ts/build-utils': ^0.40.7
-      '@effect-ts/core': ^0.60.5
-      '@effect/data': ~0.4.1
-      '@effect/language-service': ^0.0.19
-      '@repo-tooling/eslint-plugin-dprint': ^0.0.4
-      '@types/benchmark': ^2.1.2
-      '@types/chai': ^4.3.4
-      '@types/glob': ^8.1.0
-      '@types/jest': ^29.4.0
-      '@types/node': ^18.14.4
-      '@types/prettier': 2.7.2
-      '@types/rimraf': 3.0.2
-      '@typescript-eslint/eslint-plugin': ^5.54.0
-      '@typescript-eslint/parser': ^5.54.0
-      '@vitest/coverage-c8': ^0.29.2
-      ajv: ^8.12.0
-      babel-plugin-annotate-pure-calls: ^0.4.0
-      benchmark: ^2.1.4
-      concurrently: ^7.6.0
-      cpx: ^1.5.0
-      docs-ts: 0.6.10
-      dtslint: github:gcanti/dtslint
-      eslint: ^8.35.0
-      eslint-import-resolver-typescript: ^3.5.3
-      eslint-plugin-codegen: 0.17.0
-      eslint-plugin-deprecation: ^1.3.3
-      eslint-plugin-import: ^2.27.5
-      eslint-plugin-simple-import-sort: ^10.0.0
-      eslint-plugin-sort-destructure-keys: ^1.5.0
-      fast-check: ^3.7.0
-      glob: ^9.1.2
-      madge: ^6.0.0
-      picocolors: ^1.0.0
-      prettier: ^2.8.4
-      rimraf: 3.0.2
-      ts-node: ^10.9.1
-      tslint: ^6.1.3
-      typescript: ^4.9.5
-      ultra-runner: ^3.10.5
-      vite: ^4.1.4
-      vitest: 0.29.2
-    dependencies:
-      '@effect/data': 0.4.1
-      fast-check: 3.7.0
-    devDependencies:
-      '@babel/cli': 7.21.0_@babel+core@7.21.0
-      '@babel/core': 7.21.0
-      '@babel/plugin-transform-modules-commonjs': 7.21.2_@babel+core@7.21.0
-      '@changesets/changelog-github': 0.4.8
-      '@changesets/cli': 2.26.0
-      '@effect-ts/build-utils': 0.40.7_4tiomhbv3rbbenpw35oypunhgu
-      '@effect-ts/core': 0.60.5
-      '@effect/language-service': 0.0.19
-      '@repo-tooling/eslint-plugin-dprint': 0.0.4_typescript@4.9.5
-      '@types/benchmark': 2.1.2
-      '@types/chai': 4.3.4
-      '@types/glob': 8.1.0
-      '@types/jest': 29.4.0
-      '@types/node': 18.14.4
-      '@types/prettier': 2.7.2
-      '@types/rimraf': 3.0.2
-      '@typescript-eslint/eslint-plugin': 5.54.0_6mj2wypvdnknez7kws2nfdgupi
-      '@typescript-eslint/parser': 5.54.0_ycpbpc6yetojsgtrx3mwntkhsu
-      '@vitest/coverage-c8': 0.29.2_vitest@0.29.2
-      ajv: 8.12.0
-      babel-plugin-annotate-pure-calls: 0.4.0_@babel+core@7.21.0
-      benchmark: 2.1.4
-      concurrently: 7.6.0
-      cpx: 1.5.0
-      docs-ts: 0.6.10_qgxp5iqdybhc5hkiqui66b5afi_silln3pw57har7jydmecgzoypa
-      dtslint: github.com/gcanti/dtslint/4552d162099399c4e14f8486ced673411e5b3659
-      eslint: 8.35.0
-      eslint-import-resolver-typescript: 3.5.3_yckic57kx266ph64dhq6ozvb54
-      eslint-plugin-codegen: 0.17.0
-      eslint-plugin-deprecation: 1.3.3_ycpbpc6yetojsgtrx3mwntkhsu
-      eslint-plugin-import: 2.27.5_tqrcrxlenpngfto46ddarus52y
-      eslint-plugin-simple-import-sort: 10.0.0_eslint@8.35.0
-      eslint-plugin-sort-destructure-keys: 1.5.0_eslint@8.35.0
-      glob: 9.1.2
-      madge: 6.0.0
-      picocolors: 1.0.0
-      prettier: 2.8.4
-      rimraf: 3.0.2
-      ts-node: 10.9.1_oboltcrkaqheaa54woelu7cdsa
-      tslint: 6.1.3_typescript@4.9.5
-      typescript: 4.9.5
-      ultra-runner: 3.10.5
-      vite: 4.1.4_@types+node@18.14.4
-      vitest: 0.29.2
-    publishDirectory: dist
+dependencies:
+  '@effect/data': 0.4.1
+  fast-check: 3.7.0
 
-  packages/babel-plugin:
-    specifiers: {}
-
-  packages/core:
-    specifiers:
-      '@fp-ts/babel-plugin': ^0.0.0
-      '@types/glob': ^8.0.0
-      '@types/node': ^18.0.0
-      docs-ts: ^0.6.10
-      fast-check: ^3.1.4
-      glob: ^8.0.3
-      prettier: ^2.7.1
-      ts-node: ^10.9.1
-      typescript: ^4.8.2
-      vitest: 0.16.0
-    devDependencies:
-      '@fp-ts/babel-plugin': link:../babel-plugin
-      '@types/glob': 8.0.0
-      '@types/node': 18.8.0
-      docs-ts: 0.6.10_bccowfhumyeojfpizsad764w2m_dmjzcauo3cshxeipj7bv64ktgm
-      fast-check: 3.1.4
-      glob: 8.0.3
-      prettier: 2.7.1
-      ts-node: 10.9.1_5ra3kupzwcghzakkfdrtyjk72u
-      typescript: 4.8.4
-      vitest: 0.16.0
+devDependencies:
+  '@babel/cli': 7.21.0_@babel+core@7.21.0
+  '@babel/core': 7.21.0
+  '@babel/plugin-transform-modules-commonjs': 7.21.2_@babel+core@7.21.0
+  '@changesets/changelog-github': 0.4.8
+  '@changesets/cli': 2.26.0
+  '@effect-ts/build-utils': 0.40.7_4tiomhbv3rbbenpw35oypunhgu
+  '@effect-ts/core': 0.60.5
+  '@effect/language-service': 0.0.19
+  '@repo-tooling/eslint-plugin-dprint': 0.0.4_typescript@4.9.5
+  '@types/benchmark': 2.1.2
+  '@types/chai': 4.3.4
+  '@types/glob': 8.1.0
+  '@types/jest': 29.4.0
+  '@types/node': 18.14.4
+  '@types/prettier': 2.7.2
+  '@types/rimraf': 3.0.2
+  '@typescript-eslint/eslint-plugin': 5.54.0_6mj2wypvdnknez7kws2nfdgupi
+  '@typescript-eslint/parser': 5.54.0_ycpbpc6yetojsgtrx3mwntkhsu
+  '@vitest/coverage-c8': 0.29.2_vitest@0.29.2
+  ajv: 8.12.0
+  babel-plugin-annotate-pure-calls: 0.4.0_@babel+core@7.21.0
+  benchmark: 2.1.4
+  concurrently: 7.6.0
+  cpx: 1.5.0
+  docs-ts: 0.6.10_ju4qkqb2pmjymigxurmwcxugyi_silln3pw57har7jydmecgzoypa
+  dtslint: github.com/gcanti/dtslint/4552d162099399c4e14f8486ced673411e5b3659
+  eslint: 8.35.0
+  eslint-import-resolver-typescript: 3.5.3_yckic57kx266ph64dhq6ozvb54
+  eslint-plugin-codegen: 0.17.0
+  eslint-plugin-deprecation: 1.3.3_ycpbpc6yetojsgtrx3mwntkhsu
+  eslint-plugin-import: 2.27.5_tqrcrxlenpngfto46ddarus52y
+  eslint-plugin-simple-import-sort: 10.0.0_eslint@8.35.0
+  eslint-plugin-sort-destructure-keys: 1.5.0_eslint@8.35.0
+  glob: 9.1.2
+  madge: 6.0.0
+  picocolors: 1.0.0
+  prettier: 2.8.4
+  rimraf: 3.0.2
+  ts-node: 10.9.1_oboltcrkaqheaa54woelu7cdsa
+  tslint: 6.1.3_typescript@4.9.5
+  typescript: 4.9.5
+  ultra-runner: 3.10.5
+  vite: 4.1.4_@types+node@18.14.4
+  vitest: 0.29.2
 
 packages:
 
@@ -2717,7 +2689,7 @@ packages:
       path-type: 4.0.0
     dev: true
 
-  /docs-ts/0.6.10_qgxp5iqdybhc5hkiqui66b5afi_silln3pw57har7jydmecgzoypa:
+  /docs-ts/0.6.10_ju4qkqb2pmjymigxurmwcxugyi_silln3pw57har7jydmecgzoypa:
     resolution: {integrity: sha512-DTX9c5AJ92ojMOKqqvwF8t77C8Gdgs9FPB8seymHs+F+Wl6aapc3ZkHUM+p8o+jwcBmPoihxssdK903dfwQ1JQ==}
     hasBin: true
     peerDependencies:

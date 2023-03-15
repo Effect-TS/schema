@@ -1,6 +1,6 @@
 ---
 title: Parser.ts
-nav_order: 21
+nav_order: 3
 parent: Modules
 ---
 
@@ -12,68 +12,24 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [assertions](#assertions)
-  - [asserts](#asserts)
-  - [is](#is)
-- [constructors](#constructors)
-  - [make](#make)
 - [decoding](#decoding)
   - [decode](#decode)
-  - [decodeOrThrow](#decodeorthrow)
-  - [getOption](#getoption)
+  - [decodeEither](#decodeeither)
+  - [decodeOption](#decodeoption)
 - [encoding](#encoding)
   - [encode](#encode)
-  - [encodeOrThrow](#encodeorthrow)
-- [model](#model)
-  - [Parser (interface)](#parser-interface)
+  - [encodeEither](#encodeeither)
+  - [encodeOption](#encodeoption)
 - [utils](#utils)
-  - [InferAsserts (type alias)](#inferasserts-type-alias)
+  - [ToAsserts (type alias)](#toasserts-type-alias)
+- [validation](#validation)
+  - [asserts](#asserts)
+  - [is](#is)
+  - [validate](#validate)
+  - [validateEither](#validateeither)
+  - [validateOption](#validateoption)
 
 ---
-
-# assertions
-
-## asserts
-
-**Signature**
-
-```ts
-export declare const asserts: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
-```
-
-Added in v1.0.0
-
-## is
-
-**Signature**
-
-```ts
-export declare const is: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
-```
-
-Added in v1.0.0
-
-# constructors
-
-## make
-
-**Signature**
-
-```ts
-export declare const make: <A>(
-  schema: Schema<A>,
-  parse: (
-    input: unknown,
-    options?: AST.ParseOptions | undefined
-  ) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-) => Parser<A>
-```
-
-Added in v1.0.0
 
 # decoding
 
@@ -82,32 +38,35 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <A>(
-  schema: Schema<A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-```
-
-Added in v1.0.0
-
-## decodeOrThrow
-
-**Signature**
-
-```ts
-export declare const decodeOrThrow: <A>(
-  schema: Schema<A>
+export declare const decode: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
 
-## getOption
+## decodeEither
 
 **Signature**
 
 ```ts
-export declare const getOption: <A>(
-  schema: Schema<A>
+export declare const decodeEither: <I, A>(
+  schema: Schema<I, A>
+) => (
+  input: unknown,
+  options?: AST.ParseOptions | undefined
+) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+```
+
+Added in v1.0.0
+
+## decodeOption
+
+**Signature**
+
+```ts
+export declare const decodeOption: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
@@ -120,45 +79,108 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encode: <A>(
-  schema: Schema<A>
-) => (a: A, options?: AST.ParseOptions | undefined) => ParseResult<unknown>
+export declare const encode: <I, A>(schema: Schema<I, A>) => (a: A, options?: AST.ParseOptions | undefined) => I
 ```
 
 Added in v1.0.0
 
-## encodeOrThrow
+## encodeEither
 
 **Signature**
 
 ```ts
-export declare const encodeOrThrow: <A>(schema: Schema<A>) => (a: A, options?: AST.ParseOptions | undefined) => unknown
+export declare const encodeEither: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], I>
 ```
 
 Added in v1.0.0
 
-# model
-
-## Parser (interface)
+## encodeOption
 
 **Signature**
 
 ```ts
-export interface Parser<A> extends Schema<A> {
-  readonly parse: (input: unknown, options?: ParseOptions) => ParseResult<A>
-}
+export declare const encodeOption: <I, A>(
+  schema: Schema<I, A>
+) => (input: A, options?: AST.ParseOptions | undefined) => O.Option<I>
 ```
 
 Added in v1.0.0
 
 # utils
 
-## InferAsserts (type alias)
+## ToAsserts (type alias)
 
 **Signature**
 
 ```ts
-export type InferAsserts<S extends Schema<any>> = (input: unknown, options?: ParseOptions) => asserts input is Infer<S>
+export type ToAsserts<S extends Schema<any>> = (input: unknown, options?: ParseOptions) => asserts input is To<S>
+```
+
+Added in v1.0.0
+
+# validation
+
+## asserts
+
+**Signature**
+
+```ts
+export declare const asserts: <I, A>(
+  schema: Schema<I, A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
+```
+
+Added in v1.0.0
+
+## is
+
+**Signature**
+
+```ts
+export declare const is: <I, A>(
+  schema: Schema<I, A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
+```
+
+Added in v1.0.0
+
+## validate
+
+**Signature**
+
+```ts
+export declare const validate: <I, A>(
+  schema: Schema<I, A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+## validateEither
+
+**Signature**
+
+```ts
+export declare const validateEither: <I, A>(
+  schema: Schema<I, A>
+) => (
+  input: unknown,
+  options?: AST.ParseOptions | undefined
+) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+```
+
+Added in v1.0.0
+
+## validateOption
+
+**Signature**
+
+```ts
+export declare const validateOption: <I, A>(
+  schema: Schema<I, A>
+) => (input: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
 Added in v1.0.0

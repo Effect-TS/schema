@@ -1,6 +1,6 @@
 ---
 title: AST.ts
-nav_order: 4
+nav_order: 2
 parent: Modules
 ---
 
@@ -12,10 +12,30 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [annotations](#annotations)
+  - [BrandAnnotation (type alias)](#brandannotation-type-alias)
+  - [BrandAnnotationId](#brandannotationid)
+  - [DescriptionAnnotation (type alias)](#descriptionannotation-type-alias)
+  - [DescriptionAnnotationId](#descriptionannotationid)
+  - [DocumentationAnnotation (type alias)](#documentationannotation-type-alias)
+  - [DocumentationAnnotationId](#documentationannotationid)
+  - [ExamplesAnnotation (type alias)](#examplesannotation-type-alias)
+  - [ExamplesAnnotationId](#examplesannotationid)
+  - [IdentifierAnnotation (type alias)](#identifierannotation-type-alias)
+  - [IdentifierAnnotationId](#identifierannotationid)
+  - [JSONSchemaAnnotation (type alias)](#jsonschemaannotation-type-alias)
+  - [JSONSchemaAnnotationId](#jsonschemaannotationid)
+  - [MessageAnnotation (type alias)](#messageannotation-type-alias)
+  - [MessageAnnotationId](#messageannotationid)
+  - [TitleAnnotation (type alias)](#titleannotation-type-alias)
+  - [TitleAnnotationId](#titleannotationid)
+  - [TypeAnnotation (type alias)](#typeannotation-type-alias)
+  - [TypeAnnotationId](#typeannotationid)
 - [constructors](#constructors)
   - [anyKeyword](#anykeyword)
   - [bigIntKeyword](#bigintkeyword)
   - [booleanKeyword](#booleankeyword)
+  - [createDeclaration](#createdeclaration)
   - [createEnums](#createenums)
   - [createLazy](#createlazy)
   - [createLiteral](#createliteral)
@@ -23,7 +43,6 @@ Added in v1.0.0
   - [createTemplateLiteral](#createtemplateliteral)
   - [createTransform](#createtransform)
   - [createTuple](#createtuple)
-  - [createTypeAlias](#createtypealias)
   - [createTypeLiteral](#createtypeliteral)
   - [createUnion](#createunion)
   - [createUniqueSymbol](#createuniquesymbol)
@@ -39,6 +58,7 @@ Added in v1.0.0
   - [isAnyKeyword](#isanykeyword)
   - [isBigIntKeyword](#isbigintkeyword)
   - [isBooleanKeyword](#isbooleankeyword)
+  - [isDeclaration](#isdeclaration)
   - [isLazy](#islazy)
   - [isLiteral](#isliteral)
   - [isNumberKeyword](#isnumberkeyword)
@@ -48,7 +68,6 @@ Added in v1.0.0
   - [isTemplateLiteral](#istemplateliteral)
   - [isTransform](#istransform)
   - [isTuple](#istuple)
-  - [isTypeAlias](#istypealias)
   - [isTypeLiteral](#istypeliteral)
   - [isUnion](#isunion)
   - [isUniqueSymbol](#isuniquesymbol)
@@ -58,6 +77,7 @@ Added in v1.0.0
   - [AnyKeyword (interface)](#anykeyword-interface)
   - [BigIntKeyword (interface)](#bigintkeyword-interface)
   - [BooleanKeyword (interface)](#booleankeyword-interface)
+  - [Declaration (interface)](#declaration-interface)
   - [Enums (interface)](#enums-interface)
   - [Lazy (interface)](#lazy-interface)
   - [Literal (interface)](#literal-interface)
@@ -71,7 +91,6 @@ Added in v1.0.0
   - [TemplateLiteral (interface)](#templateliteral-interface)
   - [Transform (interface)](#transform-interface)
   - [Tuple (interface)](#tuple-interface)
-  - [TypeAlias (interface)](#typealias-interface)
   - [TypeLiteral (interface)](#typeliteral-interface)
   - [UndefinedKeyword (interface)](#undefinedkeyword-interface)
   - [Union (interface)](#union-interface)
@@ -95,14 +114,199 @@ Added in v1.0.0
   - [createRecord](#createrecord)
   - [getAnnotation](#getannotation)
   - [getCompiler](#getcompiler)
+  - [getFrom](#getfrom)
+  - [getTo](#getto)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
+  - [reverse](#reverse)
   - [setAnnotation](#setannotation)
 
 ---
+
+# annotations
+
+## BrandAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type BrandAnnotation = ReadonlyArray<string>
+```
+
+Added in v1.0.0
+
+## BrandAnnotationId
+
+**Signature**
+
+```ts
+export declare const BrandAnnotationId: '@effect/schema/BrandAnnotationId'
+```
+
+Added in v1.0.0
+
+## DescriptionAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type DescriptionAnnotation = string
+```
+
+Added in v1.0.0
+
+## DescriptionAnnotationId
+
+**Signature**
+
+```ts
+export declare const DescriptionAnnotationId: '@effect/schema/DescriptionAnnotationId'
+```
+
+Added in v1.0.0
+
+## DocumentationAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type DocumentationAnnotation = string
+```
+
+Added in v1.0.0
+
+## DocumentationAnnotationId
+
+**Signature**
+
+```ts
+export declare const DocumentationAnnotationId: '@effect/schema/DocumentationAnnotationId'
+```
+
+Added in v1.0.0
+
+## ExamplesAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type ExamplesAnnotation = ReadonlyArray<unknown>
+```
+
+Added in v1.0.0
+
+## ExamplesAnnotationId
+
+**Signature**
+
+```ts
+export declare const ExamplesAnnotationId: '@effect/schema/ExamplesAnnotationId'
+```
+
+Added in v1.0.0
+
+## IdentifierAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type IdentifierAnnotation = string
+```
+
+Added in v1.0.0
+
+## IdentifierAnnotationId
+
+**Signature**
+
+```ts
+export declare const IdentifierAnnotationId: '@effect/schema/IdentifierAnnotationId'
+```
+
+Added in v1.0.0
+
+## JSONSchemaAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type JSONSchemaAnnotation = object
+```
+
+Added in v1.0.0
+
+## JSONSchemaAnnotationId
+
+**Signature**
+
+```ts
+export declare const JSONSchemaAnnotationId: '@effect/schema/JSONSchemaAnnotationId'
+```
+
+Added in v1.0.0
+
+## MessageAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type MessageAnnotation<A> = (a: A) => string
+```
+
+Added in v1.0.0
+
+## MessageAnnotationId
+
+**Signature**
+
+```ts
+export declare const MessageAnnotationId: '@effect/schema/MessageAnnotationId'
+```
+
+Added in v1.0.0
+
+## TitleAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type TitleAnnotation = string
+```
+
+Added in v1.0.0
+
+## TitleAnnotationId
+
+**Signature**
+
+```ts
+export declare const TitleAnnotationId: '@effect/schema/TitleAnnotationId'
+```
+
+Added in v1.0.0
+
+## TypeAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type TypeAnnotation = string | symbol
+```
+
+Added in v1.0.0
+
+## TypeAnnotationId
+
+**Signature**
+
+```ts
+export declare const TypeAnnotationId: '@effect/schema/TypeAnnotationId'
+```
+
+Added in v1.0.0
 
 # constructors
 
@@ -132,6 +336,23 @@ Added in v1.0.0
 
 ```ts
 export declare const booleanKeyword: BooleanKeyword
+```
+
+Added in v1.0.0
+
+## createDeclaration
+
+**Signature**
+
+```ts
+export declare const createDeclaration: (
+  typeParameters: ReadonlyArray<AST>,
+  type: AST,
+  decode: (
+    ...typeParameters: ReadonlyArray<AST>
+  ) => (input: unknown, options?: ParseOptions | undefined) => ParseResult<any>,
+  annotations?: Annotated['annotations']
+) => Declaration
 ```
 
 Added in v1.0.0
@@ -173,7 +394,8 @@ Added in v1.0.0
 ```ts
 export declare const createRefinement: (
   from: AST,
-  refinement: Predicate<any>,
+  decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>,
+  isReversed: boolean,
   annotations?: Annotated['annotations']
 ) => Refinement
 ```
@@ -202,7 +424,9 @@ export declare const createTransform: (
   from: AST,
   to: AST,
   decode: Transform['decode'],
-  encode: Transform['encode']
+  encode: Transform['encode'],
+  isReversed: boolean,
+  annotations?: Annotated['annotations']
 ) => Transform
 ```
 
@@ -219,20 +443,6 @@ export declare const createTuple: (
   isReadonly: boolean,
   annotations?: Annotated['annotations']
 ) => Tuple
-```
-
-Added in v1.0.0
-
-## createTypeAlias
-
-**Signature**
-
-```ts
-export declare const createTypeAlias: (
-  typeParameters: ReadonlyArray<AST>,
-  type: AST,
-  annotations?: Annotated['annotations']
-) => TypeAlias
 ```
 
 Added in v1.0.0
@@ -383,6 +593,16 @@ export declare const isBooleanKeyword: (ast: AST) => ast is BooleanKeyword
 
 Added in v1.0.0
 
+## isDeclaration
+
+**Signature**
+
+```ts
+export declare const isDeclaration: (ast: AST) => ast is Declaration
+```
+
+Added in v1.0.0
+
 ## isLazy
 
 **Signature**
@@ -473,16 +693,6 @@ export declare const isTuple: (ast: AST) => ast is Tuple
 
 Added in v1.0.0
 
-## isTypeAlias
-
-**Signature**
-
-```ts
-export declare const isTypeAlias: (ast: AST) => ast is TypeAlias
-```
-
-Added in v1.0.0
-
 ## isTypeLiteral
 
 **Signature**
@@ -531,7 +741,7 @@ Added in v1.0.0
 
 ```ts
 export type AST =
-  | TypeAlias
+  | Declaration
   | Literal
   | UniqueSymbol
   | UndefinedKeyword
@@ -588,6 +798,21 @@ Added in v1.0.0
 ```ts
 export interface BooleanKeyword extends Annotated {
   readonly _tag: 'BooleanKeyword'
+}
+```
+
+Added in v1.0.0
+
+## Declaration (interface)
+
+**Signature**
+
+```ts
+export interface Declaration extends Annotated {
+  readonly _tag: 'Declaration'
+  readonly typeParameters: ReadonlyArray<AST>
+  readonly type: AST
+  readonly decode: (...typeParameters: ReadonlyArray<AST>) => (input: any, options?: ParseOptions) => ParseResult<any>
 }
 ```
 
@@ -689,7 +914,8 @@ Added in v1.0.0
 export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
-  readonly refinement: Predicate<any>
+  readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly isReversed: boolean
 }
 ```
 
@@ -744,6 +970,7 @@ export interface Transform extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly isReversed: boolean
 }
 ```
 
@@ -759,20 +986,6 @@ export interface Tuple extends Annotated {
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
-}
-```
-
-Added in v1.0.0
-
-## TypeAlias (interface)
-
-**Signature**
-
-```ts
-export interface TypeAlias extends Annotated {
-  readonly _tag: 'TypeAlias'
-  readonly typeParameters: ReadonlyArray<AST>
-  readonly type: AST
 }
 ```
 
@@ -1054,6 +1267,26 @@ export declare const getCompiler: <A>(match: Match<A>) => Compiler<A>
 
 Added in v1.0.0
 
+## getFrom
+
+**Signature**
+
+```ts
+export declare const getFrom: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
+## getTo
+
+**Signature**
+
+```ts
+export declare const getTo: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
 ## keyof
 
 Equivalent at runtime to the TypeScript type-level `keyof` operator.
@@ -1077,7 +1310,15 @@ export declare const mergeAnnotations: (
   ast: AST,
   annotations: Annotated['annotations']
 ) =>
-  | { annotations: { [x: string]: unknown }; _tag: 'TypeAlias'; typeParameters: readonly AST[]; type: AST }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Declaration'
+      typeParameters: readonly AST[]
+      type: AST
+      decode: (
+        ...typeParameters: readonly AST[]
+      ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
   | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
@@ -1113,7 +1354,13 @@ export declare const mergeAnnotations: (
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Refinement'
+      from: AST
+      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
+    }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Transform'
@@ -1121,6 +1368,7 @@ export declare const mergeAnnotations: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
     }
 ```
 
@@ -1162,6 +1410,16 @@ export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeL
 
 Added in v1.0.0
 
+## reverse
+
+**Signature**
+
+```ts
+export declare const reverse: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
 ## setAnnotation
 
 Adds an annotation, potentially overwriting the existing annotation with the specified id.
@@ -1174,7 +1432,15 @@ export declare const setAnnotation: (
   id: PropertyKey,
   value: unknown
 ) =>
-  | { annotations: { [x: string]: unknown }; _tag: 'TypeAlias'; typeParameters: readonly AST[]; type: AST }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Declaration'
+      typeParameters: readonly AST[]
+      type: AST
+      decode: (
+        ...typeParameters: readonly AST[]
+      ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+    }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
   | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
@@ -1210,7 +1476,13 @@ export declare const setAnnotation: (
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | { annotations: { [x: string]: unknown }; _tag: 'Refinement'; from: AST; refinement: Predicate<any> }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Refinement'
+      from: AST
+      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
+    }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Transform'
@@ -1218,6 +1490,7 @@ export declare const setAnnotation: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      isReversed: boolean
     }
 ```
 
