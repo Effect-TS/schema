@@ -16,7 +16,7 @@ import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
-import type { Schema, To } from "@effect/schema/Schema"
+import type { Schema } from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 const get = (ast: AST.AST) => {
@@ -215,7 +215,7 @@ export const is = <_, A>(schema: Schema<_, A>) => {
 export type ToAsserts<S extends Schema<any>> = (
   input: unknown,
   options?: ParseOptions
-) => asserts input is To<S>
+) => asserts input is Schema.To<S>
 
 /**
  * @category validation

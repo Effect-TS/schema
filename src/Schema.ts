@@ -33,21 +33,32 @@ import { formatErrors } from "@effect/schema/TreeFormatter"
  * @category model
  * @since 1.0.0
  */
-export interface Schema<From, To = From> {
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
+export interface Schema<From, To = From> extends Schema.Variance<From, To> {
   readonly ast: AST.AST
 }
 
-/**
- * @since 1.0.0
- */
-export type From<S extends { readonly From: (_: any) => any }> = Parameters<S["From"]>[0]
+export declare namespace Schema {
+  /**
+   * @category model
+   * @since 1.0.0
+   */
+  export interface Variance<From, To> {
+    readonly _From: (_: From) => From
+    readonly _To: (_: To) => To
+  }
 
-/**
- * @since 1.0.0
- */
-export type To<S extends { readonly To: (_: any) => any }> = Parameters<S["To"]>[0]
+  /**
+   * @since 1.0.0
+   */
+  export type From<S extends Variance<any, any>> = S extends Variance<infer From, infer _To> ? From
+    : never
+
+  /**
+   * @since 1.0.0
+   */
+  export type To<S extends Variance<any, any>> = S extends Variance<infer _From, infer To> ? To
+    : never
+}
 
 /**
  * @since 1.0.0
@@ -239,7 +250,7 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
  */
 export const templateLiteral = <T extends [Schema<any>, ...Array<Schema<any>>]>(
   ...[head, ...tail]: T
-): Schema<Join<{ [K in keyof T]: To<T[K]> }>> => {
+): Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>> => {
   let types: ReadonlyArray<AST.TemplateLiteral | AST.Literal> = getTemplateLiterals(head.ast)
   for (const span of tail) {
     types = pipe(
@@ -323,7 +334,7 @@ export const declare = (
  */
 export const union = <Members extends ReadonlyArray<Schema<any>>>(
   ...members: Members
-): Schema<From<Members[number]>, To<Members[number]>> =>
+): Schema<Schema.From<Members[number]>, Schema.To<Members[number]>> =>
   make(AST.createUnion(members.map((m) => m.ast)))
 
 /**
@@ -346,8 +357,8 @@ export const keyof = <I, A>(schema: Schema<I, A>): Schema<keyof A> => make(AST.k
 export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
   ...elements: Elements
 ): Schema<
-  { readonly [K in keyof Elements]: From<Elements[K]> },
-  { readonly [K in keyof Elements]: To<Elements[K]> }
+  { readonly [K in keyof Elements]: Schema.From<Elements[K]> },
+  { readonly [K in keyof Elements]: Schema.To<Elements[K]> }
 > =>
   make(
     AST.createTuple(elements.map((schema) => AST.createElement(schema.ast, false)), O.none(), true)
@@ -430,9 +441,7 @@ export type OptionalSchemaId = typeof OptionalSchemaId
 /**
  * @since 1.0.0
  */
-export interface OptionalSchema<From, To = From> {
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
+export interface OptionalSchema<From, To = From> extends Schema.Variance<From, To> {
   readonly _id: OptionalSchemaId
 }
 
@@ -463,12 +472,12 @@ export const struct = <Fields extends Record<PropertyKey, Schema<any> | Optional
   fields: Fields
 ): Schema<
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields>]?: From<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: Schema.From<Fields[K]> }
+    & { readonly [K in OptionalKeys<Fields>]?: Schema.From<Fields[K]> }
   >,
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: Schema.To<Fields[K]> }
+    & { readonly [K in OptionalKeys<Fields>]?: Schema.To<Fields[K]> }
   >
 > =>
   make(
@@ -565,7 +574,7 @@ export interface BrandSchema<From, To extends Brand<any>>
  * import { pipe } from "@effect/data/Function"
  *
  * const Int = pipe(S.number, S.int(), S.brand("Int"))
- * type Int = S.To<typeof Int> // number & Brand<"Int">
+ * type Int = S.Schema.To<typeof Int> // number & Brand<"Int">
  *
  * @category combinators
  * @since 1.0.0
@@ -1993,8 +2002,8 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
   <I, A extends object>(
     schema: Schema<I, A>
   ): Schema<
-    Spread<I & { readonly [K in keyof Fields]?: From<Fields[K]> }>,
-    Spread<A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> }>
+    Spread<I & { readonly [K in keyof Fields]?: Schema.From<Fields[K]> }>,
+    Spread<A & { readonly [K in keyof Fields]: Option<Schema.To<Fields[K]>> }>
   > => {
     if (AST.isTypeLiteral(schema.ast)) {
       const propertySignatures = schema.ast.propertySignatures

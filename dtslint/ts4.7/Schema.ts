@@ -214,10 +214,10 @@ S.struct({ a: S.string,  b: S.number });
 const MyModel = S.struct({ a: S.string,  b: NumberFromString });
 
 // $ExpectType { readonly a: string; readonly b: string; }
-export type MyModelFrom = S.From<typeof MyModel>
+export type MyModelFrom = S.Schema.From<typeof MyModel>
 
 // $ExpectType { readonly a: string; readonly b: number; }
-export type MyModelTo = S.To<typeof MyModel>
+export type MyModelTo = S.Schema.To<typeof MyModel>
 
 // ---------------------------------------------
 // optional

@@ -355,7 +355,7 @@ import * as S from '@effect/schema/Schema'
 import { pipe } from '@effect/data/Function'
 
 const Int = pipe(S.number, S.int(), S.brand('Int'))
-type Int = S.To<typeof Int> // number & Brand<"Int">
+type Int = S.Schema.To<typeof Int> // number & Brand<"Int">
 ```
 
 Added in v1.0.0

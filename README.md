@@ -95,7 +95,7 @@ Once you have defined a `Schema`, you can use the `To` type to extract the infer
 For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
 
 ```ts
-interface Person extends S.To<typeof Person> {}
+interface Person extends S.Schema.To<typeof Person> {}
 /*
 interface Person {
   readonly name: string;
@@ -561,7 +561,7 @@ import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserIdSchema = pipe(S.string, S.brand("UserId"));
-type UserId = S.To<typeof UserIdSchema>; // string & Brand<"UserId">
+type UserId = S.Schema.To<typeof UserIdSchema>; // string & Brand<"UserId">
 ```
 
 In the above example, `UserIdSchema` is a schema for the `UserId` branded type. The `brand` combinator takes a string argument that specifies the name of the brand to attach to the type.
