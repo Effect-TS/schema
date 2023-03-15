@@ -18,8 +18,7 @@ import * as O from "@effect/data/Option"
 import { isDate } from "@effect/data/Predicate"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
-import { Arbitrary } from "@effect/schema/Arbitrary"
-import * as Arb from "@effect/schema/Arbitrary"
+import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
@@ -1173,7 +1172,7 @@ export const fromBrand = <C extends Brand<string>>(
 // ---------------------------------------------
 
 const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
-  I.makeArbitrary(chunkFromSelf(item), (fc) => fc.array(item.arbitrary(fc)).map(C.fromIterable))
+  (fc) => fc.array(item(fc)).map(C.fromIterable)
 
 const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
   I.makePretty(
@@ -1224,8 +1223,7 @@ const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a:
 
 const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Arbitrary<A>
-): Arbitrary<D.Data<A>> =>
-  I.makeArbitrary(dataFromSelf(item), (fc) => item.arbitrary(fc).map(toData))
+): Arbitrary<D.Data<A>> => (fc) => item(fc).map(toData)
 
 const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Pretty<A>
@@ -1281,7 +1279,7 @@ export const data = <I, A extends Readonly<Record<string, any>> | ReadonlyArray<
 // data/Date
 // ---------------------------------------------
 
-const dateArbitrary = (): Arbitrary<Date> => I.makeArbitrary(date, (fc) => fc.date())
+const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date()
 
 const datePretty = (): Pretty<Date> =>
   I.makePretty(date, (date) => `new Date(${JSON.stringify(date)})`)
@@ -1329,14 +1327,7 @@ export const dateFromString = <I>(self: Schema<I, string>): Schema<I, Date> => {
 const eitherArbitrary = <E, A>(
   left: Arbitrary<E>,
   right: Arbitrary<A>
-): Arbitrary<Either<E, A>> => {
-  const schema = eitherFromSelf(left, right)
-  const arbitrary = Arb.arbitrary(eitherInline(left, right))
-  return I.makeArbitrary(
-    schema,
-    (fc) => arbitrary(fc).map((a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right))
-  )
-}
+): Arbitrary<Either<E, A>> => (fc) => fc.oneof(left(fc).map(E.left), right(fc).map(E.right))
 
 const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
   I.makePretty(
@@ -1438,6 +1429,8 @@ export type Json =
   | JsonArray
   | JsonObject
 
+const arbitraryJson: Arbitrary<Json> = (fc) => fc.jsonValue().map((json) => json as Json)
+
 /**
  * @category constructors
  * @since 1.0.0
@@ -1451,10 +1444,8 @@ export const json: Schema<Json> = lazy(() =>
     array(json),
     record(string, json)
   ), {
-  [I.ArbitraryHookId]: () => Arbitrary
+  [I.ArbitraryHookId]: () => arbitraryJson
 })
-
-const Arbitrary = I.makeArbitrary<Json>(json, (fc) => fc.jsonValue().map((json) => json as Json))
 
 // ---------------------------------------------
 // data/Number
@@ -1817,13 +1808,8 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
 // data/Option
 // ---------------------------------------------
 
-const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => {
-  const struct = Arb.arbitrary(optionInline(value))
-  return I.makeArbitrary(
-    optionFromSelf(value),
-    (fc) => struct(fc).map((a) => a._tag === "None" ? O.none() : O.some(a.value))
-  )
-}
+const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> =>
+  (fc) => fc.oneof(fc.constant(O.none()), value(fc).map(O.some))
 
 const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
   I.makePretty(
@@ -2044,10 +2030,7 @@ const readonlyMapArbitrary = <K, V>(
   key: Arbitrary<K>,
   value: Arbitrary<V>
 ): Arbitrary<ReadonlyMap<K, V>> =>
-  I.makeArbitrary(
-    readonlyMapFromSelf(key, value),
-    (fc) => fc.array(fc.tuple(key.arbitrary(fc), value.arbitrary(fc))).map((as) => new Map(as))
-  )
+  (fc) => fc.array(fc.tuple(key(fc), value(fc))).map((as) => new Map(as))
 
 const readonlyMapPretty = <K, V>(
   key: Pretty<K>,
@@ -2117,10 +2100,7 @@ export const readonlyMap = <IK, K, IV, V>(
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
 const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
-  I.makeArbitrary(
-    readonlySetFromSelf(item),
-    (fc) => fc.array(item.arbitrary(fc)).map((as) => new Set(as))
-  )
+  (fc) => fc.array(item(fc)).map((as) => new Set(as))
 
 const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
   I.makePretty(
@@ -2390,7 +2370,7 @@ export const UUID: Schema<string> = pipe(
     typeId: UUIDTypeId
   }),
   annotations({
-    [I.ArbitraryHookId]: () => I.makeArbitrary(UUID, (fc) => fc.uuid())
+    [I.ArbitraryHookId]: (): Arbitrary<string> => (fc) => fc.uuid()
   })
 )
 

@@ -2,7 +2,6 @@
  * @since 1.0.0
  */
 
-import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { Pretty } from "@effect/schema/Pretty"
 import type * as S from "@effect/schema/Schema"
@@ -10,12 +9,6 @@ import type * as S from "@effect/schema/Schema"
 // ---------------------------------------------
 // compiler constructors
 // ---------------------------------------------
-
-/** @internal */
-export const makeArbitrary = <A>(
-  schema: S.Schema<A>,
-  arbitrary: Arbitrary<A>["arbitrary"]
-): Arbitrary<A> => ({ ast: schema.ast, arbitrary }) as any
 
 /** @internal */
 export const makePretty = <A>(

@@ -14,8 +14,6 @@ Added in v1.0.0
 
 - [arbitrary](#arbitrary)
   - [arbitrary](#arbitrary-1)
-- [constructors](#constructors)
-  - [make](#make)
 - [hooks](#hooks)
   - [ArbitraryHookId](#arbitraryhookid)
 - [model](#model)
@@ -31,21 +29,6 @@ Added in v1.0.0
 
 ```ts
 export declare const arbitrary: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
-```
-
-Added in v1.0.0
-
-# constructors
-
-## make
-
-**Signature**
-
-```ts
-export declare const make: <A>(
-  schema: Schema<A, A>,
-  arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
-) => Arbitrary<A>
 ```
 
 Added in v1.0.0
@@ -69,8 +52,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Arbitrary<To> extends Schema<any, To> {
-  readonly arbitrary: (fc: typeof FastCheck) => FastCheck.Arbitrary<To>
+export interface Arbitrary<To> {
+  (fc: typeof FastCheck): FastCheck.Arbitrary<To>
 }
 ```
 
