@@ -112,9 +112,10 @@ Added in v1.0.0
   - [createIndexSignature](#createindexsignature)
   - [createPropertySignature](#createpropertysignature)
   - [createRecord](#createrecord)
-  - [from](#from)
   - [getAnnotation](#getannotation)
   - [getCompiler](#getcompiler)
+  - [getFrom](#getfrom)
+  - [getTo](#getto)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
@@ -122,7 +123,6 @@ Added in v1.0.0
   - [pick](#pick)
   - [reverse](#reverse)
   - [setAnnotation](#setannotation)
-  - [to](#to)
 
 ---
 
@@ -1246,16 +1246,6 @@ export declare const createRecord: (key: AST, value: AST, isReadonly: boolean) =
 
 Added in v1.0.0
 
-## from
-
-**Signature**
-
-```ts
-export declare const from: (ast: AST) => AST
-```
-
-Added in v1.0.0
-
 ## getAnnotation
 
 **Signature**
@@ -1272,6 +1262,26 @@ Added in v1.0.0
 
 ```ts
 export declare const getCompiler: <A>(match: Match<A>) => Compiler<A>
+```
+
+Added in v1.0.0
+
+## getFrom
+
+**Signature**
+
+```ts
+export declare const getFrom: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
+## getTo
+
+**Signature**
+
+```ts
+export declare const getTo: (ast: AST) => AST
 ```
 
 Added in v1.0.0
@@ -1481,16 +1491,6 @@ export declare const setAnnotation: (
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       isReversed: boolean
     }
-```
-
-Added in v1.0.0
-
-## to
-
-**Signature**
-
-```ts
-export declare const to: (ast: AST) => AST
 ```
 
 Added in v1.0.0

@@ -19,7 +19,7 @@ import { formatErrors } from "@effect/schema/TreeFormatter"
 
 const parse = (ast: AST.AST) => {
   const parse = go(ast)
-  return (input: unknown, options?: ParseOptions): any => {
+  return (input: unknown, options?: ParseOptions) => {
     const t = parse(input, options)
     if (PR.isFailure(t)) {
       throw new Error(formatErrors(t.left))
@@ -34,16 +34,13 @@ const parseOption = (ast: AST.AST) => {
     O.fromEither(parse(input, options))
 }
 
-const parseEither = (ast: AST.AST): (input: unknown, options?: ParseOptions) => ParseResult<any> =>
-  go(ast)
-
 /**
  * @category decoding
  * @since 1.0.0
  */
 export const decodeEither = <I, A>(
   schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => ParseResult<A> => parseEither(schema.ast)
+): (input: unknown, options?: ParseOptions) => ParseResult<A> => go(schema.ast)
 
 /**
  * @category decoding
@@ -66,7 +63,7 @@ export const decode = <I, A>(schema: Schema<I, A>): (input: unknown, options?: P
  */
 export const is = <I, A>(schema: Schema<I, A>) =>
   (input: unknown, options?: ParseOptions): input is A =>
-    E.isRight(parseEither(AST.to(schema.ast))(input, options))
+    E.isRight(go(AST.getTo(schema.ast))(input, options))
 
 /**
  * @since 1.0.0
@@ -82,7 +79,7 @@ export type ToAsserts<S extends Schema<any>> = (
  */
 export const asserts = <A>(schema: Schema<A>) =>
   (input: unknown, options?: ParseOptions): asserts input is A => {
-    parse(AST.to(schema.ast))(input, options)
+    parse(AST.getTo(schema.ast))(input, options)
   }
 
 /**
@@ -91,7 +88,7 @@ export const asserts = <A>(schema: Schema<A>) =>
  */
 export const validateEither = <I, A>(
   schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => ParseResult<A> => parseEither(AST.to(schema.ast))
+): (input: unknown, options?: ParseOptions) => ParseResult<A> => go(AST.getTo(schema.ast))
 
 /**
  * @category validation
@@ -99,7 +96,7 @@ export const validateEither = <I, A>(
  */
 export const validateOption = <I, A>(
   schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => Option<A> => parseOption(AST.to(schema.ast))
+): (input: unknown, options?: ParseOptions) => Option<A> => parseOption(AST.getTo(schema.ast))
 
 /**
  * @category validation
@@ -107,7 +104,7 @@ export const validateOption = <I, A>(
  */
 export const validate = <I, A>(
   schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => A => parse(AST.to(schema.ast))
+): (input: unknown, options?: ParseOptions) => A => parse(AST.getTo(schema.ast))
 
 /**
  * @category encoding
@@ -115,7 +112,7 @@ export const validate = <I, A>(
  */
 export const encodeEither = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => ParseResult<I> => parseEither(AST.reverse(schema.ast))
+): (a: A, options?: ParseOptions) => ParseResult<I> => go(AST.reverse(schema.ast))
 
 /**
  * @category encoding

@@ -807,7 +807,7 @@ export const createTransform = (
 ): Transform => ({
   _tag: "Transform",
   from,
-  to,
+  to: getTo(to),
   decode,
   encode,
   isReversed,
@@ -1018,31 +1018,31 @@ export const getCompiler = <A>(match: Match<A>): Compiler<A> => {
 /**
  * @since 1.0.0
  */
-export const to = (ast: AST): AST => {
+export const getTo = (ast: AST): AST => {
   switch (ast._tag) {
     case "Declaration":
-      return createDeclaration(ast.typeParameters.map(to), ast.type, ast.decode, ast.annotations)
+      return createDeclaration(ast.typeParameters.map(getTo), ast.type, ast.decode, ast.annotations)
     case "Tuple":
       return createTuple(
-        ast.elements.map((e) => ({ ...e, type: to(e.type) })),
-        O.map(ast.rest, RA.mapNonEmpty(to)),
+        ast.elements.map((e) => ({ ...e, type: getTo(e.type) })),
+        O.map(ast.rest, RA.mapNonEmpty(getTo)),
         ast.isReadonly,
         ast.annotations
       )
     case "TypeLiteral":
       return createTypeLiteral(
-        ast.propertySignatures.map((p) => ({ ...p, type: to(p.type) })),
-        ast.indexSignatures.map((is) => ({ ...is, type: to(is.type) })),
+        ast.propertySignatures.map((p) => ({ ...p, type: getTo(p.type) })),
+        ast.indexSignatures.map((is) => ({ ...is, type: getTo(is.type) })),
         ast.annotations
       )
     case "Union":
-      return createUnion(ast.types.map(to), ast.annotations)
+      return createUnion(ast.types.map(getTo), ast.annotations)
     case "Lazy":
-      return createLazy(() => to(ast.f()), ast.annotations)
+      return createLazy(() => getTo(ast.f()), ast.annotations)
     case "Refinement":
-      return createRefinement(to(ast.from), ast.decode, false, ast.annotations)
+      return createRefinement(getTo(ast.from), ast.decode, false, ast.annotations)
     case "Transform":
-      return to(ast.to)
+      return getTo(ast.to)
   }
   return ast
 }
@@ -1050,35 +1050,35 @@ export const to = (ast: AST): AST => {
 /**
  * @since 1.0.0
  */
-export const from = (ast: AST): AST => {
+export const getFrom = (ast: AST): AST => {
   switch (ast._tag) {
     case "Declaration":
       return createDeclaration(
-        ast.typeParameters.map(from),
+        ast.typeParameters.map(getFrom),
         ast.type,
         ast.decode,
         ast.annotations
       )
     case "Tuple":
       return createTuple(
-        ast.elements.map((e) => ({ ...e, type: from(e.type) })),
-        O.map(ast.rest, RA.mapNonEmpty(from)),
+        ast.elements.map((e) => ({ ...e, type: getFrom(e.type) })),
+        O.map(ast.rest, RA.mapNonEmpty(getFrom)),
         ast.isReadonly,
         ast.annotations
       )
     case "TypeLiteral":
       return createTypeLiteral(
-        ast.propertySignatures.map((p) => ({ ...p, type: from(p.type) })),
-        ast.indexSignatures.map((is) => ({ ...is, type: from(is.type) })),
+        ast.propertySignatures.map((p) => ({ ...p, type: getFrom(p.type) })),
+        ast.indexSignatures.map((is) => ({ ...is, type: getFrom(is.type) })),
         ast.annotations
       )
     case "Union":
-      return createUnion(ast.types.map(from), ast.annotations)
+      return createUnion(ast.types.map(getFrom), ast.annotations)
     case "Lazy":
-      return createLazy(() => from(ast.f()), ast.annotations)
+      return createLazy(() => getFrom(ast.f()), ast.annotations)
     case "Refinement":
     case "Transform":
-      return from(ast.from)
+      return getFrom(ast.from)
   }
   return ast
 }
