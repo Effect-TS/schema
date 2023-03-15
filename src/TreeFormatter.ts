@@ -118,13 +118,13 @@ export const formatExpected = (ast: AST.AST): string => {
     case "Union":
       return ast.types.map(formatExpected).join(" or ")
     case "Refinement":
-      return pipe(getExpected(ast), O.getOrElse(() => "refinement"))
+      return pipe(getExpected(ast), O.getOrElse(() => "<anonymous refinement schema>"))
     case "TemplateLiteral":
       return pipe(getExpected(ast), O.getOrElse(() => formatTemplateLiteral(ast)))
     case "Tuple":
-      return pipe(getExpected(ast), O.getOrElse(() => "tuple or array"))
+      return pipe(getExpected(ast), O.getOrElse(() => "<anonymous tuple or array schema>"))
     case "TypeLiteral":
-      return pipe(getExpected(ast), O.getOrElse(() => "type literal"))
+      return pipe(getExpected(ast), O.getOrElse(() => "<anonymous type literal schema>"))
     case "Enums":
       return pipe(
         getExpected(ast),
@@ -133,12 +133,12 @@ export const formatExpected = (ast: AST.AST): string => {
     case "Lazy":
       return pipe(
         getExpected(ast),
-        O.getOrElse(() => "<anonymous Lazy schema>")
+        O.getOrElse(() => "<anonymous lazy schema>")
       )
     case "Declaration":
       return pipe(
         getExpected(ast),
-        O.getOrElse(() => "<anonymous Declaration schema>")
+        O.getOrElse(() => "<anonymous declaration schema>")
       )
     case "Transform":
       return `a parsable value from ${formatExpected(ast.from)} to ${formatExpected(ast.to)}`

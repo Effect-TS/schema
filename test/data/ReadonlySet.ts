@@ -69,7 +69,7 @@ describe.concurrent("ReadonlySet", () => {
     Util.expectDecodingFailure(
       schema,
       null,
-      `Expected tuple or array, actual null`
+      `Expected <anonymous tuple or array schema>, actual null`
     )
     Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })

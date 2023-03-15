@@ -405,7 +405,7 @@ describe.concurrent("Encoder", () => {
     Util.expectEncodingFailure(
       schema,
       null as any,
-      `Expected type literal, actual null`
+      `Expected <anonymous type literal schema>, actual null`
     )
   })
 
