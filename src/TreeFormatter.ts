@@ -157,12 +157,22 @@ const go = (e: PR.ParseError): Tree<string> => {
           )
         )
       )
-    case "Index":
-      return make(`index ${e.index}`, e.errors.map(go))
+    case "Index": {
+      const es = e.errors.map(go)
+      if (es.length === 1 && es[0].forest.length !== 0) {
+        return make(`[${e.index}]${es[0].value}`, es[0].forest)
+      }
+      return make(`[${e.index}]`, es)
+    }
     case "Unexpected":
       return make(`is unexpected`)
-    case "Key":
-      return make(`key ${formatActual(e.key)}`, e.errors.map(go))
+    case "Key": {
+      const es = e.errors.map(go)
+      if (es.length === 1 && es[0].forest.length !== 0) {
+        return make(`[${formatActual(e.key)}]${es[0].value}`, es[0].forest)
+      }
+      return make(`[${formatActual(e.key)}]`, es)
+    }
     case "Missing":
       return make(`is missing`)
     case "UnionMember":

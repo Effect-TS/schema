@@ -99,9 +99,10 @@ const formatDecodeError = (e: PR.ParseError): string => {
 export const expectDecodingFailureTree = <I, A>(
   schema: Schema<I, A>,
   u: unknown,
-  message: string
+  message: string,
+  options?: ParseOptions
 ) => {
-  const t = pipe(P.decodeEither(schema)(u), E.mapLeft(formatErrors))
+  const t = pipe(P.decodeEither(schema)(u, options), E.mapLeft(formatErrors))
   expect(E.isLeft(t)).toEqual(true)
   expect(t).toEqual(E.left(message))
 }

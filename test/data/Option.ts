@@ -106,7 +106,7 @@ describe.concurrent("Option", () => {
       schema,
       { a: "a", b: "b" },
       `error(s) found
-└─ key "b"
+└─ ["b"]
    ├─ union member
    │  └─ Expected undefined, actual "b"
    ├─ union member

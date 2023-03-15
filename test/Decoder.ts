@@ -25,7 +25,7 @@ describe.concurrent("Decoder", () => {
     })
     expect(() => P.decode(schema)({})).toThrowError(
       new Error(`error(s) found
-└─ key "name"
+└─ ["name"]
    └─ is missing`)
     )
   })
@@ -968,7 +968,7 @@ describe.concurrent("Decoder", () => {
       schema,
       ["a"],
       `error(s) found
-└─ index 0
+└─ [0]
    ├─ union member
    │  └─ Expected number, actual "a"
    └─ union member
@@ -988,7 +988,7 @@ describe.concurrent("Decoder", () => {
       ["a"],
       `error(s) found
 ├─ union member
-│  └─ index 0
+│  └─ [0]
 │     ├─ union member
 │     │  └─ Expected number, actual "a"
 │     └─ union member

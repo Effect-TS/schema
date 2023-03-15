@@ -9,8 +9,39 @@ describe.concurrent("TreeFormatter", () => {
       schema,
       { a: "a", b: 1 },
       `error(s) found
-└─ key "b"
+└─ ["b"]
    └─ is unexpected`
+    )
+  })
+
+  it("formatErrors/ should collapse trees that have a branching factor of 1", () => {
+    const schema = S.struct({
+      a: S.struct({ b: S.struct({ c: S.array(S.struct({ d: S.string })) }) })
+    })
+    Util.expectDecodingFailureTree(
+      schema,
+      { a: { b: { c: [{ d: null }] } } },
+      `error(s) found
+└─ ["a"]["b"]["c"][0]["d"]
+   └─ Expected string, actual null`
+    )
+    Util.expectDecodingFailureTree(
+      schema,
+      { a: { b: { c: [{ d: null }, { d: 1 }] } } },
+      `error(s) found
+└─ ["a"]["b"]["c"][0]["d"]
+   └─ Expected string, actual null`
+    )
+    Util.expectDecodingFailureTree(
+      schema,
+      { a: { b: { c: [{ d: null }, { d: 1 }] } } },
+      `error(s) found
+└─ ["a"]["b"]["c"]
+   ├─ [0]["d"]
+   │  └─ Expected string, actual null
+   └─ [1]["d"]
+      └─ Expected string, actual 1`,
+      { allErrors: true }
     )
   })
 
