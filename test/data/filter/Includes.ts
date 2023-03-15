@@ -5,7 +5,7 @@ import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("includes", () => {
   it("property tests", () => {
-    Util.property(S.includes("a")(S.string))
+    Util.roundtrip(S.includes("a")(S.string))
   })
 
   it("Guard", () => {
@@ -31,7 +31,7 @@ describe.concurrent("includes", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.pretty(S.includes("a")(S.string))
+    const pretty = Pretty.to(S.includes("a")(S.string))
     expect(pretty("a")).toEqual(`"a"`)
   })
 })

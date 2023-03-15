@@ -1,5 +1,4 @@
 import { pipe } from "@effect/data/Function"
-import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
@@ -57,13 +56,7 @@ describe.concurrent("Number", () => {
     const schema = S.numberFromString(S.string)
 
     it("property tests", () => {
-      Util.property(schema)
-    })
-
-    it("Guard", () => {
-      const is = P.is(schema)
-      expect(is(1)).toEqual(true)
-      expect(is("a")).toEqual(false)
+      Util.roundtrip(schema)
     })
 
     it("Decoder", () => {

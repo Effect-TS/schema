@@ -127,8 +127,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const asserts: <A>(
-  schema: Schema<A, A>
+export declare const asserts: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
 ```
 

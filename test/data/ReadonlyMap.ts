@@ -11,7 +11,7 @@ describe.concurrent("ReadonlyMap", () => {
   })
 
   it("readonlyMapFromSelf. property tests", () => {
-    Util.property(S.readonlyMapFromSelf(S.number, S.string))
+    Util.roundtrip(S.readonlyMapFromSelf(S.number, S.string))
   })
 
   it("readonlyMapFromSelf. decoder", () => {
@@ -62,7 +62,7 @@ describe.concurrent("ReadonlyMap", () => {
 
   it("readonlyMapFromSelf. pretty", () => {
     const schema = S.readonlyMapFromSelf(S.number, S.string)
-    const pretty = Pretty.pretty(schema)
+    const pretty = Pretty.to(schema)
     expect(pretty(new Map())).toEqual("new Map([])")
     expect(pretty(new Map([[1, "a"], [2, "b"]]))).toEqual(
       `new Map([[1, "a"], [2, "b"]])`
@@ -70,7 +70,7 @@ describe.concurrent("ReadonlyMap", () => {
   })
 
   it("readonlyMap. property tests", () => {
-    Util.property(S.readonlyMap(S.number, S.string))
+    Util.roundtrip(S.readonlyMap(S.number, S.string))
   })
 
   it("readonlyMap. decoder", () => {

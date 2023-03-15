@@ -58,11 +58,6 @@ export const from = <I, A>(schema: Schema<I, A>): Schema<I> => make(AST.getFrom(
  */
 export const to = <I, A>(schema: Schema<I, A>): Schema<A> => make(AST.getTo(schema.ast))
 
-/**
- * @since 1.0.0
- */
-export const reverse = <I, A>(schema: Schema<I, A>): Schema<A, I> => make(AST.reverse(schema.ast))
-
 /* c8 ignore start */
 export {
   /**
@@ -1230,9 +1225,12 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
  * @category combinators
  * @since 1.0.0
  */
-export const dataFromSelf = <I, A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+export const dataFromSelf = <
+  I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
+  A extends Readonly<Record<string, any>> | ReadonlyArray<any>
+>(
   item: Schema<I, A>
-): Schema<I, D.Data<A>> => {
+): Schema<D.Data<I>, D.Data<A>> => {
   const schema = declare(
     [item],
     item,
@@ -1258,7 +1256,10 @@ export const dataFromSelf = <I, A extends Readonly<Record<string, any>> | Readon
  * @category parsers
  * @since 1.0.0
  */
-export const data = <I, A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+export const data = <
+  I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
+  A extends Readonly<Record<string, any>> | ReadonlyArray<any>
+>(
   item: Schema<I, A>
 ): Schema<I, D.Data<A>> =>
   transform(

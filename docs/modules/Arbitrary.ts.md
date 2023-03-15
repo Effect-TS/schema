@@ -13,7 +13,8 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [arbitrary](#arbitrary)
-  - [arbitrary](#arbitrary-1)
+  - [from](#from)
+  - [to](#to)
 - [hooks](#hooks)
   - [ArbitraryHookId](#arbitraryhookid)
 - [model](#model)
@@ -23,12 +24,22 @@ Added in v1.0.0
 
 # arbitrary
 
-## arbitrary
+## from
 
 **Signature**
 
 ```ts
-export declare const arbitrary: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+export declare const from: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+```
+
+Added in v1.0.0
+
+## to
+
+**Signature**
+
+```ts
+export declare const to: <I, A>(schema: Schema<I, A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
 ```
 
 Added in v1.0.0

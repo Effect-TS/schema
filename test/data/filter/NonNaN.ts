@@ -8,7 +8,7 @@ const schema = pipe(S.number, S.nonNaN())
 
 describe.concurrent("nonNaN", () => {
   it("property tests", () => {
-    Util.property(schema)
+    Util.roundtrip(schema)
   })
 
   it("Guard", () => {
@@ -23,7 +23,7 @@ describe.concurrent("nonNaN", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.pretty(schema)
+    const pretty = Pretty.to(schema)
     expect(pretty(1)).toEqual("1")
     expect(pretty(NaN)).toEqual("NaN")
   })

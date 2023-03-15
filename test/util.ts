@@ -6,20 +6,21 @@ import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
+import * as S from "@effect/schema/Schema"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
 import * as fc from "fast-check"
 
-export const property = <I, A>(schema: Schema<I, A>) => {
-  const arbitrary = A.arbitrary(schema)
-  const is = P.is(schema)
-  fc.assert(fc.property(arbitrary(fc), (a) => {
+export const roundtrip = <I, A>(schema: Schema<I, A>) => {
+  const to = S.to(schema)
+  const arb = A.to(to)
+  const is = S.is(to)
+  fc.assert(fc.property(arb(fc), (a) => {
     if (!is(a)) {
       return false
     }
-    const roundtrip = pipe(a, P.encodeEither(schema), E.flatMap(P.decodeEither(schema)))
+    const roundtrip = pipe(a, S.encodeEither(schema), E.flatMap(S.decodeEither(schema)))
     if (PR.isFailure(roundtrip)) {
       return false
     }
@@ -33,7 +34,7 @@ export const expectDecodingSuccess = <I, A>(
   a: A = u as any,
   options?: ParseOptions
 ) => {
-  const t = P.decodeEither(schema)(u, options)
+  const t = S.decodeEither(schema)(u, options)
   expect(t).toStrictEqual(E.right(a))
 }
 
@@ -43,7 +44,7 @@ export const expectDecodingFailure = <I, A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(P.decodeEither(schema)(u, options), E.mapLeft(formatAll))
+  const t = pipe(S.decodeEither(schema)(u, options), E.mapLeft(formatAll))
   expect(t).toStrictEqual(E.left(message))
 }
 
@@ -53,7 +54,7 @@ export const expectEncodingSuccess = <I, A>(
   o: unknown,
   options?: ParseOptions
 ) => {
-  const t = P.encodeEither(schema)(a, options)
+  const t = S.encodeEither(schema)(a, options)
   expect(t).toStrictEqual(E.right(o))
 }
 
@@ -63,7 +64,7 @@ export const expectEncodingFailure = <I, A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(P.encodeEither(schema)(a, options), E.mapLeft(formatAll))
+  const t = pipe(S.encodeEither(schema)(a, options), E.mapLeft(formatAll))
   expect(t).toStrictEqual(E.left(message))
 }
 
@@ -102,7 +103,7 @@ export const expectDecodingFailureTree = <I, A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(P.decodeEither(schema)(u, options), E.mapLeft(formatErrors))
+  const t = pipe(S.decodeEither(schema)(u, options), E.mapLeft(formatErrors))
   expect(E.isLeft(t)).toEqual(true)
   expect(t).toEqual(E.left(message))
 }

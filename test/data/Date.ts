@@ -9,7 +9,7 @@ describe.concurrent("Date", () => {
   })
 
   it("date. property tests", () => {
-    Util.property(S.date)
+    Util.roundtrip(S.date)
   })
 
   it("date. decoder", () => {
@@ -31,7 +31,7 @@ describe.concurrent("Date", () => {
   })
 
   it("date. pretty", () => {
-    const pretty = Pretty.pretty(S.date)
+    const pretty = Pretty.to(S.date)
     expect(pretty(new Date(0))).toEqual("new Date(\"1970-01-01T00:00:00.000Z\")")
   })
 
@@ -39,13 +39,7 @@ describe.concurrent("Date", () => {
     const schema = S.dateFromString(S.string)
 
     it("property tests", () => {
-      Util.property(schema)
-    })
-
-    it("Guard", () => {
-      const is = P.is(schema)
-      expect(is(new Date())).toEqual(true)
-      expect(is("0")).toEqual(false)
+      Util.roundtrip(schema)
     })
 
     it("Decoder", () => {

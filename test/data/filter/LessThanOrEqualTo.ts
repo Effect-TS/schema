@@ -5,7 +5,7 @@ import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("lessThanOrEqualTo", () => {
   it("property tests", () => {
-    Util.property(S.lessThanOrEqualTo(0)(S.number))
+    Util.roundtrip(S.lessThanOrEqualTo(0)(S.number))
   })
 
   it("Guard", () => {
@@ -27,7 +27,7 @@ describe.concurrent("lessThanOrEqualTo", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.pretty(S.lessThanOrEqualTo(0)(S.number))
+    const pretty = Pretty.to(S.lessThanOrEqualTo(0)(S.number))
     expect(pretty(1)).toEqual("1")
   })
 })

@@ -23,8 +23,8 @@ const Eur = B.nominal<Eur>()
 
 describe.concurrent("Brand", () => {
   it("property tests", () => {
-    Util.property(S.fromBrand(Int)(S.number)) // refined
-    Util.property(S.fromBrand(Eur)(S.number)) // nominal
+    Util.roundtrip(S.fromBrand(Int)(S.number)) // refined
+    Util.roundtrip(S.fromBrand(Eur)(S.number)) // nominal
   })
 
   it("refined", () => {

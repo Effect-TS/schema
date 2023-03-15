@@ -29,8 +29,17 @@ export const ArbitraryHookId = I.ArbitraryHookId
  * @category arbitrary
  * @since 1.0.0
  */
-export const arbitrary = <I, A>(schema: Schema<I, A>) =>
-  (fc: typeof FastCheck): FastCheck.Arbitrary<A> => go(schema.ast)(fc)
+export const to = <I, A>(
+  schema: Schema<I, A>
+): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(schema.ast)
+
+/**
+ * @category arbitrary
+ * @since 1.0.0
+ */
+export const from = <I, A>(
+  schema: Schema<I, A>
+): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(AST.getFrom(schema.ast))
 
 const record = <K extends PropertyKey, V>(
   fc: typeof FastCheck,
@@ -87,6 +96,16 @@ const go = I.memoize((ast: AST.AST): Arbitrary<any> => {
       return (fc) => fc.string().map((s) => Symbol.for(s))
     case "ObjectKeyword":
       return (fc) => fc.oneof(fc.object(), fc.array(fc.anything()))
+    case "TemplateLiteral": {
+      return (fc) => {
+        const components = [fc.constant(ast.head)]
+        for (const span of ast.spans) {
+          components.push(fc.string({ maxLength: 5 }))
+          components.push(fc.constant(span.literal))
+        }
+        return fc.tuple(...components).map((spans) => spans.join(""))
+      }
+    }
     case "Tuple": {
       const elements = ast.elements.map((e) => go(e.type))
       const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
@@ -191,16 +210,6 @@ const go = I.memoize((ast: AST.AST): Arbitrary<any> => {
           (handler) => handler(from)
         )
       )
-    }
-    case "TemplateLiteral": {
-      return (fc) => {
-        const components = [fc.constant(ast.head)]
-        for (const span of ast.spans) {
-          components.push(fc.string({ maxLength: 5 }))
-          components.push(fc.constant(span.literal))
-        }
-        return fc.tuple(...components).map((spans) => spans.join(""))
-      }
     }
     case "Transform":
       return go(ast.to)

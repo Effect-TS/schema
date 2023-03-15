@@ -10,7 +10,7 @@ const NumberFromString = S.numberFromString(S.string)
 describe.concurrent("Option", () => {
   describe.concurrent("option", () => {
     it("property tests", () => {
-      Util.property(S.option(S.number))
+      Util.roundtrip(S.option(S.number))
     })
 
     it("Decoder", () => {
@@ -28,7 +28,7 @@ describe.concurrent("Option", () => {
 
   describe.concurrent("optionFromSelf", () => {
     it("property tests", () => {
-      Util.property(S.optionFromSelf(NumberFromString))
+      Util.roundtrip(S.optionFromSelf(NumberFromString))
     })
 
     it("Guard", () => {
@@ -51,7 +51,7 @@ describe.concurrent("Option", () => {
 
     it("Pretty", () => {
       const schema = S.optionFromSelf(S.number)
-      const pretty = Pretty.pretty(schema)
+      const pretty = Pretty.to(schema)
       expect(pretty(O.none())).toEqual("none()")
       expect(pretty(O.some(1))).toEqual("some(1)")
     })
@@ -59,7 +59,7 @@ describe.concurrent("Option", () => {
 
   describe.concurrent("optionFromNullable", () => {
     it("property tests", () => {
-      Util.property(S.optionFromNullable(S.number))
+      Util.roundtrip(S.optionFromNullable(S.number))
     })
 
     it("Decoder", () => {

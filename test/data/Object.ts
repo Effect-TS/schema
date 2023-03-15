@@ -22,7 +22,7 @@ describe.concurrent("Object", () => {
 
     it("Pretty", () => {
       const schema = S.instanceOf(Set)
-      const pretty = Pretty.pretty(schema)
+      const pretty = Pretty.to(schema)
       expect(pretty(new Set())).toEqual("{}")
     })
   })

@@ -24,6 +24,18 @@ export interface Pretty<To> {
  */
 export const PrettyHookId = I.PrettyHookId
 
+/**
+ * @category prettify
+ * @since 1.0.0
+ */
+export const to = <A>(schema: Schema<A>): (a: A) => string => compile(schema.ast)
+
+/**
+ * @category prettify
+ * @since 1.0.0
+ */
+export const from = <A>(schema: Schema<A>): (a: A) => string => compile(AST.getFrom(schema.ast))
+
 const getHook = AST.getAnnotation<(...args: ReadonlyArray<Pretty<any>>) => Pretty<any>>(
   PrettyHookId
 )
@@ -163,12 +175,6 @@ export const match: AST.Match<Pretty<any>> = {
 }
 
 const compile = AST.getCompiler(match)
-
-/**
- * @category prettify
- * @since 1.0.0
- */
-export const pretty = <I, A>(schema: Schema<I, A>) => (a: A): string => compile(schema.ast)(a)
 
 const getPrettyPropertyKey = (name: PropertyKey): string =>
   typeof name === "string" ? JSON.stringify(name) : String(name)

@@ -5,7 +5,7 @@ import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("maxLength", () => {
   it("property tests", () => {
-    Util.property(S.maxLength(0)(S.string))
+    Util.roundtrip(S.maxLength(0)(S.string))
   })
 
   it("Guard", () => {
@@ -27,7 +27,7 @@ describe.concurrent("maxLength", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.pretty(S.maxLength(0)(S.string))
+    const pretty = Pretty.to(S.maxLength(0)(S.string))
     expect(pretty("a")).toEqual(`"a"`)
   })
 })

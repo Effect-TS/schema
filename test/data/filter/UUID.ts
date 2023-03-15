@@ -3,7 +3,7 @@ import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("UUID", () => {
   it("property tests", () => {
-    Util.property(S.UUID)
+    Util.roundtrip(S.UUID)
   })
 
   it("Decoder", () => {

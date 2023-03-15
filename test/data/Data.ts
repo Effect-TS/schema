@@ -14,8 +14,8 @@ describe.concurrent("Data", () => {
   })
 
   it("dataFromSelf. property tests", () => {
-    Util.property(S.dataFromSelf(S.struct({ a: S.string, b: S.number })))
-    Util.property(S.dataFromSelf(S.array(S.number)))
+    Util.roundtrip(S.dataFromSelf(S.struct({ a: S.string, b: S.number })))
+    Util.roundtrip(S.dataFromSelf(S.array(S.number)))
   })
 
   it("dataFromSelf. decoder", () => {
@@ -56,13 +56,13 @@ describe.concurrent("Data", () => {
 
   it("dataFromSelf. pretty", () => {
     const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
-    const pretty = Pretty.pretty(schema)
+    const pretty = Pretty.to(schema)
     expect(pretty(Data.struct({ a: "ok", b: 0 }))).toEqual("Data({ \"a\": \"ok\", \"b\": 0 })")
   })
 
   it("data. property tests", () => {
-    Util.property(S.data(S.struct({ a: S.string, b: S.number })))
-    Util.property(S.data(S.array(S.number)))
+    Util.roundtrip(S.data(S.struct({ a: S.string, b: S.number })))
+    Util.roundtrip(S.data(S.array(S.number)))
   })
 
   it("data. decoder", () => {

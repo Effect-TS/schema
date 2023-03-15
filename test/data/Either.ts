@@ -9,7 +9,7 @@ const NumberFromString = S.numberFromString(S.string)
 describe.concurrent("Either", () => {
   describe.concurrent("eitherFromSelf", () => {
     it("property tests", () => {
-      Util.property(S.eitherFromSelf(S.string, S.number))
+      Util.roundtrip(S.eitherFromSelf(S.string, S.number))
     })
 
     it("Guard", () => {
@@ -33,7 +33,7 @@ describe.concurrent("Either", () => {
 
     it("Pretty", () => {
       const schema = S.eitherFromSelf(S.string, S.number)
-      const pretty = Pretty.pretty(schema)
+      const pretty = Pretty.to(schema)
       expect(pretty(E.left("a"))).toEqual(`left("a")`)
       expect(pretty(E.right(1))).toEqual("right(1)")
     })
@@ -41,7 +41,7 @@ describe.concurrent("Either", () => {
 
   describe.concurrent("either", () => {
     it("property tests", () => {
-      Util.property(S.either(S.string, S.number))
+      Util.roundtrip(S.either(S.string, S.number))
     })
 
     it("Decoder", () => {

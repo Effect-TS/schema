@@ -1,18 +1,17 @@
 import { pipe } from "@effect/data/Function"
 import * as A from "@effect/schema/Arbitrary"
-import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 import * as fc from "fast-check"
 
 export const property = <A>(schema: S.Schema<A>) => {
-  const arbitrary = A.arbitrary(schema)
-  const is = P.is(schema)
+  const arbitrary = A.to(schema)
+  const is = S.is(schema)
   fc.assert(fc.property(arbitrary(fc), (a) => is(a)))
 }
 
 describe.concurrent("Arbitrary", () => {
   it("exports", () => {
-    expect(A.arbitrary).exist
+    expect(A.to).exist
     expect(A.ArbitraryHookId).exist
   })
 
@@ -47,7 +46,7 @@ describe.concurrent("Arbitrary", () => {
   })
 
   it("never", () => {
-    expect(() => A.arbitrary(S.never)(fc)).toThrowError(
+    expect(() => A.to(S.never)(fc)).toThrowError(
       new Error("cannot build an Arbitrary for `never`")
     )
   })
@@ -99,7 +98,7 @@ describe.concurrent("Arbitrary", () => {
   it("empty enums should throw", () => {
     enum Fruits {}
     const schema = S.enums(Fruits)
-    expect(() => A.arbitrary(schema)(fc)).toThrowError(
+    expect(() => A.to(schema)(fc)).toThrowError(
       new Error("cannot build an Arbitrary for an empty enum")
     )
   })

@@ -5,7 +5,7 @@ import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("minLength", () => {
   it("property tests", () => {
-    Util.property(S.minLength(0)(S.string))
+    Util.roundtrip(S.minLength(0)(S.string))
   })
 
   it("Guard", () => {
@@ -27,7 +27,7 @@ describe.concurrent("minLength", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.pretty(S.minLength(0)(S.string))
+    const pretty = Pretty.to(S.minLength(0)(S.string))
     expect(pretty("a")).toEqual(`"a"`)
   })
 })

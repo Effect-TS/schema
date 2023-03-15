@@ -6,7 +6,7 @@ describe.concurrent("trim", () => {
   const schema = S.trim(S.string)
 
   it("property tests", () => {
-    Util.property(schema)
+    Util.roundtrip(schema)
   })
 
   it("Guard", () => {

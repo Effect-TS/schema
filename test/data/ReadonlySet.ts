@@ -11,7 +11,7 @@ describe.concurrent("ReadonlySet", () => {
   })
 
   it("readonlySetFromSelf. property tests", () => {
-    Util.property(S.readonlySetFromSelf(S.number))
+    Util.roundtrip(S.readonlySetFromSelf(S.number))
   })
 
   it("readonlySetFromSelf. decoder", () => {
@@ -50,7 +50,7 @@ describe.concurrent("ReadonlySet", () => {
 
   it("readonlySetFromSelf. pretty", () => {
     const schema = S.readonlySetFromSelf(S.string)
-    const pretty = Pretty.pretty(schema)
+    const pretty = Pretty.to(schema)
     expect(pretty(new Set())).toEqual("new Set([])")
     expect(pretty(new Set(["a", "b"]))).toEqual(
       `new Set(["a", "b"])`
@@ -58,7 +58,7 @@ describe.concurrent("ReadonlySet", () => {
   })
 
   it("readonlySet. property tests", () => {
-    Util.property(S.readonlySet(S.number))
+    Util.roundtrip(S.readonlySet(S.number))
   })
 
   it("readonlySet. decoder", () => {

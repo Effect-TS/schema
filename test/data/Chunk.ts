@@ -14,7 +14,7 @@ describe.concurrent("Chunk", () => {
   })
 
   it("chunkFromSelf. property tests", () => {
-    Util.property(S.chunkFromSelf(S.number))
+    Util.roundtrip(S.chunkFromSelf(S.number))
   })
 
   it("chunkFromSelf. decoder", () => {
@@ -52,7 +52,7 @@ describe.concurrent("Chunk", () => {
 
   it("chunkFromSelf. pretty", () => {
     const schema = S.chunkFromSelf(S.string)
-    const pretty = Pretty.pretty(schema)
+    const pretty = Pretty.to(schema)
     expect(pretty(C.empty())).toEqual("Chunk()")
     expect(pretty(C.fromIterable(["a", "b"]))).toEqual(
       "Chunk(\"a\", \"b\")"
@@ -60,7 +60,7 @@ describe.concurrent("Chunk", () => {
   })
 
   it("chunk. property tests", () => {
-    Util.property(S.chunk(S.number))
+    Util.roundtrip(S.chunk(S.number))
   })
 
   it("chunk. decoder", () => {

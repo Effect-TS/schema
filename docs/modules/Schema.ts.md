@@ -183,7 +183,6 @@ Added in v1.0.0
   - [getPropertySignatures](#getpropertysignatures)
   - [is](#is)
   - [optional](#optional)
-  - [reverse](#reverse)
   - [to](#to)
   - [validate](#validate)
   - [validateEither](#validateeither)
@@ -349,9 +348,12 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const dataFromSelf: <I, A extends readonly any[] | Readonly<Record<string, any>>>(
+export declare const dataFromSelf: <
+  I extends readonly any[] | Readonly<Record<string, any>>,
+  A extends readonly any[] | Readonly<Record<string, any>>
+>(
   item: Schema<I, A>
-) => Schema<I, D.Data<A>>
+) => Schema<D.Data<I>, D.Data<A>>
 ```
 
 Added in v1.0.0
@@ -1319,7 +1321,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const data: <I, A extends readonly any[] | Readonly<Record<string, any>>>(
+export declare const data: <
+  I extends readonly any[] | Readonly<Record<string, any>>,
+  A extends readonly any[] | Readonly<Record<string, any>>
+>(
   item: Schema<I, A>
 ) => Schema<I, D.Data<A>>
 ```
@@ -2052,8 +2057,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const asserts: <A>(
-  schema: Schema<A, A>
+export declare const asserts: <I, A>(
+  schema: Schema<I, A>
 ) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
 ```
 
@@ -2194,16 +2199,6 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: <I, A>(schema: Schema<I, A>) => OptionalSchema<I, A>
-```
-
-Added in v1.0.0
-
-## reverse
-
-**Signature**
-
-```ts
-export declare const reverse: <I, A>(schema: Schema<I, A>) => Schema<A, I>
 ```
 
 Added in v1.0.0

@@ -5,7 +5,7 @@ import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("multipleOf", () => {
   it("property tests", () => {
-    Util.property(S.multipleOf(2)(S.number))
+    Util.roundtrip(S.multipleOf(2)(S.number))
   })
 
   it("Guard", () => {

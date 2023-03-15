@@ -77,7 +77,7 @@ export type ToAsserts<S extends Schema<any>> = (
  * @category validation
  * @since 1.0.0
  */
-export const asserts = <A>(schema: Schema<A>) =>
+export const asserts = <I, A>(schema: Schema<I, A>) =>
   (input: unknown, options?: ParseOptions): asserts input is A => {
     parse(AST.getTo(schema.ast))(input, options)
   }
@@ -491,7 +491,7 @@ const go = I.memoize((ast: AST.AST): Parser => {
     case "Transform": {
       const from = go(ast.from)
       if (ast.isReversed) {
-        const to = go(AST.getTo(ast.to))
+        const to = go(ast.to)
         return (a, options) =>
           pipe(
             to(a, options), // validate input
@@ -527,7 +527,7 @@ export const _getLiterals = (
     case "Refinement":
       return _getLiterals(ast.from)
     case "Transform":
-      return ast.isReversed ? _getLiterals(ast.to) : _getLiterals(ast.from)
+      return ast.isReversed ? _getLiterals(ast.to) : _getLiterals(AST.getFrom(ast.from))
   }
   return []
 }
