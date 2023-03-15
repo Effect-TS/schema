@@ -52,7 +52,6 @@ specifiers:
   ultra-runner: ^3.10.5
   vite: ^4.1.4
   vitest: 0.29.2
-publishDirectory: dist
 
 dependencies:
   '@effect/data': 0.4.1
@@ -7124,3 +7123,5 @@ packages:
       tslint: 5.20.1_typescript@4.9.5
       typescript: 4.9.5
     dev: true
+
+publishDirectory: dist
