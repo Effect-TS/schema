@@ -472,8 +472,8 @@ const go = I.memoize((ast: AST.AST): Parser => {
     }
     case "Lazy": {
       const f = () => go(ast.f())
-      const get = I.memoize<void, Parser>(f)
-      return (a, options) => get()(a, options)
+      const get = I.memoize<typeof f, Parser>(f)
+      return (a, options) => get(f)(a, options)
     }
     case "Refinement": {
       const from = go(ast.from)

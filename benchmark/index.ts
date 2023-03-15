@@ -6,14 +6,9 @@ import * as Benchmark from "benchmark"
 io-ts
 space-object (good) x 476,424 ops/sec ±0.45% (92 runs sampled)
 space-object (bad) x 434,563 ops/sec ±0.58% (87 runs sampled)
-0.0.6
-space-object (good) x 289,187 ops/sec ±0.25% (87 runs sampled)
-space-object (bad) x 885,639 ops/sec ±5.38% (76 runs sampled)
-0.0.8
-decode (good) x 244,100 ops/sec ±4.51% (82 runs sampled)
-decode (bad) x 698,427 ops/sec ±4.93% (81 runs sampled)
-is (good) x 133,939 ops/sec ±0.56% (86 runs sampled)
-is (bad) x 204,531 ops/sec ±7.83% (81 runs sampled)
+0.2.0
+decodeEither (good) x 114,959 ops/sec ±0.26% (87 runs sampled)
+decodeEither (bad) x 364,433 ops/sec ±3.79% (84 runs sampled)
 */
 
 const suite = new Benchmark.Suite()

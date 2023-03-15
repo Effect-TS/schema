@@ -170,9 +170,9 @@ export const match: AST.Match<Pretty<any>> = {
   },
   "Lazy": (ast, go) => {
     const f = () => go(ast.f())
-    const get = I.memoize<void, Pretty<any>>(f)
+    const get = I.memoize<typeof f, Pretty<any>>(f)
     const schema = I.lazy(f)
-    return make(schema, (a) => get().pretty(a))
+    return make(schema, (a) => get(f).pretty(a))
   },
   "Refinement": (ast, go) => go(ast.from),
   "Transform": (ast, go) => go(ast.to)

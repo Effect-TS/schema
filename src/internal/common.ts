@@ -67,8 +67,8 @@ export const getKeysForIndexSignature = (
 // ---------------------------------------------
 
 /** @internal */
-export const memoize = <A, B>(f: (a: A) => B): (a: A) => B => {
-  const cache = new Map()
+export const memoize = <A extends object, B>(f: (a: A) => B): (a: A) => B => {
+  const cache = new WeakMap()
   return (a) => {
     if (!cache.has(a)) {
       const b = f(a)

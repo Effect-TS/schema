@@ -190,11 +190,11 @@ const arbitraryFor = <I, A>(schema: Schema<I, A>): Arbitrary<A> => {
           O.match(
             () => {
               const f = () => go(ast.f())
-              const get = I.memoize<void, Arbitrary<A>>(f)
+              const get = I.memoize<typeof f, Arbitrary<A>>(f)
               const schema = I.lazy(f)
               return make(
                 schema,
-                (fc) => fc.constant(null).chain(() => get().arbitrary(fc))
+                (fc) => fc.constant(null).chain(() => get(f).arbitrary(fc))
               )
             },
             (handler) => handler()
