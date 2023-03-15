@@ -376,7 +376,7 @@ const Person = S.struct({
   age: S.number,
 });
 
-const PersonPretty = P.pretty(Person);
+const PersonPretty = P.to(Person);
 
 // returns a string representation of the object
 console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "age": 30 }`
@@ -995,10 +995,7 @@ const decode = (s: string): [string] => [s];
 const encode = ([s]: [string]): string => s;
 
 // use the transform combinator to convert the string schema into the tuple schema
-const transformedSchema: S.Schema<[string]> = pipe(
-  stringSchema,
-  S.transform(tupleSchema, decode, encode)
-);
+const transformedSchema: S.Schema<string, [string]> = S.transform(stringSchema, tupleSchema, decode, encode);
 ```
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
@@ -1039,10 +1036,7 @@ const decode = (s: string): PR.ParseResult<boolean> =>
 const encode = (b: boolean): ParseResult<string> => PR.success(String(b));
 
 // use the transformEither combinator to convert the string schema into the boolean schema
-const transformedSchema: S.Schema<boolean> = pipe(
-  stringSchema,
-  S.transformEither(booleanSchema, decode, encode)
-);
+const transformedSchema: S.Schema<string, boolean> = S.transformEither(stringSchema, booleanSchema, decode, encode);
 ```
 
 ### String transformations
@@ -1054,6 +1048,7 @@ The `trim` parser allows removing whitespaces from the beginning and end of a st
 ```ts
 import * as S from "@effect/schema/Schema";
 
+// const schema: S.Schema<string, string>
 const schema = S.trim(S.string);
 const decode = S.decode(schema);
 
@@ -1076,6 +1071,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 ```ts
 import * as S from "@effect/schema/Schema";
 
+// const schema: S.Schema<string, number>
 const schema = S.numberFromString(S.string);
 const decode = S.decode(schema);
 
@@ -1098,6 +1094,7 @@ Clamps a `number` between a minimum and a maximum value.
 ```ts
 import * as S from "@effect/schema/Schema";
 
+// const schema: S.Schema<number, number>
 const schema = pipe(S.number, S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
 const decode = S.decode(schema);
@@ -1115,6 +1112,7 @@ Clamps a `bigint` between a minimum and a maximum value.
 ```ts
 import * as S from "@effect/schema/Schema";
 
+// const schema: S.Schema<bigint, bigint>
 const schema = pipe(S.bigint, S.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
 const decode = S.decode(schema);
@@ -1132,6 +1130,7 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 ```ts
 import * as S from "@effect/schema/Schema";
 
+// const schema: S.Schema<string, Date>
 const schema = S.dateFromString(S.string);
 const decode = S.decode(schema);
 
@@ -1158,9 +1157,12 @@ import * as S from "@effect/schema/Schema";
 import * as O from "@effect/data/Option";
 
 /*
-const schema: Schema<{
+const schema: S.Schema<{
     readonly a: string;
-    readonly b: Option<number>;
+    readonly b: number | null | undefined;
+}, {
+    readonly a: string;
+    readonly b: O.Option<number>;
 }>
 */
 const schema = S.struct({
@@ -1198,9 +1200,12 @@ Here's an example that demonstrates how to use the `parseOptionals` combinator:
 import * as S from "@effect/schema/Schema";
 
 /*
-const schema: Schema<{
+const schema: S.Schema<{
     readonly a: string;
-    readonly b: Option<number>;
+    readonly b?: number;
+}, {
+    readonly a: string;
+    readonly b: O.Option<number>;
 }>
 */
 const schema = pipe(
@@ -1233,8 +1238,8 @@ In the following section, we demonstrate how to use the `readonlySet` combinator
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// define a schema for ReadonlySet with number values
-const schema = S.readonlySet(S.number);
+// const schema: S.Schema<readonly number[], ReadonlySet<number>>
+const schema = S.readonlySet(S.number); // define a schema for ReadonlySet with number values
 const decode = S.decode(schema);
 
 decode([1, 2, 3]); // new Set([1, 2, 3])
@@ -1247,8 +1252,8 @@ In the following section, we demonstrate how to use the `readonlyMap` combinator
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// define the schema for ReadonlyMap with number keys and string values
-const schema = S.readonlyMap(S.number, S.string);
+// const schema: S.Schema<readonly (readonly [number, string])[], ReadonlyMap<number, string>>
+const schema = S.readonlyMap(S.number, S.string); // define the schema for ReadonlyMap with number keys and string values
 const decode = S.decode(schema);
 
 decode([
@@ -1303,13 +1308,13 @@ A schema is a description of a data structure that can be used to generate vario
 From a technical point of view a schema is just a typed wrapper of an `AST` value:
 
 ```ts
-interface Schema<in out A> {
+interface Schema<I, A> {
   readonly ast: AST;
 }
 ```
 
 The `AST` type represents a tiny portion of the TypeScript AST, roughly speaking the part describing ADTs (algebraic data types),
-i.e. products (like structs and tuples) and unions.
+i.e. products (like structs and tuples) and unions, plus a custom transformation node.
 
 This means that you can define your own schema constructors / combinators as long as you are able to manipulate the `AST` value accordingly, let's see an example.
 
@@ -1349,21 +1354,6 @@ This example demonstrates the use of the low-level APIs of the `AST` module, how
 ```ts
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> =>
   S.tuple(schema, schema);
-```
-
-Please note that the `S.tuple` API is a convenient utility provided by the library, but it can also be easily defined and implemented in userland.
-
-```ts
-export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
-  ...elements: Elements
-): Schema<{ readonly [K in keyof Elements]: To<Elements[K]> }> =>
-  makeSchema(
-    AST.createTuple(
-      elements.map((schema) => AST.createElement(schema.ast, false)),
-      O.none,
-      true
-    )
-  );
 ```
 
 ## Annotations
