@@ -15,8 +15,8 @@ describe.concurrent("AST", () => {
   })
 
   it("isTypeAlias", () => {
-    expect(AST.isTypeAlias(S.optionFromSelf(S.number).ast)).toEqual(true)
-    expect(AST.isTypeAlias(S.number.ast)).toEqual(false)
+    expect(AST.isDeclaration(S.optionFromSelf(S.number).ast)).toEqual(true)
+    expect(AST.isDeclaration(S.number.ast)).toEqual(false)
   })
 
   it("isTemplateLiteral", () => {

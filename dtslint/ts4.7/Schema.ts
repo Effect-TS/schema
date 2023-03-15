@@ -376,7 +376,7 @@ class Test {
   constructor(readonly name: string) {}
 }
 
-// $ExpectType Schema<object, Test>
+// $ExpectType Schema<Test, Test>
 S.instanceOf(Test);
 
 // ---------------------------------------------

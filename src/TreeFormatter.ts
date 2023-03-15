@@ -138,7 +138,7 @@ export const formatExpected = (ast: AST.AST): string => {
     case "Declaration":
       return pipe(
         getExpected(ast),
-        O.getOrElse(() => "<anonymous TypeAlias schema>")
+        O.getOrElse(() => "<anonymous Declaration schema>")
       )
     case "Transform":
       return `a parsable value from ${formatExpected(ast.from)} to ${formatExpected(ast.to)}`

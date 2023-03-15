@@ -58,6 +58,7 @@ Added in v1.0.0
   - [isAnyKeyword](#isanykeyword)
   - [isBigIntKeyword](#isbigintkeyword)
   - [isBooleanKeyword](#isbooleankeyword)
+  - [isDeclaration](#isdeclaration)
   - [isLazy](#islazy)
   - [isLiteral](#isliteral)
   - [isNumberKeyword](#isnumberkeyword)
@@ -67,7 +68,6 @@ Added in v1.0.0
   - [isTemplateLiteral](#istemplateliteral)
   - [isTransform](#istransform)
   - [isTuple](#istuple)
-  - [isTypeAlias](#istypealias)
   - [isTypeLiteral](#istypeliteral)
   - [isUnion](#isunion)
   - [isUniqueSymbol](#isuniquesymbol)
@@ -592,6 +592,16 @@ export declare const isBooleanKeyword: (ast: AST) => ast is BooleanKeyword
 
 Added in v1.0.0
 
+## isDeclaration
+
+**Signature**
+
+```ts
+export declare const isDeclaration: (ast: AST) => ast is Declaration
+```
+
+Added in v1.0.0
+
 ## isLazy
 
 **Signature**
@@ -678,16 +688,6 @@ Added in v1.0.0
 
 ```ts
 export declare const isTuple: (ast: AST) => ast is Tuple
-```
-
-Added in v1.0.0
-
-## isTypeAlias
-
-**Signature**
-
-```ts
-export declare const isTypeAlias: (ast: AST) => ast is Declaration
 ```
 
 Added in v1.0.0

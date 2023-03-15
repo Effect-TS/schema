@@ -1796,18 +1796,22 @@ export const InstanceOfTypeId = "@effect/schema/InstanceOfTypeId"
 export const instanceOf = <A extends abstract new(...args: any) => any>(
   constructor: A,
   options?: AnnotationOptions<object>
-): Schema<object, InstanceType<A>> =>
-  pipe(
-    object,
-    filter(
-      (a): a is InstanceType<A> => a instanceof constructor,
-      {
-        typeId: { id: InstanceOfTypeId, params: { constructor } },
-        description: `an instance of ${constructor.name}`,
-        ...options
-      }
-    )
+): Schema<InstanceType<A>, InstanceType<A>> => {
+  const schema = declare(
+    [],
+    struct({}),
+    () =>
+      (input) =>
+        input instanceof constructor ? PR.success(input) : PR.failure(PR.type(schema.ast, input)),
+    {
+      [AST.TypeAnnotationId]: InstanceOfTypeId,
+      [InstanceOfTypeId]: { constructor },
+      [AST.DescriptionAnnotationId]: `an instance of ${constructor.name}`,
+      ...options
+    }
   )
+  return schema
+}
 
 // ---------------------------------------------
 // data/Option

@@ -206,7 +206,7 @@ export const createDeclaration = (
  * @category guards
  * @since 1.0.0
  */
-export const isTypeAlias = (ast: AST): ast is Declaration => ast._tag === "Declaration"
+export const isDeclaration = (ast: AST): ast is Declaration => ast._tag === "Declaration"
 
 /**
  * @since 1.0.0
