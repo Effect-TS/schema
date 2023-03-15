@@ -5,7 +5,6 @@ import * as S from "@effect/schema/Schema"
 
 describe.concurrent("Pretty", () => {
   it("exports", () => {
-    expect(P.make).exist
     expect(P.pretty).exist
     expect(P.PrettyHookId).exist
   })
@@ -425,10 +424,10 @@ describe.concurrent("Pretty", () => {
   it("should allow for custom compilers", () => {
     const match: typeof P.match = {
       ...P.match,
-      "BooleanKeyword": (ast) => P.make(S.make(ast), (b: boolean) => b ? "True" : "False")
+      "BooleanKeyword": () => (b: boolean) => b ? "True" : "False"
     }
     const go = AST.getCompiler(match)
-    const pretty = <A>(schema: S.Schema<A>) => (a: A): string => go(schema.ast).pretty(a)
+    const pretty = <A>(schema: S.Schema<A>) => (a: A): string => go(schema.ast)(a)
     expect(pretty(S.boolean)(true)).toEqual(`True`)
     const schema = S.tuple(S.string, S.boolean)
     expect(pretty(schema)(["a", true])).toEqual(`["a", True]`)

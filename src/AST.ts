@@ -10,6 +10,7 @@ import * as O from "@effect/data/Option"
 import * as RA from "@effect/data/ReadonlyArray"
 import { isString } from "@effect/data/String"
 import * as Order from "@effect/data/typeclass/Order"
+import * as I from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
 
 // -------------------------------------------------------------------------------------
@@ -1012,7 +1013,7 @@ export type Match<A> = {
  * @since 1.0.0
  */
 export const getCompiler = <A>(match: Match<A>): Compiler<A> => {
-  const compile = (ast: AST): A => match[ast._tag](ast as any, compile)
+  const compile = I.memoize((ast: AST): A => match[ast._tag](ast as any, compile))
   return compile
 }
 

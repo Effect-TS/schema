@@ -15,8 +15,8 @@ import type * as FastCheck from "fast-check"
  * @category model
  * @since 1.0.0
  */
-export interface Arbitrary<To> {
-  (fc: typeof FastCheck): FastCheck.Arbitrary<To>
+export interface Arbitrary<A> {
+  (fc: typeof FastCheck): FastCheck.Arbitrary<A>
 }
 
 /**

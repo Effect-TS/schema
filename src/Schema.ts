@@ -609,10 +609,10 @@ export const extend = <IB, B>(that: Schema<IB, B>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const lazy: <I, A = I>(
+export const lazy = <I, A = I>(
   f: () => Schema<I, A>,
   annotations?: AST.Annotated["annotations"]
-) => Schema<I, A> = I.lazy
+): Schema<I, A> => make(AST.createLazy(() => f().ast, annotations))
 
 /**
  * @since 1.0.0
@@ -1175,10 +1175,7 @@ const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
   (fc) => fc.array(item(fc)).map(C.fromIterable)
 
 const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
-  I.makePretty(
-    chunkFromSelf(item),
-    (c) => `Chunk(${C.toReadonlyArray(c).map(item.pretty).join(", ")})`
-  )
+  (c) => `Chunk(${C.toReadonlyArray(c).map(item).join(", ")})`
 
 /**
  * @category constructors
@@ -1227,11 +1224,7 @@ const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<a
 
 const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Pretty<A>
-): Pretty<D.Data<A>> =>
-  I.makePretty(
-    dataFromSelf(item),
-    (d) => `Data(${item.pretty(d)})`
-  )
+): Pretty<D.Data<A>> => (d) => `Data(${item(d)})`
 
 /**
  * @category combinators
@@ -1281,8 +1274,7 @@ export const data = <I, A extends Readonly<Record<string, any>> | ReadonlyArray<
 
 const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date()
 
-const datePretty = (): Pretty<Date> =>
-  I.makePretty(date, (date) => `new Date(${JSON.stringify(date)})`)
+const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
 
 /**
  * @category constructors
@@ -1330,12 +1322,9 @@ const eitherArbitrary = <E, A>(
 ): Arbitrary<Either<E, A>> => (fc) => fc.oneof(left(fc).map(E.left), right(fc).map(E.right))
 
 const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
-  I.makePretty(
-    eitherFromSelf(left, right),
-    E.match(
-      (e) => `left(${left.pretty(e)})`,
-      (a) => `right(${right.pretty(a)})`
-    )
+  E.match(
+    (e) => `left(${left(e)})`,
+    (a) => `right(${right(a)})`
   )
 
 const eitherInline = <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) =>
@@ -1812,12 +1801,9 @@ const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> =>
   (fc) => fc.oneof(fc.constant(O.none()), value(fc).map(O.some))
 
 const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
-  I.makePretty(
-    optionFromSelf(value),
-    O.match(
-      () => "none()",
-      (a) => `some(${value.pretty(a)})`
-    )
+  O.match(
+    () => "none()",
+    (a) => `some(${value(a)})`
   )
 
 const optionInline = <I, A>(value: Schema<I, A>) =>
@@ -2036,15 +2022,12 @@ const readonlyMapPretty = <K, V>(
   key: Pretty<K>,
   value: Pretty<V>
 ): Pretty<ReadonlyMap<K, V>> =>
-  I.makePretty(
-    readonlyMapFromSelf(key, value),
-    (map) =>
-      `new Map([${
-        Array.from(map.entries())
-          .map(([k, v]) => `[${key.pretty(k)}, ${value.pretty(v)}]`)
-          .join(", ")
-      }])`
-  )
+  (map) =>
+    `new Map([${
+      Array.from(map.entries())
+        .map(([k, v]) => `[${key(k)}, ${value(v)}]`)
+        .join(", ")
+    }])`
 
 /**
  * @category constructors
@@ -2103,10 +2086,7 @@ const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> 
   (fc) => fc.array(item(fc)).map((as) => new Set(as))
 
 const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
-  I.makePretty(
-    readonlySetFromSelf(item),
-    (set) => `new Set([${Array.from(set.values()).map((a) => item.pretty(a)).join(", ")}])`
-  )
+  (set) => `new Set([${Array.from(set.values()).map((a) => item(a)).join(", ")}])`
 
 /**
  * @category constructors

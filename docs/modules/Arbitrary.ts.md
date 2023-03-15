@@ -52,8 +52,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Arbitrary<To> {
-  (fc: typeof FastCheck): FastCheck.Arbitrary<To>
+export interface Arbitrary<A> {
+  (fc: typeof FastCheck): FastCheck.Arbitrary<A>
 }
 ```
 

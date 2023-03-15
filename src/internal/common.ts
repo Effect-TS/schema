@@ -2,19 +2,8 @@
  * @since 1.0.0
  */
 
-import * as AST from "@effect/schema/AST"
-import type { Pretty } from "@effect/schema/Pretty"
+import type * as AST from "@effect/schema/AST"
 import type * as S from "@effect/schema/Schema"
-
-// ---------------------------------------------
-// compiler constructors
-// ---------------------------------------------
-
-/** @internal */
-export const makePretty = <A>(
-  schema: S.Schema<A>,
-  pretty: Pretty<A>["pretty"]
-): Pretty<A> => ({ ast: schema.ast, pretty }) as any
 
 // ---------------------------------------------
 // hooks
@@ -32,12 +21,6 @@ export const PrettyHookId = "@effect/schema/PrettyHookId"
 
 /** @internal */
 export const makeSchema = <I, A>(ast: AST.AST): S.Schema<I, A> => ({ ast }) as any
-
-/** @internal */
-export const lazy = <I, A>(
-  f: () => S.Schema<I, A>,
-  annotations?: AST.Annotated["annotations"]
-): S.Schema<I, A> => makeSchema(AST.createLazy(() => f().ast, annotations))
 
 /** @internal */
 export const getKeysForIndexSignature = (

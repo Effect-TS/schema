@@ -12,8 +12,6 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [constructors](#constructors)
-  - [make](#make)
 - [hooks](#hooks)
   - [PrettyHookId](#prettyhookid)
 - [model](#model)
@@ -24,18 +22,6 @@ Added in v1.0.0
   - [match](#match)
 
 ---
-
-# constructors
-
-## make
-
-**Signature**
-
-```ts
-export declare const make: <A>(schema: Schema<A, A>, pretty: (a: A) => string) => Pretty<A>
-```
-
-Added in v1.0.0
 
 # hooks
 
@@ -56,8 +42,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Pretty<To> extends Schema<any, To> {
-  readonly pretty: (a: To) => string
+export interface Pretty<To> {
+  (a: To): string
 }
 ```
 
