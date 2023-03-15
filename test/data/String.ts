@@ -30,9 +30,25 @@ describe.concurrent("trim", () => {
   it("Encoder", () => {
     Util.expectEncodingSuccess(schema, "a", "a")
     Util.expectEncodingSuccess(schema, "", "")
-    Util.expectEncodingSuccess(schema, " a", "a")
-    Util.expectEncodingSuccess(schema, "a ", "a")
-    Util.expectEncodingSuccess(schema, " a ", "a")
-    Util.expectEncodingSuccess(schema, " ", "")
+    Util.expectEncodingFailure(
+      schema,
+      " a",
+      `Expected a string with no leading or trailing whitespace, actual " a"`
+    )
+    Util.expectEncodingFailure(
+      schema,
+      "a ",
+      `Expected a string with no leading or trailing whitespace, actual "a "`
+    )
+    Util.expectEncodingFailure(
+      schema,
+      " a ",
+      `Expected a string with no leading or trailing whitespace, actual " a "`
+    )
+    Util.expectEncodingFailure(
+      schema,
+      " ",
+      `Expected a string with no leading or trailing whitespace, actual " "`
+    )
   })
 })

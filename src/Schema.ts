@@ -49,6 +49,21 @@ export type From<S extends { readonly From: (_: any) => any }> = Parameters<S["F
  */
 export type To<S extends { readonly To: (_: any) => any }> = Parameters<S["To"]>[0]
 
+/**
+ * @since 1.0.0
+ */
+export const from = <I, A>(schema: Schema<I, A>): Schema<I> => make(AST.getFrom(schema.ast))
+
+/**
+ * @since 1.0.0
+ */
+export const to = <I, A>(schema: Schema<I, A>): Schema<A> => make(AST.getTo(schema.ast))
+
+/**
+ * @since 1.0.0
+ */
+export const reverse = <I, A>(schema: Schema<I, A>): Schema<A, I> => make(AST.reverse(schema.ast))
+
 /* c8 ignore start */
 export {
   /**

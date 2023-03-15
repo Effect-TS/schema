@@ -476,16 +476,30 @@ const go = I.memoize((ast: AST.AST): Parser => {
       return (a, options) => get()(a, options)
     }
     case "Refinement": {
-      const type = go(ast.from)
-      return ast.isReversed ?
-        (u, options) => pipe(ast.decode(u, options), E.flatMap((a) => type(a, options))) :
-        (u, options) => pipe(type(u, options), E.flatMap((a) => ast.decode(a, options)))
+      const from = go(ast.from)
+      if (ast.isReversed) {
+        const to = go(AST.getTo(ast.from))
+        return (a, options) =>
+          pipe(
+            to(a, options), // validate input
+            E.flatMap((a) => ast.decode(a, options)), // refine
+            E.flatMap((a) => from(a, options)) // encode
+          )
+      }
+      return (u, options) => E.flatMap(from(u, options), (a) => ast.decode(a, options))
     }
     case "Transform": {
       const from = go(ast.from)
-      return ast.isReversed ?
-        (a, options) => pipe(ast.encode(a, options), E.flatMap((a) => from(a, options))) :
-        (u, options) => pipe(from(u, options), E.flatMap((a) => ast.decode(a, options)))
+      if (ast.isReversed) {
+        const to = go(AST.getTo(ast.to))
+        return (a, options) =>
+          pipe(
+            to(a, options), // validate input
+            E.flatMap((a) => ast.encode(a, options)), // transform
+            E.flatMap((a) => from(a, options)) // encode
+          )
+      }
+      return (u, options) => E.flatMap(from(u, options), (a) => ast.decode(a, options))
     }
   }
 })

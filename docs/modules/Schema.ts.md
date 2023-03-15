@@ -179,9 +179,12 @@ Added in v1.0.0
   - [encode](#encode)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
+  - [from](#from)
   - [getPropertySignatures](#getpropertysignatures)
   - [is](#is)
   - [optional](#optional)
+  - [reverse](#reverse)
+  - [to](#to)
   - [validate](#validate)
   - [validateEither](#validateeither)
   - [validateOption](#validateoption)
@@ -2129,6 +2132,16 @@ export declare const encodeOption: <I, A>(
 
 Added in v1.0.0
 
+## from
+
+**Signature**
+
+```ts
+export declare const from: <I, A>(schema: Schema<I, A>) => Schema<I, I>
+```
+
+Added in v1.0.0
+
 ## getPropertySignatures
 
 Returns an object containing all property signatures of a given schema.
@@ -2181,6 +2194,26 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: <I, A>(schema: Schema<I, A>) => OptionalSchema<I, A>
+```
+
+Added in v1.0.0
+
+## reverse
+
+**Signature**
+
+```ts
+export declare const reverse: <I, A>(schema: Schema<I, A>) => Schema<A, I>
+```
+
+Added in v1.0.0
+
+## to
+
+**Signature**
+
+```ts
+export declare const to: <I, A>(schema: Schema<I, A>) => Schema<A, A>
 ```
 
 Added in v1.0.0

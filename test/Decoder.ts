@@ -30,6 +30,32 @@ describe.concurrent("Decoder", () => {
     )
   })
 
+  it("from", () => {
+    const schema = S.from(S.numberFromString(S.string))
+    Util.expectDecodingSuccess(schema, "a")
+    Util.expectDecodingFailure(schema, null, "Expected string, actual null")
+    Util.expectDecodingFailure(schema, 1, "Expected string, actual 1")
+  })
+
+  it("to", () => {
+    const schema = S.to(S.numberFromString(S.string))
+    Util.expectDecodingSuccess(schema, 1)
+    Util.expectDecodingFailure(schema, null, "Expected number, actual null")
+    Util.expectDecodingFailure(schema, "a", `Expected number, actual "a"`)
+  })
+
+  it("reverse/ refinement", () => {
+    const schema = pipe(S.string, S.minLength(1), S.reverse)
+    Util.expectDecodingSuccess(schema, "a")
+    Util.expectDecodingFailure(schema, null, "Expected string, actual null")
+  })
+
+  it("reverse/ transform", () => {
+    const schema = S.reverse(S.numberFromString(S.string))
+    Util.expectDecodingSuccess(schema, 1, "1")
+    Util.expectDecodingFailure(schema, null, "Expected number, actual null")
+  })
+
   it("annotations/message refinement", () => {
     const schema = pipe(
       // initial schema, a string
