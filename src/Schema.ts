@@ -18,6 +18,8 @@ import * as O from "@effect/data/Option"
 import { isDate } from "@effect/data/Predicate"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import type * as Eq from "@effect/data/typeclass/Equivalence"
+import type * as Order from "@effect/data/typeclass/Order"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -2005,6 +2007,32 @@ export const itemsCount = <A>(
         jsonSchema: { minItems: n, maxItems: n },
         ...options
       })
+    )
+
+/**
+ * Sorts an array according to the specified `Order` instances.
+ * @since 1.0.0
+ */
+export const sort = <A>(...ords: ReadonlyArray<Order.Order<A>>) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    transform(
+      self,
+      self,
+      (s) => RA.sortBy(...ords)(s),
+      (s) => RA.sortBy(...ords)(s)
+    )
+
+/**
+ * Removes duplicate elements from an array.
+ * @since 1.0.0
+ */
+export const uniq = <A>(eq: Eq.Equivalence<A>) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    transform(
+      self,
+      self,
+      (s) => RA.uniq(eq)(s),
+      (s) => RA.uniq(eq)(s)
     )
 
 // ---------------------------------------------

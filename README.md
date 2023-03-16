@@ -1139,6 +1139,40 @@ decode("1970-01-01T00:00:00.000Z"); // new Date(0)
 decode("a"); // throws
 ```
 
+### Array transformations
+
+#### sort
+
+Sorts an array of values using the provided `Order`s
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as N from "@effect/data/Number";
+
+// const schema: S.Schema<readonly number[], readonly number[]>
+const schema = pipe(S.array(S.number), S.sort(N.Order));
+
+const decode = S.decode(schema);
+decode([1, 2, 3]); // [1, 2, 3]
+decode([3, 2, 1]); // [1, 2, 3]
+```
+
+#### uniq
+
+Removes duplicate values from an array.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as N from "@effect/data/Number";
+
+// const schema: S.Schema<readonly number[], readonly number[]>
+const schema = pipe(S.array(S.number), S.sort(N.Order));
+
+const decode = S.decode(schema);
+decode([1, 2, 3]); // [1, 2, 3]
+decode([1, 1, 2, 3, 3]); // [1, 2, 3]
+```
+
 ## Option
 
 ### Decoding from nullable fields
