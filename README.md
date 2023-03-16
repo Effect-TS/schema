@@ -245,7 +245,7 @@ import * as S from "@effect/schema/Schema";
 import { pipe } from "@effect/data/Function";
 
 // Age is a schema that can decode a string to a number and encode a number to a string
-const Age = S.numerFromString(S.string);
+const Age = S.numberFromString(S.string);
 
 const Person = S.struct({
   name: S.string,
