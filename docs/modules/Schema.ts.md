@@ -183,6 +183,9 @@ Added in v1.0.0
   - [getPropertySignatures](#getpropertysignatures)
   - [is](#is)
   - [optional](#optional)
+  - [parse](#parse)
+  - [parseEither](#parseeither)
+  - [parseOption](#parseoption)
   - [to](#to)
   - [validate](#validate)
   - [validateEither](#validateeither)
@@ -2192,6 +2195,40 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: <I, A>(schema: Schema<I, A>) => OptionalSchema<I, A>
+```
+
+Added in v1.0.0
+
+## parse
+
+**Signature**
+
+```ts
+export declare const parse: <I, A>(schema: Schema<I, A>) => (i: I, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+## parseEither
+
+**Signature**
+
+```ts
+export declare const parseEither: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+```
+
+Added in v1.0.0
+
+## parseOption
+
+**Signature**
+
+```ts
+export declare const parseOption: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: AST.ParseOptions | undefined) => Option<A>
 ```
 
 Added in v1.0.0
