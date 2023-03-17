@@ -16,6 +16,9 @@ Added in v1.0.0
   - [decode](#decode)
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
+  - [parse](#parse)
+  - [parseEither](#parseeither)
+  - [parseOption](#parseoption)
 - [encoding](#encoding)
   - [encode](#encode)
   - [encodeEither](#encodeeither)
@@ -63,6 +66,40 @@ Added in v1.0.0
 export declare const decodeOption: <_, A>(
   schema: Schema<_, A>
 ) => (i: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
+```
+
+Added in v1.0.0
+
+## parse
+
+**Signature**
+
+```ts
+export declare const parse: <I, A>(schema: Schema<I, A>) => (i: I, options?: AST.ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+## parseEither
+
+**Signature**
+
+```ts
+export declare const parseEither: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+```
+
+Added in v1.0.0
+
+## parseOption
+
+**Signature**
+
+```ts
+export declare const parseOption: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
 Added in v1.0.0

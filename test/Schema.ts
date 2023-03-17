@@ -7,6 +7,10 @@ import * as S from "@effect/schema/Schema"
 
 describe.concurrent("Schema", () => {
   it("exports", () => {
+    expect(S.parse).exist
+    expect(S.parseOption).exist
+    expect(S.parseEither).exist
+
     expect(S.GreaterThanBigintTypeId).exist
     expect(S.GreaterThanOrEqualToBigintTypeId).exist
     expect(S.LessThanBigintTypeId).exist

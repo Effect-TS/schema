@@ -57,6 +57,28 @@ export const decodeEither = <_, A>(
 ): (i: unknown, options?: ParseOptions) => ParseResult<A> => go(schema.ast)
 
 /**
+ * @category decoding
+ * @since 1.0.0
+ */
+export const parse: <I, A>(schema: Schema<I, A>) => (i: I, options?: ParseOptions) => A = decode
+
+/**
+ * @category decoding
+ * @since 1.0.0
+ */
+export const parseOption: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions) => Option<A> = decodeOption
+
+/**
+ * @category decoding
+ * @since 1.0.0
+ */
+export const parseEither: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions) => ParseResult<A> = decodeEither
+
+/**
  * @category validation
  * @since 1.0.0
  */

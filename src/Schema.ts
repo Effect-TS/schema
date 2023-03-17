@@ -95,6 +95,18 @@ export {
   /**
    * @since 1.0.0
    */
+  parse,
+  /**
+   * @since 1.0.0
+   */
+  parseEither,
+  /**
+   * @since 1.0.0
+   */
+  parseOption,
+  /**
+   * @since 1.0.0
+   */
   validate,
   /**
    * @since 1.0.0
