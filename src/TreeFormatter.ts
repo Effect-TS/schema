@@ -152,6 +152,7 @@ const go = (e: PR.ParseError): Tree<string> => {
         pipe(
           getMessage(e.expected),
           O.map((f) => f(e.actual)),
+          O.orElse(() => e.message),
           O.getOrElse(() =>
             `Expected ${formatExpected(e.expected)}, actual ${formatActual(e.actual)}`
           )

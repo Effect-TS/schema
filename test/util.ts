@@ -80,6 +80,7 @@ const formatDecodeError = (e: PR.ParseError): string => {
       return pipe(
         getMessage(e.expected),
         O.map((f) => f(e.actual)),
+        O.orElse(() => e.message),
         O.getOrElse(() =>
           `Expected ${formatExpected(e.expected)}, actual ${formatActual(e.actual)}`
         )
