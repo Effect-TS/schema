@@ -1242,12 +1242,9 @@ const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>
  * @category combinators
  * @since 1.0.0
  */
-export const dataFromSelf = <
-  I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
-  A extends Readonly<Record<string, any>> | ReadonlyArray<any>
->(
-  item: Schema<I, A>
-): Schema<D.Data<I>, D.Data<A>> => {
+export const dataFromSelf = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  item: Schema<A>
+): Schema<D.Data<A>> => {
   const schema = declare(
     [item],
     item,
@@ -1281,7 +1278,7 @@ export const data = <
 ): Schema<I, D.Data<A>> =>
   transform(
     item,
-    to(dataFromSelf(item)),
+    dataFromSelf(to(item)),
     toData,
     (a) => Array.isArray(a) ? Array.from(a) : Object.assign({}, a) as any
   )
