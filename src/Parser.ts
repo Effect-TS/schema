@@ -37,54 +37,54 @@ const getOption = (ast: AST.AST) => {
  * @category decoding
  * @since 1.0.0
  */
-export const decode = <I, A>(schema: Schema<I, A>): (i: unknown, options?: ParseOptions) => A =>
+export const decode = <_, A>(schema: Schema<_, A>): (i: unknown, options?: ParseOptions) => A =>
   get(schema.ast)
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decodeOption = <I, A>(
-  schema: Schema<I, A>
+export const decodeOption = <_, A>(
+  schema: Schema<_, A>
 ): (i: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast)
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decodeEither = <I, A>(
-  schema: Schema<I, A>
+export const decodeEither = <_, A>(
+  schema: Schema<_, A>
 ): (i: unknown, options?: ParseOptions) => ParseResult<A> => go(schema.ast)
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validate = <I, A>(
-  schema: Schema<I, A>
+export const validate = <_, A>(
+  schema: Schema<_, A>
 ): (a: unknown, options?: ParseOptions) => A => get(AST.getTo(schema.ast))
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validateOption = <I, A>(
-  schema: Schema<I, A>
+export const validateOption = <_, A>(
+  schema: Schema<_, A>
 ): (a: unknown, options?: ParseOptions) => Option<A> => getOption(AST.getTo(schema.ast))
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validateEither = <I, A>(
-  schema: Schema<I, A>
+export const validateEither = <_, A>(
+  schema: Schema<_, A>
 ): (a: unknown, options?: ParseOptions) => ParseResult<A> => go(AST.getTo(schema.ast))
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const is = <I, A>(schema: Schema<I, A>) => {
+export const is = <_, A>(schema: Schema<_, A>) => {
   const parser = validateEither(schema)
   return (a: unknown): a is A => E.isRight(parser(a))
 }
@@ -101,7 +101,7 @@ export type ToAsserts<S extends Schema<any>> = (
  * @category validation
  * @since 1.0.0
  */
-export const asserts = <I, A>(schema: Schema<I, A>) => {
+export const asserts = <_, A>(schema: Schema<_, A>) => {
   const parser = validate(schema)
   return (a: unknown, options?: ParseOptions): asserts a is A => {
     parser(a, options)

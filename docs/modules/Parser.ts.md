@@ -38,7 +38,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <I, A>(schema: Schema<I, A>) => (i: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const decode: <_, A>(schema: Schema<_, A>) => (i: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -48,8 +48,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeEither: <I, A>(
-  schema: Schema<I, A>
+export declare const decodeEither: <_, A>(
+  schema: Schema<_, A>
 ) => (i: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
@@ -60,8 +60,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeOption: <I, A>(
-  schema: Schema<I, A>
+export declare const decodeOption: <_, A>(
+  schema: Schema<_, A>
 ) => (i: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
@@ -122,8 +122,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const asserts: <I, A>(
-  schema: Schema<I, A>
+export declare const asserts: <_, A>(
+  schema: Schema<_, A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => asserts a is A
 ```
 
@@ -134,7 +134,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <I, A>(schema: Schema<I, A>) => (a: unknown) => a is A
+export declare const is: <_, A>(schema: Schema<_, A>) => (a: unknown) => a is A
 ```
 
 Added in v1.0.0
@@ -144,7 +144,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validate: <I, A>(schema: Schema<I, A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const validate: <_, A>(schema: Schema<_, A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -154,8 +154,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateEither: <I, A>(
-  schema: Schema<I, A>
+export declare const validateEither: <_, A>(
+  schema: Schema<_, A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
@@ -166,8 +166,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateOption: <I, A>(
-  schema: Schema<I, A>
+export declare const validateOption: <_, A>(
+  schema: Schema<_, A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 

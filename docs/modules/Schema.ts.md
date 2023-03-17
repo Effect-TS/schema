@@ -590,8 +590,8 @@ using the provided mapping functions.
 
 ```ts
 export declare const transform: {
-  <B, A>(to: Schema<any, B>, ab: (a: A) => B, ba: (b: B) => A): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, A, B>(self: Schema<I, A>, to: Schema<any, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
+  <_, B, A>(to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): <I>(self: Schema<I, A>) => Schema<I, B>
+  <I, _, A, B>(self: Schema<I, A>, to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
 }
 ```
 
@@ -606,8 +606,8 @@ using the provided decoding functions.
 
 ```ts
 export declare const transformEither: {
-  <B, A>(
-    to: Schema<any, B>,
+  <_, B, A>(
+    to: Schema<_, B>,
     decode: (
       input: A,
       options?: AST.ParseOptions | undefined
@@ -617,9 +617,9 @@ export declare const transformEither: {
       options?: AST.ParseOptions | undefined
     ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
   ): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, A, B>(
+  <I, A, _, B>(
     self: Schema<I, A>,
-    to: Schema<any, B>,
+    to: Schema<_, B>,
     decode: (
       input: A,
       options?: AST.ParseOptions | undefined
@@ -2057,8 +2057,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const asserts: <I, A>(
-  schema: Schema<I, A>
+export declare const asserts: <_, A>(
+  schema: Schema<_, A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => asserts a is A
 ```
 
@@ -2069,7 +2069,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <I, A>(schema: Schema<I, A>) => (i: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const decode: <_, A>(schema: Schema<_, A>) => (i: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -2079,8 +2079,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeEither: <I, A>(
-  schema: Schema<I, A>
+export declare const decodeEither: <_, A>(
+  schema: Schema<_, A>
 ) => (i: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
@@ -2091,8 +2091,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeOption: <I, A>(
-  schema: Schema<I, A>
+export declare const decodeOption: <_, A>(
+  schema: Schema<_, A>
 ) => (i: unknown, options?: AST.ParseOptions | undefined) => Option<A>
 ```
 
@@ -2181,7 +2181,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <I, A>(schema: Schema<I, A>) => (a: unknown) => a is A
+export declare const is: <_, A>(schema: Schema<_, A>) => (a: unknown) => a is A
 ```
 
 Added in v1.0.0
@@ -2211,7 +2211,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validate: <I, A>(schema: Schema<I, A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const validate: <_, A>(schema: Schema<_, A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -2221,8 +2221,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateEither: <I, A>(
-  schema: Schema<I, A>
+export declare const validateEither: <_, A>(
+  schema: Schema<_, A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
@@ -2233,8 +2233,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateOption: <I, A>(
-  schema: Schema<I, A>
+export declare const validateOption: <_, A>(
+  schema: Schema<_, A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => Option<A>
 ```
 
