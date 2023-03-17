@@ -752,7 +752,9 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
 export interface Refinement extends Annotated {
   readonly _tag: "Refinement"
   readonly from: AST
+  readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly isReversed: boolean
 }
 
@@ -765,7 +767,15 @@ export const createRefinement = (
   decode: (input: any, options?: ParseOptions) => ParseResult<any>,
   isReversed: boolean,
   annotations: Annotated["annotations"] = {}
-): Refinement => ({ _tag: "Refinement", from, decode, isReversed, annotations })
+): Refinement => ({
+  _tag: "Refinement",
+  from,
+  to: getTo(from),
+  decode,
+  encode: decode,
+  isReversed,
+  annotations
+})
 
 /**
  * @category guards
@@ -792,7 +802,6 @@ export interface Transform extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly isReversed: boolean
 }
 
 /**
@@ -804,17 +813,8 @@ export const createTransform = (
   to: AST,
   decode: Transform["decode"],
   encode: Transform["encode"],
-  isReversed: boolean,
   annotations: Annotated["annotations"] = {}
-): Transform => ({
-  _tag: "Transform",
-  from,
-  to: getTo(to),
-  decode,
-  encode,
-  isReversed,
-  annotations
-})
+): Transform => ({ _tag: "Transform", from, to, decode, encode, annotations })
 
 /**
  * @category guards
@@ -1112,7 +1112,7 @@ export const reverse = (ast: AST): AST => {
     case "Refinement":
       return createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
     case "Transform":
-      return createTransform(reverse(ast.from), ast.to, ast.decode, ast.encode, !ast.isReversed)
+      return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
   }
   return ast
 }

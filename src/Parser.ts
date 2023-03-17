@@ -501,29 +501,31 @@ const go = I.memoize((ast: AST.AST): Parser<any, any> => {
     }
     case "Refinement": {
       const from = go(ast.from)
+      const to = go(ast.to)
       if (ast.isReversed) {
-        const to = go(AST.getTo(ast.from))
         return (a, options) =>
           pipe(
-            to(a, options), // validate input
-            E.flatMap((a) => ast.decode(a, options)), // refine
-            E.flatMap((a) => from(a, options)) // encode
+            to(a, options),
+            E.flatMap((a) => ast.encode(a, options)),
+            E.flatMap((a) => from(a, options))
           )
       }
-      return (u, options) => E.flatMap(from(u, options), (a) => ast.decode(a, options))
+      return (u, options) =>
+        pipe(
+          from(u, options),
+          E.flatMap((a) => ast.decode(a, options)),
+          E.flatMap((a) => to(a, options))
+        )
     }
     case "Transform": {
       const from = go(ast.from)
-      if (ast.isReversed) {
-        const to = go(ast.to)
-        return (a, options) =>
-          pipe(
-            to(a, options), // validate input
-            E.flatMap((a) => ast.encode(a, options)), // transform
-            E.flatMap((a) => from(a, options)) // encode
-          )
-      }
-      return (u, options) => E.flatMap(from(u, options), (a) => ast.decode(a, options))
+      const to = go(ast.to)
+      return (u, options) =>
+        pipe(
+          from(u, options),
+          E.flatMap((a) => ast.decode(a, options)),
+          E.flatMap((a) => to(a, options))
+        )
     }
   }
 })
@@ -551,7 +553,7 @@ export const _getLiterals = (
     case "Refinement":
       return _getLiterals(ast.from)
     case "Transform":
-      return ast.isReversed ? _getLiterals(ast.to) : _getLiterals(AST.getFrom(ast.from))
+      return _getLiterals(AST.getFrom(ast.from))
   }
   return []
 }
