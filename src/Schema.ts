@@ -11,7 +11,7 @@ import * as D from "@effect/data/Data"
 import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
-import { dual, pipe } from "@effect/data/Function"
+import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
@@ -2331,7 +2331,7 @@ export const trim = <I>(self: Schema<I, string>): Schema<I, string> =>
     self,
     pipe(self, trimmed()),
     (s) => s.trim(),
-    (s) => s.trim()
+    identity
   )
 
 /**
