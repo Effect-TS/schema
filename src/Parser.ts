@@ -17,30 +17,28 @@ import type { ParseResult } from "@effect/schema/ParseResult"
 import type { Schema, To } from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
-const goOrThrow = (ast: AST.AST) => {
-  const parse = go(ast)
+const get = (ast: AST.AST) => {
+  const parser = go(ast)
   return (input: unknown, options?: ParseOptions) => {
-    const t = parse(input, options)
-    if (PR.isFailure(t)) {
-      throw new Error(formatErrors(t.left))
+    const result = parser(input, options)
+    if (PR.isFailure(result)) {
+      throw new Error(formatErrors(result.left))
     }
-    return t.right
+    return result.right
   }
 }
 
-const goOption = (ast: AST.AST) => {
-  const parse = go(ast)
-  return (input: unknown, options?: ParseOptions): Option<any> =>
-    O.fromEither(parse(input, options))
+const getOption = (ast: AST.AST) => {
+  const parser = go(ast)
+  return (input: unknown, options?: ParseOptions) => O.fromEither(parser(input, options))
 }
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decodeEither = <I, A>(
-  schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => ParseResult<A> => go(schema.ast)
+export const decode = <I, A>(schema: Schema<I, A>): (i: unknown, options?: ParseOptions) => A =>
+  get(schema.ast)
 
 /**
  * @category decoding
@@ -48,21 +46,48 @@ export const decodeEither = <I, A>(
  */
 export const decodeOption = <I, A>(
   schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => Option<A> => goOption(schema.ast)
+): (i: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast)
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decode = <I, A>(schema: Schema<I, A>): (input: unknown, options?: ParseOptions) => A =>
-  goOrThrow(schema.ast)
+export const decodeEither = <I, A>(
+  schema: Schema<I, A>
+): (i: unknown, options?: ParseOptions) => ParseResult<A> => go(schema.ast)
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const is = <I, A>(schema: Schema<I, A>) =>
-  (input: unknown): input is A => E.isRight(go(AST.getTo(schema.ast))(input))
+export const validate = <I, A>(
+  schema: Schema<I, A>
+): (a: unknown, options?: ParseOptions) => A => get(AST.getTo(schema.ast))
+
+/**
+ * @category validation
+ * @since 1.0.0
+ */
+export const validateOption = <I, A>(
+  schema: Schema<I, A>
+): (a: unknown, options?: ParseOptions) => Option<A> => getOption(AST.getTo(schema.ast))
+
+/**
+ * @category validation
+ * @since 1.0.0
+ */
+export const validateEither = <I, A>(
+  schema: Schema<I, A>
+): (a: unknown, options?: ParseOptions) => ParseResult<A> => go(AST.getTo(schema.ast))
+
+/**
+ * @category validation
+ * @since 1.0.0
+ */
+export const is = <I, A>(schema: Schema<I, A>) => {
+  const parser = validateEither(schema)
+  return (a: unknown): a is A => E.isRight(parser(a))
+}
 
 /**
  * @since 1.0.0
@@ -76,34 +101,27 @@ export type ToAsserts<S extends Schema<any>> = (
  * @category validation
  * @since 1.0.0
  */
-export const asserts = <I, A>(schema: Schema<I, A>) =>
-  (input: unknown, options?: ParseOptions): asserts input is A => {
-    goOrThrow(AST.getTo(schema.ast))(input, options)
+export const asserts = <I, A>(schema: Schema<I, A>) => {
+  const parser = validate(schema)
+  return (a: unknown, options?: ParseOptions): asserts a is A => {
+    parser(a, options)
   }
+}
 
 /**
- * @category validation
+ * @category encoding
  * @since 1.0.0
  */
-export const validateEither = <I, A>(
-  schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => ParseResult<A> => go(AST.getTo(schema.ast))
+export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOptions) => I =>
+  get(AST.reverse(schema.ast))
 
 /**
- * @category validation
+ * @category encoding
  * @since 1.0.0
  */
-export const validateOption = <I, A>(
+export const encodeOption = <I, A>(
   schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => Option<A> => goOption(AST.getTo(schema.ast))
-
-/**
- * @category validation
- * @since 1.0.0
- */
-export const validate = <I, A>(
-  schema: Schema<I, A>
-): (input: unknown, options?: ParseOptions) => A => goOrThrow(AST.getTo(schema.ast))
+): (input: A, options?: ParseOptions) => Option<I> => getOption(AST.reverse(schema.ast))
 
 /**
  * @category encoding
@@ -113,26 +131,11 @@ export const encodeEither = <I, A>(
   schema: Schema<I, A>
 ): (a: A, options?: ParseOptions) => ParseResult<I> => go(AST.reverse(schema.ast))
 
-/**
- * @category encoding
- * @since 1.0.0
- */
-export const encodeOption = <I, A>(
-  schema: Schema<I, A>
-): (input: A, options?: ParseOptions) => Option<I> => goOption(AST.reverse(schema.ast))
-
-/**
- * @category encoding
- * @since 1.0.0
- */
-export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOptions) => I =>
-  goOrThrow(AST.reverse(schema.ast))
-
-interface Parser {
-  (input: unknown, options?: ParseOptions): ParseResult<any>
+interface Parser<I, A> {
+  (i: I, options?: ParseOptions): ParseResult<A>
 }
 
-const go = I.memoize((ast: AST.AST): Parser => {
+const go = I.memoize((ast: AST.AST): Parser<any, any> => {
   switch (ast._tag) {
     case "Declaration":
       return ast.decode(...ast.typeParameters)
@@ -471,7 +474,7 @@ const go = I.memoize((ast: AST.AST): Parser => {
     }
     case "Lazy": {
       const f = () => go(ast.f())
-      const get = I.memoize<typeof f, Parser>(f)
+      const get = I.memoize<typeof f, Parser<any, any>>(f)
       return (a, options) => get(f)(a, options)
     }
     case "Refinement": {
@@ -503,7 +506,7 @@ const go = I.memoize((ast: AST.AST): Parser => {
   }
 })
 
-const fromRefinement = <A>(ast: AST.AST, refinement: (u: unknown) => u is A): Parser =>
+const fromRefinement = <A>(ast: AST.AST, refinement: (u: unknown) => u is A): Parser<unknown, A> =>
   (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(ast, u))
 
 /** @internal */

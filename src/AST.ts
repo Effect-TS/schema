@@ -1039,7 +1039,7 @@ export const getTo = (ast: AST): AST => {
     case "Refinement":
       return createRefinement(getTo(ast.from), ast.decode, false, ast.annotations)
     case "Transform":
-      return getTo(ast.to)
+      return ast.to
   }
   return ast
 }
