@@ -2186,9 +2186,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <I, A>(
-  schema: Schema<I, A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => input is A
+export declare const is: <I, A>(schema: Schema<I, A>) => (input: unknown) => input is A
 ```
 
 Added in v1.0.0
