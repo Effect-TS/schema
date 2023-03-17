@@ -2,4 +2,4 @@
 "@effect/schema": patch
 ---
 
-fix trim definition
+fix trim, clamp, clampBigint definition

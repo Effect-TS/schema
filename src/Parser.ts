@@ -499,24 +499,7 @@ const go = I.memoize((ast: AST.AST): Parser<any, any> => {
       const get = I.memoize<typeof f, Parser<any, any>>(f)
       return (a, options) => get(f)(a, options)
     }
-    case "Refinement": {
-      const from = go(ast.from)
-      const to = go(ast.to)
-      if (ast.isReversed) {
-        return (a, options) =>
-          pipe(
-            to(a, options),
-            E.flatMap((a) => ast.encode(a, options)),
-            E.flatMap((a) => from(a, options))
-          )
-      }
-      return (u, options) =>
-        pipe(
-          from(u, options),
-          E.flatMap((a) => ast.decode(a, options)),
-          E.flatMap((a) => to(a, options))
-        )
-    }
+    case "Refinement":
     case "Transform": {
       const from = go(ast.from)
       const to = go(ast.to)
