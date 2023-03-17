@@ -105,7 +105,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const type: (expected: AST.AST, actual: unknown) => Type
+export declare const type: (expected: AST.AST, actual: unknown, message?: string | undefined) => Type
 ```
 
 Added in v1.0.0
@@ -236,6 +236,7 @@ export interface Type {
   readonly _tag: 'Type'
   readonly expected: AST.AST
   readonly actual: unknown
+  readonly message: O.Option<string>
 }
 ```
 

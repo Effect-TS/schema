@@ -4,6 +4,7 @@
 
 import type { Either, Left, Right } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
+import * as O from "@effect/data/Option"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import type * as AST from "@effect/schema/AST"
 
@@ -40,16 +41,18 @@ export interface Type {
   readonly _tag: "Type"
   readonly expected: AST.AST
   readonly actual: unknown
+  readonly message: O.Option<string>
 }
 
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const type = (expected: AST.AST, actual: unknown): Type => ({
+export const type = (expected: AST.AST, actual: unknown, message?: string): Type => ({
   _tag: "Type",
   expected,
-  actual
+  actual,
+  message: O.fromNullable(message)
 })
 
 /**

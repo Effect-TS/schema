@@ -35,6 +35,10 @@ describe.concurrent("Brand", () => {
       -0.5,
       "Expected -0.5 to be positive, Expected -0.5 to be an integer"
     )
+    expect(() => S.decode(schema)(-0.5)).toThrowError(
+      new Error(`error(s) found
+└─ Expected -0.5 to be positive, Expected -0.5 to be an integer`)
+    )
     Util.expectDecodingFailure(schema, -1, "Expected -1 to be positive")
     Util.expectDecodingFailure(schema, 0, "Expected 0 to be positive")
     Util.expectDecodingSuccess(schema, 1, 1 as PositiveInt)

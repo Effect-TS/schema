@@ -693,11 +693,11 @@ export function filter<A>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> {
-  return (from) => {
+  return (self) => {
     const decode = (a: A) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
     const ast = AST.createRefinement(
-      from.ast,
-      AST.getTo(from.ast),
+      self.ast,
+      AST.getTo(self.ast),
       decode,
       decode,
       toAnnotations(options)
@@ -1166,20 +1166,18 @@ export const fromBrand = <C extends Brand<string>>(
   constructor: Brand.Constructor<C>,
   options?: AnnotationOptions<Brand.Unbranded<C>>
 ) =>
-  <I, A extends Brand.Unbranded<C>>(self: Schema<I, A>): Schema<I, A & C> =>
-    pipe(
-      self,
-      filter<A, A & C>(
-        (x): x is A & C => constructor.refine(x),
-        {
-          typeId: BrandTypeId,
-          message: (a) =>
-            (constructor.either(a) as E.Left<Brand.BrandErrors>).left.map((v) => v.message)
-              .join(", "),
-          ...options
-        }
-      )
+  <I, A extends Brand.Unbranded<C>>(self: Schema<I, A>): Schema<I, A & C> => {
+    const decode = (a: A): ParseResult<C> =>
+      E.mapLeft(constructor.either(a), (e) => [PR.type(ast, a, e.map((v) => v.message).join(", "))])
+    const ast = AST.createRefinement(
+      self.ast,
+      AST.getTo(self.ast),
+      decode,
+      decode,
+      toAnnotations({ typeId: BrandTypeId, ...options })
     )
+    return make(ast)
+  }
 
 // ---------------------------------------------
 // data/Chunk
