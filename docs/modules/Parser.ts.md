@@ -18,17 +18,21 @@ Added in v1.0.0
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
   - [decodePromise](#decodepromise)
-  - [parse](#parse)
-  - [parseEffect](#parseeffect)
-  - [parseEither](#parseeither)
-  - [parseOption](#parseoption)
-  - [parsePromise](#parsepromise)
+  - [decodeResult](#decoderesult)
 - [encoding](#encoding)
   - [encode](#encode)
   - [encodeEffect](#encodeeffect)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
   - [encodePromise](#encodepromise)
+  - [encodeResult](#encoderesult)
+- [parsing](#parsing)
+  - [parse](#parse)
+  - [parseEffect](#parseeffect)
+  - [parseEither](#parseeither)
+  - [parseOption](#parseoption)
+  - [parsePromise](#parsepromise)
+  - [parseResult](#parseresult)
 - [utils](#utils)
   - [ToAsserts (type alias)](#toasserts-type-alias)
 - [validation](#validation)
@@ -39,6 +43,7 @@ Added in v1.0.0
   - [validateEither](#validateeither)
   - [validateOption](#validateoption)
   - [validatePromise](#validatepromise)
+  - [validateResult](#validateresult)
 
 ---
 
@@ -61,7 +66,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeEffect: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -102,6 +107,92 @@ export declare const decodePromise: <I, A>(
 
 Added in v1.0.0
 
+## decodeResult
+
+**Signature**
+
+```ts
+export declare const decodeResult: <_, A>(
+  schema: Schema<_, A>
+) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+```
+
+Added in v1.0.0
+
+# encoding
+
+## encode
+
+**Signature**
+
+```ts
+export declare const encode: <I, A>(schema: Schema<I, A>) => (a: A, options?: ParseOptions | undefined) => I
+```
+
+Added in v1.0.0
+
+## encodeEffect
+
+**Signature**
+
+```ts
+export declare const encodeEffect: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, I>
+```
+
+Added in v1.0.0
+
+## encodeEither
+
+**Signature**
+
+```ts
+export declare const encodeEither: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => E.Either<PR.ParseError, I>
+```
+
+Added in v1.0.0
+
+## encodeOption
+
+**Signature**
+
+```ts
+export declare const encodeOption: <I, A>(
+  schema: Schema<I, A>
+) => (input: A, options?: ParseOptions | undefined) => Option<I>
+```
+
+Added in v1.0.0
+
+## encodePromise
+
+**Signature**
+
+```ts
+export declare const encodePromise: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => Promise<I>
+```
+
+Added in v1.0.0
+
+## encodeResult
+
+**Signature**
+
+```ts
+export declare const encodeResult: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I>
+```
+
+Added in v1.0.0
+
+# parsing
+
 ## parse
 
 **Signature**
@@ -119,7 +210,7 @@ Added in v1.0.0
 ```ts
 export declare const parseEffect: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -160,62 +251,14 @@ export declare const parsePromise: <_, A>(
 
 Added in v1.0.0
 
-# encoding
-
-## encode
+## parseResult
 
 **Signature**
 
 ```ts
-export declare const encode: <I, A>(schema: Schema<I, A>) => (a: A, options?: ParseOptions | undefined) => I
-```
-
-Added in v1.0.0
-
-## encodeEffect
-
-**Signature**
-
-```ts
-export declare const encodeEffect: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
-```
-
-Added in v1.0.0
-
-## encodeEither
-
-**Signature**
-
-```ts
-export declare const encodeEither: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => E.Either<PR.ParseError, I>
-```
-
-Added in v1.0.0
-
-## encodeOption
-
-**Signature**
-
-```ts
-export declare const encodeOption: <I, A>(
-  schema: Schema<I, A>
-) => (input: A, options?: ParseOptions | undefined) => Option<I>
-```
-
-Added in v1.0.0
-
-## encodePromise
-
-**Signature**
-
-```ts
-export declare const encodePromise: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Promise<I>
+export declare const parseResult: <_, A>(
+  schema: Schema<_, A>
+) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -273,7 +316,7 @@ Added in v1.0.0
 ```ts
 export declare const validateEffect: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+) => (a: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -310,6 +353,18 @@ Added in v1.0.0
 export declare const validatePromise: <_, A>(
   schema: Schema<_, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Promise<A>
+```
+
+Added in v1.0.0
+
+## validateResult
+
+**Signature**
+
+```ts
+export declare const validateResult: <_, A>(
+  schema: Schema<_, A>
+) => (a: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
 Added in v1.0.0

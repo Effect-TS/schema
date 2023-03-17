@@ -31,13 +31,15 @@ Added in v1.0.0
   - [Unexpected (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
 - [optimisation](#optimisation)
-  - [either](#either)
-  - [eitherSync](#eithersync)
+  - [effect](#effect)
+  - [eitherOrRunSyncEither](#eitherorrunsynceither)
+  - [eitherOrUndefined](#eitherorundefined)
   - [flatMap](#flatmap)
   - [map](#map)
 - [utils](#utils)
+  - [IO (type alias)](#io-type-alias)
   - [ParseError (interface)](#parseerror-interface)
-  - [ParseResult (interface)](#parseresult-interface)
+  - [ParseResult (type alias)](#parseresult-type-alias)
   - [parseError](#parseerror)
 
 ---
@@ -99,7 +101,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const success: <A>(a: A) => ParseResult<A>
+export declare const success: <A>(a: A) => IO<ParseError, A>
 ```
 
 Added in v1.0.0
@@ -254,22 +256,32 @@ Added in v1.0.0
 
 # optimisation
 
-## either
+## effect
 
 **Signature**
 
 ```ts
-export declare const either: <E, A>(self: Effect.Effect<never, E, A>) => E.Left<E> | E.Right<A> | undefined
+export declare const effect: <E, A>(self: IO<E, A>) => Effect.Effect<never, E, A>
 ```
 
 Added in v1.0.0
 
-## eitherSync
+## eitherOrRunSyncEither
 
 **Signature**
 
 ```ts
-export declare const eitherSync: <E, A>(self: Effect.Effect<never, E, A>) => E.Either<E, A>
+export declare const eitherOrRunSyncEither: <E, A>(self: IO<E, A>) => E.Either<E, A>
+```
+
+Added in v1.0.0
+
+## eitherOrUndefined
+
+**Signature**
+
+```ts
+export declare const eitherOrUndefined: <E, A>(self: IO<E, A>) => E.Left<E> | E.Right<A> | undefined
 ```
 
 Added in v1.0.0
@@ -279,10 +291,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const flatMap: <E, E1, A, B>(
-  self: Effect.Effect<never, E, A>,
-  f: (self: A) => Effect.Effect<never, E1, B>
-) => Effect.Effect<never, E | E1, B>
+export declare const flatMap: <E, E1, A, B>(self: IO<E, A>, f: (self: A) => IO<E1, B>) => IO<E | E1, B>
 ```
 
 Added in v1.0.0
@@ -292,12 +301,22 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const map: <E, A, B>(self: Effect.Effect<never, E, A>, f: (self: A) => B) => Effect.Effect<never, E, B>
+export declare const map: <E, A, B>(self: IO<E, A>, f: (self: A) => B) => IO<E, B>
 ```
 
 Added in v1.0.0
 
 # utils
+
+## IO (type alias)
+
+**Signature**
+
+```ts
+export type IO<E, A> = Effect.Effect<never, E, A> | E.Either<E, A>
+```
+
+Added in v1.0.0
 
 ## ParseError (interface)
 
@@ -312,12 +331,12 @@ export interface ParseError {
 
 Added in v1.0.0
 
-## ParseResult (interface)
+## ParseResult (type alias)
 
 **Signature**
 
 ```ts
-export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
+export type ParseResult<A> = IO<ParseError, A>
 ```
 
 Added in v1.0.0

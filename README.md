@@ -18,7 +18,7 @@ Modeling the schema of data structures as first-class values
 
 Welcome to the documentation for `@effect/schema`, **a library for defining and using schemas** to validate and transform data in TypeScript.
 
-`@effect/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as **decoding** from `unknown`, **encoding** to `unknown`, **verifying** that a value conforms to a given `Schema`.
+`@effect/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as **parsing** from `unknown`, **decoding**, **encoding**, **verifying** that a value conforms to a given `Schema`.
 
 `@effect/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
 
@@ -104,47 +104,50 @@ interface Person {
 */
 ```
 
-## Decoding
+## Parsing
 
-To use the `Schema` defined above to decode a value from `unknown`, you can use the `decode` function from the `@effect/schema/Schema` module:
+To use the `Schema` defined above to parse a value from `unknown`, you can use the `parse` function from the `@effect/schema/Schema` module:
 
 ```ts
 import * as S from "@effect/schema/Schema";
+import * as E from "@effect/data/Either";
 
 const Person = S.struct({
   name: S.string,
   age: S.number,
 });
 
-const decodePerson = S.decodeEither(Person);
+const parsePerson = S.parseEither(Person);
 
-const result1 = decodePerson({ name: "Alice", age: 30 });
+const input: unknown = { name: "Alice", age: 30 }
+
+const result1 = parsePerson(input);
 if (S.isSuccess(result1)) {
   console.log(result1.right); // { name: "Alice", age: 30 }
 }
 
-const result2 = decodePerson(null);
-if (S.isFailure(result2)) {
+const result2 = parsePerson(null);
+if (E.isLeft(result2)) {
   console.log(result2.left); // [PR.type(..., null)]
 }
 ```
 
-The `decodePerson` function returns a value of type `ParseResult<A>`, which is a type alias for `Either<NonEmptyReadonlyArray<ParseError>, A>`, where `NonEmptyReadonlyArray<ParseError>` represents a list of errors that occurred during the decoding process and `A` is the inferred type of the data described by the `Schema`. A successful decode will result in a `Right`, containing the decoded data. A `Right` value indicates that the decode was successful and no errors occurred. In the case of a failed decode, the result will be a `Left` value containing a list of `ParseError`s.
+The `parsePerson` function returns a value of type `ParseResult<A>`, which is a type alias for `Either<NonEmptyReadonlyArray<ParseErrors>, A>`, where `NonEmptyReadonlyArray<ParseErrors>` represents a list of errors that occurred during the parsing process and `A` is the inferred type of the data described by the `Schema`. A successful parse will result in a `Right`, containing the parsed data. A `Right` value indicates that the parse was successful and no errors occurred. In the case of a failed parse, the result will be a `Left` value containing a list of `ParseError`s.
 
-The `decode` function is used to decode a value and throw an error if the decoding fails.
-It is useful when you want to ensure that the value being decoded is in the correct format, and want to throw an error if it is not.
+The `parse` function is used to parse a value and throw an error if the parsing fails.
+It is useful when you want to ensure that the value being parsed is in the correct format, and want to throw an error if it is not.
 
 ```ts
 try {
-  const person = S.decode(Person)({});
+  const person = S.parse(Person)({});
   console.log(person);
 } catch (e) {
-  console.error("Decoding failed:");
+  console.error("Parsing failed:");
   console.error(e);
 }
 /*
-Decoding failed:
-1 error(s) found
+Parsing failed:
+error(s) found
 └─ key "name"
    └─ is missing
 */
@@ -152,9 +155,9 @@ Decoding failed:
 
 ### Excess properties
 
-When using a `Schema` to decode a value, any properties that are not specified in the `Schema` will result in a decoding error. This is because the `Schema` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
+When using a `Schema` to parse a value, any properties that are not specified in the `Schema` will result in a parsing error. This is because the `Schema` is expecting a specific shape for the parsed value, and any excess properties do not conform to that shape.
 
-However, you can use the `isUnexpectedAllowed` option to allow excess properties while decoding. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
+However, you can use the `isUnexpectedAllowed` option to allow excess properties while parsing. This can be useful in cases where you want to be permissive in the shape of the parsed value, but still want to catch any potential errors or unexpected values.
 
 Here's an example of how you might use `isUnexpectedAllowed`:
 
@@ -168,7 +171,7 @@ const Person = S.struct({
 
 console.log(
   "%o",
-  S.decodeEither(Person)(
+  S.parseEither(Person)(
     {
       name: "Bob",
       age: 40,
@@ -187,7 +190,7 @@ console.log(
 
 ### All errors
 
-The `allErrors` option is a feature that allows you to receive all decoding errors when attempting to decode a value using a schema. By default only the first error is returned, but by setting the `allErrors` option to `true`, you can receive all errors that occurred during the decoding process. This can be useful for debugging or for providing more comprehensive error messages to the user.
+The `allErrors` option is a feature that allows you to receive all parsing errors when attempting to parse a value using a schema. By default only the first error is returned, but by setting the `allErrors` option to `true`, you can receive all errors that occurred during the parsing process. This can be useful for debugging or for providing more comprehensive error messages to the user.
 
 Here's an example of how you might use `allErrors`:
 
@@ -201,7 +204,7 @@ const Person = S.struct({
 
 console.log(
   "%o",
-  S.decodeEither(Person)(
+  S.parseEither(Person)(
     {
       name: "Bob",
       age: "abc",
@@ -244,7 +247,7 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 import * as S from "@effect/schema/Schema";
 import { pipe } from "@effect/data/Function";
 
-// Age is a schema that can decode a string to a number and encode a number to a string
+// Age is a schema that can parse a string to a number and encode a number to a string
 const Age = S.numberFromString(S.string);
 
 const Person = S.struct({
@@ -262,25 +265,26 @@ Note that during encoding, the number value `30` was converted to a string `"30"
 
 ## Formatting errors
 
-To format errors when a `decode` or an `encode` function fails, you can use the `formatErrors` function from the `@effect/schema/TreeFormatter` module.
+To format errors when a parsing or an encoding function fails, you can use the `formatErrors` function from the `@effect/schema/TreeFormatter` module.
 
 ```ts
 import * as S from "@effect/schema/Schema";
 import { formatErrors } from "@effect/schema/TreeFormatter";
+import * as E from "@effect/data/Either";
 
 const Person = S.struct({
   name: S.string,
   age: S.number,
 });
 
-const result = S.decodeEither(Person)({});
-if (S.isFailure(result)) {
-  console.error("Decoding failed:");
+const result = S.parseEither(Person)({});
+if (E.isLeft(result)) {
+  console.error("Parsing failed:");
   console.error(formatErrors(result.left));
 }
 /*
-Decoding failed:
-1 error(s) found
+Parsing failed:
+error(s) found
 └─ key "name"
    └─ is missing
 */
@@ -327,7 +331,7 @@ try {
 }
 /*
 The input does not match the schema:
-Error: 1 error(s) found
+Error: error(s) found
 └─ key "age"
    └─ Expected number, actual "30"
 */
@@ -444,7 +448,7 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 
 ## Filters
 
-**Note**. Please note that the use of filters do not alter the type of the `Schema`. They only serve to add additional constraints to the decoding process.
+**Note**. Please note that the use of filters do not alter the type of the `Schema`. They only serve to add additional constraints to the parsing process.
 
 ### String filters
 
@@ -474,7 +478,7 @@ pipe(S.number, S.between(-2, 2)); // -2 <= x <= 2
 pipe(S.number, S.int()); // value must be an integer
 
 pipe(S.number, S.nonNaN()); // not NaN
-pipe(S.number, S.finite()); // ensures that the value being decoded is finite and not equal to Infinity or -Infinity
+pipe(S.number, S.finite()); // ensures that the value being parsed is finite and not equal to Infinity or -Infinity
 
 pipe(S.number, S.positive()); // > 0
 pipe(S.number, S.nonNegative()); // >= 0
@@ -709,12 +713,12 @@ const DiscriminatedShape = S.union(
   )
 );
 
-expect(S.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(S.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
-expect(S.decode(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+expect(S.parse(DiscriminatedShape)({ sideLength: 10 })).toEqual({
   kind: "square",
   sideLength: 10,
 });
@@ -734,8 +738,8 @@ const DiscriminatedShape = S.union(
   pipe(Square, S.attachPropertySignature("kind", "square"))
 );
 
-// decoding
-expect(S.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
+// parsing
+expect(S.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
@@ -991,7 +995,7 @@ flowchart TD
   schema2--encode: I2 -> A1-->schema1
 ```
 
-The `transform` combinator takes a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to decode a value, the transformed schema will also fail.
+The `transform` combinator takes a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to parse a value, the transformed schema will also fail.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -1006,7 +1010,7 @@ const encode = ([s]: readonly [string]): string => s;
 const transformedSchema: S.Schema<string, readonly [string]> = S.transform(S.string, S.tuple(S.string), decode, encode);
 ```
 
-In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
+In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to parse values of type `string` into values of type `[string]`.
 
 The `transformEither` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
 
@@ -1042,12 +1046,12 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, string>
 const schema = S.trim(S.string);
-const decode = S.decode(schema);
+const parse = S.parse(schema);
 
-decode("a"); // "a"
-decode(" a"); // "a"
-decode("a "); // "a"
-decode(" a "); // "a"
+parse("a"); // "a"
+parse(" a"); // "a"
+parse("a "); // "a"
+parse(" a "); // "a"
 ```
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
@@ -1065,18 +1069,18 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, number>
 const schema = S.numberFromString(S.string);
-const decode = S.decode(schema);
+const parse = S.parse(schema);
 
 // success cases
-decode("1"); // 1
-decode("-1"); // -1
-decode("1.5"); // 1.5
-decode("NaN"); // NaN
-decode("Infinity"); // Infinity
-decode("-Infinity"); // -Infinity
+parse("1"); // 1
+parse("-1"); // -1
+parse("1.5"); // 1.5
+parse("NaN"); // NaN
+parse("Infinity"); // Infinity
+parse("-Infinity"); // -Infinity
 
 // failure cases
-decode("a"); // throws
+parse("a"); // throws
 ```
 
 #### clamp
@@ -1089,10 +1093,10 @@ import * as S from "@effect/schema/Schema";
 // const schema: S.Schema<number, number>
 const schema = pipe(S.number, S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
-const decode = S.decode(schema);
-decode(-3); // -1
-decode(0); // 0
-decode(3); // 1
+const parse = S.parse(schema);
+parse(-3); // -1
+parse(0); // 0
+parse(3); // 1
 ```
 
 ### Bigint transformations
@@ -1107,10 +1111,10 @@ import * as S from "@effect/schema/Schema";
 // const schema: S.Schema<bigint, bigint>
 const schema = pipe(S.bigint, S.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
-const decode = S.decode(schema);
-decode(-3n); // -1n
-decode(0n); // 0n
-decode(3n); // 1n
+const parse = S.parse(schema);
+parse(-3n); // -1n
+parse(0n); // 0n
+parse(3n); // 1n
 ```
 
 ### Date transformations
@@ -1124,23 +1128,23 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
 const schema = S.dateFromString;
-const decode = S.decode(schema);
+const parse = S.parse(schema);
 
-decode("1970-01-01T00:00:00.000Z"); // new Date(0)
+parse("1970-01-01T00:00:00.000Z"); // new Date(0)
 
-decode("a"); // throws
+parse("a"); // throws
 ```
 
 ## Option
 
-### Decoding from nullable fields
+### Parsing from nullable fields
 
-The `option` combinator in `@effect/schema/Schema` allows you to specify that a field in a schema is of type `Option<A>` and can be decoded from a required nullable field `A | undefined | null`. This is particularly useful when working with JSON data that may contain `null` values for optional fields.
+The `option` combinator in `@effect/schema/Schema` allows you to specify that a field in a schema is of type `Option<A>` and can be parsed from a required nullable field `A | undefined | null`. This is particularly useful when working with JSON data that may contain `null` values for optional fields.
 
-When decoding a nullable field, the `option` combinator follows these conversion rules:
+When parsing a nullable field, the `option` combinator follows these conversion rules:
 
-- `undefined` and `null` decode to `None`
-- `A` decodes to `Some<A>`
+- `undefined` and `null` parse to `None`
+- `A` parses to `Some<A>`
 
 Here's an example that demonstrates how to use the `option` combinator:
 
@@ -1162,13 +1166,13 @@ const schema = S.struct({
   b: S.optionFromNullable(S.number),
 });
 
-// decoding
-const decode = S.decode(schema);
-decode({ a: "hello", b: undefined }); // { a: "hello", b: none() }
-decode({ a: "hello", b: null }); // { a: "hello", b: none() }
-decode({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
+// parsing
+const parse = S.parse(schema);
+parse({ a: "hello", b: undefined }); // { a: "hello", b: none() }
+parse({ a: "hello", b: null }); // { a: "hello", b: none() }
+parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
-decode({ a: "hello" }); // throws key "b" is missing
+parse({ a: "hello" }); // throws key "b" is missing
 
 // encoding
 const encodeOrThrow = S.encode(schema);
@@ -1177,14 +1181,14 @@ encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
 encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
 ```
 
-### Decoding from optional fields
+### Parsing from optional fields
 
-When working with optional fields that contain values of type `A`, it is possible to decode them into an `Option<A>` by using the `parseOptionals` combinator.
+When working with optional fields that contain values of type `A`, it is possible to parse them into an `Option<A>` by using the `parseOptionals` combinator.
 
-When decoding a nullable field, the `parseOptionals` combinator follows these conversion rules:
+When parsing a nullable field, the `parseOptionals` combinator follows these conversion rules:
 
-- `undefined`, `null` and an absent value decode to `None`
-- `A` decodes to `Some<A>`
+- `undefined`, `null` and an absent value parse to `None`
+- `A` parses to `Some<A>`
 
 Here's an example that demonstrates how to use the `parseOptionals` combinator:
 
@@ -1205,12 +1209,12 @@ const schema = pipe(
   S.optionsFromOptionals({ b: S.number })
 );
 
-// decoding
-const decode = S.decode(schema);
-decode({ a: "hello" }); // { a: "hello", b: none() }
-decode({ a: "hello", b: undefined }); // { a: "hello", b: none() }
-decode({ a: "hello", b: null }); // { a: "hello", b: none() }
-decode({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
+// parsing
+const parse = S.parse(schema);
+parse({ a: "hello" }); // { a: "hello", b: none() }
+parse({ a: "hello", b: undefined }); // { a: "hello", b: none() }
+parse({ a: "hello", b: null }); // { a: "hello", b: none() }
+parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
 // encoding
 const encodeOrThrow = S.encode(schema);
@@ -1219,36 +1223,36 @@ encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello' }
 encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
 ```
 
-In the above example, the `parseOptionals` combinator is used to decode the optional field `b` with values of type `number` into an `Option<number>`. When decoding, `undefined`, `null` and absent values will be decoded as `none()`, and any other value will be decoded as `some(value)`.
+In the above example, the `parseOptionals` combinator is used to parse the optional field `b` with values of type `number` into an `Option<number>`. When parsing, `undefined`, `null` and absent values will be parsed as `none()`, and any other value will be parsed as `some(value)`.
 
-To use `parseOptionals`, you should first define your base schema and then apply the `parseOptionals` combinator to add the fields that you want to decode into an `Option`.
+To use `parseOptionals`, you should first define your base schema and then apply the `parseOptionals` combinator to add the fields that you want to parse into an `Option`.
 
 ## ReadonlySet
 
-In the following section, we demonstrate how to use the `readonlySet` combinator to decode a `ReadonlySet` from an array of values.
+In the following section, we demonstrate how to use the `readonlySet` combinator to parse a `ReadonlySet` from an array of values.
 
 ```ts
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<readonly number[], ReadonlySet<number>>
 const schema = S.readonlySet(S.number); // define a schema for ReadonlySet with number values
-const decode = S.decode(schema);
+const parse = S.parse(schema);
 
-decode([1, 2, 3]); // new Set([1, 2, 3])
+parse([1, 2, 3]); // new Set([1, 2, 3])
 ```
 
 ## ReadonlyMap
 
-In the following section, we demonstrate how to use the `readonlyMap` combinator to decode a `ReadonlyMap` from an array of entries.
+In the following section, we demonstrate how to use the `readonlyMap` combinator to parse a `ReadonlyMap` from an array of entries.
 
 ```ts
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<readonly (readonly [number, string])[], ReadonlyMap<number, string>>
 const schema = S.readonlyMap(S.number, S.string); // define the schema for ReadonlyMap with number keys and string values
-const decode = S.decode(schema);
+const parse = S.parse(schema);
 
-decode([
+parse([
   [1, "a"],
   [2, "b"],
   [3, "c"],
@@ -1269,9 +1273,9 @@ const LongString = pipe(
   })
 );
 
-console.log(S.decode(LongString)("a"));
+console.log(S.parse(LongString)("a"));
 /*
-1 error(s) found
+error(s) found
 └─ Expected a string at least 10 characters long, actual "a"
 */
 ```

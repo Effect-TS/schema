@@ -1348,7 +1348,7 @@ export declare const mergeAnnotations: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      ) => (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
       hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
@@ -1398,16 +1398,16 @@ export declare const mergeAnnotations: (
       _tag: 'Refinement'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
     }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
     }
 ```
 
@@ -1478,7 +1478,7 @@ export declare const setAnnotation: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      ) => (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
       hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
@@ -1528,16 +1528,16 @@ export declare const setAnnotation: (
       _tag: 'Refinement'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
     }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
     }
 ```
 
