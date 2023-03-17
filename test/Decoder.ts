@@ -44,6 +44,12 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailure(schema, "a", `Expected number, actual "a"`)
   })
 
+  it("reverse", () => {
+    const schema = pipe(S.string, S.numberFromString, S.positive(), S.reverse)
+    Util.expectDecodingSuccess(schema, 1, "1")
+    Util.expectDecodingFailure(schema, -1, "Expected a positive number, actual -1")
+  })
+
   it("annotations/message refinement", () => {
     const schema = pipe(
       // initial schema, a string

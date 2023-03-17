@@ -755,7 +755,6 @@ export interface Refinement extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly isReversed: boolean
 }
 
 /**
@@ -764,18 +763,11 @@ export interface Refinement extends Annotated {
  */
 export const createRefinement = (
   from: AST,
-  decode: (input: any, options?: ParseOptions) => ParseResult<any>,
-  isReversed: boolean,
+  to: AST,
+  decode: Refinement["decode"],
+  encode: Refinement["encode"],
   annotations: Annotated["annotations"] = {}
-): Refinement => ({
-  _tag: "Refinement",
-  from,
-  to: getTo(from),
-  decode,
-  encode: decode,
-  isReversed,
-  annotations
-})
+): Refinement => ({ _tag: "Refinement", from, to, decode, encode, annotations })
 
 /**
  * @category guards
@@ -1036,8 +1028,11 @@ export const getTo = (ast: AST): AST => {
       return createUnion(ast.types.map(getTo), ast.annotations)
     case "Lazy":
       return createLazy(() => getTo(ast.f()), ast.annotations)
-    case "Refinement":
-      return createRefinement(getTo(ast.from), ast.decode, false, ast.annotations)
+    case "Refinement": {
+      const to = getTo(ast.from)
+      return createRefinement(to, to, ast.decode, ast.decode, ast.annotations)
+    }
+
     case "Transform":
       return ast.to
   }
@@ -1110,7 +1105,13 @@ export const reverse = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => reverse(ast.f()), ast.annotations)
     case "Refinement":
-      return createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
+      return createRefinement(
+        reverse(ast.to),
+        reverse(ast.from),
+        ast.encode,
+        ast.decode,
+        ast.annotations
+      )
     case "Transform":
       return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
   }

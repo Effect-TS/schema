@@ -58,6 +58,11 @@ export const from = <I, A>(schema: Schema<I, A>): Schema<I> => make(AST.getFrom(
  */
 export const to = <I, A>(schema: Schema<I, A>): Schema<A> => make(AST.getTo(schema.ast))
 
+/**
+ * @since 1.0.0
+ */
+export const reverse = <I, A>(schema: Schema<I, A>): Schema<A, I> => make(AST.reverse(schema.ast))
+
 /* c8 ignore start */
 export {
   /**
@@ -689,10 +694,12 @@ export function filter<A>(
   options?: AnnotationOptions<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> {
   return (from) => {
+    const decode = (a: A) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
     const ast = AST.createRefinement(
       from.ast,
-      (a: A) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
-      false,
+      AST.getTo(from.ast),
+      decode,
+      decode,
       toAnnotations(options)
     )
     return make(ast)
@@ -707,23 +714,23 @@ export function filter<A>(
   @since 1.0.0
  */
 export const transformEither: {
-  <_, B, A>(
-    to: Schema<_, B>,
-    decode: (input: A, options?: ParseOptions) => ParseResult<B>,
-    encode: (input: B, options?: ParseOptions) => ParseResult<A>
-  ): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, A, _, B>(
+  <C, B, A>(
+    to: Schema<C, B>,
+    decode: (a: A, options?: ParseOptions) => ParseResult<B>,
+    encode: (b: B, options?: ParseOptions) => ParseResult<A>
+  ): <I>(self: Schema<I, A>) => Schema<I, C>
+  <I, A, C, B>(
     self: Schema<I, A>,
-    to: Schema<_, B>,
-    decode: (input: A, options?: ParseOptions) => ParseResult<B>,
-    encode: (input: B, options?: ParseOptions) => ParseResult<A>
-  ): Schema<I, B>
-} = dual(4, <I, A, _, B>(
+    to: Schema<C, B>,
+    decode: (a: A, options?: ParseOptions) => ParseResult<B>,
+    encode: (b: B, options?: ParseOptions) => ParseResult<A>
+  ): Schema<I, C>
+} = dual(4, <I, A, C, B>(
   self: Schema<I, A>,
-  to: Schema<_, B>,
-  decode: (input: A, options?: ParseOptions) => ParseResult<B>,
-  encode: (input: B, options?: ParseOptions) => ParseResult<A>
-): Schema<I, B> => make(AST.createTransform(self.ast, AST.getTo(to.ast), decode, encode)))
+  to: Schema<C, B>,
+  decode: (a: A, options?: ParseOptions) => ParseResult<B>,
+  encode: (b: B, options?: ParseOptions) => ParseResult<A>
+): Schema<I, C> => make(AST.createTransform(self.ast, AST.reverse(to.ast), decode, encode)))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -733,20 +740,20 @@ export const transformEither: {
   @since 1.0.0
 */
 export const transform: {
-  <_, B, A>(
-    to: Schema<_, B>,
+  <C, B, A>(
+    to: Schema<C, B>,
     ab: (a: A) => B,
     ba: (b: B) => A
-  ): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, A, _, B>(self: Schema<I, A>, to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
+  ): <I>(self: Schema<I, A>) => Schema<I, C>
+  <I, A, C, B>(self: Schema<I, A>, to: Schema<C, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, C>
 } = dual(
   4,
-  <I, A, _, B>(
+  <I, A, C, B>(
     self: Schema<I, A>,
-    to: Schema<_, B>,
+    to: Schema<C, B>,
     ab: (a: A) => B,
     ba: (b: B) => A
-  ): Schema<I, B> => transformEither(self, to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b)))
+  ): Schema<I, C> => transformEither(self, to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b)))
 )
 
 /**
@@ -1137,7 +1144,7 @@ export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
   <I>(self: Schema<I, A>): Schema<I, A> =>
     transform(
       self,
-      pipe(self, betweenBigint(min, max)),
+      pipe(self, to, betweenBigint(min, max)),
       (self) => B.clamp(self, min, max) as A,
       identity
     )
@@ -1216,7 +1223,7 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<
  * @since 1.0.0
  */
 export const chunk = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, Chunk<A>> =>
-  transform(array(item), chunkFromSelf(item), C.fromIterable, C.toReadonlyArray)
+  transform(array(item), to(chunkFromSelf(item)), C.fromIterable, C.toReadonlyArray)
 
 // ---------------------------------------------
 // data/Data
@@ -1276,7 +1283,7 @@ export const data = <
 ): Schema<I, D.Data<A>> =>
   transform(
     item,
-    dataFromSelf(item),
+    to(dataFromSelf(item)),
     toData,
     (a) => Array.isArray(a) ? Array.from(a) : Object.assign({}, a) as any
   )
@@ -1398,7 +1405,7 @@ export const either = <IE, E, IA, A>(
 > =>
   transform(
     eitherInline(left, right),
-    eitherFromSelf(left, right),
+    to(eitherFromSelf(left, right)),
     (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
     E.match(
       (left) => ({ _tag: "Left" as const, left }),
@@ -1738,7 +1745,7 @@ export const clamp = <A extends number>(min: number, max: number) =>
   <I>(self: Schema<I, A>): Schema<I, A> =>
     transform(
       self,
-      pipe(self, between<A>(min, max)),
+      pipe(self, to, between<A>(min, max)),
       (self) => N.clamp(self, min, max) as A,
       identity
     )
@@ -1865,7 +1872,7 @@ export const option = <I, A>(
 ): Schema<{ readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I }, Option<A>> =>
   transform(
     optionInline(value),
-    optionFromSelf(value),
+    to(optionFromSelf(value)),
     (a) => a._tag === "None" ? O.none() : O.some(a.value),
     O.match(() => ({ _tag: "None" as const }), (value) => ({ _tag: "Some" as const, value }))
   )
@@ -1877,7 +1884,7 @@ export const option = <I, A>(
 export const optionFromNullable = <I, A>(
   value: Schema<I, A>
 ): Schema<I | null | undefined, Option<A>> =>
-  transform(union(_undefined, _null, value), optionFromSelf(value), O.fromNullable, O.getOrNull)
+  transform(union(_undefined, _null, value), to(optionFromSelf(value)), O.fromNullable, O.getOrNull)
 
 /**
  * @category parsers
@@ -2084,7 +2091,7 @@ export const readonlyMap = <IK, K, IV, V>(
 ): Schema<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
   transform(
     array(tuple(key, value)),
-    readonlyMapFromSelf(key, value),
+    to(readonlyMapFromSelf(key, value)),
     (as) => new Map(as),
     (map) => Array.from(map.entries())
   )
@@ -2136,7 +2143,7 @@ export const readonlySetFromSelf = <I, A>(
 export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, ReadonlySet<A>> =>
   transform(
     array(item),
-    readonlySetFromSelf(item),
+    to(readonlySetFromSelf(item)),
     (as) => new Set(as),
     (set) => Array.from(set)
   )
@@ -2341,7 +2348,7 @@ export const includes = <A extends string>(
 export const trim = <I>(self: Schema<I, string>): Schema<I, string> =>
   transform(
     self,
-    pipe(self, trimmed()),
+    pipe(self, to, trimmed()),
     (s) => s.trim(),
     identity
   )

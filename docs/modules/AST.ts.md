@@ -394,8 +394,9 @@ Added in v1.0.0
 ```ts
 export declare const createRefinement: (
   from: AST,
-  decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>,
-  isReversed: boolean,
+  to: AST,
+  decode: Refinement['decode'],
+  encode: Refinement['encode'],
   annotations?: Annotated['annotations']
 ) => Refinement
 ```
@@ -425,7 +426,6 @@ export declare const createTransform: (
   to: AST,
   decode: Transform['decode'],
   encode: Transform['encode'],
-  isReversed: boolean,
   annotations?: Annotated['annotations']
 ) => Transform
 ```
@@ -914,8 +914,9 @@ Added in v1.0.0
 export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
+  readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly isReversed: boolean
+  readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
 }
 ```
 
@@ -970,7 +971,6 @@ export interface Transform extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly isReversed: boolean
 }
 ```
 
@@ -1358,8 +1358,9 @@ export declare const mergeAnnotations: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
+      to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      isReversed: boolean
+      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1368,7 +1369,6 @@ export declare const mergeAnnotations: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      isReversed: boolean
     }
 ```
 
@@ -1480,8 +1480,9 @@ export declare const setAnnotation: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
+      to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      isReversed: boolean
+      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1490,7 +1491,6 @@ export declare const setAnnotation: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      isReversed: boolean
     }
 ```
 

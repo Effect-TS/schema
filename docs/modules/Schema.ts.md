@@ -186,6 +186,7 @@ Added in v1.0.0
   - [parse](#parse)
   - [parseEither](#parseeither)
   - [parseOption](#parseoption)
+  - [reverse](#reverse)
   - [to](#to)
   - [validate](#validate)
   - [validateEither](#validateeither)
@@ -593,8 +594,8 @@ using the provided mapping functions.
 
 ```ts
 export declare const transform: {
-  <_, B, A>(to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, _, A, B>(self: Schema<I, A>, to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
+  <C, B, A>(to: Schema<C, B>, ab: (a: A) => B, ba: (b: B) => A): <I>(self: Schema<I, A>) => Schema<I, C>
+  <I, A, C, B>(self: Schema<I, A>, to: Schema<C, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, C>
 }
 ```
 
@@ -609,29 +610,17 @@ using the provided decoding functions.
 
 ```ts
 export declare const transformEither: {
-  <_, B, A>(
-    to: Schema<_, B>,
-    decode: (
-      input: A,
-      options?: AST.ParseOptions | undefined
-    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
-    encode: (
-      input: B,
-      options?: AST.ParseOptions | undefined
-    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-  ): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, A, _, B>(
+  <C, B, A>(
+    to: Schema<C, B>,
+    decode: (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
+    encode: (b: B, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+  ): <I>(self: Schema<I, A>) => Schema<I, C>
+  <I, A, C, B>(
     self: Schema<I, A>,
-    to: Schema<_, B>,
-    decode: (
-      input: A,
-      options?: AST.ParseOptions | undefined
-    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
-    encode: (
-      input: B,
-      options?: AST.ParseOptions | undefined
-    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-  ): Schema<I, B>
+    to: Schema<C, B>,
+    decode: (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
+    encode: (b: B, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+  ): Schema<I, C>
 }
 ```
 
@@ -2229,6 +2218,16 @@ Added in v1.0.0
 export declare const parseOption: <I, A>(
   schema: Schema<I, A>
 ) => (i: I, options?: AST.ParseOptions | undefined) => Option<A>
+```
+
+Added in v1.0.0
+
+## reverse
+
+**Signature**
+
+```ts
+export declare const reverse: <I, A>(schema: Schema<I, A>) => Schema<A, I>
 ```
 
 Added in v1.0.0
