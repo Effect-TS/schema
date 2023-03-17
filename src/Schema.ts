@@ -738,7 +738,7 @@ export const transform: {
     ab: (a: A) => B,
     ba: (b: B) => A
   ): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, _, A, B>(self: Schema<I, A>, to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
+  <I, A, _, B>(self: Schema<I, A>, to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
 } = dual(
   4,
   <I, A, _, B>(
@@ -782,7 +782,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   value: V
 ) =>
   <I, A extends object>(schema: Schema<I, A>): Schema<I, Spread<A & { readonly [k in K]: V }>> =>
-    transform<I, any, A, any>(
+    transform<I, A, any, any>(
       schema,
       pipe(schema, extend(struct({ [key]: literal(value) }))),
       (a) => ({ ...a, [key]: value }),
@@ -1139,7 +1139,7 @@ export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
       self,
       pipe(self, betweenBigint(min, max)),
       (self) => B.clamp(self, min, max) as A,
-      (self) => B.clamp(self, min, max) as A
+      identity
     )
 
 // ---------------------------------------------
@@ -1740,7 +1740,7 @@ export const clamp = <A extends number>(min: number, max: number) =>
       self,
       pipe(self, between<A>(min, max)),
       (self) => N.clamp(self, min, max) as A,
-      (self) => N.clamp(self, min, max) as A
+      identity
     )
 
 /**
