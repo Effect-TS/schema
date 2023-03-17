@@ -695,20 +695,20 @@ export function filter<A>(
   @since 1.0.0
  */
 export const transformEither: {
-  <B, A>(
-    to: Schema<any, B>,
+  <_, B, A>(
+    to: Schema<_, B>,
     decode: (input: A, options?: ParseOptions) => ParseResult<B>,
     encode: (input: B, options?: ParseOptions) => ParseResult<A>
   ): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, A, B>(
+  <I, A, _, B>(
     self: Schema<I, A>,
-    to: Schema<any, B>,
+    to: Schema<_, B>,
     decode: (input: A, options?: ParseOptions) => ParseResult<B>,
     encode: (input: B, options?: ParseOptions) => ParseResult<A>
   ): Schema<I, B>
-} = dual(4, <I, A, B>(
+} = dual(4, <I, A, _, B>(
   self: Schema<I, A>,
-  to: Schema<any, B>,
+  to: Schema<_, B>,
   decode: (input: A, options?: ParseOptions) => ParseResult<B>,
   encode: (input: B, options?: ParseOptions) => ParseResult<A>
 ): Schema<I, B> => make(AST.createTransform(self.ast, to.ast, decode, encode, false)))
@@ -721,17 +721,17 @@ export const transformEither: {
   @since 1.0.0
 */
 export const transform: {
-  <B, A>(
-    to: Schema<any, B>,
+  <_, B, A>(
+    to: Schema<_, B>,
     ab: (a: A) => B,
     ba: (b: B) => A
   ): <I>(self: Schema<I, A>) => Schema<I, B>
-  <I, A, B>(self: Schema<I, A>, to: Schema<any, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
+  <I, _, A, B>(self: Schema<I, A>, to: Schema<_, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, B>
 } = dual(
   4,
-  <I, A, B>(
+  <I, A, _, B>(
     self: Schema<I, A>,
-    to: Schema<any, B>,
+    to: Schema<_, B>,
     ab: (a: A) => B,
     ba: (b: B) => A
   ): Schema<I, B> => transformEither(self, to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b)))
@@ -770,7 +770,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   value: V
 ) =>
   <I, A extends object>(schema: Schema<I, A>): Schema<I, Spread<A & { readonly [k in K]: V }>> =>
-    transform<I, A, any>(
+    transform<I, any, A, any>(
       schema,
       pipe(schema, extend(struct({ [key]: literal(value) }))),
       (a) => ({ ...a, [key]: value }),
