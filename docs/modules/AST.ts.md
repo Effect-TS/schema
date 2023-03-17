@@ -101,6 +101,7 @@ Added in v1.0.0
   - [Annotated (interface)](#annotated-interface)
   - [Compiler (type alias)](#compiler-type-alias)
   - [Element (interface)](#element-interface)
+  - [HasTransformation (interface)](#hastransformation-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
   - [LiteralValue (type alias)](#literalvalue-type-alias)
   - [Match (type alias)](#match-type-alias)
@@ -116,6 +117,7 @@ Added in v1.0.0
   - [getCompiler](#getcompiler)
   - [getFrom](#getfrom)
   - [getTo](#getto)
+  - [hasTransformation](#hastransformation)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
@@ -808,7 +810,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Declaration extends Annotated {
+export interface Declaration extends Annotated, HasTransformation {
   readonly _tag: 'Declaration'
   readonly typeParameters: ReadonlyArray<AST>
   readonly type: AST
@@ -836,7 +838,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Lazy extends Annotated {
+export interface Lazy extends Annotated, HasTransformation {
   readonly _tag: 'Lazy'
   readonly f: () => AST
 }
@@ -911,7 +913,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Refinement extends Annotated {
+export interface Refinement extends Annotated, HasTransformation {
   readonly _tag: 'Refinement'
   readonly from: AST
   readonly to: AST
@@ -965,7 +967,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Transform extends Annotated {
+export interface Transform extends Annotated, HasTransformation {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
@@ -981,7 +983,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Tuple extends Annotated {
+export interface Tuple extends Annotated, HasTransformation {
   readonly _tag: 'Tuple'
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
@@ -996,7 +998,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface TypeLiteral extends Annotated {
+export interface TypeLiteral extends Annotated, HasTransformation {
   readonly _tag: 'TypeLiteral'
   readonly propertySignatures: ReadonlyArray<PropertySignature>
   readonly indexSignatures: ReadonlyArray<IndexSignature>
@@ -1022,7 +1024,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Union extends Annotated {
+export interface Union extends Annotated, HasTransformation {
   readonly _tag: 'Union'
   readonly types: readonly [AST, AST, ...Array<AST>]
 }
@@ -1099,6 +1101,18 @@ Added in v1.0.0
 export interface Element {
   readonly type: AST
   readonly isOptional: boolean
+}
+```
+
+Added in v1.0.0
+
+## HasTransformation (interface)
+
+**Signature**
+
+```ts
+export interface HasTransformation {
+  readonly hasTransformation: boolean
 }
 ```
 
@@ -1287,6 +1301,16 @@ export declare const getTo: (ast: AST) => AST
 
 Added in v1.0.0
 
+## hasTransformation
+
+**Signature**
+
+```ts
+export declare const hasTransformation: (ast: AST) => boolean
+```
+
+Added in v1.0.0
+
 ## keyof
 
 Equivalent at runtime to the TypeScript type-level `keyof` operator.
@@ -1318,6 +1342,7 @@ export declare const mergeAnnotations: (
       decode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1345,15 +1370,22 @@ export declare const mergeAnnotations: (
       elements: readonly Element[]
       rest: Option<readonly [AST, ...AST[]]>
       isReadonly: boolean
+      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'TypeLiteral'
       propertySignatures: readonly PropertySignature[]
       indexSignatures: readonly IndexSignature[]
+      hasTransformation: boolean
     }
-  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
-  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Union'
+      types: readonly [AST, AST, ...AST[]]
+      hasTransformation: boolean
+    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST; hasTransformation: boolean }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
@@ -1361,6 +1393,7 @@ export declare const mergeAnnotations: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1369,6 +1402,7 @@ export declare const mergeAnnotations: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      hasTransformation: boolean
     }
 ```
 
@@ -1440,6 +1474,7 @@ export declare const setAnnotation: (
       decode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1467,15 +1502,22 @@ export declare const setAnnotation: (
       elements: readonly Element[]
       rest: Option<readonly [AST, ...AST[]]>
       isReadonly: boolean
+      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'TypeLiteral'
       propertySignatures: readonly PropertySignature[]
       indexSignatures: readonly IndexSignature[]
+      hasTransformation: boolean
     }
-  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
-  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Union'
+      types: readonly [AST, AST, ...AST[]]
+      hasTransformation: boolean
+    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST; hasTransformation: boolean }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
@@ -1483,6 +1525,7 @@ export declare const setAnnotation: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1491,6 +1534,7 @@ export declare const setAnnotation: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
       encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      hasTransformation: boolean
     }
 ```
 
