@@ -2059,7 +2059,7 @@ Added in v1.0.0
 ```ts
 export declare const asserts: <I, A>(
   schema: Schema<I, A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => asserts input is A
+) => (a: unknown, options?: AST.ParseOptions | undefined) => asserts a is A
 ```
 
 Added in v1.0.0
@@ -2069,9 +2069,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <I, A>(
-  schema: Schema<I, A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const decode: <I, A>(schema: Schema<I, A>) => (i: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -2083,10 +2081,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeEither: <I, A>(
   schema: Schema<I, A>
-) => (
-  input: unknown,
-  options?: AST.ParseOptions | undefined
-) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (i: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -2098,7 +2093,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeOption: <I, A>(
   schema: Schema<I, A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
+) => (i: unknown, options?: AST.ParseOptions | undefined) => Option<A>
 ```
 
 Added in v1.0.0
@@ -2186,7 +2181,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <I, A>(schema: Schema<I, A>) => (input: unknown) => input is A
+export declare const is: <I, A>(schema: Schema<I, A>) => (a: unknown) => a is A
 ```
 
 Added in v1.0.0
@@ -2216,9 +2211,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validate: <I, A>(
-  schema: Schema<I, A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const validate: <I, A>(schema: Schema<I, A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -2230,10 +2223,7 @@ Added in v1.0.0
 ```ts
 export declare const validateEither: <I, A>(
   schema: Schema<I, A>
-) => (
-  input: unknown,
-  options?: AST.ParseOptions | undefined
-) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (a: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -2245,7 +2235,7 @@ Added in v1.0.0
 ```ts
 export declare const validateOption: <I, A>(
   schema: Schema<I, A>
-) => (input: unknown, options?: AST.ParseOptions | undefined) => Option<A>
+) => (a: unknown, options?: AST.ParseOptions | undefined) => Option<A>
 ```
 
 Added in v1.0.0
