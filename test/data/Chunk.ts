@@ -30,7 +30,7 @@ describe.concurrent("Chunk", () => {
     Util.expectDecodingFailure(
       schema,
       C.fromIterable(["1", "a", "3"]),
-      `/1 Expected a parsable value from string to number, actual "a"`
+      `/1 Expected string -> number, actual "a"`
     )
   })
 

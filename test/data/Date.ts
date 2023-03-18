@@ -51,12 +51,12 @@ describe.concurrent("Date", () => {
       Util.expectDecodingFailure(
         schema,
         "a",
-        `Expected a parsable value from string to Date, actual "a"`
+        `Expected string -> Date, actual "a"`
       )
       Util.expectDecodingFailure(
         schema,
         "a1",
-        `Expected a parsable value from string to Date, actual "a1"`
+        `Expected string -> Date, actual "a1"`
       )
     })
 
@@ -76,7 +76,7 @@ describe.concurrent("Date", () => {
       Util.expectDecodingFailure(
         schema,
         "a",
-        `Expected a parsable value from string to Date, actual "a"`
+        `Expected string -> Date, actual "a"`
       )
     })
   })

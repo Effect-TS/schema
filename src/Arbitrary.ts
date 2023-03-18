@@ -201,17 +201,16 @@ const go = I.memoize((ast: AST.AST): Arbitrary<any> => {
       }
       return (fc) => fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))
     }
-    case "Refinement": {
-      const from = go(ast.from)
+    case "Refinement":
+    case "Transform": {
+      const to = go(ast.to)
       return pipe(
         getHook(ast),
         O.match(
-          () => (fc) => from(fc).filter((a) => E.isRight(ast.decode(a))),
-          (handler) => handler(from)
+          () => (fc) => to(fc).filter((a) => E.isRight(ast.decode(a))),
+          (handler) => handler(to)
         )
       )
     }
-    case "Transform":
-      return go(ast.to)
   }
 })

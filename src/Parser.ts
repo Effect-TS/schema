@@ -534,9 +534,8 @@ export const _getLiterals = (
       return out
     }
     case "Refinement":
-      return _getLiterals(ast.from)
     case "Transform":
-      return _getLiterals(AST.getFrom(ast.from))
+      return _getLiterals(ast.from)
   }
   return []
 }

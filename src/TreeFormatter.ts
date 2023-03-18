@@ -117,8 +117,6 @@ export const formatExpected = (ast: AST.AST): string => {
       return pipe(getExpected(ast), O.getOrElse(() => formatActual(ast.symbol)))
     case "Union":
       return ast.types.map(formatExpected).join(" or ")
-    case "Refinement":
-      return pipe(getExpected(ast), O.getOrElse(() => "<anonymous refinement schema>"))
     case "TemplateLiteral":
       return pipe(getExpected(ast), O.getOrElse(() => formatTemplateLiteral(ast)))
     case "Tuple":
@@ -140,8 +138,12 @@ export const formatExpected = (ast: AST.AST): string => {
         getExpected(ast),
         O.getOrElse(() => "<anonymous declaration schema>")
       )
+    case "Refinement":
     case "Transform":
-      return `a parsable value from ${formatExpected(ast.from)} to ${formatExpected(ast.to)}`
+      return pipe(
+        getExpected(ast),
+        O.getOrElse(() => `${formatExpected(ast.from)} -> ${formatExpected(ast.to)}`)
+      )
   }
 }
 
