@@ -594,8 +594,13 @@ using the provided mapping functions.
 
 ```ts
 export declare const transform: {
-  <C, B, A>(to: Schema<C, B>, ab: (a: A) => B, ba: (b: B) => A): <I>(self: Schema<I, A>) => Schema<I, C>
-  <I, A, C, B>(self: Schema<I, A>, to: Schema<C, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, C>
+  <I2, A2, A1>(to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): <I1>(
+    self: Schema<I1, A1>
+  ) => Schema<I1, A2>
+  <I1, A1, I2, A2>(from: Schema<I1, A1>, to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Schema<
+    I1,
+    A2
+  >
 }
 ```
 
@@ -610,17 +615,29 @@ using the provided decoding functions.
 
 ```ts
 export declare const transformEither: {
-  <C, B, A>(
-    to: Schema<C, B>,
-    decode: (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
-    encode: (b: B, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-  ): <I>(self: Schema<I, A>) => Schema<I, C>
-  <I, A, C, B>(
-    self: Schema<I, A>,
-    to: Schema<C, B>,
-    decode: (a: A, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], B>,
-    encode: (b: B, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
-  ): Schema<I, C>
+  <I2, A2, A1>(
+    to: Schema<I2, A2>,
+    decode: (
+      a1: A1,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], I2>,
+    encode: (
+      i2: I2,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A1>
+  ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Schema<I1, A1>,
+    to: Schema<I2, A2>,
+    decode: (
+      a1: A1,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], I2>,
+    encode: (
+      i2: I2,
+      options?: AST.ParseOptions | undefined
+    ) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A1>
+  ): Schema<I1, A2>
 }
 ```
 

@@ -714,23 +714,23 @@ export function filter<A>(
   @since 1.0.0
  */
 export const transformEither: {
-  <C, B, A>(
-    to: Schema<C, B>,
-    decode: (a: A, options?: ParseOptions) => ParseResult<B>,
-    encode: (b: B, options?: ParseOptions) => ParseResult<A>
-  ): <I>(self: Schema<I, A>) => Schema<I, C>
-  <I, A, C, B>(
-    self: Schema<I, A>,
-    to: Schema<C, B>,
-    decode: (a: A, options?: ParseOptions) => ParseResult<B>,
-    encode: (b: B, options?: ParseOptions) => ParseResult<A>
-  ): Schema<I, C>
-} = dual(4, <I, A, C, B>(
-  self: Schema<I, A>,
-  to: Schema<C, B>,
-  decode: (a: A, options?: ParseOptions) => ParseResult<B>,
-  encode: (b: B, options?: ParseOptions) => ParseResult<A>
-): Schema<I, C> => make(AST.createTransform(self.ast, AST.reverse(to.ast), decode, encode)))
+  <I2, A2, A1>(
+    to: Schema<I2, A2>,
+    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
+    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
+  ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Schema<I1, A1>,
+    to: Schema<I2, A2>,
+    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
+    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
+  ): Schema<I1, A2>
+} = dual(4, <I1, A1, I2, A2>(
+  from: Schema<I1, A1>,
+  to: Schema<I2, A2>,
+  decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
+  encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
+): Schema<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -740,20 +740,26 @@ export const transformEither: {
   @since 1.0.0
 */
 export const transform: {
-  <C, B, A>(
-    to: Schema<C, B>,
-    ab: (a: A) => B,
-    ba: (b: B) => A
-  ): <I>(self: Schema<I, A>) => Schema<I, C>
-  <I, A, C, B>(self: Schema<I, A>, to: Schema<C, B>, ab: (a: A) => B, ba: (b: B) => A): Schema<I, C>
+  <I2, A2, A1>(
+    to: Schema<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1
+  ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Schema<I1, A1>,
+    to: Schema<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1
+  ): Schema<I1, A2>
 } = dual(
   4,
-  <I, A, C, B>(
-    self: Schema<I, A>,
-    to: Schema<C, B>,
-    ab: (a: A) => B,
-    ba: (b: B) => A
-  ): Schema<I, C> => transformEither(self, to, (a) => PR.success(ab(a)), (b) => PR.success(ba(b)))
+  <I1, A1, I2, A2>(
+    from: Schema<I1, A1>,
+    to: Schema<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1
+  ): Schema<I1, A2> =>
+    transformEither(from, to, (a) => PR.success(decode(a)), (b) => PR.success(encode(b)))
 )
 
 /**
