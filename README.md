@@ -1131,7 +1131,7 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
-const schema = S.dateFromString(S.string);
+const schema = S.dateFromString;
 const decode = S.decode(schema);
 
 decode("1970-01-01T00:00:00.000Z"); // new Date(0)

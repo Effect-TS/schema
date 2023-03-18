@@ -36,7 +36,7 @@ describe.concurrent("Date", () => {
   })
 
   describe.concurrent("dateFromString", () => {
-    const schema = S.dateFromString(S.string)
+    const schema = S.dateFromString
 
     it("property tests", () => {
       Util.roundtrip(schema)
@@ -65,7 +65,7 @@ describe.concurrent("Date", () => {
     })
 
     it("example", () => {
-      const schema = S.dateFromString(S.string) // converts string schema to date schema
+      const schema = S.dateFromString
 
       // success cases
       Util.expectDecodingSuccess(schema, "0", new Date("0"))
