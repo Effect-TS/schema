@@ -502,7 +502,7 @@ const go = I.memoize((ast: AST.AST): Parser<any, any> => {
     case "Refinement":
     case "Transform": {
       const from = go(ast.from)
-      const to = go(ast.to)
+      const to = AST.hasTransformation(ast.to) ? go(ast.to) : PR.success
       return (i1, options) =>
         pipe(
           from(i1, options),

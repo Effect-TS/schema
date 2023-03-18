@@ -676,9 +676,6 @@ export const createIndexSignature = (
   type: AST,
   isReadonly: boolean
 ): IndexSignature => {
-  if (hasTransformation(parameter)) {
-    throw new Error("IndexSignature cannot have transformations")
-  }
   return ({ parameter, type, isReadonly })
 }
 
@@ -813,7 +810,7 @@ export const createRefinement = (
   decode,
   encode,
   annotations,
-  hasTransformation: hasTransformation(from) || hasTransformation(to)
+  hasTransformation: true
 })
 
 /**
