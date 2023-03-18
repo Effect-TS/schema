@@ -530,17 +530,17 @@ export const brand = <B extends string, A>(
     annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema = make(ast)
-    const decode = P.decode(schema)
-    const decodeOption = P.decodeOption(schema)
-    const decodeEither = P.decodeEither(schema)
+    const parse = P.parse(schema)
+    const parseOption = P.parseOption(schema)
+    const parseEither = P.parseEither(schema)
     const is = P.is(schema)
-    const out: any = Object.assign((input: unknown) => decode(input), {
+    const out: any = Object.assign((input: unknown) => parse(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
       ast,
-      option: (input: unknown) => decodeOption(input),
+      option: (input: unknown) => parseOption(input),
       either: (input: unknown) =>
         E.mapLeft(
-          decodeEither(input),
+          parseEither(input),
           (errors) => [{ meta: input, message: formatErrors(errors) }]
         ),
       refine: (input: unknown): input is A & Brand<B> => is(input)
@@ -1207,11 +1207,11 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<
       length: number
     }),
     <A>(item: Schema<A>) => {
-      const items = P.decodeEither(array(item))
+      const parse = P.parseEither(array(item))
       return (u, options) =>
         !C.isChunk(u) ?
           PR.failure(PR.type(schema.ast, u)) :
-          E.map(items(C.toReadonlyArray(u), options), C.fromIterable)
+          E.map(parse(C.toReadonlyArray(u), options), C.fromIterable)
     },
     {
       [AST.IdentifierAnnotationId]: "Chunk",
@@ -1260,11 +1260,11 @@ export const dataFromSelf = <
     <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
       item: Schema<A>
     ) => {
-      const decode = P.decodeEither(item)
+      const parse = P.parseEither(item)
       return (u, options) =>
         !Equal.isEqual(u) ?
           PR.failure(PR.type(schema.ast, u)) :
-          E.map(decode(u, options), toData)
+          E.map(parse(u, options), toData)
     },
     {
       [AST.IdentifierAnnotationId]: "Data",
@@ -1378,14 +1378,14 @@ export const eitherFromSelf = <IE, E, IA, A>(
       left: Schema<E>,
       right: Schema<A>
     ) => {
-      const decodeLeft = P.decodeEither(left)
-      const decodeRight = P.decodeEither(right)
+      const parseLeft = P.parseEither(left)
+      const parseRight = P.parseEither(right)
       return (u, options) =>
         !E.isEither(u) ?
           PR.failure(PR.type(schema.ast, u)) :
           E.isLeft(u) ?
-          E.map(decodeLeft(u.left, options), E.left) :
-          E.map(decodeRight(u.right, options), E.right)
+          E.map(parseLeft(u.left, options), E.left) :
+          E.map(parseRight(u.right, options), E.right)
     },
     {
       [AST.IdentifierAnnotationId]: "Either",
@@ -1850,13 +1850,13 @@ export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Opt
     [value],
     optionInline(value),
     <A>(value: Schema<A>) => {
-      const decodeValue = P.decodeEither(value)
+      const parse = P.parseEither(value)
       return (u, options) =>
         !O.isOption(u) ?
           PR.failure(PR.type(schema.ast, u)) :
           O.isNone(u) ?
           PR.success(O.none()) :
-          E.map(decodeValue(u.value, options), O.some)
+          E.map(parse(u.value, options), O.some)
     },
     {
       [AST.IdentifierAnnotationId]: "Option",
@@ -2070,11 +2070,11 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
       key: Schema<K>,
       value: Schema<V>
     ) => {
-      const items = P.decodeEither(array(tuple(key, value)))
+      const parse = P.parseEither(array(tuple(key, value)))
       return (u, options) =>
         !isMap(u) ?
           PR.failure(PR.type(schema.ast, u)) :
-          E.map(items(Array.from(u.entries()), options), (as) => new Map(as))
+          E.map(parse(Array.from(u.entries()), options), (as) => new Map(as))
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
@@ -2125,11 +2125,11 @@ export const readonlySetFromSelf = <I, A>(
       size: number
     }),
     <A>(item: Schema<A>) => {
-      const items = P.decodeEither(array(item))
+      const parse = P.parseEither(array(item))
       return (u, options) =>
         !isSet(u) ?
           PR.failure(PR.type(schema.ast, u)) :
-          E.map(items(Array.from(u.values()), options), (as) => new Set(as))
+          E.map(parse(Array.from(u.values()), options), (as) => new Set(as))
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",

@@ -37,14 +37,14 @@ const getOption = (ast: AST.AST) => {
  * @category decoding
  * @since 1.0.0
  */
-export const decode = <_, A>(schema: Schema<_, A>): (i: unknown, options?: ParseOptions) => A =>
+export const parse = <_, A>(schema: Schema<_, A>): (i: unknown, options?: ParseOptions) => A =>
   get(schema.ast)
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decodeOption = <_, A>(
+export const parseOption = <_, A>(
   schema: Schema<_, A>
 ): (i: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast)
 
@@ -52,7 +52,7 @@ export const decodeOption = <_, A>(
  * @category decoding
  * @since 1.0.0
  */
-export const decodeEither = <_, A>(
+export const parseEither = <_, A>(
   schema: Schema<_, A>
 ): (i: unknown, options?: ParseOptions) => ParseResult<A> => go(schema.ast)
 
@@ -60,23 +60,23 @@ export const decodeEither = <_, A>(
  * @category decoding
  * @since 1.0.0
  */
-export const parse: <I, A>(schema: Schema<I, A>) => (i: I, options?: ParseOptions) => A = decode
+export const decode: <I, A>(schema: Schema<I, A>) => (i: I, options?: ParseOptions) => A = parse
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const parseOption: <I, A>(
+export const decodeOption: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions) => Option<A> = decodeOption
+) => (i: I, options?: ParseOptions) => Option<A> = parseOption
 
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const parseEither: <I, A>(
+export const decodeEither: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions) => ParseResult<A> = decodeEither
+) => (i: I, options?: ParseOptions) => ParseResult<A> = parseEither
 
 /**
  * @category validation
