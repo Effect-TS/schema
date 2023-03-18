@@ -503,11 +503,11 @@ const go = I.memoize((ast: AST.AST): Parser<any, any> => {
     case "Transform": {
       const from = go(ast.from)
       const to = go(ast.to)
-      return (u, options) =>
+      return (i1, options) =>
         pipe(
-          from(u, options),
+          from(i1, options),
           E.flatMap((a) => ast.decode(a, options)),
-          E.flatMap((a) => to(a, options))
+          E.flatMap((i2) => to(i2, options))
         )
     }
   }
