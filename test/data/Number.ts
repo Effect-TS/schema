@@ -65,12 +65,12 @@ describe.concurrent("Number", () => {
       Util.expectDecodingFailure(
         schema,
         "a",
-        `Expected a parsable value from string to number, actual "a"`
+        `Expected string -> number, actual "a"`
       )
       Util.expectDecodingFailure(
         schema,
         "a1",
-        `Expected a parsable value from string to number, actual "a1"`
+        `Expected string -> number, actual "a1"`
       )
     })
 
@@ -93,7 +93,7 @@ describe.concurrent("Number", () => {
       Util.expectDecodingFailure(
         schema,
         "a",
-        `Expected a parsable value from string to number, actual "a"`
+        `Expected string -> number, actual "a"`
       )
     })
   })

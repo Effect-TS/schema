@@ -1024,7 +1024,6 @@ export const partial = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => partial(ast.f()))
     case "Refinement":
-      return partial(ast.from)
     case "Transform":
       return partial(ast.to)
     default:
@@ -1086,10 +1085,8 @@ export const getTo = (ast: AST): AST => {
         return createUnion(ast.types.map(getTo), ast.annotations)
       case "Lazy":
         return createLazy(() => getTo(ast.f()), ast.annotations)
-      case "Refinement": {
-        const to = getTo(ast.from)
-        return createRefinement(to, to, ast.decode, ast.decode, ast.annotations)
-      }
+      case "Refinement":
+        return createRefinement(ast.to, ast.to, ast.decode, ast.decode, ast.annotations)
       case "Transform":
         return ast.to
     }
@@ -1207,7 +1204,6 @@ export const _getCardinality = (ast: AST): number => {
     case "AnyKeyword":
       return 6
     case "Refinement":
-      return _getCardinality(ast.from)
     case "Transform":
       return _getCardinality(ast.to)
     default:
@@ -1233,7 +1229,6 @@ export const _getWeight = (ast: AST): number => {
     case "Lazy":
       return 10
     case "Refinement":
-      return _getWeight(ast.from)
     case "Transform":
       return _getWeight(ast.to)
     default:
@@ -1309,7 +1304,6 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
     case "Lazy":
       return _keyof(ast.f())
     case "Refinement":
-      return _keyof(ast.from)
     case "Transform":
       return _keyof(ast.to)
     default:
@@ -1354,7 +1348,6 @@ export const _getPropertySignatures = (
     case "Lazy":
       return _getPropertySignatures(ast.f())
     case "Refinement":
-      return _getPropertySignatures(ast.from)
     case "Transform":
       return _getPropertySignatures(ast.to)
     default:
