@@ -51,7 +51,7 @@ describe.concurrent("Parser", () => {
         S.declare(
           [],
           S.struct({ _tag: S.literal("a") }),
-          () => P.decodeEither(S.struct({ _tag: S.literal("a") }))
+          () => P.parseEither(S.struct({ _tag: S.literal("a") }))
         ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])

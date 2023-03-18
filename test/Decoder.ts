@@ -23,7 +23,7 @@ describe.concurrent("Decoder", () => {
       name: "Alice",
       age: 30
     })
-    expect(() => P.decode(schema)({})).toThrowError(
+    expect(() => P.parse(schema)({})).toThrowError(
       new Error(`error(s) found
 └─ ["name"]
    └─ is missing`)

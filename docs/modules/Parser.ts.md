@@ -41,7 +41,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <_, A>(schema: Schema<_, A>) => (i: unknown, options?: AST.ParseOptions | undefined) => A
+export declare const decode: <I, A>(schema: Schema<I, A>) => (i: I, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -51,9 +51,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeEither: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+export declare const decodeEither: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -63,9 +63,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeOption: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
+export declare const decodeOption: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
 Added in v1.0.0
@@ -75,7 +75,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parse: <I, A>(schema: Schema<I, A>) => (i: I, options?: AST.ParseOptions | undefined) => A
+export declare const parse: <_, A>(schema: Schema<_, A>) => (i: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -85,9 +85,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseEither: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+export declare const parseEither: <_, A>(
+  schema: Schema<_, A>
+) => (i: unknown, options?: AST.ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
 ```
 
 Added in v1.0.0
@@ -97,9 +97,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseOption: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: AST.ParseOptions | undefined) => O.Option<A>
+export declare const parseOption: <_, A>(
+  schema: Schema<_, A>
+) => (i: unknown, options?: AST.ParseOptions | undefined) => O.Option<A>
 ```
 
 Added in v1.0.0
