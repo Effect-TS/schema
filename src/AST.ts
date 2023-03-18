@@ -1136,41 +1136,43 @@ export const getFrom = (ast: AST): AST => {
  * @since 1.0.0
  */
 export const reverse = (ast: AST): AST => {
-  switch (ast._tag) {
-    case "Declaration":
-      return createDeclaration(
-        ast.typeParameters.map(reverse),
-        ast.type,
-        ast.decode,
-        ast.annotations
-      )
-    case "Tuple":
-      return createTuple(
-        ast.elements.map((e) => ({ ...e, type: reverse(e.type) })),
-        O.map(ast.rest, RA.mapNonEmpty(reverse)),
-        ast.isReadonly,
-        ast.annotations
-      )
-    case "TypeLiteral":
-      return createTypeLiteral(
-        ast.propertySignatures.map((p) => ({ ...p, type: reverse(p.type) })),
-        ast.indexSignatures.map((is) => ({ ...is, type: reverse(is.type) })),
-        ast.annotations
-      )
-    case "Union":
-      return createUnion(ast.types.map(reverse), ast.annotations)
-    case "Lazy":
-      return createLazy(() => reverse(ast.f()), ast.annotations)
-    case "Refinement":
-      return createRefinement(
-        reverse(ast.to),
-        reverse(ast.from),
-        ast.encode,
-        ast.decode,
-        ast.annotations
-      )
-    case "Transform":
-      return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
+  if (hasTransformation(ast)) {
+    switch (ast._tag) {
+      case "Declaration":
+        return createDeclaration(
+          ast.typeParameters.map(reverse),
+          ast.type,
+          ast.decode,
+          ast.annotations
+        )
+      case "Tuple":
+        return createTuple(
+          ast.elements.map((e) => ({ ...e, type: reverse(e.type) })),
+          O.map(ast.rest, RA.mapNonEmpty(reverse)),
+          ast.isReadonly,
+          ast.annotations
+        )
+      case "TypeLiteral":
+        return createTypeLiteral(
+          ast.propertySignatures.map((p) => ({ ...p, type: reverse(p.type) })),
+          ast.indexSignatures.map((is) => ({ ...is, type: reverse(is.type) })),
+          ast.annotations
+        )
+      case "Union":
+        return createUnion(ast.types.map(reverse), ast.annotations)
+      case "Lazy":
+        return createLazy(() => reverse(ast.f()), ast.annotations)
+      case "Refinement":
+        return createRefinement(
+          reverse(ast.to),
+          reverse(ast.from),
+          ast.encode,
+          ast.decode,
+          ast.annotations
+        )
+      case "Transform":
+        return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
+    }
   }
   return ast
 }
