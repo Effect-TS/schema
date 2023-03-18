@@ -1347,7 +1347,7 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 **Signature**
 
 ```ts
-export declare const dateFromString: <I>(self: Schema<I, string>) => Schema<I, Date>
+export declare const dateFromString: Schema<string, Date>
 ```
 
 Added in v1.0.0
