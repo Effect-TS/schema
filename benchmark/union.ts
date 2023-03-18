@@ -5,20 +5,20 @@ import * as Benchmark from "benchmark"
 
 /*
 n = 3
-decodeEither (good) x 471,313 ops/sec ±0.27% (89 runs sampled)
-decodeManual (good) x 450,417 ops/sec ±3.11% (87 runs sampled)
-decodeEither (bad) x 774,310 ops/sec ±1.81% (86 runs sampled)
-decodeManual (bad) x 1,015,965 ops/sec ±2.04% (87 runs sampled)
+parseEither (good) x 471,313 ops/sec ±0.27% (89 runs sampled)
+parseManual (good) x 450,417 ops/sec ±3.11% (87 runs sampled)
+parseEither (bad) x 774,310 ops/sec ±1.81% (86 runs sampled)
+parseManual (bad) x 1,015,965 ops/sec ±2.04% (87 runs sampled)
 n = 10
-decodeEither (good) x 464,366 ops/sec ±0.25% (90 runs sampled)
-decodeManual (good) x 437,616 ops/sec ±3.07% (83 runs sampled)
-decodeEither (bad) x 785,114 ops/sec ±1.73% (84 runs sampled)
-decodeManual (bad) x 1,033,561 ops/sec ±1.62% (84 runs sampled)
+parseEither (good) x 464,366 ops/sec ±0.25% (90 runs sampled)
+parseManual (good) x 437,616 ops/sec ±3.07% (83 runs sampled)
+parseEither (bad) x 785,114 ops/sec ±1.73% (84 runs sampled)
+parseManual (bad) x 1,033,561 ops/sec ±1.62% (84 runs sampled)
 n = 100
-decodeEither (good) x 477,261 ops/sec ±0.42% (91 runs sampled)
-decodeManual (good) x 447,762 ops/sec ±3.22% (87 runs sampled)
-decodeEither (bad) x 771,355 ops/sec ±1.84% (84 runs sampled)
-decodeManual (bad) x 1,042,424 ops/sec ±0.30% (91 runs sampled)
+parseEither (good) x 477,261 ops/sec ±0.42% (91 runs sampled)
+parseManual (good) x 447,762 ops/sec ±3.22% (87 runs sampled)
+parseEither (bad) x 771,355 ops/sec ±1.84% (84 runs sampled)
+parseManual (bad) x 1,042,424 ops/sec ±0.30% (91 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -33,9 +33,9 @@ const members = RA.makeBy(n, (i) =>
   }))
 const schema = S.union(...members)
 
-const decodeEither = S.decodeEither(schema)
+const parseEither = S.parseEither(schema)
 
-const decodeManual = (input: unknown): ParseResult<{
+const parseManual = (input: unknown): ParseResult<{
   readonly kind: number
   readonly a: string
   readonly b: number
@@ -45,9 +45,9 @@ const decodeManual = (input: unknown): ParseResult<{
     typeof input === "object" && input !== null && "kind" in input && typeof input.kind === "number"
   ) {
     const kind = input.kind
-    return S.decodeEither(members[kind])(input)
+    return S.parseEither(members[kind])(input)
   }
-  return decodeEither(input)
+  return parseEither(input)
 }
 
 const good = {
@@ -64,21 +64,21 @@ const bad = {
   c: "c"
 }
 
-// console.log(decode(good))
-// console.log(decode(bad))
+// console.log(parseEither(good))
+// console.log(parseEither(bad))
 
 suite
-  .add("decodeEither (good)", function() {
-    decodeEither(good)
+  .add("parseEither (good)", function() {
+    parseEither(good)
   })
-  .add("decodeManual (good)", function() {
-    decodeManual(good)
+  .add("parseManual (good)", function() {
+    parseManual(good)
   })
-  .add("decodeEither (bad)", function() {
-    decodeEither(bad)
+  .add("parseEither (bad)", function() {
+    parseEither(bad)
   })
-  .add("decodeManual (bad)", function() {
-    decodeManual(bad)
+  .add("parseManual (bad)", function() {
+    parseManual(bad)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))
