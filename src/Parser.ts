@@ -677,8 +677,14 @@ const go = I.memoize(untracedMethod(() =>
         return (input, options) => {
           const es: Array<[number, PR.ParseError]> = []
           let stepKey = 0
-          let picks: Array<PR.ParseResult<unknown>> = []
-          let finalResult: any = undefined
+          const picks: Array<(state: State) => PR.ParseResult<unknown>> = []
+          const finalResult: { ref: any } = {
+            ref: undefined
+          }
+          type State = {
+            finalResult: typeof finalResult
+            es: typeof es
+          }
           if (len > 0) {
             // if there is at least one key then input must be an object
             if (P.isRecord(input)) {
@@ -704,21 +710,22 @@ const go = I.memoize(untracedMethod(() =>
                       } else {
                         const nk = stepKey++
                         picks.push(
-                          untraced(() =>
-                            Effect.suspend(() => {
-                              if (finalResult) {
-                                return Effect.unit()
-                              } else {
-                                return Effect.flatMap(Effect.either(te), (t) => {
-                                  if (E.isRight(t)) {
-                                    finalResult = PR.success(t.right)
-                                  } else {
-                                    es.push([nk, PR.unionMember(t.left)])
-                                  }
+                          untracedMethod(() =>
+                            ({ es, finalResult }) =>
+                              Effect.suspend(() => {
+                                if (finalResult.ref) {
                                   return Effect.unit()
-                                })
-                              }
-                            })
+                                } else {
+                                  return Effect.flatMap(Effect.either(te), (t) => {
+                                    if (E.isRight(t)) {
+                                      finalResult.ref = PR.success(t.right)
+                                    } else {
+                                      es.push([nk, PR.unionMember(t.left)])
+                                    }
+                                    return Effect.unit()
+                                  })
+                                }
+                              })
                           )
                         )
                       }
@@ -741,69 +748,76 @@ const go = I.memoize(untracedMethod(() =>
             }
           }
 
-          const computeResult = () =>
+          const computeResult = ({ es }: State) =>
             RA.isNonEmptyReadonlyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.failure(PR.type(AST.neverKeyword, input))
 
           if (picks.length > 0) {
-            return Effect.flatMap(
-              Effect.collectAllDiscard(picks),
-              () => {
-                if (finalResult) {
-                  return finalResult
-                }
-                picks = []
-                // if none of the schemas with at least one property with a literal value succeeded,
-                // proceed with those that have no literal at all
-                for (let i = 0; i < otherwise.length; i++) {
-                  const te = map.get(otherwise[i])!(input, options)
-                  const t = picks.length === 0 ? PR.either(te) : undefined
-                  if (t) {
-                    if (E.isRight(t)) {
-                      return PR.success(t.right)
+            return Effect.suspend(() => {
+              const state: State = {
+                es: Array.from(es),
+                finalResult: { ref: finalResult.ref }
+              }
+              return Effect.flatMap(
+                Effect.forEachDiscard(picks, (f) =>
+                  f(state)),
+                () => {
+                  if (state.finalResult.ref) {
+                    return state.finalResult.ref
+                  }
+                  const picks2 = []
+                  // if none of the schemas with at least one property with a literal value succeeded,
+                  // proceed with those that have no literal at all
+                  for (let i = 0; i < otherwise.length; i++) {
+                    const te = map.get(otherwise[i])!(input, options)
+                    const t = picks2.length === 0 ? PR.either(te) : undefined
+                    if (t) {
+                      if (E.isRight(t)) {
+                        return PR.success(t.right)
+                      } else {
+                        es.push([stepKey++, PR.unionMember(t.left)])
+                      }
                     } else {
-                      es.push([stepKey++, PR.unionMember(t.left)])
-                    }
-                  } else {
-                    const nk = stepKey++
-                    picks.push(
-                      untraced(() =>
-                        Effect.suspend(() => {
-                          if (finalResult) {
-                            return Effect.unit()
-                          } else {
-                            return Effect.flatMap(Effect.either(te), (t) => {
-                              if (E.isRight(t)) {
-                                finalResult = PR.success(t.right)
-                              } else {
-                                es.push([nk, PR.unionMember(t.left)])
-                              }
+                      const nk = stepKey++
+                      picks2.push(
+                        untraced(() =>
+                          Effect.suspend(() => {
+                            if (state.finalResult.ref) {
                               return Effect.unit()
-                            })
-                          }
-                        })
+                            } else {
+                              return Effect.flatMap(Effect.either(te), (t) => {
+                                if (E.isRight(t)) {
+                                  state.finalResult.ref = PR.success(t.right)
+                                } else {
+                                  es.push([nk, PR.unionMember(t.left)])
+                                }
+                                return Effect.unit()
+                              })
+                            }
+                          })
+                        )
                       )
+                    }
+                  }
+                  // ---------------------------------------------
+                  // compute output
+                  // ---------------------------------------------
+                  if (picks2.length > 0) {
+                    return Effect.flatMap(
+                      Effect.collectAllDiscard(picks2),
+                      () => {
+                        if (state.finalResult.ref) {
+                          return state.finalResult.ref
+                        }
+                        return computeResult(state)
+                      }
                     )
                   }
+                  return computeResult(state)
                 }
-                // ---------------------------------------------
-                // compute output
-                // ---------------------------------------------
-                if (picks.length > 0) {
-                  Effect.flatMap(
-                    Effect.collectAllDiscard(picks),
-                    () => {
-                      if (finalResult) {
-                        return finalResult
-                      }
-                      return computeResult()
-                    }
-                  )
-                }
-                return computeResult()
-              }
-            )
+              )
+            })
           } else {
             // if none of the schemas with at least one property with a literal value succeeded,
             // proceed with those that have no literal at all
@@ -819,21 +833,22 @@ const go = I.memoize(untracedMethod(() =>
               } else {
                 const nk = stepKey++
                 picks.push(
-                  untraced(() =>
-                    Effect.suspend(() => {
-                      if (finalResult) {
-                        return Effect.unit()
-                      } else {
-                        return Effect.flatMap(Effect.either(te), (t) => {
-                          if (E.isRight(t)) {
-                            finalResult = PR.success(t.right)
-                          } else {
-                            es.push([nk, PR.unionMember(t.left)])
-                          }
+                  untracedMethod(() =>
+                    ({ es, finalResult }) =>
+                      Effect.suspend(() => {
+                        if (finalResult.ref) {
                           return Effect.unit()
-                        })
-                      }
-                    })
+                        } else {
+                          return Effect.flatMap(Effect.either(te), (t) => {
+                            if (E.isRight(t)) {
+                              finalResult.ref = PR.success(t.right)
+                            } else {
+                              es.push([nk, PR.unionMember(t.left)])
+                            }
+                            return Effect.unit()
+                          })
+                        }
+                      })
                   )
                 )
               }
@@ -842,23 +857,28 @@ const go = I.memoize(untracedMethod(() =>
             // compute output
             // ---------------------------------------------
             if (picks.length > 0) {
-              return Effect.flatMap(
-                Effect.collectAllDiscard(picks),
-                () => {
-                  if (finalResult) {
-                    return finalResult
-                  }
-                  return computeResult()
+              return Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  finalResult: { ref: finalResult.ref }
                 }
-              )
+                return Effect.flatMap(
+                  Effect.forEachDiscard(picks, (f) => f(state)),
+                  () => {
+                    if (state.finalResult.ref) {
+                      return state.finalResult.ref
+                    }
+                    return computeResult(state)
+                  }
+                )
+              })
             }
-            return computeResult()
+            return computeResult({ es, finalResult })
           }
         }
       }
       case "Lazy": {
-        const f = () =>
-          go(ast.f())
+        const f = () => go(ast.f())
         const get = I.memoize<typeof f, Parser<any, any>>(f)
         return (a, options) => get(f)(a, options)
       }
