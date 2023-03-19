@@ -3,7 +3,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("ReadonlyArray", () => {
-  it("minItems", () => {
+  it("minItems", async () => {
     const schema = pipe(S.array(S.number), S.minItems(2))
 
     Util.expectDecodingFailure(
@@ -16,7 +16,7 @@ describe.concurrent("ReadonlyArray", () => {
     Util.expectDecodingSuccess(schema, [1, 2, 3])
   })
 
-  it("maxItems", () => {
+  it("maxItems", async () => {
     const schema = pipe(S.array(S.number), S.maxItems(2))
 
     Util.expectDecodingFailure(
@@ -29,7 +29,7 @@ describe.concurrent("ReadonlyArray", () => {
     Util.expectDecodingSuccess(schema, [1, 2])
   })
 
-  it("items", () => {
+  it("items", async () => {
     const schema = pipe(S.array(S.number), S.itemsCount(2))
 
     Util.expectDecodingFailure(

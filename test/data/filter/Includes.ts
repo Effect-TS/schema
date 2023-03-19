@@ -17,7 +17,7 @@ describe.concurrent("includes", () => {
     expect(is("ba")).toEqual(true)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     const schema = S.includes("a")(S.string)
     Util.expectDecodingSuccess(schema, "a")
     Util.expectDecodingSuccess(schema, "aa")

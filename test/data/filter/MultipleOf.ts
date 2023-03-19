@@ -20,7 +20,7 @@ describe.concurrent("multipleOf", () => {
     expect(is(3.1)).toEqual(false)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     const schema = S.multipleOf(2)(S.number)
     Util.expectDecodingSuccess(schema, -4)
     Util.expectDecodingFailure(

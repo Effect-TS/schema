@@ -27,7 +27,7 @@ describe.concurrent("Brand", () => {
     Util.roundtrip(S.fromBrand(Eur)(S.number)) // nominal
   })
 
-  it("refined", () => {
+  it("refined", async () => {
     const schema = pipe(S.number, S.fromBrand(B.all(Positive, Int)))
 
     Util.expectDecodingFailure(

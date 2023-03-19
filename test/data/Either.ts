@@ -25,7 +25,7 @@ describe.concurrent("Either", () => {
       expect(is({ _tag: "Left", left: "a" })).toEqual(false)
     })
 
-    it("Decoder", () => {
+    it("Decoder", async () => {
       const schema = S.eitherFromSelf(S.string, NumberFromString)
       Util.expectDecodingSuccess(schema, E.left("a"), E.left("a"))
       Util.expectDecodingSuccess(schema, E.right("1"), E.right(1))
@@ -44,7 +44,7 @@ describe.concurrent("Either", () => {
       Util.roundtrip(S.either(S.string, S.number))
     })
 
-    it("Decoder", () => {
+    it("Decoder", async () => {
       const schema = S.either(S.string, NumberFromString)
       Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(E.left("a"))), E.left("a"))
       Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(E.right("1"))), E.right(1))

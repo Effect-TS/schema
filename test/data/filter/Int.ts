@@ -18,7 +18,7 @@ describe.concurrent("int", () => {
     expect(is(0.5)).toEqual(false)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     Util.expectDecodingSuccess(schema, 0)
     Util.expectDecodingSuccess(schema, 1)
     Util.expectDecodingFailure(schema, 0.5, `Expected integer, actual 0.5`)

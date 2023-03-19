@@ -14,7 +14,7 @@ describe.concurrent("ReadonlyMap", () => {
     Util.roundtrip(S.readonlyMapFromSelf(S.number, S.string))
   })
 
-  it("readonlyMapFromSelf. decoder", () => {
+  it("readonlyMapFromSelf. decoder", async () => {
     const schema = S.readonlyMapFromSelf(NumberFromString, S.string)
     Util.expectDecodingSuccess(schema, new Map(), new Map())
     Util.expectDecodingSuccess(
@@ -73,7 +73,7 @@ describe.concurrent("ReadonlyMap", () => {
     Util.roundtrip(S.readonlyMap(S.number, S.string))
   })
 
-  it("readonlyMap. decoder", () => {
+  it("readonlyMap. decoder", async () => {
     const schema = S.readonlyMap(S.number, S.string)
     Util.expectDecodingSuccess(schema, [], new Map())
     Util.expectDecodingSuccess(

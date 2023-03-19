@@ -13,7 +13,7 @@ describe.concurrent("Option", () => {
       Util.roundtrip(S.option(S.number))
     })
 
-    it("Decoder", () => {
+    it("Decoder", async () => {
       const schema = S.option(NumberFromString)
       Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(O.none())), O.none())
       Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(O.some("1"))), O.some(1))
@@ -43,7 +43,7 @@ describe.concurrent("Option", () => {
       expect(is({ _tag: "Some", value: 1 })).toEqual(false)
     })
 
-    it("Decoder", () => {
+    it("Decoder", async () => {
       const schema = S.optionFromSelf(NumberFromString)
       Util.expectDecodingSuccess(schema, O.none(), O.none())
       Util.expectDecodingSuccess(schema, O.some("1"), O.some(1))
@@ -62,7 +62,7 @@ describe.concurrent("Option", () => {
       Util.roundtrip(S.optionFromNullable(S.number))
     })
 
-    it("Decoder", () => {
+    it("Decoder", async () => {
       const schema = S.optionFromNullable(NumberFromString)
       Util.expectDecodingSuccess(schema, undefined, O.none())
       Util.expectDecodingSuccess(schema, null, O.none())
@@ -91,7 +91,7 @@ describe.concurrent("Option", () => {
     })
   })
 
-  it("optionsFromOptionals", () => {
+  it("optionsFromOptionals", async () => {
     expect(() => pipe(S.object, S.optionsFromOptionals({ "b": S.number }))).toThrowError(
       new Error("`parseOptional` can only handle type literals")
     )

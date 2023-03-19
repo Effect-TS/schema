@@ -3,7 +3,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Bigint", () => {
-  it("clampBigint", () => {
+  it("clampBigint", async () => {
     const schema = pipe(S.bigint, S.clampBigint(-1n, 1n))
 
     Util.expectDecodingSuccess(schema, 3n, 1n)
@@ -19,7 +19,7 @@ describe.concurrent("Bigint", () => {
     Util.expectEncodingSuccess(schema, 1n, 1n)
   })
 
-  it("greaterThanOrEqualToBigint", () => {
+  it("greaterThanOrEqualToBigint", async () => {
     const schema = pipe(S.bigint, S.greaterThanOrEqualToBigint(0n))
 
     Util.expectDecodingFailure(
@@ -39,7 +39,7 @@ describe.concurrent("Bigint", () => {
     Util.expectDecodingFailure(schema, 1n, "Expected a bigint less than 0n, actual 1n")
   })
 
-  it("lessThanOrEqualToBigint", () => {
+  it("lessThanOrEqualToBigint", async () => {
     const schema = pipe(S.bigint, S.lessThanOrEqualToBigint(0n))
 
     Util.expectEncodingSuccess(schema, -1n, -1n)
@@ -47,7 +47,7 @@ describe.concurrent("Bigint", () => {
     Util.expectDecodingFailure(schema, 1n, "Expected a bigint less than or equal to 0n, actual 1n")
   })
 
-  it("betweenBigint", () => {
+  it("betweenBigint", async () => {
     const schema = pipe(S.bigint, S.betweenBigint(-1n, 1n))
 
     Util.expectDecodingFailure(schema, -2n, "Expected a bigint between -1n and 1n, actual -2n")
@@ -72,7 +72,7 @@ describe.concurrent("Bigint", () => {
     Util.expectDecodingFailure(schema, 1n, "Expected a negative bigint, actual 1n")
   })
 
-  it("nonNegativeBigint", () => {
+  it("nonNegativeBigint", async () => {
     const schema = pipe(S.bigint, S.nonNegativeBigint())
 
     Util.expectEncodingFailure(schema, -1n, "Expected a non-negative bigint, actual -1n")
@@ -80,7 +80,7 @@ describe.concurrent("Bigint", () => {
     Util.expectDecodingSuccess(schema, 1n, 1n)
   })
 
-  it("nonPositiveBigint", () => {
+  it("nonPositiveBigint", async () => {
     const schema = pipe(S.bigint, S.nonPositiveBigint())
 
     Util.expectEncodingSuccess(schema, -1n, -1n)

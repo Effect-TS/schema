@@ -12,7 +12,7 @@ describe.concurrent("Date", () => {
     Util.roundtrip(S.date)
   })
 
-  it("date. decoder", () => {
+  it("date. decoder", async () => {
     Util.expectDecodingSuccess(S.date, new Date(), new Date())
 
     Util.expectDecodingFailure(S.date, null, `Expected Date, actual null`)
@@ -42,7 +42,7 @@ describe.concurrent("Date", () => {
       Util.roundtrip(schema)
     })
 
-    it("Decoder", () => {
+    it("Decoder", async () => {
       Util.expectDecodingSuccess(
         schema,
         "1970-01-01T00:00:00.000Z",
@@ -64,7 +64,7 @@ describe.concurrent("Date", () => {
       Util.expectEncodingSuccess(schema, new Date(0), "1970-01-01T00:00:00.000Z")
     })
 
-    it("example", () => {
+    it("example", async () => {
       const schema = S.dateFromString
 
       // success cases
