@@ -9,7 +9,7 @@ import * as O from "@effect/data/Option"
 import * as P from "@effect/data/Predicate"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as RA from "@effect/data/ReadonlyArray"
-import { untracedMethod } from "@effect/io/Debug"
+import { untraced, untracedMethod } from "@effect/io/Debug"
 import * as Effect from "@effect/io/Effect"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -296,21 +296,24 @@ const go = I.memoize(untracedMethod(() =>
                 output.push([stepKey++, t.right])
               } else {
                 const nk = stepKey++
+                const index = i
                 residual.push(
-                  Effect.flatMap(Effect.either(te), (t) => {
-                    if (E.isLeft(t)) {
-                      // the input element is present but is not valid
-                      const e = PR.index(i, t.left)
-                      if (allErrors) {
-                        es.push([nk, e])
-                        return Effect.unit()
-                      } else {
-                        return PR.failures(mutableAppend(sortByIndex(es), e))
+                  untraced(() =>
+                    Effect.flatMap(Effect.either(te), (t) => {
+                      if (E.isLeft(t)) {
+                        // the input element is present but is not valid
+                        const e = PR.index(index, t.left)
+                        if (allErrors) {
+                          es.push([nk, e])
+                          return Effect.unit()
+                        } else {
+                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                        }
                       }
-                    }
-                    output.push([nk, t.right])
-                    return Effect.unit()
-                  })
+                      output.push([nk, t.right])
+                      return Effect.unit()
+                    })
+                  )
                 )
               }
             }
@@ -338,21 +341,24 @@ const go = I.memoize(untracedMethod(() =>
                 }
               } else {
                 const nk = stepKey++
+                const index = i
                 residual.push(
-                  Effect.flatMap(Effect.either(te), (t) => {
-                    if (E.isLeft(t)) {
-                      const e = PR.index(i, t.left)
-                      if (allErrors) {
-                        es.push([nk, e])
-                        return Effect.unit()
+                  untraced(() =>
+                    Effect.flatMap(Effect.either(te), (t) => {
+                      if (E.isLeft(t)) {
+                        const e = PR.index(index, t.left)
+                        if (allErrors) {
+                          es.push([nk, e])
+                          return Effect.unit()
+                        } else {
+                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                        }
                       } else {
-                        return PR.failures(mutableAppend(sortByIndex(es), e))
+                        output.push([nk, t.right])
+                        return Effect.unit()
                       }
-                    } else {
-                      output.push([nk, t.right])
-                      return Effect.unit()
-                    }
-                  })
+                    })
+                  )
                 )
               }
             }
@@ -381,20 +387,23 @@ const go = I.memoize(untracedMethod(() =>
                   output.push([stepKey++, t.right])
                 } else {
                   const nk = stepKey++
-                  residual.push(Effect.flatMap(Effect.either(te), (t) => {
-                    if (E.isLeft(t)) {
-                      // the input element is present but is not valid
-                      const e = PR.index(i, t.left)
-                      if (allErrors) {
-                        es.push([nk, e])
-                        return Effect.unit()
-                      } else {
-                        return PR.failures(mutableAppend(sortByIndex(es), e))
+                  const index = i
+                  residual.push(untraced(() =>
+                    Effect.flatMap(Effect.either(te), (t) => {
+                      if (E.isLeft(t)) {
+                        // the input element is present but is not valid
+                        const e = PR.index(index, t.left)
+                        if (allErrors) {
+                          es.push([nk, e])
+                          return Effect.unit()
+                        } else {
+                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                        }
                       }
-                    }
-                    output.push([nk, t.right])
-                    return Effect.unit()
-                  }))
+                      output.push([nk, t.right])
+                      return Effect.unit()
+                    })
+                  ))
                 }
               }
             }
@@ -480,21 +489,24 @@ const go = I.memoize(untracedMethod(() =>
                 output[name] = t.right
               } else {
                 const nk = stepKey++
+                const index = name
                 residual.push(
-                  Effect.flatMap(Effect.either(te), (t) => {
-                    if (E.isLeft(t)) {
-                      // the input key is present but is not valid
-                      const e = PR.key(name, t.left)
-                      if (allErrors) {
-                        es.push([nk, e])
-                        return Effect.unit()
-                      } else {
-                        return PR.failures(mutableAppend(sortByIndex(es), e))
+                  untraced(() =>
+                    Effect.flatMap(Effect.either(te), (t) => {
+                      if (E.isLeft(t)) {
+                        // the input key is present but is not valid
+                        const e = PR.key(index, t.left)
+                        if (allErrors) {
+                          es.push([nk, e])
+                          return Effect.unit()
+                        } else {
+                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                        }
                       }
-                    }
-                    output[name] = t.right
-                    return Effect.unit()
-                  })
+                      output[index] = t.right
+                      return Effect.unit()
+                    })
+                  )
                 )
               }
             }
@@ -528,19 +540,22 @@ const go = I.memoize(untracedMethod(() =>
                   }
                 } else {
                   const nk = stepKey++
+                  const index = key
                   residual.push(
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        const e = PR.key(key, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
-                          return Effect.unit()
-                        } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                    untraced(() =>
+                      Effect.flatMap(Effect.either(te), (t) => {
+                        if (E.isLeft(t)) {
+                          const e = PR.key(index, t.left)
+                          if (allErrors) {
+                            es.push([nk, e])
+                            return Effect.unit()
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                          }
                         }
-                      }
-                      return Effect.unit()
-                    })
+                        return Effect.unit()
+                      })
+                    )
                   )
                 }
                 // ---------------------------------------------
@@ -562,22 +577,25 @@ const go = I.memoize(untracedMethod(() =>
                   }
                 } else {
                   const nk = stepKey++
-                  residual.push(Effect.flatMap(
-                    Effect.either(tve),
-                    (tv) => {
-                      if (E.isLeft(tv)) {
-                        const e = PR.key(key, tv.left)
-                        if (allErrors) {
-                          es.push([nk, e])
-                          return Effect.unit()
+                  const index = key
+                  residual.push(untraced(() =>
+                    Effect.flatMap(
+                      Effect.either(tve),
+                      (tv) => {
+                        if (E.isLeft(tv)) {
+                          const e = PR.key(index, tv.left)
+                          if (allErrors) {
+                            es.push([nk, e])
+                            return Effect.unit()
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                          }
                         } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                          output[key] = tv.right
+                          return Effect.unit()
                         }
-                      } else {
-                        output[key] = tv.right
-                        return Effect.unit()
                       }
-                    }
+                    )
                   ))
                 }
               }
@@ -643,7 +661,7 @@ const go = I.memoize(untracedMethod(() =>
                     for (let i = 0; i < bucket.length; i++) {
                       const te = map.get(bucket[i])!(input, options)
                       const t = PR.either(te)
-                      if (t && picks.length === 0) {
+                      if (t) {
                         if (E.isRight(t)) {
                           return PR.success(t.right)
                         } else {
@@ -652,20 +670,22 @@ const go = I.memoize(untracedMethod(() =>
                       } else {
                         const nk = stepKey++
                         picks.push(
-                          Effect.suspend(() => {
-                            if (finalResult) {
-                              return Effect.unit()
-                            } else {
-                              return Effect.flatMap(Effect.either(te), (t) => {
-                                if (E.isRight(t)) {
-                                  finalResult = PR.success(t.right)
-                                } else {
-                                  es.push([nk, PR.unionMember(t.left)])
-                                }
+                          untraced(() =>
+                            Effect.suspend(() => {
+                              if (finalResult) {
                                 return Effect.unit()
-                              })
-                            }
-                          })
+                              } else {
+                                return Effect.flatMap(Effect.either(te), (t) => {
+                                  if (E.isRight(t)) {
+                                    finalResult = PR.success(t.right)
+                                  } else {
+                                    es.push([nk, PR.unionMember(t.left)])
+                                  }
+                                  return Effect.unit()
+                                })
+                              }
+                            })
+                          )
                         )
                       }
                     }
@@ -705,7 +725,7 @@ const go = I.memoize(untracedMethod(() =>
                 for (let i = 0; i < otherwise.length; i++) {
                   const te = map.get(otherwise[i])!(input, options)
                   const t = PR.either(te)
-                  if (t && picks.length === 0) {
+                  if (t) {
                     if (E.isRight(t)) {
                       return PR.success(t.right)
                     } else {
@@ -714,20 +734,22 @@ const go = I.memoize(untracedMethod(() =>
                   } else {
                     const nk = stepKey++
                     picks.push(
-                      Effect.suspend(() => {
-                        if (finalResult) {
-                          return Effect.unit()
-                        } else {
-                          return Effect.flatMap(Effect.either(te), (t) => {
-                            if (E.isRight(t)) {
-                              finalResult = PR.success(t.right)
-                            } else {
-                              es.push([nk, PR.unionMember(t.left)])
-                            }
+                      untraced(() =>
+                        Effect.suspend(() => {
+                          if (finalResult) {
                             return Effect.unit()
-                          })
-                        }
-                      })
+                          } else {
+                            return Effect.flatMap(Effect.either(te), (t) => {
+                              if (E.isRight(t)) {
+                                finalResult = PR.success(t.right)
+                              } else {
+                                es.push([nk, PR.unionMember(t.left)])
+                              }
+                              return Effect.unit()
+                            })
+                          }
+                        })
+                      )
                     )
                   }
                 }
@@ -763,20 +785,22 @@ const go = I.memoize(untracedMethod(() =>
               } else {
                 const nk = stepKey++
                 picks.push(
-                  Effect.suspend(() => {
-                    if (finalResult) {
-                      return Effect.unit()
-                    } else {
-                      return Effect.flatMap(Effect.either(te), (t) => {
-                        if (E.isRight(t)) {
-                          finalResult = PR.success(t.right)
-                        } else {
-                          es.push([nk, PR.unionMember(t.left)])
-                        }
+                  untraced(() =>
+                    Effect.suspend(() => {
+                      if (finalResult) {
                         return Effect.unit()
-                      })
-                    }
-                  })
+                      } else {
+                        return Effect.flatMap(Effect.either(te), (t) => {
+                          if (E.isRight(t)) {
+                            finalResult = PR.success(t.right)
+                          } else {
+                            es.push([nk, PR.unionMember(t.left)])
+                          }
+                          return Effect.unit()
+                        })
+                      }
+                    })
+                  )
                 )
               }
             }
