@@ -3,7 +3,7 @@ import * as Util from "@effect/schema/test/util"
 import * as _ from "@effect/schema/TreeFormatter"
 
 describe.concurrent("TreeFormatter", () => {
-  it("formatErrors/ Unexpected", () => {
+  it("formatErrors/ Unexpected", async () => {
     const schema = S.struct({ a: S.string })
     await Util.expectDecodingFailureTree(
       schema,
@@ -14,25 +14,25 @@ describe.concurrent("TreeFormatter", () => {
     )
   })
 
-  it("formatErrors/ should collapse trees that have a branching factor of 1", () => {
+  it("formatErrors/ should collapse trees that have a branching factor of 1", async () => {
     const schema = S.struct({
       a: S.struct({ b: S.struct({ c: S.array(S.struct({ d: S.string })) }) })
     })
-    await Util.expectDecodingFailureTree(
+    Util.expectDecodingFailureTree(
       schema,
       { a: { b: { c: [{ d: null }] } } },
       `error(s) found
 └─ ["a"]["b"]["c"][0]["d"]
    └─ Expected string, actual null`
     )
-    await Util.expectDecodingFailureTree(
+    Util.expectDecodingFailureTree(
       schema,
       { a: { b: { c: [{ d: null }, { d: 1 }] } } },
       `error(s) found
 └─ ["a"]["b"]["c"][0]["d"]
    └─ Expected string, actual null`
     )
-    await Util.expectDecodingFailureTree(
+    Util.expectDecodingFailureTree(
       schema,
       { a: { b: { c: [{ d: null }, { d: 1 }] } } },
       `error(s) found
