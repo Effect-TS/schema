@@ -103,14 +103,27 @@ export const expectDecodingSuccess = async <I, A>(
   a: A = u as any,
   options?: ParseOptions
 ) => {
-  const s = new Error().stack
+  const s = new Error()
   const t = S.parseEither(schema)(u, options)
-  expect(t).toStrictEqual(E.right(a))
+  try {
+    expect(t).toStrictEqual(E.right(a))
+  } catch (e) {
+    if (e instanceof Error && s.stack) {
+      const newStack = s.stack.split("\n")
+      newStack.splice(0, 2)
+      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
+    }
+    throw e
+  }
   const t2 = await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options))
   try {
     expect(t2).toStrictEqual(t)
   } catch (e) {
-    console.log(s)
+    if (e instanceof Error && s.stack) {
+      const newStack = s.stack.split("\n")
+      newStack.splice(0, 2)
+      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
+    }
     throw e
   }
 }
@@ -121,9 +134,18 @@ export const expectDecodingFailure = async <I, A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const s = new Error().stack
+  const s = new Error()
   const t = E.mapLeft(S.parseEither(schema)(u, options), formatAll)
-  expect(t).toStrictEqual(E.left(message))
+  try {
+    expect(t).toStrictEqual(E.left(message))
+  } catch (e) {
+    if (e instanceof Error && s.stack) {
+      const newStack = s.stack.split("\n")
+      newStack.splice(0, 2)
+      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
+    }
+    throw e
+  }
   const t2 = E.mapLeft(
     await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options)),
     formatAll
@@ -131,7 +153,11 @@ export const expectDecodingFailure = async <I, A>(
   try {
     expect(t2).toStrictEqual(t)
   } catch (e) {
-    console.log(s)
+    if (e instanceof Error && s.stack) {
+      const newStack = s.stack.split("\n")
+      newStack.splice(0, 2)
+      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
+    }
     throw e
   }
 }
