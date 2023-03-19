@@ -2349,7 +2349,7 @@ export const includes = <A extends string>(
 export const trim = <I>(self: Schema<I, string>): Schema<I, string> =>
   transform(
     self,
-    pipe(self, to, trimmed()),
+    pipe(to(self), trimmed()),
     (s) => s.trim(),
     identity
   )
