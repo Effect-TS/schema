@@ -19,7 +19,7 @@ describe.concurrent("Option", () => {
       await Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(O.some("1"))), O.some(1))
     })
 
-    it("Encoder", () => {
+    it("Encoder", async () => {
       const schema = S.option(NumberFromString)
       Util.expectEncodingSuccess(schema, O.none(), { _tag: "None" })
       Util.expectEncodingSuccess(schema, O.some(1), { _tag: "Some", value: "1" })
@@ -84,7 +84,7 @@ describe.concurrent("Option", () => {
       )
     })
 
-    it("Encoder", () => {
+    it("Encoder", async () => {
       const schema = S.optionFromNullable(NumberFromString)
       Util.expectEncodingSuccess(schema, O.none(), null)
       Util.expectEncodingSuccess(schema, O.some(1), "1")

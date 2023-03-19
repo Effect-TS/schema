@@ -31,7 +31,7 @@ describe.concurrent("ReadonlySet", () => {
     )
   })
 
-  it("readonlySetFromSelf. encoder", () => {
+  it("readonlySetFromSelf. encoder", async () => {
     const schema = S.readonlySetFromSelf(NumberFromString)
     Util.expectEncodingSuccess(schema, new Set(), new Set())
     Util.expectEncodingSuccess(schema, new Set([1, 2, 3]), new Set(["1", "2", "3"]))
@@ -74,7 +74,7 @@ describe.concurrent("ReadonlySet", () => {
     await Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })
 
-  it("readonlySet. encoder", () => {
+  it("readonlySet. encoder", async () => {
     const schema = S.readonlySet(S.number)
     Util.expectEncodingSuccess(schema, new Set(), [])
     Util.expectEncodingSuccess(schema, new Set([1, 2, 3]), [1, 2, 3])

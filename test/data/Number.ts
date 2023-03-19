@@ -39,7 +39,7 @@ describe.concurrent("Number", () => {
   it("nonNegative", async () => {
     const schema = pipe(S.number, S.nonNegative())
 
-    Util.expectEncodingFailure(schema, -1, "Expected a non-negative number, actual -1")
+    await Util.expectEncodingFailure(schema, -1, "Expected a non-negative number, actual -1")
     await Util.expectDecodingSuccess(schema, 0, 0)
     await Util.expectDecodingSuccess(schema, 1, 1)
   })
@@ -74,7 +74,7 @@ describe.concurrent("Number", () => {
       )
     })
 
-    it("Encoder", () => {
+    it("Encoder", async () => {
       Util.expectEncodingSuccess(schema, 1, "1")
     })
 

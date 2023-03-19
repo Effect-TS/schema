@@ -2,7 +2,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as _ from "@effect/schema/TreeFormatter"
 
-describe.concurrent("TreeFormatter", () => {
+describe.concurrent("TreeFormatter", async () => {
   it("formatErrors/ Unexpected", async () => {
     const schema = S.struct({ a: S.string })
     await Util.expectDecodingFailureTree(

@@ -37,7 +37,7 @@ describe.concurrent("Data", () => {
     )
   })
 
-  it("dataFromSelf. encoder", () => {
+  it("dataFromSelf. encoder", async () => {
     const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
     Util.expectEncodingSuccess(
       schema,
@@ -79,7 +79,7 @@ describe.concurrent("Data", () => {
     )
   })
 
-  it("data. encoder", () => {
+  it("data. encoder", async () => {
     const schema = S.data(S.struct({ a: S.string, b: S.number }))
     Util.expectEncodingSuccess(schema, Data.struct({ a: "ok", b: 0 }), { a: "ok", b: 0 })
   })
