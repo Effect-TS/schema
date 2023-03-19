@@ -784,7 +784,7 @@ const go = I.memoize(untracedMethod(() =>
             // compute output
             // ---------------------------------------------
             if (picks.length > 0) {
-              Effect.flatMap(
+              return Effect.flatMap(
                 Effect.collectAllDiscard(picks),
                 () => {
                   if (finalResult) {
