@@ -660,7 +660,7 @@ const go = I.memoize(untracedMethod(() =>
                     const bucket = buckets[literal]
                     for (let i = 0; i < bucket.length; i++) {
                       const te = map.get(bucket[i])!(input, options)
-                      const t = PR.either(te)
+                      const t = picks.length === 0 ? PR.either(te) : undefined
                       if (t) {
                         if (E.isRight(t)) {
                           return PR.success(t.right)
@@ -724,7 +724,7 @@ const go = I.memoize(untracedMethod(() =>
                 // proceed with those that have no literal at all
                 for (let i = 0; i < otherwise.length; i++) {
                   const te = map.get(otherwise[i])!(input, options)
-                  const t = PR.either(te)
+                  const t = picks.length === 0 ? PR.either(te) : undefined
                   if (t) {
                     if (E.isRight(t)) {
                       return PR.success(t.right)
@@ -775,8 +775,8 @@ const go = I.memoize(untracedMethod(() =>
             // proceed with those that have no literal at all
             for (let i = 0; i < otherwise.length; i++) {
               const te = map.get(otherwise[i])!(input, options)
-              const t = PR.either(te)
-              if (t && picks) {
+              const t = picks.length === 0 ? PR.either(te) : undefined
+              if (t) {
                 if (E.isRight(t)) {
                   return PR.success(t.right)
                 } else {
