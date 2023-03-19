@@ -22,6 +22,7 @@ index c0f282ca9e3ddd93e44a62e1d05c1cc45b9f5c6a..616f7f6223459e0621522279ea7fc1cf
 +                  "moduleResolution": "node",
 +                  "target": "ES2021",
 +                  "lib": ["ES2021"],
++                  "allowImportingTsExtensions": true,
 +                  "paths": {
 +                    "@effect/schema": ["../../src/index.ts"],
 +                    "@effect/schema/test/*": ["../../test/*"],
