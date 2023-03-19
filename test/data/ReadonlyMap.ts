@@ -16,19 +16,19 @@ describe.concurrent("ReadonlyMap", () => {
 
   it("readonlyMapFromSelf. decoder", async () => {
     const schema = S.readonlyMapFromSelf(NumberFromString, S.string)
-    Util.expectDecodingSuccess(schema, new Map(), new Map())
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(schema, new Map(), new Map())
+    await Util.expectDecodingSuccess(
       schema,
       new Map([["1", "a"], ["2", "b"], ["3", "c"]]),
       new Map([[1, "a"], [2, "b"], [3, "c"]])
     )
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected ReadonlyMap, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       new Map([["1", "a"], ["a", "b"]]),
       `/1 /0 Expected string -> number, actual "a"`
@@ -75,19 +75,19 @@ describe.concurrent("ReadonlyMap", () => {
 
   it("readonlyMap. decoder", async () => {
     const schema = S.readonlyMap(S.number, S.string)
-    Util.expectDecodingSuccess(schema, [], new Map())
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(schema, [], new Map())
+    await Util.expectDecodingSuccess(
       schema,
       [[1, "a"], [2, "b"], [3, "c"]],
       new Map([[1, "a"], [2, "b"], [3, "c"]])
     )
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous tuple or array schema>, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       [[1, "a"], [2, 1]],
       `/1 /1 Expected string, actual 1`

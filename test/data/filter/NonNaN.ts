@@ -18,8 +18,8 @@ describe.concurrent("nonNaN", () => {
   })
 
   it("Decoder", async () => {
-    Util.expectDecodingSuccess(schema, 1)
-    Util.expectDecodingFailure(schema, NaN, `Expected a number NaN excluded, actual NaN`)
+    await Util.expectDecodingSuccess(schema, 1)
+    await Util.expectDecodingFailure(schema, NaN, `Expected a number NaN excluded, actual NaN`)
   })
 
   it("Pretty", () => {

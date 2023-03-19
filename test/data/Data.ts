@@ -20,17 +20,17 @@ describe.concurrent("Data", () => {
 
   it("dataFromSelf. decoder", async () => {
     const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       Data.struct({ a: "ok", b: 0 }),
       Data.struct({ a: "ok", b: 0 })
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "ok", b: 0 },
       "Expected Data, actual {\"a\":\"ok\",\"b\":0}"
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       Data.struct({ a: "ok", b: "0" }),
       "/b Expected number, actual \"0\""
@@ -67,12 +67,12 @@ describe.concurrent("Data", () => {
 
   it("data. decoder", async () => {
     const schema = S.data(S.struct({ a: S.string, b: S.number }))
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       { a: "ok", b: 0 },
       Data.struct({ a: "ok", b: 0 })
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "ok", b: "0" },
       "/b Expected number, actual \"0\""

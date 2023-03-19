@@ -13,9 +13,9 @@ describe.concurrent("Date", () => {
   })
 
   it("date. decoder", async () => {
-    Util.expectDecodingSuccess(S.date, new Date(), new Date())
+    await Util.expectDecodingSuccess(S.date, new Date(), new Date())
 
-    Util.expectDecodingFailure(S.date, null, `Expected Date, actual null`)
+    await Util.expectDecodingFailure(S.date, null, `Expected Date, actual null`)
   })
 
   it("date. encoder", () => {
@@ -43,17 +43,17 @@ describe.concurrent("Date", () => {
     })
 
     it("Decoder", async () => {
-      Util.expectDecodingSuccess(
+      await Util.expectDecodingSuccess(
         schema,
         "1970-01-01T00:00:00.000Z",
         new Date(0)
       )
-      Util.expectDecodingFailure(
+      await Util.expectDecodingFailure(
         schema,
         "a",
         `Expected string -> Date, actual "a"`
       )
-      Util.expectDecodingFailure(
+      await Util.expectDecodingFailure(
         schema,
         "a1",
         `Expected string -> Date, actual "a1"`
@@ -68,12 +68,12 @@ describe.concurrent("Date", () => {
       const schema = S.dateFromString
 
       // success cases
-      Util.expectDecodingSuccess(schema, "0", new Date("0"))
-      Util.expectDecodingSuccess(schema, "1970-01-01T00:00:00.000Z", new Date(0))
-      Util.expectDecodingSuccess(schema, "2000-10-01", new Date("2000-10-01"))
+      await Util.expectDecodingSuccess(schema, "0", new Date("0"))
+      await Util.expectDecodingSuccess(schema, "1970-01-01T00:00:00.000Z", new Date(0))
+      await Util.expectDecodingSuccess(schema, "2000-10-01", new Date("2000-10-01"))
 
       // failure cases
-      Util.expectDecodingFailure(
+      await Util.expectDecodingFailure(
         schema,
         "a",
         `Expected string -> Date, actual "a"`

@@ -22,19 +22,19 @@ describe.concurrent("trimmed", () => {
   })
 
   it("Decoder", async () => {
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingSuccess(schema, "")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, "")
+    await Util.expectDecodingFailure(
       schema,
       "a ",
       `Expected a string with no leading or trailing whitespace, actual "a "`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       " a",
       `Expected a string with no leading or trailing whitespace, actual " a"`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       " a ",
       `Expected a string with no leading or trailing whitespace, actual " a "`

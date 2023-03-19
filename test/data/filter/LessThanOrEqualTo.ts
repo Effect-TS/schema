@@ -17,9 +17,9 @@ describe.concurrent("lessThanOrEqualTo", () => {
 
   it("Decoder", async () => {
     const schema = S.lessThanOrEqualTo(0)(S.number)
-    Util.expectDecodingSuccess(schema, 0)
-    Util.expectDecodingSuccess(schema, -1)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, 0)
+    await Util.expectDecodingSuccess(schema, -1)
+    await Util.expectDecodingFailure(
       schema,
       1,
       `Expected a number less than or equal to 0, actual 1`

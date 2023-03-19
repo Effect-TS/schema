@@ -17,9 +17,9 @@ describe.concurrent("maxLength", () => {
 
   it("Decoder", async () => {
     const schema = S.maxLength(1)(S.string)
-    Util.expectDecodingSuccess(schema, "")
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, "")
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingFailure(
       schema,
       "aa",
       `Expected a string at most 1 character(s) long, actual "aa"`

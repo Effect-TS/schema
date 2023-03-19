@@ -27,8 +27,8 @@ describe.concurrent("Either", () => {
 
     it("Decoder", async () => {
       const schema = S.eitherFromSelf(S.string, NumberFromString)
-      Util.expectDecodingSuccess(schema, E.left("a"), E.left("a"))
-      Util.expectDecodingSuccess(schema, E.right("1"), E.right(1))
+      await Util.expectDecodingSuccess(schema, E.left("a"), E.left("a"))
+      await Util.expectDecodingSuccess(schema, E.right("1"), E.right(1))
     })
 
     it("Pretty", () => {
@@ -46,8 +46,16 @@ describe.concurrent("Either", () => {
 
     it("Decoder", async () => {
       const schema = S.either(S.string, NumberFromString)
-      Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(E.left("a"))), E.left("a"))
-      Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(E.right("1"))), E.right(1))
+      await Util.expectDecodingSuccess(
+        schema,
+        JSON.parse(JSON.stringify(E.left("a"))),
+        E.left("a")
+      )
+      await Util.expectDecodingSuccess(
+        schema,
+        JSON.parse(JSON.stringify(E.right("1"))),
+        E.right(1)
+      )
     })
 
     it("Encoder", () => {
