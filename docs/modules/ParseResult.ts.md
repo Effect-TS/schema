@@ -22,9 +22,6 @@ Added in v1.0.0
   - [type](#type)
   - [unexpected](#unexpected)
   - [unionMember](#unionmember)
-- [guards](#guards)
-  - [isFailure](#isfailure)
-  - [isSuccess](#issuccess)
 - [model](#model)
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
@@ -33,6 +30,11 @@ Added in v1.0.0
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
+- [optimisation](#optimisation)
+  - [either](#either)
+  - [eitherSync](#eithersync)
+  - [flatMap](#flatmap)
+  - [map](#map)
 - [utils](#utils)
   - [ParseResult (type alias)](#parseresult-type-alias)
 
@@ -95,7 +97,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const success: <A>(a: A) => Either<readonly [ParseError, ...ParseError[]], A>
+export declare const success: <A>(a: A) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -126,30 +128,6 @@ Added in v1.0.0
 
 ```ts
 export declare const unionMember: (errors: readonly [ParseError, ...ParseError[]]) => UnionMember
-```
-
-Added in v1.0.0
-
-# guards
-
-## isFailure
-
-**Signature**
-
-```ts
-export declare const isFailure: <A>(
-  self: Either<readonly [ParseError, ...ParseError[]], A>
-) => self is Left<readonly [ParseError, ...ParseError[]]>
-```
-
-Added in v1.0.0
-
-## isSuccess
-
-**Signature**
-
-```ts
-export declare const isSuccess: <A>(self: Either<readonly [ParseError, ...ParseError[]], A>) => self is Right<A>
 ```
 
 Added in v1.0.0
@@ -272,6 +250,51 @@ export interface UnionMember {
 
 Added in v1.0.0
 
+# optimisation
+
+## either
+
+**Signature**
+
+```ts
+export declare const either: <E, A>(self: Effect.Effect<never, E, A>) => E.Left<E> | E.Right<A> | undefined
+```
+
+Added in v1.0.0
+
+## eitherSync
+
+**Signature**
+
+```ts
+export declare const eitherSync: <E, A>(self: Effect.Effect<never, E, A>) => E.Either<E, A>
+```
+
+Added in v1.0.0
+
+## flatMap
+
+**Signature**
+
+```ts
+export declare const flatMap: <E, E1, A, B>(
+  self: Effect.Effect<never, E, A>,
+  f: (self: A) => Effect.Effect<never, E1, B>
+) => Effect.Effect<never, E | E1, B>
+```
+
+Added in v1.0.0
+
+## map
+
+**Signature**
+
+```ts
+export declare const map: <E, A, B>(self: Effect.Effect<never, E, A>, f: (self: A) => B) => Effect.Effect<never, E, B>
+```
+
+Added in v1.0.0
+
 # utils
 
 ## ParseResult (type alias)
@@ -279,7 +302,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type ParseResult<A> = Either<NonEmptyReadonlyArray<ParseError>, A>
+export type ParseResult<A> = Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
 ```
 
 Added in v1.0.0

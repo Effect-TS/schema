@@ -1341,7 +1341,7 @@ export declare const mergeAnnotations: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      ) => (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
@@ -1391,8 +1391,8 @@ export declare const mergeAnnotations: (
       _tag: 'Refinement'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       hasTransformation: boolean
     }
   | {
@@ -1400,8 +1400,8 @@ export declare const mergeAnnotations: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       hasTransformation: boolean
     }
 ```
@@ -1473,7 +1473,7 @@ export declare const setAnnotation: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      ) => (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
@@ -1523,8 +1523,8 @@ export declare const setAnnotation: (
       _tag: 'Refinement'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       hasTransformation: boolean
     }
   | {
@@ -1532,8 +1532,8 @@ export declare const setAnnotation: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
-      encode: (input: any, options?: ParseOptions | undefined) => Either<readonly [ParseError, ...ParseError[]], any>
+      decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
+      encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       hasTransformation: boolean
     }
 ```

@@ -1,5 +1,6 @@
+import type * as E from "@effect/data/Either"
 import * as RA from "@effect/data/ReadonlyArray"
-import type { ParseResult } from "@effect/schema/ParseResult"
+import type { ParseError } from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 
@@ -35,7 +36,7 @@ const schema = S.union(...members)
 
 const parseEither = S.parseEither(schema)
 
-const parseManual = (input: unknown): ParseResult<{
+const parseManual = (input: unknown): E.Either<RA.NonEmptyReadonlyArray<ParseError>, {
   readonly kind: number
   readonly a: string
   readonly b: number
