@@ -38,7 +38,7 @@ describe.concurrent("Chunk", () => {
     )
   })
 
-  it("chunkFromSelf. encoder", () => {
+  it("chunkFromSelf. encoder", async () => {
     const schema = S.chunkFromSelf(NumberFromString)
     Util.expectEncodingSuccess(schema, C.empty(), C.empty())
     Util.expectEncodingSuccess(schema, C.fromIterable([1, 2, 3]), C.fromIterable(["1", "2", "3"]))
@@ -80,7 +80,7 @@ describe.concurrent("Chunk", () => {
     await Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })
 
-  it("chunk. encoder", () => {
+  it("chunk. encoder", async () => {
     const schema = S.chunk(S.number)
     Util.expectEncodingSuccess(schema, C.empty(), [])
     Util.expectEncodingSuccess(schema, C.fromIterable([1, 2, 3]), [1, 2, 3])

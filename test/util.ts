@@ -103,29 +103,10 @@ export const expectDecodingSuccess = async <I, A>(
   a: A = u as any,
   options?: ParseOptions
 ) => {
-  const s = new Error()
   const t = S.parseEither(schema)(u, options)
-  try {
-    expect(t).toStrictEqual(E.right(a))
-  } catch (e) {
-    if (e instanceof Error && s.stack) {
-      const newStack = s.stack.split("\n")
-      newStack.splice(0, 2)
-      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
-    }
-    throw e
-  }
+  expect(t).toStrictEqual(E.right(a))
   const t2 = await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options))
-  try {
-    expect(t2).toStrictEqual(t)
-  } catch (e) {
-    if (e instanceof Error && s.stack) {
-      const newStack = s.stack.split("\n")
-      newStack.splice(0, 2)
-      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
-    }
-    throw e
-  }
+  expect(t2).toStrictEqual(t)
 }
 
 export const expectDecodingFailure = async <I, A>(
@@ -134,35 +115,16 @@ export const expectDecodingFailure = async <I, A>(
   message: string,
   options?: ParseOptions
 ) => {
-  const s = new Error()
   const t = E.mapLeft(S.parseEither(schema)(u, options), formatAll)
-  try {
-    expect(t).toStrictEqual(E.left(message))
-  } catch (e) {
-    if (e instanceof Error && s.stack) {
-      const newStack = s.stack.split("\n")
-      newStack.splice(0, 2)
-      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
-    }
-    throw e
-  }
+  expect(t).toStrictEqual(E.left(message))
   const t2 = E.mapLeft(
     await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options)),
     formatAll
   )
-  try {
-    expect(t2).toStrictEqual(t)
-  } catch (e) {
-    if (e instanceof Error && s.stack) {
-      const newStack = s.stack.split("\n")
-      newStack.splice(0, 2)
-      Object.defineProperty(e, "stack", { value: newStack.join("\n") })
-    }
-    throw e
-  }
+  expect(t2).toStrictEqual(t)
 }
 
-export const expectEncodingSuccess = <I, A>(
+export const expectEncodingSuccess = async <I, A>(
   schema: Schema<I, A>,
   a: A,
   o: unknown,
@@ -170,16 +132,39 @@ export const expectEncodingSuccess = <I, A>(
 ) => {
   const t = S.encodeEither(schema)(a, options)
   expect(t).toStrictEqual(E.right(o))
+  const t2 = await Effect.runPromiseEither(S.encodeEffect(effectify(schema))(a, options))
+  expect(t2).toStrictEqual(t)
 }
 
-export const expectEncodingFailure = <I, A>(
+export const expectEncodingFailure = async <I, A>(
   schema: Schema<I, A>,
   a: A,
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(S.encodeEither(schema)(a, options), E.mapLeft(formatAll))
+  const t = E.mapLeft(S.encodeEither(schema)(a, options), formatAll)
   expect(t).toStrictEqual(E.left(message))
+  const t2 = E.mapLeft(
+    await Effect.runPromiseEither(S.encodeEffect(effectify(schema))(a, options)),
+    formatAll
+  )
+  expect(t2).toStrictEqual(t)
+}
+
+export const expectDecodingFailureTree = async <I, A>(
+  schema: Schema<I, A>,
+  u: unknown,
+  message: string,
+  options?: ParseOptions
+) => {
+  const t = E.mapLeft(S.parseEither(schema)(u, options), formatErrors)
+  expect(E.isLeft(t)).toEqual(true)
+  expect(t).toEqual(E.left(message))
+  const t2 = E.mapLeft(
+    await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options)),
+    formatErrors
+  )
+  expect(t2).toStrictEqual(t)
 }
 
 const formatAll = (errors: NonEmptyReadonlyArray<PR.ParseError>): string => {
@@ -210,15 +195,4 @@ const formatDecodeError = (e: PR.ParseError): string => {
     case "UnionMember":
       return `union member: ${pipe(e.errors, RA.map(formatDecodeError), RA.join(", "))}`
   }
-}
-
-export const expectDecodingFailureTree = <I, A>(
-  schema: Schema<I, A>,
-  u: unknown,
-  message: string,
-  options?: ParseOptions
-) => {
-  const t = pipe(S.parseEither(schema)(u, options), E.mapLeft(formatErrors))
-  expect(E.isLeft(t)).toEqual(true)
-  expect(t).toEqual(E.left(message))
 }

@@ -18,7 +18,7 @@ describe.concurrent("Date", () => {
     await Util.expectDecodingFailure(S.date, null, `Expected Date, actual null`)
   })
 
-  it("date. encoder", () => {
+  it("date. encoder", async () => {
     const now = new Date()
     Util.expectEncodingSuccess(S.date, now, now)
   })
@@ -60,7 +60,7 @@ describe.concurrent("Date", () => {
       )
     })
 
-    it("Encoder", () => {
+    it("Encoder", async () => {
       Util.expectEncodingSuccess(schema, new Date(0), "1970-01-01T00:00:00.000Z")
     })
 

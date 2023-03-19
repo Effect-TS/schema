@@ -83,7 +83,7 @@ describe.concurrent("Bigint", () => {
   it("nonNegativeBigint", async () => {
     const schema = pipe(S.bigint, S.nonNegativeBigint())
 
-    Util.expectEncodingFailure(schema, -1n, "Expected a non-negative bigint, actual -1n")
+    await Util.expectEncodingFailure(schema, -1n, "Expected a non-negative bigint, actual -1n")
     await Util.expectDecodingSuccess(schema, 0n, 0n)
     await Util.expectDecodingSuccess(schema, 1n, 1n)
   })

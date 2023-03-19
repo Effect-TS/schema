@@ -58,7 +58,7 @@ describe.concurrent("Either", () => {
       )
     })
 
-    it("Encoder", () => {
+    it("Encoder", async () => {
       const schema = S.either(S.string, NumberFromString)
       Util.expectEncodingSuccess(schema, E.left("a"), { _tag: "Left", left: "a" })
       Util.expectEncodingSuccess(schema, E.right(1), { _tag: "Right", right: "1" })
