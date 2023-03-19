@@ -6,7 +6,7 @@ import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as PR from "@effect/schema/ParseResult"
+import type * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
 import * as S from "@effect/schema/Schema"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
@@ -20,8 +20,12 @@ export const roundtrip = <I, A>(schema: Schema<I, A>) => {
     if (!is(a)) {
       return false
     }
-    const roundtrip = pipe(a, S.encodeEither(schema), E.flatMap(S.parseEither(schema)))
-    if (PR.isFailure(roundtrip)) {
+    const roundtrip = pipe(
+      a,
+      S.encodeEither(schema),
+      E.flatMap((a) => S.parseEither(schema)(a))
+    )
+    if (E.isLeft(roundtrip)) {
       return false
     }
     return is(roundtrip.right)
