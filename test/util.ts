@@ -2,12 +2,12 @@ import * as Duration from "@effect/data/Duration"
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
-import * as RA from "@effect/data/ReadonlyArray"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
+import * as RA from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import * as A from "@effect/schema/Arbitrary"
-import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
+import * as AST from "@effect/schema/AST"
 import type * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
 import * as S from "@effect/schema/Schema"
@@ -100,10 +100,16 @@ export const expectDecodingSuccess = async <I, A>(
   a: A = u as any,
   options?: ParseOptions
 ) => {
+  const s = new Error().stack
   const t = S.parseEither(schema)(u, options)
   expect(t).toStrictEqual(E.right(a))
   const t2 = await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options))
-  expect(t2).toStrictEqual(E.right(a))
+  try {
+    expect(t2).toStrictEqual(E.right(a))
+  } catch (e) {
+    console.log(s)
+    throw e
+  }
 }
 
 export const expectDecodingFailure = <I, A>(
