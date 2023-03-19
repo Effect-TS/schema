@@ -19,7 +19,7 @@ const sleep = Effect.sleep(Duration.millis(10))
 const goDecode = (
   decode: (input: any, options?: ParseOptions) => PR.ParseResult<any>
 ): (input: any, options?: ParseOptions) => PR.ParseResult<any> =>
-  (input, options) => Effect.map(sleep, () => decode(input, options))
+  (input, options) => Effect.flatMap(sleep, () => decode(input, options))
 
 const go = (ast: AST.AST): AST.AST => {
   switch (ast._tag) {
@@ -103,7 +103,6 @@ export const expectDecodingSuccess = async <I, A>(
   const t = S.parseEither(schema)(u, options)
   expect(t).toStrictEqual(E.right(a))
   const t2 = await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options))
-  console.log(t2)
   expect(t2).toStrictEqual(E.right(a))
 }
 
