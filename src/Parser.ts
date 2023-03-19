@@ -260,7 +260,11 @@ const go = I.memoize(untracedMethod(() =>
           const allErrors = options?.allErrors
           let i = 0
           let stepKey = 0
-          const residual: Array<PR.ParseResult<void>> = []
+          type State = {
+            es: typeof es
+            output: typeof output
+          }
+          const residual: Array<(_: State) => PR.ParseResult<void>> = []
 
           // ---------------------------------------------
           // handle elements
@@ -298,21 +302,22 @@ const go = I.memoize(untracedMethod(() =>
                 const nk = stepKey++
                 const index = i
                 residual.push(
-                  untraced(() =>
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        // the input element is present but is not valid
-                        const e = PR.index(index, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
-                          return Effect.unit()
-                        } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                  untracedMethod(() =>
+                    ({ es, output }: State) =>
+                      Effect.flatMap(Effect.either(te), (t) => {
+                        if (E.isLeft(t)) {
+                          // the input element is present but is not valid
+                          const e = PR.index(index, t.left)
+                          if (allErrors) {
+                            es.push([nk, e])
+                            return Effect.unit()
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                          }
                         }
-                      }
-                      output.push([nk, t.right])
-                      return Effect.unit()
-                    })
+                        output.push([nk, t.right])
+                        return Effect.unit()
+                      })
                   )
                 )
               }
@@ -343,21 +348,22 @@ const go = I.memoize(untracedMethod(() =>
                 const nk = stepKey++
                 const index = i
                 residual.push(
-                  untraced(() =>
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        const e = PR.index(index, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
-                          return Effect.unit()
+                  untracedMethod(() =>
+                    ({ es, output }: State) =>
+                      Effect.flatMap(Effect.either(te), (t) => {
+                        if (E.isLeft(t)) {
+                          const e = PR.index(index, t.left)
+                          if (allErrors) {
+                            es.push([nk, e])
+                            return Effect.unit()
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                          }
                         } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                          output.push([nk, t.right])
+                          return Effect.unit()
                         }
-                      } else {
-                        output.push([nk, t.right])
-                        return Effect.unit()
-                      }
-                    })
+                      })
                   )
                 )
               }
@@ -388,22 +394,25 @@ const go = I.memoize(untracedMethod(() =>
                 } else {
                   const nk = stepKey++
                   const index = i
-                  residual.push(untraced(() =>
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        // the input element is present but is not valid
-                        const e = PR.index(index, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
+                  residual.push(
+                    untracedMethod(() =>
+                      ({ es, output }: State) =>
+                        Effect.flatMap(Effect.either(te), (t) => {
+                          if (E.isLeft(t)) {
+                            // the input element is present but is not valid
+                            const e = PR.index(index, t.left)
+                            if (allErrors) {
+                              es.push([nk, e])
+                              return Effect.unit()
+                            } else {
+                              return PR.failures(mutableAppend(sortByIndex(es), e))
+                            }
+                          }
+                          output.push([nk, t.right])
                           return Effect.unit()
-                        } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
-                        }
-                      }
-                      output.push([nk, t.right])
-                      return Effect.unit()
-                    })
-                  ))
+                        })
+                    )
+                  )
                 }
               }
             }
@@ -427,20 +436,29 @@ const go = I.memoize(untracedMethod(() =>
           // ---------------------------------------------
           // compute output
           // ---------------------------------------------
-          const computeResult = () =>
+          const computeResult = ({ es, output }: State) =>
             RA.isNonEmptyReadonlyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(sortByIndex(output))
           return residual.length > 0 ?
-            Effect.flatMap(Effect.collectAllDiscard(residual), () => computeResult()) :
-            computeResult()
+            Effect.suspend(() => {
+              const state: State = {
+                es: Array.from(es),
+                output: Array.from(output)
+              }
+              return Effect.flatMap(Effect.forEachDiscard(residual, (f) => f(state)), () =>
+                computeResult(state))
+            }) :
+            computeResult({ output, es })
         }
       }
       case "TypeLiteral": {
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
           return fromRefinement(ast, P.isNotNullable)
         }
-        const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
+        const propertySignaturesTypes = ast.propertySignatures.map((f) =>
+          go(f.type)
+        )
         const indexSignatures = ast.indexSignatures.map((is) =>
           [go(is.parameter), go(is.type)] as const
         )
