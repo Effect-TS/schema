@@ -260,7 +260,11 @@ const go = I.memoize(untracedMethod(() =>
           const allErrors = options?.allErrors
           let i = 0
           let stepKey = 0
-          const residual: Array<PR.ParseResult<void>> = []
+          type State = {
+            es: typeof es
+            output: typeof output
+          }
+          const residual: Array<(_: State) => PR.ParseResult<void>> = []
 
           // ---------------------------------------------
           // handle elements
@@ -298,21 +302,22 @@ const go = I.memoize(untracedMethod(() =>
                 const nk = stepKey++
                 const index = i
                 residual.push(
-                  untraced(() =>
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        // the input element is present but is not valid
-                        const e = PR.index(index, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
-                          return Effect.unit()
-                        } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                  untracedMethod(() =>
+                    ({ es, output }: State) =>
+                      Effect.flatMap(Effect.either(te), (t) => {
+                        if (E.isLeft(t)) {
+                          // the input element is present but is not valid
+                          const e = PR.index(index, t.left)
+                          if (allErrors) {
+                            es.push([nk, e])
+                            return Effect.unit()
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                          }
                         }
-                      }
-                      output.push([nk, t.right])
-                      return Effect.unit()
-                    })
+                        output.push([nk, t.right])
+                        return Effect.unit()
+                      })
                   )
                 )
               }
@@ -343,21 +348,22 @@ const go = I.memoize(untracedMethod(() =>
                 const nk = stepKey++
                 const index = i
                 residual.push(
-                  untraced(() =>
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        const e = PR.index(index, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
-                          return Effect.unit()
+                  untracedMethod(() =>
+                    ({ es, output }: State) =>
+                      Effect.flatMap(Effect.either(te), (t) => {
+                        if (E.isLeft(t)) {
+                          const e = PR.index(index, t.left)
+                          if (allErrors) {
+                            es.push([nk, e])
+                            return Effect.unit()
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                          }
                         } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                          output.push([nk, t.right])
+                          return Effect.unit()
                         }
-                      } else {
-                        output.push([nk, t.right])
-                        return Effect.unit()
-                      }
-                    })
+                      })
                   )
                 )
               }
@@ -388,22 +394,25 @@ const go = I.memoize(untracedMethod(() =>
                 } else {
                   const nk = stepKey++
                   const index = i
-                  residual.push(untraced(() =>
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        // the input element is present but is not valid
-                        const e = PR.index(index, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
+                  residual.push(
+                    untracedMethod(() =>
+                      ({ es, output }: State) =>
+                        Effect.flatMap(Effect.either(te), (t) => {
+                          if (E.isLeft(t)) {
+                            // the input element is present but is not valid
+                            const e = PR.index(index, t.left)
+                            if (allErrors) {
+                              es.push([nk, e])
+                              return Effect.unit()
+                            } else {
+                              return PR.failures(mutableAppend(sortByIndex(es), e))
+                            }
+                          }
+                          output.push([nk, t.right])
                           return Effect.unit()
-                        } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
-                        }
-                      }
-                      output.push([nk, t.right])
-                      return Effect.unit()
-                    })
-                  ))
+                        })
+                    )
+                  )
                 }
               }
             }
@@ -427,20 +436,29 @@ const go = I.memoize(untracedMethod(() =>
           // ---------------------------------------------
           // compute output
           // ---------------------------------------------
-          const computeResult = () =>
+          const computeResult = ({ es, output }: State) =>
             RA.isNonEmptyReadonlyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(sortByIndex(output))
           return residual.length > 0 ?
-            Effect.flatMap(Effect.collectAllDiscard(residual), () => computeResult()) :
-            computeResult()
+            Effect.suspend(() => {
+              const state: State = {
+                es: Array.from(es),
+                output: Array.from(output)
+              }
+              return Effect.flatMap(Effect.forEachDiscard(residual, (f) => f(state)), () =>
+                computeResult(state))
+            }) :
+            computeResult({ output, es })
         }
       }
       case "TypeLiteral": {
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
           return fromRefinement(ast, P.isNotNullable)
         }
-        const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
+        const propertySignaturesTypes = ast.propertySignatures.map((f) =>
+          go(f.type)
+        )
         const indexSignatures = ast.indexSignatures.map((is) =>
           [go(is.parameter), go(is.type)] as const
         )
@@ -451,9 +469,13 @@ const go = I.memoize(untracedMethod(() =>
           const output: any = {}
           const expectedKeys: any = {}
           const es: Array<[number, PR.ParseError]> = []
+          type State = {
+            es: typeof es
+            output: typeof output
+          }
           const allErrors = options?.allErrors
           let stepKey = 0
-          const residual: Array<PR.ParseResult<void>> = []
+          const residual: Array<(state: State) => PR.ParseResult<void>> = []
           // ---------------------------------------------
           // handle property signatures
           // ---------------------------------------------
@@ -491,21 +513,22 @@ const go = I.memoize(untracedMethod(() =>
                 const nk = stepKey++
                 const index = name
                 residual.push(
-                  untraced(() =>
-                    Effect.flatMap(Effect.either(te), (t) => {
-                      if (E.isLeft(t)) {
-                        // the input key is present but is not valid
-                        const e = PR.key(index, t.left)
-                        if (allErrors) {
-                          es.push([nk, e])
-                          return Effect.unit()
-                        } else {
-                          return PR.failures(mutableAppend(sortByIndex(es), e))
+                  untracedMethod(() =>
+                    ({ es, output }: State) =>
+                      Effect.flatMap(Effect.either(te), (t) => {
+                        if (E.isLeft(t)) {
+                          // the input key is present but is not valid
+                          const e = PR.key(index, t.left)
+                          if (allErrors) {
+                            es.push([nk, e])
+                            return Effect.unit()
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                          }
                         }
-                      }
-                      output[index] = t.right
-                      return Effect.unit()
-                    })
+                        output[index] = t.right
+                        return Effect.unit()
+                      })
                   )
                 )
               }
@@ -542,19 +565,20 @@ const go = I.memoize(untracedMethod(() =>
                   const nk = stepKey++
                   const index = key
                   residual.push(
-                    untraced(() =>
-                      Effect.flatMap(Effect.either(te), (t) => {
-                        if (E.isLeft(t)) {
-                          const e = PR.key(index, t.left)
-                          if (allErrors) {
-                            es.push([nk, e])
-                            return Effect.unit()
-                          } else {
-                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                    untracedMethod(() =>
+                      ({ es }: State) =>
+                        Effect.flatMap(Effect.either(te), (t) => {
+                          if (E.isLeft(t)) {
+                            const e = PR.key(index, t.left)
+                            if (allErrors) {
+                              es.push([nk, e])
+                              return Effect.unit()
+                            } else {
+                              return PR.failures(mutableAppend(sortByIndex(es), e))
+                            }
                           }
-                        }
-                        return Effect.unit()
-                      })
+                          return Effect.unit()
+                        })
                     )
                   )
                 }
@@ -578,25 +602,28 @@ const go = I.memoize(untracedMethod(() =>
                 } else {
                   const nk = stepKey++
                   const index = key
-                  residual.push(untraced(() =>
-                    Effect.flatMap(
-                      Effect.either(tve),
-                      (tv) => {
-                        if (E.isLeft(tv)) {
-                          const e = PR.key(index, tv.left)
-                          if (allErrors) {
-                            es.push([nk, e])
-                            return Effect.unit()
-                          } else {
-                            return PR.failures(mutableAppend(sortByIndex(es), e))
+                  residual.push(
+                    untracedMethod(() =>
+                      ({ es, output }: State) =>
+                        Effect.flatMap(
+                          Effect.either(tve),
+                          (tv) => {
+                            if (E.isLeft(tv)) {
+                              const e = PR.key(index, tv.left)
+                              if (allErrors) {
+                                es.push([nk, e])
+                                return Effect.unit()
+                              } else {
+                                return PR.failures(mutableAppend(sortByIndex(es), e))
+                              }
+                            } else {
+                              output[key] = tv.right
+                              return Effect.unit()
+                            }
                           }
-                        } else {
-                          output[key] = tv.right
-                          return Effect.unit()
-                        }
-                      }
+                        )
                     )
-                  ))
+                  )
                 }
               }
             }
@@ -622,13 +649,20 @@ const go = I.memoize(untracedMethod(() =>
           // ---------------------------------------------
           // compute output
           // ---------------------------------------------
-          const computeResult = () =>
+          const computeResult = ({ es, output }: State) =>
             RA.isNonEmptyReadonlyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(output)
           return residual.length > 0 ?
-            Effect.flatMap(Effect.collectAllDiscard(residual), () => computeResult()) :
-            computeResult()
+            Effect.suspend(() => {
+              const state: State = {
+                es: Array.from(es),
+                output: Object.assign({}, output)
+              }
+              return Effect.flatMap(Effect.forEachDiscard(residual, (f) => f(state)), () =>
+                computeResult(state))
+            }) :
+            computeResult({ es, output })
         }
       }
       case "Union": {
@@ -643,8 +677,14 @@ const go = I.memoize(untracedMethod(() =>
         return (input, options) => {
           const es: Array<[number, PR.ParseError]> = []
           let stepKey = 0
-          let picks: Array<PR.ParseResult<unknown>> = []
-          let finalResult: any = undefined
+          const picks: Array<(state: State) => PR.ParseResult<unknown>> = []
+          const finalResult: { ref: any } = {
+            ref: undefined
+          }
+          type State = {
+            finalResult: typeof finalResult
+            es: typeof es
+          }
           if (len > 0) {
             // if there is at least one key then input must be an object
             if (P.isRecord(input)) {
@@ -670,21 +710,22 @@ const go = I.memoize(untracedMethod(() =>
                       } else {
                         const nk = stepKey++
                         picks.push(
-                          untraced(() =>
-                            Effect.suspend(() => {
-                              if (finalResult) {
-                                return Effect.unit()
-                              } else {
-                                return Effect.flatMap(Effect.either(te), (t) => {
-                                  if (E.isRight(t)) {
-                                    finalResult = PR.success(t.right)
-                                  } else {
-                                    es.push([nk, PR.unionMember(t.left)])
-                                  }
+                          untracedMethod(() =>
+                            ({ es, finalResult }) =>
+                              Effect.suspend(() => {
+                                if (finalResult.ref) {
                                   return Effect.unit()
-                                })
-                              }
-                            })
+                                } else {
+                                  return Effect.flatMap(Effect.either(te), (t) => {
+                                    if (E.isRight(t)) {
+                                      finalResult.ref = PR.success(t.right)
+                                    } else {
+                                      es.push([nk, PR.unionMember(t.left)])
+                                    }
+                                    return Effect.unit()
+                                  })
+                                }
+                              })
                           )
                         )
                       }
@@ -707,69 +748,76 @@ const go = I.memoize(untracedMethod(() =>
             }
           }
 
-          const computeResult = () =>
+          const computeResult = ({ es }: State) =>
             RA.isNonEmptyReadonlyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.failure(PR.type(AST.neverKeyword, input))
 
           if (picks.length > 0) {
-            return Effect.flatMap(
-              Effect.collectAllDiscard(picks),
-              () => {
-                if (finalResult) {
-                  return finalResult
-                }
-                picks = []
-                // if none of the schemas with at least one property with a literal value succeeded,
-                // proceed with those that have no literal at all
-                for (let i = 0; i < otherwise.length; i++) {
-                  const te = map.get(otherwise[i])!(input, options)
-                  const t = picks.length === 0 ? PR.either(te) : undefined
-                  if (t) {
-                    if (E.isRight(t)) {
-                      return PR.success(t.right)
+            return Effect.suspend(() => {
+              const state: State = {
+                es: Array.from(es),
+                finalResult: { ref: finalResult.ref }
+              }
+              return Effect.flatMap(
+                Effect.forEachDiscard(picks, (f) =>
+                  f(state)),
+                () => {
+                  if (state.finalResult.ref) {
+                    return state.finalResult.ref
+                  }
+                  const picks2 = []
+                  // if none of the schemas with at least one property with a literal value succeeded,
+                  // proceed with those that have no literal at all
+                  for (let i = 0; i < otherwise.length; i++) {
+                    const te = map.get(otherwise[i])!(input, options)
+                    const t = picks2.length === 0 ? PR.either(te) : undefined
+                    if (t) {
+                      if (E.isRight(t)) {
+                        return PR.success(t.right)
+                      } else {
+                        es.push([stepKey++, PR.unionMember(t.left)])
+                      }
                     } else {
-                      es.push([stepKey++, PR.unionMember(t.left)])
-                    }
-                  } else {
-                    const nk = stepKey++
-                    picks.push(
-                      untraced(() =>
-                        Effect.suspend(() => {
-                          if (finalResult) {
-                            return Effect.unit()
-                          } else {
-                            return Effect.flatMap(Effect.either(te), (t) => {
-                              if (E.isRight(t)) {
-                                finalResult = PR.success(t.right)
-                              } else {
-                                es.push([nk, PR.unionMember(t.left)])
-                              }
+                      const nk = stepKey++
+                      picks2.push(
+                        untraced(() =>
+                          Effect.suspend(() => {
+                            if (state.finalResult.ref) {
                               return Effect.unit()
-                            })
-                          }
-                        })
+                            } else {
+                              return Effect.flatMap(Effect.either(te), (t) => {
+                                if (E.isRight(t)) {
+                                  state.finalResult.ref = PR.success(t.right)
+                                } else {
+                                  es.push([nk, PR.unionMember(t.left)])
+                                }
+                                return Effect.unit()
+                              })
+                            }
+                          })
+                        )
                       )
+                    }
+                  }
+                  // ---------------------------------------------
+                  // compute output
+                  // ---------------------------------------------
+                  if (picks2.length > 0) {
+                    return Effect.flatMap(
+                      Effect.collectAllDiscard(picks2),
+                      () => {
+                        if (state.finalResult.ref) {
+                          return state.finalResult.ref
+                        }
+                        return computeResult(state)
+                      }
                     )
                   }
+                  return computeResult(state)
                 }
-                // ---------------------------------------------
-                // compute output
-                // ---------------------------------------------
-                if (picks.length > 0) {
-                  Effect.flatMap(
-                    Effect.collectAllDiscard(picks),
-                    () => {
-                      if (finalResult) {
-                        return finalResult
-                      }
-                      return computeResult()
-                    }
-                  )
-                }
-                return computeResult()
-              }
-            )
+              )
+            })
           } else {
             // if none of the schemas with at least one property with a literal value succeeded,
             // proceed with those that have no literal at all
@@ -785,21 +833,22 @@ const go = I.memoize(untracedMethod(() =>
               } else {
                 const nk = stepKey++
                 picks.push(
-                  untraced(() =>
-                    Effect.suspend(() => {
-                      if (finalResult) {
-                        return Effect.unit()
-                      } else {
-                        return Effect.flatMap(Effect.either(te), (t) => {
-                          if (E.isRight(t)) {
-                            finalResult = PR.success(t.right)
-                          } else {
-                            es.push([nk, PR.unionMember(t.left)])
-                          }
+                  untracedMethod(() =>
+                    ({ es, finalResult }) =>
+                      Effect.suspend(() => {
+                        if (finalResult.ref) {
                           return Effect.unit()
-                        })
-                      }
-                    })
+                        } else {
+                          return Effect.flatMap(Effect.either(te), (t) => {
+                            if (E.isRight(t)) {
+                              finalResult.ref = PR.success(t.right)
+                            } else {
+                              es.push([nk, PR.unionMember(t.left)])
+                            }
+                            return Effect.unit()
+                          })
+                        }
+                      })
                   )
                 )
               }
@@ -808,17 +857,23 @@ const go = I.memoize(untracedMethod(() =>
             // compute output
             // ---------------------------------------------
             if (picks.length > 0) {
-              return Effect.flatMap(
-                Effect.collectAllDiscard(picks),
-                () => {
-                  if (finalResult) {
-                    return finalResult
-                  }
-                  return computeResult()
+              return Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  finalResult: { ref: finalResult.ref }
                 }
-              )
+                return Effect.flatMap(
+                  Effect.forEachDiscard(picks, (f) => f(state)),
+                  () => {
+                    if (state.finalResult.ref) {
+                      return state.finalResult.ref
+                    }
+                    return computeResult(state)
+                  }
+                )
+              })
             }
-            return computeResult()
+            return computeResult({ es, finalResult })
           }
         }
       }
