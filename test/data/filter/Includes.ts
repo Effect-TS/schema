@@ -19,11 +19,11 @@ describe.concurrent("includes", () => {
 
   it("Decoder", async () => {
     const schema = S.includes("a")(S.string)
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingSuccess(schema, "aa")
-    Util.expectDecodingSuccess(schema, "bac")
-    Util.expectDecodingSuccess(schema, "ba")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, "aa")
+    await Util.expectDecodingSuccess(schema, "bac")
+    await Util.expectDecodingSuccess(schema, "ba")
+    await Util.expectDecodingFailure(
       schema,
       "",
       `Expected a string including "a", actual ""`

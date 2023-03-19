@@ -19,13 +19,13 @@ describe.concurrent("finite", () => {
   })
 
   it("Decoder", async () => {
-    Util.expectDecodingSuccess(schema, 1)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, 1)
+    await Util.expectDecodingFailure(
       schema,
       Infinity,
       `Expected a finite number, actual Infinity`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       -Infinity,
       `Expected a finite number, actual -Infinity`

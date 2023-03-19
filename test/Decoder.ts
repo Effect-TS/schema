@@ -32,22 +32,22 @@ describe.concurrent("Decoder", () => {
 
   it("from", async () => {
     const schema = S.from(S.numberFromString(S.string))
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingFailure(schema, null, "Expected string, actual null")
-    Util.expectDecodingFailure(schema, 1, "Expected string, actual 1")
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingFailure(schema, null, "Expected string, actual null")
+    await Util.expectDecodingFailure(schema, 1, "Expected string, actual 1")
   })
 
   it("to", async () => {
     const schema = S.to(S.numberFromString(S.string))
-    Util.expectDecodingSuccess(schema, 1)
-    Util.expectDecodingFailure(schema, null, "Expected number, actual null")
-    Util.expectDecodingFailure(schema, "a", `Expected number, actual "a"`)
+    await Util.expectDecodingSuccess(schema, 1)
+    await Util.expectDecodingFailure(schema, null, "Expected number, actual null")
+    await Util.expectDecodingFailure(schema, "a", `Expected number, actual "a"`)
   })
 
   it("reverse", async () => {
     const schema = pipe(S.string, S.numberFromString, S.positive(), S.reverse)
-    Util.expectDecodingSuccess(schema, 1, "1")
-    Util.expectDecodingFailure(schema, -1, "Expected a positive number, actual -1")
+    await Util.expectDecodingSuccess(schema, 1, "1")
+    await Util.expectDecodingFailure(schema, -1, "Expected a positive number, actual -1")
   })
 
   it("annotations/message refinement", async () => {
@@ -62,67 +62,67 @@ describe.concurrent("Decoder", () => {
       S.maxLength(10, { message: (s) => `${s} is too long` })
     )
 
-    Util.expectDecodingFailure(schema, null, "not a string")
-    Util.expectDecodingFailure(schema, "", "required")
-    Util.expectDecodingSuccess(schema, "a", "a")
-    Util.expectDecodingFailure(schema, "aaaaaaaaaaaaaa", "aaaaaaaaaaaaaa is too long")
+    await Util.expectDecodingFailure(schema, null, "not a string")
+    await Util.expectDecodingFailure(schema, "", "required")
+    await Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingFailure(schema, "aaaaaaaaaaaaaa", "aaaaaaaaaaaaaa is too long")
   })
 
   it("void", async () => {
     const schema = S.void
-    Util.expectDecodingSuccess(schema, undefined, undefined)
-    Util.expectDecodingFailure(schema, 1, `Expected void, actual 1`)
+    await Util.expectDecodingSuccess(schema, undefined, undefined)
+    await Util.expectDecodingFailure(schema, 1, `Expected void, actual 1`)
   })
 
   it("any", async () => {
     const schema = S.any
-    Util.expectDecodingSuccess(schema, undefined, undefined)
-    Util.expectDecodingSuccess(schema, null, null)
-    Util.expectDecodingSuccess(schema, "a", "a")
-    Util.expectDecodingSuccess(schema, 1, 1)
-    Util.expectDecodingSuccess(schema, true, true)
-    Util.expectDecodingSuccess(schema, [], [])
-    Util.expectDecodingSuccess(schema, {}, {})
+    await Util.expectDecodingSuccess(schema, undefined, undefined)
+    await Util.expectDecodingSuccess(schema, null, null)
+    await Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingSuccess(schema, 1, 1)
+    await Util.expectDecodingSuccess(schema, true, true)
+    await Util.expectDecodingSuccess(schema, [], [])
+    await Util.expectDecodingSuccess(schema, {}, {})
   })
 
   it("unknown", async () => {
     const schema = S.unknown
-    Util.expectDecodingSuccess(schema, undefined, undefined)
-    Util.expectDecodingSuccess(schema, null, null)
-    Util.expectDecodingSuccess(schema, "a", "a")
-    Util.expectDecodingSuccess(schema, 1, 1)
-    Util.expectDecodingSuccess(schema, true, true)
-    Util.expectDecodingSuccess(schema, [], [])
-    Util.expectDecodingSuccess(schema, {}, {})
+    await Util.expectDecodingSuccess(schema, undefined, undefined)
+    await Util.expectDecodingSuccess(schema, null, null)
+    await Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingSuccess(schema, 1, 1)
+    await Util.expectDecodingSuccess(schema, true, true)
+    await Util.expectDecodingSuccess(schema, [], [])
+    await Util.expectDecodingSuccess(schema, {}, {})
   })
 
   it("templateLiteral. a", async () => {
     const schema = S.templateLiteral(S.literal("a"))
-    Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingSuccess(schema, "a", "a")
 
-    Util.expectDecodingFailure(schema, "ab", `Expected "a", actual "ab"`)
-    Util.expectDecodingFailure(schema, "", `Expected "a", actual ""`)
-    Util.expectDecodingFailure(schema, null, `Expected "a", actual null`)
+    await Util.expectDecodingFailure(schema, "ab", `Expected "a", actual "ab"`)
+    await Util.expectDecodingFailure(schema, "", `Expected "a", actual ""`)
+    await Util.expectDecodingFailure(schema, null, `Expected "a", actual null`)
   })
 
   it("templateLiteral. a b", async () => {
     const schema = S.templateLiteral(S.literal("a"), S.literal(" "), S.literal("b"))
-    Util.expectDecodingSuccess(schema, "a b", "a b")
+    await Util.expectDecodingSuccess(schema, "a b", "a b")
 
-    Util.expectDecodingFailure(schema, "a  b", `Expected "a b", actual "a  b"`)
+    await Util.expectDecodingFailure(schema, "a  b", `Expected "a b", actual "a  b"`)
   })
 
   it("templateLiteral. a${string}", async () => {
     const schema = S.templateLiteral(S.literal("a"), S.string)
-    Util.expectDecodingSuccess(schema, "a", "a")
-    Util.expectDecodingSuccess(schema, "ab", "ab")
+    await Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingSuccess(schema, "ab", "ab")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       "Expected a${string}, actual null"
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "",
       "Expected a${string}, actual \"\""
@@ -131,20 +131,20 @@ describe.concurrent("Decoder", () => {
 
   it("templateLiteral. a${number}", async () => {
     const schema = S.templateLiteral(S.literal("a"), S.number)
-    Util.expectDecodingSuccess(schema, "a1", "a1")
-    Util.expectDecodingSuccess(schema, "a1.2", "a1.2")
+    await Util.expectDecodingSuccess(schema, "a1", "a1")
+    await Util.expectDecodingSuccess(schema, "a1.2", "a1.2")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       "Expected a${number}, actual null"
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "",
       "Expected a${number}, actual \"\""
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "aa",
       "Expected a${number}, actual \"aa\""
@@ -153,27 +153,27 @@ describe.concurrent("Decoder", () => {
 
   it("templateLiteral. ${string}", async () => {
     const schema = S.templateLiteral(S.string)
-    Util.expectDecodingSuccess(schema, "a", "a")
-    Util.expectDecodingSuccess(schema, "ab", "ab")
-    Util.expectDecodingSuccess(schema, "", "")
+    await Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingSuccess(schema, "ab", "ab")
+    await Util.expectDecodingSuccess(schema, "", "")
   })
 
   it("templateLiteral. a${string}b", async () => {
     const schema = S.templateLiteral(S.literal("a"), S.string, S.literal("b"))
-    Util.expectDecodingSuccess(schema, "ab", "ab")
-    Util.expectDecodingSuccess(schema, "acb", "acb")
-    Util.expectDecodingSuccess(schema, "abb", "abb")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, "ab", "ab")
+    await Util.expectDecodingSuccess(schema, "acb", "acb")
+    await Util.expectDecodingSuccess(schema, "abb", "abb")
+    await Util.expectDecodingFailure(
       schema,
       "",
       "Expected a${string}b, actual \"\""
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "a",
       "Expected a${string}b, actual \"a\""
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "b",
       "Expected a${string}b, actual \"b\""
@@ -182,16 +182,16 @@ describe.concurrent("Decoder", () => {
 
   it("templateLiteral. a${string}b${string}", async () => {
     const schema = S.templateLiteral(S.literal("a"), S.string, S.literal("b"), S.string)
-    Util.expectDecodingSuccess(schema, "ab", "ab")
-    Util.expectDecodingSuccess(schema, "acb", "acb")
-    Util.expectDecodingSuccess(schema, "acbd", "acbd")
+    await Util.expectDecodingSuccess(schema, "ab", "ab")
+    await Util.expectDecodingSuccess(schema, "acb", "acb")
+    await Util.expectDecodingSuccess(schema, "acbd", "acbd")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "a",
       "Expected a${string}b${string}, actual \"a\""
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "b",
       "Expected a${string}b${string}, actual \"b\""
@@ -202,12 +202,12 @@ describe.concurrent("Decoder", () => {
     const EmailLocaleIDs = S.literal("welcome_email", "email_heading")
     const FooterLocaleIDs = S.literal("footer_title", "footer_sendoff")
     const schema = S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"))
-    Util.expectDecodingSuccess(schema, "welcome_email_id", "welcome_email_id")
-    Util.expectDecodingSuccess(schema, "email_heading_id", "email_heading_id")
-    Util.expectDecodingSuccess(schema, "footer_title_id", "footer_title_id")
-    Util.expectDecodingSuccess(schema, "footer_sendoff_id", "footer_sendoff_id")
+    await Util.expectDecodingSuccess(schema, "welcome_email_id", "welcome_email_id")
+    await Util.expectDecodingSuccess(schema, "email_heading_id", "email_heading_id")
+    await Util.expectDecodingSuccess(schema, "footer_title_id", "footer_title_id")
+    await Util.expectDecodingSuccess(schema, "footer_sendoff_id", "footer_sendoff_id")
 
-    Util.expectDecodingFailureTree(
+    await Util.expectDecodingFailureTree(
       schema,
       "_id",
       `error(s) found
@@ -224,42 +224,42 @@ describe.concurrent("Decoder", () => {
 
   it("never", async () => {
     const schema = S.never
-    Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")
+    await Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")
   })
 
   it("string", async () => {
     const schema = S.string
-    Util.expectDecodingSuccess(schema, "a", "a")
-    Util.expectDecodingFailure(schema, 1, "Expected string, actual 1")
+    await Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingFailure(schema, 1, "Expected string, actual 1")
   })
 
   it("number", async () => {
     const schema = S.number
-    Util.expectDecodingSuccess(schema, 1, 1)
-    Util.expectDecodingSuccess(schema, NaN, NaN)
-    Util.expectDecodingSuccess(schema, Infinity, Infinity)
-    Util.expectDecodingSuccess(schema, -Infinity, -Infinity)
-    Util.expectDecodingFailure(schema, "a", `Expected number, actual "a"`)
+    await Util.expectDecodingSuccess(schema, 1, 1)
+    await Util.expectDecodingSuccess(schema, NaN, NaN)
+    await Util.expectDecodingSuccess(schema, Infinity, Infinity)
+    await Util.expectDecodingSuccess(schema, -Infinity, -Infinity)
+    await Util.expectDecodingFailure(schema, "a", `Expected number, actual "a"`)
   })
 
   it("boolean", async () => {
     const schema = S.boolean
-    Util.expectDecodingSuccess(schema, true, true)
-    Util.expectDecodingSuccess(schema, false, false)
-    Util.expectDecodingFailure(schema, 1, `Expected boolean, actual 1`)
+    await Util.expectDecodingSuccess(schema, true, true)
+    await Util.expectDecodingSuccess(schema, false, false)
+    await Util.expectDecodingFailure(schema, 1, `Expected boolean, actual 1`)
   })
 
   it("bigint", async () => {
     const schema = S.bigint
-    Util.expectDecodingSuccess(schema, 0n, 0n)
-    Util.expectDecodingSuccess(schema, 1n, 1n)
+    await Util.expectDecodingSuccess(schema, 0n, 0n)
+    await Util.expectDecodingSuccess(schema, 1n, 1n)
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       "Expected bigint, actual null"
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       1.2,
       `Expected bigint, actual 1.2`
@@ -269,8 +269,8 @@ describe.concurrent("Decoder", () => {
   it("symbol", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const schema = S.symbol
-    Util.expectDecodingSuccess(schema, a)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, a)
+    await Util.expectDecodingFailure(
       schema,
       "@effect/schema/test/a",
       `Expected symbol, actual "@effect/schema/test/a"`
@@ -279,28 +279,28 @@ describe.concurrent("Decoder", () => {
 
   it("object", async () => {
     const schema = S.object
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingFailure(schema, null, `Expected object, actual null`)
-    Util.expectDecodingFailure(schema, "a", `Expected object, actual "a"`)
-    Util.expectDecodingFailure(schema, 1, `Expected object, actual 1`)
-    Util.expectDecodingFailure(schema, true, `Expected object, actual true`)
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingFailure(schema, null, `Expected object, actual null`)
+    await Util.expectDecodingFailure(schema, "a", `Expected object, actual "a"`)
+    await Util.expectDecodingFailure(schema, 1, `Expected object, actual 1`)
+    await Util.expectDecodingFailure(schema, true, `Expected object, actual true`)
   })
 
   it("literal 1 member", async () => {
     const schema = S.literal(1)
-    Util.expectDecodingSuccess(schema, 1)
+    await Util.expectDecodingSuccess(schema, 1)
 
-    Util.expectDecodingFailure(schema, "a", `Expected 1, actual "a"`)
-    Util.expectDecodingFailure(schema, null, `Expected 1, actual null`)
+    await Util.expectDecodingFailure(schema, "a", `Expected 1, actual "a"`)
+    await Util.expectDecodingFailure(schema, null, `Expected 1, actual null`)
   })
 
   it("literal 2 members", async () => {
     const schema = S.literal(1, "a")
-    Util.expectDecodingSuccess(schema, 1)
-    Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, 1)
+    await Util.expectDecodingSuccess(schema, "a")
 
-    Util.expectDecodingFailureTree(
+    await Util.expectDecodingFailureTree(
       schema,
       null,
       `error(s) found
@@ -314,9 +314,9 @@ describe.concurrent("Decoder", () => {
   it("uniqueSymbol", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const schema = S.uniqueSymbol(a)
-    Util.expectDecodingSuccess(schema, a)
-    Util.expectDecodingSuccess(schema, Symbol.for("@effect/schema/test/a"))
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, a)
+    await Util.expectDecodingSuccess(schema, Symbol.for("@effect/schema/test/a"))
+    await Util.expectDecodingFailure(
       schema,
       "Symbol(@effect/schema/test/a)",
       `Expected Symbol(@effect/schema/test/a), actual "Symbol(@effect/schema/test/a)"`
@@ -329,12 +329,12 @@ describe.concurrent("Decoder", () => {
       Banana
     }
     const schema = S.enums(Fruits)
-    Util.expectDecodingSuccess(schema, Fruits.Apple)
-    Util.expectDecodingSuccess(schema, Fruits.Banana)
-    Util.expectDecodingSuccess(schema, 0)
-    Util.expectDecodingSuccess(schema, 1)
+    await Util.expectDecodingSuccess(schema, Fruits.Apple)
+    await Util.expectDecodingSuccess(schema, Fruits.Banana)
+    await Util.expectDecodingSuccess(schema, 0)
+    await Util.expectDecodingSuccess(schema, 1)
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       3,
       `Expected 0 | 1, actual 3`
@@ -348,13 +348,13 @@ describe.concurrent("Decoder", () => {
       Cantaloupe = 0
     }
     const schema = S.enums(Fruits)
-    Util.expectDecodingSuccess(schema, Fruits.Apple)
-    Util.expectDecodingSuccess(schema, Fruits.Cantaloupe)
-    Util.expectDecodingSuccess(schema, "apple")
-    Util.expectDecodingSuccess(schema, "banana")
-    Util.expectDecodingSuccess(schema, 0)
+    await Util.expectDecodingSuccess(schema, Fruits.Apple)
+    await Util.expectDecodingSuccess(schema, Fruits.Cantaloupe)
+    await Util.expectDecodingSuccess(schema, "apple")
+    await Util.expectDecodingSuccess(schema, "banana")
+    await Util.expectDecodingSuccess(schema, 0)
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "Cantaloupe",
       `Expected 0 | 1 | 2, actual "Cantaloupe"`
@@ -368,11 +368,11 @@ describe.concurrent("Decoder", () => {
       Cantaloupe: 3
     } as const
     const schema = S.enums(Fruits)
-    Util.expectDecodingSuccess(schema, "apple")
-    Util.expectDecodingSuccess(schema, "banana")
-    Util.expectDecodingSuccess(schema, 3)
+    await Util.expectDecodingSuccess(schema, "apple")
+    await Util.expectDecodingSuccess(schema, "banana")
+    await Util.expectDecodingSuccess(schema, 3)
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "Cantaloupe",
       `Expected 0 | 1 | 2, actual "Cantaloupe"`
@@ -381,162 +381,166 @@ describe.concurrent("Decoder", () => {
 
   it("tuple. empty", async () => {
     const schema = S.tuple()
-    Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, [])
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous tuple or array schema>, actual null`
     )
-    Util.expectDecodingFailure(schema, {}, `Expected <anonymous tuple or array schema>, actual {}`)
-    Util.expectDecodingFailure(schema, [undefined], `/0 is unexpected`)
-    Util.expectDecodingFailure(schema, [1], `/0 is unexpected`)
+    await Util.expectDecodingFailure(
+      schema,
+      {},
+      `Expected <anonymous tuple or array schema>, actual {}`
+    )
+    await Util.expectDecodingFailure(schema, [undefined], `/0 is unexpected`)
+    await Util.expectDecodingFailure(schema, [1], `/0 is unexpected`)
   })
 
   it("tuple. required element", async () => {
     const schema = S.tuple(S.number)
-    Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, [1])
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous tuple or array schema>, actual null`
     )
-    Util.expectDecodingFailure(schema, [], `/0 is missing`)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, [], `/0 is missing`)
+    await Util.expectDecodingFailure(
       schema,
       [undefined],
       `/0 Expected number, actual undefined`
     )
-    Util.expectDecodingFailure(schema, ["a"], `/0 Expected number, actual "a"`)
-    Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
+    await Util.expectDecodingFailure(schema, ["a"], `/0 Expected number, actual "a"`)
+    await Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
   })
 
   it("tuple. required element with undefined", async () => {
     const schema = S.tuple(S.union(S.number, S.undefined))
-    Util.expectDecodingSuccess(schema, [1])
-    Util.expectDecodingSuccess(schema, [undefined])
+    await Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, [undefined])
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous tuple or array schema>, actual null`
     )
-    Util.expectDecodingFailure(schema, [], `/0 is missing`)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, [], `/0 is missing`)
+    await Util.expectDecodingFailure(
       schema,
       ["a"],
       `/0 union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
     )
-    Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
+    await Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
   })
 
   it("tuple. optional element", async () => {
     const schema = pipe(S.tuple(), S.optionalElement(S.number))
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, [1])
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous tuple or array schema>, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       ["a"],
       `/0 Expected number, actual "a"`
     )
-    Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
+    await Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
   })
 
   it("tuple. optional element with undefined", async () => {
     const schema = pipe(S.tuple(), S.optionalElement(S.union(S.number, S.undefined)))
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingSuccess(schema, [1])
-    Util.expectDecodingSuccess(schema, [undefined])
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, [undefined])
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous tuple or array schema>, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       ["a"],
       `/0 union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
     )
-    Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
+    await Util.expectDecodingFailure(schema, [1, "b"], `/1 is unexpected`)
   })
 
   it("tuple. e e?", async () => {
     const schema = pipe(S.tuple(S.string), S.optionalElement(S.number))
-    Util.expectDecodingSuccess(schema, ["a"])
-    Util.expectDecodingSuccess(schema, ["a", 1])
+    await Util.expectDecodingSuccess(schema, ["a"])
+    await Util.expectDecodingSuccess(schema, ["a", 1])
 
-    Util.expectDecodingFailure(schema, [1], `/0 Expected string, actual 1`)
-    Util.expectDecodingFailure(schema, ["a", "b"], `/1 Expected number, actual "b"`)
+    await Util.expectDecodingFailure(schema, [1], `/0 Expected string, actual 1`)
+    await Util.expectDecodingFailure(schema, ["a", "b"], `/1 Expected number, actual "b"`)
   })
 
   it("tuple. e r", async () => {
     const schema = pipe(S.tuple(S.string), S.rest(S.number))
-    Util.expectDecodingSuccess(schema, ["a"])
-    Util.expectDecodingSuccess(schema, ["a", 1])
-    Util.expectDecodingSuccess(schema, ["a", 1, 2])
+    await Util.expectDecodingSuccess(schema, ["a"])
+    await Util.expectDecodingSuccess(schema, ["a", 1])
+    await Util.expectDecodingSuccess(schema, ["a", 1, 2])
 
-    Util.expectDecodingFailure(schema, [], `/0 is missing`)
+    await Util.expectDecodingFailure(schema, [], `/0 is missing`)
   })
 
   it("tuple. e? r", async () => {
     const schema = pipe(S.tuple(), S.optionalElement(S.string), S.rest(S.number))
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingSuccess(schema, ["a"])
-    Util.expectDecodingSuccess(schema, ["a", 1])
-    Util.expectDecodingSuccess(schema, ["a", 1, 2])
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, ["a"])
+    await Util.expectDecodingSuccess(schema, ["a", 1])
+    await Util.expectDecodingSuccess(schema, ["a", 1, 2])
 
-    Util.expectDecodingFailure(schema, [1], `/0 Expected string, actual 1`)
+    await Util.expectDecodingFailure(schema, [1], `/0 Expected string, actual 1`)
   })
 
   it("tuple. r", async () => {
     const schema = S.array(S.number)
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingSuccess(schema, [1])
-    Util.expectDecodingSuccess(schema, [1, 2])
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, [1, 2])
 
-    Util.expectDecodingFailure(schema, ["a"], `/0 Expected number, actual "a"`)
-    Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
+    await Util.expectDecodingFailure(schema, ["a"], `/0 Expected number, actual "a"`)
+    await Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })
 
   it("tuple. r e", async () => {
     const schema = pipe(S.array(S.string), S.element(S.number))
-    Util.expectDecodingSuccess(schema, [1])
-    Util.expectDecodingSuccess(schema, ["a", 1])
-    Util.expectDecodingSuccess(schema, ["a", "b", 1])
+    await Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, ["a", 1])
+    await Util.expectDecodingSuccess(schema, ["a", "b", 1])
 
-    Util.expectDecodingFailure(schema, [], `/0 is missing`)
-    Util.expectDecodingFailure(schema, ["a"], `/0 Expected number, actual "a"`)
-    Util.expectDecodingFailure(schema, [1, 2], `/0 Expected string, actual 1`)
+    await Util.expectDecodingFailure(schema, [], `/0 is missing`)
+    await Util.expectDecodingFailure(schema, ["a"], `/0 Expected number, actual "a"`)
+    await Util.expectDecodingFailure(schema, [1, 2], `/0 Expected string, actual 1`)
   })
 
   it("tuple. e r e", async () => {
     const schema = pipe(S.tuple(S.string), S.rest(S.number), S.element(S.boolean))
-    Util.expectDecodingSuccess(schema, ["a", true])
-    Util.expectDecodingSuccess(schema, ["a", 1, true])
-    Util.expectDecodingSuccess(schema, ["a", 1, 2, true])
+    await Util.expectDecodingSuccess(schema, ["a", true])
+    await Util.expectDecodingSuccess(schema, ["a", 1, true])
+    await Util.expectDecodingSuccess(schema, ["a", 1, 2, true])
 
-    Util.expectDecodingFailure(schema, [], `/0 is missing`)
-    Util.expectDecodingFailure(schema, ["a"], `/1 is missing`)
-    Util.expectDecodingFailure(schema, [true], `/0 Expected string, actual true`)
-    Util.expectDecodingFailure(schema, ["a", 1], `/1 Expected boolean, actual 1`)
-    Util.expectDecodingFailure(schema, [1, true], `/0 Expected string, actual 1`)
+    await Util.expectDecodingFailure(schema, [], `/0 is missing`)
+    await Util.expectDecodingFailure(schema, ["a"], `/1 is missing`)
+    await Util.expectDecodingFailure(schema, [true], `/0 Expected string, actual true`)
+    await Util.expectDecodingFailure(schema, ["a", 1], `/1 Expected boolean, actual 1`)
+    await Util.expectDecodingFailure(schema, [1, true], `/0 Expected string, actual 1`)
   })
 
   it("struct/empty", async () => {
     const schema = S.struct({})
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { a: 1 })
-    Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, [])
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous type literal schema>, actual null`
@@ -545,86 +549,86 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ required property signature", async () => {
     const schema = S.struct({ a: S.number })
-    Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, { a: 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous type literal schema>, actual null`
     )
-    Util.expectDecodingFailure(schema, {}, "/a is missing")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, {}, "/a is missing")
+    await Util.expectDecodingFailure(
       schema,
       { a: undefined },
       "/a Expected number, actual undefined"
     )
-    Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
   })
 
   it("struct/ required property signature with undefined", async () => {
     const schema = S.struct({ a: S.union(S.number, S.undefined) })
-    Util.expectDecodingSuccess(schema, { a: 1 })
-    Util.expectDecodingSuccess(schema, { a: undefined })
+    await Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, { a: undefined })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous type literal schema>, actual null`
     )
-    Util.expectDecodingFailure(schema, {}, "/a is missing")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, {}, "/a is missing")
+    await Util.expectDecodingFailure(
       schema,
       { a: "a" },
       `/a union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
     )
-    Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
   })
 
   it("struct/ optional property signature", async () => {
     const schema = S.struct({ a: S.optional(S.number) })
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { a: 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous type literal schema>, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "a" },
       `/a Expected number, actual "a"`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: undefined },
       `/a Expected number, actual undefined`
     )
-    Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
   })
 
   it("struct/ optional property signature with undefined", async () => {
     const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { a: 1 })
-    Util.expectDecodingSuccess(schema, { a: undefined })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, { a: undefined })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous type literal schema>, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "a" },
       `/a union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
     )
-    Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectDecodingFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
   })
 
   it("struct/ should not add optional keys", async () => {
     const schema = S.partial(S.struct({ a: S.string, b: S.number }))
-    Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, {})
   })
 
   it("struct/extend record(string, string)", async () => {
@@ -632,13 +636,13 @@ describe.concurrent("Decoder", () => {
       S.struct({ a: S.string }),
       S.extend(S.record(S.string, S.string))
     )
-    Util.expectDecodingSuccess(schema, { a: "a" })
-    Util.expectDecodingSuccess(schema, { a: "a", b: "b" })
+    await Util.expectDecodingSuccess(schema, { a: "a" })
+    await Util.expectDecodingSuccess(schema, { a: "a", b: "b" })
 
-    Util.expectDecodingFailure(schema, {}, "/a is missing")
-    Util.expectDecodingFailure(schema, { b: "b" }, "/a is missing")
-    Util.expectDecodingFailure(schema, { a: 1 }, "/a Expected string, actual 1")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, {}, "/a is missing")
+    await Util.expectDecodingFailure(schema, { b: "b" }, "/a is missing")
+    await Util.expectDecodingFailure(schema, { a: 1 }, "/a Expected string, actual 1")
+    await Util.expectDecodingFailure(
       schema,
       { a: "a", b: 1 },
       "/b Expected string, actual 1"
@@ -647,15 +651,15 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ record(string, number)", async () => {
     const schema = S.record(S.string, S.number)
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { a: 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       [],
       "Expected <anonymous type literal schema>, actual []"
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "a" },
       `/a Expected number, actual "a"`
@@ -665,15 +669,15 @@ describe.concurrent("Decoder", () => {
   it("struct/ record(symbol, number)", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const schema = S.record(S.symbol, S.number)
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { [a]: 1 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { [a]: 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       [],
       "Expected <anonymous type literal schema>, actual []"
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { [a]: "a" },
       `/Symbol(@effect/schema/test/a) Expected number, actual "a"`
@@ -682,27 +686,27 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ record(never, number)", async () => {
     const schema = S.record(S.never, S.number)
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { a: 1 })
   })
 
   it("struct/ record('a' | 'b', number)", async () => {
     const schema = S.record(S.union(S.literal("a"), S.literal("b")), S.number)
-    Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
+    await Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
 
-    Util.expectDecodingFailure(schema, {}, `/a is missing`)
-    Util.expectDecodingFailure(schema, { a: 1 }, `/b is missing`)
-    Util.expectDecodingFailure(schema, { b: 2 }, `/a is missing`)
+    await Util.expectDecodingFailure(schema, {}, `/a is missing`)
+    await Util.expectDecodingFailure(schema, { a: 1 }, `/b is missing`)
+    await Util.expectDecodingFailure(schema, { b: 2 }, `/a is missing`)
   })
 
   it("struct/ record(keyof struct({ a, b }), number)", async () => {
     const schema = S.record(S.keyof(S.struct({ a: S.string, b: S.string })), S.number)
-    Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
+    await Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
 
-    Util.expectDecodingFailure(schema, {}, `/a is missing`)
-    Util.expectDecodingFailure(schema, { a: 1 }, `/b is missing`)
-    Util.expectDecodingFailure(schema, { b: 2 }, `/a is missing`)
-    Util.expectDecodingFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectDecodingFailure(schema, {}, `/a is missing`)
+    await Util.expectDecodingFailure(schema, { a: 1 }, `/b is missing`)
+    await Util.expectDecodingFailure(schema, { b: 2 }, `/a is missing`)
+    await Util.expectDecodingFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
   })
 
   it("struct/ record(keyof struct({ a, b } & Record<string, string>), number)", async () => {
@@ -710,12 +714,12 @@ describe.concurrent("Decoder", () => {
       S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.string, S.string)))),
       S.number
     )
-    Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { a: 1 })
-    Util.expectDecodingSuccess(schema, { b: 2 })
+    await Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, { b: 2 })
 
-    Util.expectDecodingFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectDecodingFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
   })
 
   it("struct/ record(keyof struct({ a, b } & Record<symbol, string>), number)", async () => {
@@ -723,15 +727,15 @@ describe.concurrent("Decoder", () => {
       S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.symbol, S.string)))),
       S.number
     )
-    Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
+    await Util.expectDecodingSuccess(schema, { a: 1, b: 2 })
     const c = Symbol.for("@effect/schema/test/c")
-    Util.expectDecodingSuccess(schema, { a: 1, b: 2, [c]: 3 })
+    await Util.expectDecodingSuccess(schema, { a: 1, b: 2, [c]: 3 })
 
-    Util.expectDecodingFailure(schema, {}, `/a is missing`)
-    Util.expectDecodingFailure(schema, { a: 1 }, `/b is missing`)
-    Util.expectDecodingFailure(schema, { b: 2 }, `/a is missing`)
-    Util.expectDecodingFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, {}, `/a is missing`)
+    await Util.expectDecodingFailure(schema, { a: 1 }, `/b is missing`)
+    await Util.expectDecodingFailure(schema, { b: 2 }, `/a is missing`)
+    await Util.expectDecodingFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectDecodingFailure(
       schema,
       { a: 1, b: 2, [c]: "c" },
       `/Symbol(@effect/schema/test/c) Expected number, actual "c"`
@@ -742,15 +746,15 @@ describe.concurrent("Decoder", () => {
     const a = Symbol.for("@effect/schema/test/a")
     const b = Symbol.for("@effect/schema/test/b")
     const schema = S.record(S.union(S.uniqueSymbol(a), S.uniqueSymbol(b)), S.number)
-    Util.expectDecodingSuccess(schema, { [a]: 1, [b]: 2 })
+    await Util.expectDecodingSuccess(schema, { [a]: 1, [b]: 2 })
 
-    Util.expectDecodingFailure(schema, {}, `/Symbol(@effect/schema/test/a) is missing`)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, {}, `/Symbol(@effect/schema/test/a) is missing`)
+    await Util.expectDecodingFailure(
       schema,
       { [a]: 1 },
       `/Symbol(@effect/schema/test/b) is missing`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { [b]: 2 },
       `/Symbol(@effect/schema/test/a) is missing`
@@ -759,18 +763,18 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ record(${string}-${string}, number)", async () => {
     const schema = S.record(S.templateLiteral(S.string, S.literal("-"), S.string), S.number)
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { "-": 1 })
-    Util.expectDecodingSuccess(schema, { "a-": 1 })
-    Util.expectDecodingSuccess(schema, { "-b": 1 })
-    Util.expectDecodingSuccess(schema, { "a-b": 1 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { "-": 1 })
+    await Util.expectDecodingSuccess(schema, { "a-": 1 })
+    await Util.expectDecodingSuccess(schema, { "-b": 1 })
+    await Util.expectDecodingSuccess(schema, { "a-b": 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { "": 1 },
       "/ Expected ${string}-${string}, actual \"\""
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { "-": "a" },
       `/- Expected number, actual "a"`
@@ -779,16 +783,16 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ record(minLength(1), number)", async () => {
     const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { "aa": 1 })
-    Util.expectDecodingSuccess(schema, { "aaa": 1 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { "aa": 1 })
+    await Util.expectDecodingSuccess(schema, { "aaa": 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { "": 1 },
       `/ Expected a string at least 2 character(s) long, actual ""`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { "a": 1 },
       `/a Expected a string at least 2 character(s) long, actual "a"`
@@ -797,7 +801,7 @@ describe.concurrent("Decoder", () => {
 
   it("union/ empty union", async () => {
     const schema = S.union()
-    Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")
+    await Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")
   })
 
   it("union/ members with literals but the input doesn't have any", async () => {
@@ -805,14 +809,18 @@ describe.concurrent("Decoder", () => {
       S.struct({ a: S.literal(1), c: S.string }),
       S.struct({ b: S.literal(2), d: S.number })
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       "Expected <anonymous type literal schema>, actual null"
     )
-    Util.expectDecodingFailure(schema, {}, "/a is missing, /b is missing")
-    Util.expectDecodingFailure(schema, { a: null }, `/a Expected 1, actual null, /b is missing`)
-    Util.expectDecodingFailure(schema, { b: 3 }, `/a is missing, /b Expected 2, actual 3`)
+    await Util.expectDecodingFailure(schema, {}, "/a is missing, /b is missing")
+    await Util.expectDecodingFailure(
+      schema,
+      { a: null },
+      `/a Expected 1, actual null, /b is missing`
+    )
+    await Util.expectDecodingFailure(schema, { b: 3 }, `/a is missing, /b Expected 2, actual 3`)
   })
 
   it("union/ members with multiple tags", async () => {
@@ -821,18 +829,18 @@ describe.concurrent("Decoder", () => {
       S.struct({ category: S.literal("catA"), tag: S.literal("b") }),
       S.struct({ category: S.literal("catA"), tag: S.literal("c") })
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       "Expected <anonymous type literal schema>, actual null"
     )
-    Util.expectDecodingFailure(schema, {}, "/category is missing, /tag is missing")
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, {}, "/category is missing, /tag is missing")
+    await Util.expectDecodingFailure(
       schema,
       { category: null },
       `/category Expected "catA", actual null, /tag is missing`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { tag: "d" },
       `/category is missing, /tag Expected "b" or "c", actual "d"`
@@ -843,14 +851,14 @@ describe.concurrent("Decoder", () => {
     const a = S.struct({ a: S.string })
     const ab = S.struct({ a: S.string, b: S.number })
     const schema = S.union(a, ab)
-    Util.expectDecodingSuccess(schema, { a: "a", b: 1 })
+    await Util.expectDecodingSuccess(schema, { a: "a", b: 1 })
   })
 
   it("union/optional property signatures: should return the best output", async () => {
     const ab = S.struct({ a: S.string, b: S.optional(S.number) })
     const ac = S.struct({ a: S.string, c: S.optional(S.number) })
     const schema = S.union(ab, ac)
-    Util.expectDecodingSuccess(schema, { a: "a", c: 1 })
+    await Util.expectDecodingSuccess(schema, { a: "a", c: 1 })
   })
 
   it("lazy/ baseline", async () => {
@@ -865,20 +873,20 @@ describe.concurrent("Decoder", () => {
       })
     )
 
-    Util.expectDecodingSuccess(schema, { a: "a1", as: [] })
-    Util.expectDecodingSuccess(schema, { a: "a1", as: [{ a: "a2", as: [] }] })
+    await Util.expectDecodingSuccess(schema, { a: "a1", as: [] })
+    await Util.expectDecodingSuccess(schema, { a: "a1", as: [{ a: "a2", as: [] }] })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous type literal schema>, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "a1" },
       `/as is missing`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "a1", as: [{ a: "a2", as: [1] }] },
       "/as /0 /as /0 Expected <anonymous type literal schema>, actual 1"
@@ -938,15 +946,15 @@ describe.concurrent("Decoder", () => {
       }
     }
 
-    Util.expectDecodingSuccess(Operation, input)
+    await Util.expectDecodingSuccess(Operation, input)
   })
 
   it("partial/ struct", async () => {
     const schema = S.partial(S.struct({ a: S.number }))
-    Util.expectDecodingSuccess(schema, {})
-    Util.expectDecodingSuccess(schema, { a: 1 })
+    await Util.expectDecodingSuccess(schema, {})
+    await Util.expectDecodingSuccess(schema, { a: 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: undefined },
       `/a Expected number, actual undefined`
@@ -955,18 +963,18 @@ describe.concurrent("Decoder", () => {
 
   it("partial/ tuple", async () => {
     const schema = S.partial(S.tuple(S.string, S.number))
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingSuccess(schema, ["a"])
-    Util.expectDecodingSuccess(schema, ["a", 1])
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, ["a"])
+    await Util.expectDecodingSuccess(schema, ["a", 1])
   })
 
   it("partial/ array", async () => {
     const schema = S.partial(S.array(S.number))
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingSuccess(schema, [1])
-    Util.expectDecodingSuccess(schema, [undefined])
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, [undefined])
 
-    Util.expectDecodingFailureTree(
+    await Util.expectDecodingFailureTree(
       schema,
       ["a"],
       `error(s) found
@@ -980,12 +988,12 @@ describe.concurrent("Decoder", () => {
 
   it("partial/ union", async () => {
     const schema = S.partial(S.union(S.string, S.array(S.number)))
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingSuccess(schema, [])
-    Util.expectDecodingSuccess(schema, [1])
-    Util.expectDecodingSuccess(schema, [undefined])
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, [])
+    await Util.expectDecodingSuccess(schema, [1])
+    await Util.expectDecodingSuccess(schema, [undefined])
 
-    Util.expectDecodingFailureTree(
+    await Util.expectDecodingFailureTree(
       schema,
       ["a"],
       `error(s) found
@@ -1003,30 +1011,30 @@ describe.concurrent("Decoder", () => {
   it("omit/ baseline", async () => {
     const base = S.struct({ a: S.string, b: S.number, c: S.boolean })
     const schema = pipe(base, S.omit("c"))
-    Util.expectDecodingSuccess(schema, { a: "a", b: 1 })
+    await Util.expectDecodingSuccess(schema, { a: "a", b: 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       "Expected <anonymous type literal schema>, actual null"
     )
-    Util.expectDecodingFailure(schema, { a: "a" }, `/b is missing`)
-    Util.expectDecodingFailure(schema, { b: 1 }, "/a is missing")
+    await Util.expectDecodingFailure(schema, { a: "a" }, `/b is missing`)
+    await Util.expectDecodingFailure(schema, { b: 1 }, "/a is missing")
   })
 
   it("omit/ involving a symbol", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const base = S.struct({ [a]: S.string, b: S.number, c: S.boolean })
     const schema = pipe(base, S.omit("c"))
-    Util.expectDecodingSuccess(schema, { [a]: "a", b: 1 })
+    await Util.expectDecodingSuccess(schema, { [a]: "a", b: 1 })
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       "Expected <anonymous type literal schema>, actual null"
     )
-    Util.expectDecodingFailure(schema, { [a]: "a" }, `/b is missing`)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(schema, { [a]: "a" }, `/b is missing`)
+    await Util.expectDecodingFailure(
       schema,
       { b: 1 },
       `/Symbol(@effect/schema/test/a) is missing`
@@ -1035,10 +1043,10 @@ describe.concurrent("Decoder", () => {
 
   it("maxLength", async () => {
     const schema = pipe(S.string, S.maxLength(1))
-    Util.expectDecodingSuccess(schema, "")
-    Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, "")
+    await Util.expectDecodingSuccess(schema, "a")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "aa",
       `Expected a string at most 1 character(s) long, actual "aa"`
@@ -1047,10 +1055,10 @@ describe.concurrent("Decoder", () => {
 
   it("nonEmpty", async () => {
     const schema = pipe(S.string, S.nonEmpty())
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingSuccess(schema, "aa")
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, "aa")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "",
       `Expected a string at least 1 character(s) long, actual ""`
@@ -1059,14 +1067,14 @@ describe.concurrent("Decoder", () => {
 
   it("length", async () => {
     const schema = pipe(S.string, S.length(1))
-    Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, "a")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "",
       `Expected a string at least 1 character(s) long, actual ""`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "aa",
       `Expected a string at most 1 character(s) long, actual "aa"`
@@ -1075,15 +1083,15 @@ describe.concurrent("Decoder", () => {
 
   it("startsWith", async () => {
     const schema = pipe(S.string, S.startsWith("a"))
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingSuccess(schema, "ab")
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, "ab")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "",
       `Expected a string starting with "a", actual ""`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "b",
       `Expected a string starting with "a", actual "b"`
@@ -1092,15 +1100,15 @@ describe.concurrent("Decoder", () => {
 
   it("endsWith", async () => {
     const schema = pipe(S.string, S.endsWith("a"))
-    Util.expectDecodingSuccess(schema, "a")
-    Util.expectDecodingSuccess(schema, "ba")
+    await Util.expectDecodingSuccess(schema, "a")
+    await Util.expectDecodingSuccess(schema, "ba")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "",
       `Expected a string ending with "a", actual ""`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "b",
       `Expected a string ending with "a", actual "b"`
@@ -1109,15 +1117,15 @@ describe.concurrent("Decoder", () => {
 
   it("pattern", async () => {
     const schema = pipe(S.string, S.pattern(/^abb+$/))
-    Util.expectDecodingSuccess(schema, "abb")
-    Util.expectDecodingSuccess(schema, "abbb")
+    await Util.expectDecodingSuccess(schema, "abb")
+    await Util.expectDecodingSuccess(schema, "abbb")
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "ab",
       `Expected a string matching the pattern ^abb+$, actual "ab"`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "a",
       `Expected a string matching the pattern ^abb+$, actual "a"`
@@ -1136,7 +1144,7 @@ describe.concurrent("Decoder", () => {
     const a = S.struct({ a: S.optional(S.number) })
     const b = S.struct({ a: S.optional(S.number), b: S.optional(S.string) })
     const schema = S.union(a, b)
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       { a: 1, b: "b", c: true },
       {
@@ -1149,7 +1157,7 @@ describe.concurrent("Decoder", () => {
 
   it("isUnexpectedAllowed/tuple of a struct", async () => {
     const schema = S.tuple(S.struct({ b: S.number }))
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       [{ b: 1, c: "c" }],
       [{ b: 1 }],
@@ -1159,7 +1167,7 @@ describe.concurrent("Decoder", () => {
 
   it("isUnexpectedAllowed/tuple rest element of a struct", async () => {
     const schema = S.array(S.struct({ b: S.number }))
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       [{ b: 1, c: "c" }],
       [{ b: 1 }],
@@ -1169,8 +1177,8 @@ describe.concurrent("Decoder", () => {
 
   it("isUnexpectedAllowed/tuple. post rest elements of a struct", async () => {
     const schema = pipe(S.array(S.string), S.element(S.struct({ b: S.number })))
-    Util.expectDecodingSuccess(schema, [{ b: 1 }])
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(schema, [{ b: 1 }])
+    await Util.expectDecodingSuccess(
       schema,
       [{ b: 1, c: "c" }],
       [{ b: 1 }],
@@ -1180,12 +1188,12 @@ describe.concurrent("Decoder", () => {
 
   it("isUnexpectedAllowed/tuple excess elements", async () => {
     const schema = S.tuple(S.number)
-    Util.expectDecodingSuccess(schema, [1, "b"], [1], isUnexpectedAllowed)
+    await Util.expectDecodingSuccess(schema, [1, "b"], [1], isUnexpectedAllowed)
   })
 
   it("isUnexpectedAllowed/struct excess property signatures", async () => {
     const schema = S.struct({ a: S.number })
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       { a: 1, b: "b" },
       { a: 1 },
@@ -1195,7 +1203,7 @@ describe.concurrent("Decoder", () => {
 
   it("isUnexpectedAllowed/struct nested struct", async () => {
     const schema = S.struct({ a: S.struct({ b: S.number }) })
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       { a: { b: 1, c: "c" } },
       {
@@ -1207,7 +1215,7 @@ describe.concurrent("Decoder", () => {
 
   it("isUnexpectedAllowed/record of struct", async () => {
     const schema = S.record(S.string, S.struct({ b: S.number }))
-    Util.expectDecodingSuccess(
+    await Util.expectDecodingSuccess(
       schema,
       { a: { b: 1, c: "c" } },
       { a: { b: 1 } },
@@ -1225,12 +1233,12 @@ describe.concurrent("Decoder", () => {
 
   it("allErrors/tuple: missing element", async () => {
     const schema = S.tuple(S.string, S.number)
-    Util.expectDecodingFailure(schema, [], `/0 is missing, /1 is missing`, allErrors)
+    await Util.expectDecodingFailure(schema, [], `/0 is missing, /1 is missing`, allErrors)
   })
 
   it("allErrors/tuple: wrong type for values", async () => {
     const schema = S.tuple(S.string, S.number)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       [1, "b"],
       `/0 Expected string, actual 1, /1 Expected number, actual "b"`,
@@ -1240,12 +1248,17 @@ describe.concurrent("Decoder", () => {
 
   it("allErrors/tuple: unexpected indexes", async () => {
     const schema = S.tuple()
-    Util.expectDecodingFailure(schema, ["a", "b"], `/0 is unexpected, /1 is unexpected`, allErrors)
+    await Util.expectDecodingFailure(
+      schema,
+      ["a", "b"],
+      `/0 is unexpected, /1 is unexpected`,
+      allErrors
+    )
   })
 
   it("allErrors/tuple/rest: wrong type for values", async () => {
     const schema = pipe(S.tuple(S.string), S.rest(S.number))
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       ["a", "b", "c"],
       `/1 Expected number, actual "b", /2 Expected number, actual "c"`,
@@ -1255,7 +1268,7 @@ describe.concurrent("Decoder", () => {
 
   it("allErrors/tuple/post rest elements: wrong type for values", async () => {
     const schema = pipe(S.array(S.boolean), S.element(S.number), S.element(S.number))
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       ["a", "b"],
       `/0 Expected number, actual "a", /1 Expected number, actual "b"`,
@@ -1265,12 +1278,12 @@ describe.concurrent("Decoder", () => {
 
   it("allErrors/struct: missing keys", async () => {
     const schema = S.struct({ a: S.string, b: S.number })
-    Util.expectDecodingFailure(schema, {}, `/a is missing, /b is missing`, allErrors)
+    await Util.expectDecodingFailure(schema, {}, `/a is missing, /b is missing`, allErrors)
   })
 
   it("allErrors/struct: wrong type for values", async () => {
     const schema = S.struct({ a: S.string, b: S.number })
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: 1, b: "b" },
       `/a Expected string, actual 1, /b Expected number, actual "b"`,
@@ -1280,7 +1293,7 @@ describe.concurrent("Decoder", () => {
 
   it("allErrors/struct: unexpected keys", async () => {
     const schema = S.struct({ a: S.number })
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: 1, b: "b", c: "c" },
       `/b is unexpected, /c is unexpected`,
@@ -1290,7 +1303,7 @@ describe.concurrent("Decoder", () => {
 
   it("allErrors/record: wrong type for keys", async () => {
     const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: 1, b: 2 },
       `/a Expected a string at least 2 character(s) long, actual "a", /b Expected a string at least 2 character(s) long, actual "b"`,
@@ -1300,7 +1313,7 @@ describe.concurrent("Decoder", () => {
 
   it("allErrors/record: wrong type for values", async () => {
     const schema = S.record(S.string, S.number)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       { a: "a", b: "b" },
       `/a Expected number, actual "a", /b Expected number, actual "b"`,
@@ -1314,6 +1327,6 @@ describe.concurrent("Decoder", () => {
       S.extend(S.record(S.string, S.boolean))
     )
 
-    Util.expectDecodingSuccess(schema, { a: "a" })
+    await Util.expectDecodingSuccess(schema, { a: "a" })
   })
 })

@@ -22,20 +22,20 @@ describe.concurrent("multipleOf", () => {
 
   it("Decoder", async () => {
     const schema = S.multipleOf(2)(S.number)
-    Util.expectDecodingSuccess(schema, -4)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, -4)
+    await Util.expectDecodingFailure(
       schema,
       -3,
       `Expected a number divisible by 2, actual -3`
     )
-    Util.expectDecodingSuccess(schema, 0)
-    Util.expectDecodingSuccess(schema, 2)
-    Util.expectDecodingFailure(
+    await Util.expectDecodingSuccess(schema, 0)
+    await Util.expectDecodingSuccess(schema, 2)
+    await Util.expectDecodingFailure(
       schema,
       2.5,
       `Expected a number divisible by 2, actual 2.5`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       "",
       `Expected number, actual ""`

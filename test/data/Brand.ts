@@ -30,7 +30,7 @@ describe.concurrent("Brand", () => {
   it("refined", async () => {
     const schema = pipe(S.number, S.fromBrand(B.all(Positive, Int)))
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       -0.5,
       "Expected -0.5 to be positive, Expected -0.5 to be an integer"
@@ -39,10 +39,10 @@ describe.concurrent("Brand", () => {
       new Error(`error(s) found
 └─ Expected -0.5 to be positive, Expected -0.5 to be an integer`)
     )
-    Util.expectDecodingFailure(schema, -1, "Expected -1 to be positive")
-    Util.expectDecodingFailure(schema, 0, "Expected 0 to be positive")
-    Util.expectDecodingSuccess(schema, 1, 1 as PositiveInt)
-    Util.expectDecodingFailure(schema, 1.5, "Expected 1.5 to be an integer")
-    Util.expectDecodingSuccess(schema, 2, 2 as PositiveInt)
+    await Util.expectDecodingFailure(schema, -1, "Expected -1 to be positive")
+    await Util.expectDecodingFailure(schema, 0, "Expected 0 to be positive")
+    await Util.expectDecodingSuccess(schema, 1, 1 as PositiveInt)
+    await Util.expectDecodingFailure(schema, 1.5, "Expected 1.5 to be an integer")
+    await Util.expectDecodingSuccess(schema, 2, 2 as PositiveInt)
   })
 })

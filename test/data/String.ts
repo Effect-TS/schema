@@ -20,11 +20,11 @@ describe.concurrent("trim", () => {
   })
 
   it("Decoder", async () => {
-    Util.expectDecodingSuccess(schema, "a", "a")
-    Util.expectDecodingSuccess(schema, "", "")
-    Util.expectDecodingSuccess(schema, "a ", "a")
-    Util.expectDecodingSuccess(schema, " a ", "a")
-    Util.expectDecodingSuccess(schema, " ", "")
+    await Util.expectDecodingSuccess(schema, "a", "a")
+    await Util.expectDecodingSuccess(schema, "", "")
+    await Util.expectDecodingSuccess(schema, "a ", "a")
+    await Util.expectDecodingSuccess(schema, " a ", "a")
+    await Util.expectDecodingSuccess(schema, " ", "")
   })
 
   it("Encoder", () => {

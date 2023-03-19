@@ -15,8 +15,8 @@ describe.concurrent("Option", () => {
 
     it("Decoder", async () => {
       const schema = S.option(NumberFromString)
-      Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(O.none())), O.none())
-      Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(O.some("1"))), O.some(1))
+      await Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(O.none())), O.none())
+      await Util.expectDecodingSuccess(schema, JSON.parse(JSON.stringify(O.some("1"))), O.some(1))
     })
 
     it("Encoder", () => {
@@ -45,8 +45,8 @@ describe.concurrent("Option", () => {
 
     it("Decoder", async () => {
       const schema = S.optionFromSelf(NumberFromString)
-      Util.expectDecodingSuccess(schema, O.none(), O.none())
-      Util.expectDecodingSuccess(schema, O.some("1"), O.some(1))
+      await Util.expectDecodingSuccess(schema, O.none(), O.none())
+      await Util.expectDecodingSuccess(schema, O.some("1"), O.some(1))
     })
 
     it("Pretty", () => {
@@ -64,14 +64,14 @@ describe.concurrent("Option", () => {
 
     it("Decoder", async () => {
       const schema = S.optionFromNullable(NumberFromString)
-      Util.expectDecodingSuccess(schema, undefined, O.none())
-      Util.expectDecodingSuccess(schema, null, O.none())
-      Util.expectDecodingSuccess(schema, "1", O.some(1))
+      await Util.expectDecodingSuccess(schema, undefined, O.none())
+      await Util.expectDecodingSuccess(schema, null, O.none())
+      await Util.expectDecodingSuccess(schema, "1", O.some(1))
 
       expect(O.isOption(S.decode(schema)(null))).toEqual(true)
       expect(O.isOption(S.decode(schema)("1"))).toEqual(true)
 
-      Util.expectDecodingFailureTree(
+      await Util.expectDecodingFailureTree(
         schema,
         {},
         `error(s) found
@@ -97,12 +97,12 @@ describe.concurrent("Option", () => {
     )
 
     const schema = pipe(S.struct({ a: S.string }), S.optionsFromOptionals({ b: S.number }))
-    Util.expectDecodingSuccess(schema, { a: "a" }, { a: "a", b: O.none() })
-    Util.expectDecodingSuccess(schema, { a: "a", b: undefined }, { a: "a", b: O.none() })
-    Util.expectDecodingSuccess(schema, { a: "a", b: null }, { a: "a", b: O.none() })
-    Util.expectDecodingSuccess(schema, { a: "a", b: 1 }, { a: "a", b: O.some(1) })
+    await Util.expectDecodingSuccess(schema, { a: "a" }, { a: "a", b: O.none() })
+    await Util.expectDecodingSuccess(schema, { a: "a", b: undefined }, { a: "a", b: O.none() })
+    await Util.expectDecodingSuccess(schema, { a: "a", b: null }, { a: "a", b: O.none() })
+    await Util.expectDecodingSuccess(schema, { a: "a", b: 1 }, { a: "a", b: O.some(1) })
 
-    Util.expectDecodingFailureTree(
+    await Util.expectDecodingFailureTree(
       schema,
       { a: "a", b: "b" },
       `error(s) found

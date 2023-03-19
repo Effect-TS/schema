@@ -19,15 +19,19 @@ describe.concurrent("Chunk", () => {
 
   it("chunkFromSelf. decoder", async () => {
     const schema = S.chunkFromSelf(NumberFromString)
-    Util.expectDecodingSuccess(schema, C.empty(), C.empty())
-    Util.expectDecodingSuccess(schema, C.fromIterable(["1", "2", "3"]), C.fromIterable([1, 2, 3]))
+    await Util.expectDecodingSuccess(schema, C.empty(), C.empty())
+    await Util.expectDecodingSuccess(
+      schema,
+      C.fromIterable(["1", "2", "3"]),
+      C.fromIterable([1, 2, 3])
+    )
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected Chunk, actual null`
     )
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       C.fromIterable(["1", "a", "3"]),
       `/1 Expected string -> number, actual "a"`
@@ -65,15 +69,15 @@ describe.concurrent("Chunk", () => {
 
   it("chunk. decoder", async () => {
     const schema = S.chunk(S.number)
-    Util.expectDecodingSuccess(schema, [], C.empty())
-    Util.expectDecodingSuccess(schema, [1, 2, 3], C.fromIterable([1, 2, 3]))
+    await Util.expectDecodingSuccess(schema, [], C.empty())
+    await Util.expectDecodingSuccess(schema, [1, 2, 3], C.fromIterable([1, 2, 3]))
 
-    Util.expectDecodingFailure(
+    await Util.expectDecodingFailure(
       schema,
       null,
       `Expected <anonymous tuple or array schema>, actual null`
     )
-    Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
+    await Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })
 
   it("chunk. encoder", () => {
