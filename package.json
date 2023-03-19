@@ -110,7 +110,7 @@
     }
   },
   "dependencies": {
-    "@effect/data": "~0.4.1",
+    "@effect/data": "~0.5.0",
     "fast-check": "^3.7.0"
   }
 }
