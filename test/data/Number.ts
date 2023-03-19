@@ -20,7 +20,7 @@ describe.concurrent("Number", () => {
     Util.expectDecodingFailure(schema, 2, "Expected a number between -1 and 1, actual 2")
   })
 
-  it("positive", () => {
+  it("positive", async () => {
     const schema = pipe(S.number, S.positive())
 
     Util.expectDecodingFailure(schema, -1, "Expected a positive number, actual -1")
@@ -28,7 +28,7 @@ describe.concurrent("Number", () => {
     Util.expectEncodingSuccess(schema, 1, 1)
   })
 
-  it("negative", () => {
+  it("negative", async () => {
     const schema = pipe(S.number, S.negative())
 
     Util.expectEncodingSuccess(schema, -1, -1)

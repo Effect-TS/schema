@@ -11,7 +11,7 @@ describe.concurrent("Bigint", () => {
     Util.expectDecodingSuccess(schema, -3n, -1n)
   })
 
-  it("greaterThanBigint", () => {
+  it("greaterThanBigint", async () => {
     const schema = pipe(S.bigint, S.greaterThanBigint(0n))
 
     Util.expectDecodingFailure(schema, -1n, "Expected a bigint greater than 0n, actual -1n")
@@ -31,7 +31,7 @@ describe.concurrent("Bigint", () => {
     Util.expectEncodingSuccess(schema, 1n, 1n)
   })
 
-  it("lessThanBigint", () => {
+  it("lessThanBigint", async () => {
     const schema = pipe(S.bigint, S.lessThanBigint(0n))
 
     Util.expectEncodingSuccess(schema, -1n, -1n)
@@ -56,7 +56,7 @@ describe.concurrent("Bigint", () => {
     Util.expectDecodingFailure(schema, 2n, "Expected a bigint between -1n and 1n, actual 2n")
   })
 
-  it("positiveBigint", () => {
+  it("positiveBigint", async () => {
     const schema = pipe(S.bigint, S.positiveBigint())
 
     Util.expectDecodingFailure(schema, -1n, "Expected a positive bigint, actual -1n")
@@ -64,7 +64,7 @@ describe.concurrent("Bigint", () => {
     Util.expectEncodingSuccess(schema, 1n, 1n)
   })
 
-  it("negativeBigint", () => {
+  it("negativeBigint", async () => {
     const schema = pipe(S.bigint, S.negativeBigint())
 
     Util.expectEncodingSuccess(schema, -1n, -1n)
