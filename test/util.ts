@@ -49,10 +49,10 @@ const go = (ast: AST.AST): AST.AST => {
       return AST.createLazy(() => go(ast.f()), ast.annotations)
     case "Refinement":
       return AST.createRefinement(
-        ast.to,
+        ast.from,
         ast.to,
         goDecode(ast.decode),
-        goDecode(ast.decode),
+        goDecode(ast.encode),
         ast.annotations
       )
     case "Transform":
