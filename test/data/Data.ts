@@ -18,7 +18,7 @@ describe.concurrent("Data", () => {
     Util.roundtrip(S.dataFromSelf(S.array(S.number)))
   })
 
-  it("dataFromSelf. decoder", () => {
+  it("dataFromSelf. decoder", async () => {
     const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
     Util.expectDecodingSuccess(
       schema,
@@ -65,7 +65,7 @@ describe.concurrent("Data", () => {
     Util.roundtrip(S.data(S.array(S.number)))
   })
 
-  it("data. decoder", () => {
+  it("data. decoder", async () => {
     const schema = S.data(S.struct({ a: S.string, b: S.number }))
     Util.expectDecodingSuccess(
       schema,

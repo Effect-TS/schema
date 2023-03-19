@@ -17,7 +17,7 @@ describe.concurrent("Chunk", () => {
     Util.roundtrip(S.chunkFromSelf(S.number))
   })
 
-  it("chunkFromSelf. decoder", () => {
+  it("chunkFromSelf. decoder", async () => {
     const schema = S.chunkFromSelf(NumberFromString)
     Util.expectDecodingSuccess(schema, C.empty(), C.empty())
     Util.expectDecodingSuccess(schema, C.fromIterable(["1", "2", "3"]), C.fromIterable([1, 2, 3]))
@@ -63,7 +63,7 @@ describe.concurrent("Chunk", () => {
     Util.roundtrip(S.chunk(S.number))
   })
 
-  it("chunk. decoder", () => {
+  it("chunk. decoder", async () => {
     const schema = S.chunk(S.number)
     Util.expectDecodingSuccess(schema, [], C.empty())
     Util.expectDecodingSuccess(schema, [1, 2, 3], C.fromIterable([1, 2, 3]))

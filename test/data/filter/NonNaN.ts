@@ -17,7 +17,7 @@ describe.concurrent("nonNaN", () => {
     expect(is(NaN)).toEqual(false)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     Util.expectDecodingSuccess(schema, 1)
     Util.expectDecodingFailure(schema, NaN, `Expected a number NaN excluded, actual NaN`)
   })

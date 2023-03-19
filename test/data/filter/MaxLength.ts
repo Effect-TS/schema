@@ -15,7 +15,7 @@ describe.concurrent("maxLength", () => {
     expect(is("aa")).toEqual(false)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     const schema = S.maxLength(1)(S.string)
     Util.expectDecodingSuccess(schema, "")
     Util.expectDecodingSuccess(schema, "a")

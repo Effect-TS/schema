@@ -6,7 +6,7 @@ describe.concurrent("UUID", () => {
     Util.roundtrip(S.UUID)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     const schema = S.UUID
     Util.expectDecodingSuccess(schema, "123e4567-e89b-12d3-a456-426614174000")
     Util.expectDecodingFailure(

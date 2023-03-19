@@ -18,7 +18,7 @@ describe.concurrent("finite", () => {
     expect(is(-Infinity)).toEqual(false)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     Util.expectDecodingSuccess(schema, 1)
     Util.expectDecodingFailure(
       schema,

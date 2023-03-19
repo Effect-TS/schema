@@ -19,7 +19,7 @@ describe.concurrent("trim", () => {
     expect(is(" ")).toEqual(false)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     Util.expectDecodingSuccess(schema, "a", "a")
     Util.expectDecodingSuccess(schema, "", "")
     Util.expectDecodingSuccess(schema, "a ", "a")

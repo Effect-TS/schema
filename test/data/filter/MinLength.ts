@@ -15,7 +15,7 @@ describe.concurrent("minLength", () => {
     expect(is("aa")).toEqual(true)
   })
 
-  it("Decoder", () => {
+  it("Decoder", async () => {
     const schema = S.minLength(1)(S.string)
     Util.expectDecodingSuccess(schema, "a")
     Util.expectDecodingSuccess(schema, "aa")

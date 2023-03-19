@@ -3,7 +3,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Number", () => {
-  it("clamp", () => {
+  it("clamp", async () => {
     const schema = pipe(S.number, S.clamp(-1, 1))
 
     Util.expectDecodingSuccess(schema, 3, 1)
@@ -11,7 +11,7 @@ describe.concurrent("Number", () => {
     Util.expectDecodingSuccess(schema, -3, -1)
   })
 
-  it("between", () => {
+  it("between", async () => {
     const schema = pipe(S.number, S.between(-1, 1))
 
     Util.expectDecodingFailure(schema, -2, "Expected a number between -1 and 1, actual -2")
@@ -36,7 +36,7 @@ describe.concurrent("Number", () => {
     Util.expectDecodingFailure(schema, 1, "Expected a negative number, actual 1")
   })
 
-  it("nonNegative", () => {
+  it("nonNegative", async () => {
     const schema = pipe(S.number, S.nonNegative())
 
     Util.expectEncodingFailure(schema, -1, "Expected a non-negative number, actual -1")
@@ -44,7 +44,7 @@ describe.concurrent("Number", () => {
     Util.expectDecodingSuccess(schema, 1, 1)
   })
 
-  it("nonPositive", () => {
+  it("nonPositive", async () => {
     const schema = pipe(S.number, S.nonPositive())
 
     Util.expectEncodingSuccess(schema, -1, -1)
@@ -59,7 +59,7 @@ describe.concurrent("Number", () => {
       Util.roundtrip(schema)
     })
 
-    it("Decoder", () => {
+    it("Decoder", async () => {
       Util.expectDecodingSuccess(schema, "1", 1)
       Util.expectDecodingSuccess(schema, "1a", 1)
       Util.expectDecodingFailure(
@@ -78,7 +78,7 @@ describe.concurrent("Number", () => {
       Util.expectEncodingSuccess(schema, 1, "1")
     })
 
-    it("example", () => {
+    it("example", async () => {
       const schema = S.numberFromString(S.string) // converts string schema to number schema
 
       // success cases

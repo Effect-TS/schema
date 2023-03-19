@@ -14,7 +14,7 @@ describe.concurrent("ReadonlySet", () => {
     Util.roundtrip(S.readonlySetFromSelf(S.number))
   })
 
-  it("readonlySetFromSelf. decoder", () => {
+  it("readonlySetFromSelf. decoder", async () => {
     const schema = S.readonlySetFromSelf(NumberFromString)
     Util.expectDecodingSuccess(schema, new Set(), new Set())
     Util.expectDecodingSuccess(schema, new Set(["1", "2", "3"]), new Set([1, 2, 3]))
@@ -61,7 +61,7 @@ describe.concurrent("ReadonlySet", () => {
     Util.roundtrip(S.readonlySet(S.number))
   })
 
-  it("readonlySet. decoder", () => {
+  it("readonlySet. decoder", async () => {
     const schema = S.readonlySet(S.number)
     Util.expectDecodingSuccess(schema, [], new Set([]))
     Util.expectDecodingSuccess(schema, [1, 2, 3], new Set([1, 2, 3]))
