@@ -108,21 +108,32 @@ export const expectDecodingSuccess = async <I, A>(
   expect(t).toStrictEqual(E.right(a))
   const t2 = await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options))
   try {
-    expect(t2).toStrictEqual(E.right(a))
+    expect(t2).toStrictEqual(t)
   } catch (e) {
     console.log(s)
     throw e
   }
 }
 
-export const expectDecodingFailure = <I, A>(
+export const expectDecodingFailure = async <I, A>(
   schema: Schema<I, A>,
   u: unknown,
   message: string,
   options?: ParseOptions
 ) => {
-  const t = pipe(S.parseEither(schema)(u, options), E.mapLeft(formatAll))
+  const s = new Error().stack
+  const t = E.mapLeft(S.parseEither(schema)(u, options), formatAll)
   expect(t).toStrictEqual(E.left(message))
+  const t2 = E.mapLeft(
+    await Effect.runPromiseEither(S.parseEffect(effectify(schema))(u, options)),
+    formatAll
+  )
+  try {
+    expect(t2).toStrictEqual(t)
+  } catch (e) {
+    console.log(s)
+    throw e
+  }
 }
 
 export const expectEncodingSuccess = <I, A>(

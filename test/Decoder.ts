@@ -222,7 +222,7 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("never", () => {
+  it("never", async () => {
     const schema = S.never
     Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")
   })
@@ -795,12 +795,12 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("union/ empty union", () => {
+  it("union/ empty union", async () => {
     const schema = S.union()
     Util.expectDecodingFailure(schema, 1, "Expected never, actual 1")
   })
 
-  it("union/ members with literals but the input doesn't have any", () => {
+  it("union/ members with literals but the input doesn't have any", async () => {
     const schema = S.union(
       S.struct({ a: S.literal(1), c: S.string }),
       S.struct({ b: S.literal(2), d: S.number })
@@ -815,7 +815,7 @@ describe.concurrent("Decoder", () => {
     Util.expectDecodingFailure(schema, { b: 3 }, `/a is missing, /b Expected 2, actual 3`)
   })
 
-  it("union/ members with multiple tags", () => {
+  it("union/ members with multiple tags", async () => {
     const schema = S.union(
       S.struct({ category: S.literal("catA"), tag: S.literal("a") }),
       S.struct({ category: S.literal("catA"), tag: S.literal("b") }),
@@ -1223,12 +1223,12 @@ describe.concurrent("Decoder", () => {
     allErrors: true
   }
 
-  it("allErrors/tuple: missing element", () => {
+  it("allErrors/tuple: missing element", async () => {
     const schema = S.tuple(S.string, S.number)
     Util.expectDecodingFailure(schema, [], `/0 is missing, /1 is missing`, allErrors)
   })
 
-  it("allErrors/tuple: wrong type for values", () => {
+  it("allErrors/tuple: wrong type for values", async () => {
     const schema = S.tuple(S.string, S.number)
     Util.expectDecodingFailure(
       schema,
@@ -1238,12 +1238,12 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("allErrors/tuple: unexpected indexes", () => {
+  it("allErrors/tuple: unexpected indexes", async () => {
     const schema = S.tuple()
     Util.expectDecodingFailure(schema, ["a", "b"], `/0 is unexpected, /1 is unexpected`, allErrors)
   })
 
-  it("allErrors/tuple/rest: wrong type for values", () => {
+  it("allErrors/tuple/rest: wrong type for values", async () => {
     const schema = pipe(S.tuple(S.string), S.rest(S.number))
     Util.expectDecodingFailure(
       schema,
@@ -1253,7 +1253,7 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("allErrors/tuple/post rest elements: wrong type for values", () => {
+  it("allErrors/tuple/post rest elements: wrong type for values", async () => {
     const schema = pipe(S.array(S.boolean), S.element(S.number), S.element(S.number))
     Util.expectDecodingFailure(
       schema,
@@ -1263,12 +1263,12 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("allErrors/struct: missing keys", () => {
+  it("allErrors/struct: missing keys", async () => {
     const schema = S.struct({ a: S.string, b: S.number })
     Util.expectDecodingFailure(schema, {}, `/a is missing, /b is missing`, allErrors)
   })
 
-  it("allErrors/struct: wrong type for values", () => {
+  it("allErrors/struct: wrong type for values", async () => {
     const schema = S.struct({ a: S.string, b: S.number })
     Util.expectDecodingFailure(
       schema,
@@ -1278,7 +1278,7 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("allErrors/struct: unexpected keys", () => {
+  it("allErrors/struct: unexpected keys", async () => {
     const schema = S.struct({ a: S.number })
     Util.expectDecodingFailure(
       schema,
@@ -1288,7 +1288,7 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("allErrors/record: wrong type for keys", () => {
+  it("allErrors/record: wrong type for keys", async () => {
     const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
     Util.expectDecodingFailure(
       schema,
@@ -1298,7 +1298,7 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("allErrors/record: wrong type for values", () => {
+  it("allErrors/record: wrong type for values", async () => {
     const schema = S.record(S.string, S.number)
     Util.expectDecodingFailure(
       schema,
