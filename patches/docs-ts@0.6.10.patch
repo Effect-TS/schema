@@ -1,8 +1,8 @@
 diff --git a/lib/Core.js b/lib/Core.js
-index c0f282ca9e3ddd93e44a62e1d05c1cc45b9f5c6a..616f7f6223459e0621522279ea7fc1cf1868abe8 100644
+index c0f282ca9e3ddd93e44a62e1d05c1cc45b9f5c6a..77af02a8dc72a0da6c426dc62a0957eb9dacdf57 100644
 --- a/lib/Core.js
 +++ b/lib/Core.js
-@@ -167,7 +167,30 @@ var typeCheckExamples = function (modules) {
+@@ -167,7 +167,31 @@ var typeCheckExamples = function (modules) {
      return function_1.pipe(getExampleFiles(modules), RTE.chain(handleImports), RTE.chain(function (examples) {
          return examples.length === 0
              ? cleanExamples
@@ -19,10 +19,10 @@ index c0f282ca9e3ddd93e44a62e1d05c1cc45b9f5c6a..616f7f6223459e0621522279ea7fc1cf
 +                  "noUnusedLocals": false,
 +                  "noUnusedParameters": false,
 +                  "noFallthroughCasesInSwitch": true,
++                  "allowImportingTsExtensions": true,
 +                  "moduleResolution": "node",
 +                  "target": "ES2021",
 +                  "lib": ["ES2021"],
-+                  "allowImportingTsExtensions": true,
 +                  "paths": {
 +                    "@effect/schema": ["../../src/index.ts"],
 +                    "@effect/schema/test/*": ["../../test/*"],
@@ -36,15 +36,16 @@ index c0f282ca9e3ddd93e44a62e1d05c1cc45b9f5c6a..616f7f6223459e0621522279ea7fc1cf
  };
  // -------------------------------------------------------------------------------------
 diff --git a/lib/index.js b/lib/index.js
-index 51bdb346c4c33e8835bbda0c16aea71bc0c3115e..7d084d363efd3f8aad76051f4253b0b59cd0c5cd 100644
+index 51bdb346c4c33e8835bbda0c16aea71bc0c3115e..7c67a9eec30171b7f4cad959becfab86dd99151c 100644
 --- a/lib/index.js
 +++ b/lib/index.js
-@@ -33,7 +33,13 @@ exports.exit = TE.fold(onLeft, function () { return onRight; });
+@@ -33,7 +33,14 @@ exports.exit = TE.fold(onLeft, function () { return onRight; });
   * @internal
   */
  exports.compilerOptions = {
 -    strict: true
 +    strict: true,
++    allowImportingTsExtensions: true,
 +    paths: {
 +      "@effect/schema": ["./src/index.ts"],
 +      "@effect/schema/test/*": ["./test/*"],
