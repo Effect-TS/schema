@@ -22,6 +22,9 @@ const goDecode = (
   (input, options) => Effect.flatMap(sleep, () => decode(input, options))
 
 const go = (ast: AST.AST): AST.AST => {
+  if (Math.random() < 0.5) {
+    return ast
+  }
   switch (ast._tag) {
     case "Declaration":
       return AST.createDeclaration(
