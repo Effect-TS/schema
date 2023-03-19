@@ -831,8 +831,9 @@ export const _getLiterals = (
       const out: Array<[PropertyKey, AST.Literal]> = []
       for (let i = 0; i < ast.propertySignatures.length; i++) {
         const propertySignature = ast.propertySignatures[i]
-        if (AST.isLiteral(propertySignature.type) && !propertySignature.isOptional) {
-          out.push([propertySignature.name, propertySignature.type])
+        const type = AST.getFrom(propertySignature.type)
+        if (AST.isLiteral(type) && !propertySignature.isOptional) {
+          out.push([propertySignature.name, type])
         }
       }
       return out
