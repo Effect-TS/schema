@@ -8,7 +8,7 @@ import * as Effect from "@effect/io/Effect"
 import * as A from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
-import type * as PR from "@effect/schema/ParseResult"
+import * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
 import * as S from "@effect/schema/Schema"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
@@ -88,12 +88,18 @@ export const roundtrip = <I, A>(schema: Schema<I, A>) => {
     const roundtrip = pipe(
       a,
       S.encodeEither(schema),
-      E.flatMap((a) => S.parseEither(schema)(a))
+      E.flatMap(S.parseEither(schema))
     )
     if (E.isLeft(roundtrip)) {
       return false
     }
     return is(roundtrip.right)
+  }))
+  fc.assert(fc.asyncProperty(arb(fc), async (a) => {
+    const roundtrip = await Effect.runPromiseEither(
+      PR.flatMap(S.encodeEffect(schema)(a), S.parseEffect(schema))
+    )
+    return E.isRight(roundtrip)
   }))
 }
 
