@@ -259,7 +259,7 @@ const go = I.memoize(untracedMethod(() =>
           const es: Array<[number, PR.ParseError]> = []
           const allErrors = options?.allErrors
           let i = 0
-          let k = 0
+          let stepKey = 0
           const residual: Array<PR.ParseResult<void>> = []
 
           // ---------------------------------------------
@@ -272,7 +272,7 @@ const go = I.memoize(untracedMethod(() =>
                 // ...but the element is required
                 const e = PR.index(i, [PR.missing])
                 if (allErrors) {
-                  es.push([k++, e])
+                  es.push([stepKey++, e])
                   continue
                 } else {
                   return PR.failure(e)
@@ -287,15 +287,15 @@ const go = I.memoize(untracedMethod(() =>
                   // the input element is present but is not valid
                   const e = PR.index(i, t.left)
                   if (allErrors) {
-                    es.push([k++, e])
+                    es.push([stepKey++, e])
                     continue
                   } else {
                     return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 }
-                output.push([k++, t.right])
+                output.push([stepKey++, t.right])
               } else {
-                const nk = k++
+                const nk = stepKey++
                 residual.push(
                   Effect.flatMap(Effect.either(te), (t) => {
                     if (E.isLeft(t)) {
@@ -328,16 +328,16 @@ const go = I.memoize(untracedMethod(() =>
                 if (E.isLeft(t)) {
                   const e = PR.index(i, t.left)
                   if (allErrors) {
-                    es.push([k++, e])
+                    es.push([stepKey++, e])
                     continue
                   } else {
                     return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 } else {
-                  output.push([k++, t.right])
+                  output.push([stepKey++, t.right])
                 }
               } else {
-                const nk = k++
+                const nk = stepKey++
                 residual.push(
                   Effect.flatMap(Effect.either(te), (t) => {
                     if (E.isLeft(t)) {
@@ -372,15 +372,15 @@ const go = I.memoize(untracedMethod(() =>
                     // the input element is present but is not valid
                     const e = PR.index(i, t.left)
                     if (allErrors) {
-                      es.push([k++, e])
+                      es.push([stepKey++, e])
                       continue
                     } else {
                       return PR.failures(mutableAppend(sortByIndex(es), e))
                     }
                   }
-                  output.push([k++, t.right])
+                  output.push([stepKey++, t.right])
                 } else {
-                  const nk = k++
+                  const nk = stepKey++
                   residual.push(Effect.flatMap(Effect.either(te), (t) => {
                     if (E.isLeft(t)) {
                       // the input element is present but is not valid
@@ -407,7 +407,7 @@ const go = I.memoize(untracedMethod(() =>
               const e = PR.index(i, [PR.unexpected(input[i])])
               if (!isUnexpectedAllowed) {
                 if (allErrors) {
-                  es.push([k++, e])
+                  es.push([stepKey++, e])
                   continue
                 } else {
                   return PR.failures(mutableAppend(sortByIndex(es), e))
@@ -443,7 +443,7 @@ const go = I.memoize(untracedMethod(() =>
           const expectedKeys: any = {}
           const es: Array<[number, PR.ParseError]> = []
           const allErrors = options?.allErrors
-          let k = 0
+          let stepKey = 0
           const residual: Array<PR.ParseResult<void>> = []
           // ---------------------------------------------
           // handle property signatures
@@ -457,7 +457,7 @@ const go = I.memoize(untracedMethod(() =>
               if (!ps.isOptional) {
                 const e = PR.key(name, [PR.missing])
                 if (allErrors) {
-                  es.push([k++, e])
+                  es.push([stepKey++, e])
                   continue
                 } else {
                   return PR.failure(e)
@@ -471,7 +471,7 @@ const go = I.memoize(untracedMethod(() =>
                   // the input key is present but is not valid
                   const e = PR.key(name, t.left)
                   if (allErrors) {
-                    es.push([k++, e])
+                    es.push([stepKey++, e])
                     continue
                   } else {
                     return PR.failures(mutableAppend(sortByIndex(es), e))
@@ -479,7 +479,7 @@ const go = I.memoize(untracedMethod(() =>
                 }
                 output[name] = t.right
               } else {
-                const nk = k++
+                const nk = stepKey++
                 residual.push(
                   Effect.flatMap(Effect.either(te), (t) => {
                     if (E.isLeft(t)) {
@@ -520,14 +520,14 @@ const go = I.memoize(untracedMethod(() =>
                   if (E.isLeft(t)) {
                     const e = PR.key(key, t.left)
                     if (allErrors) {
-                      es.push([k++, e])
+                      es.push([stepKey++, e])
                       continue
                     } else {
                       return PR.failures(mutableAppend(sortByIndex(es), e))
                     }
                   }
                 } else {
-                  const nk = k++
+                  const nk = stepKey++
                   residual.push(
                     Effect.flatMap(Effect.either(te), (t) => {
                       if (E.isLeft(t)) {
@@ -552,7 +552,7 @@ const go = I.memoize(untracedMethod(() =>
                   if (E.isLeft(tv)) {
                     const e = PR.key(key, tv.left)
                     if (allErrors) {
-                      es.push([k++, e])
+                      es.push([stepKey++, e])
                       continue
                     } else {
                       return PR.failures(mutableAppend(sortByIndex(es), e))
@@ -561,7 +561,7 @@ const go = I.memoize(untracedMethod(() =>
                     output[key] = tv.right
                   }
                 } else {
-                  const nk = k++
+                  const nk = stepKey++
                   residual.push(Effect.flatMap(
                     Effect.either(tve),
                     (tv) => {
@@ -592,7 +592,7 @@ const go = I.memoize(untracedMethod(() =>
                 const e = PR.key(key, [PR.unexpected(input[key])])
                 if (!isUnexpectedAllowed) {
                   if (allErrors) {
-                    es.push([k++, e])
+                    es.push([stepKey++, e])
                     continue
                   } else {
                     return PR.failures(mutableAppend(sortByIndex(es), e))
@@ -624,7 +624,7 @@ const go = I.memoize(untracedMethod(() =>
         }
         return (input, options) => {
           const es: Array<[number, PR.ParseError]> = []
-          let k = 0
+          let stepKey = 0
           let picks: Array<PR.ParseResult<unknown>> = []
           let finalResult: any = undefined
           if (len > 0) {
@@ -643,14 +643,14 @@ const go = I.memoize(untracedMethod(() =>
                     for (let i = 0; i < bucket.length; i++) {
                       const te = map.get(bucket[i])!(input, options)
                       const t = PR.either(te)
-                      if (t) {
+                      if (t && picks.length === 0) {
                         if (E.isRight(t)) {
                           return PR.success(t.right)
                         } else {
-                          es.push([k++, PR.unionMember(t.left)])
+                          es.push([stepKey++, PR.unionMember(t.left)])
                         }
                       } else {
-                        const nk = k++
+                        const nk = stepKey++
                         picks.push(
                           Effect.suspend(() => {
                             if (finalResult) {
@@ -671,7 +671,7 @@ const go = I.memoize(untracedMethod(() =>
                     }
                   } else {
                     es.push([
-                      k++,
+                      stepKey++,
                       PR.key(name, [PR.type(
                         searchTree.keys[name].ast,
                         input[name]
@@ -679,11 +679,11 @@ const go = I.memoize(untracedMethod(() =>
                     ])
                   }
                 } else {
-                  es.push([k++, PR.key(name, [PR.missing])])
+                  es.push([stepKey++, PR.key(name, [PR.missing])])
                 }
               }
             } else {
-              es.push([k++, PR.type(unknownRecord, input)])
+              es.push([stepKey++, PR.type(unknownRecord, input)])
             }
           }
 
@@ -705,14 +705,14 @@ const go = I.memoize(untracedMethod(() =>
                 for (let i = 0; i < otherwise.length; i++) {
                   const te = map.get(otherwise[i])!(input, options)
                   const t = PR.either(te)
-                  if (t) {
+                  if (t && picks.length === 0) {
                     if (E.isRight(t)) {
                       return PR.success(t.right)
                     } else {
-                      es.push([k++, PR.unionMember(t.left)])
+                      es.push([stepKey++, PR.unionMember(t.left)])
                     }
                   } else {
-                    const nk = k++
+                    const nk = stepKey++
                     picks.push(
                       Effect.suspend(() => {
                         if (finalResult) {
@@ -754,14 +754,14 @@ const go = I.memoize(untracedMethod(() =>
             for (let i = 0; i < otherwise.length; i++) {
               const te = map.get(otherwise[i])!(input, options)
               const t = PR.either(te)
-              if (t) {
+              if (t && picks) {
                 if (E.isRight(t)) {
                   return PR.success(t.right)
                 } else {
-                  es.push([k++, PR.unionMember(t.left)])
+                  es.push([stepKey++, PR.unionMember(t.left)])
                 }
               } else {
-                const nk = k++
+                const nk = stepKey++
                 picks.push(
                   Effect.suspend(() => {
                     if (finalResult) {
