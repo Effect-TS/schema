@@ -52,7 +52,8 @@ describe.concurrent("Schema", () => {
   it("brand/ annotations", () => {
     // const Branded: S.Schema<number & Brand<"A"> & Brand<"B">>
     const Branded = pipe(
-      S.number,
+      S.string,
+      S.numberFromString,
       S.int(),
       S.brand("A"),
       S.brand("B", {
@@ -68,7 +69,7 @@ describe.concurrent("Schema", () => {
   })
 
   it("brand/ ()", () => {
-    const Int = pipe(S.number, S.int(), S.brand("Int"))
+    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
     expect(Int(1)).toEqual(1)
     expect(() => Int(1.2)).toThrowError(
       new Error(`error(s) found
@@ -77,13 +78,13 @@ describe.concurrent("Schema", () => {
   })
 
   it("brand/ option", () => {
-    const Int = pipe(S.number, S.int(), S.brand("Int"))
+    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
     expect(Int.option(1)).toEqual(O.some(1))
     expect(Int.option(1.2)).toEqual(O.none())
   })
 
   it("brand/ either", () => {
-    const Int = pipe(S.number, S.int(), S.brand("Int"))
+    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
     expect(Int.either(1)).toEqual(E.right(1))
     expect(Int.either(1.2)).toEqual(E.left([{
       meta: 1.2,
@@ -93,7 +94,7 @@ describe.concurrent("Schema", () => {
   })
 
   it("brand/ refine", () => {
-    const Int = pipe(S.number, S.int(), S.brand("Int"))
+    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
     expect(Int.refine(1)).toEqual(true)
     expect(Int.refine(1.2)).toEqual(false)
   })
@@ -104,7 +105,7 @@ describe.concurrent("Schema", () => {
     const positive = <I, A extends number>(self: S.Schema<I, A>) =>
       pipe(self, S.positive(), S.brand("Positive"))
 
-    const PositiveInt = pipe(S.number, int, positive)
+    const PositiveInt = pipe(S.string, S.numberFromString, int, positive)
 
     expect(PositiveInt.refine(1)).toEqual(true)
     expect(PositiveInt.refine(-1)).toEqual(false)

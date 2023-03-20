@@ -379,6 +379,16 @@ describe.concurrent("Decoder", () => {
     )
   })
 
+  it("brand/ decoding", async () => {
+    const schema = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
+    await Util.expectDecodingSuccess(schema, "1", 1 as any)
+    await Util.expectDecodingFailure(
+      schema,
+      null,
+      `Expected string, actual null`
+    )
+  })
+
   it("tuple. empty", async () => {
     const schema = S.tuple()
     await Util.expectDecodingSuccess(schema, [])
