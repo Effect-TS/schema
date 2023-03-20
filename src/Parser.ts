@@ -983,12 +983,16 @@ export const _getSearchTree = (
   return { keys, otherwise }
 }
 
-const unknownArray = AST.createTuple([], O.some([AST.unknownKeyword]), true)
+const unknownArray = AST.createTuple([], O.some([AST.unknownKeyword]), true, {
+  [AST.DescriptionAnnotationId]: "a generic array"
+})
 
 const unknownRecord = AST.createTypeLiteral([], [
   AST.createIndexSignature(AST.stringKeyword, AST.unknownKeyword, true),
   AST.createIndexSignature(AST.symbolKeyword, AST.unknownKeyword, true)
-])
+], {
+  [AST.DescriptionAnnotationId]: "a generic object"
+})
 
 const mutableAppend = <A>(self: Array<A>, a: A): NonEmptyReadonlyArray<A> => {
   self.push(a)

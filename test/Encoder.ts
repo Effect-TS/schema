@@ -396,7 +396,7 @@ describe.concurrent("Encoder", () => {
     )
   })
 
-  it("struct/empty", async () => {
+  it("struct/ empty", async () => {
     const schema = S.struct({})
     Util.expectEncodingSuccess(schema, {}, {})
     Util.expectEncodingSuccess(schema, { a: 1 }, { a: 1 })
