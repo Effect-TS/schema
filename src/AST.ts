@@ -179,7 +179,9 @@ export interface HasTransformation {
  * @since 1.0.0
  */
 export const hasTransformation = (ast: AST): boolean =>
-  "hasTransformation" in ast && ast.hasTransformation
+  isRefinement(ast) || isTransform(ast) || (
+    "hasTransformation" in ast && ast.hasTransformation
+  )
 
 /**
  * @since 1.0.0
@@ -796,7 +798,7 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
  * @category model
  * @since 1.0.0
  */
-export interface Refinement extends Annotated, HasTransformation {
+export interface Refinement extends Annotated {
   readonly _tag: "Refinement"
   readonly from: AST
   readonly to: AST
@@ -814,15 +816,7 @@ export const createRefinement = (
   decode: Refinement["decode"],
   encode: Refinement["encode"],
   annotations: Annotated["annotations"] = {}
-): Refinement => ({
-  _tag: "Refinement",
-  from,
-  to,
-  decode,
-  encode,
-  annotations,
-  hasTransformation: true
-})
+): Refinement => ({ _tag: "Refinement", from, to, decode, encode, annotations })
 
 /**
  * @category guards
@@ -843,7 +837,7 @@ export interface ParseOptions {
  * @category model
  * @since 1.0.0
  */
-export interface Transform extends Annotated, HasTransformation {
+export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
@@ -861,15 +855,7 @@ export const createTransform = (
   decode: Transform["decode"],
   encode: Transform["encode"],
   annotations: Annotated["annotations"] = {}
-): Transform => ({
-  _tag: "Transform",
-  from,
-  to,
-  decode,
-  encode,
-  annotations,
-  hasTransformation: true
-})
+): Transform => ({ _tag: "Transform", from, to, decode, encode, annotations })
 
 /**
  * @category guards
