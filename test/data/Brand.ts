@@ -1,4 +1,5 @@
 import * as B from "@effect/data/Brand"
+import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -25,6 +26,16 @@ describe.concurrent("Brand", () => {
   it("property tests", () => {
     Util.roundtrip(S.fromBrand(Int)(S.number)) // refined
     Util.roundtrip(S.fromBrand(Eur)(S.number)) // nominal
+  })
+
+  it("construct", () => {
+    const Id = pipe(
+      S.numberFromString(S.string),
+      S.filter((n) => n > 1, { message: (n) => `${n} should be >= 1` }),
+      S.brand("Id")
+    )
+
+    expect(Id.either(2)).toStrictEqual(E.right(2))
   })
 
   it("refined", async () => {
