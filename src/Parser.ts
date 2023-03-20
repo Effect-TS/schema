@@ -497,7 +497,6 @@ const go = I.memoize(untracedMethod(() =>
               const te = parser(input[name], options)
               const t = PR.either(te)
               if (t) {
-                console.log("sync")
                 if (E.isLeft(t)) {
                   // the input key is present but is not valid
                   const e = PR.key(name, t.left.errors)
@@ -510,7 +509,6 @@ const go = I.memoize(untracedMethod(() =>
                 }
                 output[name] = t.right
               } else {
-                console.log("async")
                 const nk = stepKey++
                 const index = name
                 residual.push(
@@ -886,7 +884,7 @@ const go = I.memoize(untracedMethod(() =>
       case "Refinement":
       case "Transform": {
         const from = go(ast.from)
-        const to = AST.hasTransformation(ast.to) ? go(ast.to) : PR.success
+        const to = go(ast.to)
         return (i1, options) =>
           PR.flatMap(
             from(i1, options),
