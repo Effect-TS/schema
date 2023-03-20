@@ -465,22 +465,16 @@ const go = I.memoize(untracedMethod(() =>
           if (!P.isRecord(input)) {
             return PR.failure(PR.type(unknownRecord, input))
           }
-          const output: any = {}
+          const allErrors = options?.allErrors
+          const isUnexpectedAllowed = options?.isUnexpectedAllowed
           const expectedKeys: any = {}
           const es: Array<[number, PR.ParseErrors]> = []
-          type State = {
-            es: typeof es
-            output: typeof output
-          }
-          const allErrors = options?.allErrors
           let stepKey = 0
-          const residual: Array<(state: State) => PR.ParseResult<void>> = []
           // ---------------------------------------------
-          // handle property signatures
+          // handle missing keys
           // ---------------------------------------------
           for (let i = 0; i < propertySignaturesTypes.length; i++) {
             const ps = ast.propertySignatures[i]
-            const parser = propertySignaturesTypes[i]
             const name = ps.name
             expectedKeys[name] = null
             if (!Object.prototype.hasOwnProperty.call(input, name)) {
@@ -493,7 +487,40 @@ const go = I.memoize(untracedMethod(() =>
                   return PR.failure(e)
                 }
               }
-            } else {
+            }
+          }
+          // ---------------------------------------------
+          // handle unexpected keys
+          // ---------------------------------------------
+          if (!isUnexpectedAllowed && indexSignatures.length === 0) {
+            for (const key of Reflect.ownKeys(input)) {
+              if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
+                const e = PR.key(key, [PR.unexpected(input[key])])
+                if (allErrors) {
+                  es.push([stepKey++, e])
+                  continue
+                } else {
+                  return PR.failures(mutableAppend(sortByIndex(es), e))
+                }
+              }
+            }
+          }
+
+          // ---------------------------------------------
+          // handle property signatures
+          // ---------------------------------------------
+          const output: any = {}
+          type State = {
+            es: typeof es
+            output: typeof output
+          }
+          const residual: Array<(state: State) => PR.ParseResult<void>> = []
+
+          for (let i = 0; i < propertySignaturesTypes.length; i++) {
+            const ps = ast.propertySignatures[i]
+            const parser = propertySignaturesTypes[i]
+            const name = ps.name
+            if (Object.prototype.hasOwnProperty.call(input, name)) {
               const te = parser(input[name], options)
               const t = PR.either(te)
               if (t) {
@@ -605,24 +632,6 @@ const go = I.memoize(untracedMethod(() =>
                         )
                     )
                   )
-                }
-              }
-            }
-          } else {
-            // ---------------------------------------------
-            // handle unexpected keys
-            // ---------------------------------------------
-            const isUnexpectedAllowed = options?.isUnexpectedAllowed
-            for (const key of Reflect.ownKeys(input)) {
-              if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
-                const e = PR.key(key, [PR.unexpected(input[key])])
-                if (!isUnexpectedAllowed) {
-                  if (allErrors) {
-                    es.push([stepKey++, e])
-                    continue
-                  } else {
-                    return PR.failures(mutableAppend(sortByIndex(es), e))
-                  }
                 }
               }
             }

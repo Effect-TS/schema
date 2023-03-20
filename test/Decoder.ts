@@ -794,8 +794,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(schema, {}, `/a is missing`)
     await Util.expectParseFailure(schema, { a: 1 }, `/b is missing`)
     await Util.expectParseFailure(schema, { b: 2 }, `/a is missing`)
-    // TODO
-    // await Util.expectParseFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, { a: "a" }, `/b is missing`)
   })
 
   it("struct/ record(keyof struct({ a, b } & Record<string, string>), number)", async () => {
@@ -828,8 +827,7 @@ describe.concurrent("Decoder", () => {
       { a: 1, b: 2, [c]: "c" },
       `/Symbol(@effect/schema/test/c) Expected number, actual "c"`
     )
-    // TODO
-    // await Util.expectParseFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, { a: "a" }, `/b is missing`)
   })
 
   it("struct/ record(Symbol('a') | Symbol('b'), number)", async () => {
