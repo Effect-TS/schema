@@ -17,9 +17,9 @@ describe.concurrent("minLength", () => {
 
   it("Decoder", async () => {
     const schema = S.minLength(1)(S.string)
-    await Util.expectDecodingSuccess(schema, "a")
-    await Util.expectDecodingSuccess(schema, "aa")
-    await Util.expectDecodingFailure(
+    await Util.expectParseSuccess(schema, "a")
+    await Util.expectParseSuccess(schema, "aa")
+    await Util.expectParseFailure(
       schema,
       "",
       `Expected a string at least 1 character(s) long, actual ""`

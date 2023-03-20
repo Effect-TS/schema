@@ -20,32 +20,32 @@ describe.concurrent("trim", () => {
   })
 
   it("Decoder", async () => {
-    await Util.expectDecodingSuccess(schema, "a", "a")
-    await Util.expectDecodingSuccess(schema, "", "")
-    await Util.expectDecodingSuccess(schema, "a ", "a")
-    await Util.expectDecodingSuccess(schema, " a ", "a")
-    await Util.expectDecodingSuccess(schema, " ", "")
+    await Util.expectParseSuccess(schema, "a", "a")
+    await Util.expectParseSuccess(schema, "", "")
+    await Util.expectParseSuccess(schema, "a ", "a")
+    await Util.expectParseSuccess(schema, " a ", "a")
+    await Util.expectParseSuccess(schema, " ", "")
   })
 
   it("Encoder", async () => {
-    Util.expectEncodingSuccess(schema, "a", "a")
-    Util.expectEncodingSuccess(schema, "", "")
-    await Util.expectEncodingFailure(
+    Util.expectEncodeSuccess(schema, "a", "a")
+    Util.expectEncodeSuccess(schema, "", "")
+    await Util.expectEncodeFailure(
       schema,
       " a",
       `Expected a string with no leading or trailing whitespace, actual " a"`
     )
-    await Util.expectEncodingFailure(
+    await Util.expectEncodeFailure(
       schema,
       "a ",
       `Expected a string with no leading or trailing whitespace, actual "a "`
     )
-    await Util.expectEncodingFailure(
+    await Util.expectEncodeFailure(
       schema,
       " a ",
       `Expected a string with no leading or trailing whitespace, actual " a "`
     )
-    await Util.expectEncodingFailure(
+    await Util.expectEncodeFailure(
       schema,
       " ",
       `Expected a string with no leading or trailing whitespace, actual " "`

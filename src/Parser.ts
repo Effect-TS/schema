@@ -1016,5 +1016,6 @@ const getTemplateLiteralRegex = (ast: AST.TemplateLiteral): RegExp => {
 function sortByIndex<T>(es: RA.NonEmptyArray<[number, T]>): RA.NonEmptyArray<T>
 function sortByIndex<T>(es: Array<[number, T]>): Array<T>
 function sortByIndex(es: Array<[number, any]>): any {
+  // TODO: can be optimised by tracking whether the array is already sorted?
   return es.sort(([a], [b]) => a > b ? 1 : a < b ? -1 : 0).map(([_, a]) => a)
 }

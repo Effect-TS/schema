@@ -140,13 +140,13 @@ export {
    */
   validateOption
 } from "@effect/schema/Parser"
+
 export type {
   /**
    * @since 1.0.0
    */
   ToAsserts
 } from "@effect/schema/Parser"
-
 /* c8 ignore end */
 
 // ---------------------------------------------
@@ -935,8 +935,6 @@ const _void: Schema<void> = make(AST.voidKeyword)
 
 const _null: Schema<null> = make(AST.createLiteral(null))
 
-/* c8 ignore start */
-
 export {
   /**
    * @category primitives
@@ -954,8 +952,6 @@ export {
    */
   _void as void
 }
-
-/* c8 ignore end */
 
 /**
  * @category primitives

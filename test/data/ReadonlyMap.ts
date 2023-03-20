@@ -16,19 +16,19 @@ describe.concurrent("ReadonlyMap", () => {
 
   it("readonlyMapFromSelf. decoder", async () => {
     const schema = S.readonlyMapFromSelf(NumberFromString, S.string)
-    await Util.expectDecodingSuccess(schema, new Map(), new Map())
-    await Util.expectDecodingSuccess(
+    await Util.expectParseSuccess(schema, new Map(), new Map())
+    await Util.expectParseSuccess(
       schema,
       new Map([["1", "a"], ["2", "b"], ["3", "c"]]),
       new Map([[1, "a"], [2, "b"], [3, "c"]])
     )
 
-    await Util.expectDecodingFailure(
+    await Util.expectParseFailure(
       schema,
       null,
       `Expected ReadonlyMap, actual null`
     )
-    await Util.expectDecodingFailure(
+    await Util.expectParseFailure(
       schema,
       new Map([["1", "a"], ["a", "b"]]),
       `/1 /0 Expected string -> number, actual "a"`
@@ -37,8 +37,8 @@ describe.concurrent("ReadonlyMap", () => {
 
   it("readonlyMapFromSelf. encoder", async () => {
     const schema = S.readonlyMapFromSelf(NumberFromString, S.string)
-    Util.expectEncodingSuccess(schema, new Map(), new Map())
-    Util.expectEncodingSuccess(
+    Util.expectEncodeSuccess(schema, new Map(), new Map())
+    Util.expectEncodeSuccess(
       schema,
       new Map([[1, "a"], [2, "b"], [3, "c"]]),
       new Map([["1", "a"], ["2", "b"], ["3", "c"]])
@@ -75,19 +75,19 @@ describe.concurrent("ReadonlyMap", () => {
 
   it("readonlyMap. decoder", async () => {
     const schema = S.readonlyMap(S.number, S.string)
-    await Util.expectDecodingSuccess(schema, [], new Map())
-    await Util.expectDecodingSuccess(
+    await Util.expectParseSuccess(schema, [], new Map())
+    await Util.expectParseSuccess(
       schema,
       [[1, "a"], [2, "b"], [3, "c"]],
       new Map([[1, "a"], [2, "b"], [3, "c"]])
     )
 
-    await Util.expectDecodingFailure(
+    await Util.expectParseFailure(
       schema,
       null,
       `Expected a generic array, actual null`
     )
-    await Util.expectDecodingFailure(
+    await Util.expectParseFailure(
       schema,
       [[1, "a"], [2, 1]],
       `/1 /1 Expected string, actual 1`
@@ -96,8 +96,8 @@ describe.concurrent("ReadonlyMap", () => {
 
   it("readonlyMap. encoder", async () => {
     const schema = S.readonlyMap(S.number, S.string)
-    Util.expectEncodingSuccess(schema, new Map(), [])
-    Util.expectEncodingSuccess(schema, new Map([[1, "a"], [2, "b"], [3, "c"]]), [[1, "a"], [
+    Util.expectEncodeSuccess(schema, new Map(), [])
+    Util.expectEncodeSuccess(schema, new Map([[1, "a"], [2, "b"], [3, "c"]]), [[1, "a"], [
       2,
       "b"
     ], [3, "c"]])

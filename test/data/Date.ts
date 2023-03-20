@@ -13,14 +13,14 @@ describe.concurrent("Date", () => {
   })
 
   it("date. decoder", async () => {
-    await Util.expectDecodingSuccess(S.date, new Date(), new Date())
+    await Util.expectParseSuccess(S.date, new Date(), new Date())
 
-    await Util.expectDecodingFailure(S.date, null, `Expected Date, actual null`)
+    await Util.expectParseFailure(S.date, null, `Expected Date, actual null`)
   })
 
   it("date. encoder", async () => {
     const now = new Date()
-    Util.expectEncodingSuccess(S.date, now, now)
+    Util.expectEncodeSuccess(S.date, now, now)
   })
 
   it("date. guard", () => {
@@ -43,17 +43,17 @@ describe.concurrent("Date", () => {
     })
 
     it("Decoder", async () => {
-      await Util.expectDecodingSuccess(
+      await Util.expectParseSuccess(
         schema,
         "1970-01-01T00:00:00.000Z",
         new Date(0)
       )
-      await Util.expectDecodingFailure(
+      await Util.expectParseFailure(
         schema,
         "a",
         `Expected string -> Date, actual "a"`
       )
-      await Util.expectDecodingFailure(
+      await Util.expectParseFailure(
         schema,
         "a1",
         `Expected string -> Date, actual "a1"`
@@ -61,19 +61,19 @@ describe.concurrent("Date", () => {
     })
 
     it("Encoder", async () => {
-      Util.expectEncodingSuccess(schema, new Date(0), "1970-01-01T00:00:00.000Z")
+      Util.expectEncodeSuccess(schema, new Date(0), "1970-01-01T00:00:00.000Z")
     })
 
     it("example", async () => {
       const schema = S.dateFromString
 
       // success cases
-      await Util.expectDecodingSuccess(schema, "0", new Date("0"))
-      await Util.expectDecodingSuccess(schema, "1970-01-01T00:00:00.000Z", new Date(0))
-      await Util.expectDecodingSuccess(schema, "2000-10-01", new Date("2000-10-01"))
+      await Util.expectParseSuccess(schema, "0", new Date("0"))
+      await Util.expectParseSuccess(schema, "1970-01-01T00:00:00.000Z", new Date(0))
+      await Util.expectParseSuccess(schema, "2000-10-01", new Date("2000-10-01"))
 
       // failure cases
-      await Util.expectDecodingFailure(
+      await Util.expectParseFailure(
         schema,
         "a",
         `Expected string -> Date, actual "a"`

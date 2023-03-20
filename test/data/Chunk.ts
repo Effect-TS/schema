@@ -19,19 +19,19 @@ describe.concurrent("Chunk", () => {
 
   it("chunkFromSelf. decoder", async () => {
     const schema = S.chunkFromSelf(NumberFromString)
-    await Util.expectDecodingSuccess(schema, C.empty(), C.empty())
-    await Util.expectDecodingSuccess(
+    await Util.expectParseSuccess(schema, C.empty(), C.empty())
+    await Util.expectParseSuccess(
       schema,
       C.fromIterable(["1", "2", "3"]),
       C.fromIterable([1, 2, 3])
     )
 
-    await Util.expectDecodingFailure(
+    await Util.expectParseFailure(
       schema,
       null,
       `Expected Chunk, actual null`
     )
-    await Util.expectDecodingFailure(
+    await Util.expectParseFailure(
       schema,
       C.fromIterable(["1", "a", "3"]),
       `/1 Expected string -> number, actual "a"`
@@ -40,8 +40,8 @@ describe.concurrent("Chunk", () => {
 
   it("chunkFromSelf. encoder", async () => {
     const schema = S.chunkFromSelf(NumberFromString)
-    Util.expectEncodingSuccess(schema, C.empty(), C.empty())
-    Util.expectEncodingSuccess(schema, C.fromIterable([1, 2, 3]), C.fromIterable(["1", "2", "3"]))
+    Util.expectEncodeSuccess(schema, C.empty(), C.empty())
+    Util.expectEncodeSuccess(schema, C.fromIterable([1, 2, 3]), C.fromIterable(["1", "2", "3"]))
   })
 
   it("chunkFromSelf. guard", () => {
@@ -69,20 +69,20 @@ describe.concurrent("Chunk", () => {
 
   it("chunk. decoder", async () => {
     const schema = S.chunk(S.number)
-    await Util.expectDecodingSuccess(schema, [], C.empty())
-    await Util.expectDecodingSuccess(schema, [1, 2, 3], C.fromIterable([1, 2, 3]))
+    await Util.expectParseSuccess(schema, [], C.empty())
+    await Util.expectParseSuccess(schema, [1, 2, 3], C.fromIterable([1, 2, 3]))
 
-    await Util.expectDecodingFailure(
+    await Util.expectParseFailure(
       schema,
       null,
       `Expected a generic array, actual null`
     )
-    await Util.expectDecodingFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
   })
 
   it("chunk. encoder", async () => {
     const schema = S.chunk(S.number)
-    Util.expectEncodingSuccess(schema, C.empty(), [])
-    Util.expectEncodingSuccess(schema, C.fromIterable([1, 2, 3]), [1, 2, 3])
+    Util.expectEncodeSuccess(schema, C.empty(), [])
+    Util.expectEncodeSuccess(schema, C.fromIterable([1, 2, 3]), [1, 2, 3])
   })
 })
