@@ -270,21 +270,44 @@ const go = I.memoize(untracedMethod(() =>
           // ---------------------------------------------
           for (; i < elements.length; i++) {
             if (input.length < i + 1) {
-              // the input element is missing...
-              if (!ast.elements[i].isOptional) {
-                // ...but the element is required
-                const e = PR.index(i, [PR.missing])
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failure(e)
+              if (residual.length === 0) {
+                // the input element is missing...
+                if (!ast.elements[i].isOptional) {
+                  // ...but the element is required
+                  const e = PR.index(i, [PR.missing])
+                  if (allErrors) {
+                    es.push([stepKey++, e])
+                    continue
+                  } else {
+                    return PR.failure(e)
+                  }
                 }
+              } else {
+                const ci = i
+                const nk = stepKey++
+                residual.push(
+                  untracedMethod(() =>
+                    ({ es }: State) =>
+                      Effect.suspend(() => {
+                        // the input element is missing...
+                        if (!ast.elements[ci].isOptional) {
+                          // ...but the element is required
+                          const e = PR.index(ci, [PR.missing])
+                          if (allErrors) {
+                            es.push([nk, e])
+                          } else {
+                            return PR.failure(e)
+                          }
+                        }
+                        return Effect.unit()
+                      })
+                  )
+                )
               }
             } else {
               const parser = elements[i]
               const te = parser(input[i], options)
-              const t = PR.either(te)
+              const t = residual.length === 0 ? PR.either(te) : undefined
               if (t) {
                 if (E.isLeft(t)) {
                   // the input element is present but is not valid
@@ -330,7 +353,7 @@ const go = I.memoize(untracedMethod(() =>
             const tail = RA.tailNonEmpty(rest.value)
             for (; i < input.length - tail.length; i++) {
               const te = head(input[i], options)
-              const t = PR.either(te)
+              const t = residual.length === 0 ? PR.either(te) : undefined
               if (t) {
                 if (E.isLeft(t)) {
                   const e = PR.index(i, t.left.errors)
@@ -377,7 +400,7 @@ const go = I.memoize(untracedMethod(() =>
                 return PR.failures(mutableAppend(sortByIndex(es), PR.index(i, [PR.missing])))
               } else {
                 const te = tail[j](input[i], options)
-                const t = PR.either(te)
+                const t = residual.length === 0 ? PR.either(te) : undefined
                 if (t) {
                   if (E.isLeft(t)) {
                     // the input element is present but is not valid
@@ -495,7 +518,7 @@ const go = I.memoize(untracedMethod(() =>
               }
             } else {
               const te = parser(input[name], options)
-              const t = PR.either(te)
+              const t = residual.length === 0 ? PR.either(te) : undefined
               if (t) {
                 if (E.isLeft(t)) {
                   // the input key is present but is not valid
@@ -549,7 +572,7 @@ const go = I.memoize(untracedMethod(() =>
                 // ---------------------------------------------
                 // handle keys
                 // ---------------------------------------------
-                const t = PR.either(te)
+                const t = residual.length === 0 ? PR.either(te) : undefined
                 if (t) {
                   if (E.isLeft(t)) {
                     const e = PR.key(key, t.left.errors)
@@ -567,7 +590,7 @@ const go = I.memoize(untracedMethod(() =>
                 // handle values
                 // ---------------------------------------------
                 const tve = type(input[key], options)
-                const tv = PR.either(tve)
+                const tv = residual.length === 0 ? PR.either(tve) : undefined
                 if (tv) {
                   if (E.isLeft(tv)) {
                     const e = PR.key(key, tv.left.errors)
