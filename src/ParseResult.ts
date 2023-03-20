@@ -15,15 +15,31 @@ import type * as AST from "@effect/schema/AST"
 /**
  * @since 1.0.0
  */
-export type ParseResult<A> = Effect.Effect<never, NonEmptyReadonlyArray<ParseError>, A>
+export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
 
 /**
- * `ParseError` is a type that represents the different types of errors that can occur when decoding a value.
+ * @since 1.0.0
+ */
+export interface ParseError {
+  readonly _tag: "ParseError"
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+}
+
+/**
+ * @since 1.0.0
+ */
+export const parseError = (errors: NonEmptyReadonlyArray<ParseErrors>): ParseError => ({
+  _tag: "ParseError",
+  errors
+})
+
+/**
+ * `ParseErrors` is a type that represents the different types of errors that can occur when decoding a value.
  *
  * @category model
  * @since 1.0.0
  */
-export type ParseError =
+export type ParseErrors =
   | Type
   | Index
   | Key
@@ -71,7 +87,7 @@ export const type = (expected: AST.AST, actual: unknown, message?: string): Type
 export interface Index {
   readonly _tag: "Index"
   readonly index: number
-  readonly errors: NonEmptyReadonlyArray<ParseError>
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
 }
 
 /**
@@ -80,7 +96,7 @@ export interface Index {
  */
 export const index = (
   index: number,
-  errors: NonEmptyReadonlyArray<ParseError>
+  errors: NonEmptyReadonlyArray<ParseErrors>
 ): Index => ({
   _tag: "Index",
   index,
@@ -100,7 +116,7 @@ export const index = (
 export interface Key {
   readonly _tag: "Key"
   readonly key: PropertyKey
-  readonly errors: NonEmptyReadonlyArray<ParseError>
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
 }
 
 /**
@@ -109,7 +125,7 @@ export interface Key {
  */
 export const key = (
   key: PropertyKey,
-  errors: NonEmptyReadonlyArray<ParseError>
+  errors: NonEmptyReadonlyArray<ParseErrors>
 ): Key => ({
   _tag: "Key",
   key,
@@ -162,7 +178,7 @@ export const unexpected = (
  */
 export interface UnionMember {
   readonly _tag: "UnionMember"
-  readonly errors: NonEmptyReadonlyArray<ParseError>
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
 }
 
 /**
@@ -170,7 +186,7 @@ export interface UnionMember {
  * @since 1.0.0
  */
 export const unionMember = (
-  errors: NonEmptyReadonlyArray<ParseError>
+  errors: NonEmptyReadonlyArray<ParseErrors>
 ): UnionMember => ({
   _tag: "UnionMember",
   errors
@@ -186,15 +202,15 @@ export const success: <A>(a: A) => ParseResult<A> = (a) => Exit.succeed(a)
  * @category constructors
  * @since 1.0.0
  */
-export const failure = (e: ParseError): ParseResult<never> => Exit.fail([e])
+export const failure = (e: ParseErrors): ParseResult<never> => Exit.fail(parseError([e]))
 
 /**
  * @category constructors
  * @since 1.0.0
  */
 export const failures = (
-  es: NonEmptyReadonlyArray<ParseError>
-): ParseResult<never> => Exit.fail(es)
+  es: NonEmptyReadonlyArray<ParseErrors>
+): ParseResult<never> => Exit.fail(parseError(es))
 
 const untrace = <E, A>(self: Effect.Effect<never, E, A>): Effect.Effect<never, E, A> => {
   // TODO: find a way to detect Traced

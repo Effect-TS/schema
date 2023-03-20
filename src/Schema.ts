@@ -559,7 +559,7 @@ export const brand = <B extends string, A>(
       either: (input: unknown) =>
         E.mapLeft(
           validateEither(input),
-          (errors) => [{ meta: input, message: formatErrors(errors) }]
+          (e) => [{ meta: input, message: formatErrors(e.errors) }]
         ),
       refine: (input: unknown): input is A & Brand<B> => is(input)
     })
@@ -763,11 +763,11 @@ export const transformEither: {
     decode: (
       a1: A1,
       options?: ParseOptions
-    ) => E.Either<RA.NonEmptyReadonlyArray<PR.ParseError>, I2>,
+    ) => E.Either<PR.ParseError, I2>,
     encode: (
       i2: I2,
       options?: ParseOptions
-    ) => E.Either<RA.NonEmptyReadonlyArray<PR.ParseError>, A1>
+    ) => E.Either<PR.ParseError, A1>
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
@@ -775,17 +775,20 @@ export const transformEither: {
     decode: (
       a1: A1,
       options?: ParseOptions
-    ) => E.Either<RA.NonEmptyReadonlyArray<PR.ParseError>, I2>,
+    ) => E.Either<PR.ParseError, I2>,
     encode: (
       i2: I2,
       options?: ParseOptions
-    ) => E.Either<RA.NonEmptyReadonlyArray<PR.ParseError>, A1>
+    ) => E.Either<PR.ParseError, A1>
   ): Schema<I1, A2>
 } = dual(4, <I1, A1, I2, A2>(
   from: Schema<I1, A1>,
   to: Schema<I2, A2>,
-  decode: (a1: A1, options?: ParseOptions) => E.Either<RA.NonEmptyReadonlyArray<PR.ParseError>, I2>,
-  encode: (i2: I2, options?: ParseOptions) => E.Either<RA.NonEmptyReadonlyArray<PR.ParseError>, A1>
+  decode: (
+    a1: A1,
+    options?: ParseOptions
+  ) => E.Either<PR.ParseError, I2>,
+  encode: (i2: I2, options?: ParseOptions) => E.Either<PR.ParseError, A1>
 ): Schema<I1, A2> =>
   make(
     AST.createTransform(from.ast, to.ast, (i, o) =>
@@ -1243,7 +1246,8 @@ export const fromBrand = <C extends Brand<string>>(
         Effect.fromEither(
           E.mapLeft(
             constructor.either(a),
-            (e) => [PR.type(ast, a, e.map((v) => v.message).join(", "))]
+            (brandErrors) =>
+              PR.parseError([PR.type(ast, a, brandErrors.map((v) => v.message).join(", "))])
           )
         )
     )

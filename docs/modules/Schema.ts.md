@@ -647,14 +647,14 @@ using the provided decoding functions.
 export declare const transformEither: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A1>
+    decode: (a1: A1, options?: ParseOptions | undefined) => Either<PR.ParseError, I2>,
+    encode: (i2: I2, options?: ParseOptions | undefined) => Either<PR.ParseError, A1>
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A1>
+    decode: (a1: A1, options?: ParseOptions | undefined) => Either<PR.ParseError, I2>,
+    encode: (i2: I2, options?: ParseOptions | undefined) => Either<PR.ParseError, A1>
   ): Schema<I1, A2>
 }
 ```
@@ -2117,7 +2117,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeEither: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (i: I, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -2163,7 +2163,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeEither: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], I>
+) => (a: A, options?: ParseOptions | undefined) => Either<PR.ParseError, I>
 ```
 
 Added in v1.0.0
@@ -2273,7 +2273,7 @@ Added in v1.0.0
 ```ts
 export declare const parseEither: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (i: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -2339,7 +2339,7 @@ Added in v1.0.0
 ```ts
 export declare const validateEither: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (a: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
 ```
 
 Added in v1.0.0

@@ -69,7 +69,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeEither: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (i: I, options?: ParseOptions | undefined) => E.Either<PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -115,7 +115,7 @@ Added in v1.0.0
 ```ts
 export declare const parseEither: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (i: unknown, options?: ParseOptions | undefined) => E.Either<PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -163,7 +163,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeEither: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], I>
+) => (a: A, options?: ParseOptions | undefined) => E.Either<PR.ParseError, I>
 ```
 
 Added in v1.0.0
@@ -245,7 +245,7 @@ Added in v1.0.0
 ```ts
 export declare const validateEither: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => E.Either<readonly [PR.ParseError, ...PR.ParseError[]], A>
+) => (a: unknown, options?: ParseOptions | undefined) => E.Either<PR.ParseError, A>
 ```
 
 Added in v1.0.0
