@@ -437,7 +437,7 @@ const go = I.memoize(untracedMethod(() =>
           // compute output
           // ---------------------------------------------
           const computeResult = ({ es, output }: State) =>
-            RA.isNonEmptyReadonlyArray(es) ?
+            RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(sortByIndex(output))
           return residual.length > 0 ?
@@ -650,7 +650,7 @@ const go = I.memoize(untracedMethod(() =>
           // compute output
           // ---------------------------------------------
           const computeResult = ({ es, output }: State) =>
-            RA.isNonEmptyReadonlyArray(es) ?
+            RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(output)
           return residual.length > 0 ?
@@ -749,7 +749,7 @@ const go = I.memoize(untracedMethod(() =>
           }
 
           const computeResult = ({ es }: State) =>
-            RA.isNonEmptyReadonlyArray(es) ?
+            RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.failure(PR.type(AST.neverKeyword, input))
 
@@ -766,7 +766,7 @@ const go = I.memoize(untracedMethod(() =>
                   if (state.finalResult.ref) {
                     return state.finalResult.ref
                   }
-                  const picks2 = []
+                  const picks2: Array<Effect.Effect<never, never, void>> = []
                   // if none of the schemas with at least one property with a literal value succeeded,
                   // proceed with those that have no literal at all
                   for (let i = 0; i < otherwise.length; i++) {
@@ -1010,9 +1010,8 @@ const getTemplateLiteralRegex = (ast: AST.TemplateLiteral): RegExp => {
   return new RegExp(pattern)
 }
 
-function sortByIndex<T>(es: RA.NonEmptyReadonlyArray<[number, T]>): RA.NonEmptyReadonlyArray<T>
+function sortByIndex<T>(es: RA.NonEmptyArray<[number, T]>): RA.NonEmptyArray<T>
 function sortByIndex<T>(es: Array<[number, T]>): Array<T>
-function sortByIndex(es: any): any {
-  // @ts-expect-error
+function sortByIndex(es: Array<[number, any]>): any {
   return es.sort(([a], [b]) => a > b ? 1 : a < b ? -1 : 0).map(([_, a]) => a)
 }
