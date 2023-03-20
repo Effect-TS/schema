@@ -264,7 +264,6 @@ const go = I.memoize(untracedMethod(() =>
             output: typeof output
           }
           const residual: Array<(_: State) => PR.ParseResult<void>> = []
-
           const processResidual = Effect.suspend(() => {
             const state: State = {
               es: Array.from(es),
@@ -482,7 +481,7 @@ const go = I.memoize(untracedMethod(() =>
               PR.success(sortByIndex(output))
 
           return residual.length > 0 ?
-            Effect.flatMap(processResidual, (state) => computeResult(state)) :
+            Effect.flatMap(processResidual, computeResult) :
             computeResult({ output, es })
         }
       }
@@ -508,6 +507,16 @@ const go = I.memoize(untracedMethod(() =>
           const allErrors = options?.allErrors
           let stepKey = 0
           const residual: Array<(state: State) => PR.ParseResult<void>> = []
+          const processResidual = Effect.suspend(() => {
+            const state: State = {
+              es: Array.from(es),
+              output: Object.assign({}, output)
+            }
+            return Effect.map(
+              Effect.forEachDiscard(residual, (f) => f(state)),
+              () => state
+            )
+          })
           // ---------------------------------------------
           // handle property signatures
           // ---------------------------------------------
@@ -517,14 +526,35 @@ const go = I.memoize(untracedMethod(() =>
             const name = ps.name
             expectedKeys[name] = null
             if (!Object.prototype.hasOwnProperty.call(input, name)) {
-              if (!ps.isOptional) {
-                const e = PR.key(name, [PR.missing])
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failure(e)
+              if (residual.length === 0) {
+                if (!ps.isOptional) {
+                  const e = PR.key(name, [PR.missing])
+                  if (allErrors) {
+                    es.push([stepKey++, e])
+                    continue
+                  } else {
+                    return PR.failure(e)
+                  }
                 }
+              } else {
+                const nk = stepKey++
+                const index = name
+                residual.push(
+                  untracedMethod(() =>
+                    ({ es }: State) =>
+                      Effect.suspend(() => {
+                        if (!ps.isOptional) {
+                          const e = PR.key(index, [PR.missing])
+                          if (allErrors) {
+                            es.push([nk, e])
+                          } else {
+                            return PR.failure(e)
+                          }
+                        }
+                        return Effect.unit()
+                      })
+                  )
+                )
               }
             } else {
               const te = parser(input[name], options)
@@ -648,14 +678,33 @@ const go = I.memoize(untracedMethod(() =>
             const isUnexpectedAllowed = options?.isUnexpectedAllowed
             for (const key of Reflect.ownKeys(input)) {
               if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
-                const e = PR.key(key, [PR.unexpected(input[key])])
-                if (!isUnexpectedAllowed) {
-                  if (allErrors) {
-                    es.push([stepKey++, e])
-                    continue
-                  } else {
-                    return PR.failures(mutableAppend(sortByIndex(es), e))
+                if (residual.length === 0) {
+                  const e = PR.key(key, [PR.unexpected(input[key])])
+                  if (!isUnexpectedAllowed) {
+                    if (allErrors) {
+                      es.push([stepKey++, e])
+                      continue
+                    } else {
+                      return PR.failures(mutableAppend(sortByIndex(es), e))
+                    }
                   }
+                } else {
+                  const index = key
+                  const nk = stepKey++
+                  residual.push(untracedMethod(() =>
+                    (state) =>
+                      Effect.suspend(() => {
+                        const e = PR.key(index, [PR.unexpected(input[index])])
+                        if (!isUnexpectedAllowed) {
+                          if (allErrors) {
+                            es.push([nk, e])
+                          } else {
+                            return PR.failures(mutableAppend(sortByIndex(state.es), e))
+                          }
+                        }
+                        return Effect.unit()
+                      })
+                  ))
                 }
               }
             }
@@ -668,16 +717,7 @@ const go = I.memoize(untracedMethod(() =>
               PR.failures(sortByIndex(es)) :
               PR.success(output)
           return residual.length > 0 ?
-            Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                output: Object.assign({}, output)
-              }
-              return Effect.flatMap(
-                Effect.forEachDiscard(residual, (f) => f(state)),
-                () => computeResult(state)
-              )
-            }) :
+            Effect.flatMap(processResidual, computeResult) :
             computeResult({ es, output })
         }
       }
