@@ -85,7 +85,7 @@ describe.concurrent("ReadonlyMap", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous tuple or array schema>, actual null`
+      `Expected a generic array, actual null`
     )
     await Util.expectDecodingFailure(
       schema,

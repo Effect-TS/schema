@@ -396,12 +396,12 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous tuple or array schema>, actual null`
+      `Expected a generic array, actual null`
     )
     await Util.expectDecodingFailure(
       schema,
       {},
-      `Expected <anonymous tuple or array schema>, actual {}`
+      `Expected a generic array, actual {}`
     )
     await Util.expectDecodingFailure(schema, [undefined], `/0 is unexpected`)
     await Util.expectDecodingFailure(schema, [1], `/0 is unexpected`)
@@ -414,7 +414,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous tuple or array schema>, actual null`
+      `Expected a generic array, actual null`
     )
     await Util.expectDecodingFailure(schema, [], `/0 is missing`)
     await Util.expectDecodingFailure(
@@ -434,7 +434,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous tuple or array schema>, actual null`
+      `Expected a generic array, actual null`
     )
     await Util.expectDecodingFailure(schema, [], `/0 is missing`)
     await Util.expectDecodingFailure(
@@ -453,7 +453,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous tuple or array schema>, actual null`
+      `Expected a generic array, actual null`
     )
     await Util.expectDecodingFailure(
       schema,
@@ -472,7 +472,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous tuple or array schema>, actual null`
+      `Expected a generic array, actual null`
     )
     await Util.expectDecodingFailure(
       schema,
@@ -544,7 +544,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(schema, [1, true], `/0 Expected string, actual 1`)
   })
 
-  it("struct/empty", async () => {
+  it("struct/ empty", async () => {
     const schema = S.struct({})
     await Util.expectDecodingSuccess(schema, {})
     await Util.expectDecodingSuccess(schema, { a: 1 })
@@ -564,7 +564,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous type literal schema>, actual null`
+      `Expected a generic object, actual null`
     )
     await Util.expectDecodingFailure(schema, {}, "/a is missing")
     await Util.expectDecodingFailure(
@@ -583,7 +583,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous type literal schema>, actual null`
+      `Expected a generic object, actual null`
     )
     await Util.expectDecodingFailure(schema, {}, "/a is missing")
     await Util.expectDecodingFailure(
@@ -602,7 +602,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous type literal schema>, actual null`
+      `Expected a generic object, actual null`
     )
     await Util.expectDecodingFailure(
       schema,
@@ -626,7 +626,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous type literal schema>, actual null`
+      `Expected a generic object, actual null`
     )
     await Util.expectDecodingFailure(
       schema,
@@ -667,7 +667,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       [],
-      "Expected <anonymous type literal schema>, actual []"
+      "Expected a generic object, actual []"
     )
     await Util.expectDecodingFailure(
       schema,
@@ -685,7 +685,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       [],
-      "Expected <anonymous type literal schema>, actual []"
+      "Expected a generic object, actual []"
     )
     await Util.expectDecodingFailure(
       schema,
@@ -822,7 +822,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      "Expected <anonymous type literal schema>, actual null"
+      "Expected a generic object, actual null"
     )
     await Util.expectDecodingFailure(schema, {}, "/a is missing, /b is missing")
     await Util.expectDecodingFailure(
@@ -842,7 +842,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      "Expected <anonymous type literal schema>, actual null"
+      "Expected a generic object, actual null"
     )
     await Util.expectDecodingFailure(schema, {}, "/category is missing, /tag is missing")
     await Util.expectDecodingFailure(
@@ -889,7 +889,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      `Expected <anonymous type literal schema>, actual null`
+      `Expected a generic object, actual null`
     )
     await Util.expectDecodingFailure(
       schema,
@@ -899,7 +899,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       { a: "a1", as: [{ a: "a2", as: [1] }] },
-      "/as /0 /as /0 Expected <anonymous type literal schema>, actual 1"
+      "/as /0 /as /0 Expected a generic object, actual 1"
     )
   })
 
@@ -1026,7 +1026,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      "Expected <anonymous type literal schema>, actual null"
+      "Expected a generic object, actual null"
     )
     await Util.expectDecodingFailure(schema, { a: "a" }, `/b is missing`)
     await Util.expectDecodingFailure(schema, { b: 1 }, "/a is missing")
@@ -1041,7 +1041,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectDecodingFailure(
       schema,
       null,
-      "Expected <anonymous type literal schema>, actual null"
+      "Expected a generic object, actual null"
     )
     await Util.expectDecodingFailure(schema, { [a]: "a" }, `/b is missing`)
     await Util.expectDecodingFailure(
