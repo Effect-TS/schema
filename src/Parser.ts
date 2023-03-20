@@ -697,7 +697,7 @@ const go = I.memoize(untracedMethod(() =>
                         const e = PR.key(index, [PR.unexpected(input[index])])
                         if (!isUnexpectedAllowed) {
                           if (allErrors) {
-                            es.push([nk, e])
+                            state.es.push([nk, e])
                           } else {
                             return PR.failures(mutableAppend(sortByIndex(state.es), e))
                           }
