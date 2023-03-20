@@ -6,13 +6,13 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as AST from "@effect/schema/AST"
-import type * as PR from "@effect/schema/ParseResult"
+import type { ParseErrors } from "@effect/schema/ParseResult"
 
 interface Forest<A> extends ReadonlyArray<Tree<A>> {}
 
 interface Tree<A> {
-  value: A
-  forest: Forest<A>
+  readonly value: A
+  readonly forest: Forest<A>
 }
 
 const make = <A>(value: A, forest: Forest<A> = []): Tree<A> => ({
@@ -23,7 +23,7 @@ const make = <A>(value: A, forest: Forest<A> = []): Tree<A> => ({
 /**
  * @since 1.0.0
  */
-export const formatErrors = (errors: NonEmptyReadonlyArray<PR.ParseError>): string =>
+export const formatErrors = (errors: NonEmptyReadonlyArray<ParseErrors>): string =>
   drawTree(make(`error(s) found`, errors.map(go)))
 
 const drawTree = (tree: Tree<string>): string => tree.value + draw("\n", tree.forest)
@@ -147,7 +147,7 @@ export const formatExpected = (ast: AST.AST): string => {
   }
 }
 
-const go = (e: PR.ParseError): Tree<string> => {
+const go = (e: ParseErrors): Tree<string> => {
   switch (e._tag) {
     case "Type":
       return make(

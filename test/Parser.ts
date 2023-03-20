@@ -28,7 +28,9 @@ describe.concurrent("Parser", () => {
     const schema = pipe(S.string, S.maxLength(1), S.numberFromString)
     expect(P.validateEither(schema)(1)).toEqual(E.right(1))
     expect(P.validateEither(schema)(10)).toEqual(E.right(10))
-    expect(P.validateEither(schema)("a")).toEqual(E.left([PR.type(S.number.ast, "a")]))
+    expect(P.validateEither(schema)("a")).toEqual(
+      E.left(PR.parseError([PR.type(S.number.ast, "a")]))
+    )
   })
 
   it("_getLiterals", () => {
