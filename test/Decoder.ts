@@ -618,8 +618,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(schema, ["a"], `/1 is missing`)
     await Util.expectParseFailure(schema, ["a", 1], `/1 Expected boolean, actual 1`)
     await Util.expectParseFailure(schema, [1, true], `/0 Expected string, actual 1`)
-    // TODO
-    // await Util.expectParseFailure(schema, [true], `/0 Expected string, actual true`)
+    await Util.expectParseFailure(schema, [true], `/1 is missing`)
   })
 
   it("struct/ empty", async () => {
@@ -1318,6 +1317,18 @@ describe.concurrent("Decoder", () => {
   const allErrors: AST.ParseOptions = {
     allErrors: true
   }
+
+  it("allErrors/tuple. e r e", async () => {
+    const schema = pipe(S.tuple(S.string), S.rest(S.number), S.element(S.boolean))
+    await Util.expectParseFailure(
+      schema,
+      [true],
+      `/1 is missing, /0 Expected string, actual true`,
+      {
+        allErrors: true
+      }
+    )
+  })
 
   it("allErrors/tuple: missing element", async () => {
     const schema = S.tuple(S.string, S.number)

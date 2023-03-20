@@ -250,15 +250,48 @@ const go = I.memoize(untracedMethod(() =>
       case "Tuple": {
         const elements = ast.elements.map((e) => go(e.type))
         const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
+        let requiredLen = ast.elements.filter((e) => !e.isOptional).length
+        if (O.isSome(ast.rest)) {
+          requiredLen += ast.rest.value.length - 1
+        }
         return (input: unknown, options) => {
           if (!Array.isArray(input)) {
             return PR.failure(PR.type(unknownArray, input))
           }
-          const output: Array<[number, any]> = []
-          const es: Array<[number, PR.ParseErrors]> = []
           const allErrors = options?.allErrors
-          let i = 0
+          const es: Array<[number, PR.ParseErrors]> = []
           let stepKey = 0
+          // ---------------------------------------------
+          // handle missing indexes
+          // ---------------------------------------------
+          const len = input.length
+          for (let i = len; i <= requiredLen - 1; i++) {
+            const e = PR.index(i, [PR.missing])
+            if (allErrors) {
+              es.push([stepKey++, e])
+              continue
+            } else {
+              return PR.failure(e)
+            }
+          }
+          // ---------------------------------------------
+          // handle unexpected indexes
+          // ---------------------------------------------
+          const isUnexpectedAllowed = options?.isUnexpectedAllowed
+          if (!isUnexpectedAllowed && O.isNone(ast.rest)) {
+            for (let i = ast.elements.length; i <= len - 1; i++) {
+              const e = PR.index(i, [PR.unexpected(input[i])])
+              if (allErrors) {
+                es.push([stepKey++, e])
+                continue
+              } else {
+                return PR.failures(mutableAppend(sortByIndex(es), e))
+              }
+            }
+          }
+
+          const output: Array<[number, any]> = []
+          let i = 0
           type State = {
             es: typeof es
             output: typeof output
@@ -269,17 +302,10 @@ const go = I.memoize(untracedMethod(() =>
           // handle elements
           // ---------------------------------------------
           for (; i < elements.length; i++) {
-            if (input.length < i + 1) {
+            if (len < i + 1) {
               // the input element is missing...
-              if (!ast.elements[i].isOptional) {
-                // ...but the element is required
-                const e = PR.index(i, [PR.missing])
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failure(e)
-                }
+              if (ast.elements[i].isOptional) {
+                continue
               }
             } else {
               const parser = elements[i]
@@ -328,7 +354,7 @@ const go = I.memoize(untracedMethod(() =>
           if (O.isSome(rest)) {
             const head = RA.headNonEmpty(rest.value)
             const tail = RA.tailNonEmpty(rest.value)
-            for (; i < input.length - tail.length; i++) {
+            for (; i < len - tail.length; i++) {
               const te = head(input[i], options)
               const t = PR.either(te)
               if (t) {
@@ -372,9 +398,8 @@ const go = I.memoize(untracedMethod(() =>
             // ---------------------------------------------
             for (let j = 0; j < tail.length; j++) {
               i += j
-              if (input.length < i + 1) {
-                // the input element is missing and the element is required, bail out
-                return PR.failures(mutableAppend(sortByIndex(es), PR.index(i, [PR.missing])))
+              if (len < i + 1) {
+                continue
               } else {
                 const te = tail[j](input[i], options)
                 const t = PR.either(te)
@@ -415,23 +440,8 @@ const go = I.memoize(untracedMethod(() =>
                 }
               }
             }
-          } else {
-            // ---------------------------------------------
-            // handle unexpected indexes
-            // ---------------------------------------------
-            const isUnexpectedAllowed = options?.isUnexpectedAllowed
-            for (; i < input.length; i++) {
-              const e = PR.index(i, [PR.unexpected(input[i])])
-              if (!isUnexpectedAllowed) {
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failures(mutableAppend(sortByIndex(es), e))
-                }
-              }
-            }
           }
+
           // ---------------------------------------------
           // compute output
           // ---------------------------------------------
@@ -466,7 +476,6 @@ const go = I.memoize(untracedMethod(() =>
             return PR.failure(PR.type(unknownRecord, input))
           }
           const allErrors = options?.allErrors
-          const isUnexpectedAllowed = options?.isUnexpectedAllowed
           const expectedKeys: any = {}
           const es: Array<[number, PR.ParseErrors]> = []
           let stepKey = 0
@@ -492,6 +501,7 @@ const go = I.memoize(untracedMethod(() =>
           // ---------------------------------------------
           // handle unexpected keys
           // ---------------------------------------------
+          const isUnexpectedAllowed = options?.isUnexpectedAllowed
           if (!isUnexpectedAllowed && indexSignatures.length === 0) {
             for (const key of Reflect.ownKeys(input)) {
               if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
