@@ -548,17 +548,17 @@ export const brand = <B extends string, A>(
     annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema = make(ast)
-    const parse = P.parse(schema)
-    const parseOption = P.parseOption(schema)
-    const parseEither = P.parseEither(schema)
+    const validate = P.validate(schema)
+    const validateOption = P.validateOption(schema)
+    const validateEither = P.validateEither(schema)
     const is = P.is(schema)
-    const out: any = Object.assign((input: unknown) => parse(input), {
+    const out: any = Object.assign((input: unknown) => validate(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
       ast,
-      option: (input: unknown) => parseOption(input),
+      option: (input: unknown) => validateOption(input),
       either: (input: unknown) =>
         E.mapLeft(
-          parseEither(input),
+          validateEither(input),
           (errors) => [{ meta: input, message: formatErrors(errors) }]
         ),
       refine: (input: unknown): input is A & Brand<B> => is(input)
