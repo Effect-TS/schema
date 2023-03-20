@@ -20,7 +20,7 @@ describe.concurrent("Date", () => {
 
   it("date. encoder", async () => {
     const now = new Date()
-    Util.expectEncodeSuccess(S.date, now, now)
+    await Util.expectEncodeSuccess(S.date, now, now)
   })
 
   it("date. guard", () => {
@@ -61,7 +61,7 @@ describe.concurrent("Date", () => {
     })
 
     it("Encoder", async () => {
-      Util.expectEncodeSuccess(schema, new Date(0), "1970-01-01T00:00:00.000Z")
+      await Util.expectEncodeSuccess(schema, new Date(0), "1970-01-01T00:00:00.000Z")
     })
 
     it("example", async () => {

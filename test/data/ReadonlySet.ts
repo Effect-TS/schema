@@ -33,8 +33,8 @@ describe.concurrent("ReadonlySet", () => {
 
   it("readonlySetFromSelf. encoder", async () => {
     const schema = S.readonlySetFromSelf(NumberFromString)
-    Util.expectEncodeSuccess(schema, new Set(), new Set())
-    Util.expectEncodeSuccess(schema, new Set([1, 2, 3]), new Set(["1", "2", "3"]))
+    await Util.expectEncodeSuccess(schema, new Set(), new Set())
+    await Util.expectEncodeSuccess(schema, new Set([1, 2, 3]), new Set(["1", "2", "3"]))
   })
 
   it("readonlySetFromSelf. guard", () => {
@@ -76,7 +76,7 @@ describe.concurrent("ReadonlySet", () => {
 
   it("readonlySet. encoder", async () => {
     const schema = S.readonlySet(S.number)
-    Util.expectEncodeSuccess(schema, new Set(), [])
-    Util.expectEncodeSuccess(schema, new Set([1, 2, 3]), [1, 2, 3])
+    await Util.expectEncodeSuccess(schema, new Set(), [])
+    await Util.expectEncodeSuccess(schema, new Set([1, 2, 3]), [1, 2, 3])
   })
 })

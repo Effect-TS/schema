@@ -40,8 +40,12 @@ describe.concurrent("Chunk", () => {
 
   it("chunkFromSelf. encoder", async () => {
     const schema = S.chunkFromSelf(NumberFromString)
-    Util.expectEncodeSuccess(schema, C.empty(), C.empty())
-    Util.expectEncodeSuccess(schema, C.fromIterable([1, 2, 3]), C.fromIterable(["1", "2", "3"]))
+    await Util.expectEncodeSuccess(schema, C.empty(), C.empty())
+    await Util.expectEncodeSuccess(
+      schema,
+      C.fromIterable([1, 2, 3]),
+      C.fromIterable(["1", "2", "3"])
+    )
   })
 
   it("chunkFromSelf. guard", () => {
@@ -82,7 +86,7 @@ describe.concurrent("Chunk", () => {
 
   it("chunk. encoder", async () => {
     const schema = S.chunk(S.number)
-    Util.expectEncodeSuccess(schema, C.empty(), [])
-    Util.expectEncodeSuccess(schema, C.fromIterable([1, 2, 3]), [1, 2, 3])
+    await Util.expectEncodeSuccess(schema, C.empty(), [])
+    await Util.expectEncodeSuccess(schema, C.fromIterable([1, 2, 3]), [1, 2, 3])
   })
 })

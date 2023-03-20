@@ -42,8 +42,8 @@ describe.concurrent("trimmed", () => {
   })
 
   it("Encoder", async () => {
-    Util.expectEncodeSuccess(schema, "a", "a")
-    Util.expectEncodeSuccess(schema, "", "")
+    await Util.expectEncodeSuccess(schema, "a", "a")
+    await Util.expectEncodeSuccess(schema, "", "")
     await Util.expectEncodeFailure(
       schema,
       "a ",

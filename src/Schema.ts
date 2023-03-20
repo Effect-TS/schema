@@ -592,11 +592,11 @@ const isOverlappingPropertySignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral)
 const isOverlappingIndexSignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral): boolean =>
   x.indexSignatures.some((ix) =>
     y.indexSignatures.some((iy) => {
-      const bx = AST._getParameter(ix.parameter)
-      const by = AST._getParameter(iy.parameter)
+      const keyofx = AST._getParameterKeyof(ix.parameter)
+      const keyofy = AST._getParameterKeyof(iy.parameter)
       // there cannot be two string index signatures or two symbol index signatures at the same time
-      return (AST.isStringKeyword(bx) && AST.isStringKeyword(by)) ||
-        (AST.isSymbolKeyword(bx) && AST.isSymbolKeyword(by))
+      return (AST.isStringKeyword(keyofx) && AST.isStringKeyword(keyofy)) ||
+        (AST.isSymbolKeyword(keyofx) && AST.isSymbolKeyword(keyofy))
     })
   )
 

@@ -560,27 +560,9 @@ const go = I.memoize(untracedMethod(() =>
                       return PR.failures(mutableAppend(sortByIndex(es), e))
                     }
                   }
-                } else {
-                  const nk = stepKey++
-                  const index = key
-                  residual.push(
-                    untracedMethod(() =>
-                      ({ es }: State) =>
-                        Effect.flatMap(Effect.either(te), (t) => {
-                          if (E.isLeft(t)) {
-                            const e = PR.key(index, t.left.errors)
-                            if (allErrors) {
-                              es.push([nk, e])
-                              return Effect.unit()
-                            } else {
-                              return PR.failures(mutableAppend(sortByIndex(es), e))
-                            }
-                          }
-                          return Effect.unit()
-                        })
-                    )
-                  )
                 }
+                // there's no else here because index signature parameters can't have transformations
+
                 // ---------------------------------------------
                 // handle values
                 // ---------------------------------------------
