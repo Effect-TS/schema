@@ -5,7 +5,7 @@ import * as _ from "@effect/schema/TreeFormatter"
 describe.concurrent("TreeFormatter", async () => {
   it("formatErrors/ Unexpected", async () => {
     const schema = S.struct({ a: S.string })
-    await Util.expectDecodingFailureTree(
+    await Util.expectParseFailureTree(
       schema,
       { a: "a", b: 1 },
       `error(s) found
@@ -18,21 +18,21 @@ describe.concurrent("TreeFormatter", async () => {
     const schema = S.struct({
       a: S.struct({ b: S.struct({ c: S.array(S.struct({ d: S.string })) }) })
     })
-    Util.expectDecodingFailureTree(
+    Util.expectParseFailureTree(
       schema,
       { a: { b: { c: [{ d: null }] } } },
       `error(s) found
 └─ ["a"]["b"]["c"][0]["d"]
    └─ Expected string, actual null`
     )
-    Util.expectDecodingFailureTree(
+    Util.expectParseFailureTree(
       schema,
       { a: { b: { c: [{ d: null }, { d: 1 }] } } },
       `error(s) found
 └─ ["a"]["b"]["c"][0]["d"]
    └─ Expected string, actual null`
     )
-    Util.expectDecodingFailureTree(
+    Util.expectParseFailureTree(
       schema,
       { a: { b: { c: [{ d: null }, { d: 1 }] } } },
       `error(s) found
