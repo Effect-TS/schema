@@ -24,9 +24,11 @@ const goDecode = (
 let skip = false
 
 const go = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
-  if (mode === "semi" && skip) {
+  if (mode === "semi") {
     skip = !skip
-    return ast
+    if (!skip) {
+      return ast
+    }
   }
   switch (ast._tag) {
     case "Declaration":
