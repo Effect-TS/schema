@@ -1,8 +1,11 @@
 import type * as E from "@effect/data/Either"
 import * as RA from "@effect/data/ReadonlyArray"
+import * as D from "@effect/io/Debug"
 import type { ParseError } from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
+
+D.runtimeDebug.tracingEnabled = true
 
 /*
 n = 3

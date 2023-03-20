@@ -264,16 +264,18 @@ const go = I.memoize(untracedMethod(() =>
             output: typeof output
           }
           const residual: Array<(_: State) => PR.ParseResult<void>> = []
-          const processResidual = Effect.suspend(() => {
-            const state: State = {
-              es: Array.from(es),
-              output: Array.from(output)
-            }
-            return Effect.map(
-              Effect.forEachDiscard(residual, (f) => f(state)),
-              () => state
-            )
-          })
+          const processResidual = untraced(() =>
+            Effect.suspend(() => {
+              const state: State = {
+                es: Array.from(es),
+                output: Array.from(output)
+              }
+              return Effect.map(
+                Effect.forEachDiscard(residual, (f) => f(state)),
+                () => state
+              )
+            })
+          )
 
           // ---------------------------------------------
           // handle elements
@@ -507,16 +509,18 @@ const go = I.memoize(untracedMethod(() =>
           const allErrors = options?.allErrors
           let stepKey = 0
           const residual: Array<(state: State) => PR.ParseResult<void>> = []
-          const processResidual = Effect.suspend(() => {
-            const state: State = {
-              es: Array.from(es),
-              output: Object.assign({}, output)
-            }
-            return Effect.map(
-              Effect.forEachDiscard(residual, (f) => f(state)),
-              () => state
-            )
-          })
+          const processResidual = untraced(() =>
+            Effect.suspend(() => {
+              const state: State = {
+                es: Array.from(es),
+                output: Object.assign({}, output)
+              }
+              return Effect.map(
+                Effect.forEachDiscard(residual, (f) => f(state)),
+                () => state
+              )
+            })
+          )
           // ---------------------------------------------
           // handle property signatures
           // ---------------------------------------------
@@ -810,69 +814,71 @@ const go = I.memoize(untracedMethod(() =>
               PR.failure(PR.type(AST.neverKeyword, input))
 
           if (picks.length > 0) {
-            return Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                finalResult: { ref: finalResult.ref }
-              }
-              return Effect.flatMap(
-                Effect.forEachDiscard(picks, (f) => f(state)),
-                () => {
-                  if (state.finalResult.ref) {
-                    return state.finalResult.ref
-                  }
-                  const picks2: Array<Effect.Effect<never, never, void>> = []
-                  // if none of the schemas with at least one property with a literal value succeeded,
-                  // proceed with those that have no literal at all
-                  for (let i = 0; i < otherwise.length; i++) {
-                    const te = map.get(otherwise[i])!(input, options)
-                    const t = picks2.length === 0 ? PR.either(te) : undefined
-                    if (t) {
-                      if (E.isRight(t)) {
-                        return PR.success(t.right)
+            return untraced(() =>
+              Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  finalResult: { ref: finalResult.ref }
+                }
+                return Effect.flatMap(
+                  Effect.forEachDiscard(picks, (f) => f(state)),
+                  () => {
+                    if (state.finalResult.ref) {
+                      return state.finalResult.ref
+                    }
+                    const picks2: Array<Effect.Effect<never, never, void>> = []
+                    // if none of the schemas with at least one property with a literal value succeeded,
+                    // proceed with those that have no literal at all
+                    for (let i = 0; i < otherwise.length; i++) {
+                      const te = map.get(otherwise[i])!(input, options)
+                      const t = picks2.length === 0 ? PR.either(te) : undefined
+                      if (t) {
+                        if (E.isRight(t)) {
+                          return PR.success(t.right)
+                        } else {
+                          es.push([stepKey++, PR.unionMember(t.left.errors)])
+                        }
                       } else {
-                        es.push([stepKey++, PR.unionMember(t.left.errors)])
-                      }
-                    } else {
-                      const nk = stepKey++
-                      picks2.push(
-                        untraced(() =>
-                          Effect.suspend(() => {
-                            if (state.finalResult.ref) {
-                              return Effect.unit()
-                            } else {
-                              return Effect.flatMap(Effect.either(te), (t) => {
-                                if (E.isRight(t)) {
-                                  state.finalResult.ref = PR.success(t.right)
-                                } else {
-                                  es.push([nk, PR.unionMember(t.left.errors)])
-                                }
+                        const nk = stepKey++
+                        picks2.push(
+                          untraced(() =>
+                            Effect.suspend(() => {
+                              if (state.finalResult.ref) {
                                 return Effect.unit()
-                              })
-                            }
-                          })
+                              } else {
+                                return Effect.flatMap(Effect.either(te), (t) => {
+                                  if (E.isRight(t)) {
+                                    state.finalResult.ref = PR.success(t.right)
+                                  } else {
+                                    es.push([nk, PR.unionMember(t.left.errors)])
+                                  }
+                                  return Effect.unit()
+                                })
+                              }
+                            })
+                          )
                         )
+                      }
+                    }
+                    // ---------------------------------------------
+                    // compute output
+                    // ---------------------------------------------
+                    if (picks2.length > 0) {
+                      return Effect.flatMap(
+                        Effect.collectAllDiscard(picks2),
+                        () => {
+                          if (state.finalResult.ref) {
+                            return state.finalResult.ref
+                          }
+                          return computeResult(state)
+                        }
                       )
                     }
+                    return computeResult(state)
                   }
-                  // ---------------------------------------------
-                  // compute output
-                  // ---------------------------------------------
-                  if (picks2.length > 0) {
-                    return Effect.flatMap(
-                      Effect.collectAllDiscard(picks2),
-                      () => {
-                        if (state.finalResult.ref) {
-                          return state.finalResult.ref
-                        }
-                        return computeResult(state)
-                      }
-                    )
-                  }
-                  return computeResult(state)
-                }
-              )
-            })
+                )
+              })
+            )
           } else {
             // if none of the schemas with at least one property with a literal value succeeded,
             // proceed with those that have no literal at all
@@ -912,21 +918,23 @@ const go = I.memoize(untracedMethod(() =>
             // compute output
             // ---------------------------------------------
             if (picks.length > 0) {
-              return Effect.suspend(() => {
-                const state: State = {
-                  es: Array.from(es),
-                  finalResult: { ref: finalResult.ref }
-                }
-                return Effect.flatMap(
-                  Effect.forEachDiscard(picks, (f) => f(state)),
-                  () => {
-                    if (state.finalResult.ref) {
-                      return state.finalResult.ref
-                    }
-                    return computeResult(state)
+              return untraced(() =>
+                Effect.suspend(() => {
+                  const state: State = {
+                    es: Array.from(es),
+                    finalResult: { ref: finalResult.ref }
                   }
-                )
-              })
+                  return Effect.flatMap(
+                    Effect.forEachDiscard(picks, (f) => f(state)),
+                    () => {
+                      if (state.finalResult.ref) {
+                        return state.finalResult.ref
+                      }
+                      return computeResult(state)
+                    }
+                  )
+                })
+              )
             }
             return computeResult({ es, finalResult })
           }
