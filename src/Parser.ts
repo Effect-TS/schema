@@ -265,6 +265,17 @@ const go = I.memoize(untracedMethod(() =>
           }
           const residual: Array<(_: State) => PR.ParseResult<void>> = []
 
+          const processResidual = Effect.suspend(() => {
+            const state: State = {
+              es: Array.from(es),
+              output: Array.from(output)
+            }
+            return Effect.map(
+              Effect.forEachDiscard(residual, (f) => f(state)),
+              () => state
+            )
+          })
+
           // ---------------------------------------------
           // handle elements
           // ---------------------------------------------
@@ -397,7 +408,14 @@ const go = I.memoize(untracedMethod(() =>
               i += j
               if (input.length < i + 1) {
                 // the input element is missing and the element is required, bail out
-                return PR.failures(mutableAppend(sortByIndex(es), PR.index(i, [PR.missing])))
+                const ci = i
+                return residual.length > 0 ?
+                  Effect.flatMap(
+                    processResidual,
+                    (state) =>
+                      PR.failures(mutableAppend(sortByIndex(state.es), PR.index(ci, [PR.missing])))
+                  ) :
+                  PR.failures(mutableAppend(sortByIndex(es), PR.index(i, [PR.missing])))
               } else {
                 const te = tail[j](input[i], options)
                 const t = residual.length === 0 ? PR.either(te) : undefined
@@ -462,15 +480,9 @@ const go = I.memoize(untracedMethod(() =>
             RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(sortByIndex(output))
+
           return residual.length > 0 ?
-            Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                output: Array.from(output)
-              }
-              return Effect.flatMap(Effect.forEachDiscard(residual, (f) => f(state)), () =>
-                computeResult(state))
-            }) :
+            Effect.flatMap(processResidual, (state) => computeResult(state)) :
             computeResult({ output, es })
         }
       }
@@ -478,9 +490,7 @@ const go = I.memoize(untracedMethod(() =>
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
           return fromRefinement(ast, P.isNotNullable)
         }
-        const propertySignaturesTypes = ast.propertySignatures.map((f) =>
-          go(f.type)
-        )
+        const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
         const indexSignatures = ast.indexSignatures.map((is) =>
           [go(is.parameter), go(is.type)] as const
         )
@@ -663,8 +673,10 @@ const go = I.memoize(untracedMethod(() =>
                 es: Array.from(es),
                 output: Object.assign({}, output)
               }
-              return Effect.flatMap(Effect.forEachDiscard(residual, (f) => f(state)), () =>
-                computeResult(state))
+              return Effect.flatMap(
+                Effect.forEachDiscard(residual, (f) => f(state)),
+                () => computeResult(state)
+              )
             }) :
             computeResult({ es, output })
         }
@@ -764,8 +776,7 @@ const go = I.memoize(untracedMethod(() =>
                 finalResult: { ref: finalResult.ref }
               }
               return Effect.flatMap(
-                Effect.forEachDiscard(picks, (f) =>
-                  f(state)),
+                Effect.forEachDiscard(picks, (f) => f(state)),
                 () => {
                   if (state.finalResult.ref) {
                     return state.finalResult.ref
