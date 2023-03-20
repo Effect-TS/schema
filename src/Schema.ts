@@ -50,14 +50,12 @@ export declare namespace Schema {
   /**
    * @since 1.0.0
    */
-  export type From<S extends Variance<any, any>> = S extends Variance<infer From, infer _To> ? From
-    : never
+  export type From<S extends Variance<any, any>> = Parameters<S["_From"]>[0]
 
   /**
    * @since 1.0.0
    */
-  export type To<S extends Variance<any, any>> = S extends Variance<infer _From, infer To> ? To
-    : never
+  export type To<S extends Variance<any, any>> = Parameters<S["_To"]>[0]
 }
 
 /**
