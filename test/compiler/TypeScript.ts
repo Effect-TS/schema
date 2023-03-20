@@ -326,7 +326,7 @@ const typeScriptFor = <A>(schema: S.Schema<A>): TypeScript<A> => {
           )
         )
       case "Lazy":
-        throw new Error("Unhandled schema: TODO")
+        throw new Error("Unhandled schema")
       case "Enums": {
         const id = pipe(
           getIdentifier(ast),
