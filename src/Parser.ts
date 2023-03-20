@@ -264,17 +264,18 @@ const go = I.memoize(untracedMethod(() =>
             output: typeof output
           }
           const residual: Array<(_: State) => PR.ParseResult<void>> = []
-          const processResidual = untraced(() =>
-            Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                output: Array.from(output)
-              }
-              return Effect.map(
-                Effect.forEachDiscard(residual, (f) => f(state)),
-                () => state
-              )
-            })
+          const processResidual = untracedMethod(() =>
+            () =>
+              Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  output: Array.from(output)
+                }
+                return Effect.map(
+                  Effect.forEachDiscard(residual, (f) => f(state)),
+                  () => state
+                )
+              })
           )
 
           // ---------------------------------------------
@@ -412,7 +413,7 @@ const go = I.memoize(untracedMethod(() =>
                 const ci = i
                 return residual.length > 0 ?
                   Effect.flatMap(
-                    processResidual,
+                    processResidual(),
                     (state) =>
                       PR.failures(mutableAppend(sortByIndex(state.es), PR.index(ci, [PR.missing])))
                   ) :
@@ -483,7 +484,7 @@ const go = I.memoize(untracedMethod(() =>
               PR.success(sortByIndex(output))
 
           return residual.length > 0 ?
-            Effect.flatMap(processResidual, computeResult) :
+            Effect.flatMap(processResidual(), computeResult) :
             computeResult({ output, es })
         }
       }
@@ -509,17 +510,18 @@ const go = I.memoize(untracedMethod(() =>
           const allErrors = options?.allErrors
           let stepKey = 0
           const residual: Array<(state: State) => PR.ParseResult<void>> = []
-          const processResidual = untraced(() =>
-            Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                output: Object.assign({}, output)
-              }
-              return Effect.map(
-                Effect.forEachDiscard(residual, (f) => f(state)),
-                () => state
-              )
-            })
+          const processResidual = untracedMethod(() =>
+            () =>
+              Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  output: Object.assign({}, output)
+                }
+                return Effect.map(
+                  Effect.forEachDiscard(residual, (f) => f(state)),
+                  () => state
+                )
+              })
           )
           // ---------------------------------------------
           // handle property signatures
@@ -721,7 +723,7 @@ const go = I.memoize(untracedMethod(() =>
               PR.failures(sortByIndex(es)) :
               PR.success(output)
           return residual.length > 0 ?
-            Effect.flatMap(processResidual, computeResult) :
+            Effect.flatMap(processResidual(), computeResult) :
             computeResult({ es, output })
         }
       }
