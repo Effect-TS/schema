@@ -6,20 +6,20 @@ import * as Benchmark from "benchmark"
 
 /*
 n = 3
-parseEither (good) x 471,313 ops/sec ±0.27% (89 runs sampled)
-parseManual (good) x 450,417 ops/sec ±3.11% (87 runs sampled)
-parseEither (bad) x 774,310 ops/sec ±1.81% (86 runs sampled)
-parseManual (bad) x 1,015,965 ops/sec ±2.04% (87 runs sampled)
+parseEither (good) x 406,821 ops/sec ±0.48% (88 runs sampled)
+parseManual (good) x 376,234 ops/sec ±4.45% (81 runs sampled)
+parseEither (bad) x 407,671 ops/sec ±2.12% (87 runs sampled)
+parseManual (bad) x 514,905 ops/sec ±0.51% (88 runs sampled)
 n = 10
-parseEither (good) x 464,366 ops/sec ±0.25% (90 runs sampled)
-parseManual (good) x 437,616 ops/sec ±3.07% (83 runs sampled)
-parseEither (bad) x 785,114 ops/sec ±1.73% (84 runs sampled)
-parseManual (bad) x 1,033,561 ops/sec ±1.62% (84 runs sampled)
+parseEither (good) x 403,275 ops/sec ±0.46% (88 runs sampled)
+parseManual (good) x 369,469 ops/sec ±4.57% (79 runs sampled)
+parseEither (bad) x 383,222 ops/sec ±0.57% (84 runs sampled)
+parseManual (bad) x 473,157 ops/sec ±3.27% (85 runs sampled)
 n = 100
-parseEither (good) x 477,261 ops/sec ±0.42% (91 runs sampled)
-parseManual (good) x 447,762 ops/sec ±3.22% (87 runs sampled)
-parseEither (bad) x 771,355 ops/sec ±1.84% (84 runs sampled)
-parseManual (bad) x 1,042,424 ops/sec ±0.30% (91 runs sampled)
+parseEither (good) x 402,634 ops/sec ±0.43% (90 runs sampled)
+parseManual (good) x 363,675 ops/sec ±4.94% (78 runs sampled)
+parseEither (bad) x 409,706 ops/sec ±2.37% (81 runs sampled)
+parseManual (bad) x 509,025 ops/sec ±0.47% (90 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -36,7 +36,7 @@ const schema = S.union(...members)
 
 const parseEither = S.parseEither(schema)
 
-const parseManual = (input: unknown): E.Either<RA.NonEmptyReadonlyArray<ParseError>, {
+const parseManual = (input: unknown): E.Either<ParseError, {
   readonly kind: number
   readonly a: string
   readonly b: number
