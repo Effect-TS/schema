@@ -16,7 +16,7 @@ describe.concurrent("Number", () => {
 
     await Util.expectParseFailure(schema, -2, "Expected a number between -1 and 1, actual -2")
     await Util.expectParseSuccess(schema, 0, 0)
-    Util.expectEncodeSuccess(schema, 1, 1)
+    await Util.expectEncodeSuccess(schema, 1, 1)
     await Util.expectParseFailure(schema, 2, "Expected a number between -1 and 1, actual 2")
   })
 
@@ -25,13 +25,13 @@ describe.concurrent("Number", () => {
 
     await Util.expectParseFailure(schema, -1, "Expected a positive number, actual -1")
     await Util.expectParseFailure(schema, 0, "Expected a positive number, actual 0")
-    Util.expectEncodeSuccess(schema, 1, 1)
+    await Util.expectEncodeSuccess(schema, 1, 1)
   })
 
   it("negative", async () => {
     const schema = pipe(S.number, S.negative())
 
-    Util.expectEncodeSuccess(schema, -1, -1)
+    await Util.expectEncodeSuccess(schema, -1, -1)
     await Util.expectParseFailure(schema, 0, "Expected a negative number, actual 0")
     await Util.expectParseFailure(schema, 1, "Expected a negative number, actual 1")
   })
@@ -47,7 +47,7 @@ describe.concurrent("Number", () => {
   it("nonPositive", async () => {
     const schema = pipe(S.number, S.nonPositive())
 
-    Util.expectEncodeSuccess(schema, -1, -1)
+    await Util.expectEncodeSuccess(schema, -1, -1)
     await Util.expectParseSuccess(schema, 0, 0)
     await Util.expectParseFailure(schema, 1, "Expected a non-positive number, actual 1")
   })
@@ -75,7 +75,7 @@ describe.concurrent("Number", () => {
     })
 
     it("Encoder", async () => {
-      Util.expectEncodeSuccess(schema, 1, "1")
+      await Util.expectEncodeSuccess(schema, 1, "1")
     })
 
     it("example", async () => {

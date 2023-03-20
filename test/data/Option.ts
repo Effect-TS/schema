@@ -21,8 +21,8 @@ describe.concurrent("Option", () => {
 
     it("Encoder", async () => {
       const schema = S.option(NumberFromString)
-      Util.expectEncodeSuccess(schema, O.none(), { _tag: "None" })
-      Util.expectEncodeSuccess(schema, O.some(1), { _tag: "Some", value: "1" })
+      await Util.expectEncodeSuccess(schema, O.none(), { _tag: "None" })
+      await Util.expectEncodeSuccess(schema, O.some(1), { _tag: "Some", value: "1" })
     })
   })
 
@@ -86,8 +86,8 @@ describe.concurrent("Option", () => {
 
     it("Encoder", async () => {
       const schema = S.optionFromNullable(NumberFromString)
-      Util.expectEncodeSuccess(schema, O.none(), null)
-      Util.expectEncodeSuccess(schema, O.some(1), "1")
+      await Util.expectEncodeSuccess(schema, O.none(), null)
+      await Util.expectEncodeSuccess(schema, O.some(1), "1")
     })
   })
 
@@ -115,7 +115,7 @@ describe.concurrent("Option", () => {
       └─ Expected number, actual "b"`
     )
 
-    Util.expectEncodeSuccess(schema, { a: "a", b: O.none() }, { a: "a" })
-    Util.expectEncodeSuccess(schema, { a: "a", b: O.some(1) }, { a: "a", b: 1 })
+    await Util.expectEncodeSuccess(schema, { a: "a", b: O.none() }, { a: "a" })
+    await Util.expectEncodeSuccess(schema, { a: "a", b: O.some(1) }, { a: "a", b: 1 })
   })
 })

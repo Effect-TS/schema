@@ -339,6 +339,12 @@ export const neverKeyword: NeverKeyword = {
 }
 
 /**
+ * @category guards
+ * @since 1.0.0
+ */
+export const isNeverKeyword = (ast: AST): ast is NeverKeyword => ast._tag === "NeverKeyword"
+
+/**
  * @category model
  * @since 1.0.0
  */
@@ -663,7 +669,7 @@ export const createPropertySignature = (
  * @since 1.0.0
  */
 export interface IndexSignature {
-  readonly parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement
+  readonly parameter: AST
   readonly type: AST
   readonly isReadonly: boolean
 }
@@ -672,10 +678,15 @@ export interface IndexSignature {
  * @since 1.0.0
  */
 export const createIndexSignature = (
-  parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement,
+  parameter: AST,
   type: AST,
   isReadonly: boolean
 ): IndexSignature => {
+  if (isNeverKeyword(_getParameterKeyof(parameter))) {
+    throw new Error(
+      "An index signature parameter type must be 'string', 'symbol', a template literal type or a refinement of the previous types"
+    )
+  }
   return ({ parameter, type, isReadonly })
 }
 
@@ -1280,10 +1291,19 @@ const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
 }
 
 /** @internal */
-export const _getParameter = (
-  x: IndexSignature["parameter"]
-): StringKeyword | SymbolKeyword | TemplateLiteral =>
-  isRefinement(x) ? _getParameter(x.from as any) : x
+export const _getParameterKeyof = (
+  ast: AST
+): StringKeyword | SymbolKeyword | TemplateLiteral | NeverKeyword => {
+  switch (ast._tag) {
+    case "StringKeyword":
+    case "SymbolKeyword":
+    case "TemplateLiteral":
+      return ast
+    case "Refinement":
+      return _getParameterKeyof(ast.from)
+  }
+  return neverKeyword
+}
 
 const _keyof = (ast: AST): ReadonlyArray<AST> => {
   switch (ast._tag) {
@@ -1297,7 +1317,7 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
     case "TypeLiteral":
       return ast.propertySignatures.map((p): AST =>
         typeof p.name === "symbol" ? createUniqueSymbol(p.name) : createLiteral(p.name)
-      ).concat(ast.indexSignatures.map((is) => _getParameter(is.parameter)))
+      ).concat(ast.indexSignatures.map((is) => _getParameterKeyof(is.parameter)))
     case "Union": {
       return _getPropertySignatures(ast).map((p): AST =>
         typeof p.name === "symbol" ? createUniqueSymbol(p.name) : createLiteral(p.name)

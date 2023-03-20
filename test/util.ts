@@ -51,7 +51,9 @@ const go = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
     case "TypeLiteral":
       return AST.createTypeLiteral(
         ast.propertySignatures.map((p) => ({ ...p, type: go(p.type, mode) })),
-        ast.indexSignatures.map((is) => ({ ...is, type: go(is.type, mode) })),
+        ast.indexSignatures.map((is) =>
+          AST.createIndexSignature(is.parameter, go(is.type, mode), is.isReadonly)
+        ),
         ast.annotations
       )
     case "Union":
