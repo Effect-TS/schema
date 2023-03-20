@@ -5,17 +5,15 @@
 import * as E from "@effect/data/Either"
 import * as O from "@effect/data/Option"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
-import { failureOption } from "@effect/io/Cause"
 import * as Debug from "@effect/io/Debug"
 import * as Effect from "@effect/io/Effect"
-import * as Exit from "@effect/io/Exit"
-import { isExit } from "@effect/io/Exit"
+import * as Query from "@effect/query/Query"
 import type * as AST from "@effect/schema/AST"
 
 /**
  * @since 1.0.0
  */
-export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
+export interface ParseResult<A> extends Query.Query<never, ParseError, A> {}
 
 /**
  * @since 1.0.0
@@ -196,43 +194,32 @@ export const unionMember = (
  * @category constructors
  * @since 1.0.0
  */
-export const success: <A>(a: A) => ParseResult<A> = (a) => Exit.succeed(a)
+export const success = Debug.untracedMethod(() => <A>(a: A): ParseResult<A> => Query.succeed(a))
 
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const failure = (e: ParseErrors): ParseResult<never> => Exit.fail(parseError([e]))
+export const failure = Debug.untracedMethod(() =>
+  (e: ParseErrors): ParseResult<never> => Query.fail(parseError([e]))
+)
 
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const failures = (
-  es: NonEmptyReadonlyArray<ParseErrors>
-): ParseResult<never> => Exit.fail(parseError(es))
-
-const untrace = <E, A>(self: Effect.Effect<never, E, A>): Effect.Effect<never, E, A> => {
-  // TODO: find a way to detect Traced
-  const s: any = self
-  return s["_tag"] === "Traced" ? s["i0"] : s
-}
-
+export const failures = Debug.untracedMethod(() =>
+  (es: NonEmptyReadonlyArray<ParseErrors>): ParseResult<never> => Query.fail(parseError(es))
+)
 /**
  * @category optimisation
  * @since 1.0.0
  */
-export const either = <E, A>(self: Effect.Effect<never, E, A>): E.Either<E, A> | undefined => {
-  const untraced = untrace(self)
-  if (isExit(untraced)) {
-    if (untraced._tag === "Success") {
-      return E.right(untraced.value as A)
-    } else {
-      const failure = failureOption(untraced.cause)
-      if (failure._tag === "Some") {
-        return E.left(failure.value as E)
-      }
-    }
+export const either = <E, A>(self: Query.Query<never, E, A>): E.Either<E, A> | undefined => {
+  if ((self as any)["i1"] === "Fail") {
+    return E.left((self as any)["i2"])
+  } else if ((self as any)["i1"] === "Succeed") {
+    return E.right((self as any)["i2"])
   }
 }
 
@@ -240,17 +227,10 @@ export const either = <E, A>(self: Effect.Effect<never, E, A>): E.Either<E, A> |
  * @category optimisation
  * @since 1.0.0
  */
-export const eitherSync = <E, A>(self: Effect.Effect<never, E, A>): E.Either<E, A> => {
-  const untraced = untrace(self)
-  if (isExit(untraced)) {
-    if (untraced._tag === "Success") {
-      return E.right(untraced.value as A)
-    } else {
-      const failure = failureOption(untraced.cause)
-      if (failure._tag === "Some") {
-        return E.left(failure.value as E)
-      }
-    }
+export const eitherSync = <E, A>(self: Query.Query<never, E, A>): E.Either<E, A> => {
+  const e = either(self)
+  if (e) {
+    return e
   }
   return Debug.untraced(() => Effect.runSyncEither(self))
 }
@@ -261,18 +241,18 @@ export const eitherSync = <E, A>(self: Effect.Effect<never, E, A>): E.Either<E, 
  */
 export const flatMap = Debug.methodWithTrace((trace, restore) =>
   <E, E1, A, B>(
-    self: Effect.Effect<never, E, A>,
-    f: (self: A) => Effect.Effect<never, E1, B>
-  ): Effect.Effect<never, E | E1, B> => {
+    self: Query.Query<never, E, A>,
+    f: (self: A) => Query.Query<never, E1, B>
+  ): Query.Query<never, E | E1, B> => {
     const e = either(self)
     if (e) {
       if (E.isRight(e)) {
         return restore(f)(e.right)
       } else {
-        return Exit.fail(e.left)
+        return Query.fail(e.left)
       }
     }
-    return Effect.flatMap(self, restore(f)).traced(trace)
+    return Query.flatMap(self, restore(f)).traced(trace)
   }
 )
 
@@ -282,17 +262,17 @@ export const flatMap = Debug.methodWithTrace((trace, restore) =>
  */
 export const map = Debug.methodWithTrace((trace, restore) =>
   <E, A, B>(
-    self: Effect.Effect<never, E, A>,
+    self: Query.Query<never, E, A>,
     f: (self: A) => B
-  ): Effect.Effect<never, E, B> => {
+  ): Query.Query<never, E, B> => {
     const e = either(self)
     if (e) {
       if (E.isRight(e)) {
-        return Exit.succeed(restore(f)(e.right))
+        return Query.succeed(restore(f)(e.right))
       } else {
-        return Exit.fail(e.left)
+        return Query.fail(e.left)
       }
     }
-    return Effect.map(self, restore(f)).traced(trace)
+    return Query.map(self, restore(f)).traced(trace)
   }
 )

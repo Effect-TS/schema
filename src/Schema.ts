@@ -19,7 +19,7 @@ import type { Predicate, Refinement } from "@effect/data/Predicate"
 import { isDate } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import { untracedMethod } from "@effect/io/Debug"
-import * as Effect from "@effect/io/Effect"
+import * as Query from "@effect/query/Query"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -78,10 +78,6 @@ export {
   /**
    * @since 1.0.0
    */
-  decodeEffect,
-  /**
-   * @since 1.0.0
-   */
   decodeEither,
   /**
    * @since 1.0.0
@@ -90,11 +86,11 @@ export {
   /**
    * @since 1.0.0
    */
-  encode,
+  decodeQuery,
   /**
    * @since 1.0.0
    */
-  encodeEffect,
+  encode,
   /**
    * @since 1.0.0
    */
@@ -106,15 +102,15 @@ export {
   /**
    * @since 1.0.0
    */
+  encodeQuery,
+  /**
+   * @since 1.0.0
+   */
   is,
   /**
    * @since 1.0.0
    */
   parse,
-  /**
-   * @since 1.0.0
-   */
-  parseEffect,
   /**
    * @since 1.0.0
    */
@@ -126,11 +122,11 @@ export {
   /**
    * @since 1.0.0
    */
-  validate,
+  parseQuery,
   /**
    * @since 1.0.0
    */
-  validateEffect,
+  validate,
   /**
    * @since 1.0.0
    */
@@ -138,7 +134,11 @@ export {
   /**
    * @since 1.0.0
    */
-  validateOption
+  validateOption,
+  /**
+   * @since 1.0.0
+   */
+  validateQuery
 } from "@effect/schema/Parser"
 
 export type {
@@ -731,7 +731,7 @@ export function filter<A>(
   @category combinators
   @since 1.0.0
  */
-export const transformEffect: {
+export const transformQuery: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
     decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
@@ -792,8 +792,8 @@ export const transformEither: {
 ): Schema<I1, A2> =>
   make(
     AST.createTransform(from.ast, to.ast, (i, o) =>
-      Effect.fromEither(decode(i, o)), (i, o) =>
-      Effect.fromEither(encode(i, o)))
+      Query.fromEither(decode(i, o)), (i, o) =>
+      Query.fromEither(encode(i, o)))
   ))
 
 /**
@@ -823,7 +823,7 @@ export const transform: {
     decode: (a1: A1) => I2,
     encode: (i2: I2) => A1
   ): Schema<I1, A2> =>
-    transformEffect(from, to, (a) => PR.success(decode(a)), (b) => PR.success(encode(b)))
+    transformQuery(from, to, (a) => PR.success(decode(a)), (b) => PR.success(encode(b)))
 )
 
 /**
@@ -1239,7 +1239,7 @@ export const fromBrand = <C extends Brand<string>>(
   <I, A extends Brand.Unbranded<C>>(self: Schema<I, A>): Schema<I, A & C> => {
     const decode = untracedMethod(() =>
       (a: A): ParseResult<C> =>
-        Effect.fromEither(
+        Query.fromEither(
           E.mapLeft(
             constructor.either(a),
             (brandErrors) =>
@@ -1279,7 +1279,7 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<
       length: number
     }),
     <A>(item: Schema<A>) => {
-      const parse = P.parseEffect(array(item))
+      const parse = P.parseQuery(array(item))
       return (u, options) =>
         !C.isChunk(u) ?
           PR.failure(PR.type(schema.ast, u)) :
@@ -1332,7 +1332,7 @@ export const dataFromSelf = <
     <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
       item: Schema<A>
     ) => {
-      const parse = P.parseEffect(item)
+      const parse = P.parseQuery(item)
       return (u, options) =>
         !Equal.isEqual(u) ?
           PR.failure(PR.type(schema.ast, u)) :
@@ -1393,7 +1393,7 @@ export const date: Schema<Date> = declare(
   @category parsers
   @since 1.0.0
 */
-export const dateFromString: Schema<string, Date> = transformEffect(
+export const dateFromString: Schema<string, Date> = transformQuery(
   string,
   date,
   (s) => {
@@ -1447,8 +1447,8 @@ export const eitherFromSelf = <IE, E, IA, A>(
       left: Schema<E>,
       right: Schema<A>
     ) => {
-      const parseLeft = P.parseEffect(left)
-      const parseRight = P.parseEffect(right)
+      const parseLeft = P.parseQuery(left)
+      const parseRight = P.parseQuery(right)
       return (u, options) =>
         !E.isEither(u) ?
           PR.failure(PR.type(schema.ast, u)) :
@@ -1832,7 +1832,7 @@ export const clamp = <A extends number>(min: number, max: number) =>
   @since 1.0.0
 */
 export const numberFromString = <I>(self: Schema<I, string>): Schema<I, number> => {
-  const schema: Schema<I, number> = transformEffect(
+  const schema: Schema<I, number> = transformQuery(
     self,
     number,
     (s) => {
@@ -1919,7 +1919,7 @@ export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Opt
     [value],
     optionInline(value),
     <A>(value: Schema<A>) => {
-      const parse = P.parseEffect(value)
+      const parse = P.parseQuery(value)
       return (u, options) =>
         !O.isOption(u) ?
           PR.failure(PR.type(schema.ast, u)) :
@@ -2139,7 +2139,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
       key: Schema<K>,
       value: Schema<V>
     ) => {
-      const parse = P.parseEffect(array(tuple(key, value)))
+      const parse = P.parseQuery(array(tuple(key, value)))
       return (u, options) =>
         !isMap(u) ?
           PR.failure(PR.type(schema.ast, u)) :
@@ -2194,7 +2194,7 @@ export const readonlySetFromSelf = <I, A>(
       size: number
     }),
     <A>(item: Schema<A>) => {
-      const parse = P.parseEffect(array(item))
+      const parse = P.parseQuery(array(item))
       return (u, options) =>
         !isSet(u) ?
           PR.failure(PR.type(schema.ast, u)) :

@@ -42,8 +42,8 @@ Added in v1.0.0
   - [rest](#rest)
   - [struct](#struct)
   - [transform](#transform)
-  - [transformEffect](#transformeffect)
   - [transformEither](#transformeither)
+  - [transformQuery](#transformquery)
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
@@ -175,27 +175,27 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [asserts](#asserts)
   - [decode](#decode)
-  - [decodeEffect](#decodeeffect)
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
+  - [decodeQuery](#decodequery)
   - [encode](#encode)
-  - [encodeEffect](#encodeeffect)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
+  - [encodeQuery](#encodequery)
   - [from](#from)
   - [getPropertySignatures](#getpropertysignatures)
   - [is](#is)
   - [optional](#optional)
   - [parse](#parse)
-  - [parseEffect](#parseeffect)
   - [parseEither](#parseeither)
   - [parseOption](#parseoption)
+  - [parseQuery](#parsequery)
   - [reverse](#reverse)
   - [to](#to)
   - [validate](#validate)
-  - [validateEffect](#validateeffect)
   - [validateEither](#validateeither)
   - [validateOption](#validateoption)
+  - [validateQuery](#validatequery)
 
 ---
 
@@ -611,31 +611,6 @@ export declare const transform: {
 
 Added in v1.0.0
 
-## transformEffect
-
-Create a new `Schema` by transforming the input and output of an existing `Schema`
-using the provided decoding functions.
-
-**Signature**
-
-```ts
-export declare const transformEffect: {
-  <I2, A2, A1>(
-    to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => ParseResult<A1>
-  ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Schema<I1, A1>,
-    to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => ParseResult<A1>
-  ): Schema<I1, A2>
-}
-```
-
-Added in v1.0.0
-
 ## transformEither
 
 Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -655,6 +630,31 @@ export declare const transformEither: {
     to: Schema<I2, A2>,
     decode: (a1: A1, options?: ParseOptions | undefined) => Either<PR.ParseError, I2>,
     encode: (i2: I2, options?: ParseOptions | undefined) => Either<PR.ParseError, A1>
+  ): Schema<I1, A2>
+}
+```
+
+Added in v1.0.0
+
+## transformQuery
+
+Create a new `Schema` by transforming the input and output of an existing `Schema`
+using the provided decoding functions.
+
+**Signature**
+
+```ts
+export declare const transformQuery: {
+  <I2, A2, A1>(
+    to: Schema<I2, A2>,
+    decode: (a1: A1, options?: ParseOptions | undefined) => ParseResult<I2>,
+    encode: (i2: I2, options?: ParseOptions | undefined) => ParseResult<A1>
+  ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Schema<I1, A1>,
+    to: Schema<I2, A2>,
+    decode: (a1: A1, options?: ParseOptions | undefined) => ParseResult<I2>,
+    encode: (i2: I2, options?: ParseOptions | undefined) => ParseResult<A1>
   ): Schema<I1, A2>
 }
 ```
@@ -2098,18 +2098,6 @@ export declare const decode: <I, A>(schema: Schema<I, A>) => (i: I, options?: Pa
 
 Added in v1.0.0
 
-## decodeEffect
-
-**Signature**
-
-```ts
-export declare const decodeEffect: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
-```
-
-Added in v1.0.0
-
 ## decodeEither
 
 **Signature**
@@ -2134,24 +2122,24 @@ export declare const decodeOption: <I, A>(
 
 Added in v1.0.0
 
+## decodeQuery
+
+**Signature**
+
+```ts
+export declare const decodeQuery: <_, A>(
+  schema: Schema<_, A>
+) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+```
+
+Added in v1.0.0
+
 ## encode
 
 **Signature**
 
 ```ts
 export declare const encode: <I, A>(schema: Schema<I, A>) => (a: A, options?: ParseOptions | undefined) => I
-```
-
-Added in v1.0.0
-
-## encodeEffect
-
-**Signature**
-
-```ts
-export declare const encodeEffect: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
 ```
 
 Added in v1.0.0
@@ -2176,6 +2164,18 @@ Added in v1.0.0
 export declare const encodeOption: <I, A>(
   schema: Schema<I, A>
 ) => (input: A, options?: ParseOptions | undefined) => Option<I>
+```
+
+Added in v1.0.0
+
+## encodeQuery
+
+**Signature**
+
+```ts
+export declare const encodeQuery: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
 ```
 
 Added in v1.0.0
@@ -2254,18 +2254,6 @@ export declare const parse: <_, A>(schema: Schema<_, A>) => (i: unknown, options
 
 Added in v1.0.0
 
-## parseEffect
-
-**Signature**
-
-```ts
-export declare const parseEffect: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
-```
-
-Added in v1.0.0
-
 ## parseEither
 
 **Signature**
@@ -2286,6 +2274,18 @@ Added in v1.0.0
 export declare const parseOption: <_, A>(
   schema: Schema<_, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Option<A>
+```
+
+Added in v1.0.0
+
+## parseQuery
+
+**Signature**
+
+```ts
+export declare const parseQuery: <_, A>(
+  schema: Schema<_, A>
+) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -2320,18 +2320,6 @@ export declare const validate: <_, A>(schema: Schema<_, A>) => (a: unknown, opti
 
 Added in v1.0.0
 
-## validateEffect
-
-**Signature**
-
-```ts
-export declare const validateEffect: <_, A>(
-  schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => ParseResult<A>
-```
-
-Added in v1.0.0
-
 ## validateEither
 
 **Signature**
@@ -2352,6 +2340,18 @@ Added in v1.0.0
 export declare const validateOption: <_, A>(
   schema: Schema<_, A>
 ) => (a: unknown, options?: ParseOptions | undefined) => Option<A>
+```
+
+Added in v1.0.0
+
+## validateQuery
+
+**Signature**
+
+```ts
+export declare const validateQuery: <_, A>(
+  schema: Schema<_, A>
+) => (a: unknown, options?: ParseOptions | undefined) => ParseResult<A>
 ```
 
 Added in v1.0.0

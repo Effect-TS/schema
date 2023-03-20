@@ -10,7 +10,7 @@ import * as P from "@effect/data/Predicate"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as RA from "@effect/data/ReadonlyArray"
 import { untraced, untracedMethod } from "@effect/io/Debug"
-import * as Effect from "@effect/io/Effect"
+import * as Query from "@effect/query/Query"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
@@ -68,7 +68,7 @@ export const parseEither = <_, A>(
  * @category decoding
  * @since 1.0.0
  */
-export const parseEffect = <_, A>(
+export const parseQuery = <_, A>(
   schema: Schema<_, A>
 ): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast)
 
@@ -98,9 +98,9 @@ export const decodeEither: <I, A>(
  * @category decoding
  * @since 1.0.0
  */
-export const decodeEffect: <_, A>(
+export const decodeQuery: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A> = parseEffect
+) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A> = parseQuery
 
 /**
  * @category validation
@@ -134,7 +134,7 @@ export const validateEither = <_, A>(
  * @category validation
  * @since 1.0.0
  */
-export const validateEffect = <_, A>(
+export const validateQuery = <_, A>(
   schema: Schema<_, A>
 ) => {
   const parser = go(AST.getTo(schema.ast))
@@ -200,7 +200,7 @@ export const encodeEither = <I, A>(
  * @category encoding
  * @since 1.0.0
  */
-export const encodeEffect = <I, A>(
+export const encodeQuery = <I, A>(
   schema: Schema<I, A>
 ) => {
   const parser = go(AST.reverse(schema.ast))
@@ -266,13 +266,13 @@ const go = I.memoize(untracedMethod(() =>
           const residual: Array<(_: State) => PR.ParseResult<void>> = []
           const processResidual = untracedMethod(() =>
             () =>
-              Effect.suspend(() => {
+              Query.suspend(() => {
                 const state: State = {
                   es: Array.from(es),
                   output: Array.from(output)
                 }
-                return Effect.map(
-                  Effect.forEachDiscard(residual, (f) => f(state)),
+                return Query.map(
+                  Query.forEachPar(residual, (f) => f(state)),
                   () => state
                 )
               })
@@ -301,7 +301,7 @@ const go = I.memoize(untracedMethod(() =>
                 residual.push(
                   untracedMethod(() =>
                     ({ es }: State) =>
-                      Effect.suspend(() => {
+                      Query.suspend(() => {
                         // the input element is missing...
                         if (!ast.elements[ci].isOptional) {
                           // ...but the element is required
@@ -312,7 +312,7 @@ const go = I.memoize(untracedMethod(() =>
                             return PR.failure(e)
                           }
                         }
-                        return Effect.unit()
+                        return Query.unit()
                       })
                   )
                 )
@@ -339,19 +339,19 @@ const go = I.memoize(untracedMethod(() =>
                 residual.push(
                   untracedMethod(() =>
                     ({ es, output }: State) =>
-                      Effect.flatMap(Effect.either(te), (t) => {
+                      Query.flatMap(Query.either(te), (t) => {
                         if (E.isLeft(t)) {
                           // the input element is present but is not valid
                           const e = PR.index(index, t.left.errors)
                           if (allErrors) {
                             es.push([nk, e])
-                            return Effect.unit()
+                            return Query.unit()
                           } else {
                             return PR.failures(mutableAppend(sortByIndex(es), e))
                           }
                         }
                         output.push([nk, t.right])
-                        return Effect.unit()
+                        return Query.unit()
                       })
                   )
                 )
@@ -385,18 +385,18 @@ const go = I.memoize(untracedMethod(() =>
                 residual.push(
                   untracedMethod(() =>
                     ({ es, output }: State) =>
-                      Effect.flatMap(Effect.either(te), (t) => {
+                      Query.flatMap(Query.either(te), (t) => {
                         if (E.isLeft(t)) {
                           const e = PR.index(index, t.left.errors)
                           if (allErrors) {
                             es.push([nk, e])
-                            return Effect.unit()
+                            return Query.unit()
                           } else {
                             return PR.failures(mutableAppend(sortByIndex(es), e))
                           }
                         } else {
                           output.push([nk, t.right])
-                          return Effect.unit()
+                          return Query.unit()
                         }
                       })
                   )
@@ -412,7 +412,7 @@ const go = I.memoize(untracedMethod(() =>
                 // the input element is missing and the element is required, bail out
                 const ci = i
                 return residual.length > 0 ?
-                  Effect.flatMap(
+                  Query.flatMap(
                     processResidual(),
                     (state) =>
                       PR.failures(mutableAppend(sortByIndex(state.es), PR.index(ci, [PR.missing])))
@@ -439,19 +439,19 @@ const go = I.memoize(untracedMethod(() =>
                   residual.push(
                     untracedMethod(() =>
                       ({ es, output }: State) =>
-                        Effect.flatMap(Effect.either(te), (t) => {
+                        Query.flatMap(Query.either(te), (t) => {
                           if (E.isLeft(t)) {
                             // the input element is present but is not valid
                             const e = PR.index(index, t.left.errors)
                             if (allErrors) {
                               es.push([nk, e])
-                              return Effect.unit()
+                              return Query.unit()
                             } else {
                               return PR.failures(mutableAppend(sortByIndex(es), e))
                             }
                           }
                           output.push([nk, t.right])
-                          return Effect.unit()
+                          return Query.unit()
                         })
                     )
                   )
@@ -484,7 +484,7 @@ const go = I.memoize(untracedMethod(() =>
               PR.success(sortByIndex(output))
 
           return residual.length > 0 ?
-            Effect.flatMap(processResidual(), computeResult) :
+            Query.flatMap(processResidual(), computeResult) :
             computeResult({ output, es })
         }
       }
@@ -512,13 +512,13 @@ const go = I.memoize(untracedMethod(() =>
           const residual: Array<(state: State) => PR.ParseResult<void>> = []
           const processResidual = untracedMethod(() =>
             () =>
-              Effect.suspend(() => {
+              Query.suspend(() => {
                 const state: State = {
                   es: Array.from(es),
                   output: Object.assign({}, output)
                 }
-                return Effect.map(
-                  Effect.forEachDiscard(residual, (f) => f(state)),
+                return Query.map(
+                  Query.forEachPar(residual, (f) => f(state)),
                   () => state
                 )
               })
@@ -548,7 +548,7 @@ const go = I.memoize(untracedMethod(() =>
                 residual.push(
                   untracedMethod(() =>
                     ({ es }: State) =>
-                      Effect.suspend(() => {
+                      Query.suspend(() => {
                         if (!ps.isOptional) {
                           const e = PR.key(index, [PR.missing])
                           if (allErrors) {
@@ -557,7 +557,7 @@ const go = I.memoize(untracedMethod(() =>
                             return PR.failure(e)
                           }
                         }
-                        return Effect.unit()
+                        return Query.unit()
                       })
                   )
                 )
@@ -583,19 +583,19 @@ const go = I.memoize(untracedMethod(() =>
                 residual.push(
                   untracedMethod(() =>
                     ({ es, output }: State) =>
-                      Effect.flatMap(Effect.either(te), (t) => {
+                      Query.flatMap(Query.either(te), (t) => {
                         if (E.isLeft(t)) {
                           // the input key is present but is not valid
                           const e = PR.key(index, t.left.errors)
                           if (allErrors) {
                             es.push([nk, e])
-                            return Effect.unit()
+                            return Query.unit()
                           } else {
                             return PR.failures(mutableAppend(sortByIndex(es), e))
                           }
                         }
                         output[index] = t.right
-                        return Effect.unit()
+                        return Query.unit()
                       })
                   )
                 )
@@ -655,20 +655,20 @@ const go = I.memoize(untracedMethod(() =>
                   residual.push(
                     untracedMethod(() =>
                       ({ es, output }: State) =>
-                        Effect.flatMap(
-                          Effect.either(tve),
+                        Query.flatMap(
+                          Query.either(tve),
                           (tv) => {
                             if (E.isLeft(tv)) {
                               const e = PR.key(index, tv.left.errors)
                               if (allErrors) {
                                 es.push([nk, e])
-                                return Effect.unit()
+                                return Query.unit()
                               } else {
                                 return PR.failures(mutableAppend(sortByIndex(es), e))
                               }
                             } else {
                               output[key] = tv.right
-                              return Effect.unit()
+                              return Query.unit()
                             }
                           }
                         )
@@ -699,7 +699,7 @@ const go = I.memoize(untracedMethod(() =>
                   const nk = stepKey++
                   residual.push(untracedMethod(() =>
                     (state) =>
-                      Effect.suspend(() => {
+                      Query.suspend(() => {
                         const e = PR.key(index, [PR.unexpected(input[index])])
                         if (!isUnexpectedAllowed) {
                           if (allErrors) {
@@ -708,7 +708,7 @@ const go = I.memoize(untracedMethod(() =>
                             return PR.failures(mutableAppend(sortByIndex(state.es), e))
                           }
                         }
-                        return Effect.unit()
+                        return Query.unit()
                       })
                   ))
                 }
@@ -723,7 +723,7 @@ const go = I.memoize(untracedMethod(() =>
               PR.failures(sortByIndex(es)) :
               PR.success(output)
           return residual.length > 0 ?
-            Effect.flatMap(processResidual(), computeResult) :
+            Query.flatMap(processResidual(), computeResult) :
             computeResult({ es, output })
         }
       }
@@ -774,17 +774,17 @@ const go = I.memoize(untracedMethod(() =>
                         picks.push(
                           untracedMethod(() =>
                             ({ es, finalResult }) =>
-                              Effect.suspend(() => {
+                              Query.suspend(() => {
                                 if (finalResult.ref) {
-                                  return Effect.unit()
+                                  return Query.unit()
                                 } else {
-                                  return Effect.flatMap(Effect.either(te), (t) => {
+                                  return Query.flatMap(Query.either(te), (t) => {
                                     if (E.isRight(t)) {
                                       finalResult.ref = PR.success(t.right)
                                     } else {
                                       es.push([nk, PR.unionMember(t.left.errors)])
                                     }
-                                    return Effect.unit()
+                                    return Query.unit()
                                   })
                                 }
                               })
@@ -817,18 +817,18 @@ const go = I.memoize(untracedMethod(() =>
 
           if (picks.length > 0) {
             return untraced(() =>
-              Effect.suspend(() => {
+              Query.suspend(() => {
                 const state: State = {
                   es: Array.from(es),
                   finalResult: { ref: finalResult.ref }
                 }
-                return Effect.flatMap(
-                  Effect.forEachDiscard(picks, (f) => f(state)),
+                return Query.flatMap(
+                  Query.forEach(picks, (f) => f(state)),
                   () => {
                     if (state.finalResult.ref) {
                       return state.finalResult.ref
                     }
-                    const picks2: Array<Effect.Effect<never, never, void>> = []
+                    const picks2: Array<Query.Query<never, never, void>> = []
                     // if none of the schemas with at least one property with a literal value succeeded,
                     // proceed with those that have no literal at all
                     for (let i = 0; i < otherwise.length; i++) {
@@ -844,17 +844,17 @@ const go = I.memoize(untracedMethod(() =>
                         const nk = stepKey++
                         picks2.push(
                           untraced(() =>
-                            Effect.suspend(() => {
+                            Query.suspend(() => {
                               if (state.finalResult.ref) {
-                                return Effect.unit()
+                                return Query.unit()
                               } else {
-                                return Effect.flatMap(Effect.either(te), (t) => {
+                                return Query.flatMap(Query.either(te), (t) => {
                                   if (E.isRight(t)) {
                                     state.finalResult.ref = PR.success(t.right)
                                   } else {
                                     es.push([nk, PR.unionMember(t.left.errors)])
                                   }
-                                  return Effect.unit()
+                                  return Query.unit()
                                 })
                               }
                             })
@@ -866,8 +866,8 @@ const go = I.memoize(untracedMethod(() =>
                     // compute output
                     // ---------------------------------------------
                     if (picks2.length > 0) {
-                      return Effect.flatMap(
-                        Effect.collectAllDiscard(picks2),
+                      return Query.flatMap(
+                        Query.collectAll(picks2),
                         () => {
                           if (state.finalResult.ref) {
                             return state.finalResult.ref
@@ -898,17 +898,17 @@ const go = I.memoize(untracedMethod(() =>
                 picks.push(
                   untracedMethod(() =>
                     ({ es, finalResult }) =>
-                      Effect.suspend(() => {
+                      Query.suspend(() => {
                         if (finalResult.ref) {
-                          return Effect.unit()
+                          return Query.unit()
                         } else {
-                          return Effect.flatMap(Effect.either(te), (t) => {
+                          return Query.flatMap(Query.either(te), (t) => {
                             if (E.isRight(t)) {
                               finalResult.ref = PR.success(t.right)
                             } else {
                               es.push([nk, PR.unionMember(t.left.errors)])
                             }
-                            return Effect.unit()
+                            return Query.unit()
                           })
                         }
                       })
@@ -921,13 +921,13 @@ const go = I.memoize(untracedMethod(() =>
             // ---------------------------------------------
             if (picks.length > 0) {
               return untraced(() =>
-                Effect.suspend(() => {
+                Query.suspend(() => {
                   const state: State = {
                     es: Array.from(es),
                     finalResult: { ref: finalResult.ref }
                   }
-                  return Effect.flatMap(
-                    Effect.forEachDiscard(picks, (f) => f(state)),
+                  return Query.flatMap(
+                    Query.forEach(picks, (f) => f(state)),
                     () => {
                       if (state.finalResult.ref) {
                         return state.finalResult.ref

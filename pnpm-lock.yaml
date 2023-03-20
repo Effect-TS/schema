@@ -16,6 +16,7 @@ specifiers:
   '@effect/data': ~0.5.0
   '@effect/io': ^0.10.0
   '@effect/language-service': ^0.0.19
+  '@effect/query': ^0.3.0
   '@repo-tooling/eslint-plugin-dprint': ^0.0.4
   '@types/benchmark': ^2.1.2
   '@types/chai': ^4.3.4
@@ -57,6 +58,7 @@ specifiers:
 dependencies:
   '@effect/data': 0.5.0
   '@effect/io': 0.10.0
+  '@effect/query': 0.3.0
   fast-check: 3.7.1
 
 devDependencies:
@@ -641,6 +643,13 @@ packages:
       '@fp-ts/core': 0.0.11
       '@fp-ts/data': 0.0.41
     dev: true
+
+  /@effect/query/0.3.0:
+    resolution: {integrity: sha512-yGKEWuncw307qG/s7ZRi4YQqMpRG9QaLsy/iW66jenjpyOG57ZG3Q8MmJ4lscA2TG+huNyTj111BMy8aj+LoZQ==}
+    dependencies:
+      '@effect/data': 0.5.0
+      '@effect/io': 0.10.0
+    dev: false
 
   /@esbuild/android-arm/0.17.12:
     resolution: {integrity: sha512-E/sgkvwoIfj4aMAPL2e35VnUJspzVYl7+M1B2cqeubdBhADV4uPon0KCc8p2G+LqSJ6i8ocYPCqY3A4GGq0zkQ==}

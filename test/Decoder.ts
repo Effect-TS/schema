@@ -41,8 +41,8 @@ describe.concurrent("Decoder", () => {
 
   it("parseEffect", async () => {
     const schema = S.numberFromString(S.string)
-    expect(await Effect.runPromiseEither(P.parseEffect(schema)("1"))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.parseEffect(schema)("a"))).toEqual(
+    expect(await Effect.runPromiseEither(P.parseQuery(schema)("1"))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(P.parseQuery(schema)("a"))).toEqual(
       E.left(PR.parseError([PR.type(schema.ast, "a")]))
     )
   })
@@ -70,8 +70,8 @@ describe.concurrent("Decoder", () => {
 
   it("decodeEffect", async () => {
     const schema = S.numberFromString(S.string)
-    expect(await Effect.runPromiseEither(P.decodeEffect(schema)("1"))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.decodeEffect(schema)("a"))).toEqual(
+    expect(await Effect.runPromiseEither(P.decodeQuery(schema)("1"))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(P.decodeQuery(schema)("a"))).toEqual(
       E.left(PR.parseError([PR.type(schema.ast, "a")]))
     )
   })
@@ -101,8 +101,8 @@ describe.concurrent("Decoder", () => {
 
   it("validateEffect", async () => {
     const schema = S.numberFromString(S.string)
-    expect(await Effect.runPromiseEither(P.validateEffect(schema)(1))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.validateEffect(schema)("1"))).toEqual(
+    expect(await Effect.runPromiseEither(P.validateQuery(schema)(1))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(P.validateQuery(schema)("1"))).toEqual(
       E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })

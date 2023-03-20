@@ -259,7 +259,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const either: <E, A>(self: Effect.Effect<never, E, A>) => E.Left<E> | E.Right<A> | undefined
+export declare const either: <E, A>(self: Query.Query<never, E, A>) => E.Left<E> | E.Right<A> | undefined
 ```
 
 Added in v1.0.0
@@ -269,7 +269,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const eitherSync: <E, A>(self: Effect.Effect<never, E, A>) => E.Either<E, A>
+export declare const eitherSync: <E, A>(self: Query.Query<never, E, A>) => E.Either<E, A>
 ```
 
 Added in v1.0.0
@@ -280,9 +280,9 @@ Added in v1.0.0
 
 ```ts
 export declare const flatMap: <E, E1, A, B>(
-  self: Effect.Effect<never, E, A>,
-  f: (self: A) => Effect.Effect<never, E1, B>
-) => Effect.Effect<never, E | E1, B>
+  self: Query.Query<never, E, A>,
+  f: (self: A) => Query.Query<never, E1, B>
+) => Query.Query<never, E | E1, B>
 ```
 
 Added in v1.0.0
@@ -292,7 +292,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const map: <E, A, B>(self: Effect.Effect<never, E, A>, f: (self: A) => B) => Effect.Effect<never, E, B>
+export declare const map: <E, A, B>(self: Query.Query<never, E, A>, f: (self: A) => B) => Query.Query<never, E, B>
 ```
 
 Added in v1.0.0
@@ -317,7 +317,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
+export interface ParseResult<A> extends Query.Query<never, ParseError, A> {}
 ```
 
 Added in v1.0.0

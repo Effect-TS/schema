@@ -107,6 +107,7 @@
   "dependencies": {
     "@effect/data": "~0.5.0",
     "@effect/io": "^0.10.0",
+    "@effect/query": "^0.3.0",
     "fast-check": "^3.7.1"
   },
   "pnpm": {
