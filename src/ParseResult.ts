@@ -196,9 +196,11 @@ export const failures = (
   es: NonEmptyReadonlyArray<ParseError>
 ): ParseResult<never> => Exit.fail(es)
 
-const untrace = <E, A>(self: Effect.Effect<never, E, A>): Effect.Effect<never, E, A> =>
-  // @ts-expect-error
-  self["_tag"] === "Traced" ? self["i0"] : self
+const untrace = <E, A>(self: Effect.Effect<never, E, A>): Effect.Effect<never, E, A> => {
+  // TODO: find a way to detect Traced
+  const s: any = self
+  return s["_tag"] === "Traced" ? s["i0"] : s
+}
 
 /**
  * @category optimisation
