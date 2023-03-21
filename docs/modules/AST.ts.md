@@ -61,6 +61,7 @@ Added in v1.0.0
   - [isDeclaration](#isdeclaration)
   - [isLazy](#islazy)
   - [isLiteral](#isliteral)
+  - [isNeverKeyword](#isneverkeyword)
   - [isNumberKeyword](#isnumberkeyword)
   - [isRefinement](#isrefinement)
   - [isStringKeyword](#isstringkeyword)
@@ -625,6 +626,16 @@ export declare const isLiteral: (ast: AST) => ast is Literal
 
 Added in v1.0.0
 
+## isNeverKeyword
+
+**Signature**
+
+```ts
+export declare const isNeverKeyword: (ast: AST) => ast is NeverKeyword
+```
+
+Added in v1.0.0
+
 ## isNumberKeyword
 
 **Signature**
@@ -913,7 +924,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Refinement extends Annotated, HasTransformation {
+export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
   readonly to: AST
@@ -967,7 +978,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Transform extends Annotated, HasTransformation {
+export interface Transform extends Annotated {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
@@ -1124,7 +1135,7 @@ Added in v1.0.0
 
 ```ts
 export interface IndexSignature {
-  readonly parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement
+  readonly parameter: AST
   readonly type: AST
   readonly isReadonly: boolean
 }
@@ -1224,11 +1235,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createIndexSignature: (
-  parameter: StringKeyword | SymbolKeyword | TemplateLiteral | Refinement,
-  type: AST,
-  isReadonly: boolean
-) => IndexSignature
+export declare const createIndexSignature: (parameter: AST, type: AST, isReadonly: boolean) => IndexSignature
 ```
 
 Added in v1.0.0
@@ -1393,7 +1400,6 @@ export declare const mergeAnnotations: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1402,7 +1408,6 @@ export declare const mergeAnnotations: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      hasTransformation: boolean
     }
 ```
 
@@ -1525,7 +1530,6 @@ export declare const setAnnotation: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1534,7 +1538,6 @@ export declare const setAnnotation: (
       to: AST
       decode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
       encode: (input: any, options?: ParseOptions | undefined) => ParseResult<any>
-      hasTransformation: boolean
     }
 ```
 
