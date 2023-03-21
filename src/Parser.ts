@@ -9,7 +9,7 @@ import * as O from "@effect/data/Option"
 import * as P from "@effect/data/Predicate"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as RA from "@effect/data/ReadonlyArray"
-import { untraced, untracedMethod } from "@effect/io/Debug"
+import { untracedMethod } from "@effect/io/Debug"
 import * as Effect from "@effect/io/Effect"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -669,7 +669,6 @@ const go = I.memoize(untracedMethod(() =>
         const searchTree = _getSearchTree(ast.types)
         const ownKeys = Reflect.ownKeys(searchTree.keys)
         const len = ownKeys.length
-        const otherwise = searchTree.otherwise
         const map = new Map<any, Parser<any, any>>()
         for (let i = 0; i < ast.types.length; i++) {
           map.set(ast.types[i], go(ast.types[i]))
@@ -677,14 +676,7 @@ const go = I.memoize(untracedMethod(() =>
         return (input, options) => {
           const es: Array<[number, PR.ParseErrors]> = []
           let stepKey = 0
-          const queueWithState: Array<(state: State) => PR.ParseResult<unknown>> = []
-          const finalResult: { ref: any } = {
-            ref: undefined
-          }
-          type State = {
-            finalResult: typeof finalResult
-            es: typeof es
-          }
+          let candidates: Array<AST.AST> = []
           if (len > 0) {
             // if there is at least one key then input must be an object
             if (P.isRecord(input)) {
@@ -697,42 +689,7 @@ const go = I.memoize(untracedMethod(() =>
                   // check that the value obtained from the input for the property corresponds to an existing bucket
                   if (Object.prototype.hasOwnProperty.call(buckets, literal)) {
                     // retrive the minimal set of candidates for decoding
-                    const bucket = buckets[literal]
-                    for (let i = 0; i < bucket.length; i++) {
-                      const te = map.get(bucket[i])!(input, options)
-                      // the members of a union are ordered based on which one should be decoded first,
-                      // therefore if one member has added a task, all subsequent members must
-                      // also add a task to the queue even if they are synchronous.
-                      const t = queueWithState.length === 0 ? PR.either(te) : undefined
-                      if (t) {
-                        if (E.isRight(t)) {
-                          return PR.success(t.right)
-                        } else {
-                          es.push([stepKey++, PR.unionMember(t.left.errors)])
-                        }
-                      } else {
-                        const nk = stepKey++
-                        queueWithState.push(
-                          untracedMethod(() =>
-                            ({ es, finalResult }) =>
-                              Effect.suspend(() => {
-                                if (finalResult.ref) {
-                                  return Effect.unit()
-                                } else {
-                                  return Effect.flatMap(Effect.either(te), (t) => {
-                                    if (E.isRight(t)) {
-                                      finalResult.ref = PR.success(t.right)
-                                    } else {
-                                      es.push([nk, PR.unionMember(t.left.errors)])
-                                    }
-                                    return Effect.unit()
-                                  })
-                                }
-                              })
-                          )
-                        )
-                      }
-                    }
+                    candidates = candidates.concat(buckets[literal])
                   } else {
                     es.push([
                       stepKey++,
@@ -750,141 +707,83 @@ const go = I.memoize(untracedMethod(() =>
               es.push([stepKey++, PR.type(unknownRecord, input)])
             }
           }
+          if (searchTree.otherwise.length > 0) {
+            candidates = candidates.concat(searchTree.otherwise)
+          }
 
+          const queue: Array<(state: State) => PR.ParseResult<unknown>> = []
+          const finalResult: { ref: any } = {
+            ref: undefined
+          }
+          type State = {
+            finalResult: typeof finalResult
+            es: typeof es
+          }
+
+          for (let i = 0; i < candidates.length; i++) {
+            const te = map.get(candidates[i])!(input, options)
+            // the members of a union are ordered based on which one should be decoded first,
+            // therefore if one member has added a task, all subsequent members must
+            // also add a task to the queue even if they are synchronous
+            const t = queue.length === 0 ? PR.either(te) : undefined
+            if (t) {
+              if (E.isRight(t)) {
+                return PR.success(t.right)
+              } else {
+                es.push([stepKey++, PR.unionMember(t.left.errors)])
+              }
+            } else {
+              const nk = stepKey++
+              queue.push(
+                untracedMethod(() =>
+                  ({ es, finalResult }) =>
+                    Effect.suspend(() => {
+                      if (finalResult.ref) {
+                        return Effect.unit()
+                      } else {
+                        return Effect.flatMap(Effect.either(te), (t) => {
+                          if (E.isRight(t)) {
+                            finalResult.ref = PR.success(t.right)
+                          } else {
+                            es.push([nk, PR.unionMember(t.left.errors)])
+                          }
+                          return Effect.unit()
+                        })
+                      }
+                    })
+                )
+              )
+            }
+          }
+
+          // ---------------------------------------------
+          // compute output
+          // ---------------------------------------------
           const computeResult = ({ es }: State) =>
             RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
               // this should never happen
               PR.failure(PR.type(AST.neverKeyword, input))
 
-          if (queueWithState.length > 0) {
+          if (queue.length > 0) {
             return Effect.suspend(() => {
               const state: State = {
                 es: Array.from(es),
                 finalResult: { ref: finalResult.ref }
               }
               return Effect.flatMap(
-                Effect.forEachDiscard(queueWithState, (f) =>
+                Effect.forEachDiscard(queue, (f) =>
                   f(state)),
                 () => {
                   if (state.finalResult.ref) {
                     return state.finalResult.ref
                   }
-                  const queue: Array<Effect.Effect<never, never, void>> = []
-                  // if none of the schemas with at least one property with a literal value succeeded,
-                  // proceed with those that have no literal at all
-                  for (let i = 0; i < otherwise.length; i++) {
-                    const te = map.get(otherwise[i])!(input, options)
-                    // the members of a union are ordered based on which one should be decoded first,
-                    // therefore if one member has added a task, all subsequent members must
-                    // also add a task to the queue even if they are synchronous.
-                    const t = queue.length === 0 ? PR.either(te) : undefined
-                    if (t) {
-                      if (E.isRight(t)) {
-                        return PR.success(t.right)
-                      } else {
-                        state.es.push([stepKey++, PR.unionMember(t.left.errors)])
-                      }
-                    } else {
-                      const nk = stepKey++
-                      queue.push(
-                        untraced(() =>
-                          Effect.suspend(() => {
-                            if (state.finalResult.ref) {
-                              return Effect.unit()
-                            } else {
-                              return Effect.flatMap(Effect.either(te), (t) => {
-                                if (E.isRight(t)) {
-                                  state.finalResult.ref = PR.success(t.right)
-                                } else {
-                                  state.es.push([nk, PR.unionMember(t.left.errors)])
-                                }
-                                return Effect.unit()
-                              })
-                            }
-                          })
-                        )
-                      )
-                    }
-                  }
-                  // ---------------------------------------------
-                  // compute output
-                  // ---------------------------------------------
-                  if (queue.length > 0) {
-                    return Effect.flatMap(
-                      Effect.collectAllDiscard(queue),
-                      () => {
-                        if (state.finalResult.ref) {
-                          return state.finalResult.ref
-                        }
-                        return computeResult(state)
-                      }
-                    )
-                  }
                   return computeResult(state)
                 }
               )
             })
-          } else {
-            // if none of the schemas with at least one property with a literal value succeeded,
-            // proceed with those that have no literal at all
-            for (let i = 0; i < otherwise.length; i++) {
-              const te = map.get(otherwise[i])!(input, options)
-              // the members of a union are ordered based on which one should be decoded first,
-              // therefore if one member has added a task, all subsequent members must
-              // also add a task to the queue even if they are synchronous.
-              const t = queueWithState.length === 0 ? PR.either(te) : undefined
-              if (t) {
-                if (E.isRight(t)) {
-                  return PR.success(t.right)
-                } else {
-                  es.push([stepKey++, PR.unionMember(t.left.errors)])
-                }
-              } else {
-                const nk = stepKey++
-                queueWithState.push(
-                  untracedMethod(() =>
-                    ({ es, finalResult }) =>
-                      Effect.suspend(() => {
-                        if (finalResult.ref) {
-                          return Effect.unit()
-                        } else {
-                          return Effect.flatMap(Effect.either(te), (t) => {
-                            if (E.isRight(t)) {
-                              finalResult.ref = PR.success(t.right)
-                            } else {
-                              es.push([nk, PR.unionMember(t.left.errors)])
-                            }
-                            return Effect.unit()
-                          })
-                        }
-                      })
-                  )
-                )
-              }
-            }
-            // ---------------------------------------------
-            // compute output
-            // ---------------------------------------------
-            if (queueWithState.length > 0) {
-              return Effect.suspend(() => {
-                const state: State = {
-                  es: Array.from(es),
-                  finalResult: { ref: finalResult.ref }
-                }
-                return Effect.flatMap(
-                  Effect.forEachDiscard(queueWithState, (f) => f(state)),
-                  () => {
-                    if (state.finalResult.ref) {
-                      return state.finalResult.ref
-                    }
-                    return computeResult(state)
-                  }
-                )
-              })
-            }
-            return computeResult({ es, finalResult })
           }
+          return computeResult({ es, finalResult })
         }
       }
       case "Lazy": {
@@ -1027,6 +926,5 @@ const getTemplateLiteralRegex = (ast: AST.TemplateLiteral): RegExp => {
 function sortByIndex<T>(es: RA.NonEmptyArray<[number, T]>): RA.NonEmptyArray<T>
 function sortByIndex<T>(es: Array<[number, T]>): Array<T>
 function sortByIndex(es: Array<[number, any]>): any {
-  // TODO: can be optimised by tracking whether the array is already sorted?
   return es.sort(([a], [b]) => a > b ? 1 : a < b ? -1 : 0).map(([_, a]) => a)
 }

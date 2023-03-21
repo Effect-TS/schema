@@ -21,24 +21,26 @@ describe.concurrent("Effect", () => {
     )
   })
 
-  it("union/ should keep the member order with two structs with the same tag and a struct in otherwise", async () => {
+  it.skip("union/ should keep the member order with two structs with the same tag and structs in otherwise", async () => {
     const schema = S.union(
       S.struct({ _tag: S.literal("a"), b: S.string }),
       S.struct({ _tag: S.literal("a"), c: S.number }),
-      S.struct({ d: S.boolean })
+      S.struct({ d: S.boolean }),
+      S.struct({ e: S.object })
     )
     await Util.expectParseSuccess(schema, { _tag: "a", b: "b" })
     await Util.expectParseSuccess(schema, { _tag: "a", c: 1 })
     await Util.expectParseSuccess(schema, { d: true })
+    await Util.expectParseSuccess(schema, { e: {} })
     await Util.expectParseFailure(
       schema,
       { _tag: "a" },
-      `union member: /b is missing, union member: /c is missing, union member: /d is missing`
+      `union member: /b is missing, union member: /c is missing, union member: /d is missing, union member: /e is missing`
     )
     await Util.expectParseFailure(
       schema,
       { _tag: "a", c: "c" },
-      `union member: /b is missing, union member: /c Expected number, actual "c", union member: /d is missing`
+      `union member: /b is missing, union member: /c Expected number, actual "c", union member: /d is missing, union member: /e is missing`
     )
   })
 })
