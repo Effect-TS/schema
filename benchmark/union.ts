@@ -1,8 +1,11 @@
 import type * as E from "@effect/data/Either"
 import * as RA from "@effect/data/ReadonlyArray"
+import * as D from "@effect/io/Debug"
 import type { ParseError } from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
+
+D.runtimeDebug.tracingEnabled = true
 
 /*
 n = 3
@@ -16,10 +19,10 @@ parseManual (good) x 369,469 ops/sec ±4.57% (79 runs sampled)
 parseEither (bad) x 383,222 ops/sec ±0.57% (84 runs sampled)
 parseManual (bad) x 473,157 ops/sec ±3.27% (85 runs sampled)
 n = 100
-parseEither (good) x 402,634 ops/sec ±0.43% (90 runs sampled)
-parseManual (good) x 363,675 ops/sec ±4.94% (78 runs sampled)
-parseEither (bad) x 409,706 ops/sec ±2.37% (81 runs sampled)
-parseManual (bad) x 509,025 ops/sec ±0.47% (90 runs sampled)
+parseEither (good) x 366,276 ops/sec ±1.94% (85 runs sampled)
+parseManual (good) x 373,495 ops/sec ±4.38% (80 runs sampled)
+parseEither (bad) x 322,847 ops/sec ±0.64% (86 runs sampled)
+parseManual (bad) x 408,789 ops/sec ±2.73% (85 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
