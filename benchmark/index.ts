@@ -1,6 +1,9 @@
+import * as D from "@effect/io/Debug"
 import * as P from "@effect/schema/Parser"
 import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
+
+D.runtimeDebug.tracingEnabled = true
 
 /*
 io-ts

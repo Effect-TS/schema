@@ -9,7 +9,7 @@ import * as O from "@effect/data/Option"
 import * as P from "@effect/data/Predicate"
 import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
 import * as RA from "@effect/data/ReadonlyArray"
-import { untracedMethod } from "@effect/io/Debug"
+import { untraced, untracedMethod } from "@effect/io/Debug"
 import * as Effect from "@effect/io/Effect"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -325,7 +325,7 @@ const go = I.memoize(untracedMethod(() =>
             es: typeof es
             output: typeof output
           }
-          const residual: Array<(_: State) => PR.ParseResult<void>> = []
+          const queue: Array<(_: State) => PR.ParseResult<void>> = []
 
           // ---------------------------------------------
           // handle elements
@@ -355,7 +355,7 @@ const go = I.memoize(untracedMethod(() =>
               } else {
                 const nk = stepKey++
                 const index = i
-                residual.push(
+                queue.push(
                   untracedMethod(() =>
                     ({ es, output }: State) =>
                       Effect.flatMap(Effect.either(te), (t) => {
@@ -401,7 +401,7 @@ const go = I.memoize(untracedMethod(() =>
               } else {
                 const nk = stepKey++
                 const index = i
-                residual.push(
+                queue.push(
                   untracedMethod(() =>
                     ({ es, output }: State) =>
                       Effect.flatMap(Effect.either(te), (t) => {
@@ -447,7 +447,7 @@ const go = I.memoize(untracedMethod(() =>
                 } else {
                   const nk = stepKey++
                   const index = i
-                  residual.push(
+                  queue.push(
                     untracedMethod(() =>
                       ({ es, output }: State) =>
                         Effect.flatMap(Effect.either(te), (t) => {
@@ -478,15 +478,19 @@ const go = I.memoize(untracedMethod(() =>
             RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(sortByIndex(output))
-          return residual.length > 0 ?
-            Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                output: Array.from(output)
-              }
-              return Effect.flatMap(Effect.forEachDiscard(residual, (f) => f(state)), () =>
-                computeResult(state))
-            }) :
+          return queue.length > 0 ?
+            untraced(() =>
+              Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  output: Array.from(output)
+                }
+                return Effect.flatMap(
+                  Effect.forEachDiscard(queue, (f) => f(state)),
+                  () => computeResult(state)
+                )
+              })
+            ) :
             computeResult({ output, es })
         }
       }
@@ -494,9 +498,7 @@ const go = I.memoize(untracedMethod(() =>
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
           return fromRefinement(ast, P.isNotNullable)
         }
-        const propertySignaturesTypes = ast.propertySignatures.map((f) =>
-          go(f.type)
-        )
+        const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
         const indexSignatures = ast.indexSignatures.map((is) =>
           [go(is.parameter), go(is.type)] as const
         )
@@ -553,7 +555,7 @@ const go = I.memoize(untracedMethod(() =>
             es: typeof es
             output: typeof output
           }
-          const residual: Array<(state: State) => PR.ParseResult<void>> = []
+          const queue: Array<(state: State) => PR.ParseResult<void>> = []
 
           for (let i = 0; i < propertySignaturesTypes.length; i++) {
             const ps = ast.propertySignatures[i]
@@ -577,7 +579,7 @@ const go = I.memoize(untracedMethod(() =>
               } else {
                 const nk = stepKey++
                 const index = name
-                residual.push(
+                queue.push(
                   untracedMethod(() =>
                     ({ es, output }: State) =>
                       Effect.flatMap(Effect.either(te), (t) => {
@@ -649,7 +651,7 @@ const go = I.memoize(untracedMethod(() =>
                 } else {
                   const nk = stepKey++
                   const index = key
-                  residual.push(
+                  queue.push(
                     untracedMethod(() =>
                       ({ es, output }: State) =>
                         Effect.flatMap(
@@ -682,15 +684,19 @@ const go = I.memoize(untracedMethod(() =>
             RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
               PR.success(output)
-          return residual.length > 0 ?
-            Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                output: Object.assign({}, output)
-              }
-              return Effect.flatMap(Effect.forEachDiscard(residual, (f) => f(state)), () =>
-                computeResult(state))
-            }) :
+          return queue.length > 0 ?
+            untraced(() =>
+              Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  output: Object.assign({}, output)
+                }
+                return Effect.flatMap(
+                  Effect.forEachDiscard(queue, (f) => f(state)),
+                  () => computeResult(state)
+                )
+              })
+            ) :
             computeResult({ es, output })
         }
       }
@@ -794,25 +800,25 @@ const go = I.memoize(untracedMethod(() =>
               // this should never happen
               PR.failure(PR.type(AST.neverKeyword, input))
 
-          if (queue.length > 0) {
-            return Effect.suspend(() => {
-              const state: State = {
-                es: Array.from(es),
-                finalResult: { ref: finalResult.ref }
-              }
-              return Effect.flatMap(
-                Effect.forEachDiscard(queue, (f) =>
-                  f(state)),
-                () => {
-                  if (state.finalResult.ref) {
-                    return state.finalResult.ref
-                  }
-                  return computeResult(state)
+          return queue.length > 0 ?
+            untraced(() =>
+              Effect.suspend(() => {
+                const state: State = {
+                  es: Array.from(es),
+                  finalResult: { ref: finalResult.ref }
                 }
-              )
-            })
-          }
-          return computeResult({ es, finalResult })
+                return Effect.flatMap(
+                  Effect.forEachDiscard(queue, (f) => f(state)),
+                  () => {
+                    if (state.finalResult.ref) {
+                      return state.finalResult.ref
+                    }
+                    return computeResult(state)
+                  }
+                )
+              })
+            ) :
+            computeResult({ es, finalResult })
         }
       }
       case "Lazy": {
