@@ -1,5 +1,5 @@
 ---
-"@effect/schema": minor
+"@effect/schema": patch
 ---
 
-AST: remove isReversed from Transform
+Add back missing commits from wrong rebase.
