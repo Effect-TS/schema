@@ -258,10 +258,10 @@ const go = I.memoize((ast: AST.AST): Parser => {
           // ---------------------------------------------
           // handle unexpected indexes
           // ---------------------------------------------
-          const isUnexpectedAllowed = options?.isUnexpectedAllowed
+          const allowExcess = options?.allowExcess
           for (; i < input.length; i++) {
             const e = PR.index(i, [PR.unexpected(input[i])])
-            if (!isUnexpectedAllowed) {
+            if (!allowExcess) {
               if (allErrors) {
                 es.push(e)
                 continue
@@ -376,11 +376,11 @@ const go = I.memoize((ast: AST.AST): Parser => {
           // ---------------------------------------------
           // handle unexpected keys
           // ---------------------------------------------
-          const isUnexpectedAllowed = options?.isUnexpectedAllowed
+          const allowExcess = options?.allowExcess
           for (const key of Reflect.ownKeys(input)) {
             if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
               const e = PR.key(key, [PR.unexpected(input[key])])
-              if (!isUnexpectedAllowed) {
+              if (!allowExcess) {
                 if (allErrors) {
                   es.push(e)
                   continue

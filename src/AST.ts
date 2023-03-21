@@ -778,7 +778,7 @@ export const isRefinement = (ast: AST): ast is Refinement => ast._tag === "Refin
  * @since 1.0.0
  */
 export interface ParseOptions {
-  readonly isUnexpectedAllowed?: boolean
+  readonly allowExcess?: boolean
   readonly allErrors?: boolean
 }
 

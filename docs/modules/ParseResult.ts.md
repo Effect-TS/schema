@@ -31,7 +31,7 @@ Added in v1.0.0
   - [Missing (interface)](#missing-interface)
   - [ParseError (type alias)](#parseerror-type-alias)
   - [Type (interface)](#type-interface)
-  - [Unexpected (interface)](#unexpected-interface)
+  - [Excess (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
 - [utils](#utils)
   - [ParseResult (type alias)](#parseresult-type-alias)
@@ -115,7 +115,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unexpected: (actual: unknown) => Unexpected
+export declare const unexpected: (actual: unknown) => Excess
 ```
 
 Added in v1.0.0
@@ -180,7 +180,7 @@ Added in v1.0.0
 The `Key` variant of the `ParseError` type represents an error that occurs when a key in an object is invalid.
 This error typically occurs when the `actual` value is not a valid key type (e.g. a string or number)
 or when the key is not present in the object being decoded. In either case, the `key` field of the error will contain
-the invalid key value. This error is typically used in combination with the `Unexpected` error,
+the invalid key value. This error is typically used in combination with the `Excess` error,
 which indicates that an unexpected key was found in the object being decoded.
 
 **Signature**
@@ -216,7 +216,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type ParseError = Type | Index | Key | Missing | Unexpected | UnionMember
+export type ParseError = Type | Index | Key | Missing | Excess | UnionMember
 ```
 
 Added in v1.0.0
@@ -241,15 +241,15 @@ export interface Type {
 
 Added in v1.0.0
 
-## Unexpected (interface)
+## Excess (interface)
 
 Error that occurs when an unexpected key or index is present.
 
 **Signature**
 
 ```ts
-export interface Unexpected {
-  readonly _tag: 'Unexpected'
+export interface Excess {
+  readonly _tag: 'Excess'
   readonly actual: unknown
 }
 ```

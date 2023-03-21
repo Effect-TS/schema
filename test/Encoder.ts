@@ -352,14 +352,14 @@ describe.concurrent("Encoder", () => {
   })
 
   // ---------------------------------------------
-  // isUnexpectedAllowed option
+  // allowExcess option
   // ---------------------------------------------
 
-  const isUnexpectedAllowed: ParseOptions = {
-    isUnexpectedAllowed: true
+  const allowExcess: ParseOptions = {
+    allowExcess: true
   }
 
-  it("isUnexpectedAllowed/union/struct choose the output more info", () => {
+  it("allowExcess/union/struct choose the output more info", () => {
     const a = S.struct({ a: S.optional(S.number) })
     const b = S.struct({ a: S.optional(S.number), b: S.optional(S.string) })
     const schema = S.union(a, b)
@@ -370,11 +370,11 @@ describe.concurrent("Encoder", () => {
         a: 1,
         b: "b"
       },
-      isUnexpectedAllowed
+      allowExcess
     )
   })
 
-  it("isUnexpectedAllowed/union/tuple choose the output more info", () => {
+  it("allowExcess/union/tuple choose the output more info", () => {
     const a = S.tuple(S.number)
     const b = pipe(S.tuple(S.number), S.optionalElement(S.string))
     const schema = S.union(a, b)
@@ -382,17 +382,17 @@ describe.concurrent("Encoder", () => {
       schema,
       [1, "b", true] as any,
       [1, "b"],
-      isUnexpectedAllowed
+      allowExcess
     )
   })
 
-  it("isUnexpectedAllowed/tuple unexpected indexes", () => {
+  it("allowExcess/tuple unexpected indexes", () => {
     const schema = S.tuple(S.string)
     Util.expectEncodingSuccess(
       schema,
       ["a", 1, 2] as any,
       ["a"],
-      isUnexpectedAllowed
+      allowExcess
     )
   })
 

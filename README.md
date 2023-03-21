@@ -154,9 +154,9 @@ Decoding failed:
 
 When using a `Schema` to decode a value, any properties that are not specified in the `Schema` will result in a decoding error. This is because the `Schema` is expecting a specific shape for the decoded value, and any excess properties do not conform to that shape.
 
-However, you can use the `isUnexpectedAllowed` option to allow excess properties while decoding. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
+However, you can use the `allowExcess` option to allow excess properties while decoding. This can be useful in cases where you want to be permissive in the shape of the decoded value, but still want to catch any potential errors or unexpected values.
 
-Here's an example of how you might use `isUnexpectedAllowed`:
+Here's an example of how you might use `allowExcess`:
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -174,7 +174,7 @@ console.log(
       age: 40,
       email: "bob@example.com",
     },
-    { isUnexpectedAllowed: true }
+    { allowExcess: true }
   )
 );
 /*
@@ -226,7 +226,7 @@ console.log(
       _tag: 'Key',
       key: 'email',
       errors: [
-        { _tag: 'Unexpected', actual: 'bob@example.com' },
+        { _tag: 'Excess', actual: 'bob@example.com' },
         [length]: 1
       ]
     },

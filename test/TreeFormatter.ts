@@ -3,7 +3,7 @@ import * as Util from "@effect/schema/test/util"
 import * as _ from "@effect/schema/TreeFormatter"
 
 describe.concurrent("TreeFormatter", () => {
-  it("formatErrors/ Unexpected", () => {
+  it("formatErrors/ Excess", () => {
     const schema = S.struct({ a: S.string })
     Util.expectDecodingFailureTree(
       schema,

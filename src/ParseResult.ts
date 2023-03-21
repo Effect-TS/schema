@@ -23,7 +23,7 @@ export type ParseError =
   | Index
   | Key
   | Missing
-  | Unexpected
+  | Excess
   | UnionMember
 
 /**
@@ -84,7 +84,7 @@ export const index = (
  * The `Key` variant of the `ParseError` type represents an error that occurs when a key in an object is invalid.
  * This error typically occurs when the `actual` value is not a valid key type (e.g. a string or number)
  * or when the key is not present in the object being decoded. In either case, the `key` field of the error will contain
- * the invalid key value. This error is typically used in combination with the `Unexpected` error,
+ * the invalid key value. This error is typically used in combination with the `Excess` error,
  * which indicates that an unexpected key was found in the object being decoded.
  *
  * @category model
@@ -131,8 +131,8 @@ export const missing: Missing = { _tag: "Missing" }
  * @category model
  * @since 1.0.0
  */
-export interface Unexpected {
-  readonly _tag: "Unexpected"
+export interface Excess {
+  readonly _tag: "Excess"
   readonly actual: unknown
 }
 
@@ -142,8 +142,8 @@ export interface Unexpected {
  */
 export const unexpected = (
   actual: unknown
-): Unexpected => ({
-  _tag: "Unexpected",
+): Excess => ({
+  _tag: "Excess",
   actual
 })
 

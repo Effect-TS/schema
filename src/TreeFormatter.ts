@@ -164,7 +164,7 @@ const go = (e: PR.ParseError): Tree<string> => {
       }
       return make(`[${e.index}]`, es)
     }
-    case "Unexpected":
+    case "Excess":
       return make(`is unexpected`)
     case "Key": {
       const es = e.errors.map(go)

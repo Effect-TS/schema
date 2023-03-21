@@ -90,7 +90,7 @@ const formatDecodeError = (e: PR.ParseError): string => {
       return `/${String(e.key)} ${pipe(e.errors, RA.map(formatDecodeError), RA.join(", "))}`
     case "Missing":
       return `is missing`
-    case "Unexpected":
+    case "Excess":
       return `is unexpected`
     case "UnionMember":
       return `union member: ${pipe(e.errors, RA.map(formatDecodeError), RA.join(", "))}`

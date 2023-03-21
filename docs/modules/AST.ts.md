@@ -899,7 +899,7 @@ Added in v1.0.0
 
 ```ts
 export interface ParseOptions {
-  readonly isUnexpectedAllowed?: boolean
+  readonly allowExcess?: boolean
   readonly allErrors?: boolean
 }
 ```
