@@ -45,6 +45,10 @@ export const getKeysForIndexSignature = (
 // ---------------------------------------------
 
 /** @internal */
+export const ownKeys = (o: object): ReadonlyArray<PropertyKey> =>
+  (Object.keys(o) as ReadonlyArray<PropertyKey>).concat(Object.getOwnPropertySymbols(o))
+
+/** @internal */
 export const memoize = <A extends object, B>(f: (a: A) => B): (a: A) => B => {
   const cache = new WeakMap()
   return (a) => {

@@ -625,7 +625,7 @@ const go = I.memoize(untracedMethod(() =>
           // ---------------------------------------------
           const isUnexpectedAllowed = options?.isUnexpectedAllowed
           if (!isUnexpectedAllowed && indexSignatures.length === 0) {
-            for (const key of Reflect.ownKeys(input)) {
+            for (const key of I.ownKeys(input)) {
               if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
                 const e = PR.key(key, [PR.unexpected(input[key])])
                 if (allErrors) {
@@ -819,7 +819,7 @@ const go = I.memoize(untracedMethod(() =>
       }
       case "Union": {
         const searchTree = _getSearchTree(ast.types)
-        const ownKeys = Reflect.ownKeys(searchTree.keys)
+        const ownKeys = I.ownKeys(searchTree.keys)
         const len = ownKeys.length
         const map = new Map<any, Parser<any, any>>()
         for (let i = 0; i < ast.types.length; i++) {

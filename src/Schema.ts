@@ -473,7 +473,7 @@ export const struct = <Fields extends Record<PropertyKey, Schema<any> | Optional
 > =>
   make(
     AST.createTypeLiteral(
-      Reflect.ownKeys(fields).map((key) =>
+      I.ownKeys(fields).map((key) =>
         AST.createPropertySignature(
           key,
           (fields[key] as any).ast,
@@ -1998,7 +1998,7 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
   > => {
     if (AST.isTypeLiteral(schema.ast)) {
       const propertySignatures = schema.ast.propertySignatures
-      const ownKeys = Reflect.ownKeys(fields)
+      const ownKeys = I.ownKeys(fields)
       const from = AST.createTypeLiteral(
         propertySignatures.concat(
           ownKeys.map((key) =>
