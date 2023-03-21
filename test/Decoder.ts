@@ -39,6 +39,12 @@ describe.concurrent("Decoder", () => {
     expect(P.parseEither(schema)("a")).toEqual(E.left(PR.parseError([PR.type(schema.ast, "a")])))
   })
 
+  it("parsePromise", async () => {
+    const schema = S.numberFromString(S.string)
+    await expect(P.parsePromise(schema)("1")).resolves.toEqual(1)
+    await expect(P.parsePromise(schema)("a")).rejects.toThrow()
+  })
+
   it("parseEffect", async () => {
     const schema = S.numberFromString(S.string)
     expect(await Effect.runPromiseEither(P.parseEffect(schema)("1"))).toEqual(E.right(1))
@@ -66,6 +72,12 @@ describe.concurrent("Decoder", () => {
     const schema = S.numberFromString(S.string)
     expect(P.decodeEither(schema)("1")).toEqual(E.right(1))
     expect(P.decodeEither(schema)("a")).toEqual(E.left(PR.parseError([PR.type(schema.ast, "a")])))
+  })
+
+  it("decodePromise", async () => {
+    const schema = S.numberFromString(S.string)
+    await expect(P.decodePromise(schema)("1")).resolves.toEqual(1)
+    await expect(P.decodePromise(schema)("a")).rejects.toThrow()
   })
 
   it("decodeEffect", async () => {
@@ -99,12 +111,24 @@ describe.concurrent("Decoder", () => {
     )
   })
 
+  it("validatePromise", async () => {
+    const schema = S.numberFromString(S.string)
+    await expect(P.validatePromise(schema)(1)).resolves.toEqual(1)
+    await expect(P.validatePromise(schema)("1")).rejects.toThrow()
+    await expect(P.validatePromise(schema)("a")).rejects.toThrow()
+  })
+
   it("validateEffect", async () => {
     const schema = S.numberFromString(S.string)
     expect(await Effect.runPromiseEither(P.validateEffect(schema)(1))).toEqual(E.right(1))
     expect(await Effect.runPromiseEither(P.validateEffect(schema)("1"))).toEqual(
       E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
+  })
+
+  it("encodePromise", async () => {
+    const schema = S.numberFromString(S.string)
+    await expect(P.encodePromise(schema)(1)).resolves.toEqual("1")
   })
 
   it("from", async () => {

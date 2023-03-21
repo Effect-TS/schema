@@ -37,6 +37,16 @@ const getOption = (ast: AST.AST) => {
     O.fromEither(PR.eitherSync(parser(input, options)))
 }
 
+const getEither = (ast: AST.AST) => {
+  const parser = go(ast)
+  return (input: unknown, options?: ParseOptions) => PR.eitherSync(parser(input, options))
+}
+
+const getPromise = (ast: AST.AST) => {
+  const parser = go(ast)
+  return (input: unknown, options?: ParseOptions) => Effect.runPromise(parser(input, options))
+}
+
 /**
  * @category decoding
  * @since 1.0.0
@@ -58,11 +68,15 @@ export const parseOption = <_, A>(
  */
 export const parseEither = <_, A>(
   schema: Schema<_, A>
-) => {
-  const parser = go(schema.ast)
-  return (i: unknown, options?: ParseOptions): E.Either<PR.ParseError, A> =>
-    PR.eitherSync(parser(i, options))
-}
+): (i: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> => getEither(schema.ast)
+
+/**
+ * @category decoding
+ * @since 1.0.0
+ */
+export const parsePromise = <_, A>(
+  schema: Schema<_, A>
+): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(schema.ast)
 
 /**
  * @category decoding
@@ -98,6 +112,14 @@ export const decodeEither: <I, A>(
  * @category decoding
  * @since 1.0.0
  */
+export const decodePromise: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions) => Promise<A> = parsePromise
+
+/**
+ * @category decoding
+ * @since 1.0.0
+ */
 export const decodeEffect: <_, A>(
   schema: Schema<_, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A> = parseEffect
@@ -124,11 +146,16 @@ export const validateOption = <_, A>(
  */
 export const validateEither = <_, A>(
   schema: Schema<_, A>
-) => {
-  const parser = go(AST.getTo(schema.ast))
-  return (a: unknown, options?: ParseOptions): E.Either<PR.ParseError, A> =>
-    PR.eitherSync(parser(a, options))
-}
+): (a: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> =>
+  getEither(AST.getTo(schema.ast))
+
+/**
+ * @category validation
+ * @since 1.0.0
+ */
+export const validatePromise = <_, A>(
+  schema: Schema<_, A>
+): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(AST.getTo(schema.ast))
 
 /**
  * @category validation
@@ -136,18 +163,15 @@ export const validateEither = <_, A>(
  */
 export const validateEffect = <_, A>(
   schema: Schema<_, A>
-) => {
-  const parser = go(AST.getTo(schema.ast))
-  return (a: unknown, options?: ParseOptions): PR.ParseResult<A> => parser(a, options)
-}
+): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.getTo(schema.ast))
 
 /**
  * @category validation
  * @since 1.0.0
  */
 export const is = <_, A>(schema: Schema<_, A>) => {
-  const parser = validateEither(schema)
-  return (a: unknown): a is A => E.isRight(parser(a))
+  const getEither = validateEither(schema)
+  return (a: unknown): a is A => E.isRight(getEither(a))
 }
 
 /**
@@ -163,9 +187,9 @@ export type ToAsserts<S extends Schema<any>> = (
  * @since 1.0.0
  */
 export const asserts = <_, A>(schema: Schema<_, A>) => {
-  const parser = validate(schema)
+  const get = validate(schema)
   return (a: unknown, options?: ParseOptions): asserts a is A => {
-    parser(a, options)
+    get(a, options)
   }
 }
 
@@ -190,11 +214,16 @@ export const encodeOption = <I, A>(
  */
 export const encodeEither = <I, A>(
   schema: Schema<I, A>
-) => {
-  const parser = go(AST.reverse(schema.ast))
-  return (a: A, options?: ParseOptions): E.Either<PR.ParseError, I> =>
-    PR.eitherSync(parser(a, options))
-}
+): (a: A, options?: ParseOptions) => E.Either<PR.ParseError, I> =>
+  getEither(AST.reverse(schema.ast))
+
+/**
+ * @category encoding
+ * @since 1.0.0
+ */
+export const encodePromise = <I, A>(
+  schema: Schema<I, A>
+): (a: A, options?: ParseOptions) => Promise<I> => getPromise(AST.reverse(schema.ast))
 
 /**
  * @category encoding
