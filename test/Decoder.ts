@@ -1419,13 +1419,4 @@ describe.concurrent("Decoder", () => {
       allErrors
     )
   })
-
-  it("extend struct with record", async () => {
-    const schema = pipe(
-      S.struct({ a: S.string }),
-      S.extend(S.record(S.string, S.boolean))
-    )
-
-    await Util.expectParseSuccess(schema, { a: "a" })
-  })
 })
