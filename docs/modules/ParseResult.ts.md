@@ -22,19 +22,23 @@ Added in v1.0.0
   - [type](#type)
   - [unexpected](#unexpected)
   - [unionMember](#unionmember)
-- [guards](#guards)
-  - [isFailure](#isfailure)
-  - [isSuccess](#issuccess)
 - [model](#model)
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
   - [Missing (interface)](#missing-interface)
-  - [ParseError (type alias)](#parseerror-type-alias)
+  - [ParseErrors (type alias)](#parseerrors-type-alias)
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
+- [optimisation](#optimisation)
+  - [either](#either)
+  - [eitherSync](#eithersync)
+  - [flatMap](#flatmap)
+  - [map](#map)
 - [utils](#utils)
-  - [ParseResult (type alias)](#parseresult-type-alias)
+  - [ParseError (interface)](#parseerror-interface)
+  - [ParseResult (interface)](#parseresult-interface)
+  - [parseError](#parseerror)
 
 ---
 
@@ -45,7 +49,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const failure: (e: ParseError) => ParseResult<never>
+export declare const failure: (e: ParseErrors) => ParseResult<never>
 ```
 
 Added in v1.0.0
@@ -55,7 +59,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const failures: (es: readonly [ParseError, ...ParseError[]]) => ParseResult<never>
+export declare const failures: (es: readonly [ParseErrors, ...ParseErrors[]]) => ParseResult<never>
 ```
 
 Added in v1.0.0
@@ -65,7 +69,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const index: (index: number, errors: readonly [ParseError, ...ParseError[]]) => Index
+export declare const index: (index: number, errors: readonly [ParseErrors, ...ParseErrors[]]) => Index
 ```
 
 Added in v1.0.0
@@ -75,7 +79,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const key: (key: PropertyKey, errors: readonly [ParseError, ...ParseError[]]) => Key
+export declare const key: (key: PropertyKey, errors: readonly [ParseErrors, ...ParseErrors[]]) => Key
 ```
 
 Added in v1.0.0
@@ -95,7 +99,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const success: <A>(a: A) => Either<readonly [ParseError, ...ParseError[]], A>
+export declare const success: <A>(a: A) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -105,7 +109,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const type: (expected: AST.AST, actual: unknown) => Type
+export declare const type: (expected: AST.AST, actual: unknown, message?: string | undefined) => Type
 ```
 
 Added in v1.0.0
@@ -125,31 +129,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unionMember: (errors: readonly [ParseError, ...ParseError[]]) => UnionMember
-```
-
-Added in v1.0.0
-
-# guards
-
-## isFailure
-
-**Signature**
-
-```ts
-export declare const isFailure: <A>(
-  self: Either<readonly [ParseError, ...ParseError[]], A>
-) => self is Left<readonly [ParseError, ...ParseError[]]>
-```
-
-Added in v1.0.0
-
-## isSuccess
-
-**Signature**
-
-```ts
-export declare const isSuccess: <A>(self: Either<readonly [ParseError, ...ParseError[]], A>) => self is Right<A>
+export declare const unionMember: (errors: readonly [ParseErrors, ...ParseErrors[]]) => UnionMember
 ```
 
 Added in v1.0.0
@@ -169,7 +149,7 @@ that a specific element in an array did not match the expected type or value.
 export interface Index {
   readonly _tag: 'Index'
   readonly index: number
-  readonly errors: NonEmptyReadonlyArray<ParseError>
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
 }
 ```
 
@@ -189,7 +169,7 @@ which indicates that an unexpected key was found in the object being decoded.
 export interface Key {
   readonly _tag: 'Key'
   readonly key: PropertyKey
-  readonly errors: NonEmptyReadonlyArray<ParseError>
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
 }
 ```
 
@@ -209,14 +189,14 @@ export interface Missing {
 
 Added in v1.0.0
 
-## ParseError (type alias)
+## ParseErrors (type alias)
 
-`ParseError` is a type that represents the different types of errors that can occur when decoding a value.
+`ParseErrors` is a type that represents the different types of errors that can occur when decoding a value.
 
 **Signature**
 
 ```ts
-export type ParseError = Type | Index | Key | Missing | Unexpected | UnionMember
+export type ParseErrors = Type | Index | Key | Missing | Unexpected | UnionMember
 ```
 
 Added in v1.0.0
@@ -236,6 +216,7 @@ export interface Type {
   readonly _tag: 'Type'
   readonly expected: AST.AST
   readonly actual: unknown
+  readonly message: O.Option<string>
 }
 ```
 
@@ -265,20 +246,88 @@ Error that occurs when a member in a union has an error.
 ```ts
 export interface UnionMember {
   readonly _tag: 'UnionMember'
-  readonly errors: NonEmptyReadonlyArray<ParseError>
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
 }
+```
+
+Added in v1.0.0
+
+# optimisation
+
+## either
+
+**Signature**
+
+```ts
+export declare const either: <E, A>(self: Effect.Effect<never, E, A>) => E.Left<E> | E.Right<A> | undefined
+```
+
+Added in v1.0.0
+
+## eitherSync
+
+**Signature**
+
+```ts
+export declare const eitherSync: <E, A>(self: Effect.Effect<never, E, A>) => E.Either<E, A>
+```
+
+Added in v1.0.0
+
+## flatMap
+
+**Signature**
+
+```ts
+export declare const flatMap: <E, E1, A, B>(
+  self: Effect.Effect<never, E, A>,
+  f: (self: A) => Effect.Effect<never, E1, B>
+) => Effect.Effect<never, E | E1, B>
+```
+
+Added in v1.0.0
+
+## map
+
+**Signature**
+
+```ts
+export declare const map: <E, A, B>(self: Effect.Effect<never, E, A>, f: (self: A) => B) => Effect.Effect<never, E, B>
 ```
 
 Added in v1.0.0
 
 # utils
 
-## ParseResult (type alias)
+## ParseError (interface)
 
 **Signature**
 
 ```ts
-export type ParseResult<A> = Either<NonEmptyReadonlyArray<ParseError>, A>
+export interface ParseError {
+  readonly _tag: 'ParseError'
+  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+}
+```
+
+Added in v1.0.0
+
+## ParseResult (interface)
+
+**Signature**
+
+```ts
+export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
+```
+
+Added in v1.0.0
+
+## parseError
+
+**Signature**
+
+```ts
+export declare const parseError: (errors: readonly [ParseErrors, ...ParseErrors[]]) => ParseError
 ```
 
 Added in v1.0.0

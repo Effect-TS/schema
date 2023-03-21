@@ -1,24 +1,28 @@
+import type * as E from "@effect/data/Either"
 import * as RA from "@effect/data/ReadonlyArray"
-import type { ParseResult } from "@effect/schema/ParseResult"
+import * as D from "@effect/io/Debug"
+import type { ParseError } from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 
+D.runtimeDebug.tracingEnabled = true
+
 /*
 n = 3
-decodeEither (good) x 471,313 ops/sec ±0.27% (89 runs sampled)
-decodeManual (good) x 450,417 ops/sec ±3.11% (87 runs sampled)
-decodeEither (bad) x 774,310 ops/sec ±1.81% (86 runs sampled)
-decodeManual (bad) x 1,015,965 ops/sec ±2.04% (87 runs sampled)
+parseEither (good) x 406,821 ops/sec ±0.48% (88 runs sampled)
+parseManual (good) x 376,234 ops/sec ±4.45% (81 runs sampled)
+parseEither (bad) x 407,671 ops/sec ±2.12% (87 runs sampled)
+parseManual (bad) x 514,905 ops/sec ±0.51% (88 runs sampled)
 n = 10
-decodeEither (good) x 464,366 ops/sec ±0.25% (90 runs sampled)
-decodeManual (good) x 437,616 ops/sec ±3.07% (83 runs sampled)
-decodeEither (bad) x 785,114 ops/sec ±1.73% (84 runs sampled)
-decodeManual (bad) x 1,033,561 ops/sec ±1.62% (84 runs sampled)
+parseEither (good) x 403,275 ops/sec ±0.46% (88 runs sampled)
+parseManual (good) x 369,469 ops/sec ±4.57% (79 runs sampled)
+parseEither (bad) x 383,222 ops/sec ±0.57% (84 runs sampled)
+parseManual (bad) x 473,157 ops/sec ±3.27% (85 runs sampled)
 n = 100
-decodeEither (good) x 477,261 ops/sec ±0.42% (91 runs sampled)
-decodeManual (good) x 447,762 ops/sec ±3.22% (87 runs sampled)
-decodeEither (bad) x 771,355 ops/sec ±1.84% (84 runs sampled)
-decodeManual (bad) x 1,042,424 ops/sec ±0.30% (91 runs sampled)
+parseEither (good) x 366,276 ops/sec ±1.94% (85 runs sampled)
+parseManual (good) x 373,495 ops/sec ±4.38% (80 runs sampled)
+parseEither (bad) x 322,847 ops/sec ±0.64% (86 runs sampled)
+parseManual (bad) x 408,789 ops/sec ±2.73% (85 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -33,9 +37,9 @@ const members = RA.makeBy(n, (i) =>
   }))
 const schema = S.union(...members)
 
-const decodeEither = S.decodeEither(schema)
+const parseEither = S.parseEither(schema)
 
-const decodeManual = (input: unknown): ParseResult<{
+const parseManual = (input: unknown): E.Either<ParseError, {
   readonly kind: number
   readonly a: string
   readonly b: number
@@ -45,9 +49,9 @@ const decodeManual = (input: unknown): ParseResult<{
     typeof input === "object" && input !== null && "kind" in input && typeof input.kind === "number"
   ) {
     const kind = input.kind
-    return S.decodeEither(members[kind])(input)
+    return S.parseEither(members[kind])(input)
   }
-  return decodeEither(input)
+  return parseEither(input)
 }
 
 const good = {
@@ -64,21 +68,21 @@ const bad = {
   c: "c"
 }
 
-// console.log(decode(good))
-// console.log(decode(bad))
+// console.log(parseEither(good))
+// console.log(parseEither(bad))
 
 suite
-  .add("decodeEither (good)", function() {
-    decodeEither(good)
+  .add("parseEither (good)", function() {
+    parseEither(good)
   })
-  .add("decodeManual (good)", function() {
-    decodeManual(good)
+  .add("parseManual (good)", function() {
+    parseManual(good)
   })
-  .add("decodeEither (bad)", function() {
-    decodeEither(bad)
+  .add("parseEither (bad)", function() {
+    parseEither(bad)
   })
-  .add("decodeManual (bad)", function() {
-    decodeManual(bad)
+  .add("parseManual (bad)", function() {
+    parseManual(bad)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))

@@ -975,27 +975,35 @@ const Operation: S.Schema<Operation> = S.lazy(() =>
 
 In some cases, we may need to transform the output of a schema to a different type. For instance, we may want to parse a string into a number, or we may want to transform a date string into a `Date` object.
 
-To perform these kinds of transformations, the `@effect/schema` library provides the `transform` and `transformEither` combinators.
+To perform these kinds of transformations, the `@effect/schema` library provides the `transform` combinator.
+
+**transform**
+
+```ts
+<I1, A1, I2, A2>(from: Schema<I1, A1>, to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Schema<I1, A2>
+```
+
+```mermaid
+flowchart TD
+  schema1["from: Schema&lt;I1, A1&gt;"]
+  schema2["to: Schema&lt;I2, A2&gt;"]
+  schema1--decode: A1 -> I2-->schema2
+  schema2--encode: I2 -> A1-->schema1
+```
 
 The `transform` combinator takes a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to decode a value, the transformed schema will also fail.
 
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// define a schema for the string type
-const stringSchema: S.Schema<string> = S.string;
-
-// define a schema for a tuple with one element of type string
-const tupleSchema: S.Schema<[string]> = S.tuple(S.string);
-
 // define a function that converts a string into a tuple with one element of type string
 const decode = (s: string): [string] => [s];
 
 // define a function that converts a tuple with one element of type string into a string
-const encode = ([s]: [string]): string => s;
+const encode = ([s]: readonly [string]): string => s;
 
 // use the transform combinator to convert the string schema into the tuple schema
-const transformedSchema: S.Schema<string, [string]> = S.transform(stringSchema, tupleSchema, decode, encode);
+const transformedSchema: S.Schema<string, readonly [string]> = S.transform(S.string, S.tuple(S.string), decode, encode);
 ```
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to decode values of type `string` into values of type `[string]`.
@@ -1005,38 +1013,22 @@ The `transformEither` combinator works in a similar way, but allows the transfor
 Here's an example of the `transformEither` combinator which converts a `string` into a `boolean`:
 
 ```ts
-import { pipe } from "@effect/data/Function";
 import * as PR from "@effect/schema/ParseResult";
 import * as S from "@effect/schema/Schema";
-import * as AST from "@effect/schema/AST";
-
-// define a schema for the string type
-const stringSchema: S.Schema<string> = S.string;
-
-// define a schema for the boolean type
-const booleanSchema: S.Schema<boolean> = S.boolean;
 
 // define a function that converts a string into a boolean
-const decode = (s: string): PR.ParseResult<boolean> =>
+const decode = (s: string) =>
   s === "true"
     ? PR.success(true)
     : s === "false"
     ? PR.success(false)
-    : PR.failure(
-        PR.type(
-          AST.createUnion([
-            AST.createLiteral("true"),
-            AST.createLiteral("false"),
-          ]),
-          s
-        )
-      );
+    : PR.failure(PR.type(S.union(S.literal('true'), S.literal('false')).ast, s));
 
 // define a function that converts a boolean into a string
-const encode = (b: boolean): ParseResult<string> => PR.success(String(b));
+const encode = (b: boolean) => PR.success(String(b));
 
 // use the transformEither combinator to convert the string schema into the boolean schema
-const transformedSchema: S.Schema<string, boolean> = S.transformEither(stringSchema, booleanSchema, decode, encode);
+const transformedSchema: S.Schema<string, boolean> = S.transformEither(S.string, S.boolean, decode, encode);
 ```
 
 ### String transformations
@@ -1131,7 +1123,7 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
-const schema = S.dateFromString(S.string);
+const schema = S.dateFromString;
 const decode = S.decode(schema);
 
 decode("1970-01-01T00:00:00.000Z"); // new Date(0)

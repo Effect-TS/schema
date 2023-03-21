@@ -1,14 +1,17 @@
+import * as D from "@effect/io/Debug"
 import * as P from "@effect/schema/Parser"
 import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
+
+D.runtimeDebug.tracingEnabled = true
 
 /*
 io-ts
 space-object (good) x 476,424 ops/sec ±0.45% (92 runs sampled)
 space-object (bad) x 434,563 ops/sec ±0.58% (87 runs sampled)
-0.2.0
-decodeEither (good) x 114,959 ops/sec ±0.26% (87 runs sampled)
-decodeEither (bad) x 364,433 ops/sec ±3.79% (84 runs sampled)
+0.3.0
+parseEither (good) x 84,398 ops/sec ±1.93% (88 runs sampled)
+parseEither (bad) x 205,431 ops/sec ±5.29% (80 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -53,7 +56,7 @@ const Ship = t.struct({
 
 export const T = t.union(Asteroid, Planet, Ship)
 
-export const decodeEither = P.decodeEither(T)
+export const parseEither = P.parseEither(T)
 
 const good = {
   type: "ship",
@@ -97,15 +100,15 @@ const bad = {
   ]
 }
 
-// console.log(decode(good))
-// console.log(decode(bad))
+// console.log(parseEither(good))
+// console.log(parseEither(bad))
 
 suite
-  .add("decodeEither (good)", function() {
-    decodeEither(good)
+  .add("parseEither (good)", function() {
+    parseEither(good)
   })
-  .add("decodeEither (bad)", function() {
-    decodeEither(bad)
+  .add("parseEither (bad)", function() {
+    parseEither(bad)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))

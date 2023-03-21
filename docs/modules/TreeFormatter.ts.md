@@ -24,7 +24,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const formatErrors: (errors: readonly [PR.ParseError, ...PR.ParseError[]]) => string
+export declare const formatErrors: (errors: readonly [ParseErrors, ...ParseErrors[]]) => string
 ```
 
 Added in v1.0.0

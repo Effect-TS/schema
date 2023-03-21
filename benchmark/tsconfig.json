@@ -2,11 +2,20 @@
   "compilerOptions": {
     "strict": true,
     "module": "commonjs",
+    "target": "ES2022",
     "paths": {
-      "@effect/schema": ["../src/index.ts"],
-      "@effect/schema/test/*": ["../test/*"],
-      "@effect/schema/examples/*": ["../examples/*"],
-      "@effect/schema/*": ["../src/*"]
+      "@effect/schema": [
+        "../src/index.ts"
+      ],
+      "@effect/schema/test/*": [
+        "../test/*"
+      ],
+      "@effect/schema/examples/*": [
+        "../examples/*"
+      ],
+      "@effect/schema/*": [
+        "../src/*"
+      ]
     }
   }
 }
