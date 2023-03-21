@@ -677,7 +677,7 @@ const go = I.memoize(untracedMethod(() =>
         return (input, options) => {
           const es: Array<[number, PR.ParseErrors]> = []
           let stepKey = 0
-          const picks: Array<(state: State) => PR.ParseResult<unknown>> = []
+          const queueWithState: Array<(state: State) => PR.ParseResult<unknown>> = []
           const finalResult: { ref: any } = {
             ref: undefined
           }
@@ -700,7 +700,10 @@ const go = I.memoize(untracedMethod(() =>
                     const bucket = buckets[literal]
                     for (let i = 0; i < bucket.length; i++) {
                       const te = map.get(bucket[i])!(input, options)
-                      const t = picks.length === 0 ? PR.either(te) : undefined
+                      // the members of a union are ordered based on which one should be decoded first,
+                      // therefore if one member has added a task, all subsequent members must
+                      // also add a task to the queue even if they are synchronous.
+                      const t = queueWithState.length === 0 ? PR.either(te) : undefined
                       if (t) {
                         if (E.isRight(t)) {
                           return PR.success(t.right)
@@ -709,7 +712,7 @@ const go = I.memoize(untracedMethod(() =>
                         }
                       } else {
                         const nk = stepKey++
-                        picks.push(
+                        queueWithState.push(
                           untracedMethod(() =>
                             ({ es, finalResult }) =>
                               Effect.suspend(() => {
@@ -751,36 +754,40 @@ const go = I.memoize(untracedMethod(() =>
           const computeResult = ({ es }: State) =>
             RA.isNonEmptyArray(es) ?
               PR.failures(sortByIndex(es)) :
+              // this should never happen
               PR.failure(PR.type(AST.neverKeyword, input))
 
-          if (picks.length > 0) {
+          if (queueWithState.length > 0) {
             return Effect.suspend(() => {
               const state: State = {
                 es: Array.from(es),
                 finalResult: { ref: finalResult.ref }
               }
               return Effect.flatMap(
-                Effect.forEachDiscard(picks, (f) =>
+                Effect.forEachDiscard(queueWithState, (f) =>
                   f(state)),
                 () => {
                   if (state.finalResult.ref) {
                     return state.finalResult.ref
                   }
-                  const picks2: Array<Effect.Effect<never, never, void>> = []
+                  const queue: Array<Effect.Effect<never, never, void>> = []
                   // if none of the schemas with at least one property with a literal value succeeded,
                   // proceed with those that have no literal at all
                   for (let i = 0; i < otherwise.length; i++) {
                     const te = map.get(otherwise[i])!(input, options)
-                    const t = picks2.length === 0 ? PR.either(te) : undefined
+                    // the members of a union are ordered based on which one should be decoded first,
+                    // therefore if one member has added a task, all subsequent members must
+                    // also add a task to the queue even if they are synchronous.
+                    const t = queue.length === 0 ? PR.either(te) : undefined
                     if (t) {
                       if (E.isRight(t)) {
                         return PR.success(t.right)
                       } else {
-                        es.push([stepKey++, PR.unionMember(t.left.errors)])
+                        state.es.push([stepKey++, PR.unionMember(t.left.errors)])
                       }
                     } else {
                       const nk = stepKey++
-                      picks2.push(
+                      queue.push(
                         untraced(() =>
                           Effect.suspend(() => {
                             if (state.finalResult.ref) {
@@ -790,7 +797,7 @@ const go = I.memoize(untracedMethod(() =>
                                 if (E.isRight(t)) {
                                   state.finalResult.ref = PR.success(t.right)
                                 } else {
-                                  es.push([nk, PR.unionMember(t.left.errors)])
+                                  state.es.push([nk, PR.unionMember(t.left.errors)])
                                 }
                                 return Effect.unit()
                               })
@@ -803,9 +810,9 @@ const go = I.memoize(untracedMethod(() =>
                   // ---------------------------------------------
                   // compute output
                   // ---------------------------------------------
-                  if (picks2.length > 0) {
+                  if (queue.length > 0) {
                     return Effect.flatMap(
-                      Effect.collectAllDiscard(picks2),
+                      Effect.collectAllDiscard(queue),
                       () => {
                         if (state.finalResult.ref) {
                           return state.finalResult.ref
@@ -823,7 +830,10 @@ const go = I.memoize(untracedMethod(() =>
             // proceed with those that have no literal at all
             for (let i = 0; i < otherwise.length; i++) {
               const te = map.get(otherwise[i])!(input, options)
-              const t = picks.length === 0 ? PR.either(te) : undefined
+              // the members of a union are ordered based on which one should be decoded first,
+              // therefore if one member has added a task, all subsequent members must
+              // also add a task to the queue even if they are synchronous.
+              const t = queueWithState.length === 0 ? PR.either(te) : undefined
               if (t) {
                 if (E.isRight(t)) {
                   return PR.success(t.right)
@@ -832,7 +842,7 @@ const go = I.memoize(untracedMethod(() =>
                 }
               } else {
                 const nk = stepKey++
-                picks.push(
+                queueWithState.push(
                   untracedMethod(() =>
                     ({ es, finalResult }) =>
                       Effect.suspend(() => {
@@ -856,14 +866,14 @@ const go = I.memoize(untracedMethod(() =>
             // ---------------------------------------------
             // compute output
             // ---------------------------------------------
-            if (picks.length > 0) {
+            if (queueWithState.length > 0) {
               return Effect.suspend(() => {
                 const state: State = {
                   es: Array.from(es),
                   finalResult: { ref: finalResult.ref }
                 }
                 return Effect.flatMap(
-                  Effect.forEachDiscard(picks, (f) => f(state)),
+                  Effect.forEachDiscard(queueWithState, (f) => f(state)),
                   () => {
                     if (state.finalResult.ref) {
                       return state.finalResult.ref

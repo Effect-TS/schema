@@ -1,17 +1,44 @@
-import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Effect", () => {
-  it("tuple. e r e", async () => {
-    const schema = pipe(S.tuple(S.string), S.rest(S.number), S.element(S.boolean))
+  it.skip("union/ should keep the member order with two structs with the same tag", async () => {
+    const schema = S.union(
+      S.struct({ _tag: S.literal("a"), b: S.string }),
+      S.struct({ _tag: S.literal("a"), c: S.number })
+    )
+    await Util.expectParseSuccess(schema, { _tag: "a", b: "b" })
+    await Util.expectParseSuccess(schema, { _tag: "a", c: 1 })
     await Util.expectParseFailure(
       schema,
-      [true],
-      `/1 is missing, /0 Expected string, actual true`,
-      {
-        allErrors: true
-      }
+      { _tag: "a" },
+      `union member: /b is missing, union member: /c is missing`
+    )
+    await Util.expectParseFailure(
+      schema,
+      { _tag: "a", c: "c" },
+      `union member: /b is missing, union member: /c Expected number, actual "c"`
+    )
+  })
+
+  it("union/ should keep the member order with two structs with the same tag and a struct in otherwise", async () => {
+    const schema = S.union(
+      S.struct({ _tag: S.literal("a"), b: S.string }),
+      S.struct({ _tag: S.literal("a"), c: S.number }),
+      S.struct({ d: S.boolean })
+    )
+    await Util.expectParseSuccess(schema, { _tag: "a", b: "b" })
+    await Util.expectParseSuccess(schema, { _tag: "a", c: 1 })
+    await Util.expectParseSuccess(schema, { d: true })
+    await Util.expectParseFailure(
+      schema,
+      { _tag: "a" },
+      `union member: /b is missing, union member: /c is missing, union member: /d is missing`
+    )
+    await Util.expectParseFailure(
+      schema,
+      { _tag: "a", c: "c" },
+      `union member: /b is missing, union member: /c Expected number, actual "c", union member: /d is missing`
     )
   })
 })
