@@ -90,6 +90,10 @@ export {
   /**
    * @since 1.0.0
    */
+  decodePromise,
+  /**
+   * @since 1.0.0
+   */
   encode,
   /**
    * @since 1.0.0
@@ -103,6 +107,10 @@ export {
    * @since 1.0.0
    */
   encodeOption,
+  /**
+   * @since 1.0.0
+   */
+  encodePromise,
   /**
    * @since 1.0.0
    */
@@ -126,6 +134,10 @@ export {
   /**
    * @since 1.0.0
    */
+  parsePromise,
+  /**
+   * @since 1.0.0
+   */
   validate,
   /**
    * @since 1.0.0
@@ -138,7 +150,11 @@ export {
   /**
    * @since 1.0.0
    */
-  validateOption
+  validateOption,
+  /**
+   * @since 1.0.0
+   */
+  validatePromise
 } from "@effect/schema/Parser"
 
 export type {

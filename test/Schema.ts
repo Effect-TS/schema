@@ -47,6 +47,11 @@ describe.concurrent("Schema", () => {
 
     expect(S.OptionalSchemaId).exist
     expect(S.nullable).exist
+
+    expect(S.parsePromise).exist
+    expect(S.decodePromise).exist
+    expect(S.validatePromise).exist
+    expect(S.encodePromise).exist
   })
 
   it("brand/ annotations", () => {
