@@ -123,9 +123,12 @@ export const match: AST.Match<Pretty<any>> = {
   "TypeLiteral": (ast, go) => {
     const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
     const indexSignatureTypes = ast.indexSignatures.map((is) => go(is.type))
+    const expectedKeys: any = {}
+    for (let i = 0; i < propertySignaturesTypes.length; i++) {
+      expectedKeys[ast.propertySignatures[i].name] = null
+    }
     return (input: { readonly [x: PropertyKey]: unknown }) => {
       const output: Array<string> = []
-      const expectedKeys: any = {}
       // ---------------------------------------------
       // handle property signatures
       // ---------------------------------------------
@@ -138,7 +141,6 @@ export const match: AST.Match<Pretty<any>> = {
         output.push(
           `${getPrettyPropertyKey(name)}: ${propertySignaturesTypes[i](input[name])}`
         )
-        expectedKeys[name] = null
       }
       // ---------------------------------------------
       // handle index signatures

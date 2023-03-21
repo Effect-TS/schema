@@ -13,14 +13,24 @@ zod (bad) x 45,989 ops/sec ±2.33% (88 runs sampled)
 
 const suite = new Benchmark.Suite()
 
+// const UserZod = z.object({
+//   name: z.string().min(3).max(20),
+//   age: z.number().min(0).max(120)
+// })
+
+// const schema = S.struct({
+//   name: pipe(S.string, S.maxLength(20)),
+//   age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
+// })
+
 const UserZod = z.object({
-  name: z.string().min(3).max(20),
-  age: z.number().min(0).max(120)
+  name: z.string(),
+  age: z.number()
 })
 
 const schema = S.struct({
-  name: pipe(S.string, S.minLength(3), S.maxLength(20)),
-  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
+  name: pipe(S.string),
+  age: pipe(S.number)
 })
 
 const good = {
@@ -33,9 +43,10 @@ const bad = {
   age: 13
 }
 
-const parseEither = S.validateEither(schema)
+const parseEither = S.parseEither(schema)
 const options = { allErrors: false }
 
+// parseEither(good, options)
 // console.log(UserZod.safeParse(good))
 // console.log(parseEither(good))
 // console.log(JSON.stringify(UserZod.safeParse(bad), null, 2))

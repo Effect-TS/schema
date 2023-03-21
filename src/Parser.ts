@@ -593,12 +593,15 @@ const go = I.memoize(untracedMethod(() =>
         const indexSignatures = ast.indexSignatures.map((is) =>
           [go(is.parameter), go(is.type)] as const
         )
+        const expectedKeys: any = {}
+        for (let i = 0; i < propertySignaturesTypes.length; i++) {
+          expectedKeys[ast.propertySignatures[i].name] = null
+        }
         return (input: unknown, options) => {
           if (!P.isRecord(input)) {
             return PR.failure(PR.type(unknownRecord, input))
           }
           const allErrors = options?.allErrors
-          const expectedKeys: any = {}
           const es: Array<[number, PR.ParseErrors]> = []
           let stepKey = 0
           // ---------------------------------------------
@@ -607,7 +610,6 @@ const go = I.memoize(untracedMethod(() =>
           for (let i = 0; i < propertySignaturesTypes.length; i++) {
             const ps = ast.propertySignatures[i]
             const name = ps.name
-            expectedKeys[name] = null
             if (!Object.prototype.hasOwnProperty.call(input, name)) {
               if (!ps.isOptional) {
                 const e = PR.key(name, [PR.missing])
@@ -620,6 +622,7 @@ const go = I.memoize(untracedMethod(() =>
               }
             }
           }
+
           // ---------------------------------------------
           // handle unexpected keys
           // ---------------------------------------------
@@ -705,6 +708,7 @@ const go = I.memoize(untracedMethod(() =>
               }
             }
           }
+
           // ---------------------------------------------
           // handle index signatures
           // ---------------------------------------------
