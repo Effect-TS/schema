@@ -293,23 +293,39 @@ const go = untracedMethod(() =>
       }
     }
     switch (ast._tag) {
-      // case "Refinement":
-      // case "Transform": {
-      //   const to = go(ast.to, false)
-      //   if (isBoundary) {
-      //     const from = go(ast.from)
-      //     return to === PR.success ?
-      //       (i1, options) => PR.flatMap(from(i1, options), (a) => ast.decode(a, options)) :
-      //       (i1, options) =>
-      //         PR.flatMap(from(i1, options), (a) =>
-      //           PR.flatMap(ast.decode(a, options), (i2) => to(i2, options)))
-      //   } else {
-      //     return to === PR.success ?
-      //       ast.decode :
-      //       (a, options) =>
-      //         PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
-      //   }
-      // }
+      case "Refinement":
+      case "Transform": {
+        const to = go(ast.to, false)
+        if (isBoundary) {
+          const from = go(ast.from)
+          return (i1, options) => {
+            const conditional = to === PR.success ?
+              PR.flatMap(from(i1, options), (a) => ast.decode(a, options)) :
+              PR.flatMap(
+                from(i1, options),
+                (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+              )
+            const either = PR.eitherOrUndefined(conditional)
+            return either ?
+              either :
+              options?.isEffectAllowed === true ?
+              conditional :
+              PR.failure(PR.forbidden)
+          }
+        } else {
+          return to === PR.success ?
+            ast.decode :
+            (a, options) => {
+              const conditional = PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+              const either = PR.eitherOrUndefined(conditional)
+              return either ?
+                either :
+                options?.isEffectAllowed === true ?
+                conditional :
+                PR.failure(PR.forbidden)
+            }
+        }
+      }
       case "Declaration":
         return (i, options) => {
           const conditional = ast.decode(...ast.typeParameters)(i, options)
@@ -972,24 +988,6 @@ const go = untracedMethod(() =>
         const f = () => go(ast.f(), isBoundary)
         const get = I.memoize<void, Parser<any, any>>(f)
         return (a, options) => get()(a, options)
-      }
-      case "Refinement":
-      case "Transform": {
-        const from = go(ast.from)
-        const to = go(ast.to)
-        return (i1, options) => {
-          const conditional = PR.flatMap(
-            from(i1, options),
-            (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
-          )
-          const either = PR.eitherOrUndefined(conditional)
-          if (either) {
-            return either
-          } else if (options?.isEffectAllowed === true) {
-            return conditional
-          }
-          return PR.failure(PR.forbidden)
-        }
       }
     }
   }

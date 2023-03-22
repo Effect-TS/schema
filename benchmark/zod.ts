@@ -5,10 +5,10 @@ import * as Benchmark from "benchmark"
 import { z } from "zod"
 
 /*
-schema (good) x 8,596 ops/sec ±0.75% (78 runs sampled)
-zod (good) x 416,109 ops/sec ±6.18% (79 runs sampled)
-schema (bad) x 8,783 ops/sec ±0.62% (86 runs sampled)
-zod (bad) x 108,641 ops/sec ±5.58% (83 runs sampled)
+schema (good) x 107,508 ops/sec ±0.47% (87 runs sampled)
+zod (good) x 407,693 ops/sec ±6.17% (77 runs sampled)
+schema (bad) x 104,383 ops/sec ±2.04% (88 runs sampled)
+zod (bad) x 102,018 ops/sec ±5.56% (79 runs sampled)
 */
 
 const suite = new Benchmark.Suite()

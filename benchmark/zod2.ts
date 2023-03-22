@@ -6,38 +6,38 @@ import { z } from "zod"
 
 /*
 1)
-schema (good) x 24,401 ops/sec ±0.53% (75 runs sampled)
-zod (good) x 1,357,847 ops/sec ±7.08% (81 runs sampled)
-schema (bad) x 27,871 ops/sec ±0.60% (80 runs sampled)
-zod (bad) x 130,448 ops/sec ±5.99% (83 runs sampled)
+schema (good) x 338,786 ops/sec ±0.55% (88 runs sampled)
+zod (good) x 1,312,221 ops/sec ±6.42% (79 runs sampled)
+schema (bad) x 373,497 ops/sec ±1.22% (89 runs sampled)
+zod (bad) x 126,029 ops/sec ±3.76% (85 runs sampled)
 2)
-schema (good) x 155,060 ops/sec ±0.53% (89 runs sampled)
-zod (good) x 1,327,839 ops/sec ±7.00% (79 runs sampled)
-schema (bad) x 120,482 ops/sec ±0.51% (90 runs sampled)
-zod (bad) x 126,954 ops/sec ±6.93% (82 runs sampled)
+schema (good) x 616,053 ops/sec ±0.55% (89 runs sampled)
+zod (good) x 1,237,098 ops/sec ±7.91% (76 runs sampled)
+schema (bad) x 546,779 ops/sec ±0.63% (86 runs sampled)
+zod (bad) x 127,494 ops/sec ±5.93% (83 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
 
-// const UserZod = z.object({
-//   name: z.string().min(3).max(20),
-//   age: z.number().min(0).max(120)
-// })
-
-// const schema = S.struct({
-//   name: pipe(S.string, S.minLength(3), S.maxLength(20)),
-//   age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
-// })
-
 const UserZod = z.object({
-  name: z.string().min(3),
-  age: z.number()
-}).strict()
+  name: z.string().min(3).max(20),
+  age: z.number().min(0).max(120)
+})
 
 const schema = S.struct({
-  name: pipe(S.string, S.minLength(3)),
-  age: pipe(S.number)
+  name: pipe(S.string, S.minLength(3), S.maxLength(20)),
+  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
 })
+
+// const UserZod = z.object({
+//   name: z.string().min(3),
+//   age: z.number()
+// }).strict()
+
+// const schema = S.struct({
+//   name: pipe(S.string, S.minLength(3)),
+//   age: pipe(S.number)
+// })
 
 const good = {
   name: "Joe",
