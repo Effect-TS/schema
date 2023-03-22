@@ -10,8 +10,8 @@ io-ts
 space-object (good) x 476,424 ops/sec ±0.45% (92 runs sampled)
 space-object (bad) x 434,563 ops/sec ±0.58% (87 runs sampled)
 0.3.0
-parseEither (good) x 84,398 ops/sec ±1.93% (88 runs sampled)
-parseEither (bad) x 205,431 ops/sec ±5.29% (80 runs sampled)
+parseEither (good) x 96,815 ops/sec ±0.46% (88 runs sampled)
+parseEither (bad) x 261,251 ops/sec ±4.72% (85 runs sampled)
 */
 
 const suite = new Benchmark.Suite()

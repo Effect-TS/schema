@@ -8,21 +8,11 @@ import * as Benchmark from "benchmark"
 D.runtimeDebug.tracingEnabled = true
 
 /*
-n = 3
-parseEither (good) x 406,821 ops/sec ±0.48% (88 runs sampled)
-parseManual (good) x 376,234 ops/sec ±4.45% (81 runs sampled)
-parseEither (bad) x 407,671 ops/sec ±2.12% (87 runs sampled)
-parseManual (bad) x 514,905 ops/sec ±0.51% (88 runs sampled)
-n = 10
-parseEither (good) x 403,275 ops/sec ±0.46% (88 runs sampled)
-parseManual (good) x 369,469 ops/sec ±4.57% (79 runs sampled)
-parseEither (bad) x 383,222 ops/sec ±0.57% (84 runs sampled)
-parseManual (bad) x 473,157 ops/sec ±3.27% (85 runs sampled)
 n = 100
-parseEither (good) x 366,276 ops/sec ±1.94% (85 runs sampled)
-parseManual (good) x 373,495 ops/sec ±4.38% (80 runs sampled)
-parseEither (bad) x 322,847 ops/sec ±0.64% (86 runs sampled)
-parseManual (bad) x 408,789 ops/sec ±2.73% (85 runs sampled)
+parseEither (good) x 393,891 ops/sec ±0.52% (90 runs sampled)
+parseManual (good) x 329,977 ops/sec ±4.59% (84 runs sampled)
+parseEither (bad) x 424,932 ops/sec ±1.99% (87 runs sampled)
+parseManual (bad) x 410,312 ops/sec ±0.45% (87 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
