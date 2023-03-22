@@ -23,35 +23,36 @@ const get = (ast: AST.AST) => {
   const parser = go(ast)
   return (input: unknown, options?: ParseOptions) => {
     const result = parser(input, options)
-    const resultComputed = PR.eitherOrRunSyncEither(result)
-    if (E.isLeft(resultComputed)) {
-      throw new Error(formatErrors(resultComputed.left.errors))
+    // @ts-expect-error
+    if (E.isLeft(result)) {
+      throw new Error(formatErrors(result.left.errors))
     }
-    return resultComputed.right
+    // @ts-expect-error
+    return result.right
   }
 }
 
 const getOption = (ast: AST.AST) => {
   const parser = go(ast)
   return (input: unknown, options?: ParseOptions) =>
-    O.fromEither(PR.eitherOrRunSyncEither(parser(input, options)))
+    O.fromEither<any, any>(parser(input, options) as any)
 }
 
 const getEither = (ast: AST.AST) => {
   const parser = go(ast)
-  return (input: unknown, options?: ParseOptions) =>
-    PR.eitherOrRunSyncEither(parser(input, options))
+  return (input: unknown, options?: ParseOptions) => parser(input, options) as any
 }
 
 const getPromise = (ast: AST.AST) => {
   const parser = go(ast)
   return (input: unknown, options?: ParseOptions) =>
-    Effect.runPromise(PR.effect(parser(input, options)))
+    Effect.runPromise(PR.effect(parser(input, { ...options, isEffectAllowed: true })))
 }
 
 const getEffect = (ast: AST.AST) => {
   const parser = go(ast)
-  return (input: unknown, options?: ParseOptions) => PR.effect(parser(input, options))
+  return (input: unknown, options?: ParseOptions) =>
+    PR.effect(parser(input, { ...options, isEffectAllowed: true }))
 }
 
 /**
@@ -276,15 +277,28 @@ export const encodeEffect = <I, A>(
 ): (a: A, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, I> =>
   getEffect(AST.reverse(schema.ast))
 
+interface ParseEffectOptions extends ParseOptions {
+  readonly isEffectAllowed?: boolean
+}
+
 interface Parser<I, A> {
-  (i: I, options?: ParseOptions): ParseResult<A>
+  (i: I, options?: ParseOptions & ParseEffectOptions): ParseResult<A>
 }
 
 const go = I.memoize(untracedMethod(() =>
   (ast: AST.AST): Parser<any, any> => {
     switch (ast._tag) {
       case "Declaration":
-        return ast.decode(...ast.typeParameters)
+        return (i, options) => {
+          const conditional = ast.decode(...ast.typeParameters)(i, options)
+          const decoded = PR.eitherOrUndefined(conditional)
+          if (decoded) {
+            return decoded
+          } else if (options?.isEffectAllowed === true) {
+            return conditional
+          }
+          return PR.failure(PR.forbiddn())
+        }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)
       case "UniqueSymbol":
@@ -393,7 +407,7 @@ const go = I.memoize(untracedMethod(() =>
                   }
                 }
                 output.push([stepKey++, t.right])
-              } else {
+              } else if (options?.isEffectAllowed === true) {
                 const nk = stepKey++
                 const index = i
                 if (!queue) {
@@ -418,6 +432,15 @@ const go = I.memoize(untracedMethod(() =>
                       })
                   )
                 )
+              } else {
+                // the input element is present but is not valid
+                const e = PR.index(i, [PR.forbiddn()])
+                if (allErrors) {
+                  es.push([stepKey++, e])
+                  continue
+                } else {
+                  return PR.failures(mutableAppend(sortByIndex(es), e))
+                }
               }
             }
           }
@@ -442,7 +465,7 @@ const go = I.memoize(untracedMethod(() =>
                 } else {
                   output.push([stepKey++, t.right])
                 }
-              } else {
+              } else if (options?.isEffectAllowed === true) {
                 const nk = stepKey++
                 const index = i
                 if (!queue) {
@@ -467,6 +490,14 @@ const go = I.memoize(untracedMethod(() =>
                       })
                   )
                 )
+              } else {
+                const e = PR.index(i, [PR.forbiddn()])
+                if (allErrors) {
+                  es.push([stepKey++, e])
+                  continue
+                } else {
+                  return PR.failures(mutableAppend(sortByIndex(es), e))
+                }
               }
             }
             // ---------------------------------------------
@@ -491,7 +522,7 @@ const go = I.memoize(untracedMethod(() =>
                     }
                   }
                   output.push([stepKey++, t.right])
-                } else {
+                } else if (options?.isEffectAllowed === true) {
                   const nk = stepKey++
                   const index = i
                   if (!queue) {
@@ -516,6 +547,14 @@ const go = I.memoize(untracedMethod(() =>
                         })
                     )
                   )
+                } else {
+                  const e = PR.index(i, [PR.forbiddn()])
+                  if (allErrors) {
+                    es.push([stepKey++, e])
+                    continue
+                  } else {
+                    return PR.failures(mutableAppend(sortByIndex(es), e))
+                  }
                 }
               }
             }
@@ -630,7 +669,7 @@ const go = I.memoize(untracedMethod(() =>
                   }
                 }
                 output[name] = t.right
-              } else {
+              } else if (options?.isEffectAllowed === true) {
                 const nk = stepKey++
                 const index = name
                 if (!queue) {
@@ -655,6 +694,14 @@ const go = I.memoize(untracedMethod(() =>
                       })
                   )
                 )
+              } else {
+                const e = PR.key(name, [PR.forbiddn()])
+                if (allErrors) {
+                  es.push([stepKey++, e])
+                  continue
+                } else {
+                  return PR.failures(mutableAppend(sortByIndex(es), e))
+                }
               }
             }
           }
@@ -686,7 +733,7 @@ const go = I.memoize(untracedMethod(() =>
                     }
                   }
                 }
-                // there's no else here because index signature parameters can't have transformations
+                // there's no else here because index signature parameters are restricted to primitives
 
                 // ---------------------------------------------
                 // handle values
@@ -705,7 +752,7 @@ const go = I.memoize(untracedMethod(() =>
                   } else {
                     output[key] = tv.right
                   }
-                } else {
+                } else if (options?.isEffectAllowed === true) {
                   const nk = stepKey++
                   const index = key
                   if (!queue) {
@@ -733,6 +780,14 @@ const go = I.memoize(untracedMethod(() =>
                         )
                     )
                   )
+                } else {
+                  const e = PR.key(key, [PR.forbiddn()])
+                  if (allErrors) {
+                    es.push([stepKey++, e])
+                    continue
+                  } else {
+                    return PR.failures(mutableAppend(sortByIndex(es), e))
+                  }
                 }
               }
             }
@@ -829,7 +884,7 @@ const go = I.memoize(untracedMethod(() =>
               } else {
                 es.push([stepKey++, PR.unionMember(t.left.errors)])
               }
-            } else {
+            } else if (options?.isEffectAllowed === true) {
               const nk = stepKey++
               if (!queue) {
                 queue = []
@@ -853,6 +908,8 @@ const go = I.memoize(untracedMethod(() =>
                     })
                 )
               )
+            } else {
+              es.push([stepKey++, PR.unionMember([PR.forbiddn()])])
             }
           }
 
@@ -894,11 +951,19 @@ const go = I.memoize(untracedMethod(() =>
       case "Transform": {
         const from = go(ast.from)
         const to = go(ast.to)
-        return (i1, options) =>
-          PR.flatMap(
+        return (i1, options) => {
+          const conditional = PR.flatMap(
             from(i1, options),
             (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
           )
+          const either = PR.eitherOrUndefined(conditional)
+          if (either) {
+            return either
+          } else if (options?.isEffectAllowed === true) {
+            return conditional
+          }
+          return PR.failure(PR.forbiddn())
+        }
       }
     }
   }
