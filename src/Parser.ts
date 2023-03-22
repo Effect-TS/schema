@@ -129,9 +129,9 @@ export const decodeEither: <I, A>(
  * @category decoding
  * @since 1.0.0
  */
-export const decodeResult: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A> = parseResult
+export const decodeResult: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => ParseResult<A> = parseResult
 
 /**
  * @category decoding
@@ -145,9 +145,9 @@ export const decodePromise: <I, A>(
  * @category decoding
  * @since 1.0.0
  */
-export const decodeEffect: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A> =
+export const decodeEffect: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A> =
   parseEffect
 
 /**
