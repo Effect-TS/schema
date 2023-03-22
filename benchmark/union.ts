@@ -1,18 +1,17 @@
-import type * as E from "@effect/data/Either"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as D from "@effect/io/Debug"
-import type { ParseError } from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
+import { z } from "zod"
 
 D.runtimeDebug.tracingEnabled = true
 
 /*
 n = 100
-parseEither (good) x 425,815 ops/sec ±0.59% (86 runs sampled)
-parseManual (good) x 333,999 ops/sec ±5.18% (81 runs sampled)
-parseEither (bad) x 483,767 ops/sec ±0.43% (90 runs sampled)
-parseManual (bad) x 416,222 ops/sec ±2.79% (87 runs sampled)
+parseEither (good) x 423,411 ops/sec ±0.82% (84 runs sampled)
+zod (good) x 773,350 ops/sec ±7.44% (78 runs sampled)
+parseEither (bad) x 363,213 ops/sec ±2.59% (89 runs sampled)
+zod (bad) x 853,607 ops/sec ±1.29% (89 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -27,22 +26,18 @@ const members = RA.makeBy(n, (i) =>
   }))
 const schema = S.union(...members)
 
-const parseEither = S.parseEither(schema)
+const x = RA.makeBy(n, (i) =>
+  z.object({
+    kind: z.literal(i),
+    a: z.string(),
+    b: z.number(),
+    c: z.boolean()
+  }).strict())
 
-const parseManual = (input: unknown): E.Either<ParseError, {
-  readonly kind: number
-  readonly a: string
-  readonly b: number
-  readonly c: boolean
-}> => {
-  if (
-    typeof input === "object" && input !== null && "kind" in input && typeof input.kind === "number"
-  ) {
-    const kind = input.kind
-    return S.parseEither(members[kind])(input)
-  }
-  return parseEither(input)
-}
+const UnionZod = z.discriminatedUnion("kind", x)
+
+const parseEither = S.parseEither(schema)
+const options = { allErrors: true }
 
 const good = {
   kind: n - 1,
@@ -63,16 +58,16 @@ const bad = {
 
 suite
   .add("parseEither (good)", function() {
-    parseEither(good)
+    parseEither(good, options)
   })
-  .add("parseManual (good)", function() {
-    parseManual(good)
+  .add("zod (good)", function() {
+    UnionZod.safeParse(good)
   })
   .add("parseEither (bad)", function() {
-    parseEither(bad)
+    parseEither(bad, options)
   })
-  .add("parseManual (bad)", function() {
-    parseManual(bad)
+  .add("zod (bad)", function() {
+    UnionZod.safeParse(good)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))
