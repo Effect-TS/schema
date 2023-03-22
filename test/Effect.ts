@@ -1,3 +1,4 @@
+import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
@@ -42,5 +43,13 @@ describe.concurrent("Effect", () => {
       { _tag: "a", c: "c" },
       `union member: /b is missing, union member: /c Expected number, actual "c", union member: /d is missing, union member: /e is missing`
     )
+  })
+
+  it("reverse", async () => {
+    // string -> number | positive
+    const schemao = pipe(S.string, S.numberFromString, S.positive())
+    const schema = S.reverse(schemao)
+    await Util.expectParseSuccess(schema, 1, "1")
+    await Util.expectParseFailure(schema, -1, "Expected a positive number, actual -1")
   })
 })
