@@ -285,7 +285,7 @@ interface Parser<I, A> {
   (i: I, options?: ParseOptions & ParseEffectOptions): ParseResult<A>
 }
 
-const go = I.memoize(untracedMethod(() =>
+const go = untracedMethod(() =>
   (ast: AST.AST): Parser<any, any> => {
     switch (ast._tag) {
       case "Declaration":
@@ -948,8 +948,8 @@ const go = I.memoize(untracedMethod(() =>
       }
       case "Lazy": {
         const f = () => go(ast.f())
-        const get = I.memoize<typeof f, Parser<any, any>>(f)
-        return (a, options) => get(f)(a, options)
+        const get = I.memoize<void, Parser<any, any>>(f)
+        return (a, options) => get()(a, options)
       }
       case "Refinement":
       case "Transform": {
@@ -971,7 +971,7 @@ const go = I.memoize(untracedMethod(() =>
       }
     }
   }
-))
+)
 
 const fromRefinement = <A>(ast: AST.AST, refinement: (u: unknown) => u is A): Parser<unknown, A> =>
   (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(ast, u))

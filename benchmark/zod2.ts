@@ -30,9 +30,8 @@ const UserZod = z.object({
 }).strict()
 
 const schema = S.struct({
-  name: pipe(S.string, S.minLength(3), S.maxLength(20)),
-  // name: pipe(S.string),
-  age: pipe(S.number)
+  name: pipe(S.string, S.minLength(3), S.maxLength(20), S.maxLength(20), S.maxLength(20)),
+  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120), S.lessThanOrEqualTo(120))
 })
 
 const good = {
@@ -48,7 +47,7 @@ const bad = {
 const parseEither = S.parseEither(schema)
 const options = { allErrors: true }
 
-// parseEither(good, options)
+parseEither(good, options)
 // console.log(UserZod.safeParse(good))
 // console.log(parseEither(good))
 // console.log(JSON.stringify(UserZod.safeParse(bad), null, 2))
@@ -73,4 +72,4 @@ suite
   .on("complete", function(this: any) {
     console.log("Fastest is " + this.filter("fastest").map("name"))
   })
-  .run({ async: true })
+// .run({ async: true })
