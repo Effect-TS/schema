@@ -19,17 +19,19 @@ const suite = new Benchmark.Suite()
 // })
 
 // const schema = S.struct({
-//   name: pipe(S.string, S.maxLength(20)),
+//   name: pipe(S.string, S.minLength(3), S.maxLength(20)),
 //   age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
 // })
 
 const UserZod = z.object({
-  name: z.string(),
+  name: z.string().min(3).max(20),
+  // name: z.string(),
   age: z.number()
-})
+}).strict()
 
 const schema = S.struct({
-  name: pipe(S.string),
+  name: pipe(S.string, S.minLength(3), S.maxLength(20)),
+  // name: pipe(S.string),
   age: pipe(S.number)
 })
 
@@ -44,7 +46,7 @@ const bad = {
 }
 
 const parseEither = S.parseEither(schema)
-const options = { allErrors: false }
+const options = { allErrors: true }
 
 // parseEither(good, options)
 // console.log(UserZod.safeParse(good))

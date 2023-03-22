@@ -23,7 +23,7 @@ const UserZod = z.object({
     country: z.string().min(3).max(200),
     zip: z.string().min(3).max(200)
   })
-})
+}).strict()
 
 const schema = S.struct({
   name: pipe(S.string, S.minLength(3), S.maxLength(20)),
@@ -61,7 +61,8 @@ const bad = {
   }
 }
 
-const parseEither = S.validateEither(schema)
+const parseEither = S.parseEither(schema)
+const options = { allErrors: true }
 
 // console.log(UserZod.safeParse(good))
 // console.log(parseEither(good))
@@ -70,13 +71,13 @@ const parseEither = S.validateEither(schema)
 
 suite
   .add("schema (good)", function() {
-    parseEither(good)
+    parseEither(good, options)
   })
   .add("zod (good)", function() {
     UserZod.safeParse(good)
   })
   .add("schema (bad)", function() {
-    parseEither(bad)
+    parseEither(bad, options)
   })
   .add("zod (bad)", function() {
     UserZod.safeParse(bad)
