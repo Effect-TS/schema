@@ -64,9 +64,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeEffect: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
+export declare const decodeEffect: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -112,9 +112,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeResult: <_, A>(
-  schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+export declare const decodeResult: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
 Added in v1.0.0

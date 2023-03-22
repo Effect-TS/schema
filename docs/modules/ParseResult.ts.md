@@ -15,6 +15,7 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [failure](#failure)
   - [failures](#failures)
+  - [forbidden](#forbidden)
   - [index](#index)
   - [key](#key)
   - [missing](#missing)
@@ -23,6 +24,7 @@ Added in v1.0.0
   - [unexpected](#unexpected)
   - [unionMember](#unionmember)
 - [model](#model)
+  - [Forbidden (interface)](#forbidden-interface)
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
   - [Missing (interface)](#missing-interface)
@@ -32,7 +34,6 @@ Added in v1.0.0
   - [UnionMember (interface)](#unionmember-interface)
 - [optimisation](#optimisation)
   - [effect](#effect)
-  - [eitherOrRunSyncEither](#eitherorrunsynceither)
   - [eitherOrUndefined](#eitherorundefined)
   - [flatMap](#flatmap)
   - [map](#map)
@@ -62,6 +63,16 @@ Added in v1.0.0
 
 ```ts
 export declare const failures: (es: readonly [ParseErrors, ...ParseErrors[]]) => ParseResult<never>
+```
+
+Added in v1.0.0
+
+## forbidden
+
+**Signature**
+
+```ts
+export declare const forbidden: Forbidden
 ```
 
 Added in v1.0.0
@@ -138,6 +149,20 @@ Added in v1.0.0
 
 # model
 
+## Forbidden (interface)
+
+The `Forbidden` variant of the `ParseError` type represents an error that occurs when an Effect is encounter but disallowed from execution.
+
+**Signature**
+
+```ts
+export interface Forbidden {
+  readonly _tag: 'Forbidden'
+}
+```
+
+Added in v1.0.0
+
 ## Index (interface)
 
 The `Index` decode error indicates that there was an error at a specific index in an array or tuple.
@@ -198,7 +223,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type ParseErrors = Type | Index | Key | Missing | Unexpected | UnionMember
+export type ParseErrors = Type | Index | Key | Missing | Unexpected | UnionMember | Forbidden
 ```
 
 Added in v1.0.0
@@ -262,16 +287,6 @@ Added in v1.0.0
 
 ```ts
 export declare const effect: <E, A>(self: IO<E, A>) => Effect.Effect<never, E, A>
-```
-
-Added in v1.0.0
-
-## eitherOrRunSyncEither
-
-**Signature**
-
-```ts
-export declare const eitherOrRunSyncEither: <E, A>(self: IO<E, A>) => E.Either<E, A>
 ```
 
 Added in v1.0.0
