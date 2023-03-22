@@ -5,10 +5,10 @@ import * as Benchmark from "benchmark"
 import { z } from "zod"
 
 /*
-schema (good) x 401,457 ops/sec ±0.44% (89 runs sampled)
-zod (good) x 400,149 ops/sec ±6.77% (81 runs sampled)
-schema (bad) x 3,559,130 ops/sec ±2.83% (86 runs sampled)
-zod (bad) x 45,989 ops/sec ±2.33% (88 runs sampled)
+schema (good) x 84,539 ops/sec ±0.64% (89 runs sampled)
+zod (good) x 1,328,778 ops/sec ±7.02% (79 runs sampled)
+schema (bad) x 83,138 ops/sec ±0.44% (87 runs sampled)
+zod (bad) x 131,997 ops/sec ±6.19% (82 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -24,14 +24,13 @@ const suite = new Benchmark.Suite()
 // })
 
 const UserZod = z.object({
-  name: z.string().min(3).max(20),
-  // name: z.string(),
+  name: z.string().min(3),
   age: z.number()
 }).strict()
 
 const schema = S.struct({
-  name: pipe(S.string, S.minLength(3), S.maxLength(20), S.maxLength(20), S.maxLength(20)),
-  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120), S.lessThanOrEqualTo(120))
+  name: pipe(S.string, S.minLength(3)),
+  age: pipe(S.number)
 })
 
 const good = {
@@ -47,7 +46,7 @@ const bad = {
 const parseEither = S.parseEither(schema)
 const options = { allErrors: true }
 
-parseEither(good, options)
+// parseEither(good, options)
 // console.log(UserZod.safeParse(good))
 // console.log(parseEither(good))
 // console.log(JSON.stringify(UserZod.safeParse(bad), null, 2))
@@ -72,4 +71,4 @@ suite
   .on("complete", function(this: any) {
     console.log("Fastest is " + this.filter("fastest").map("name"))
   })
-// .run({ async: true })
+  .run({ async: true })

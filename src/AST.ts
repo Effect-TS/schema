@@ -1059,7 +1059,7 @@ export const getTo = (ast: AST): AST => {
       case "Declaration":
         return createDeclaration(
           ast.typeParameters.map(getTo),
-          ast.type,
+          getTo(ast.type),
           ast.decode,
           ast.annotations
         )
@@ -1098,7 +1098,7 @@ export const getFrom = (ast: AST): AST => {
       case "Declaration":
         return createDeclaration(
           ast.typeParameters.map(getFrom),
-          ast.type,
+          getFrom(ast.type),
           ast.decode,
           ast.annotations
         )

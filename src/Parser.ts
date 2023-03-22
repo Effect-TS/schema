@@ -286,8 +286,30 @@ interface Parser<I, A> {
 }
 
 const go = untracedMethod(() =>
-  (ast: AST.AST): Parser<any, any> => {
+  (ast: AST.AST, isBoundary = true): Parser<any, any> => {
+    if (isBoundary === false) {
+      if (!AST.hasTransformation(ast)) {
+        return PR.success
+      }
+    }
     switch (ast._tag) {
+      // case "Refinement":
+      // case "Transform": {
+      //   const to = go(ast.to, false)
+      //   if (isBoundary) {
+      //     const from = go(ast.from)
+      //     return to === PR.success ?
+      //       (i1, options) => PR.flatMap(from(i1, options), (a) => ast.decode(a, options)) :
+      //       (i1, options) =>
+      //         PR.flatMap(from(i1, options), (a) =>
+      //           PR.flatMap(ast.decode(a, options), (i2) => to(i2, options)))
+      //   } else {
+      //     return to === PR.success ?
+      //       ast.decode :
+      //       (a, options) =>
+      //         PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+      //   }
+      // }
       case "Declaration":
         return (i, options) => {
           const conditional = ast.decode(...ast.typeParameters)(i, options)
@@ -331,7 +353,7 @@ const go = untracedMethod(() =>
         return fromRefinement(ast, (u): u is any => P.isString(u) && regex.test(u))
       }
       case "Tuple": {
-        const elements = ast.elements.map((e) => go(e.type))
+        const elements = ast.elements.map((e) => go(e.type, isBoundary))
         const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
         let requiredLen = ast.elements.filter((e) => !e.isOptional).length
         if (O.isSome(ast.rest)) {
@@ -589,9 +611,9 @@ const go = untracedMethod(() =>
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
           return fromRefinement(ast, P.isNotNullable)
         }
-        const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type))
+        const propertySignaturesTypes = ast.propertySignatures.map((f) => go(f.type, isBoundary))
         const indexSignatures = ast.indexSignatures.map((is) =>
-          [go(is.parameter), go(is.type)] as const
+          [go(is.parameter, isBoundary), go(is.type, isBoundary)] as const
         )
         const expectedKeys: any = {}
         for (let i = 0; i < propertySignaturesTypes.length; i++) {
@@ -827,7 +849,7 @@ const go = untracedMethod(() =>
         const len = ownKeys.length
         const map = new Map<any, Parser<any, any>>()
         for (let i = 0; i < ast.types.length; i++) {
-          map.set(ast.types[i], go(ast.types[i]))
+          map.set(ast.types[i], go(ast.types[i], true)) // <= this must be true
         }
         return (input, options) => {
           const es: Array<[number, PR.ParseErrors]> = []
@@ -947,7 +969,7 @@ const go = untracedMethod(() =>
         }
       }
       case "Lazy": {
-        const f = () => go(ast.f())
+        const f = () => go(ast.f(), isBoundary)
         const get = I.memoize<void, Parser<any, any>>(f)
         return (a, options) => get()(a, options)
       }
