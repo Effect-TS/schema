@@ -179,7 +179,7 @@ export interface HasTransformation {
  * @since 1.0.0
  */
 export const hasTransformation = (ast: AST): boolean =>
-  isRefinement(ast) || isTransform(ast) || (
+  isRefinement(ast) || isTransform(ast) || isLazy(ast) || (
     "hasTransformation" in ast && ast.hasTransformation
   )
 
@@ -769,7 +769,7 @@ export const isUnion = (ast: AST): ast is Union => ast._tag === "Union"
  * @category model
  * @since 1.0.0
  */
-export interface Lazy extends Annotated, HasTransformation {
+export interface Lazy extends Annotated {
   readonly _tag: "Lazy"
   readonly f: () => AST
 }
@@ -784,8 +784,7 @@ export const createLazy = (
 ): Lazy => ({
   _tag: "Lazy",
   f,
-  annotations,
-  hasTransformation: true
+  annotations
 })
 
 /**
