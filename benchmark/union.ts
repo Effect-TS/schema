@@ -34,7 +34,7 @@ const x = RA.makeBy(n, (i) =>
     c: z.boolean()
   }).strict())
 
-const UnionZod = z.discriminatedUnion("kind", x)
+const schemaZod = z.discriminatedUnion("kind", x)
 
 const parseEither = S.parseEither(schema)
 const options = { allErrors: true }
@@ -61,13 +61,13 @@ suite
     parseEither(good, options)
   })
   .add("zod (good)", function() {
-    UnionZod.safeParse(good)
+    schemaZod.safeParse(good)
   })
   .add("parseEither (bad)", function() {
     parseEither(bad, options)
   })
   .add("zod (bad)", function() {
-    UnionZod.safeParse(good)
+    schemaZod.safeParse(good)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))

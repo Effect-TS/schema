@@ -2,27 +2,32 @@ import * as D from "@effect/io/Debug"
 import * as P from "@effect/schema/Parser"
 import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
+import { z } from "zod"
 
 D.runtimeDebug.tracingEnabled = true
 
 /*
-io-ts
-space-object (good) x 476,424 ops/sec ±0.45% (92 runs sampled)
-space-object (bad) x 434,563 ops/sec ±0.58% (87 runs sampled)
-0.3.2
-parseEither (good) x 94,103 ops/sec ±0.86% (90 runs sampled)
-parseEither (bad) x 243,343 ops/sec ±4.91% (84 runs sampled)
+parseEither (good) x 94,095 ops/sec ±1.96% (86 runs sampled)
+zod (good) x 166,346 ops/sec ±7.01% (79 runs sampled)
+parseEither (bad) x 269,512 ops/sec ±2.68% (85 runs sampled)
+zod (bad) x 182,540 ops/sec ±2.00% (85 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
 
 const Vector = t.tuple(t.number, t.number, t.number)
+const VectorZod = z.tuple([z.number(), z.number(), z.number()])
 
 const Asteroid = t.struct({
   type: t.literal("asteroid"),
   location: Vector,
   mass: t.number
 })
+const AsteroidZod = z.object({
+  type: z.literal("asteroid"),
+  location: VectorZod,
+  mass: z.number()
+}).strict()
 
 const Planet = t.struct({
   type: t.literal("planet"),
@@ -31,6 +36,13 @@ const Planet = t.struct({
   population: t.number,
   habitable: t.boolean
 })
+const PlanetZod = z.object({
+  type: z.literal("planet"),
+  location: VectorZod,
+  mass: z.number(),
+  population: z.number(),
+  habitable: z.boolean()
+}).strict()
 
 const Rank = t.union(
   t.literal("captain"),
@@ -38,6 +50,12 @@ const Rank = t.union(
   t.literal("officer"),
   t.literal("ensign")
 )
+const RankZod = z.union([
+  z.literal("captain"),
+  z.literal("first mate"),
+  z.literal("officer"),
+  z.literal("ensign")
+])
 
 const CrewMember = t.struct({
   name: t.string,
@@ -45,6 +63,12 @@ const CrewMember = t.struct({
   rank: Rank,
   home: Planet
 })
+const CrewMemberZod = z.object({
+  name: z.string(),
+  age: z.number(),
+  rank: RankZod,
+  home: PlanetZod
+}).strict()
 
 const Ship = t.struct({
   type: t.literal("ship"),
@@ -53,10 +77,18 @@ const Ship = t.struct({
   name: t.string,
   crew: t.array(CrewMember)
 })
+const ShipZod = z.object({
+  type: z.literal("ship"),
+  location: VectorZod,
+  mass: z.number(),
+  name: z.string(),
+  crew: z.array(CrewMemberZod)
+}).strict()
 
-export const T = t.union(Asteroid, Planet, Ship)
+export const schema = t.union(Asteroid, Planet, Ship)
+export const schemaZod = z.discriminatedUnion("type", [AsteroidZod, PlanetZod, ShipZod])
 
-export const parseEither = P.parseEither(T)
+export const parseEither = P.parseEither(schema)
 
 const good = {
   type: "ship",
@@ -107,8 +139,14 @@ suite
   .add("parseEither (good)", function() {
     parseEither(good)
   })
+  .add("zod (good)", function() {
+    schemaZod.safeParse(good)
+  })
   .add("parseEither (bad)", function() {
     parseEither(bad)
+  })
+  .add("zod (bad)", function() {
+    schemaZod.safeParse(good)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))
