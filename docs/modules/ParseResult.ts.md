@@ -72,7 +72,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const forbidden: () => Forbidden
+export declare const forbidden: Forbidden
 ```
 
 Added in v1.0.0

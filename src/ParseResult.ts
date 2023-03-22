@@ -92,9 +92,9 @@ export const type = (expected: AST.AST, actual: unknown, message?: string): Type
  * @category constructors
  * @since 1.0.0
  */
-export const forbidden = (): Forbidden => ({
+export const forbidden: Forbidden = {
   _tag: "Forbidden"
-})
+}
 
 /**
  * The `Index` decode error indicates that there was an error at a specific index in an array or tuple.
