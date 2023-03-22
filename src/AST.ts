@@ -1108,19 +1108,17 @@ export const getFrom = (ast: AST): AST => {
         return createTuple(
           ast.elements.map((e) => ({ ...e, type: getFrom(e.type) })),
           O.map(ast.rest, RA.mapNonEmpty(getFrom)),
-          ast.isReadonly,
-          ast.annotations
+          ast.isReadonly
         )
       case "TypeLiteral":
         return createTypeLiteral(
           ast.propertySignatures.map((p) => ({ ...p, type: getFrom(p.type) })),
-          ast.indexSignatures.map((is) => ({ ...is, type: getFrom(is.type) })),
-          ast.annotations
+          ast.indexSignatures.map((is) => ({ ...is, type: getFrom(is.type) }))
         )
       case "Union":
-        return createUnion(ast.types.map(getFrom), ast.annotations)
+        return createUnion(ast.types.map(getFrom))
       case "Lazy":
-        return createLazy(() => getFrom(ast.f()), ast.annotations)
+        return createLazy(() => getFrom(ast.f()))
       case "Refinement":
       case "Transform":
         return getFrom(ast.from)
