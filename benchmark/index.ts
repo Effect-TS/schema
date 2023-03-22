@@ -7,10 +7,12 @@ import { z } from "zod"
 D.runtimeDebug.tracingEnabled = true
 
 /*
-parseEither (good) x 94,095 ops/sec ±1.96% (86 runs sampled)
-zod (good) x 166,346 ops/sec ±7.01% (79 runs sampled)
-parseEither (bad) x 269,512 ops/sec ±2.68% (85 runs sampled)
-zod (bad) x 182,540 ops/sec ±2.00% (85 runs sampled)
+parseEither (good) x 96,300 ops/sec ±0.45% (91 runs sampled)
+zod (good) x 168,570 ops/sec ±7.15% (80 runs sampled)
+parseEither (bad) x 76,757 ops/sec ±2.38% (87 runs sampled)
+zod (bad) x 56,287 ops/sec ±4.53% (84 runs sampled)
+parseEither (bad2) x 75,451 ops/sec ±7.84% (84 runs sampled)
+zod (bad2) x 77,259 ops/sec ±5.32% (84 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -89,6 +91,7 @@ export const schema = t.union(Asteroid, Planet, Ship)
 export const schemaZod = z.discriminatedUnion("type", [AsteroidZod, PlanetZod, ShipZod])
 
 export const parseEither = P.parseEither(schema)
+const options = { allErrors: true }
 
 const good = {
   type: "ship",
@@ -132,21 +135,49 @@ const bad = {
   ]
 }
 
+const bad2 = {
+  type: "ship",
+  location: [1, 2, 3],
+  mass: 4,
+  name: "foo",
+  crew: [
+    {
+      name: "bar",
+      age: 44,
+      rank: "captain",
+      home: {
+        type: "planet",
+        location: [5, 6, 7],
+        mass: 8,
+        population: 1000,
+        habitable: true
+      }
+    }
+  ],
+  excess: 1
+}
+
 // console.log(parseEither(good))
 // console.log(parseEither(bad))
 
 suite
   .add("parseEither (good)", function() {
-    parseEither(good)
+    parseEither(good, options)
   })
   .add("zod (good)", function() {
     schemaZod.safeParse(good)
   })
   .add("parseEither (bad)", function() {
-    parseEither(bad)
+    parseEither(bad, options)
   })
   .add("zod (bad)", function() {
-    schemaZod.safeParse(good)
+    schemaZod.safeParse(bad)
+  })
+  .add("parseEither (bad2)", function() {
+    parseEither(bad2, options)
+  })
+  .add("zod (bad2)", function() {
+    schemaZod.safeParse(bad2)
   })
   .on("cycle", function(event: any) {
     console.log(String(event.target))
