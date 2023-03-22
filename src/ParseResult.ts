@@ -92,7 +92,7 @@ export const type = (expected: AST.AST, actual: unknown, message?: string): Type
  * @category constructors
  * @since 1.0.0
  */
-export const forbiddn = (): Forbidden => ({
+export const forbidden = (): Forbidden => ({
   _tag: "Forbidden"
 })
 

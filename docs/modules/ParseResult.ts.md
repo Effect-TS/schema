@@ -15,6 +15,7 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [failure](#failure)
   - [failures](#failures)
+  - [forbidden](#forbidden)
   - [index](#index)
   - [key](#key)
   - [missing](#missing)
@@ -62,6 +63,16 @@ Added in v1.0.0
 
 ```ts
 export declare const failures: (es: readonly [ParseErrors, ...ParseErrors[]]) => ParseResult<never>
+```
+
+Added in v1.0.0
+
+## forbidden
+
+**Signature**
+
+```ts
+export declare const forbidden: () => Forbidden
 ```
 
 Added in v1.0.0

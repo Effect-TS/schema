@@ -297,7 +297,7 @@ const go = I.memoize(untracedMethod(() =>
           } else if (options?.isEffectAllowed === true) {
             return conditional
           }
-          return PR.failure(PR.forbiddn())
+          return PR.failure(PR.forbidden())
         }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)
@@ -434,7 +434,7 @@ const go = I.memoize(untracedMethod(() =>
                 )
               } else {
                 // the input element is present but is not valid
-                const e = PR.index(i, [PR.forbiddn()])
+                const e = PR.index(i, [PR.forbidden()])
                 if (allErrors) {
                   es.push([stepKey++, e])
                   continue
@@ -491,7 +491,7 @@ const go = I.memoize(untracedMethod(() =>
                   )
                 )
               } else {
-                const e = PR.index(i, [PR.forbiddn()])
+                const e = PR.index(i, [PR.forbidden()])
                 if (allErrors) {
                   es.push([stepKey++, e])
                   continue
@@ -548,7 +548,7 @@ const go = I.memoize(untracedMethod(() =>
                     )
                   )
                 } else {
-                  const e = PR.index(i, [PR.forbiddn()])
+                  const e = PR.index(i, [PR.forbidden()])
                   if (allErrors) {
                     es.push([stepKey++, e])
                     continue
@@ -695,7 +695,7 @@ const go = I.memoize(untracedMethod(() =>
                   )
                 )
               } else {
-                const e = PR.key(name, [PR.forbiddn()])
+                const e = PR.key(name, [PR.forbidden()])
                 if (allErrors) {
                   es.push([stepKey++, e])
                   continue
@@ -781,7 +781,7 @@ const go = I.memoize(untracedMethod(() =>
                     )
                   )
                 } else {
-                  const e = PR.key(key, [PR.forbiddn()])
+                  const e = PR.key(key, [PR.forbidden()])
                   if (allErrors) {
                     es.push([stepKey++, e])
                     continue
@@ -909,7 +909,7 @@ const go = I.memoize(untracedMethod(() =>
                 )
               )
             } else {
-              es.push([stepKey++, PR.unionMember([PR.forbiddn()])])
+              es.push([stepKey++, PR.unionMember([PR.forbidden()])])
             }
           }
 
@@ -962,7 +962,7 @@ const go = I.memoize(untracedMethod(() =>
           } else if (options?.isEffectAllowed === true) {
             return conditional
           }
-          return PR.failure(PR.forbiddn())
+          return PR.failure(PR.forbidden())
         }
       }
     }
