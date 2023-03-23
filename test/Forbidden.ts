@@ -37,4 +37,13 @@ describe.concurrent("Forbidden", () => {
       "union member: is forbidden, union member: is forbidden"
     )
   })
+
+  it("declaration", () => {
+    const schema = S.declare([], S.number, () => S.parseEffect(S.number))
+    expectForbidden(
+      schema,
+      1,
+      "is forbidden"
+    )
+  })
 })
