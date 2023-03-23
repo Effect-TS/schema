@@ -11,10 +11,6 @@ const expectForbidden = <I, A>(
   expect(E.mapLeft(S.parseEither(eschema)(u), (e) => Util.formatAll(e.errors))).toEqual(
     E.left(message)
   )
-  expect(E.mapLeft(S.parseEither(eschema)(u, { allErrors: true }), (e) => Util.formatAll(e.errors)))
-    .toEqual(
-      E.left(message)
-    )
 }
 
 describe.concurrent("Forbidden", () => {

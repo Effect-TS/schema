@@ -313,15 +313,7 @@ const go = untracedMethod(() =>
         } else {
           return to === PR.success ?
             ast.decode :
-            (a, options) => {
-              const conditional = PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
-              const either = PR.eitherOrUndefined(conditional)
-              return either ?
-                either :
-                options?.isEffectAllowed === true ?
-                conditional :
-                PR.failure(PR.forbidden)
-            }
+            (a, options) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
         }
       }
       case "Declaration":
