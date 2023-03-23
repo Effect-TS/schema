@@ -282,15 +282,13 @@ interface ParseEffectOptions extends ParseOptions {
 }
 
 interface Parser<I, A> {
-  (i: I, options?: ParseOptions & ParseEffectOptions): ParseResult<A>
+  (i: I, options?: ParseEffectOptions): ParseResult<A>
 }
 
 const go = untracedMethod(() =>
   (ast: AST.AST, isBoundary = true): Parser<any, any> => {
-    if (isBoundary === false) {
-      if (!AST.hasTransformation(ast)) {
-        return PR.success
-      }
+    if (isBoundary === false && !AST.hasTransformation(ast)) {
+      return PR.success
     }
     switch (ast._tag) {
       case "Refinement":
@@ -329,13 +327,12 @@ const go = untracedMethod(() =>
       case "Declaration":
         return (i, options) => {
           const conditional = ast.decode(...ast.typeParameters)(i, options)
-          const decoded = PR.eitherOrUndefined(conditional)
-          if (decoded) {
-            return decoded
-          } else if (options?.isEffectAllowed === true) {
-            return conditional
-          }
-          return PR.failure(PR.forbidden)
+          const either = PR.eitherOrUndefined(conditional)
+          return either ?
+            either :
+            options?.isEffectAllowed === true ?
+            conditional :
+            PR.failure(PR.forbidden)
         }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)
@@ -370,7 +367,7 @@ const go = untracedMethod(() =>
       }
       case "Tuple": {
         const elements = ast.elements.map((e) => go(e.type, isBoundary))
-        const rest = pipe(ast.rest, O.map(RA.mapNonEmpty(go)))
+        const rest = pipe(ast.rest, O.map(RA.mapNonEmpty((ast) => go(ast))))
         let requiredLen = ast.elements.filter((e) => !e.isOptional).length
         if (O.isSome(ast.rest)) {
           requiredLen += ast.rest.value.length - 1
@@ -445,7 +442,7 @@ const go = untracedMethod(() =>
                   }
                 }
                 output.push([stepKey++, t.right])
-              } else if (options?.isEffectAllowed === true) {
+              } else {
                 const nk = stepKey++
                 const index = i
                 if (!queue) {
@@ -470,15 +467,6 @@ const go = untracedMethod(() =>
                       })
                   )
                 )
-              } else {
-                // the input element is present but is not valid
-                const e = PR.index(i, [PR.forbidden])
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failures(mutableAppend(sortByIndex(es), e))
-                }
               }
             }
           }
@@ -503,7 +491,7 @@ const go = untracedMethod(() =>
                 } else {
                   output.push([stepKey++, t.right])
                 }
-              } else if (options?.isEffectAllowed === true) {
+              } else {
                 const nk = stepKey++
                 const index = i
                 if (!queue) {
@@ -528,14 +516,6 @@ const go = untracedMethod(() =>
                       })
                   )
                 )
-              } else {
-                const e = PR.index(i, [PR.forbidden])
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failures(mutableAppend(sortByIndex(es), e))
-                }
               }
             }
             // ---------------------------------------------
@@ -560,7 +540,7 @@ const go = untracedMethod(() =>
                     }
                   }
                   output.push([stepKey++, t.right])
-                } else if (options?.isEffectAllowed === true) {
+                } else {
                   const nk = stepKey++
                   const index = i
                   if (!queue) {
@@ -585,14 +565,6 @@ const go = untracedMethod(() =>
                         })
                     )
                   )
-                } else {
-                  const e = PR.index(i, [PR.forbidden])
-                  if (allErrors) {
-                    es.push([stepKey++, e])
-                    continue
-                  } else {
-                    return PR.failures(mutableAppend(sortByIndex(es), e))
-                  }
                 }
               }
             }
@@ -710,7 +682,7 @@ const go = untracedMethod(() =>
                   }
                 }
                 output[name] = t.right
-              } else if (options?.isEffectAllowed === true) {
+              } else {
                 const nk = stepKey++
                 const index = name
                 if (!queue) {
@@ -735,14 +707,6 @@ const go = untracedMethod(() =>
                       })
                   )
                 )
-              } else {
-                const e = PR.key(name, [PR.forbidden])
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failures(mutableAppend(sortByIndex(es), e))
-                }
               }
             }
           }
@@ -794,7 +758,7 @@ const go = untracedMethod(() =>
                   } else {
                     output[key] = tv.right
                   }
-                } else if (options?.isEffectAllowed === true) {
+                } else {
                   const nk = stepKey++
                   const index = key
                   if (!queue) {
@@ -822,14 +786,6 @@ const go = untracedMethod(() =>
                         )
                     )
                   )
-                } else {
-                  const e = PR.key(key, [PR.forbidden])
-                  if (allErrors) {
-                    es.push([stepKey++, e])
-                    continue
-                  } else {
-                    return PR.failures(mutableAppend(sortByIndex(es), e))
-                  }
                 }
               }
             }
@@ -926,7 +882,7 @@ const go = untracedMethod(() =>
               } else {
                 es.push([stepKey++, PR.unionMember(t.left.errors)])
               }
-            } else if (options?.isEffectAllowed === true) {
+            } else {
               const nk = stepKey++
               if (!queue) {
                 queue = []
@@ -950,8 +906,6 @@ const go = untracedMethod(() =>
                     })
                 )
               )
-            } else {
-              es.push([stepKey++, PR.unionMember([PR.forbidden])])
             }
           }
 

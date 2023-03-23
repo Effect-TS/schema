@@ -849,7 +849,7 @@ export const transform: {
     decode: (a1: A1) => I2,
     encode: (i2: I2) => A1
   ): Schema<I1, A2> =>
-    transformEffect(from, to, (a) => PR.success(decode(a)), (b) => PR.success(encode(b)))
+    transformEither(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)))
 )
 
 /**
