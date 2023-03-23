@@ -5,65 +5,54 @@ import * as Benchmark from "benchmark"
 import { z } from "zod"
 
 /*
-schema (good) x 107,508 ops/sec ±0.47% (87 runs sampled)
-zod (good) x 407,693 ops/sec ±6.17% (77 runs sampled)
-schema (bad) x 104,383 ops/sec ±2.04% (88 runs sampled)
-zod (bad) x 102,018 ops/sec ±5.56% (79 runs sampled)
+1)
+schema (good) x 338,786 ops/sec ±0.55% (88 runs sampled)
+zod (good) x 1,312,221 ops/sec ±6.42% (79 runs sampled)
+schema (bad) x 373,497 ops/sec ±1.22% (89 runs sampled)
+zod (bad) x 126,029 ops/sec ±3.76% (85 runs sampled)
+2)
+schema (good) x 616,053 ops/sec ±0.55% (89 runs sampled)
+zod (good) x 1,237,098 ops/sec ±7.91% (76 runs sampled)
+schema (bad) x 546,779 ops/sec ±0.63% (86 runs sampled)
+zod (bad) x 127,494 ops/sec ±5.93% (83 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
 
 const UserZod = z.object({
   name: z.string().min(3).max(20),
-  age: z.number().min(0).max(120),
-  address: z.object({
-    street: z.string().min(3).max(200),
-    number: z.number().min(0).max(120),
-    city: z.string().min(3).max(200),
-    country: z.string().min(3).max(200),
-    zip: z.string().min(3).max(200)
-  })
-}).strict()
+  age: z.number().min(0).max(120)
+})
 
 const schema = S.struct({
   name: pipe(S.string, S.minLength(3), S.maxLength(20)),
-  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120)),
-  address: S.struct({
-    street: pipe(S.string, S.minLength(3), S.maxLength(200)),
-    number: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120)),
-    city: pipe(S.string, S.minLength(3), S.maxLength(200)),
-    country: pipe(S.string, S.minLength(3), S.maxLength(200)),
-    zip: pipe(S.string, S.minLength(3), S.maxLength(200))
-  })
+  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
 })
+
+// const UserZod = z.object({
+//   name: z.string().min(3),
+//   age: z.number()
+// }).strict()
+
+// const schema = S.struct({
+//   name: pipe(S.string, S.minLength(3)),
+//   age: pipe(S.number)
+// })
 
 const good = {
   name: "Joe",
-  age: 13,
-  address: {
-    street: "Main Street",
-    number: 12,
-    city: "New York",
-    country: "USA",
-    zip: "12345"
-  }
+  age: 13
 }
 
 const bad = {
   name: "Jo",
-  age: 13,
-  address: {
-    street: "Main Street",
-    number: 12,
-    city: "New York",
-    country: "USA",
-    zip: "12345"
-  }
+  age: 13
 }
 
 const parseEither = S.parseEither(schema)
 const options = { allErrors: true }
 
+// parseEither(good, options)
 // console.log(UserZod.safeParse(good))
 // console.log(parseEither(good))
 // console.log(JSON.stringify(UserZod.safeParse(bad), null, 2))
