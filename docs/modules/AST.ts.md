@@ -849,7 +849,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Lazy extends Annotated, HasTransformation {
+export interface Lazy extends Annotated {
   readonly _tag: 'Lazy'
   readonly f: () => AST
 }
@@ -1392,7 +1392,7 @@ export declare const mergeAnnotations: (
       types: readonly [AST, AST, ...AST[]]
       hasTransformation: boolean
     }
-  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST; hasTransformation: boolean }
+  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
@@ -1522,7 +1522,7 @@ export declare const setAnnotation: (
       types: readonly [AST, AST, ...AST[]]
       hasTransformation: boolean
     }
-  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST; hasTransformation: boolean }
+  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
