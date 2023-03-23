@@ -981,7 +981,7 @@ In some cases, we may need to transform the output of a schema to a different ty
 
 To perform these kinds of transformations, the `@effect/schema` library provides the `transform` combinator.
 
-**transform**
+### transform
 
 ```ts
 <I1, A1, I2, A2>(from: Schema<I1, A1>, to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Schema<I1, A2>
@@ -1012,9 +1012,9 @@ const transformedSchema: S.Schema<string, readonly [string]> = S.transform(S.str
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to parse values of type `string` into values of type `[string]`.
 
-The `transformEither` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
+### transformResult
 
-Here's an example of the `transformEither` combinator which converts a `string` into a `boolean`:
+The `transformResult` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
 
 ```ts
 import * as PR from "@effect/schema/ParseResult";
@@ -1031,8 +1031,7 @@ const decode = (s: string) =>
 // define a function that converts a boolean into a string
 const encode = (b: boolean) => PR.success(String(b));
 
-// use the transformEither combinator to convert the string schema into the boolean schema
-const transformedSchema: S.Schema<string, boolean> = S.transformEither(S.string, S.boolean, decode, encode);
+const transformedSchema: S.Schema<string, boolean> = S.transformEffect(S.string, S.boolean, decode, encode);
 ```
 
 ### String transformations

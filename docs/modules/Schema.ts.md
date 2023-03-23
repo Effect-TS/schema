@@ -42,8 +42,7 @@ Added in v1.0.0
   - [rest](#rest)
   - [struct](#struct)
   - [transform](#transform)
-  - [transformEffect](#transformeffect)
-  - [transformEither](#transformeither)
+  - [transformResult](#transformresult)
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
@@ -619,7 +618,7 @@ export declare const transform: {
 
 Added in v1.0.0
 
-## transformEffect
+## transformResult
 
 Create a new `Schema` by transforming the input and output of an existing `Schema`
 using the provided decoding functions.
@@ -627,7 +626,7 @@ using the provided decoding functions.
 **Signature**
 
 ```ts
-export declare const transformEffect: {
+export declare const transformResult: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
     decode: (a1: A1, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I2>,
@@ -638,31 +637,6 @@ export declare const transformEffect: {
     to: Schema<I2, A2>,
     decode: (a1: A1, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I2>,
     encode: (i2: I2, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A1>
-  ): Schema<I1, A2>
-}
-```
-
-Added in v1.0.0
-
-## transformEither
-
-Create a new `Schema` by transforming the input and output of an existing `Schema`
-using the provided decoding functions.
-
-**Signature**
-
-```ts
-export declare const transformEither: {
-  <I2, A2, A1>(
-    to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => Either<PR.ParseError, I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => Either<PR.ParseError, A1>
-  ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Schema<I1, A1>,
-    to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => Either<PR.ParseError, I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => Either<PR.ParseError, A1>
   ): Schema<I1, A2>
 }
 ```
