@@ -18,9 +18,14 @@ Modeling the schema of data structures as first-class values
 
 Welcome to the documentation for `@effect/schema`, **a library for defining and using schemas** to validate and transform data in TypeScript.
 
-`@effect/schema` allows you to define a `Schema` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as **parsing** from `unknown`, **decoding**, **encoding**, **verifying** that a value conforms to a given `Schema`.
+`@effect/schema` allows you to define a `Schema<I, A>` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as:
 
-`@effect/schema` also provides a number of other features, including the ability to derive various artifacts such as `Arbitrary`s, `JSONSchema`s, and `Pretty`s from a `Schema`, as well as the ability to customize the library through the use of custom artifact compilers and custom `Schema` combinators.
+- parsing from `unknown`
+- decoding from `I` to `A`
+- encoding from `A` to `I`
+- verifying that a value conforms to a given `Schema`
+- generating fast-check arbitraries
+- pretty printing
 
 If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
 
@@ -122,13 +127,26 @@ const parsePerson = S.parseEither(Person);
 const input: unknown = { name: "Alice", age: 30 }
 
 const result1 = parsePerson(input);
-if (S.isSuccess(result1)) {
+ if (E.isRight(result1)) {
   console.log(result1.right); // { name: "Alice", age: 30 }
 }
 
 const result2 = parsePerson(null);
 if (E.isLeft(result2)) {
-  console.log(result2.left); // [PR.type(..., null)]
+  console.log(result2.left);
+  /*
+  {
+  _tag: 'ParseError',
+    errors: [
+      {
+        _tag: 'Type',
+        expected: [Object],
+        actual: null,
+        message: [Object]
+      }
+    ]
+  }
+  */
 }
 ```
 
@@ -147,8 +165,8 @@ try {
 }
 /*
 Parsing failed:
-error(s) found
-└─ key "name"
+Error: error(s) found
+└─ ["name"]
    └─ is missing
 */
 ```
@@ -181,10 +199,7 @@ console.log(
   )
 );
 /*
-{
-  _tag: 'Right',
-  right: { name: 'Bob', age: 40 }
-}
+{ _tag: 'Right', right: { name: 'Bob', age: 40 } }
 */
 ```
 
@@ -216,25 +231,14 @@ console.log(
 /*
 {
   _tag: 'Left',
-  left: [
-    {
-      _tag: 'Key',
-      key: 'age',
-      errors: [
-        { _tag: 'Type', expected: ..., actual: 'abc' },
-        [length]: 1
-      ]
-    },
-    {
-      _tag: 'Key',
-      key: 'email',
-      errors: [
-        { _tag: 'Unexpected', actual: 'bob@example.com' },
-        [length]: 1
-      ]
-    },
-    [length]: 2
-  ]
+  left: {
+    _tag: 'ParseError',
+    errors: [
+      { _tag: 'Key', key: 'email', errors: [ [Object], [length]: 1 ] },
+      { _tag: 'Key', key: 'age', errors: [ [Object], [length]: 1 ] },
+      [length]: 2
+    ]
+  }
 }
 */
 ```
@@ -245,7 +249,7 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import { pipe } from "@effect/data/Function";
+import * as E from "@effect/data/Either";
 
 // Age is a schema that can parse a string to a number and encode a number to a string
 const Age = S.numberFromString(S.string);
@@ -256,7 +260,7 @@ const Person = S.struct({
 });
 
 const encoded = S.encodeEither(Person)({ name: "Alice", age: 30 });
-if (S.isSuccess(encoded)) {
+if (E.isRight(encoded)) {
   console.log(encoded.right); // { name: "Alice", age: "30" }
 }
 ```
@@ -280,12 +284,12 @@ const Person = S.struct({
 const result = S.parseEither(Person)({});
 if (E.isLeft(result)) {
   console.error("Parsing failed:");
-  console.error(formatErrors(result.left));
+  console.error(formatErrors(result.left.errors));
 }
 /*
 Parsing failed:
 error(s) found
-└─ key "name"
+└─ ["name"]
    └─ is missing
 */
 ```
@@ -321,7 +325,7 @@ const Person = S.struct({
 });
 
 // const assertsPerson: (input: unknown) => asserts input is Person
-const assertsPerson: S.ToAsserts<typeof Person> = P.asserts(Person);
+const assertsPerson: S.ToAsserts<typeof Person> = S.asserts(Person);
 
 try {
   assertsPerson({ name: "Alice", age: "30" });
@@ -332,7 +336,7 @@ try {
 /*
 The input does not match the schema:
 Error: error(s) found
-└─ key "age"
+└─ ["age"]
    └─ Expected number, actual "30"
 */
 
@@ -345,23 +349,33 @@ assertsPerson({ name: "Alice", age: 30 });
 The `arbitrary` function provided by the `@effect/schema/Arbitrary` module represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
 
 ```ts
+import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 import * as A from "@effect/schema/Arbitrary";
 import * as fc from "fast-check";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: pipe(S.string, S.numberFromString, S.int())
 });
 
-const PersonArbitrary = A.arbitrary(Person)(fc);
+// Arbitrary for the To type
+const PersonArbitraryTo = A.to(Person)(fc);
 
-console.log(fc.sample(PersonArbitrary, 2));
+console.log(fc.sample(PersonArbitraryTo, 2));
 /*
 [
-{ name: '!U?z/X', age: -2.5223372357846707e-44 },
-{ name: 'valukeypro', age: -1.401298464324817e-45 }
+  { name: 'WJh;`Jz', age: 3.4028216409684243e+38 },
+  { name: 'x&~', age: 139480325657985020 }
 ]
+*/
+
+// Arbitrary for the From type
+const PersonArbitraryFrom = A.from(Person)(fc);
+
+console.log(fc.sample(PersonArbitraryFrom, 2));
+/*
+[ { name: 'Q}"H@aT', age: ']P$8w' }, { name: '|', age: '"' } ]
 */
 ```
 
@@ -981,7 +995,7 @@ In some cases, we may need to transform the output of a schema to a different ty
 
 To perform these kinds of transformations, the `@effect/schema` library provides the `transform` combinator.
 
-**transform**
+### transform
 
 ```ts
 <I1, A1, I2, A2>(from: Schema<I1, A1>, to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Schema<I1, A2>
@@ -1012,9 +1026,9 @@ const transformedSchema: S.Schema<string, readonly [string]> = S.transform(S.str
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to parse values of type `string` into values of type `[string]`.
 
-The `transformEither` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
+### transformResult
 
-Here's an example of the `transformEither` combinator which converts a `string` into a `boolean`:
+The `transformResult` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
 
 ```ts
 import * as PR from "@effect/schema/ParseResult";
@@ -1031,8 +1045,7 @@ const decode = (s: string) =>
 // define a function that converts a boolean into a string
 const encode = (b: boolean) => PR.success(String(b));
 
-// use the transformEither combinator to convert the string schema into the boolean schema
-const transformedSchema: S.Schema<string, boolean> = S.transformEither(S.string, S.boolean, decode, encode);
+const transformedSchema: S.Schema<string, boolean> = S.transformEffect(S.string, S.boolean, decode, encode);
 ```
 
 ### String transformations
