@@ -341,7 +341,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 **Signature**
 
 ```ts
-export declare const brand: <B extends string, A>(
+export declare const brand: <B extends string | symbol, A>(
   brand: B,
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => BrandSchema<I, any>
