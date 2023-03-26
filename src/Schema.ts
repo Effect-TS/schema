@@ -40,11 +40,13 @@ export interface Schema<From, To = From> {
 }
 
 /**
+ * @category model
  * @since 1.0.0
  */
 export type From<S extends { readonly From: (_: any) => any }> = Parameters<S["From"]>[0]
 
 /**
+ * @category model
  * @since 1.0.0
  */
 export type To<S extends { readonly To: (_: any) => any }> = Parameters<S["To"]>[0]
@@ -67,106 +69,132 @@ export const reverse = <I, A>(schema: Schema<I, A>): Schema<A, I> => make(AST.re
 /* c8 ignore start */
 export {
   /**
+   * @category validation
    * @since 1.0.0
    */
   asserts,
   /**
+   * @category decoding
    * @since 1.0.0
    */
   decode,
   /**
+   * @category decoding
    * @since 1.0.0
    */
   decodeEffect,
   /**
+   * @category decoding
    * @since 1.0.0
    */
   decodeEither,
   /**
+   * @category decoding
    * @since 1.0.0
    */
   decodeOption,
   /**
+   * @category decoding
    * @since 1.0.0
    */
   decodePromise,
   /**
+   * @category decoding
    * @since 1.0.0
    */
   decodeResult,
   /**
+   * @category encoding
    * @since 1.0.0
    */
   encode,
   /**
+   * @category encoding
    * @since 1.0.0
    */
   encodeEffect,
   /**
+   * @category encoding
    * @since 1.0.0
    */
   encodeEither,
   /**
+   * @category encoding
    * @since 1.0.0
    */
   encodeOption,
   /**
+   * @category encoding
    * @since 1.0.0
    */
   encodePromise,
   /**
+   * @category encoding
    * @since 1.0.0
    */
   encodeResult,
   /**
+   * @category validation
    * @since 1.0.0
    */
   is,
   /**
+   * @category parsing
    * @since 1.0.0
    */
   parse,
   /**
+   * @category parsing
    * @since 1.0.0
    */
   parseEffect,
   /**
+   * @category parsing
    * @since 1.0.0
    */
   parseEither,
   /**
+   * @category parsing
    * @since 1.0.0
    */
   parseOption,
   /**
+   * @category parsing
    * @since 1.0.0
    */
   parsePromise,
   /**
+   * @category parsing
    * @since 1.0.0
    */
   parseResult,
   /**
+   * @category validation
    * @since 1.0.0
    */
   validate,
   /**
+   * @category validation
    * @since 1.0.0
    */
   validateEffect,
   /**
+   * @category validation
    * @since 1.0.0
    */
   validateEither,
   /**
+   * @category validation
    * @since 1.0.0
    */
   validateOption,
   /**
+   * @category validation
    * @since 1.0.0
    */
   validatePromise,
   /**
+   * @category validation
    * @since 1.0.0
    */
   validateResult
@@ -676,6 +704,7 @@ export const lazy = <I, A = I>(
 ): Schema<I, A> => make(AST.createLazy(() => f().ast, annotations))
 
 /**
+ * @category model
  * @since 1.0.0
  */
 export type AnnotationOptions<A> = {
@@ -997,12 +1026,13 @@ export const object: Schema<object> = make(AST.objectKeyword)
 // ---------------------------------------------
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const GreaterThanBigintTypeId = "@effect/schema/GreaterThanBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const greaterThanBigint = <A extends bigint>(
@@ -1021,12 +1051,13 @@ export const greaterThanBigint = <A extends bigint>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const GreaterThanOrEqualToBigintTypeId = "@effect/schema/GreaterThanOrEqualToBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const greaterThanOrEqualToBigint = <A extends bigint>(
@@ -1045,12 +1076,13 @@ export const greaterThanOrEqualToBigint = <A extends bigint>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const LessThanBigintTypeId = "@effect/schema/LessThanBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const lessThanBigint = <A extends bigint>(
@@ -1069,12 +1101,13 @@ export const lessThanBigint = <A extends bigint>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const LessThanOrEqualToBigintTypeId = "@effect/schema/LessThanOrEqualToBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const lessThanOrEqualToBigint = <A extends bigint>(
@@ -1093,12 +1126,13 @@ export const lessThanOrEqualToBigint = <A extends bigint>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const BetweenBigintTypeId = "@effect/schema/BetweenBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const betweenBigint = <A extends bigint>(
@@ -1118,12 +1152,13 @@ export const betweenBigint = <A extends bigint>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const PositiveBigintTypeId = "@effect/schema/PositiveBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const positiveBigint = <A extends bigint>(
@@ -1136,12 +1171,13 @@ export const positiveBigint = <A extends bigint>(
   })
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const NegativeBigintTypeId = "@effect/schema/NegativeBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const negativeBigint = <A extends bigint>(
@@ -1154,12 +1190,13 @@ export const negativeBigint = <A extends bigint>(
   })
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const NonNegativeBigintTypeId = "@effect/schema/NonNegativeBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const nonNegativeBigint = <A extends bigint>(
@@ -1172,12 +1209,13 @@ export const nonNegativeBigint = <A extends bigint>(
   })
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const NonPositiveBigintTypeId = "@effect/schema/NonPositiveBigintTypeId"
 
 /**
- * @category filters
+ * @category bigint
  * @since 1.0.0
  */
 export const nonPositiveBigint = <A extends bigint>(
@@ -1192,7 +1230,7 @@ export const nonPositiveBigint = <A extends bigint>(
 /**
  * Clamps a bigint between a minimum and a maximum value.
  *
- * @category parsers
+ * @category bigint
  * @since 1.0.0
  */
 export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
@@ -1209,6 +1247,7 @@ export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
 // ---------------------------------------------
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const BrandTypeId = "@effect/schema/BrandTypeId"
@@ -1278,7 +1317,7 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<
 }
 
 /**
- * @category parsers
+ * @category combinators
  * @since 1.0.0
  */
 export const chunk = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, Chunk<A>> =>
@@ -1331,7 +1370,7 @@ export const dataFromSelf = <
 }
 
 /**
- * @category parsers
+ * @category combinators
  * @since 1.0.0
  */
 export const data = <
@@ -1373,7 +1412,7 @@ export const date: Schema<Date> = declare(
 /**
   Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
-  @category parsers
+  @category date
   @since 1.0.0
 */
 export const dateFromString: Schema<string, Date> = transformResult(
@@ -1416,7 +1455,7 @@ const eitherInline = <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) =
   )
 
 /**
- * @category constructors
+ * @category combinators
  * @since 1.0.0
  */
 export const eitherFromSelf = <IE, E, IA, A>(
@@ -1449,7 +1488,7 @@ export const eitherFromSelf = <IE, E, IA, A>(
 }
 
 /**
- * @category parsers
+ * @category combinators
  * @since 1.0.0
  */
 export const either = <IE, E, IA, A>(
@@ -1474,16 +1513,19 @@ export const either = <IE, E, IA, A>(
 // ---------------------------------------------
 
 /**
+ * @category model
  * @since 1.0.0
  */
 export type JsonArray = ReadonlyArray<Json>
 
 /**
+ * @category model
  * @since 1.0.0
  */
 export type JsonObject = { readonly [key: string]: Json }
 
 /**
+ * @category model
  * @since 1.0.0
  */
 export type Json =
@@ -1517,12 +1559,13 @@ export const json: Schema<Json> = lazy(() =>
 // ---------------------------------------------
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const FiniteTypeId = "@effect/schema/FiniteTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const finite = <A extends number>(options?: AnnotationOptions<A>) =>
@@ -1537,12 +1580,13 @@ export const finite = <A extends number>(options?: AnnotationOptions<A>) =>
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const GreaterThanTypeId = "@effect/schema/GreaterThanTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const greaterThan = <A extends number>(
@@ -1561,12 +1605,13 @@ export const greaterThan = <A extends number>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const GreaterThanOrEqualToTypeId = "@effect/schema/GreaterThanOrEqualToTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const greaterThanOrEqualTo = <A extends number>(
@@ -1585,12 +1630,13 @@ export const greaterThanOrEqualTo = <A extends number>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const MultipleOfTypeId = "@effect/schema/MultipleOfTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const multipleOf = <A extends number>(
@@ -1609,12 +1655,13 @@ export const multipleOf = <A extends number>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const IntTypeId = "@effect/schema/IntTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const int = <A extends number>(options?: AnnotationOptions<A>) =>
@@ -1630,12 +1677,13 @@ export const int = <A extends number>(options?: AnnotationOptions<A>) =>
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const LessThanTypeId = "@effect/schema/LessThanTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const lessThan = <A extends number>(max: number, options?: AnnotationOptions<A>) =>
@@ -1651,12 +1699,13 @@ export const lessThan = <A extends number>(max: number, options?: AnnotationOpti
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const LessThanOrEqualToTypeId = "@effect/schema/LessThanOrEqualToTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const lessThanOrEqualTo = <A extends number>(
@@ -1675,12 +1724,13 @@ export const lessThanOrEqualTo = <A extends number>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const BetweenTypeId = "@effect/schema/BetweenTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const between = <A extends number>(
@@ -1700,12 +1750,13 @@ export const between = <A extends number>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const NonNaNTypeId = "@effect/schema/NonNaNTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const nonNaN = <A extends number>(options?: AnnotationOptions<A>) =>
@@ -1720,12 +1771,13 @@ export const nonNaN = <A extends number>(options?: AnnotationOptions<A>) =>
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const PositiveTypeId = "@effect/schema/PositiveTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const positive = <A extends number>(
@@ -1738,12 +1790,13 @@ export const positive = <A extends number>(
   })
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const NegativeTypeId = "@effect/schema/NegativeTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const negative = <A extends number>(
@@ -1756,12 +1809,13 @@ export const negative = <A extends number>(
   })
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const NonNegativeTypeId = "@effect/schema/NonNegativeTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const nonNegative = <A extends number>(
@@ -1774,12 +1828,13 @@ export const nonNegative = <A extends number>(
   })
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const NonPositiveTypeId = "@effect/schema/NonPositiveTypeId"
 
 /**
- * @category filters
+ * @category number
  * @since 1.0.0
  */
 export const nonPositive = <A extends number>(
@@ -1794,7 +1849,7 @@ export const nonPositive = <A extends number>(
 /**
  * Clamps a number between a minimum and a maximum value.
  *
- * @category parsers
+ * @category number
  * @since 1.0.0
  */
 export const clamp = <A extends number>(min: number, max: number) =>
@@ -1811,7 +1866,7 @@ export const clamp = <A extends number>(min: number, max: number) =>
 
   The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
-  @category parsers
+  @category number
   @since 1.0.0
 */
 export const numberFromString = <I>(self: Schema<I, string>): Schema<I, number> => {
@@ -1841,6 +1896,7 @@ export const numberFromString = <I>(self: Schema<I, string>): Schema<I, number> 
 // ---------------------------------------------
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const InstanceOfTypeId = "@effect/schema/InstanceOfTypeId"
@@ -1894,7 +1950,7 @@ const optionInline = <I, A>(value: Schema<I, A>) =>
   )
 
 /**
- * @category constructors
+ * @category combinators
  * @since 1.0.0
  */
 export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Option<A>> => {
@@ -1920,7 +1976,7 @@ export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Opt
 }
 
 /**
- * @category parsers
+ * @category combinators
  * @since 1.0.0
  */
 export const option = <I, A>(
@@ -1934,7 +1990,7 @@ export const option = <I, A>(
   )
 
 /**
- * @category parsers
+ * @category option
  * @since 1.0.0
  */
 export const optionFromNullable = <I, A>(
@@ -1943,7 +1999,7 @@ export const optionFromNullable = <I, A>(
   transform(union(_undefined, _null, value), to(optionFromSelf(value)), O.fromNullable, O.getOrNull)
 
 /**
- * @category parsers
+ * @category option
  * @since 1.0.0
  */
 export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<any>>>(
@@ -2018,12 +2074,13 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
 // ---------------------------------------------
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const MinItemsTypeId = "@effect/schema/MinItemsTypeId"
 
 /**
- * @category filters
+ * @category array
  * @since 1.0.0
  */
 export const minItems = <A>(
@@ -2042,12 +2099,13 @@ export const minItems = <A>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const MaxItemsTypeId = "@effect/schema/MaxItemsTypeId"
 
 /**
- * @category filters
+ * @category array
  * @since 1.0.0
  */
 export const maxItems = <A>(
@@ -2066,12 +2124,13 @@ export const maxItems = <A>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const ItemsCountTypeId = "@effect/schema/ItemsCountTypeId"
 
 /**
- * @category filters
+ * @category array
  * @since 1.0.0
  */
 export const itemsCount = <A>(
@@ -2145,7 +2204,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
 }
 
 /**
- * @category parsers
+ * @category combinators
  * @since 1.0.0
  */
 export const readonlyMap = <IK, K, IV, V>(
@@ -2200,7 +2259,7 @@ export const readonlySetFromSelf = <I, A>(
 }
 
 /**
- * @category parsers
+ * @category combinators
  * @since 1.0.0
  */
 export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, ReadonlySet<A>> =>
@@ -2216,6 +2275,7 @@ export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, 
 // ---------------------------------------------
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const TrimmedTypeId = "@effect/schema/TrimmedTypeId"
@@ -2228,7 +2288,7 @@ const trimmedRegex = /^\S.*\S$|^\S$|^$/
  * Note. This combinator does not make any transformations, it only validates.
  * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
  *
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const trimmed = <A extends string>(options?: AnnotationOptions<A>) =>
@@ -2247,7 +2307,7 @@ export const trimmed = <A extends string>(options?: AnnotationOptions<A>) =>
     )
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const maxLength = <A extends string>(
@@ -2268,7 +2328,7 @@ export const maxLength = <A extends string>(
     )
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const minLength = <A extends string>(
@@ -2289,12 +2349,13 @@ export const minLength = <A extends string>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const PatternTypeId = "@effect/schema/PatternTypeId"
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const pattern = <A extends string>(
@@ -2322,12 +2383,13 @@ export const pattern = <A extends string>(
   }
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const StartsWithTypeId = "@effect/schema/StartsWithTypeId"
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const startsWith = <A extends string>(
@@ -2349,12 +2411,13 @@ export const startsWith = <A extends string>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const EndsWithTypeId = "@effect/schema/EndsWithTypeId"
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const endsWith = <A extends string>(
@@ -2376,12 +2439,13 @@ export const endsWith = <A extends string>(
     )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const IncludesTypeId = "@effect/schema/IncludesTypeId"
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const includes = <A extends string>(
@@ -2405,7 +2469,7 @@ export const includes = <A extends string>(
 /**
  * The `trim` parser allows removing whitespaces from the beginning and end of a string.
  *
- * @category parsers
+ * @category string
  * @since 1.0.0
  */
 export const trim = <I>(self: Schema<I, string>): Schema<I, string> =>
@@ -2417,6 +2481,7 @@ export const trim = <I>(self: Schema<I, string>): Schema<I, string> =>
   )
 
 /**
+ * @category type id
  * @since 1.0.0
  */
 export const UUIDTypeId = "@effect/schema/UUIDTypeId"
@@ -2438,7 +2503,7 @@ export const UUID: Schema<string> = pipe(
 )
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const length = <A extends string>(
@@ -2447,7 +2512,7 @@ export const length = <A extends string>(
 ) => <I>(self: Schema<I, A>): Schema<I, A> => minLength(length, options)(maxLength<A>(length)(self))
 
 /**
- * @category filters
+ * @category string
  * @since 1.0.0
  */
 export const nonEmpty = <A extends string>(
