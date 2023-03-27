@@ -1020,7 +1020,7 @@ export const partial = (ast: AST): AST => {
       return createLazy(() => partial(ast.f()))
     case "Refinement":
     case "Transform":
-      return partial(ast.to)
+      throw new Error("`partial` cannot handle refinement or transformations")
     default:
       return ast
   }

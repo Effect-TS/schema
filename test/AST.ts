@@ -215,24 +215,6 @@ describe.concurrent("AST", () => {
     )
   })
 
-  it("partial/refinement", () => {
-    const schema = pipe(
-      S.struct({ a: S.string, b: S.string }),
-      S.filter(({ a, b }) => a === b),
-      S.partial
-    )
-    expect(schema.ast).toEqual(S.struct({ a: S.optional(S.string), b: S.optional(S.string) }).ast)
-  })
-
-  it("partial/transform", () => {
-    const schema = pipe(
-      S.string,
-      S.transform(S.struct({ a: S.string }), (a) => ({ a }), ({ a }) => a),
-      S.partial
-    )
-    expect(schema.ast).toEqual(S.struct({ a: S.optional(S.string) }).ast)
-  })
-
   it("partial/tuple/ e", () => {
     // type A = [string]
     // type B = Partial<A>
