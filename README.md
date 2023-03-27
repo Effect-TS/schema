@@ -866,6 +866,13 @@ pipe(S.struct({ a: S.string, b: S.number }), S.omit("a"));
 S.partial(S.struct({ a: S.string, b: S.number }));
 ```
 
+## Required
+
+```ts
+// $ExpectType Schema<Required<{ readonly a?: string; readonly b?: number; }>>
+S.required(S.struct({ a: S.optional(S.string), b: S.optional(S.number) }));
+```
+
 ## Records
 
 ### String keys
