@@ -27,7 +27,7 @@ describe.concurrent("partial", () => {
 
   it("partial/refinement primitive", async () => {
     expect(() => S.partial(pipe(S.string, S.minLength(2)))).toThrowError(
-      new Error("`partial` cannot handle refinement or transformations")
+      new Error("`partial` cannot handle refinements or transformations")
     )
   })
 })
