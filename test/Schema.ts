@@ -611,4 +611,30 @@ describe.concurrent("Schema", () => {
       radius: 10
     })
   })
+
+  test("withDefault/", () => {
+    const schema = S.struct({ a: S.string, b: S.withDefault(S.number, () => -1) })
+
+    expect(S.decode(schema)({ a: "a" })).toEqual({ a: "a", b: -1 })
+    expect(S.decode(schema)({ a: "a", b: 1 })).toEqual({ a: "a", b: 1 })
+
+    expect(S.encode(schema)({ a: "a", b: 1 })).toEqual({ a: "a", b: 1 })
+  })
+
+  test("withDefault/ refinement", () => {
+    const schema = S.struct({
+      a: S.string,
+      b: pipe(
+        S.number,
+        S.greaterThan(0),
+        S.withDefault(() => -1)
+      )
+    })
+
+    expect(() => S.decode(schema)({ a: "a" })).toThrowError(
+      new Error(`error(s) found
+└─ ["b"]
+   └─ Expected a number greater than 0, actual -1`)
+    )
+  })
 })

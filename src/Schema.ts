@@ -12,6 +12,7 @@ import { untracedMethod } from "@effect/data/Debug"
 import type { Either } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
+import type { LazyArg } from "@effect/data/Function"
 import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
@@ -476,6 +477,31 @@ export const fromOptional = <I, A>(
   out["_id"] = FromOptionalSchemaId
   return out
 }
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const withDefault: {
+  <A>(
+    defaultValue: LazyArg<A>
+  ): <I>(self: Schema<I, A>) => FromOptionalSchema<Exclude<I, undefined>, A>
+  <I, A>(
+    self: Schema<I, A>,
+    defaultValue: LazyArg<A>
+  ): FromOptionalSchema<Exclude<I, undefined>, A>
+} = dual(
+  2,
+  <I, A>(self: Schema<I, A>, defaultValue: LazyArg<A>) =>
+    fromOptional(
+      transform(
+        union(_undefined, self),
+        to(self),
+        (a) => a === undefined ? defaultValue() : a,
+        identity
+      )
+    )
+)
 
 /**
  * @since 1.0.0
