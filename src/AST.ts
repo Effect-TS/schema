@@ -1063,8 +1063,9 @@ export const required = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => required(ast.f()))
     case "Refinement":
+      throw new Error("`required` cannot handle refinements")
     case "Transform":
-      return required(ast.to)
+      throw new Error("`required` cannot handle transformations")
     default:
       return ast
   }

@@ -1,10 +1,14 @@
-import { pipe } from "@effect/data/Function"
+import { identity, pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 const NumberFromString = S.numberFromString(S.string)
 
 describe.concurrent("required", () => {
+  it("string", () => {
+    expect(S.required(S.string).ast).toEqual(S.string.ast)
+  })
+
   it("struct", async () => {
     const schema = S.required(S.struct({
       a: S.optional(pipe(NumberFromString, S.greaterThan(0)))
@@ -72,21 +76,48 @@ describe.concurrent("required", () => {
     )
   })
 
-  it("required/refinement", () => {
-    const schema = pipe(
-      S.struct({ a: S.optional(S.string), b: S.optional(S.string) }),
-      S.filter(({ a, b }) => a === b),
-      S.required
+  it("union", async () => {
+    const schema = S.required(S.union(
+      S.struct({ a: S.optional(S.string) }),
+      S.struct({ b: S.optional(S.number) })
+    ))
+    await Util.expectParseSuccess(schema, { a: "a" })
+    await Util.expectParseSuccess(schema, { b: 1 })
+    await Util.expectParseFailure(
+      schema,
+      {},
+      "union member: /a is missing, union member: /b is missing"
     )
-    expect(schema.ast).toEqual(S.struct({ a: S.string, b: S.string }).ast)
   })
 
-  it("required/transform", () => {
-    const schema = pipe(
-      S.string,
-      S.transform(S.struct({ a: S.optional(S.string) }), (a) => ({ a }), ({ a }) => a || ""),
-      S.required
+  it("lazy", async () => {
+    interface A {
+      readonly a: null | A
+    }
+    const schema: S.Schema<A> = S.required(S.lazy(() =>
+      S.struct({
+        a: S.optional(S.union(S.null, schema))
+      })
+    ))
+    await Util.expectParseSuccess(schema, { a: null })
+    await Util.expectParseSuccess(schema, { a: { a: null } })
+    await Util.expectParseFailure(schema, {}, "/a is missing")
+    await Util.expectParseFailure(
+      schema,
+      { a: {} },
+      "/a union member: /a is missing, union member: Expected null, actual {}"
     )
-    expect(schema.ast).toEqual(S.struct({ a: S.string }).ast)
+  })
+
+  it("refinement should throw", async () => {
+    expect(() => S.required(pipe(S.string, S.minLength(2)))).toThrowError(
+      new Error("`required` cannot handle refinements")
+    )
+  })
+
+  it("transformation should throw", async () => {
+    expect(() => S.required(S.transform(S.string, S.string, identity, identity))).toThrowError(
+      new Error("`required` cannot handle transformations")
+    )
   })
 })
