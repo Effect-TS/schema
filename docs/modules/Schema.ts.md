@@ -39,6 +39,7 @@ Added in v1.0.0
   - [partial](#partial)
   - [pick](#pick)
   - [record](#record)
+  - [required](#required)
   - [rest](#rest)
   - [struct](#struct)
   - [transform](#transform)
@@ -526,7 +527,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: <I, A>(self: Schema<I, A>) => Schema<Partial<I>, Partial<A>>
+export declare const partial: <I, A>(self: Schema<I, A>) => Schema<Spread<Partial<I>>, Spread<Partial<A>>>
 ```
 
 Added in v1.0.0
@@ -554,6 +555,16 @@ export declare const record: <K extends string | symbol, I, A>(
   key: Schema<K, K>,
   value: Schema<I, A>
 ) => Schema<{ readonly [k in K]: I }, { readonly [k in K]: A }>
+```
+
+Added in v1.0.0
+
+## required
+
+**Signature**
+
+```ts
+export declare const required: <I, A>(self: Schema<I, A>) => Schema<Spread<Required<I>>, Spread<Required<A>>>
 ```
 
 Added in v1.0.0

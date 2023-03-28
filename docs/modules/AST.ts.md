@@ -124,6 +124,7 @@ Added in v1.0.0
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
+  - [required](#required)
   - [reverse](#reverse)
   - [setAnnotation](#setannotation)
 
@@ -1445,6 +1446,18 @@ Equivalent at runtime to the built-in TypeScript utility type `Pick`.
 
 ```ts
 export declare const pick: (ast: AST, keys: ReadonlyArray<PropertyKey>) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## required
+
+Equivalent at runtime to the built-in TypeScript utility type `Required`.
+
+**Signature**
+
+```ts
+export declare const required: (ast: AST) => AST
 ```
 
 Added in v1.0.0
