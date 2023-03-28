@@ -124,10 +124,10 @@ const Person = S.struct({
 
 const parsePerson = S.parseEither(Person);
 
-const input: unknown = { name: "Alice", age: 30 }
+const input: unknown = { name: "Alice", age: 30 };
 
 const result1 = parsePerson(input);
- if (E.isRight(result1)) {
+if (E.isRight(result1)) {
   console.log(result1.right); // { name: "Alice", age: 30 }
 }
 
@@ -173,11 +173,11 @@ Error: error(s) found
 
 ### Excess properties
 
-When using a `Schema` to parse a value, any properties that are not specified in the `Schema` will result in a parsing error. This is because the `Schema` is expecting a specific shape for the parsed value, and any excess properties do not conform to that shape.
+When using a `Schema` to parse a value, any properties that are not specified in the `Schema` will be stripped out from the output. This is because the `Schema` is expecting a specific shape for the parsed value, and any excess properties do not conform to that shape.
 
-However, you can use the `isUnexpectedAllowed` option to allow excess properties while parsing. This can be useful in cases where you want to be permissive in the shape of the parsed value, but still want to catch any potential errors or unexpected values.
+However, you can use the `onExcessProperty` option (default value: `"ignore"`) to trigger a parsing error. This can be particularly useful in cases where you need to detect and handle potential errors or unexpected values.
 
-Here's an example of how you might use `isUnexpectedAllowed`:
+Here's an example of how you might use `onExcessProperty`:
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -188,26 +188,37 @@ const Person = S.struct({
 });
 
 console.log(
-  "%o",
-  S.parseEither(Person)(
-    {
-      name: "Bob",
-      age: 40,
-      email: "bob@example.com",
-    },
-    { isUnexpectedAllowed: true }
-  )
+  S.parse(Person)({
+    name: "Bob",
+    age: 40,
+    email: "bob@example.com",
+  })
 );
 /*
-{ _tag: 'Right', right: { name: 'Bob', age: 40 } }
+{ name: 'Bob', age: 40 }
+*/
+
+S.parse(Person)(
+  {
+    name: "Bob",
+    age: 40,
+    email: "bob@example.com",
+  },
+  { onExcessProperty: "error" }
+);
+/*
+throws
+Error: error(s) found
+└─ ["email"]
+   └─ is unexpected
 */
 ```
 
 ### All errors
 
-The `allErrors` option is a feature that allows you to receive all parsing errors when attempting to parse a value using a schema. By default only the first error is returned, but by setting the `allErrors` option to `true`, you can receive all errors that occurred during the parsing process. This can be useful for debugging or for providing more comprehensive error messages to the user.
+The `errors` option allows you to receive all parsing errors when attempting to parse a value using a schema. By default only the first error is returned, but by setting the `errors` option to `"all"`, you can receive all errors that occurred during the parsing process. This can be useful for debugging or for providing more comprehensive error messages to the user.
 
-Here's an example of how you might use `allErrors`:
+Here's an example of how you might use `errors`:
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -217,29 +228,21 @@ const Person = S.struct({
   age: S.number,
 });
 
-console.log(
-  "%o",
-  S.parseEither(Person)(
-    {
-      name: "Bob",
-      age: "abc",
-      email: "bob@example.com",
-    },
-    { allErrors: true }
-  )
+S.parse(Person)(
+  {
+    name: "Bob",
+    age: "abc",
+    email: "bob@example.com",
+  },
+  { errors: "all" }
 );
 /*
-{
-  _tag: 'Left',
-  left: {
-    _tag: 'ParseError',
-    errors: [
-      { _tag: 'Key', key: 'email', errors: [ [Object], [length]: 1 ] },
-      { _tag: 'Key', key: 'age', errors: [ [Object], [length]: 1 ] },
-      [length]: 2
-    ]
-  }
-}
+throws
+Error: error(s) found
+├─ ["email"]
+│  └─ is unexpected
+└─ ["age"]
+   └─ Expected number, actual "abc"
 */
 ```
 
@@ -356,7 +359,7 @@ import * as fc from "fast-check";
 
 const Person = S.struct({
   name: S.string,
-  age: pipe(S.string, S.numberFromString, S.int())
+  age: pipe(S.string, S.numberFromString, S.int()),
 });
 
 // Arbitrary for the To type
@@ -1028,7 +1031,12 @@ const decode = (s: string): [string] => [s];
 const encode = ([s]: readonly [string]): string => s;
 
 // use the transform combinator to convert the string schema into the tuple schema
-const transformedSchema: S.Schema<string, readonly [string]> = S.transform(S.string, S.tuple(S.string), decode, encode);
+const transformedSchema: S.Schema<string, readonly [string]> = S.transform(
+  S.string,
+  S.tuple(S.string),
+  decode,
+  encode
+);
 ```
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to parse values of type `string` into values of type `[string]`.
@@ -1047,12 +1055,19 @@ const decode = (s: string) =>
     ? PR.success(true)
     : s === "false"
     ? PR.success(false)
-    : PR.failure(PR.type(S.union(S.literal('true'), S.literal('false')).ast, s));
+    : PR.failure(
+        PR.type(S.union(S.literal("true"), S.literal("false")).ast, s)
+      );
 
 // define a function that converts a boolean into a string
 const encode = (b: boolean) => PR.success(String(b));
 
-const transformedSchema: S.Schema<string, boolean> = S.transformEffect(S.string, S.boolean, decode, encode);
+const transformedSchema: S.Schema<string, boolean> = S.transformEffect(
+  S.string,
+  S.boolean,
+  decode,
+  encode
+);
 ```
 
 ### String transformations

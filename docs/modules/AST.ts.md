@@ -913,8 +913,10 @@ Added in v1.0.0
 
 ```ts
 export interface ParseOptions {
-  readonly isUnexpectedAllowed?: boolean
-  readonly allErrors?: boolean
+  /** default "first" */
+  readonly errors?: 'first' | 'all'
+  /** default "ignore" */
+  readonly onExcessProperty?: 'ignore' | 'error'
 }
 ```
 
