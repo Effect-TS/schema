@@ -321,51 +321,6 @@ describe.concurrent("Encoder", () => {
     })
   })
 
-  // ---------------------------------------------
-  // isUnexpectedAllowed option
-  // ---------------------------------------------
-
-  const isUnexpectedAllowed: ParseOptions = {
-    isUnexpectedAllowed: true
-  }
-
-  it("isUnexpectedAllowed/union/struct choose the output more info", async () => {
-    const a = S.struct({ a: S.optional(S.number) })
-    const b = S.struct({ a: S.optional(S.number), b: S.optional(S.string) })
-    const schema = S.union(a, b)
-    await Util.expectEncodeSuccess(
-      schema,
-      { a: 1, b: "b", c: true } as any,
-      {
-        a: 1,
-        b: "b"
-      },
-      isUnexpectedAllowed
-    )
-  })
-
-  it("isUnexpectedAllowed/union/tuple choose the output more info", async () => {
-    const a = S.tuple(S.number)
-    const b = pipe(S.tuple(S.number), S.optionalElement(S.string))
-    const schema = S.union(a, b)
-    await Util.expectEncodeSuccess(
-      schema,
-      [1, "b", true] as any,
-      [1, "b"],
-      isUnexpectedAllowed
-    )
-  })
-
-  it("isUnexpectedAllowed/tuple unexpected indexes", async () => {
-    const schema = S.tuple(S.string)
-    await Util.expectEncodeSuccess(
-      schema,
-      ["a", 1, 2] as any,
-      ["a"],
-      isUnexpectedAllowed
-    )
-  })
-
   it("struct/ empty", async () => {
     const schema = S.struct({})
     await Util.expectEncodeSuccess(schema, {}, {})

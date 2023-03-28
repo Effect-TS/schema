@@ -384,11 +384,11 @@ const go = untracedMethod(() =>
               return PR.failure(e)
             }
           }
+
           // ---------------------------------------------
-          // handle unexpected indexes
+          // handle excess indexes
           // ---------------------------------------------
-          const isUnexpectedAllowed = options?.isUnexpectedAllowed
-          if (!isUnexpectedAllowed && O.isNone(ast.rest)) {
+          if (O.isNone(ast.rest)) {
             for (let i = ast.elements.length; i <= len - 1; i++) {
               const e = PR.index(i, [PR.unexpected(input[i])])
               if (allErrors) {
@@ -626,7 +626,7 @@ const go = untracedMethod(() =>
           }
 
           // ---------------------------------------------
-          // handle unexpected keys
+          // handle excess properties
           // ---------------------------------------------
           const isUnexpectedAllowed = options?.isUnexpectedAllowed
           if (!isUnexpectedAllowed && indexSignatures.length === 0) {
