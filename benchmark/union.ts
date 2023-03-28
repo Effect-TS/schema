@@ -1,5 +1,6 @@
+import * as D from "@effect/data/Debug"
 import * as RA from "@effect/data/ReadonlyArray"
-import * as D from "@effect/io/Debug"
+import type { ParseOptions } from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
@@ -37,7 +38,7 @@ const x = RA.makeBy(n, (i) =>
 const schemaZod = z.discriminatedUnion("kind", x)
 
 const parseEither = S.parseEither(schema)
-const options = { allErrors: true }
+const options: ParseOptions = { errors: "all" }
 
 const good = {
   kind: n - 1,

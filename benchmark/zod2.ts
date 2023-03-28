@@ -1,5 +1,6 @@
 import { pipe } from "@effect/data/Function"
-// import * as D from "@effect/io/Debug"
+import type { ParseOptions } from "@effect/schema/AST"
+// import * as D from "@effect/data/Debug"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
@@ -50,7 +51,7 @@ const bad = {
 }
 
 const parseEither = S.parseEither(schema)
-const options = { allErrors: true }
+const options: ParseOptions = { errors: "all" }
 
 // parseEither(good, options)
 // console.log(UserZod.safeParse(good))

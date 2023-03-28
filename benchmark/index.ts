@@ -1,4 +1,5 @@
-import * as D from "@effect/io/Debug"
+import * as D from "@effect/data/Debug"
+import type { ParseOptions } from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
@@ -91,7 +92,7 @@ export const schema = t.union(Asteroid, Planet, Ship)
 export const schemaZod = z.discriminatedUnion("type", [AsteroidZod, PlanetZod, ShipZod])
 
 export const parseEither = P.parseEither(schema)
-const options = { allErrors: true }
+const options: ParseOptions = { errors: "all" }
 
 const good = {
   type: "ship",
