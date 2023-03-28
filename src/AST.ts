@@ -1033,24 +1033,18 @@ export const partial = (ast: AST): AST => {
  */
 export const required = (ast: AST): AST => {
   switch (ast._tag) {
-    case "Tuple": {
-      const restElement = pipe(
-        ast.rest,
-        O.map((rest) => createUnion(rest))
-      )
-
+    case "Tuple":
       return createTuple(
-        [
-          ...ast.elements.map((e) => createElement(e.type, false)),
-          ...(O.isSome(restElement) ? [createElement(restElement.value, false)] : [])
-        ],
+        ast.elements.map((e) => createElement(e.type, false)),
         pipe(
           ast.rest,
-          O.map((rest) => [createUnion(rest)])
+          O.map((rest) => {
+            const u = createUnion([...rest])
+            return RA.mapNonEmpty(rest, () => u)
+          })
         ),
         ast.isReadonly
       )
-    }
     case "TypeLiteral":
       return createTypeLiteral(
         ast.propertySignatures.map((f) =>
@@ -1303,20 +1297,29 @@ const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   if (out.some(isUnknownKeyword)) {
     return [unknownKeyword]
   }
-  if (out.some(isStringKeyword)) {
-    out = out.filter((m) => !(isLiteral(m) && typeof m.literal === "string"))
+  let i: number
+  if ((i = out.findIndex(isStringKeyword)) !== -1) {
+    out = out.filter((m, j) =>
+      j === i || (!isStringKeyword(m) && !(isLiteral(m) && typeof m.literal === "string"))
+    )
   }
-  if (out.some(isNumberKeyword)) {
-    out = out.filter((m) => !(isLiteral(m) && typeof m.literal === "number"))
+  if ((i = out.findIndex(isNumberKeyword)) !== -1) {
+    out = out.filter((m, j) =>
+      j === i || (!isNumberKeyword(m) && !(isLiteral(m) && typeof m.literal === "number"))
+    )
   }
-  if (out.some(isBooleanKeyword)) {
-    out = out.filter((m) => !(isLiteral(m) && typeof m.literal === "boolean"))
+  if ((i = out.findIndex(isBooleanKeyword)) !== -1) {
+    out = out.filter((m, j) =>
+      j === i || (!isBooleanKeyword(m) && !(isLiteral(m) && typeof m.literal === "boolean"))
+    )
   }
-  if (out.some(isBigIntKeyword)) {
-    out = out.filter((m) => !(isLiteral(m) && typeof m.literal === "bigint"))
+  if ((i = out.findIndex(isBigIntKeyword)) !== -1) {
+    out = out.filter((m, j) =>
+      j === i || (!isBigIntKeyword(m) && !(isLiteral(m) && typeof m.literal === "bigint"))
+    )
   }
-  if (out.some(isSymbolKeyword)) {
-    out = out.filter((m) => !isUniqueSymbol(m))
+  if ((i = out.findIndex(isSymbolKeyword)) !== -1) {
+    out = out.filter((m, j) => j === i || (!isSymbolKeyword(m) && !isUniqueSymbol(m)))
   }
   return out
 }
