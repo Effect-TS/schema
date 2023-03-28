@@ -3,7 +3,7 @@ import * as Util from "@effect/schema/test/util"
 import * as _ from "@effect/schema/TreeFormatter"
 
 describe.concurrent("TreeFormatter", async () => {
-  it("formatErrors/ Unexpected", async () => {
+  it("formatErrors/ excess property", async () => {
     const schema = S.struct({ a: S.string })
     await Util.expectParseFailureTree(
       schema,

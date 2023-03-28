@@ -1,6 +1,5 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
-import type { ParseOptions } from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -211,21 +210,36 @@ describe.concurrent("Encoder", () => {
   it("struct/ required property signature", async () => {
     const schema = S.struct({ a: S.number })
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
-    await Util.expectEncodeFailure(schema, { a: 1, b: "b" } as any, `/b is unexpected`)
+    await Util.expectEncodeFailure(
+      schema,
+      { a: 1, b: "b" } as any,
+      `/b is unexpected`,
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ required property signature with undefined", async () => {
     const schema = S.struct({ a: S.union(S.number, S.undefined) })
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: undefined }, { a: undefined })
-    await Util.expectEncodeFailure(schema, { a: 1, b: "b" } as any, `/b is unexpected`)
+    await Util.expectEncodeFailure(
+      schema,
+      { a: 1, b: "b" } as any,
+      `/b is unexpected`,
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ optional property signature", async () => {
     const schema = S.struct({ a: S.optional(S.number) })
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
-    await Util.expectEncodeFailure(schema, { a: 1, b: "b" } as any, `/b is unexpected`)
+    await Util.expectEncodeFailure(
+      schema,
+      { a: 1, b: "b" } as any,
+      `/b is unexpected`,
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ optional property signature with undefined", async () => {
@@ -233,7 +247,12 @@ describe.concurrent("Encoder", () => {
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: undefined }, { a: undefined })
-    await Util.expectEncodeFailure(schema, { a: 1, b: "b" } as any, `/b is unexpected`)
+    await Util.expectEncodeFailure(
+      schema,
+      { a: 1, b: "b" } as any,
+      `/b is unexpected`,
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ should handle symbols as keys", async () => {
@@ -338,17 +357,13 @@ describe.concurrent("Encoder", () => {
   // allErrors option
   // ---------------------------------------------
 
-  const allErrors: ParseOptions = {
-    allErrors: true
-  }
-
   it("allErrors/tuple: unexpected indexes", async () => {
     const schema = S.tuple()
     await Util.expectEncodeFailure(
       schema,
       [1, 1] as any,
       `/0 is unexpected, /1 is unexpected`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -358,7 +373,7 @@ describe.concurrent("Encoder", () => {
       schema,
       [10, 10],
       `/0 Expected a string at most 1 character(s) long, actual "10", /1 Expected a string at most 1 character(s) long, actual "10"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -368,7 +383,7 @@ describe.concurrent("Encoder", () => {
       schema,
       [10, 10],
       `/0 Expected a string at most 1 character(s) long, actual "10", /1 Expected a string at most 1 character(s) long, actual "10"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -378,7 +393,7 @@ describe.concurrent("Encoder", () => {
       schema,
       [10, 10],
       `/0 Expected a string at most 1 character(s) long, actual "10", /1 Expected a string at most 1 character(s) long, actual "10"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -388,7 +403,7 @@ describe.concurrent("Encoder", () => {
       schema,
       { a: 10, b: 10 },
       `/a Expected a string at most 1 character(s) long, actual "10", /b Expected a string at most 1 character(s) long, actual "10"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -398,7 +413,7 @@ describe.concurrent("Encoder", () => {
       schema,
       { aa: "a", bb: "bb" },
       `/aa Expected a string at most 1 character(s) long, actual "aa", /bb Expected a string at most 1 character(s) long, actual "bb"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -408,7 +423,7 @@ describe.concurrent("Encoder", () => {
       schema,
       { a: "aa", b: "bb" },
       `/a Expected a string at most 1 character(s) long, actual "aa", /b Expected a string at most 1 character(s) long, actual "bb"`,
-      allErrors
+      Util.allErrors
     )
   })
 })

@@ -557,7 +557,12 @@ describe.concurrent("Decoder", () => {
       { a: undefined },
       "/a Expected number, actual undefined"
     )
-    await Util.expectParseFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectParseFailure(
+      schema,
+      { a: 1, b: "b" },
+      "/b is unexpected",
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ required property signature with undefined", async () => {
@@ -576,7 +581,12 @@ describe.concurrent("Decoder", () => {
       { a: "a" },
       `/a union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
     )
-    await Util.expectParseFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectParseFailure(
+      schema,
+      { a: 1, b: "b" },
+      "/b is unexpected",
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ optional property signature", async () => {
@@ -599,7 +609,12 @@ describe.concurrent("Decoder", () => {
       { a: undefined },
       `/a Expected number, actual undefined`
     )
-    await Util.expectParseFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectParseFailure(
+      schema,
+      { a: 1, b: "b" },
+      "/b is unexpected",
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ optional property signature with undefined", async () => {
@@ -618,7 +633,12 @@ describe.concurrent("Decoder", () => {
       { a: "a" },
       `/a union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
     )
-    await Util.expectParseFailure(schema, { a: 1, b: "b" }, "/b is unexpected")
+    await Util.expectParseFailure(
+      schema,
+      { a: 1, b: "b" },
+      "/b is unexpected",
+      Util.onExcessPropertyError
+    )
   })
 
   it("struct/ should not add optional keys", async () => {
@@ -1065,77 +1085,6 @@ describe.concurrent("Decoder", () => {
       schema,
       "a",
       `Expected a string matching the pattern ^abb+$, actual "a"`
-    )
-  })
-
-  // ---------------------------------------------
-  // isUnexpectedAllowed option
-  // ---------------------------------------------
-
-  const isUnexpectedAllowed: AST.ParseOptions = {
-    isUnexpectedAllowed: true
-  }
-
-  it("isUnexpectedAllowed/tuple of a struct", async () => {
-    const schema = S.tuple(S.struct({ b: S.number }))
-    await Util.expectParseSuccess(
-      schema,
-      [{ b: 1, c: "c" }],
-      [{ b: 1 }],
-      isUnexpectedAllowed
-    )
-  })
-
-  it("isUnexpectedAllowed/tuple rest element of a struct", async () => {
-    const schema = S.array(S.struct({ b: S.number }))
-    await Util.expectParseSuccess(
-      schema,
-      [{ b: 1, c: "c" }],
-      [{ b: 1 }],
-      isUnexpectedAllowed
-    )
-  })
-
-  it("isUnexpectedAllowed/tuple. post rest elements of a struct", async () => {
-    const schema = pipe(S.array(S.string), S.element(S.struct({ b: S.number })))
-    await Util.expectParseSuccess(schema, [{ b: 1 }])
-    await Util.expectParseSuccess(
-      schema,
-      [{ b: 1, c: "c" }],
-      [{ b: 1 }],
-      isUnexpectedAllowed
-    )
-  })
-
-  it("isUnexpectedAllowed/struct excess property signatures", async () => {
-    const schema = S.struct({ a: S.number })
-    await Util.expectParseSuccess(
-      schema,
-      { a: 1, b: "b" },
-      { a: 1 },
-      isUnexpectedAllowed
-    )
-  })
-
-  it("isUnexpectedAllowed/struct nested struct", async () => {
-    const schema = S.struct({ a: S.struct({ b: S.number }) })
-    await Util.expectParseSuccess(
-      schema,
-      { a: { b: 1, c: "c" } },
-      {
-        a: { b: 1 }
-      },
-      isUnexpectedAllowed
-    )
-  })
-
-  it("isUnexpectedAllowed/record of struct", async () => {
-    const schema = S.record(S.string, S.struct({ b: S.number }))
-    await Util.expectParseSuccess(
-      schema,
-      { a: { b: 1, c: "c" } },
-      { a: { b: 1 } },
-      isUnexpectedAllowed
     )
   })
 
