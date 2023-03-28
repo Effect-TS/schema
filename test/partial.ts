@@ -1,4 +1,4 @@
-import { pipe } from "@effect/data/Function"
+import { identity, pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
@@ -25,9 +25,21 @@ describe.concurrent("partial", () => {
     await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
   })
 
-  it("partial/refinement primitive", async () => {
+  it("declarations should throw", async () => {
+    expect(() => S.partial(S.optionFromSelf(S.string))).toThrowError(
+      new Error("`partial` cannot handle declarations")
+    )
+  })
+
+  it("refinements should throw", async () => {
     expect(() => S.partial(pipe(S.string, S.minLength(2)))).toThrowError(
-      new Error("`partial` cannot handle refinements or transformations")
+      new Error("`partial` cannot handle refinements")
+    )
+  })
+
+  it("transformations should throw", async () => {
+    expect(() => S.partial(S.transform(S.string, S.string, identity, identity))).toThrowError(
+      new Error("`partial` cannot handle transformations")
     )
   })
 })

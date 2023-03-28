@@ -1018,9 +1018,12 @@ export const partial = (ast: AST): AST => {
       return createUnion(ast.types.map((member) => partial(member)))
     case "Lazy":
       return createLazy(() => partial(ast.f()))
+    case "Declaration":
+      throw new Error("`partial` cannot handle declarations")
     case "Refinement":
+      throw new Error("`partial` cannot handle refinements")
     case "Transform":
-      throw new Error("`partial` cannot handle refinements or transformations")
+      throw new Error("`partial` cannot handle transformations")
     default:
       return ast
   }
