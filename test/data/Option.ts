@@ -91,6 +91,18 @@ describe.concurrent("Option", () => {
     })
   })
 
+  it("optionFromOptional", async () => {
+    const schema = S.struct({
+      a: S.optionFromOptional(S.number)
+    })
+    await Util.expectParseSuccess(schema, {}, { a: O.none() })
+    await Util.expectParseSuccess(schema, { a: 1 }, { a: O.some(1) })
+    await Util.expectParseFailure(schema, null, `Expected a generic object, actual null`)
+
+    await Util.expectEncodeSuccess(schema, { a: O.none() }, {})
+    await Util.expectEncodeSuccess(schema, { a: O.some(1) }, { a: 1 })
+  })
+
   it("optionsFromOptionals", async () => {
     expect(() => pipe(S.object, S.optionsFromOptionals({ "b": S.number }))).toThrowError(
       new Error(

@@ -449,6 +449,46 @@ export const optional = <I, A>(schema: Schema<I, A>): OptionalSchema<I, A> => {
 /**
  * @since 1.0.0
  */
+export const FromOptionalSchemaId = Symbol.for("@effect/schema/Schema/FromOptionalSchema")
+
+/**
+ * @since 1.0.0
+ */
+export type FromOptionalSchemaId = typeof FromOptionalSchemaId
+
+/**
+ * @since 1.0.0
+ */
+export interface FromOptionalSchema<From, To = From> extends Schema<From, To> {
+  readonly _id: FromOptionalSchemaId
+}
+
+const isFromOptionalSchema = <I, A>(schema: object): schema is FromOptionalSchema<I, A> =>
+  "_id" in schema && schema["_id"] === FromOptionalSchemaId
+
+/**
+ * @since 1.0.0
+ */
+export const fromOptional = <I, A>(
+  schema: Schema<I | undefined, A>
+): FromOptionalSchema<Exclude<I, undefined>, A> => {
+  const out: any = make(schema.ast)
+  out["_id"] = FromOptionalSchemaId
+  return out
+}
+
+/**
+ * @since 1.0.0
+ */
+export type FromOptionalKeys<T> = {
+  [K in keyof T]: T[K] extends FromOptionalSchema<any> ? K
+    : T[K] extends OptionalSchema<any> ? K
+    : never
+}[keyof T]
+
+/**
+ * @since 1.0.0
+ */
 export type OptionalKeys<T> = {
   [K in keyof T]: T[K] extends OptionalSchema<any> ? K : never
 }[keyof T]
@@ -457,31 +497,63 @@ export type OptionalKeys<T> = {
  * @category combinators
  * @since 1.0.0
  */
-export const struct = <Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any>>>(
+export const struct = <
+  Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any> | FromOptionalSchema<any>>
+>(
   fields: Fields
 ): Schema<
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields>]?: From<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
+    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
   Spread<
     & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> }
   >
-> =>
-  make(
-    AST.createTypeLiteral(
-      I.ownKeys(fields).map((key) =>
-        AST.createPropertySignature(
-          key,
-          (fields[key] as any).ast,
-          isOptionalSchema(fields[key]),
-          true
-        )
-      ),
-      []
-    )
+> => {
+  const fieldKeys = I.ownKeys(fields)
+  const fromOptionals = fieldKeys.filter((key) => isFromOptionalSchema(fields[key]))
+  const fromOptionalsLen = fromOptionals.length
+
+  const from = AST.createTypeLiteral(
+    fieldKeys.map((key) =>
+      AST.createPropertySignature(
+        key,
+        (fields[key] as any).ast,
+        isOptionalSchema(fields[key]) || isFromOptionalSchema(fields[key]),
+        true
+      )
+    ),
+    []
   )
+  if (fromOptionalsLen === 0) {
+    return make(from)
+  }
+
+  return make(AST.createTransform(unknown.ast, from, (input) => {
+    if (typeof input !== "object" || input === null) {
+      return PR.success(input)
+    }
+
+    const o = { ...input }
+    for (let i = 0; i < fromOptionalsLen; i++) {
+      const key = fromOptionals[i]
+      if (!Object.prototype.hasOwnProperty.call(input, key)) {
+        o[key] = undefined
+      }
+    }
+    return PR.success(o)
+  }, (a) => {
+    const o = { ...a }
+    for (let i = 0; i < fromOptionalsLen; i++) {
+      const key = fromOptionals[i]
+      if (a[key] === undefined) {
+        delete o[key]
+      }
+    }
+    return PR.success(o)
+  }))
+}
 
 /**
  * @category combinators
@@ -1947,6 +2019,23 @@ export const optionFromNullable = <I, A>(
   value: Schema<I, A>
 ): Schema<I | null | undefined, Option<A>> =>
   transform(union(_undefined, _null, value), to(optionFromSelf(value)), O.fromNullable, O.getOrNull)
+
+/**
+ * @category parsers
+ * @since 1.0.0
+ */
+export const optionFromOptional = <I, A>(
+  value: Schema<I, A>
+): FromOptionalSchema<Exclude<I | null, undefined>, Option<A>> => {
+  return fromOptional(
+    transform(
+      union(_undefined, _null, value),
+      to(optionFromSelf(value)),
+      O.fromNullable,
+      O.getOrUndefined
+    )
+  )
+}
 
 /**
  * @category parsers
