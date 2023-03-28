@@ -30,7 +30,8 @@ describe.concurrent("TreeFormatter", async () => {
       { a: "a", b: 1 },
       `error(s) found
 └─ ["b"]
-   └─ is unexpected`
+   └─ is unexpected`,
+      Util.onExcessPropertyError
     )
   })
 
@@ -61,7 +62,7 @@ describe.concurrent("TreeFormatter", async () => {
    │  └─ Expected string, actual null
    └─ [1]["d"]
       └─ Expected string, actual 1`,
-      { allErrors: true }
+      Util.allErrors
     )
   })
 

@@ -315,7 +315,18 @@ describe.concurrent("Encoder", () => {
     const ab = S.struct({ a: S.string, b: S.optional(S.number) })
     const ac = S.struct({ a: S.string, c: S.optional(S.number) })
     const schema = S.union(ab, ac)
-    await Util.expectEncodeSuccess(schema, { a: "a", c: 1 }, { a: "a", c: 1 })
+    await Util.expectEncodeSuccess(
+      schema,
+      { a: "a", c: 1 },
+      { a: "a" },
+      Util.onExcessPropertyIgnore
+    )
+    await Util.expectEncodeSuccess(
+      schema,
+      { a: "a", c: 1 },
+      { a: "a", c: 1 },
+      Util.onExcessPropertyError
+    )
   })
 
   it("lazy", async () => {

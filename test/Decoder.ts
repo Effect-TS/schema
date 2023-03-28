@@ -1,5 +1,4 @@
 import { pipe } from "@effect/data/Function"
-import type * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
@@ -873,7 +872,18 @@ describe.concurrent("Decoder", () => {
     const ab = S.struct({ a: S.string, b: S.optional(S.number) })
     const ac = S.struct({ a: S.string, c: S.optional(S.number) })
     const schema = S.union(ab, ac)
-    await Util.expectParseSuccess(schema, { a: "a", c: 1 })
+    await Util.expectParseSuccess(
+      schema,
+      { a: "a", c: 1 },
+      { a: "a" },
+      Util.onExcessPropertyIgnore
+    )
+    await Util.expectParseSuccess(
+      schema,
+      { a: "a", c: 1 },
+      { a: "a", c: 1 },
+      Util.onExcessPropertyError
+    )
   })
 
   it("lazy/ baseline", async () => {
@@ -1092,25 +1102,19 @@ describe.concurrent("Decoder", () => {
   // allErrors option
   // ---------------------------------------------
 
-  const allErrors: AST.ParseOptions = {
-    allErrors: true
-  }
-
   it("allErrors/tuple. e r e", async () => {
     const schema = pipe(S.tuple(S.string), S.rest(S.number), S.element(S.boolean))
     await Util.expectParseFailure(
       schema,
       [true],
       `/1 is missing, /0 Expected string, actual true`,
-      {
-        allErrors: true
-      }
+      Util.allErrors
     )
   })
 
   it("allErrors/tuple: missing element", async () => {
     const schema = S.tuple(S.string, S.number)
-    await Util.expectParseFailure(schema, [], `/0 is missing, /1 is missing`, allErrors)
+    await Util.expectParseFailure(schema, [], `/0 is missing, /1 is missing`, Util.allErrors)
   })
 
   it("allErrors/tuple: wrong type for values", async () => {
@@ -1119,7 +1123,7 @@ describe.concurrent("Decoder", () => {
       schema,
       [1, "b"],
       `/0 Expected string, actual 1, /1 Expected number, actual "b"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -1129,7 +1133,7 @@ describe.concurrent("Decoder", () => {
       schema,
       ["a", "b"],
       `/0 is unexpected, /1 is unexpected`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -1139,7 +1143,7 @@ describe.concurrent("Decoder", () => {
       schema,
       ["a", "b", "c"],
       `/1 Expected number, actual "b", /2 Expected number, actual "c"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -1149,13 +1153,13 @@ describe.concurrent("Decoder", () => {
       schema,
       ["a", "b"],
       `/0 Expected number, actual "a", /1 Expected number, actual "b"`,
-      allErrors
+      Util.allErrors
     )
   })
 
   it("allErrors/struct: missing keys", async () => {
     const schema = S.struct({ a: S.string, b: S.number })
-    await Util.expectParseFailure(schema, {}, `/a is missing, /b is missing`, allErrors)
+    await Util.expectParseFailure(schema, {}, `/a is missing, /b is missing`, Util.allErrors)
   })
 
   it("allErrors/struct: wrong type for values", async () => {
@@ -1164,7 +1168,7 @@ describe.concurrent("Decoder", () => {
       schema,
       { a: 1, b: "b" },
       `/a Expected string, actual 1, /b Expected number, actual "b"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -1174,7 +1178,7 @@ describe.concurrent("Decoder", () => {
       schema,
       { a: 1, b: "b", c: "c" },
       `/b is unexpected, /c is unexpected`,
-      allErrors
+      { ...Util.allErrors, ...Util.onExcessPropertyError }
     )
   })
 
@@ -1184,7 +1188,7 @@ describe.concurrent("Decoder", () => {
       schema,
       { a: 1, b: 2 },
       `/a Expected a string at least 2 character(s) long, actual "a", /b Expected a string at least 2 character(s) long, actual "b"`,
-      allErrors
+      Util.allErrors
     )
   })
 
@@ -1194,7 +1198,7 @@ describe.concurrent("Decoder", () => {
       schema,
       { a: "a", b: "b" },
       `/a Expected number, actual "a", /b Expected number, actual "b"`,
-      allErrors
+      Util.allErrors
     )
   })
 })
