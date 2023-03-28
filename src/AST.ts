@@ -1062,6 +1062,8 @@ export const required = (ast: AST): AST => {
       return createUnion(ast.types.map((member) => required(member)))
     case "Lazy":
       return createLazy(() => required(ast.f()))
+    case "Declaration":
+      throw new Error("`required` cannot handle declarations")
     case "Refinement":
       throw new Error("`required` cannot handle refinements")
     case "Transform":

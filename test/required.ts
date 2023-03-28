@@ -109,13 +109,19 @@ describe.concurrent("required", () => {
     )
   })
 
-  it("refinement should throw", async () => {
+  it("declarations should throw", async () => {
+    expect(() => S.required(S.optionFromSelf(S.string))).toThrowError(
+      new Error("`required` cannot handle declarations")
+    )
+  })
+
+  it("refinements should throw", async () => {
     expect(() => S.required(pipe(S.string, S.minLength(2)))).toThrowError(
       new Error("`required` cannot handle refinements")
     )
   })
 
-  it("transformation should throw", async () => {
+  it("transformations should throw", async () => {
     expect(() => S.required(S.transform(S.string, S.string, identity, identity))).toThrowError(
       new Error("`required` cannot handle transformations")
     )
