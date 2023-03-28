@@ -3,6 +3,26 @@ import * as Util from "@effect/schema/test/util"
 import * as _ from "@effect/schema/TreeFormatter"
 
 describe.concurrent("TreeFormatter", async () => {
+  it("formatErrors/ forbidden", async () => {
+    const schema = Util.effectifySchema(S.struct({ a: S.string }), "all")
+    expect(() => S.parse(schema)({ a: "a" })).toThrowError(
+      new Error(`error(s) found
+└─ ["a"]
+   └─ is forbidden`)
+    )
+  })
+
+  it("formatErrors/ missing", async () => {
+    const schema = S.struct({ a: S.string })
+    await Util.expectParseFailureTree(
+      schema,
+      {},
+      `error(s) found
+└─ ["a"]
+   └─ is missing`
+    )
+  })
+
   it("formatErrors/ excess property", async () => {
     const schema = S.struct({ a: S.string })
     await Util.expectParseFailureTree(
