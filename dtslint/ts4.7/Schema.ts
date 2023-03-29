@@ -426,3 +426,18 @@ pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")
 
 // $ExpectType Schema<{ readonly radius: string; }, { readonly radius: number; readonly kind: "circle"; }>
 pipe(S.struct({ radius: NumberFromString }), S.attachPropertySignature("kind", "circle"))
+
+// ---------------------------------------------
+// filter
+// ---------------------------------------------
+
+const predicate = (u: unknown) => typeof u === 'string'
+const FromFilter = S.union(S.string, S.number)
+
+// $ExpectType Schema<string | number, string | number>
+pipe(FromFilter, S.filter(predicate))
+
+const FromRefinement = S.struct({ a: S.optional(S.string), b: S.optional(S.number) })
+
+// $ExpectType Schema<{ readonly a?: string; readonly b?: number; }, { readonly a?: string; readonly b: number; }>
+pipe(FromRefinement, S.filter(S.is(S.struct({ b: S.number }))))

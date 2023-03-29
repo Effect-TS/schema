@@ -307,7 +307,9 @@ but rather maps to another schema, for example when you want to add a discrimina
 export declare const attachPropertySignature: <K extends string | number | symbol, V extends AST.LiteralValue>(
   key: K,
   value: V
-) => <I, A extends object>(schema: Schema<I, A>) => Schema<I, Spread<A & { readonly [k in K]: V }>>
+) => <I, A extends object>(
+  schema: Schema<I, A>
+) => Schema<I, { [K in keyof (A & { readonly [k in K]: V })]: (A & { readonly [k in K]: V })[K] }>
 ```
 
 **Example**
@@ -413,7 +415,7 @@ Added in v1.0.0
 ```ts
 export declare const extend: <IB, B>(
   that: Schema<IB, B>
-) => <I, A>(self: Schema<I, A>) => Schema<Spread<I & IB>, Spread<A & B>>
+) => <I, A>(self: Schema<I, A>) => Schema<{ [K in keyof (I & IB)]: (I & IB)[K] }, { [K in keyof (A & B)]: (A & B)[K] }>
 ```
 
 Added in v1.0.0
@@ -423,14 +425,14 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function filter<A, B extends A>(
+export declare function filter<C extends A, B extends A, A = C>(
   refinement: Refinement<A, B>,
   options?: AnnotationOptions<A>
-): <I>(self: Schema<I, A>) => Schema<I, B>
-export declare function filter<A>(
+): <I>(self: Schema<I, C>) => Schema<I, Spread<C & B>>
+export declare function filter<B extends A, A = B>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
-): <I>(self: Schema<I, A>) => Schema<I, A>
+): <I>(self: Schema<I, B>) => Schema<I, B>
 ```
 
 Added in v1.0.0
@@ -527,7 +529,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: <I, A>(self: Schema<I, A>) => Schema<Spread<Partial<I>>, Spread<Partial<A>>>
+export declare const partial: <I, A>(
+  self: Schema<I, A>
+) => Schema<{ [K in keyof Partial<I>]: Partial<I>[K] }, { [K in keyof Partial<A>]: Partial<A>[K] }>
 ```
 
 Added in v1.0.0
@@ -564,7 +568,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const required: <I, A>(self: Schema<I, A>) => Schema<Spread<Required<I>>, Spread<Required<A>>>
+export declare const required: <I, A>(
+  self: Schema<I, A>
+) => Schema<{ [K in keyof Required<I>]: Required<I>[K] }, { [K in keyof Required<A>]: Required<A>[K] }>
 ```
 
 Added in v1.0.0
@@ -593,16 +599,20 @@ export declare const struct: <
 >(
   fields: Fields
 ) => Schema<
-  Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> } & {
+  {
+    [K in keyof ({ readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> } & {
       readonly [K in OptionalKeys<Fields>]?: From<Fields[K]> | undefined
-    }
-  >,
-  Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> } & {
+    })]: ({ readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> } & {
+      readonly [K in OptionalKeys<Fields>]?: From<Fields[K]> | undefined
+    })[K]
+  },
+  {
+    [K in keyof ({ readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> } & {
       readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> | undefined
-    }
-  >
+    })]: ({ readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> } & {
+      readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> | undefined
+    })[K]
+  }
 >
 ```
 
@@ -1422,8 +1432,16 @@ export declare const optionsFromOptionals: <Fields extends Record<string | numbe
 ) => <I, A extends object>(
   schema: Schema<I, A>
 ) => Schema<
-  Spread<I & { readonly [K in keyof Fields]?: From<Fields[K]> | undefined }>,
-  Spread<A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> }>
+  {
+    [K in keyof (I & { readonly [K in keyof Fields]?: From<Fields[K]> | undefined })]: (I & {
+      readonly [K in keyof Fields]?: From<Fields[K]> | undefined
+    })[K]
+  },
+  {
+    [K in keyof (A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> })]: (A & {
+      readonly [K in keyof Fields]: Option<To<Fields[K]>>
+    })[K]
+  }
 >
 ```
 
@@ -2010,11 +2028,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type Spread<A> = {
-  [K in keyof A]: A[K]
-} extends infer B
-  ? B
-  : never
+export type Spread<A> = { [K in keyof A]: A[K] } & {}
 ```
 
 Added in v1.0.0
