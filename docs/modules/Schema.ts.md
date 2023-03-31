@@ -428,7 +428,7 @@ Added in v1.0.0
 export declare function filter<C extends A, B extends A, A = C>(
   refinement: Refinement<A, B>,
   options?: AnnotationOptions<A>
-): <I>(self: Schema<I, C>) => Schema<I, Spread<C & B>>
+): <I>(self: Schema<I, C>) => Schema<I, C & B>
 export declare function filter<B extends A, A = B>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
@@ -1680,7 +1680,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type From<S extends { readonly From: (_: any) => any }> = Parameters<S['From']>[0]
+export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S['From']>[0]
 ```
 
 Added in v1.0.0
@@ -2048,7 +2048,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type To<S extends { readonly To: (_: any) => any }> = Parameters<S['To']>[0]
+export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
 ```
 
 Added in v1.0.0
