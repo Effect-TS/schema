@@ -9,10 +9,11 @@ D.runtimeDebug.tracingEnabled = true
 
 /*
 n = 100
-parseEither (good) x 423,411 ops/sec ±0.82% (84 runs sampled)
-zod (good) x 773,350 ops/sec ±7.44% (78 runs sampled)
-parseEither (bad) x 363,213 ops/sec ±2.59% (89 runs sampled)
-zod (bad) x 853,607 ops/sec ±1.29% (89 runs sampled)
+parseEither (good) x 2,048,528 ops/sec ±0.80% (95 runs sampled)
+zod (good) x 1,344,811 ops/sec ±0.21% (98 runs sampled)
+parseEither (bad) x 1,526,846 ops/sec ±0.08% (95 runs sampled)
+zod (bad) x 1,302,142 ops/sec ±2.92% (92 runs sampled)
+Fastest is parseEither (good)
 */
 
 const suite = new Benchmark.Suite()
