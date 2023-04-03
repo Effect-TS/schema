@@ -613,7 +613,7 @@ const go = untracedMethod(() =>
             const ps = ast.propertySignatures[i]
             const name = ps.name
             if (!Object.prototype.hasOwnProperty.call(input, name)) {
-              if (!ps.isOptional) {
+              if (ps.isOptional === "never") {
                 const e = PR.key(name, [PR.missing])
                 if (allErrors) {
                   es.push([stepKey++, e])
@@ -659,7 +659,7 @@ const go = untracedMethod(() =>
             const ps = ast.propertySignatures[i]
             const parser = propertySignaturesTypes[i]
             const name = ps.name
-            if (Object.prototype.hasOwnProperty.call(input, name)) {
+            if (Object.prototype.hasOwnProperty.call(input, name) || ps.isOptional === "fromOnly") {
               const te = parser(input[name], options)
               const t = PR.eitherOrUndefined(te)
               if (t) {
@@ -700,11 +700,6 @@ const go = untracedMethod(() =>
                   )
                 )
               }
-            } else if (ps.isOptional && AST.DefaultValueAnnotationId in ps.type.annotations) {
-              output[name] =
-                (ps.type.annotations[AST.DefaultValueAnnotationId] as AST.DefaultValueAnnotation<
-                  unknown
-                >)()
             }
           }
 
@@ -959,7 +954,7 @@ export const _getLiterals = (
       for (let i = 0; i < ast.propertySignatures.length; i++) {
         const propertySignature = ast.propertySignatures[i]
         const type = AST.getFrom(propertySignature.type)
-        if (AST.isLiteral(type) && !propertySignature.isOptional) {
+        if (AST.isLiteral(type) && propertySignature.isOptional === "never") {
           out.push([propertySignature.name, type])
         }
       }

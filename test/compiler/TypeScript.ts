@@ -287,7 +287,7 @@ const typeScriptFor = <A>(schema: S.Schema<A>): TypeScript<A> => {
                         [ts.factory.createModifier(ts.SyntaxKind.ReadonlyKeyword)] :
                         undefined,
                       getPropertyName(ps),
-                      ps.isOptional ?
+                      ps.isOptional !== "never" ?
                         ts.factory.createToken(ts.SyntaxKind.QuestionToken) :
                         undefined,
                       type
@@ -837,7 +837,7 @@ describe.concurrent("TypeScript", () => {
     it("property signatures", () => {
       const schema = S.make(AST.createTypeLiteral(
         [
-          AST.createPropertySignature("a", AST.stringKeyword, false, true, {
+          AST.createPropertySignature("a", AST.stringKeyword, "never", true, {
             [AST.DocumentationAnnotationId]: "description"
           })
         ],

@@ -429,33 +429,36 @@ export type OptionalSchemaId = typeof OptionalSchemaId
 /**
  * @since 1.0.0
  */
-export interface OptionalSchema<From, To = From, WithDefault = false> {
+export interface OptionalSchema<From, To = From, ToRequired = false> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
-  readonly WithDefault: (_: never) => WithDefault
   readonly _id: OptionalSchemaId
+  readonly toRequired: ToRequired
 }
 
 const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A, boolean> =>
   "_id" in schema && schema["_id"] === OptionalSchemaId
 
+const isToRequiredOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A, true> =>
+  isOptionalSchema(schema) && schema.toRequired
+
 /**
  * @since 1.0.0
  */
-export const optional: {
-  <I, A>(schema: Schema<I, A>): OptionalSchema<I, A, false>
-  <I, A>(schema: Schema<I, A>, defaultValue: LazyArg<A>): OptionalSchema<I, A, true>
-} = <I, A>(schema: Schema<I, A>, defaultValue?: LazyArg<A>) => {
-  const out: any = make(
-    defaultValue ?
-      AST.setAnnotation(
-        schema.ast,
-        AST.DefaultValueAnnotationId,
-        defaultValue
-      ) :
-      schema.ast
-  )
+export const optional = <I, A>(schema: Schema<I, A>): OptionalSchema<I, A, false> => {
+  const out: any = make(schema.ast)
   out["_id"] = OptionalSchemaId
+  return out
+}
+
+/**
+ * @since 1.0.0
+ */
+export const optionalToRequired = <I, A>(
+  schema: Schema<I | undefined, A>
+): OptionalSchema<Exclude<I, undefined>, A, true> => {
+  const out: any = optional(schema)
+  out.toRequired = true
   return out
 }
 
@@ -466,7 +469,16 @@ export const optional: {
 export const withDefault: {
   <A>(defaultValue: LazyArg<A>): <I>(self: Schema<I, A>) => OptionalSchema<I, A, true>
   <I, A>(self: Schema<I, A>, defaultValue: LazyArg<A>): OptionalSchema<I, A, true>
-} = dual(2, <I, A>(self: Schema<I, A>, defaultValue: LazyArg<A>) => optional(self, defaultValue))
+} = dual(
+  2,
+  <I, A>(self: Schema<I, A>, defaultValue: LazyArg<A>) =>
+    optionalToRequired(transform(
+      union(_undefined, self),
+      to(self),
+      (i) => (i === undefined ? defaultValue() : i),
+      identity
+    ))
+)
 
 /**
  * @since 1.0.0
@@ -506,7 +518,11 @@ export const struct = <
       AST.createPropertySignature(
         key,
         (fields[key] as any).ast,
-        isOptionalSchema(fields[key]),
+        isToRequiredOptionalSchema(fields[key]) ?
+          "fromOnly" :
+          isOptionalSchema(fields[key]) ?
+          "always" :
+          "never",
         true
       )
     ),
@@ -1985,15 +2001,14 @@ export const optionFromNullable = <I, A>(
 export const optionFromOptional = <I, A>(
   value: Schema<I, A>
 ): OptionalSchema<Exclude<I | null, undefined>, Option<A>, true> =>
-  optional(
+  optionalToRequired(
     transform(
       union(_undefined, _null, value),
       to(optionFromSelf(value)),
       O.fromNullable,
       O.getOrUndefined
-    ),
-    O.none
-  ) as any
+    )
+  )
 
 /**
  * @category parsers
@@ -2025,14 +2040,14 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
         const encode = AST.isTypeLiteral(ast) ? PR.success : ast.encode
         const from2 = AST.createTypeLiteral(
           from.propertySignatures.concat(
-            ownKeys.map((key) => AST.createPropertySignature(key, fields[key].ast, true, true))
+            ownKeys.map((key) => AST.createPropertySignature(key, fields[key].ast, "always", true))
           ),
           from.indexSignatures
         )
         const to2 = AST.createTypeLiteral(
           to.propertySignatures.concat(
             ownKeys.map((key) =>
-              AST.createPropertySignature(key, optionFromSelf(fields[key]).ast, false, true)
+              AST.createPropertySignature(key, optionFromSelf(fields[key]).ast, "never", true)
             )
           ),
           to.indexSignatures

@@ -484,7 +484,7 @@ describe.concurrent("Schema", () => {
               return AST.createPropertySignature(
                 isOptional ? key.substring(0, key.length - 1) : key,
                 fields[key].ast,
-                isOptional,
+                isOptional ? "always" : "never",
                 true
               )
             }),
@@ -627,11 +627,17 @@ describe.concurrent("Schema", () => {
       b: pipe(
         S.number,
         S.greaterThan(0),
-        S.withDefault(() => 1)
+        S.withDefault(() => -1)
       )
     })
 
-    expect(S.decode(schema)({ a: "a" })).toEqual({ a: "a", b: 1 })
+    expect(() => S.decode(schema)({ a: "a" })).toThrowError(
+      new Error(
+        `error(s) found
+└─ ["b"]
+   └─ Expected a number greater than 0, actual -1`
+      )
+    )
   })
 
   test("withDefault/ extend", () => {

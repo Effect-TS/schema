@@ -208,7 +208,7 @@ const jsonSchemaFor = <A>(schema: Schema<A>): JsonSchema7Type => {
             // ---------------------------------------------
             // handle optional property signatures
             // ---------------------------------------------
-            if (!ast.propertySignatures[i].isOptional) {
+            if (ast.propertySignatures[i].isOptional === "never") {
               output.required.push(name)
             }
           } else {

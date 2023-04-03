@@ -135,7 +135,7 @@ export const match: AST.Match<Pretty<any>> = {
       for (let i = 0; i < propertySignaturesTypes.length; i++) {
         const ps = ast.propertySignatures[i]
         const name = ps.name
-        if (ps.isOptional && !Object.prototype.hasOwnProperty.call(input, name)) {
+        if (ps.isOptional !== "never" && !Object.prototype.hasOwnProperty.call(input, name)) {
           continue
         }
         output.push(

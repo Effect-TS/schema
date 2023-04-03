@@ -160,7 +160,7 @@ const go = (ast: AST.AST): Arbitrary<any> => {
         for (let i = 0; i < propertySignaturesTypes.length; i++) {
           const ps = ast.propertySignatures[i]
           const name = ps.name
-          if (!ps.isOptional) {
+          if (ps.isOptional === "never") {
             requiredKeys.push(name)
           }
           arbs[name] = propertySignaturesTypes[i](fc)

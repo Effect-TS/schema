@@ -98,7 +98,10 @@ describe.concurrent("AST", () => {
 
   it("createRecord/ numeric literal", () => {
     expect(AST.createRecord(AST.createLiteral(1), AST.numberKeyword, true)).toEqual(
-      AST.createTypeLiteral([AST.createPropertySignature(1, AST.numberKeyword, false, true)], [])
+      AST.createTypeLiteral(
+        [AST.createPropertySignature(1, AST.numberKeyword, "never", true)],
+        []
+      )
     )
   })
 
@@ -357,8 +360,8 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
-          AST.createPropertySignature("b", AST.createLiteral("b"), false, true),
-          AST.createPropertySignature("a", AST.stringKeyword, false, true)
+          AST.createPropertySignature("b", AST.createLiteral("b"), "never", true),
+          AST.createPropertySignature("a", AST.stringKeyword, "never", true)
         ],
         indexSignatures: [],
         annotations: {},
@@ -371,8 +374,8 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
-          AST.createPropertySignature("b", AST.undefinedKeyword, false, true),
-          AST.createPropertySignature("a", AST.stringKeyword, false, true)
+          AST.createPropertySignature("b", AST.undefinedKeyword, "never", true),
+          AST.createPropertySignature("a", AST.stringKeyword, "never", true)
         ],
         indexSignatures: [],
         annotations: {},
@@ -385,8 +388,8 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
-          AST.createPropertySignature("b", AST.booleanKeyword, false, true),
-          AST.createPropertySignature("a", AST.stringKeyword, false, true)
+          AST.createPropertySignature("b", AST.booleanKeyword, "never", true),
+          AST.createPropertySignature("a", AST.stringKeyword, "never", true)
         ],
         indexSignatures: [],
         annotations: {},
@@ -399,8 +402,8 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
-          AST.createPropertySignature("b", AST.createLiteral(null), false, true),
-          AST.createPropertySignature("a", AST.booleanKeyword, false, true)
+          AST.createPropertySignature("b", AST.createLiteral(null), "never", true),
+          AST.createPropertySignature("a", AST.booleanKeyword, "never", true)
         ],
         indexSignatures: [],
         annotations: {},

@@ -15,7 +15,7 @@ describe.concurrent("getPropertySignatures", () => {
       AST.createPropertySignature(
         "_tag",
         S.union(S.literal("Some"), S.literal("None")).ast,
-        false,
+        "never",
         true
       )
     ])
@@ -24,16 +24,16 @@ describe.concurrent("getPropertySignatures", () => {
   it("_getPropertySignatures/ tuple", () => {
     const schema = S.tuple(S.string, S.number)
     expect(AST._getPropertySignatures(schema.ast)).toEqual([
-      AST.createPropertySignature(0, S.string.ast, false, true),
-      AST.createPropertySignature(1, S.number.ast, false, true)
+      AST.createPropertySignature(0, S.string.ast, "never", true),
+      AST.createPropertySignature(1, S.number.ast, "never", true)
     ])
   })
 
   it("_getPropertySignatures/struct string keys", () => {
     const schema = S.struct({ a: S.string, b: S.number })
     expect(AST._getPropertySignatures(schema.ast)).toEqual([
-      AST.createPropertySignature("a", S.string.ast, false, true),
-      AST.createPropertySignature("b", S.number.ast, false, true)
+      AST.createPropertySignature("a", S.string.ast, "never", true),
+      AST.createPropertySignature("b", S.number.ast, "never", true)
     ])
   })
 
@@ -42,8 +42,8 @@ describe.concurrent("getPropertySignatures", () => {
     const b = Symbol.for("@effect/schema/test/b")
     const schema = S.struct({ [a]: S.string, [b]: S.number })
     expect(AST._getPropertySignatures(schema.ast)).toEqual([
-      AST.createPropertySignature(a, S.string.ast, false, true),
-      AST.createPropertySignature(b, S.number.ast, false, true)
+      AST.createPropertySignature(a, S.string.ast, "never", true),
+      AST.createPropertySignature(b, S.number.ast, "never", true)
     ])
   })
 
@@ -56,7 +56,7 @@ describe.concurrent("getPropertySignatures", () => {
       AST.createPropertySignature(
         "a",
         AST.createUnion([S.string.ast, S.boolean.ast]),
-        false,
+        "never",
         true
       )
     ])
@@ -71,7 +71,7 @@ describe.concurrent("getPropertySignatures", () => {
       AST.createPropertySignature(
         "a",
         AST.createUnion([S.string.ast, S.boolean.ast]),
-        true,
+        "always",
         true
       )
     ])
@@ -89,11 +89,11 @@ describe.concurrent("getPropertySignatures", () => {
       })
     )
     expect(AST._getPropertySignatures(Category.ast)).toEqual([
-      AST.createPropertySignature("name", S.string.ast, false, true),
+      AST.createPropertySignature("name", S.string.ast, "never", true),
       AST.createPropertySignature(
         "categories",
         AST.createTuple([], O.some([Category.ast]), true),
-        false,
+        "never",
         true
       )
     ])

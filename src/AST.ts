@@ -2,7 +2,6 @@
  * @since 1.0.0
  */
 
-import type { LazyArg } from "@effect/data/Function"
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
@@ -156,18 +155,6 @@ export type DocumentationAnnotation = string
  * @since 1.0.0
  */
 export const DocumentationAnnotationId = "@effect/schema/DocumentationAnnotationId"
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export type DefaultValueAnnotation<A> = LazyArg<A>
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const DefaultValueAnnotationId = "@effect/schema/DefaultInputAnnotationId"
 
 // ---------------------------------------------
 // models
@@ -664,7 +651,7 @@ export const isTuple = (ast: AST): ast is Tuple => ast._tag === "Tuple"
 export interface PropertySignature extends Annotated {
   readonly name: PropertyKey
   readonly type: AST
-  readonly isOptional: boolean
+  readonly isOptional: "never" | "always" | "fromOnly"
   readonly isReadonly: boolean
 }
 
@@ -674,7 +661,7 @@ export interface PropertySignature extends Annotated {
 export const createPropertySignature = (
   name: PropertyKey,
   type: AST,
-  isOptional: boolean,
+  isOptional: "never" | "always" | "fromOnly",
   isReadonly: boolean,
   annotations: Annotated["annotations"] = {}
 ): PropertySignature => ({ name, type, isOptional, isReadonly, annotations })
@@ -971,11 +958,13 @@ export const createRecord = (key: AST, value: AST, isReadonly: boolean): TypeLit
         break
       case "Literal":
         if (isString(key.literal) || isNumber(key.literal)) {
-          propertySignatures.push(createPropertySignature(key.literal, value, false, isReadonly))
+          propertySignatures.push(
+            createPropertySignature(key.literal, value, "never", isReadonly)
+          )
         }
         break
       case "UniqueSymbol":
-        propertySignatures.push(createPropertySignature(key.symbol, value, false, isReadonly))
+        propertySignatures.push(createPropertySignature(key.symbol, value, "never", isReadonly))
         break
       case "Union":
         key.types.forEach(go)
@@ -1023,7 +1012,7 @@ export const partial = (ast: AST): AST => {
     case "TypeLiteral":
       return createTypeLiteral(
         ast.propertySignatures.map((f) =>
-          createPropertySignature(f.name, f.type, true, f.isReadonly, f.annotations)
+          createPropertySignature(f.name, f.type, "always", f.isReadonly, f.annotations)
         ),
         ast.indexSignatures
       )
@@ -1064,7 +1053,7 @@ export const required = (ast: AST): AST => {
     case "TypeLiteral":
       return createTypeLiteral(
         ast.propertySignatures.map((f) =>
-          createPropertySignature(f.name, f.type, false, f.isReadonly, f.annotations)
+          createPropertySignature(f.name, f.type, "never", f.isReadonly, f.annotations)
         ),
         ast.indexSignatures
       )
@@ -1389,7 +1378,12 @@ export const _getPropertySignatures = (
       return _getPropertySignatures(ast.type)
     case "Tuple":
       return ast.elements.map((element, i) =>
-        createPropertySignature(i, element.type, element.isOptional, ast.isReadonly)
+        createPropertySignature(
+          i,
+          element.type,
+          element.isOptional ? "always" : "never",
+          ast.isReadonly
+        )
       )
     case "TypeLiteral":
       return ast.propertySignatures
@@ -1406,7 +1400,11 @@ export const _getPropertySignatures = (
             return O.some(createPropertySignature(
               name,
               createUnion(members.map((p) => p.type)),
-              members.some((p) => p.isOptional),
+              members.every((p) => p.isOptional === "fromOnly") ?
+                "fromOnly" :
+                members.some((p) => p.isOptional === "always") ?
+                "always" :
+                "never",
               members.some((p) => p.isReadonly)
             ))
           }
