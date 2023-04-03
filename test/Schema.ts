@@ -627,14 +627,21 @@ describe.concurrent("Schema", () => {
       b: pipe(
         S.number,
         S.greaterThan(0),
-        S.withDefault(() => -1)
+        S.withDefault(() => 1)
       )
     })
 
-    expect(() => S.decode(schema)({ a: "a" })).toThrowError(
-      new Error(`error(s) found
-└─ ["b"]
-   └─ Expected a number greater than 0, actual -1`)
+    expect(S.decode(schema)({ a: "a" })).toEqual({ a: "a", b: 1 })
+  })
+
+  test("withDefault/ extend", () => {
+    const schema = pipe(
+      S.struct({ a: S.string }),
+      S.extend(S.struct({
+        b: S.withDefault(S.number, () => -1)
+      }))
     )
+
+    expect(S.decode(schema)({ a: "a" })).toEqual({ a: "a", b: -1 })
   })
 })

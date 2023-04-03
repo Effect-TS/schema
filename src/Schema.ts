@@ -429,52 +429,33 @@ export type OptionalSchemaId = typeof OptionalSchemaId
 /**
  * @since 1.0.0
  */
-export interface OptionalSchema<From, To = From> {
+export interface OptionalSchema<From, To = From, WithDefault = false> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
+  readonly WithDefault: (_: never) => WithDefault
   readonly _id: OptionalSchemaId
 }
 
-const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> =>
+const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A, boolean> =>
   "_id" in schema && schema["_id"] === OptionalSchemaId
 
 /**
  * @since 1.0.0
  */
-export const optional = <I, A>(schema: Schema<I, A>): OptionalSchema<I, A> => {
-  const out: any = make(schema.ast)
+export const optional: {
+  <I, A>(schema: Schema<I, A>): OptionalSchema<I, A, false>
+  <I, A>(schema: Schema<I, A>, defaultValue: LazyArg<A>): OptionalSchema<I, A, true>
+} = <I, A>(schema: Schema<I, A>, defaultValue?: LazyArg<A>) => {
+  const out: any = make(
+    defaultValue ?
+      AST.setAnnotation(
+        schema.ast,
+        AST.DefaultValueAnnotationId,
+        defaultValue
+      ) :
+      schema.ast
+  )
   out["_id"] = OptionalSchemaId
-  return out
-}
-
-/**
- * @since 1.0.0
- */
-export const FromOptionalSchemaId = Symbol.for("@effect/schema/Schema/FromOptionalSchema")
-
-/**
- * @since 1.0.0
- */
-export type FromOptionalSchemaId = typeof FromOptionalSchemaId
-
-/**
- * @since 1.0.0
- */
-export interface FromOptionalSchema<From, To = From> extends Schema<From, To> {
-  readonly _id: FromOptionalSchemaId
-}
-
-const isFromOptionalSchema = <I, A>(schema: object): schema is FromOptionalSchema<I, A> =>
-  "_id" in schema && schema["_id"] === FromOptionalSchemaId
-
-/**
- * @since 1.0.0
- */
-export const fromOptional = <I, A>(
-  schema: Schema<I | undefined, A>
-): FromOptionalSchema<Exclude<I, undefined>, A> => {
-  const out: any = make(schema.ast)
-  out["_id"] = FromOptionalSchemaId
   return out
 }
 
@@ -483,32 +464,15 @@ export const fromOptional = <I, A>(
  * @since 1.0.0
  */
 export const withDefault: {
-  <A>(
-    defaultValue: LazyArg<A>
-  ): <I>(self: Schema<I, A>) => FromOptionalSchema<Exclude<I, undefined>, A>
-  <I, A>(
-    self: Schema<I, A>,
-    defaultValue: LazyArg<A>
-  ): FromOptionalSchema<Exclude<I, undefined>, A>
-} = dual(
-  2,
-  <I, A>(self: Schema<I, A>, defaultValue: LazyArg<A>) =>
-    fromOptional(
-      transform(
-        union(_undefined, self),
-        to(self),
-        (a) => a === undefined ? defaultValue() : a,
-        identity
-      )
-    )
-)
+  <A>(defaultValue: LazyArg<A>): <I>(self: Schema<I, A>) => OptionalSchema<I, A, true>
+  <I, A>(self: Schema<I, A>, defaultValue: LazyArg<A>): OptionalSchema<I, A, true>
+} = dual(2, <I, A>(self: Schema<I, A>, defaultValue: LazyArg<A>) => optional(self, defaultValue))
 
 /**
  * @since 1.0.0
  */
 export type FromOptionalKeys<T> = {
-  [K in keyof T]: T[K] extends FromOptionalSchema<any> ? K
-    : T[K] extends OptionalSchema<any> ? K
+  [K in keyof T]: T[K] extends OptionalSchema<any, any, boolean> ? K
     : never
 }[keyof T]
 
@@ -516,7 +480,7 @@ export type FromOptionalKeys<T> = {
  * @since 1.0.0
  */
 export type OptionalKeys<T> = {
-  [K in keyof T]: T[K] extends OptionalSchema<any> ? K : never
+  [K in keyof T]: T[K] extends OptionalSchema<any, any, false> ? K : never
 }[keyof T]
 
 /**
@@ -524,7 +488,7 @@ export type OptionalKeys<T> = {
  * @since 1.0.0
  */
 export const struct = <
-  Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any> | FromOptionalSchema<any>>
+  Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any, any, boolean>>
 >(
   fields: Fields
 ): Schema<
@@ -536,50 +500,18 @@ export const struct = <
     & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> }
   >
-> => {
-  const fieldKeys = I.ownKeys(fields)
-  const fromOptionals = fieldKeys.filter((key) => isFromOptionalSchema(fields[key]))
-  const fromOptionalsLen = fromOptionals.length
-
-  const from = AST.createTypeLiteral(
-    fieldKeys.map((key) =>
+> =>
+  make(AST.createTypeLiteral(
+    I.ownKeys(fields).map((key) =>
       AST.createPropertySignature(
         key,
         (fields[key] as any).ast,
-        isOptionalSchema(fields[key]) || isFromOptionalSchema(fields[key]),
+        isOptionalSchema(fields[key]),
         true
       )
     ),
     []
-  )
-  if (fromOptionalsLen === 0) {
-    return make(from)
-  }
-
-  return make(AST.createTransform(unknown.ast, from, (input) => {
-    if (typeof input !== "object" || input === null) {
-      return PR.success(input)
-    }
-
-    const o = { ...input }
-    for (let i = 0; i < fromOptionalsLen; i++) {
-      const key = fromOptionals[i]
-      if (!Object.prototype.hasOwnProperty.call(input, key)) {
-        o[key] = undefined
-      }
-    }
-    return PR.success(o)
-  }, (a) => {
-    const o = { ...a }
-    for (let i = 0; i < fromOptionalsLen; i++) {
-      const key = fromOptionals[i]
-      if (a[key] === undefined) {
-        delete o[key]
-      }
-    }
-    return PR.success(o)
-  }))
-}
+  ))
 
 /**
  * @category combinators
@@ -2052,16 +1984,16 @@ export const optionFromNullable = <I, A>(
  */
 export const optionFromOptional = <I, A>(
   value: Schema<I, A>
-): FromOptionalSchema<Exclude<I | null, undefined>, Option<A>> => {
-  return fromOptional(
+): OptionalSchema<Exclude<I | null, undefined>, Option<A>, true> =>
+  optional(
     transform(
       union(_undefined, _null, value),
       to(optionFromSelf(value)),
       O.fromNullable,
       O.getOrUndefined
-    )
-  )
-}
+    ),
+    O.none
+  ) as any
 
 /**
  * @category parsers

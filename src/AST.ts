@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+import type { LazyArg } from "@effect/data/Function"
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
@@ -155,6 +156,18 @@ export type DocumentationAnnotation = string
  * @since 1.0.0
  */
 export const DocumentationAnnotationId = "@effect/schema/DocumentationAnnotationId"
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export type DefaultValueAnnotation<A> = LazyArg<A>
+
+/**
+ * @category annotations
+ * @since 1.0.0
+ */
+export const DefaultValueAnnotationId = "@effect/schema/DefaultInputAnnotationId"
 
 // ---------------------------------------------
 // models

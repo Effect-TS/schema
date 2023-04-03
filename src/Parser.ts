@@ -700,6 +700,11 @@ const go = untracedMethod(() =>
                   )
                 )
               }
+            } else if (ps.isOptional && AST.DefaultValueAnnotationId in ps.type.annotations) {
+              output[name] =
+                (ps.type.annotations[AST.DefaultValueAnnotationId] as AST.DefaultValueAnnotation<
+                  unknown
+                >)()
             }
           }
 

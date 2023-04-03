@@ -99,7 +99,7 @@ describe.concurrent("Option", () => {
     await Util.expectParseSuccess(schema, { a: 1 }, { a: O.some(1) })
     await Util.expectParseFailure(schema, null, `Expected a generic object, actual null`)
 
-    await Util.expectEncodeSuccess(schema, { a: O.none() }, {})
+    await Util.expectEncodeSuccess(schema, { a: O.none() }, { a: undefined })
     await Util.expectEncodeSuccess(schema, { a: O.some(1) }, { a: 1 })
   })
 
