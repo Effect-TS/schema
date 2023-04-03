@@ -1062,7 +1062,7 @@ const decode = (s: string) =>
 // define a function that converts a boolean into a string
 const encode = (b: boolean) => PR.success(String(b));
 
-const transformedSchema: S.Schema<string, boolean> = S.transformEffect(
+const transformedSchema: S.Schema<string, boolean> = S.transformResult(
   S.string,
   S.boolean,
   decode,
