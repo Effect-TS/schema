@@ -1155,7 +1155,7 @@ export const getTo = (ast: AST): AST => {
       case "Refinement":
         return createRefinement(ast.to, ast.to, ast.decode, ast.decode, ast.annotations)
       case "Transform":
-        return ast.to
+        return getTo(ast.to)
     }
   }
   return ast
