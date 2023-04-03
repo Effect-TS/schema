@@ -32,7 +32,7 @@ export const ArbitraryHookId = I.ArbitraryHookId
  */
 export const to = <I, A>(
   schema: Schema<I, A>
-): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(schema.ast)
+): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(AST.getTo(schema.ast))
 
 /**
  * @category arbitrary
@@ -202,8 +202,7 @@ const go = (ast: AST.AST): Arbitrary<any> => {
       }
       return (fc) => fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))
     }
-    case "Refinement":
-    case "Transform": {
+    case "Refinement": {
       const to = go(ast.to)
       return pipe(
         getHook(ast),
@@ -222,5 +221,7 @@ const go = (ast: AST.AST): Arbitrary<any> => {
         )
       )
     }
+    case "Transform":
+      throw new Error("cannot build an Arbitrary for transformations")
   }
 }
