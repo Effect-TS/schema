@@ -75,13 +75,16 @@ Added in v1.0.0
   - [isUnknownKeyword](#isunknownkeyword)
 - [model](#model)
   - [AST (type alias)](#ast-type-alias)
+  - [Annotated (interface)](#annotated-interface)
   - [AnyKeyword (interface)](#anykeyword-interface)
   - [BigIntKeyword (interface)](#bigintkeyword-interface)
   - [BooleanKeyword (interface)](#booleankeyword-interface)
   - [Declaration (interface)](#declaration-interface)
   - [Enums (interface)](#enums-interface)
+  - [HasTransformation (interface)](#hastransformation-interface)
   - [Lazy (interface)](#lazy-interface)
   - [Literal (interface)](#literal-interface)
+  - [LiteralValue (type alias)](#literalvalue-type-alias)
   - [NeverKeyword (interface)](#neverkeyword-interface)
   - [NumberKeyword (interface)](#numberkeyword-interface)
   - [ObjectKeyword (interface)](#objectkeyword-interface)
@@ -99,12 +102,9 @@ Added in v1.0.0
   - [UnknownKeyword (interface)](#unknownkeyword-interface)
   - [VoidKeyword (interface)](#voidkeyword-interface)
 - [utils](#utils)
-  - [Annotated (interface)](#annotated-interface)
   - [Compiler (type alias)](#compiler-type-alias)
   - [Element (interface)](#element-interface)
-  - [HasTransformation (interface)](#hastransformation-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
-  - [LiteralValue (type alias)](#literalvalue-type-alias)
   - [Match (type alias)](#match-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
@@ -781,6 +781,18 @@ export type AST =
 
 Added in v1.0.0
 
+## Annotated (interface)
+
+**Signature**
+
+```ts
+export interface Annotated {
+  readonly annotations: Record<string | symbol, unknown>
+}
+```
+
+Added in v1.0.0
+
 ## AnyKeyword (interface)
 
 **Signature**
@@ -845,6 +857,18 @@ export interface Enums extends Annotated {
 
 Added in v1.0.0
 
+## HasTransformation (interface)
+
+**Signature**
+
+```ts
+export interface HasTransformation {
+  readonly hasTransformation: boolean
+}
+```
+
+Added in v1.0.0
+
 ## Lazy (interface)
 
 **Signature**
@@ -867,6 +891,16 @@ export interface Literal extends Annotated {
   readonly _tag: 'Literal'
   readonly literal: LiteralValue
 }
+```
+
+Added in v1.0.0
+
+## LiteralValue (type alias)
+
+**Signature**
+
+```ts
+export type LiteralValue = string | number | boolean | null | bigint
 ```
 
 Added in v1.0.0
@@ -1085,18 +1119,6 @@ Added in v1.0.0
 
 # utils
 
-## Annotated (interface)
-
-**Signature**
-
-```ts
-export interface Annotated {
-  readonly annotations: Record<string | symbol, unknown>
-}
-```
-
-Added in v1.0.0
-
 ## Compiler (type alias)
 
 **Signature**
@@ -1120,18 +1142,6 @@ export interface Element {
 
 Added in v1.0.0
 
-## HasTransformation (interface)
-
-**Signature**
-
-```ts
-export interface HasTransformation {
-  readonly hasTransformation: boolean
-}
-```
-
-Added in v1.0.0
-
 ## IndexSignature (interface)
 
 **Signature**
@@ -1142,16 +1152,6 @@ export interface IndexSignature {
   readonly type: AST
   readonly isReadonly: boolean
 }
-```
-
-Added in v1.0.0
-
-## LiteralValue (type alias)
-
-**Signature**
-
-```ts
-export type LiteralValue = string | number | boolean | null | bigint
 ```
 
 Added in v1.0.0

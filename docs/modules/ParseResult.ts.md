@@ -33,7 +33,6 @@ Added in v1.0.0
   - [Unexpected (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
 - [optimisation](#optimisation)
-  - [effect](#effect)
   - [eitherOrUndefined](#eitherorundefined)
   - [flatMap](#flatmap)
   - [map](#map)
@@ -280,16 +279,6 @@ export interface UnionMember {
 Added in v1.0.0
 
 # optimisation
-
-## effect
-
-**Signature**
-
-```ts
-export declare const effect: <E, A>(self: IO<E, A>) => Effect.Effect<never, E, A>
-```
-
-Added in v1.0.0
 
 ## eitherOrUndefined
 
