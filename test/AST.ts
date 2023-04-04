@@ -57,11 +57,11 @@ describe.concurrent("AST", () => {
   })
 
   it("getCardinality/ object", () => {
-    expect(AST._getCardinality(AST.objectKeyword)).toEqual(4)
+    expect(AST._getCardinality(AST.objectKeyword)).toEqual(5)
   })
 
   it("getCardinality/ refinement", () => {
-    expect(AST._getCardinality(pipe(S.string, S.nonEmpty()).ast)).toEqual(3)
+    expect(AST._getCardinality(pipe(S.string, S.nonEmpty()).ast)).toEqual(4)
   })
 
   it("getWeight/transform/ should return the weight of type", () => {

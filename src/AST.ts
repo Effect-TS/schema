@@ -1268,15 +1268,12 @@ export const _getCardinality = (ast: AST): number => {
     case "SymbolKeyword":
       return 3
     case "ObjectKeyword":
-      return 4
+      return 5
     case "UnknownKeyword":
     case "AnyKeyword":
       return 6
-    case "Refinement":
-    case "Transform":
-      return _getCardinality(ast.to)
     default:
-      return 5
+      return 4
   }
 }
 
