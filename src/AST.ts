@@ -740,7 +740,7 @@ export const createTypeLiteral = (
 ): TypeLiteral => ({
   _tag: "TypeLiteral",
   propertySignatures: sortByCardinalityAsc(propertySignatures),
-  indexSignatures: sortByCardinalityAsc(indexSignatures),
+  indexSignatures,
   annotations,
   hasTransformation: propertySignatures.some((p) => hasTransformation(p.type)) ||
     indexSignatures.some((is) => hasTransformation(is.type))

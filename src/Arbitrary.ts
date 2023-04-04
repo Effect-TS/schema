@@ -211,11 +211,7 @@ const go = (ast: AST.AST): Arbitrary<any> => {
             (fc) =>
               from(fc).filter((a) => {
                 const computed = eitherOrUndefined(ast.decode(a))
-                if (computed) {
-                  return E.isRight(computed)
-                } else {
-                  return false
-                }
+                return computed ? E.isRight(computed) : false
               }),
           (handler) => handler(from)
         )
