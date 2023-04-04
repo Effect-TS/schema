@@ -169,22 +169,6 @@ export interface Annotated {
 }
 
 /**
- * @category model
- * @since 1.0.0
- */
-export interface HasTransformation {
-  readonly hasTransformation: boolean
-}
-
-/**
- * @since 1.0.0
- */
-export const hasTransformation = (ast: AST): boolean =>
-  isRefinement(ast) || isTransform(ast) || isLazy(ast) || (
-    "hasTransformation" in ast && ast.hasTransformation
-  )
-
-/**
  * @since 1.0.0
  */
 export const getAnnotation = <A>(key: PropertyKey) =>
@@ -197,7 +181,7 @@ export const getAnnotation = <A>(key: PropertyKey) =>
  * @category model
  * @since 1.0.0
  */
-export interface Declaration extends Annotated, HasTransformation {
+export interface Declaration extends Annotated {
   readonly _tag: "Declaration"
   readonly typeParameters: ReadonlyArray<AST>
   readonly type: AST
@@ -222,8 +206,7 @@ export const createDeclaration = (
   typeParameters,
   type,
   decode,
-  annotations,
-  hasTransformation: hasTransformation(type) || typeParameters.some(hasTransformation)
+  annotations
 })
 
 /**
@@ -641,7 +624,7 @@ export const createElement = (
  * @category model
  * @since 1.0.0
  */
-export interface Tuple extends Annotated, HasTransformation {
+export interface Tuple extends Annotated {
   readonly _tag: "Tuple"
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
@@ -662,9 +645,7 @@ export const createTuple = (
   elements,
   rest,
   isReadonly,
-  annotations,
-  hasTransformation: elements.some((e) => hasTransformation(e.type)) ||
-    (O.isSome(rest) && rest.value.some(hasTransformation))
+  annotations
 })
 
 /**
@@ -723,7 +704,7 @@ export const createIndexSignature = (
  * @category model
  * @since 1.0.0
  */
-export interface TypeLiteral extends Annotated, HasTransformation {
+export interface TypeLiteral extends Annotated {
   readonly _tag: "TypeLiteral"
   readonly propertySignatures: ReadonlyArray<PropertySignature>
   readonly indexSignatures: ReadonlyArray<IndexSignature>
@@ -741,9 +722,7 @@ export const createTypeLiteral = (
   _tag: "TypeLiteral",
   propertySignatures: sortPropertySignatures(propertySignatures),
   indexSignatures,
-  annotations,
-  hasTransformation: propertySignatures.some((p) => hasTransformation(p.type)) ||
-    indexSignatures.some((is) => hasTransformation(is.type))
+  annotations
 })
 
 /**
@@ -756,7 +735,7 @@ export const isTypeLiteral = (ast: AST): ast is TypeLiteral => ast._tag === "Typ
  * @category model
  * @since 1.0.0
  */
-export interface Union extends Annotated, HasTransformation {
+export interface Union extends Annotated {
   readonly _tag: "Union"
   readonly types: readonly [AST, AST, ...Array<AST>]
 }
@@ -779,8 +758,7 @@ export const createUnion = (
       return {
         _tag: "Union",
         types: sortByWeightDesc(types) as any,
-        annotations,
-        hasTransformation: types.some(hasTransformation)
+        annotations
       }
     }
   }
@@ -1126,37 +1104,35 @@ export const getCompiler = <A>(match: Match<A>): Compiler<A> => {
  * @since 1.0.0
  */
 export const getTo = (ast: AST): AST => {
-  if (hasTransformation(ast)) {
-    switch (ast._tag) {
-      case "Declaration":
-        return createDeclaration(
-          ast.typeParameters.map(getTo),
-          getTo(ast.type),
-          ast.decode,
-          ast.annotations
-        )
-      case "Tuple":
-        return createTuple(
-          ast.elements.map((e) => ({ ...e, type: getTo(e.type) })),
-          O.map(ast.rest, RA.mapNonEmpty(getTo)),
-          ast.isReadonly,
-          ast.annotations
-        )
-      case "TypeLiteral":
-        return createTypeLiteral(
-          ast.propertySignatures.map((p) => ({ ...p, type: getTo(p.type) })),
-          ast.indexSignatures.map((is) => ({ ...is, type: getTo(is.type) })),
-          ast.annotations
-        )
-      case "Union":
-        return createUnion(ast.types.map(getTo), ast.annotations)
-      case "Lazy":
-        return createLazy(() => getTo(ast.f()), ast.annotations)
-      case "Refinement":
-        return createRefinement(ast.to, ast.to, ast.decode, ast.decode, ast.annotations)
-      case "Transform":
-        return getTo(ast.to)
-    }
+  switch (ast._tag) {
+    case "Declaration":
+      return createDeclaration(
+        ast.typeParameters.map(getTo),
+        getTo(ast.type),
+        ast.decode,
+        ast.annotations
+      )
+    case "Tuple":
+      return createTuple(
+        ast.elements.map((e) => ({ ...e, type: getTo(e.type) })),
+        O.map(ast.rest, RA.mapNonEmpty(getTo)),
+        ast.isReadonly,
+        ast.annotations
+      )
+    case "TypeLiteral":
+      return createTypeLiteral(
+        ast.propertySignatures.map((p) => ({ ...p, type: getTo(p.type) })),
+        ast.indexSignatures.map((is) => ({ ...is, type: getTo(is.type) })),
+        ast.annotations
+      )
+    case "Union":
+      return createUnion(ast.types.map(getTo), ast.annotations)
+    case "Lazy":
+      return createLazy(() => getTo(ast.f()), ast.annotations)
+    case "Refinement":
+      return createRefinement(ast.to, ast.to, ast.decode, ast.decode, ast.annotations)
+    case "Transform":
+      return getTo(ast.to)
   }
   return ast
 }
@@ -1165,34 +1141,32 @@ export const getTo = (ast: AST): AST => {
  * @since 1.0.0
  */
 export const getFrom = (ast: AST): AST => {
-  if (hasTransformation(ast)) {
-    switch (ast._tag) {
-      case "Declaration":
-        return createDeclaration(
-          ast.typeParameters.map(getFrom),
-          getFrom(ast.type),
-          ast.decode,
-          ast.annotations
-        )
-      case "Tuple":
-        return createTuple(
-          ast.elements.map((e) => ({ ...e, type: getFrom(e.type) })),
-          O.map(ast.rest, RA.mapNonEmpty(getFrom)),
-          ast.isReadonly
-        )
-      case "TypeLiteral":
-        return createTypeLiteral(
-          ast.propertySignatures.map((p) => ({ ...p, type: getFrom(p.type) })),
-          ast.indexSignatures.map((is) => ({ ...is, type: getFrom(is.type) }))
-        )
-      case "Union":
-        return createUnion(ast.types.map(getFrom))
-      case "Lazy":
-        return createLazy(() => getFrom(ast.f()))
-      case "Refinement":
-      case "Transform":
-        return getFrom(ast.from)
-    }
+  switch (ast._tag) {
+    case "Declaration":
+      return createDeclaration(
+        ast.typeParameters.map(getFrom),
+        getFrom(ast.type),
+        ast.decode,
+        ast.annotations
+      )
+    case "Tuple":
+      return createTuple(
+        ast.elements.map((e) => ({ ...e, type: getFrom(e.type) })),
+        O.map(ast.rest, RA.mapNonEmpty(getFrom)),
+        ast.isReadonly
+      )
+    case "TypeLiteral":
+      return createTypeLiteral(
+        ast.propertySignatures.map((p) => ({ ...p, type: getFrom(p.type) })),
+        ast.indexSignatures.map((is) => ({ ...is, type: getFrom(is.type) }))
+      )
+    case "Union":
+      return createUnion(ast.types.map(getFrom))
+    case "Lazy":
+      return createLazy(() => getFrom(ast.f()))
+    case "Refinement":
+    case "Transform":
+      return getFrom(ast.from)
   }
   return ast
 }
@@ -1201,45 +1175,43 @@ export const getFrom = (ast: AST): AST => {
  * @since 1.0.0
  */
 export const reverse = (ast: AST): AST => {
-  if (hasTransformation(ast)) {
-    switch (ast._tag) {
-      case "Declaration":
-        return createDeclaration(
-          ast.typeParameters.map(reverse),
-          ast.type,
-          ast.decode,
-          ast.annotations
-        )
-      case "Tuple":
-        return createTuple(
-          ast.elements.map((e) => createElement(reverse(e.type), e.isOptional)),
-          O.map(ast.rest, RA.mapNonEmpty(reverse)),
-          ast.isReadonly
-        )
-      case "TypeLiteral":
-        return createTypeLiteral(
-          ast.propertySignatures.map((ps) =>
-            createPropertySignature(
-              ps.name,
-              reverse(ps.type),
-              ps.isOptional,
-              ps.isReadonly,
-              ps.annotations
-            )
-          ),
-          ast.indexSignatures.map((is) =>
-            createIndexSignature(is.parameter, reverse(is.type), is.isReadonly)
+  switch (ast._tag) {
+    case "Declaration":
+      return createDeclaration(
+        ast.typeParameters.map(reverse),
+        ast.type,
+        ast.decode,
+        ast.annotations
+      )
+    case "Tuple":
+      return createTuple(
+        ast.elements.map((e) => createElement(reverse(e.type), e.isOptional)),
+        O.map(ast.rest, RA.mapNonEmpty(reverse)),
+        ast.isReadonly
+      )
+    case "TypeLiteral":
+      return createTypeLiteral(
+        ast.propertySignatures.map((ps) =>
+          createPropertySignature(
+            ps.name,
+            reverse(ps.type),
+            ps.isOptional,
+            ps.isReadonly,
+            ps.annotations
           )
+        ),
+        ast.indexSignatures.map((is) =>
+          createIndexSignature(is.parameter, reverse(is.type), is.isReadonly)
         )
-      case "Union":
-        return createUnion(ast.types.map(reverse))
-      case "Lazy":
-        return createLazy(() => reverse(ast.f()))
-      case "Refinement":
-        return createRefinement(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
-      case "Transform":
-        return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
-    }
+      )
+    case "Union":
+      return createUnion(ast.types.map(reverse))
+    case "Lazy":
+      return createLazy(() => reverse(ast.f()))
+    case "Refinement":
+      return createRefinement(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
+    case "Transform":
+      return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
   }
   return ast
 }

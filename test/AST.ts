@@ -146,8 +146,7 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [ab.ast, a.ast],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
 
@@ -158,8 +157,7 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [ab.ast, a.ast],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
 
@@ -170,8 +168,7 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [a.ast, b.ast],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
 
@@ -182,8 +179,7 @@ describe.concurrent("AST", () => {
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [a.ast, b.ast],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
   })
@@ -360,8 +356,7 @@ describe.concurrent("AST", () => {
           AST.createPropertySignature("a", AST.stringKeyword, false, true)
         ],
         indexSignatures: [],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
 
@@ -374,8 +369,7 @@ describe.concurrent("AST", () => {
           AST.createPropertySignature("a", AST.stringKeyword, false, true)
         ],
         indexSignatures: [],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
 
@@ -388,8 +382,7 @@ describe.concurrent("AST", () => {
           AST.createPropertySignature("a", AST.stringKeyword, false, true)
         ],
         indexSignatures: [],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
 
@@ -402,8 +395,7 @@ describe.concurrent("AST", () => {
           AST.createPropertySignature("a", AST.booleanKeyword, false, true)
         ],
         indexSignatures: [],
-        annotations: {},
-        hasTransformation: false
+        annotations: {}
       })
     })
   })

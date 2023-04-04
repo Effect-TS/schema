@@ -287,9 +287,6 @@ interface Parser<I, A> {
 
 const go = untracedMethod(() =>
   (ast: AST.AST, isBoundary = true): Parser<any, any> => {
-    if (isBoundary === false && !AST.hasTransformation(ast)) {
-      return PR.success
-    }
     switch (ast._tag) {
       case "Refinement":
       case "Transform": {
@@ -297,12 +294,10 @@ const go = untracedMethod(() =>
         if (isBoundary) {
           const from = go(ast.from)
           return (i1, options) => {
-            const conditional = to === PR.success ?
-              PR.flatMap(from(i1, options), (a) => ast.decode(a, options)) :
-              PR.flatMap(
-                from(i1, options),
-                (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
-              )
+            const conditional = PR.flatMap(
+              from(i1, options),
+              (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+            )
             const either = PR.eitherOrUndefined(conditional)
             return either ?
               either :
@@ -311,9 +306,7 @@ const go = untracedMethod(() =>
               PR.failure(PR.forbidden)
           }
         } else {
-          return to === PR.success ?
-            ast.decode :
-            (a, options) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+          return (a, options) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
         }
       }
       case "Declaration":
