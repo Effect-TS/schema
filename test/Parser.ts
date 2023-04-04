@@ -164,7 +164,7 @@ describe.concurrent("Parser", () => {
         ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])
-    // TypeAlias
+    // declare
     expect(
       P._getLiterals(
         S.declare(

@@ -24,7 +24,7 @@ describe.concurrent("AST", () => {
       )
   })
 
-  it("isTypeAlias", () => {
+  it("isDeclaration", () => {
     expect(AST.isDeclaration(S.optionFromSelf(S.number).ast)).toEqual(true)
     expect(AST.isDeclaration(S.number.ast)).toEqual(false)
   })
@@ -217,6 +217,11 @@ describe.concurrent("AST", () => {
     expect(AST.keyof(
       pipe(S.struct({ [a]: S.string }), S.extend(S.record(S.symbol, S.string))).ast
     )).toEqual(S.symbol.ast)
+  })
+
+  it("keyof/ tuple", () => {
+    expect(() => AST.keyof(S.tuple(S.string).ast))
+      .toThrowError(new Error("`keyof` cannot handle tuples / arrays"))
   })
 
   it("keyof/ refinement", () => {
