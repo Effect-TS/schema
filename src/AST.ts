@@ -1395,8 +1395,9 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
     case "Lazy":
       return _keyof(ast.f())
     case "Refinement":
+      throw new Error("`keyof` cannot handle refinements")
     case "Transform":
-      return _keyof(ast.to)
+      throw new Error("`keyof` cannot handle transformations")
     default:
       return []
   }

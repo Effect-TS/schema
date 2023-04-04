@@ -228,14 +228,13 @@ describe.concurrent("AST", () => {
   })
 
   it("keyof/ refinement", () => {
-    expect(AST.keyof(pipe(S.struct({ a: S.number }), S.filter(({ a }) => a > 0)).ast)).toEqual(
-      S.literal("a").ast
-    )
+    expect(() => AST.keyof(pipe(S.struct({ a: S.number }), S.filter(({ a }) => a > 0)).ast))
+      .toThrowError(new Error("`keyof` cannot handle refinements"))
   })
 
   it("keyof/ transform", () => {
-    expect(AST.keyof(S.numberFromString(S.string).ast)).toEqual(
-      AST.neverKeyword
+    expect(() => AST.keyof(S.numberFromString(S.string).ast)).toThrowError(
+      new Error("`keyof` cannot handle transformations")
     )
   })
 
