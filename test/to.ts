@@ -18,15 +18,16 @@ describe.concurrent("to", () => {
 
   it("refinement", () => {
     const schema = pipe(
-      S.string,
-      S.minLength(1),
-      S.maxLength(2),
+      S.numberFromString(S.string),
+      S.greaterThanOrEqualTo(1),
+      S.lessThanOrEqualTo(2),
       S.to
     )
-    expect(S.is(schema)("")).toEqual(false)
-    expect(S.is(schema)("a")).toEqual(true)
-    expect(S.is(schema)("ab")).toEqual(true)
-    expect(S.is(schema)("abc")).toEqual(false)
+    console.log("%o", schema)
+    expect(S.is(schema)(0)).toEqual(false)
+    expect(S.is(schema)(1)).toEqual(true)
+    expect(S.is(schema)(2)).toEqual(true)
+    expect(S.is(schema)(3)).toEqual(false)
   })
 
   it("lazy", async () => {

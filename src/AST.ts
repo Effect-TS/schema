@@ -1130,7 +1130,7 @@ export const getTo = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => getTo(ast.f()), ast.annotations)
     case "Refinement":
-      return createRefinement(ast.to, ast.to, ast.decode, ast.decode, ast.annotations)
+      return createRefinement(getTo(ast.from), ast.to, ast.decode, ast.encode, ast.annotations)
     case "Transform":
       return getTo(ast.to)
   }
