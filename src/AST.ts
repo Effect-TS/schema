@@ -757,7 +757,7 @@ export const createUnion = (
     default: {
       return {
         _tag: "Union",
-        types: sortByWeightDesc(types) as any,
+        types: sortUnionMembers(types) as any,
         annotations
       }
     }
@@ -1279,8 +1279,7 @@ export const _getWeight = (ast: AST): number => {
   }
 }
 
-/** @internal */
-export const sortByWeightDesc = RA.sort(Order.reverse(Order.contramap(Number.Order, _getWeight)))
+const sortUnionMembers = RA.sort(Order.reverse(Order.contramap(Number.Order, _getWeight)))
 
 const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   let out = pipe(
