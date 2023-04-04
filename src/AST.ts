@@ -718,12 +718,42 @@ export const createTypeLiteral = (
   propertySignatures: ReadonlyArray<PropertySignature>,
   indexSignatures: ReadonlyArray<IndexSignature>,
   annotations: Annotated["annotations"] = {}
-): TypeLiteral => ({
-  _tag: "TypeLiteral",
-  propertySignatures: sortPropertySignatures(propertySignatures),
-  indexSignatures,
-  annotations
-})
+): TypeLiteral => {
+  // check for duplicate property signatures
+  const keys: Record<PropertyKey, null> = {}
+  for (let i = 0; i < propertySignatures.length; i++) {
+    const name = propertySignatures[i].name
+    if (name in keys) {
+      throw new Error(`Duplicate property signature \`${String(name)}\``)
+    }
+    keys[name] = null
+  }
+  // check for duplicate index signatures
+  const parameters = {
+    string: false,
+    symbol: false
+  }
+  for (let i = 0; i < indexSignatures.length; i++) {
+    const parameter = _getParameterKeyof(indexSignatures[i].parameter)
+    if (isStringKeyword(parameter)) {
+      if (parameters.string) {
+        throw new Error("Duplicate index signature for type `string`")
+      }
+      parameters.string = true
+    } else if (isSymbolKeyword(parameter)) {
+      if (parameters.symbol) {
+        throw new Error("Duplicate index signature for type `symbol`")
+      }
+      parameters.symbol = true
+    }
+  }
+  return {
+    _tag: "TypeLiteral",
+    propertySignatures: sortPropertySignatures(propertySignatures),
+    indexSignatures,
+    annotations
+  }
+}
 
 /**
  * @category guards

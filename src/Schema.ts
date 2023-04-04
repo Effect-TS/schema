@@ -653,31 +653,11 @@ export const record = <K extends string | symbol, I, A>(
 ): Schema<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
   make(AST.createRecord(key.ast, value.ast, true))
 
-const isOverlappingPropertySignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral): boolean =>
-  x.propertySignatures.some((px) => y.propertySignatures.some((py) => px.name === py.name))
-
-const isOverlappingIndexSignatures = (x: AST.TypeLiteral, y: AST.TypeLiteral): boolean =>
-  x.indexSignatures.some((ix) =>
-    y.indexSignatures.some((iy) => {
-      const keyofx = AST._getParameterKeyof(ix.parameter)
-      const keyofy = AST._getParameterKeyof(iy.parameter)
-      // there cannot be two string index signatures or two symbol index signatures at the same time
-      return (AST.isStringKeyword(keyofx) && AST.isStringKeyword(keyofy)) ||
-        (AST.isSymbolKeyword(keyofx) && AST.isSymbolKeyword(keyofy))
-    })
-  )
-
 const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST.AST>) => {
   if (xs.every(AST.isTypeLiteral) && ys.every(AST.isTypeLiteral)) {
     return AST.createUnion(
       xs.flatMap((x) =>
         ys.map((y) => {
-          if (isOverlappingPropertySignatures(x, y)) {
-            throw new Error("`extend` cannot handle overlapping property signatures")
-          }
-          if (isOverlappingIndexSignatures(x, y)) {
-            throw new Error("`extend` cannot handle overlapping index signatures")
-          }
           return AST.createTypeLiteral(
             x.propertySignatures.concat(y.propertySignatures),
             x.indexSignatures.concat(y.indexSignatures)
