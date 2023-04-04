@@ -692,7 +692,7 @@ export const createIndexSignature = (
   type: AST,
   isReadonly: boolean
 ): IndexSignature => {
-  if (isNeverKeyword(_getParameterKeyof(parameter))) {
+  if (isNeverKeyword(_getParameterType(parameter))) {
     throw new Error(
       "An index signature parameter type must be 'string', 'symbol', a template literal type or a refinement of the previous types"
     )
@@ -734,7 +734,7 @@ export const createTypeLiteral = (
     symbol: false
   }
   for (let i = 0; i < indexSignatures.length; i++) {
-    const parameter = _getParameterKeyof(indexSignatures[i].parameter)
+    const parameter = _getParameterType(indexSignatures[i].parameter)
     if (isStringKeyword(parameter)) {
       if (parameters.string) {
         throw new Error("Duplicate index signature for type `string`")
@@ -1358,8 +1358,7 @@ const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   return out
 }
 
-/** @internal */
-export const _getParameterKeyof = (
+const _getParameterType = (
   ast: AST
 ): StringKeyword | SymbolKeyword | TemplateLiteral | NeverKeyword => {
   switch (ast._tag) {
@@ -1368,7 +1367,7 @@ export const _getParameterKeyof = (
     case "TemplateLiteral":
       return ast
     case "Refinement":
-      return _getParameterKeyof(ast.from)
+      return _getParameterType(ast.from)
   }
   return neverKeyword
 }
@@ -1385,7 +1384,7 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
     case "TypeLiteral":
       return ast.propertySignatures.map((p): AST =>
         typeof p.name === "symbol" ? createUniqueSymbol(p.name) : createLiteral(p.name)
-      ).concat(ast.indexSignatures.map((is) => _getParameterKeyof(is.parameter)))
+      ).concat(ast.indexSignatures.map((is) => _getParameterType(is.parameter)))
     case "Union": {
       return _getPropertySignatures(ast).map((p): AST =>
         typeof p.name === "symbol" ? createUniqueSymbol(p.name) : createLiteral(p.name)

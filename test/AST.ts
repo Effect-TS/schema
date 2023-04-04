@@ -24,10 +24,6 @@ describe.concurrent("AST", () => {
       )
   })
 
-  it("_getParameterKeyof/ should return never on unsupported ASTs", () => {
-    expect(AST._getParameterKeyof(pipe(S.number, S.greaterThan(1)).ast)).toEqual(AST.neverKeyword)
-  })
-
   it("isTypeAlias", () => {
     expect(AST.isDeclaration(S.optionFromSelf(S.number).ast)).toEqual(true)
     expect(AST.isDeclaration(S.number.ast)).toEqual(false)
