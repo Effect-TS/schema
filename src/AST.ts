@@ -739,7 +739,7 @@ export const createTypeLiteral = (
   annotations: Annotated["annotations"] = {}
 ): TypeLiteral => ({
   _tag: "TypeLiteral",
-  propertySignatures: sortByCardinalityAsc(propertySignatures),
+  propertySignatures: sortPropertySignatures(propertySignatures),
   indexSignatures,
   annotations,
   hasTransformation: propertySignatures.some((p) => hasTransformation(p.type)) ||
@@ -1212,14 +1212,24 @@ export const reverse = (ast: AST): AST => {
         )
       case "Tuple":
         return createTuple(
-          ast.elements.map((e) => ({ ...e, type: reverse(e.type) })),
+          ast.elements.map((e) => createElement(reverse(e.type), e.isOptional)),
           O.map(ast.rest, RA.mapNonEmpty(reverse)),
           ast.isReadonly
         )
       case "TypeLiteral":
         return createTypeLiteral(
-          ast.propertySignatures.map((p) => ({ ...p, type: reverse(p.type) })),
-          ast.indexSignatures.map((is) => ({ ...is, type: reverse(is.type) }))
+          ast.propertySignatures.map((ps) =>
+            createPropertySignature(
+              ps.name,
+              reverse(ps.type),
+              ps.isOptional,
+              ps.isReadonly,
+              ps.annotations
+            )
+          ),
+          ast.indexSignatures.map((is) =>
+            createIndexSignature(is.parameter, reverse(is.type), is.isReadonly)
+          )
         )
       case "Union":
         return createUnion(ast.types.map(reverse))
@@ -1270,8 +1280,8 @@ export const _getCardinality = (ast: AST): number => {
   }
 }
 
-const sortByCardinalityAsc = RA.sort(
-  pipe(Number.Order, Order.contramap(({ type }: { readonly type: AST }) => _getCardinality(type)))
+const sortPropertySignatures = RA.sort(
+  pipe(Number.Order, Order.contramap((ps: PropertySignature) => _getCardinality(ps.type)))
 )
 
 /** @internal */
