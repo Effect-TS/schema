@@ -285,10 +285,53 @@ interface Parser<I, A> {
   (i: I, options?: ParseEffectOptions): ParseResult<A>
 }
 
+const excludeRefinements = (ast: AST.AST): AST.AST => {
+  switch (ast._tag) {
+    case "Refinement":
+      return excludeRefinements(ast.from)
+  }
+  return ast
+}
+
 const go = untracedMethod(() =>
   (ast: AST.AST, isBoundary = true): Parser<any, any> => {
     switch (ast._tag) {
-      case "Refinement":
+      case "Refinement": {
+        if (ast.isReversed) {
+          const from = go(AST.getTo(ast), isBoundary)
+          const to = go(AST.reverse(excludeRefinements(ast.from)), false)
+          return (i, options) => {
+            const conditional = PR.flatMap(
+              from(i, options),
+              (a) => to(a, options)
+            )
+            const either = PR.eitherOrUndefined(conditional)
+            return either ?
+              either :
+              options?.isEffectAllowed === true ?
+              conditional :
+              PR.failure(PR.forbidden)
+          }
+        } else {
+          if (isBoundary) {
+            const from = go(ast.from)
+            return (i, options) => {
+              const conditional = PR.flatMap(
+                from(i, options),
+                (a) => ast.decode(a, options)
+              )
+              const either = PR.eitherOrUndefined(conditional)
+              return either ?
+                either :
+                options?.isEffectAllowed === true ?
+                conditional :
+                PR.failure(PR.forbidden)
+            }
+          } else {
+            return ast.decode
+          }
+        }
+      }
       case "Transform": {
         const to = go(ast.to, false)
         if (isBoundary) {

@@ -21,6 +21,10 @@ describe.concurrent("dev", () => {
       S.filter(() => {
         console.log("filter 2")
         return true
+      }),
+      S.filter(() => {
+        console.log("filter 3")
+        return true
       })
     )
     // console.log("%o", schema.ast)

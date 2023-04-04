@@ -783,9 +783,8 @@ export function filter<A>(
     const decode = (a: A) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
     const ast = AST.createRefinement(
       self.ast,
-      AST.getTo(self.ast),
       decode,
-      decode,
+      false,
       toAnnotations(options)
     )
     return make(ast)
@@ -1279,9 +1278,8 @@ export const fromBrand = <C extends Brand<string | symbol>>(
     )
     const ast = AST.createRefinement(
       self.ast,
-      AST.getTo(self.ast),
       decode,
-      decode,
+      false,
       toAnnotations({ typeId: BrandTypeId, ...options })
     )
     return make(ast)

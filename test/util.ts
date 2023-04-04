@@ -60,9 +60,8 @@ const go = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
     case "Refinement":
       return AST.createRefinement(
         go(ast.from, mode),
-        go(ast.to, mode),
         goDecode(ast.decode),
-        goDecode(ast.encode),
+        ast.isReversed,
         ast.annotations
       )
     case "Transform":

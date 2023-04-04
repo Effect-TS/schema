@@ -23,7 +23,6 @@ describe.concurrent("to", () => {
       S.lessThanOrEqualTo(2),
       S.to
     )
-    console.log("%o", schema)
     expect(S.is(schema)(0)).toEqual(false)
     expect(S.is(schema)(1)).toEqual(true)
     expect(S.is(schema)(2)).toEqual(true)
