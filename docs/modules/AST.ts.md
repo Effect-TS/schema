@@ -81,7 +81,6 @@ Added in v1.0.0
   - [BooleanKeyword (interface)](#booleankeyword-interface)
   - [Declaration (interface)](#declaration-interface)
   - [Enums (interface)](#enums-interface)
-  - [HasTransformation (interface)](#hastransformation-interface)
   - [Lazy (interface)](#lazy-interface)
   - [Literal (interface)](#literal-interface)
   - [LiteralValue (type alias)](#literalvalue-type-alias)
@@ -118,7 +117,6 @@ Added in v1.0.0
   - [getCompiler](#getcompiler)
   - [getFrom](#getfrom)
   - [getTo](#getto)
-  - [hasTransformation](#hastransformation)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
@@ -398,9 +396,8 @@ Added in v1.0.0
 ```ts
 export declare const createRefinement: (
   from: AST,
-  to: AST,
   decode: Refinement['decode'],
-  encode: Refinement['encode'],
+  isReversed: boolean,
   annotations?: Annotated['annotations']
 ) => Refinement
 ```
@@ -834,7 +831,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Declaration extends Annotated, HasTransformation {
+export interface Declaration extends Annotated {
   readonly _tag: 'Declaration'
   readonly typeParameters: ReadonlyArray<AST>
   readonly type: AST
@@ -852,18 +849,6 @@ Added in v1.0.0
 export interface Enums extends Annotated {
   readonly _tag: 'Enums'
   readonly enums: ReadonlyArray<readonly [string, string | number]>
-}
-```
-
-Added in v1.0.0
-
-## HasTransformation (interface)
-
-**Signature**
-
-```ts
-export interface HasTransformation {
-  readonly hasTransformation: boolean
 }
 ```
 
@@ -964,9 +949,8 @@ Added in v1.0.0
 export interface Refinement extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: AST
-  readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly isReversed: boolean
 }
 ```
 
@@ -1031,7 +1015,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Tuple extends Annotated, HasTransformation {
+export interface Tuple extends Annotated {
   readonly _tag: 'Tuple'
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
@@ -1046,7 +1030,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface TypeLiteral extends Annotated, HasTransformation {
+export interface TypeLiteral extends Annotated {
   readonly _tag: 'TypeLiteral'
   readonly propertySignatures: ReadonlyArray<PropertySignature>
   readonly indexSignatures: ReadonlyArray<IndexSignature>
@@ -1072,7 +1056,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Union extends Annotated, HasTransformation {
+export interface Union extends Annotated {
   readonly _tag: 'Union'
   readonly types: readonly [AST, AST, ...Array<AST>]
 }
@@ -1311,16 +1295,6 @@ export declare const getTo: (ast: AST) => AST
 
 Added in v1.0.0
 
-## hasTransformation
-
-**Signature**
-
-```ts
-export declare const hasTransformation: (ast: AST) => boolean
-```
-
-Added in v1.0.0
-
 ## keyof
 
 Equivalent at runtime to the TypeScript type-level `keyof` operator.
@@ -1352,7 +1326,6 @@ export declare const mergeAnnotations: (
       decode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
-      hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1380,29 +1353,21 @@ export declare const mergeAnnotations: (
       elements: readonly Element[]
       rest: Option<readonly [AST, ...AST[]]>
       isReadonly: boolean
-      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'TypeLiteral'
       propertySignatures: readonly PropertySignature[]
       indexSignatures: readonly IndexSignature[]
-      hasTransformation: boolean
     }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Union'
-      types: readonly [AST, AST, ...AST[]]
-      hasTransformation: boolean
-    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      to: AST
       decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
-      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      isReversed: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1494,7 +1459,6 @@ export declare const setAnnotation: (
       decode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
-      hasTransformation: boolean
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1522,29 +1486,21 @@ export declare const setAnnotation: (
       elements: readonly Element[]
       rest: Option<readonly [AST, ...AST[]]>
       isReadonly: boolean
-      hasTransformation: boolean
     }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'TypeLiteral'
       propertySignatures: readonly PropertySignature[]
       indexSignatures: readonly IndexSignature[]
-      hasTransformation: boolean
     }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Union'
-      types: readonly [AST, AST, ...AST[]]
-      hasTransformation: boolean
-    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      to: AST
       decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
-      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      isReversed: boolean
     }
   | {
       annotations: { [x: string]: unknown }

@@ -293,7 +293,7 @@ const go = untracedMethod(() =>
     switch (ast._tag) {
       case "Refinement": {
         if (ast.isReversed) {
-          const from = go(AST.getTo(ast), isBoundary)
+          const from = isBoundary ? go(AST.getTo(ast)) : PR.success
           const to = go(AST.reverse(dropRefinements(ast.from)), false)
           return (i, options) => {
             const conditional = PR.flatMap(

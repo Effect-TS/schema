@@ -1240,12 +1240,12 @@ export const nonPositiveBigint = <A extends bigint>(
  * @category bigint
  * @since 1.0.0
  */
-export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
-  <I>(self: Schema<I, A>): Schema<I, A> =>
+export const clampBigint = (min: bigint, max: bigint) =>
+  <I>(self: Schema<I, bigint>): Schema<I, bigint> =>
     transform(
       self,
       pipe(self, to, betweenBigint(min, max)),
-      (self) => B.clamp(self, min, max) as A,
+      (self) => B.clamp(self, min, max),
       identity
     )
 
@@ -1421,7 +1421,8 @@ export const date: Schema<Date> = declare(
   @category date
   @since 1.0.0
 */
-export const dateFromString = <I>(self: Schema<I, string>): Schema<I, Date> => {
+export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, Date> => {
+  const validateResult = P.validateResult(self)
   const schema: Schema<I, Date> = transformResult(
     self,
     date,
@@ -1431,7 +1432,7 @@ export const dateFromString = <I>(self: Schema<I, string>): Schema<I, Date> => {
         ? PR.failure(PR.type(schema.ast, s))
         : PR.success(new Date(n))
     },
-    (n) => PR.success(n.toISOString())
+    (n) => validateResult(n.toISOString())
   )
   return schema
 }
@@ -1861,12 +1862,12 @@ export const nonPositive = <A extends number>(
  * @category number
  * @since 1.0.0
  */
-export const clamp = <A extends number>(min: number, max: number) =>
-  <I>(self: Schema<I, A>): Schema<I, A> =>
+export const clamp = (min: number, max: number) =>
+  <I>(self: Schema<I, number>): Schema<I, number> =>
     transform(
       self,
-      pipe(self, to, between<A>(min, max)),
-      (self) => N.clamp(self, min, max) as A,
+      pipe(self, to, between(min, max)),
+      (self) => N.clamp(self, min, max),
       identity
     )
 
@@ -1878,7 +1879,8 @@ export const clamp = <A extends number>(min: number, max: number) =>
   @category number
   @since 1.0.0
 */
-export const numberFromString = <I>(self: Schema<I, string>): Schema<I, number> => {
+export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, number> => {
+  const validateResult = P.validateResult(self)
   const schema: Schema<I, number> = transformResult(
     self,
     number,
@@ -1895,7 +1897,7 @@ export const numberFromString = <I>(self: Schema<I, string>): Schema<I, number> 
       const n = parseFloat(s)
       return isNaN(n) ? PR.failure(PR.type(schema.ast, s)) : PR.success(n)
     },
-    (n) => PR.success(String(n))
+    (n) => validateResult(String(n))
   )
   return schema
 }

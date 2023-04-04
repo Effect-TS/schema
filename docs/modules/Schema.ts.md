@@ -344,10 +344,7 @@ Clamps a bigint between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clampBigint: <A extends bigint>(
-  min: bigint,
-  max: bigint
-) => <I>(self: Schema<I, A>) => Schema<I, A>
+export declare const clampBigint: (min: bigint, max: bigint) => <I>(self: Schema<I, bigint>) => Schema<I, bigint>
 ```
 
 Added in v1.0.0
@@ -1096,7 +1093,7 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 **Signature**
 
 ```ts
-export declare const dateFromString: <I>(self: Schema<I, string>) => Schema<I, date>
+export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
 ```
 
 Added in v1.0.0
@@ -1363,7 +1360,7 @@ Clamps a number between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clamp: <A extends number>(min: number, max: number) => <I>(self: Schema<I, A>) => Schema<I, A>
+export declare const clamp: (min: number, max: number) => <I>(self: Schema<I, number>) => Schema<I, number>
 ```
 
 Added in v1.0.0
@@ -1514,7 +1511,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 **Signature**
 
 ```ts
-export declare const numberFromString: <I>(self: Schema<I, string>) => Schema<I, number>
+export declare const numberFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, number>
 ```
 
 Added in v1.0.0
