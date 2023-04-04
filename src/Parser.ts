@@ -285,13 +285,8 @@ interface Parser<I, A> {
   (i: I, options?: ParseEffectOptions): ParseResult<A>
 }
 
-const excludeRefinements = (ast: AST.AST): AST.AST => {
-  switch (ast._tag) {
-    case "Refinement":
-      return excludeRefinements(ast.from)
-  }
-  return ast
-}
+const dropRefinements = (ast: AST.AST): AST.AST =>
+  AST.isRefinement(ast) ? dropRefinements(ast.from) : ast
 
 const go = untracedMethod(() =>
   (ast: AST.AST, isBoundary = true): Parser<any, any> => {
@@ -299,7 +294,7 @@ const go = untracedMethod(() =>
       case "Refinement": {
         if (ast.isReversed) {
           const from = go(AST.getTo(ast), isBoundary)
-          const to = go(AST.reverse(excludeRefinements(ast.from)), false)
+          const to = go(AST.reverse(dropRefinements(ast.from)), false)
           return (i, options) => {
             const conditional = PR.flatMap(
               from(i, options),
