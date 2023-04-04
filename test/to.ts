@@ -1,5 +1,6 @@
 import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
+import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("to", () => {
   it("transform", () => {
@@ -26,5 +27,22 @@ describe.concurrent("to", () => {
     expect(S.is(schema)("a")).toEqual(true)
     expect(S.is(schema)("ab")).toEqual(true)
     expect(S.is(schema)("abc")).toEqual(false)
+  })
+
+  it("lazy", async () => {
+    interface I {
+      prop: I | string
+    }
+    interface A {
+      prop: A | number
+    }
+    const schema: S.Schema<I, A> = S.lazy(() =>
+      S.struct({
+        prop: S.union(S.numberFromString(S.string), schema)
+      })
+    )
+    const to = S.to(schema)
+    await Util.expectParseSuccess(to, { prop: 1 })
+    await Util.expectParseSuccess(to, { prop: { prop: 1 } })
   })
 })
