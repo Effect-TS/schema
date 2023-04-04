@@ -203,13 +203,13 @@ const go = (ast: AST.AST): Arbitrary<any> => {
       return (fc) => fc.oneof(...ast.enums.map(([_, value]) => fc.constant(value)))
     }
     case "Refinement": {
-      const to = go(ast.to)
+      const from = go(ast.from)
       return pipe(
         getHook(ast),
         O.match(
           () =>
             (fc) =>
-              to(fc).filter((a) => {
+              from(fc).filter((a) => {
                 const computed = eitherOrUndefined(ast.decode(a))
                 if (computed) {
                   return E.isRight(computed)
@@ -217,7 +217,7 @@ const go = (ast: AST.AST): Arbitrary<any> => {
                   return false
                 }
               }),
-          (handler) => handler(to)
+          (handler) => handler(from)
         )
       )
     }
