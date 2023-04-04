@@ -1369,7 +1369,7 @@ export const _getParameterKeyof = (
     case "TemplateLiteral":
       return ast
     case "Refinement":
-      return _getParameterKeyof(ast.to)
+      return _getParameterKeyof(ast.from)
   }
   return neverKeyword
 }
