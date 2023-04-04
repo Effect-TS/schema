@@ -31,9 +31,6 @@ const go = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
     }
   }
   switch (ast._tag) {
-    case "Literal":
-      // do not perturb literals otherwise the union optimisation algorithm doesn't kick in
-      return ast
     case "Declaration":
       return AST.createDeclaration(
         ast.typeParameters.map((ast) => go(ast, mode)),
@@ -79,7 +76,7 @@ const go = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
   }
   const decode = S.decodeEffect(S.make(ast))
   return AST.createTransform(
-    AST.unknownKeyword,
+    ast,
     ast,
     (a, options) => Effect.flatMap(sleep, () => decode(a, options)),
     (a, options) => Effect.flatMap(sleep, () => decode(a, options))

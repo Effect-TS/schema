@@ -71,16 +71,10 @@ describe.concurrent("Option", () => {
       expect(O.isOption(S.decode(schema)(null))).toEqual(true)
       expect(O.isOption(S.decode(schema)("1"))).toEqual(true)
 
-      await Util.expectParseFailureTree(
+      await Util.expectParseFailure(
         schema,
         {},
-        `error(s) found
-├─ union member
-│  └─ Expected undefined, actual {}
-├─ union member
-│  └─ Expected null, actual {}
-└─ union member
-   └─ Expected string, actual {}`
+        `union member: Expected undefined, actual {}, union member: Expected null, actual {}, union member: Expected string, actual {}`
       )
     })
 

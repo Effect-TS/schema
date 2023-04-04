@@ -1298,7 +1298,7 @@ export const _getWeight = (ast: AST): number => {
       return 10
     case "Refinement":
     case "Transform":
-      return _getWeight(ast.to)
+      return _getWeight(ast.from)
     case "ObjectKeyword":
       return -1
     case "UnknownKeyword":
