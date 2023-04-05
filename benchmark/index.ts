@@ -8,13 +8,12 @@ import { z } from "zod"
 D.runtimeDebug.tracingEnabled = true
 
 /*
-parseEither (good) x 364,438 ops/sec ±0.42% (94 runs sampled)
-zod (good) x 264,341 ops/sec ±0.33% (100 runs sampled)
-parseEither (bad) x 314,865 ops/sec ±0.34% (94 runs sampled)
-zod (bad) x 74,072 ops/sec ±3.19% (90 runs sampled)
-parseEither (bad2) x 310,721 ops/sec ±0.34% (96 runs sampled)
-zod (bad2) x 104,655 ops/sec ±4.01% (94 runs sampled)
-Fastest is parseEither (good)
+parseEither (good) x 258,771 ops/sec ±0.47% (86 runs sampled)
+zod (good) x 171,941 ops/sec ±8.44% (77 runs sampled)
+parseEither (bad) x 218,765 ops/sec ±2.90% (86 runs sampled)
+zod (bad) x 54,979 ops/sec ±4.90% (83 runs sampled)
+parseEither (bad2) x 198,661 ops/sec ±9.61% (78 runs sampled)
+zod (bad2) x 182,703 ops/sec ±0.94% (86 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -31,7 +30,7 @@ const AsteroidZod = z.object({
   type: z.literal("asteroid"),
   location: VectorZod,
   mass: z.number()
-}).strict()
+})
 
 const Planet = t.struct({
   type: t.literal("planet"),
@@ -46,7 +45,7 @@ const PlanetZod = z.object({
   mass: z.number(),
   population: z.number(),
   habitable: z.boolean()
-}).strict()
+})
 
 const Rank = t.union(
   t.literal("captain"),
@@ -72,7 +71,7 @@ const CrewMemberZod = z.object({
   age: z.number(),
   rank: RankZod,
   home: PlanetZod
-}).strict()
+})
 
 const Ship = t.struct({
   type: t.literal("ship"),
@@ -87,7 +86,7 @@ const ShipZod = z.object({
   mass: z.number(),
   name: z.string(),
   crew: z.array(CrewMemberZod)
-}).strict()
+})
 
 export const schema = t.union(Asteroid, Planet, Ship)
 export const schemaZod = z.discriminatedUnion("type", [AsteroidZod, PlanetZod, ShipZod])
