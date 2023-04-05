@@ -295,13 +295,9 @@ const go = untracedMethod(() =>
           return (i, options) =>
             handleForbidden(PR.flatMap(from(i, options), (a) => to(a, options)), options)
         } else {
-          if (isBoundary) {
-            const from = go(ast.from)
-            return (i, options) =>
-              handleForbidden(PR.flatMap(from(i, options), (a) => ast.decode(a, options)), options)
-          } else {
-            return ast.decode
-          }
+          const from = go(ast.from, isBoundary)
+          return (i, options) =>
+            handleForbidden(PR.flatMap(from(i, options), (a) => ast.decode(a, options)), options)
         }
       }
       case "Transform": {

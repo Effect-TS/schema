@@ -1885,7 +1885,7 @@ The `trim` parser allows removing whitespaces from the beginning and end of a st
 **Signature**
 
 ```ts
-export declare const trim: <I>(self: Schema<I, string>) => Schema<I, string>
+export declare const trim: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0

@@ -2473,11 +2473,11 @@ export const includes = <A extends string>(
  * @category string
  * @since 1.0.0
  */
-export const trim = <I>(self: Schema<I, string>): Schema<I, string> =>
+export const trim = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
   transform(
     self,
     pipe(to(self), trimmed()),
-    (s) => s.trim(),
+    (s) => s.trim() as A, // this is safe because `pipe(to(self), trimmed())` will check its input anyway
     identity
   )
 

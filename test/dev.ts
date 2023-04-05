@@ -11,10 +11,23 @@ describe.concurrent("dev", () => {
     await Util.expectEncodeSuccess(schema, O.some(1), "1")
   })
 
-  it("refinement", async () => {
-    const schema = pipe(S.string, S.maxLength(1), S.numberFromString)
-    // console.log("%o", schema.ast)
-    // expect(S.decode(schema)("1")).toEqual(1)
-    expect(S.encode(schema)(1)).toEqual("1")
+  it.skip("refinement", () => {
+    const schema = pipe(
+      S.string,
+      S.filter(() => {
+        console.log("filter1")
+        return true
+      }),
+      S.filter(() => {
+        console.log("filter2")
+        return true
+      }),
+      S.filter(() => {
+        console.log("filter3")
+        return true
+      })
+    )
+    // expect(S.decode(schema)("a")).toEqual("a")
+    expect(S.encode(schema)("a")).toEqual("a")
   })
 })
