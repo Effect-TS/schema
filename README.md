@@ -481,7 +481,7 @@ pipe(S.string, S.includes(searchString));
 pipe(S.string, S.trimmed()); // verifies that a string contains no leading or trailing whitespaces
 ```
 
-**Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+**Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator ot the `Trim` schema.
 
 ### Number filters
 
