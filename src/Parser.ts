@@ -285,21 +285,6 @@ interface Parser<I, A> {
   (i: I, options?: ParseEffectOptions): ParseResult<A>
 }
 
-const dropRightRefinement = (ast: AST.AST): AST.AST =>
-  AST.isRefinement(ast) ? dropRightRefinement(ast.from) : ast
-
-const handleForbidden = <A>(
-  conditional: ParseResult<A>,
-  options?: ParseEffectOptions
-): ParseResult<A> => {
-  const either = PR.eitherOrUndefined(conditional)
-  return either ?
-    either :
-    options?.isEffectAllowed === true ?
-    conditional :
-    PR.failure(PR.forbidden)
-}
-
 const go = untracedMethod(() =>
   (ast: AST.AST, isBoundary = true): Parser<any, any> => {
     switch (ast._tag) {
@@ -307,27 +292,25 @@ const go = untracedMethod(() =>
         if (ast.isReversed) {
           const from = isBoundary ? go(AST.getTo(ast)) : PR.success
           const to = go(AST.reverse(dropRightRefinement(ast.from)), false)
-          return (i, options) => {
-            return handleForbidden(
+          return (i, options) =>
+            handleForbidden(
               PR.flatMap(
                 from(i, options),
                 (a) => to(a, options)
               ),
               options
             )
-          }
         } else {
           if (isBoundary) {
             const from = go(ast.from)
-            return (i, options) => {
-              return handleForbidden(
+            return (i, options) =>
+              handleForbidden(
                 PR.flatMap(
                   from(i, options),
                   (a) => ast.decode(a, options)
                 ),
                 options
               )
-            }
           } else {
             return ast.decode
           }
@@ -337,22 +320,22 @@ const go = untracedMethod(() =>
         const to = go(ast.to, false)
         if (isBoundary) {
           const from = go(ast.from)
-          return (i1, options) => {
-            return handleForbidden(
+          return (i1, options) =>
+            handleForbidden(
               PR.flatMap(
                 from(i1, options),
                 (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
               ),
               options
             )
-          }
         } else {
           return (a, options) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
         }
       }
-      case "Declaration":
-        return (i, options) =>
-          handleForbidden(ast.decode(...ast.typeParameters)(i, options), options)
+      case "Declaration": {
+        const decode = ast.decode(...ast.typeParameters)
+        return (i, options) => handleForbidden(decode(i, options), options)
+      }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)
       case "UniqueSymbol":
@@ -448,11 +431,11 @@ const go = untracedMethod(() =>
             } else {
               const parser = elements[i]
               const te = parser(input[i], options)
-              const t = PR.eitherOrUndefined(te)
-              if (t) {
-                if (E.isLeft(t)) {
+              const eu = PR.eitherOrUndefined(te)
+              if (eu) {
+                if (E.isLeft(eu)) {
                   // the input element is present but is not valid
-                  const e = PR.index(i, t.left.errors)
+                  const e = PR.index(i, eu.left.errors)
                   if (allErrors) {
                     es.push([stepKey++, e])
                     continue
@@ -460,7 +443,7 @@ const go = untracedMethod(() =>
                     return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 }
-                output.push([stepKey++, t.right])
+                output.push([stepKey++, eu.right])
               } else {
                 const nk = stepKey++
                 const index = i
@@ -497,10 +480,10 @@ const go = untracedMethod(() =>
             const tail = RA.tailNonEmpty(rest.value)
             for (; i < len - tail.length; i++) {
               const te = head(input[i], options)
-              const t = PR.eitherOrUndefined(te)
-              if (t) {
-                if (E.isLeft(t)) {
-                  const e = PR.index(i, t.left.errors)
+              const eu = PR.eitherOrUndefined(te)
+              if (eu) {
+                if (E.isLeft(eu)) {
+                  const e = PR.index(i, eu.left.errors)
                   if (allErrors) {
                     es.push([stepKey++, e])
                     continue
@@ -508,7 +491,7 @@ const go = untracedMethod(() =>
                     return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 } else {
-                  output.push([stepKey++, t.right])
+                  output.push([stepKey++, eu.right])
                 }
               } else {
                 const nk = stepKey++
@@ -546,11 +529,11 @@ const go = untracedMethod(() =>
                 continue
               } else {
                 const te = tail[j](input[i], options)
-                const t = PR.eitherOrUndefined(te)
-                if (t) {
-                  if (E.isLeft(t)) {
+                const eu = PR.eitherOrUndefined(te)
+                if (eu) {
+                  if (E.isLeft(eu)) {
                     // the input element is present but is not valid
-                    const e = PR.index(i, t.left.errors)
+                    const e = PR.index(i, eu.left.errors)
                     if (allErrors) {
                       es.push([stepKey++, e])
                       continue
@@ -558,7 +541,7 @@ const go = untracedMethod(() =>
                       return PR.failures(mutableAppend(sortByIndex(es), e))
                     }
                   }
-                  output.push([stepKey++, t.right])
+                  output.push([stepKey++, eu.right])
                 } else {
                   const nk = stepKey++
                   const index = i
@@ -688,11 +671,11 @@ const go = untracedMethod(() =>
             const name = ps.name
             if (Object.prototype.hasOwnProperty.call(input, name)) {
               const te = parser(input[name], options)
-              const t = PR.eitherOrUndefined(te)
-              if (t) {
-                if (E.isLeft(t)) {
+              const eu = PR.eitherOrUndefined(te)
+              if (eu) {
+                if (E.isLeft(eu)) {
                   // the input key is present but is not valid
-                  const e = PR.key(name, t.left.errors)
+                  const e = PR.key(name, eu.left.errors)
                   if (allErrors) {
                     es.push([stepKey++, e])
                     continue
@@ -700,7 +683,7 @@ const go = untracedMethod(() =>
                     return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 }
-                output[name] = t.right
+                output[name] = eu.right
               } else {
                 const nk = stepKey++
                 const index = name
@@ -742,14 +725,13 @@ const go = untracedMethod(() =>
                 if (Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
                   continue
                 }
-                const te = parameter(key, options)
                 // ---------------------------------------------
                 // handle keys
                 // ---------------------------------------------
-                const t = PR.eitherOrUndefined(te)
-                if (t) {
-                  if (E.isLeft(t)) {
-                    const e = PR.key(key, t.left.errors)
+                const keu = PR.eitherOrUndefined(parameter(key, options))
+                if (keu) {
+                  if (E.isLeft(keu)) {
+                    const e = PR.key(key, keu.left.errors)
                     if (allErrors) {
                       es.push([stepKey++, e])
                       continue
@@ -763,11 +745,11 @@ const go = untracedMethod(() =>
                 // ---------------------------------------------
                 // handle values
                 // ---------------------------------------------
-                const tve = type(input[key], options)
-                const tv = PR.eitherOrUndefined(tve)
-                if (tv) {
-                  if (E.isLeft(tv)) {
-                    const e = PR.key(key, tv.left.errors)
+                const vpr = type(input[key], options)
+                const veu = PR.eitherOrUndefined(vpr)
+                if (veu) {
+                  if (E.isLeft(veu)) {
+                    const e = PR.key(key, veu.left.errors)
                     if (allErrors) {
                       es.push([stepKey++, e])
                       continue
@@ -775,7 +757,7 @@ const go = untracedMethod(() =>
                       return PR.failures(mutableAppend(sortByIndex(es), e))
                     }
                   } else {
-                    output[key] = tv.right
+                    output[key] = veu.right
                   }
                 } else {
                   const nk = stepKey++
@@ -787,7 +769,7 @@ const go = untracedMethod(() =>
                     untracedMethod(() =>
                       ({ es, output }: State) =>
                         Effect.flatMap(
-                          Effect.either(tve),
+                          Effect.either(vpr),
                           (tv) => {
                             if (E.isLeft(tv)) {
                               const e = PR.key(index, tv.left.errors)
@@ -890,16 +872,16 @@ const go = untracedMethod(() =>
           }
 
           for (let i = 0; i < candidates.length; i++) {
-            const te = map.get(candidates[i])!(input, options)
+            const pr = map.get(candidates[i])!(input, options)
             // the members of a union are ordered based on which one should be decoded first,
             // therefore if one member has added a task, all subsequent members must
             // also add a task to the queue even if they are synchronous
-            const t = !queue || queue.length === 0 ? PR.eitherOrUndefined(te) : undefined
-            if (t) {
-              if (E.isRight(t)) {
-                return PR.success(t.right)
+            const eu = !queue || queue.length === 0 ? PR.eitherOrUndefined(pr) : undefined
+            if (eu) {
+              if (E.isRight(eu)) {
+                return PR.success(eu.right)
               } else {
-                es.push([stepKey++, PR.unionMember(t.left.errors)])
+                es.push([stepKey++, PR.unionMember(eu.left.errors)])
               }
             } else {
               const nk = stepKey++
@@ -913,7 +895,7 @@ const go = untracedMethod(() =>
                       if ("finalResult" in state) {
                         return Effect.unit()
                       } else {
-                        return Effect.flatMap(Effect.either(te), (t) => {
+                        return Effect.flatMap(Effect.either(pr), (t) => {
                           if (E.isRight(t)) {
                             state.finalResult = PR.success(t.right)
                           } else {
@@ -1052,6 +1034,17 @@ export const _getSearchTree = (
     }
   }
   return { keys, otherwise }
+}
+
+const dropRightRefinement = (ast: AST.AST): AST.AST =>
+  AST.isRefinement(ast) ? dropRightRefinement(ast.from) : ast
+
+const handleForbidden = <A>(
+  conditional: ParseResult<A>,
+  options?: ParseEffectOptions
+): ParseResult<A> => {
+  const eu = PR.eitherOrUndefined(conditional)
+  return eu ? eu : options?.isEffectAllowed === true ? conditional : PR.failure(PR.forbidden)
 }
 
 const unknownArray = AST.createTuple([], O.some([AST.unknownKeyword]), true, {
