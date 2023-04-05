@@ -86,7 +86,7 @@ devDependencies:
   concurrently: 8.0.1
   cpx: 1.5.0
   docs-ts: 0.6.10_g7hfsee23mnk2i66lqywaix7ge_yjxfxdzwsjhh6zso5hxd2y2tpu
-  dtslint: github.com/gcanti/dtslint/4552d162099399c4e14f8486ced673411e5b3659
+  dtslint: github.com/gcanti/dtslint/1558adbeda424fec83a8d314784c18728a970cd4
   eslint: 8.37.0
   eslint-import-resolver-typescript: 3.5.4_rbts4wm34tb3x7owcp777e4f4y
   eslint-plugin-codegen: 0.17.0
@@ -7152,8 +7152,8 @@ packages:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: true
 
-  github.com/gcanti/dtslint/4552d162099399c4e14f8486ced673411e5b3659:
-    resolution: {tarball: https://codeload.github.com/gcanti/dtslint/tar.gz/4552d162099399c4e14f8486ced673411e5b3659}
+  github.com/gcanti/dtslint/1558adbeda424fec83a8d314784c18728a970cd4:
+    resolution: {tarball: https://codeload.github.com/gcanti/dtslint/tar.gz/1558adbeda424fec83a8d314784c18728a970cd4}
     name: dtslint
     version: 0.4.4
     engines: {node: '>=6.10.0'}
