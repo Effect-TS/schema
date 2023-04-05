@@ -11,7 +11,7 @@ describe.concurrent("from", () => {
     }
     const schema: S.Schema<I, A> = S.lazy(() =>
       S.struct({
-        prop: S.union(S.numberFromString(S.string), schema)
+        prop: S.union(S.NumberFromString, schema)
       })
     )
     const from = S.from(schema)

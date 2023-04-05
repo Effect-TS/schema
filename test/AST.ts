@@ -230,7 +230,7 @@ describe.concurrent("AST", () => {
   })
 
   it("keyof/ transform", () => {
-    expect(() => AST.keyof(S.numberFromString(S.string).ast)).toThrowError(
+    expect(() => AST.keyof(S.NumberFromString.ast)).toThrowError(
       new Error("`keyof` cannot handle transformations")
     )
   })

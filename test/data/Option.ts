@@ -5,7 +5,7 @@ import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
-const NumberFromString = S.numberFromString(S.string)
+const NumberFromString = S.NumberFromString
 
 describe.concurrent("Option", () => {
   describe.concurrent("option", () => {

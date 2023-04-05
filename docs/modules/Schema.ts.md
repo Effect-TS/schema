@@ -193,6 +193,7 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
 - [utils](#utils)
   - [Join (type alias)](#join-type-alias)
+  - [NumberFromString](#numberfromstring)
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [OptionalSchema (interface)](#optionalschema-interface)
   - [OptionalSchemaId](#optionalschemaid)
@@ -2227,6 +2228,16 @@ Added in v1.0.0
 export type Join<T> = T extends [infer Head, ...infer Tail]
   ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? '' : Join<Tail>}`
   : never
+```
+
+Added in v1.0.0
+
+## NumberFromString
+
+**Signature**
+
+```ts
+export declare const NumberFromString: Schema<string, number>
 ```
 
 Added in v1.0.0

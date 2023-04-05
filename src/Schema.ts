@@ -1860,7 +1860,6 @@ export const clamp = (min: number, max: number) =>
   @since 1.0.0
 */
 export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, number> => {
-  const validateResult = P.validateResult(self)
   const schema: Schema<I, number> = transformResult(
     self,
     number,
@@ -1877,10 +1876,15 @@ export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schem
       const n = parseFloat(s)
       return isNaN(n) ? PR.failure(PR.type(schema.ast, s)) : PR.success(n)
     },
-    (n) => validateResult(String(n))
+    (n) => PR.success(String(n) as A) // this is safe because `self` will check its input anyway
   )
   return schema
 }
+
+/**
+ * @since 1.0.0
+ */
+export const NumberFromString: Schema<string, number> = numberFromString(string)
 
 // ---------------------------------------------
 // data/Object

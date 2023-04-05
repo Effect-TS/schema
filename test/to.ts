@@ -7,7 +7,7 @@ describe.concurrent("to", () => {
     const schema = pipe(
       S.string,
       S.transform(
-        S.tuple(S.numberFromString(S.string), S.numberFromString(S.string)),
+        S.tuple(S.NumberFromString, S.NumberFromString),
         (s) => [s, s] as const,
         ([s]) => s
       ),
@@ -18,7 +18,7 @@ describe.concurrent("to", () => {
 
   it("refinement", () => {
     const schema = pipe(
-      S.numberFromString(S.string),
+      S.NumberFromString,
       S.greaterThanOrEqualTo(1),
       S.lessThanOrEqualTo(2),
       S.to
@@ -38,7 +38,7 @@ describe.concurrent("to", () => {
     }
     const schema: S.Schema<I, A> = S.lazy(() =>
       S.struct({
-        prop: S.union(S.numberFromString(S.string), schema)
+        prop: S.union(S.NumberFromString, schema)
       })
     )
     const to = S.to(schema)

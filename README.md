@@ -1093,7 +1093,7 @@ parse(" a "); // "a"
 
 ### Number transformations
 
-#### numberFromString
+#### NumberFromString
 
 Transforms a `string` into a `number` by parsing the string using `parseFloat`.
 
@@ -1103,7 +1103,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, number>
-const schema = S.numberFromString(S.string);
+const schema = S.NumberFromString;
 const parse = S.parse(schema);
 
 // success cases

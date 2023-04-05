@@ -290,27 +290,15 @@ const go = untracedMethod(() =>
     switch (ast._tag) {
       case "Refinement": {
         if (ast.isReversed) {
-          const from = isBoundary ? go(AST.getTo(ast)) : PR.success
+          const from = go(AST.getTo(ast), isBoundary)
           const to = go(AST.reverse(dropRightRefinement(ast.from)), false)
           return (i, options) =>
-            handleForbidden(
-              PR.flatMap(
-                from(i, options),
-                (a) => to(a, options)
-              ),
-              options
-            )
+            handleForbidden(PR.flatMap(from(i, options), (a) => to(a, options)), options)
         } else {
           if (isBoundary) {
             const from = go(ast.from)
             return (i, options) =>
-              handleForbidden(
-                PR.flatMap(
-                  from(i, options),
-                  (a) => ast.decode(a, options)
-                ),
-                options
-              )
+              handleForbidden(PR.flatMap(from(i, options), (a) => ast.decode(a, options)), options)
           } else {
             return ast.decode
           }

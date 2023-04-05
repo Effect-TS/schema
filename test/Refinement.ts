@@ -5,7 +5,7 @@ import * as Util from "@effect/schema/test/util"
 describe.concurrent("Refinement", () => {
   it("refinement", async () => {
     const schema = pipe(
-      S.numberFromString(S.string),
+      S.NumberFromString,
       S.greaterThanOrEqualTo(1),
       S.lessThanOrEqualTo(2)
     )
