@@ -1402,7 +1402,6 @@ export const date: Schema<Date> = declare(
   @since 1.0.0
 */
 export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, Date> => {
-  const validateResult = P.validateResult(self)
   const schema: Schema<I, Date> = transformResult(
     self,
     date,
@@ -1412,10 +1411,16 @@ export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<
         ? PR.failure(PR.type(schema.ast, s))
         : PR.success(new Date(n))
     },
-    (n) => validateResult(n.toISOString())
+    (n) => PR.success(n.toISOString() as A) // this is safe because `self` will check its input anyway
   )
   return schema
 }
+
+/**
+ * @category date
+ * @since 1.0.0
+ */
+export const DateFromString: Schema<string, Date> = dateFromString(string)
 
 // ---------------------------------------------
 // data/Either
@@ -1882,6 +1887,7 @@ export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schem
 }
 
 /**
+ * @category number
  * @since 1.0.0
  */
 export const NumberFromString: Schema<string, number> = numberFromString(string)
