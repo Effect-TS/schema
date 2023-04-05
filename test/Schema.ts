@@ -59,6 +59,12 @@ describe.concurrent("Schema", () => {
 
     expect(S.partial).exist
     expect(S.required).exist
+
+    expect(S.numberFromString).exist
+    expect(S.dateFromString).exist
+    expect(S.trim).exist
+    expect(S.clamp).exist
+    expect(S.clampBigint).exist
   })
 
   it("brand/ annotations", () => {

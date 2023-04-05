@@ -1072,15 +1072,15 @@ const transformedSchema: S.Schema<string, boolean> = S.transformResult(
 
 ### String transformations
 
-#### trim
+#### Trim
 
-The `trim` parser allows removing whitespaces from the beginning and end of a string.
+The `Trim` schema allows removing whitespaces from the beginning and end of a string.
 
 ```ts
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, string>
-const schema = S.trim(S.string);
+const schema = S.Trim;
 const parse = S.parse(schema);
 
 parse("a"); // "a"

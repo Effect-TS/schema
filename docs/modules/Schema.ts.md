@@ -149,6 +149,7 @@ Added in v1.0.0
   - [unknown](#unknown)
   - [void](#void)
 - [string](#string-1)
+  - [Trim](#trim)
   - [endsWith](#endswith)
   - [includes](#includes)
   - [length](#length)
@@ -1090,6 +1091,8 @@ Added in v1.0.0
 
 ## DateFromString
 
+This schema transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+
 **Signature**
 
 ```ts
@@ -1100,7 +1103,7 @@ Added in v1.0.0
 
 ## dateFromString
 
-Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+This combinator transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 **Signature**
 
@@ -1353,6 +1356,10 @@ Added in v1.0.0
 
 ## NumberFromString
 
+This schema transforms a `string` into a `number` by parsing the string using `parseFloat`.
+
+The following special string values are supported: "NaN", "Infinity", "-Infinity".
+
 **Signature**
 
 ```ts
@@ -1526,7 +1533,7 @@ Added in v1.0.0
 
 ## numberFromString
 
-Transforms a `string` into a `number` by parsing the string using `parseFloat`.
+This combinator transforms a `string` into a `number` by parsing the string using `parseFloat`.
 
 The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
@@ -1775,6 +1782,18 @@ Added in v1.0.0
 
 # string
 
+## Trim
+
+This schema allows removing whitespaces from the beginning and end of a string.
+
+**Signature**
+
+```ts
+export declare const Trim: Schema<string, string>
+```
+
+Added in v1.0.0
+
 ## endsWith
 
 **Signature**
@@ -1880,7 +1899,7 @@ Added in v1.0.0
 
 ## trim
 
-The `trim` parser allows removing whitespaces from the beginning and end of a string.
+This combinator allows removing whitespaces from the beginning and end of a string.
 
 **Signature**
 

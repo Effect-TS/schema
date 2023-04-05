@@ -1396,7 +1396,7 @@ export const date: Schema<Date> = declare(
 )
 
 /**
-  Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+  This combinator transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
   @category date
   @since 1.0.0
@@ -1417,6 +1417,8 @@ export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<
 }
 
 /**
+ * This schema transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+ *
  * @category date
  * @since 1.0.0
  */
@@ -1857,7 +1859,7 @@ export const clamp = (min: number, max: number) =>
     )
 
 /**
-  Transforms a `string` into a `number` by parsing the string using `parseFloat`.
+  This combinator transforms a `string` into a `number` by parsing the string using `parseFloat`.
 
   The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
@@ -1887,6 +1889,10 @@ export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schem
 }
 
 /**
+ * This schema transforms a `string` into a `number` by parsing the string using `parseFloat`.
+ *
+ * The following special string values are supported: "NaN", "Infinity", "-Infinity".
+ *
  * @category number
  * @since 1.0.0
  */
@@ -2468,7 +2474,7 @@ export const includes = <A extends string>(
     )
 
 /**
- * The `trim` parser allows removing whitespaces from the beginning and end of a string.
+ * This combinator allows removing whitespaces from the beginning and end of a string.
  *
  * @category string
  * @since 1.0.0
@@ -2480,6 +2486,14 @@ export const trim = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
     (s) => s.trim() as A, // this is safe because `pipe(to(self), trimmed())` will check its input anyway
     identity
   )
+
+/**
+ * This schema allows removing whitespaces from the beginning and end of a string.
+ *
+ * @category string
+ * @since 1.0.0
+ */
+export const Trim: Schema<string, string> = trim(string)
 
 /**
  * @category type id

@@ -5,12 +5,12 @@ import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("trim", () => {
   it("property tests", () => {
-    const schema = S.trim(S.string)
+    const schema = S.Trim
     Util.roundtrip(schema)
   })
 
   it("Guard", () => {
-    const schema = S.trim(S.string)
+    const schema = S.Trim
     const is = P.is(schema)
     expect(is("a")).toEqual(true)
     expect(is("")).toEqual(true)
