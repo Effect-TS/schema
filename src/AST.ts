@@ -565,7 +565,7 @@ export const createEnums = (
  * @category guards
  * @since 1.0.0
  */
-export const isEnum = (ast: AST): ast is Enums => ast._tag === "Enums"
+export const isEnums = (ast: AST): ast is Enums => ast._tag === "Enums"
 
 /**
  * @since 1.0.0

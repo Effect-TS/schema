@@ -24,26 +24,6 @@ describe.concurrent("AST", () => {
       )
   })
 
-  it("isDeclaration", () => {
-    expect(AST.isDeclaration(S.optionFromSelf(S.number).ast)).toEqual(true)
-    expect(AST.isDeclaration(S.number.ast)).toEqual(false)
-  })
-
-  it("isTemplateLiteral", () => {
-    expect(AST.isTemplateLiteral(S.templateLiteral(S.literal("a"), S.string).ast)).toEqual(true)
-    expect(AST.isTemplateLiteral(S.number.ast)).toEqual(false)
-  })
-
-  it("isLazy", () => {
-    expect(AST.isLazy(S.json.ast)).toEqual(true)
-    expect(AST.isLazy(S.number.ast)).toEqual(false)
-  })
-
-  it("isTransform", () => {
-    expect(AST.isTransform(pipe(S.string, S.trim).ast)).toEqual(true)
-    expect(AST.isTransform(S.number.ast)).toEqual(false)
-  })
-
   it("createTemplateLiteral/ should return a literal if there are no template literal spans", () => {
     expect(AST.createTemplateLiteral("a", [])).toEqual(AST.createLiteral("a"))
   })

@@ -59,10 +59,12 @@ Added in v1.0.0
   - [isBigIntKeyword](#isbigintkeyword)
   - [isBooleanKeyword](#isbooleankeyword)
   - [isDeclaration](#isdeclaration)
+  - [isEnums](#isenums)
   - [isLazy](#islazy)
   - [isLiteral](#isliteral)
   - [isNeverKeyword](#isneverkeyword)
   - [isNumberKeyword](#isnumberkeyword)
+  - [isObjectKeyword](#isobjectkeyword)
   - [isRefinement](#isrefinement)
   - [isStringKeyword](#isstringkeyword)
   - [isSymbolKeyword](#issymbolkeyword)
@@ -70,9 +72,11 @@ Added in v1.0.0
   - [isTransform](#istransform)
   - [isTuple](#istuple)
   - [isTypeLiteral](#istypeliteral)
+  - [isUndefinedKeyword](#isundefinedkeyword)
   - [isUnion](#isunion)
   - [isUniqueSymbol](#isuniquesymbol)
   - [isUnknownKeyword](#isunknownkeyword)
+  - [isVoidKeyword](#isvoidkeyword)
 - [model](#model)
   - [AST (type alias)](#ast-type-alias)
   - [Annotated (interface)](#annotated-interface)
@@ -604,6 +608,16 @@ export declare const isDeclaration: (ast: AST) => ast is Declaration
 
 Added in v1.0.0
 
+## isEnums
+
+**Signature**
+
+```ts
+export declare const isEnums: (ast: AST) => ast is Enums
+```
+
+Added in v1.0.0
+
 ## isLazy
 
 **Signature**
@@ -640,6 +654,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isNumberKeyword: (ast: AST) => ast is NumberKeyword
+```
+
+Added in v1.0.0
+
+## isObjectKeyword
+
+**Signature**
+
+```ts
+export declare const isObjectKeyword: (ast: AST) => ast is ObjectKeyword
 ```
 
 Added in v1.0.0
@@ -714,6 +738,16 @@ export declare const isTypeLiteral: (ast: AST) => ast is TypeLiteral
 
 Added in v1.0.0
 
+## isUndefinedKeyword
+
+**Signature**
+
+```ts
+export declare const isUndefinedKeyword: (ast: AST) => ast is UndefinedKeyword
+```
+
+Added in v1.0.0
+
 ## isUnion
 
 **Signature**
@@ -740,6 +774,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isUnknownKeyword: (ast: AST) => ast is UnknownKeyword
+```
+
+Added in v1.0.0
+
+## isVoidKeyword
+
+**Signature**
+
+```ts
+export declare const isVoidKeyword: (ast: AST) => ast is VoidKeyword
 ```
 
 Added in v1.0.0
