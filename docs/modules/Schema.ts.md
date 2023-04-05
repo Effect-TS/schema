@@ -347,7 +347,10 @@ Clamps a bigint between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clampBigint: (min: bigint, max: bigint) => <I>(self: Schema<I, bigint>) => Schema<I, bigint>
+export declare const clampBigint: (
+  min: bigint,
+  max: bigint
+) => <I, A extends bigint>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1389,7 +1392,7 @@ Clamps a number between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clamp: (min: number, max: number) => <I>(self: Schema<I, number>) => Schema<I, number>
+export declare const clamp: (min: number, max: number) => <I, A extends number>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0

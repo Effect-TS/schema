@@ -1221,11 +1221,11 @@ export const nonPositiveBigint = <A extends bigint>(
  * @since 1.0.0
  */
 export const clampBigint = (min: bigint, max: bigint) =>
-  <I>(self: Schema<I, bigint>): Schema<I, bigint> =>
+  <I, A extends bigint>(self: Schema<I, A>): Schema<I, A> =>
     transform(
       self,
       pipe(self, to, betweenBigint(min, max)),
-      (self) => B.clamp(self, min, max),
+      (self) => B.clamp(self, min, max) as A, // this is safe because `pipe(self, to, betweenBigint(min, max))` will check its input anyway
       identity
     )
 
@@ -1850,11 +1850,11 @@ export const nonPositive = <A extends number>(
  * @since 1.0.0
  */
 export const clamp = (min: number, max: number) =>
-  <I>(self: Schema<I, number>): Schema<I, number> =>
+  <I, A extends number>(self: Schema<I, A>): Schema<I, A> =>
     transform(
       self,
       pipe(self, to, between(min, max)),
-      (self) => N.clamp(self, min, max),
+      (self) => N.clamp(self, min, max) as A, // this is safe because `pipe(self, to, between(min, max))` will check its input anyway
       identity
     )
 
