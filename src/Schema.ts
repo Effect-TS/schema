@@ -1251,6 +1251,24 @@ export const clampBigint = <A extends bigint>(min: bigint, max: bigint) =>
     )
 
 // ---------------------------------------------
+// data/Boolean
+// ---------------------------------------------
+
+/**
+ * Negates a boolean value
+ *
+ * @category boolean
+ * @since 1.0.0
+ */
+export const not = <I>(self: Schema<I, boolean>): Schema<I, boolean> =>
+  transform(
+    self,
+    to(self),
+    (self) => !self,
+    (self) => !self
+  )
+
+// ---------------------------------------------
 // data/Brand
 // ---------------------------------------------
 
