@@ -9,11 +9,10 @@ D.runtimeDebug.tracingEnabled = true
 
 /*
 n = 100
-parseEither (good) x 2,048,528 ops/sec ±0.80% (95 runs sampled)
-zod (good) x 1,344,811 ops/sec ±0.21% (98 runs sampled)
-parseEither (bad) x 1,526,846 ops/sec ±0.08% (95 runs sampled)
-zod (bad) x 1,302,142 ops/sec ±2.92% (92 runs sampled)
-Fastest is parseEither (good)
+parseEither (good) x 1,588,627 ops/sec ±0.48% (89 runs sampled)
+zod (good) x 795,941 ops/sec ±10.56% (73 runs sampled)
+parseEither (bad) x 1,072,065 ops/sec ±3.08% (82 runs sampled)
+zod (bad) x 971,883 ops/sec ±0.55% (90 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -34,7 +33,7 @@ const x = RA.makeBy(n, (i) =>
     a: z.string(),
     b: z.number(),
     c: z.boolean()
-  }).strict())
+  }))
 
 const schemaZod = z.discriminatedUnion("kind", x)
 

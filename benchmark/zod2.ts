@@ -6,11 +6,10 @@ import * as Benchmark from "benchmark"
 import { z } from "zod"
 
 /*
-schema (good) x 2,216,849 ops/sec ±2.38% (94 runs sampled)
-zod (good) x 1,903,219 ops/sec ±0.29% (98 runs sampled)
-schema (bad) x 2,024,713 ops/sec ±2.67% (96 runs sampled)
-zod (bad) x 185,096 ops/sec ±3.20% (91 runs sampled)
-Fastest is schema (good)
+schema (good) x 2,013,098 ops/sec ±0.52% (88 runs sampled)
+zod (good) x 1,338,523 ops/sec ±7.56% (79 runs sampled)
+schema (bad) x 1,554,092 ops/sec ±3.37% (80 runs sampled)
+zod (bad) x 138,241 ops/sec ±4.44% (85 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
@@ -24,16 +23,6 @@ const schema = S.struct({
   name: pipe(S.string, S.minLength(3), S.maxLength(20)),
   age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
 })
-
-// const UserZod = z.object({
-//   name: z.string().min(3),
-//   age: z.number()
-// }).strict()
-
-// const schema = S.struct({
-//   name: pipe(S.string, S.minLength(3)),
-//   age: pipe(S.number)
-// })
 
 const good = {
   name: "Joe",

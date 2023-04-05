@@ -83,6 +83,7 @@ Added in v1.0.0
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [date](#date-1)
+  - [DateFromString](#datefromstring)
   - [dateFromString](#datefromstring)
 - [decoding](#decoding)
   - [decode](#decode)
@@ -108,6 +109,7 @@ Added in v1.0.0
   - [Schema (interface)](#schema-interface)
   - [To (type alias)](#to-type-alias)
 - [number](#number)
+  - [NumberFromString](#numberfromstring)
   - [between](#between)
   - [clamp](#clamp)
   - [finite](#finite)
@@ -147,6 +149,7 @@ Added in v1.0.0
   - [unknown](#unknown)
   - [void](#void)
 - [string](#string-1)
+  - [Trim](#trim)
   - [endsWith](#endswith)
   - [includes](#includes)
   - [length](#length)
@@ -344,10 +347,10 @@ Clamps a bigint between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clampBigint: <A extends bigint>(
+export declare const clampBigint: (
   min: bigint,
   max: bigint
-) => <I>(self: Schema<I, A>) => Schema<I, A>
+) => <I, A extends bigint>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1089,14 +1092,26 @@ Added in v1.0.0
 
 # date
 
-## dateFromString
+## DateFromString
 
-Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+This schema transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
 **Signature**
 
 ```ts
-export declare const dateFromString: <I>(self: Schema<I, string>) => Schema<I, date>
+export declare const DateFromString: Schema<string, Date>
+```
+
+Added in v1.0.0
+
+## dateFromString
+
+This combinator transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+
+**Signature**
+
+```ts
+export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
 ```
 
 Added in v1.0.0
@@ -1342,6 +1357,20 @@ Added in v1.0.0
 
 # number
 
+## NumberFromString
+
+This schema transforms a `string` into a `number` by parsing the string using `parseFloat`.
+
+The following special string values are supported: "NaN", "Infinity", "-Infinity".
+
+**Signature**
+
+```ts
+export declare const NumberFromString: Schema<string, number>
+```
+
+Added in v1.0.0
+
 ## between
 
 **Signature**
@@ -1363,7 +1392,7 @@ Clamps a number between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clamp: <A extends number>(min: number, max: number) => <I>(self: Schema<I, A>) => Schema<I, A>
+export declare const clamp: (min: number, max: number) => <I, A extends number>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1507,14 +1536,14 @@ Added in v1.0.0
 
 ## numberFromString
 
-Transforms a `string` into a `number` by parsing the string using `parseFloat`.
+This combinator transforms a `string` into a `number` by parsing the string using `parseFloat`.
 
 The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
 **Signature**
 
 ```ts
-export declare const numberFromString: <I>(self: Schema<I, string>) => Schema<I, number>
+export declare const numberFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, number>
 ```
 
 Added in v1.0.0
@@ -1756,6 +1785,18 @@ Added in v1.0.0
 
 # string
 
+## Trim
+
+This schema allows removing whitespaces from the beginning and end of a string.
+
+**Signature**
+
+```ts
+export declare const Trim: Schema<string, string>
+```
+
+Added in v1.0.0
+
 ## endsWith
 
 **Signature**
@@ -1861,12 +1902,12 @@ Added in v1.0.0
 
 ## trim
 
-The `trim` parser allows removing whitespaces from the beginning and end of a string.
+This combinator allows removing whitespaces from the beginning and end of a string.
 
 **Signature**
 
 ```ts
-export declare const trim: <I>(self: Schema<I, string>) => Schema<I, string>
+export declare const trim: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0

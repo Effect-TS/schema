@@ -481,7 +481,7 @@ pipe(S.string, S.includes(searchString));
 pipe(S.string, S.trimmed()); // verifies that a string contains no leading or trailing whitespaces
 ```
 
-**Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+**Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator ot the `Trim` schema.
 
 ### Number filters
 
@@ -1072,15 +1072,15 @@ const transformedSchema: S.Schema<string, boolean> = S.transformResult(
 
 ### String transformations
 
-#### trim
+#### Trim
 
-The `trim` parser allows removing whitespaces from the beginning and end of a string.
+The `Trim` schema allows removing whitespaces from the beginning and end of a string.
 
 ```ts
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, string>
-const schema = S.trim(S.string);
+const schema = S.Trim;
 const parse = S.parse(schema);
 
 parse("a"); // "a"
@@ -1093,7 +1093,7 @@ parse(" a "); // "a"
 
 ### Number transformations
 
-#### numberFromString
+#### NumberFromString
 
 Transforms a `string` into a `number` by parsing the string using `parseFloat`.
 
@@ -1103,7 +1103,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, number>
-const schema = S.numberFromString(S.string);
+const schema = S.NumberFromString;
 const parse = S.parse(schema);
 
 // success cases
@@ -1154,7 +1154,7 @@ parse(3n); // 1n
 
 ### Date transformations
 
-#### dateFromString
+#### DateFromString
 
 Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 
@@ -1162,7 +1162,7 @@ Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
-const schema = S.dateFromString(S.string);
+const schema = S.DateFromString;
 const parse = S.parse(schema);
 
 parse("1970-01-01T00:00:00.000Z"); // new Date(0)
