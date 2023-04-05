@@ -285,8 +285,20 @@ interface Parser<I, A> {
   (i: I, options?: ParseEffectOptions): ParseResult<A>
 }
 
-const dropRefinements = (ast: AST.AST): AST.AST =>
-  AST.isRefinement(ast) ? dropRefinements(ast.from) : ast
+const dropRightRefinement = (ast: AST.AST): AST.AST =>
+  AST.isRefinement(ast) ? dropRightRefinement(ast.from) : ast
+
+const handleForbidden = <A>(
+  conditional: ParseResult<A>,
+  options?: ParseEffectOptions
+): ParseResult<A> => {
+  const either = PR.eitherOrUndefined(conditional)
+  return either ?
+    either :
+    options?.isEffectAllowed === true ?
+    conditional :
+    PR.failure(PR.forbidden)
+}
 
 const go = untracedMethod(() =>
   (ast: AST.AST, isBoundary = true): Parser<any, any> => {
@@ -294,33 +306,27 @@ const go = untracedMethod(() =>
       case "Refinement": {
         if (ast.isReversed) {
           const from = isBoundary ? go(AST.getTo(ast)) : PR.success
-          const to = go(AST.reverse(dropRefinements(ast.from)), false)
+          const to = go(AST.reverse(dropRightRefinement(ast.from)), false)
           return (i, options) => {
-            const conditional = PR.flatMap(
-              from(i, options),
-              (a) => to(a, options)
+            return handleForbidden(
+              PR.flatMap(
+                from(i, options),
+                (a) => to(a, options)
+              ),
+              options
             )
-            const either = PR.eitherOrUndefined(conditional)
-            return either ?
-              either :
-              options?.isEffectAllowed === true ?
-              conditional :
-              PR.failure(PR.forbidden)
           }
         } else {
           if (isBoundary) {
             const from = go(ast.from)
             return (i, options) => {
-              const conditional = PR.flatMap(
-                from(i, options),
-                (a) => ast.decode(a, options)
+              return handleForbidden(
+                PR.flatMap(
+                  from(i, options),
+                  (a) => ast.decode(a, options)
+                ),
+                options
               )
-              const either = PR.eitherOrUndefined(conditional)
-              return either ?
-                either :
-                options?.isEffectAllowed === true ?
-                conditional :
-                PR.failure(PR.forbidden)
             }
           } else {
             return ast.decode
@@ -332,31 +338,21 @@ const go = untracedMethod(() =>
         if (isBoundary) {
           const from = go(ast.from)
           return (i1, options) => {
-            const conditional = PR.flatMap(
-              from(i1, options),
-              (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+            return handleForbidden(
+              PR.flatMap(
+                from(i1, options),
+                (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+              ),
+              options
             )
-            const either = PR.eitherOrUndefined(conditional)
-            return either ?
-              either :
-              options?.isEffectAllowed === true ?
-              conditional :
-              PR.failure(PR.forbidden)
           }
         } else {
           return (a, options) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
         }
       }
       case "Declaration":
-        return (i, options) => {
-          const conditional = ast.decode(...ast.typeParameters)(i, options)
-          const either = PR.eitherOrUndefined(conditional)
-          return either ?
-            either :
-            options?.isEffectAllowed === true ?
-            conditional :
-            PR.failure(PR.forbidden)
-        }
+        return (i, options) =>
+          handleForbidden(ast.decode(...ast.typeParameters)(i, options), options)
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)
       case "UniqueSymbol":
