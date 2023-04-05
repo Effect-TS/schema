@@ -28,33 +28,6 @@ describe.concurrent("AST", () => {
     expect(AST.createTemplateLiteral("a", [])).toEqual(AST.createLiteral("a"))
   })
 
-  it("getCardinality/ never", () => {
-    expect(AST._getCardinality(AST.neverKeyword)).toEqual(0)
-  })
-
-  it("getCardinality/ object", () => {
-    expect(AST._getCardinality(AST.objectKeyword)).toEqual(5)
-  })
-
-  it("getCardinality/ refinement", () => {
-    expect(AST._getCardinality(pipe(S.string, S.nonEmpty()).ast)).toEqual(4)
-  })
-
-  it("getWeight/transform/ should return the weight of type", () => {
-    expect(AST._getWeight(S.optionFromSelf(S.number).ast)).toEqual(3)
-  })
-
-  it("getWeight/union/ should return the sum of the members weight", () => {
-    expect(AST._getWeight(S.union(S.struct({ a: S.string }), S.struct({ b: S.number })).ast))
-      .toEqual(2)
-  })
-
-  it("getWeight/refinement/ should return the weight of the from type", () => {
-    expect(AST._getWeight(pipe(S.array(S.string), S.filter((as) => as.length === 2)).ast)).toEqual(
-      1
-    )
-  })
-
   it("union/ should remove never from members", () => {
     expect(AST.createUnion([AST.neverKeyword, AST.neverKeyword])).toEqual(
       AST.neverKeyword
