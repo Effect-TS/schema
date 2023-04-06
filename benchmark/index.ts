@@ -8,12 +8,12 @@ import { z } from "zod"
 D.runtimeDebug.tracingEnabled = true
 
 /*
-parseEither (good) x 258,771 ops/sec ±0.47% (86 runs sampled)
-zod (good) x 171,941 ops/sec ±8.44% (77 runs sampled)
-parseEither (bad) x 218,765 ops/sec ±2.90% (86 runs sampled)
-zod (bad) x 54,979 ops/sec ±4.90% (83 runs sampled)
-parseEither (bad2) x 198,661 ops/sec ±9.61% (78 runs sampled)
-zod (bad2) x 182,703 ops/sec ±0.94% (86 runs sampled)
+parseEither (good) x 283,841 ops/sec ±0.55% (86 runs sampled)
+zod (good) x 176,785 ops/sec ±6.98% (81 runs sampled)
+parseEither (bad) x 231,839 ops/sec ±3.18% (83 runs sampled)
+zod (bad) x 55,584 ops/sec ±4.29% (83 runs sampled)
+parseEither (bad2) x 220,214 ops/sec ±9.78% (78 runs sampled)
+zod (bad2) x 185,401 ops/sec ±0.85% (85 runs sampled)
 */
 
 const suite = new Benchmark.Suite()
