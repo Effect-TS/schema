@@ -39,7 +39,7 @@ This library was inspired by the following projects:
 
 ## Requirements
 
-- TypeScript 4.7 or newer
+- TypeScript 4.9 or newer
 - The `strict` flag enabled in your `tsconfig.json` file
 - The `exactOptionalPropertyTypes` flag enabled in your `tsconfig.json` file
 
