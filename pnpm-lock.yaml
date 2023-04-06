@@ -13,8 +13,8 @@ specifiers:
   '@changesets/cli': ^2.26.1
   '@effect-ts/build-utils': ^0.40.7
   '@effect-ts/core': ^0.60.5
-  '@effect/data': ^0.10.3
-  '@effect/io': ^0.18.0
+  '@effect/data': ^0.11.1
+  '@effect/io': ^0.19.0
   '@effect/language-service': ^0.0.19
   '@repo-tooling/eslint-plugin-dprint': ^0.0.4
   '@types/benchmark': ^2.1.2
@@ -56,8 +56,8 @@ specifiers:
   zod: ^3.21.4
 
 dependencies:
-  '@effect/data': 0.10.3
-  '@effect/io': 0.18.0
+  '@effect/data': 0.11.1
+  '@effect/io': 0.19.0
   fast-check: 3.8.0
 
 devDependencies:
@@ -627,14 +627,14 @@ packages:
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
     dev: true
 
-  /@effect/data/0.10.3:
-    resolution: {integrity: sha512-D3T43FOiCDeYYQCfjR4ra1apgL78GS4T85wMMZ4A2UZ3SmKWeM0CP66jnysUoRW4f9Q6xnk4BfbU8eyUQo8oZw==}
+  /@effect/data/0.11.1:
+    resolution: {integrity: sha512-HjsZIwrT9M0GqOGbM/NHL7bDt3n2mPsC8Lv9YOt76JW/R08s6UexIfmFn2+B1VB/aELY7hXqDlyUlk0QcDs9TQ==}
     dev: false
 
-  /@effect/io/0.18.0:
-    resolution: {integrity: sha512-NAeIvSxuwTa4y9Tj5DtxfnFUPbprz494YBA+56e+bt/UKT1LPhF8iZ58jSCmNG/R7BFZQEF4qHlTTRN6TOF0Zw==}
+  /@effect/io/0.19.0:
+    resolution: {integrity: sha512-jdXf0GF361ruzpp40bOUGbbizDOsw7pmTtASGWqxPtZ4g/nGLIJ5TzvhQJX7+sg9VGyvo6Rri1cMIKno66tpLA==}
     dependencies:
-      '@effect/data': 0.10.3
+      '@effect/data': 0.11.1
     dev: false
 
   /@effect/language-service/0.0.19:
