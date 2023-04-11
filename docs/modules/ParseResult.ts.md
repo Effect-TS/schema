@@ -285,7 +285,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const eitherOrUndefined: <E, A>(self: IO<E, A>) => E.Left<E> | E.Right<A> | undefined
+export declare const eitherOrUndefined: <E, A>(self: IO<E, A>) => E.Left<E, A> | E.Right<E, A> | undefined
 ```
 
 Added in v1.0.0
