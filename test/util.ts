@@ -14,6 +14,9 @@ import * as S from "@effect/schema/Schema"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
 import * as fc from "fast-check"
 
+const doEffectify = true
+const doRoundtrip = true
+
 export const sleep = Effect.sleep(Duration.millis(10))
 
 const goDecode = (
@@ -85,9 +88,10 @@ const go = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
 export const effectifySchema = <I, A>(schema: Schema<I, A>, mode: "all" | "semi"): Schema<I, A> =>
   S.make(go(schema.ast, mode))
 
-const doEffectify = true
-
 export const roundtrip = <I, A>(schema: Schema<I, A>) => {
+  if (!doRoundtrip) {
+    return
+  }
   const to = S.to(schema)
   const arb = A.to(to)
   const is = S.is(to)
@@ -106,13 +110,13 @@ export const roundtrip = <I, A>(schema: Schema<I, A>) => {
     return is(roundtrip.right)
   }))
   if (doEffectify) {
-    // const effect = effectifySchema(schema, "semi")
-    // fc.assert(fc.asyncProperty(arb(fc), async (a) => {
-    //   const roundtrip = await Effect.runPromiseEither(
-    //     PR.flatMap(S.encodeEffect(effect)(a), S.decodeEffect(effect))
-    //   )
-    //   return E.isRight(roundtrip)
-    // }))
+    const effect = effectifySchema(schema, "semi")
+    fc.assert(fc.asyncProperty(arb(fc), async (a) => {
+      const roundtrip = await Effect.runPromiseEither(
+        PR.flatMap(S.encodeEffect(effect)(a), S.decodeEffect(effect))
+      )
+      return E.isRight(roundtrip)
+    }))
   }
 }
 

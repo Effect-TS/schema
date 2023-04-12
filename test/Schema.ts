@@ -270,50 +270,6 @@ describe.concurrent("Schema", () => {
     expect(is(3)).toEqual(false)
   })
 
-  it("keyof/struct/ string keys", () => {
-    const schema = S.struct({
-      a: S.string,
-      b: S.number
-    })
-    const keyOf = S.keyof(schema)
-    const is = P.is(keyOf)
-    expect(is("a")).toEqual(true)
-    expect(is("b")).toEqual(true)
-    expect(is("c")).toEqual(false)
-  })
-
-  it("keyof/struct/ symbol keys", () => {
-    const a = Symbol.for("@effect/schema/test/a")
-    const b = Symbol.for("@effect/schema/test/b")
-    const schema = S.struct({
-      [a]: S.string,
-      [b]: S.number
-    })
-    const keyOf = S.keyof(schema)
-    const is = P.is(keyOf)
-    expect(is(a)).toEqual(true)
-    expect(is(b)).toEqual(true)
-    expect(is("a")).toEqual(false)
-    expect(is("b")).toEqual(false)
-  })
-
-  it("keyof/ union", () => {
-    const schema = S.union(
-      S.struct({
-        a: S.string,
-        b: S.number
-      }),
-      S.struct({
-        a: S.boolean,
-        c: S.number
-      })
-    )
-    const is = P.is(S.keyof(schema))
-    expect(is("a")).toEqual(true)
-    expect(is("b")).toEqual(false)
-    expect(is("c")).toEqual(false)
-  })
-
   it(`extend/ union of structs with struct`, () => {
     const schema = pipe(
       S.struct({ b: S.boolean }),
