@@ -99,6 +99,18 @@ describe.concurrent("Option", () => {
     const schema = pipe(S.struct({ a: S.string }), S.optionsFromOptionals({ b: S.number }))
     await Util.expectParseSuccess(schema, { a: "a" }, { a: "a", b: O.none() })
     await Util.expectParseSuccess(schema, { a: "a", b: 1 }, { a: "a", b: O.some(1) })
+    await Util.expectParseSuccess(
+      schema,
+      { a: "a" },
+      { a: "a", b: O.none() },
+      Util.onExcessPropertyError
+    )
+    await Util.expectParseSuccess(
+      schema,
+      { a: "a", b: 1 },
+      { a: "a", b: O.some(1) },
+      Util.onExcessPropertyError
+    )
 
     await Util.expectParseFailure(
       schema,

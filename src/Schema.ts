@@ -2041,7 +2041,7 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
           ),
           to.indexSignatures
         )
-        const out = AST.createTransform(from2, to2, (input) => {
+        const out = AST.createTransform(from2, to2, (input, options) => {
           const o = { ...input }
           const n: any = {}
           for (let i = 0; i < len; i++) {
@@ -2049,8 +2049,8 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
             delete o[key]
             n[key] = O.fromNullable(input[key])
           }
-          return PR.map(decode(o), (o) => ({ ...o, ...n }))
-        }, (a) => {
+          return PR.map(decode(o, options), (o) => ({ ...o, ...n }))
+        }, (a, options) => {
           const o = { ...a }
           const n: any = {}
           for (let i = 0; i < len; i++) {
@@ -2060,7 +2060,7 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
               n[key] = a[key].value
             }
           }
-          return PR.map(encode(o), (o) => ({ ...o, ...n }))
+          return PR.map(encode(o, options), (o) => ({ ...o, ...n }))
         })
         return make(out)
       }
