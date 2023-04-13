@@ -1216,52 +1216,6 @@ encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
 encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
 ```
 
-### Parsing from optional fields
-
-When working with optional fields that contain values of type `A`, it is possible to parse them into an `Option<A>` by using the `parseOptionals` combinator.
-
-When parsing a nullable field, the `parseOptionals` combinator follows these conversion rules:
-
-- `undefined`, `null` and an absent value parse to `None`
-- `A` parses to `Some<A>`
-
-Here's an example that demonstrates how to use the `parseOptionals` combinator:
-
-```ts
-import * as S from "@effect/schema/Schema";
-
-/*
-const schema: S.Schema<{
-    readonly a: string;
-    readonly b?: number;
-}, {
-    readonly a: string;
-    readonly b: O.Option<number>;
-}>
-*/
-const schema = pipe(
-  S.struct({ a: S.string }),
-  S.optionsFromOptionals({ b: S.number })
-);
-
-// parsing
-const parse = S.parse(schema);
-parse({ a: "hello" }); // { a: "hello", b: none() }
-parse({ a: "hello", b: undefined }); // { a: "hello", b: none() }
-parse({ a: "hello", b: null }); // { a: "hello", b: none() }
-parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
-
-// encoding
-const encodeOrThrow = S.encode(schema);
-
-encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello' }
-encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
-```
-
-In the above example, the `parseOptionals` combinator is used to parse the optional field `b` with values of type `number` into an `Option<number>`. When parsing, `undefined`, `null` and absent values will be parsed as `none()`, and any other value will be parsed as `some(value)`.
-
-To use `parseOptionals`, you should first define your base schema and then apply the `parseOptionals` combinator to add the fields that you want to parse into an `Option`.
-
 ## ReadonlySet
 
 In the following section, we demonstrate how to use the `readonlySet` combinator to parse a `ReadonlySet` from an array of values.

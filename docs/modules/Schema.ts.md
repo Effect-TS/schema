@@ -127,7 +127,6 @@ Added in v1.0.0
   - [positive](#positive)
 - [option](#option-1)
   - [optionFromNullable](#optionfromnullable)
-  - [optionsFromOptionals](#optionsfromoptionals)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEffect](#parseeffect)
@@ -1568,23 +1567,6 @@ Added in v1.0.0
 
 ```ts
 export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null | undefined, Option<A>>
-```
-
-Added in v1.0.0
-
-## optionsFromOptionals
-
-**Signature**
-
-```ts
-export declare const optionsFromOptionals: <Fields extends Record<string | number | symbol, Schema<any, any>>>(
-  fields: Fields
-) => <I, A extends object>(
-  schema: Schema<I, A>
-) => Schema<
-  Spread<I & { readonly [K in keyof Fields]?: From<Fields[K]> | undefined }>,
-  Spread<A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> }>
->
 ```
 
 Added in v1.0.0

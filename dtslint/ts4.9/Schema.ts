@@ -384,16 +384,6 @@ S.optionFromSelf(S.number)
 S.optionFromSelf(NumberFromString)
 
 // ---------------------------------------------
-// optionsFromOptionals
-// ---------------------------------------------
-
-// $ExpectType Schema<{ readonly a: string; readonly b?: number; }, { readonly a: string; readonly b: Option<number>; }>
-pipe(S.struct({ a: S.string }), S.optionsFromOptionals({ b: S.number }))
-
-// $ExpectType Schema<{ readonly a: string; readonly b?: string; }, { readonly a: string; readonly b: Option<number>; }>
-pipe(S.struct({ a: S.string }), S.optionsFromOptionals({ b: NumberFromString }))
-
-// ---------------------------------------------
 // instanceOf
 // ---------------------------------------------
 

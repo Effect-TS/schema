@@ -120,6 +120,7 @@ Added in v1.0.0
   - [getAnnotation](#getannotation)
   - [getCompiler](#getcompiler)
   - [getFrom](#getfrom)
+  - [getPropertySignatures](#getpropertysignatures)
   - [getTo](#getto)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
@@ -1325,6 +1326,16 @@ Added in v1.0.0
 
 ```ts
 export declare const getFrom: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
+## getPropertySignatures
+
+**Signature**
+
+```ts
+export declare const getPropertySignatures: (ast: AST) => ReadonlyArray<PropertySignature>
 ```
 
 Added in v1.0.0
