@@ -93,7 +93,7 @@ describe.concurrent("Option", () => {
     )
     expect(() => pipe(S.struct({ a: S.number }), S.optionsFromOptionals({ a: S.number })))
       .toThrowError(
-        new Error("`optionsFromOptionals` cannot handle overlapping property signatures")
+        new Error("Duplicate property signature a")
       )
 
     const schema = pipe(S.struct({ a: S.string }), S.optionsFromOptionals({ b: S.number }))

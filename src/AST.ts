@@ -724,7 +724,7 @@ export const createTypeLiteral = (
   for (let i = 0; i < propertySignatures.length; i++) {
     const name = propertySignatures[i].name
     if (name in keys) {
-      throw new Error(`Duplicate property signature \`${String(name)}\``)
+      throw new Error(`Duplicate property signature ${String(name)}`)
     }
     keys[name] = null
   }

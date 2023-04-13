@@ -2022,15 +2022,9 @@ export const optionsFromOptionals = <Fields extends Record<PropertyKey, Schema<a
     if (AST.isTypeLiteral(ast) || AST.isTransform(ast)) {
       const ownKeys = I.ownKeys(fields)
       const len = ownKeys.length
-      const from = AST.getFrom(schema.ast)
-      const to = AST.getTo(schema.ast)
+      const from = AST.getFrom(ast)
+      const to = AST.getTo(ast)
       if (AST.isTypeLiteral(from) && AST.isTypeLiteral(to)) {
-        if (
-          (from.propertySignatures.some((px) => ownKeys.some((name) => px.name === name))) ||
-          (to.propertySignatures.some((px) => ownKeys.some((name) => px.name === name)))
-        ) {
-          throw new Error("`optionsFromOptionals` cannot handle overlapping property signatures")
-        }
         const decode = AST.isTypeLiteral(ast) ? PR.success : ast.decode
         const encode = AST.isTypeLiteral(ast) ? PR.success : ast.encode
         const from2 = AST.createTypeLiteral(

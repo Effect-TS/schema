@@ -369,7 +369,7 @@ describe.concurrent("Schema", () => {
         S.struct({ a: S.literal("a") }),
         S.extend(S.struct({ a: S.string }))
       )
-    ).toThrowError(new Error("Duplicate property signature `a`"))
+    ).toThrowError(new Error("Duplicate property signature a"))
     expect(() =>
       pipe(
         S.struct({ a: S.literal("a") }),
@@ -380,7 +380,7 @@ describe.concurrent("Schema", () => {
           )
         )
       )
-    ).toThrowError(new Error("Duplicate property signature `a`"))
+    ).toThrowError(new Error("Duplicate property signature a"))
   })
 
   describe.concurrent("experimental", () => {
