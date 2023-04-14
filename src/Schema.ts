@@ -722,19 +722,80 @@ export const record = <K extends string | symbol, I, A>(
   make(AST.createRecord(key.ast, value.ast, true))
 
 const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST.AST>) => {
-  if (xs.every(AST.isTypeLiteral) && ys.every(AST.isTypeLiteral)) {
-    return AST.createUnion(
-      xs.flatMap((x) =>
-        ys.map((y) => {
-          return AST.createTypeLiteral(
-            x.propertySignatures.concat(y.propertySignatures),
-            x.indexSignatures.concat(y.indexSignatures)
-          )
-        })
-      )
-    )
-  }
-  throw new Error("`extend` can only handle type literals or unions of type literals")
+  return AST.createUnion(
+    xs.flatMap((x) => {
+      return ys.map((y) => {
+        if (AST.isTypeLiteral(x)) {
+          if (AST.isTypeLiteral(y)) {
+            return AST.createTypeLiteral(
+              x.propertySignatures.concat(y.propertySignatures),
+              x.indexSignatures.concat(y.indexSignatures)
+            )
+          } else if (
+            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
+            AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
+          ) {
+            const from = AST.createTypeLiteral(
+              x.propertySignatures.concat(y.from.propertySignatures),
+              x.indexSignatures.concat(y.from.indexSignatures)
+            )
+            const to = AST.createTypeLiteral(
+              x.propertySignatures.concat(y.to.propertySignatures),
+              x.indexSignatures.concat(y.to.indexSignatures)
+            )
+            return AST.createTransform(
+              from,
+              to,
+              y.decode,
+              y.encode,
+              y.propertySignatureTransformations
+            )
+          }
+        } else if (
+          AST.isTransform(x) && x.propertySignatureTransformations.length > 0 &&
+          AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
+        ) {
+          if (AST.isTypeLiteral(y)) {
+            const from = AST.createTypeLiteral(
+              x.from.propertySignatures.concat(y.propertySignatures),
+              x.from.indexSignatures.concat(y.indexSignatures)
+            )
+            const to = AST.createTypeLiteral(
+              x.to.propertySignatures.concat(y.propertySignatures),
+              x.to.indexSignatures.concat(y.indexSignatures)
+            )
+            return AST.createTransform(
+              from,
+              to,
+              x.decode,
+              x.encode,
+              x.propertySignatureTransformations
+            )
+          } else if (
+            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
+            AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
+          ) {
+            const from = AST.createTypeLiteral(
+              x.from.propertySignatures.concat(y.from.propertySignatures),
+              x.from.indexSignatures.concat(y.from.indexSignatures)
+            )
+            const to = AST.createTypeLiteral(
+              x.to.propertySignatures.concat(y.to.propertySignatures),
+              x.to.indexSignatures.concat(y.to.indexSignatures)
+            )
+            const propertySignatureTransformations = x.propertySignatureTransformations.concat(
+              y.propertySignatureTransformations
+            )
+            const { decode, encode } = AST.compilePropertySignatureTransformations(
+              propertySignatureTransformations
+            )
+            return AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+          }
+        }
+        throw new Error("`extend` can only handle type literals or unions of type literals")
+      })
+    })
+  )
 }
 
 /**

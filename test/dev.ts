@@ -1,24 +1,40 @@
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
-import * as O from "@effect/data/Option"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("dev", () => {
-  it("all", async () => {
-    const schema = S.struct({
-      a: S.boolean,
-      b: S.optional(S.NumberFromString),
-      c: S.optional(S.Trim, { to: "default", value: "-" }),
-      d: S.optional(S.DateFromString, { to: "Option" })
+  it("dev", async () => {
+    const schema = pipe(
+      S.union(
+        S.struct({
+          a: S.optional(S.string, { to: "default", value: "a" }),
+          b: S.string
+        }),
+        S.struct({
+          c: S.optional(S.string, { to: "default", value: "c" }),
+          d: S.string
+        })
+      ),
+      S.extend(
+        S.union(
+          S.struct({
+            e: S.optional(S.string, { to: "default", value: "e" }),
+            f: S.string
+          }),
+          S.struct({
+            g: S.optional(S.string, { to: "default", value: "g" }),
+            h: S.string
+          })
+        )
+      )
+    )
+    await Util.expectParseSuccess(schema, { b: "b", f: "f" }, {
+      a: "a",
+      b: "b",
+      e: "e",
+      f: "f"
     })
-    await Util.expectParseSuccess(schema, { a: true, b: "1" }, {
-      a: true,
-      b: 1,
-      c: "-",
-      d: O.none()
-    })
-    await Util.expectParseSuccess(schema, { a: true }, { a: true, c: "-", d: O.none() })
   })
 
   it.skip("dev2", async () => {
