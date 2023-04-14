@@ -11,6 +11,7 @@ import { isString, isSymbol } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
 import type { ParseResult } from "@effect/schema/ParseResult"
+import * as PR from "@effect/schema/ParseResult"
 
 // -------------------------------------------------------------------------------------
 // model
@@ -888,6 +889,44 @@ export const createPropertySignatureTransformation = (
   decode: (o: Option<any>) => Option<any>,
   encode: (o: Option<any>) => Option<any>
 ): PropertySignatureTransformation => ({ from, to, decode, encode })
+
+/** @internal */
+export const compilePropertySignatureTransformations = (
+  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
+): Pick<Transform, "decode" | "encode"> => {
+  return {
+    decode: (input: any) => {
+      for (let i = 0; i < propertySignatureTransformations.length; i++) {
+        const t = propertySignatureTransformations[i]
+        const name = t.from
+        const from = Object.prototype.hasOwnProperty.call(input, name) ?
+          O.some(input[name]) :
+          O.none()
+        delete input[name]
+        const to = t.decode(from)
+        if (O.isSome(to)) {
+          input[t.to] = to.value
+        }
+      }
+      return PR.success(input)
+    },
+    encode: (input: any) => {
+      for (let i = 0; i < propertySignatureTransformations.length; i++) {
+        const t = propertySignatureTransformations[i]
+        const name = t.to
+        const from = Object.prototype.hasOwnProperty.call(input, name) ?
+          O.some(input[name]) :
+          O.none()
+        delete input[name]
+        const to = t.encode(from)
+        if (O.isSome(to)) {
+          input[t.from] = to.value
+        }
+      }
+      return PR.success(input)
+    }
+  }
+}
 
 /**
  * @category model
