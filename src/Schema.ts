@@ -458,10 +458,12 @@ export type OptionalSchemaId = typeof OptionalSchemaId
 /**
  * @since 1.0.0
  */
-export interface OptionalSchema<From, To = From> {
+export interface OptionalSchema<From, To = From, ToIsOptional extends boolean = true> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
+  readonly ToIsOptional: ToIsOptional
   readonly _id: OptionalSchemaId
+  readonly options?: { _tag: "option" } | { _tag: "default"; value: unknown }
 }
 
 const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> =>
@@ -470,48 +472,110 @@ const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> 
 /**
  * @since 1.0.0
  */
-export const optional = <I, A>(schema: Schema<I, A>): OptionalSchema<I, A> => {
+export function optional<I, A>(
+  schema: Schema<I, A>,
+  options: { _tag: "default"; value: A }
+): OptionalSchema<I, A, false>
+export function optional<I, A>(
+  schema: Schema<I, A>,
+  options: { _tag: "option" }
+): OptionalSchema<I, Option<A>, false>
+export function optional<I, A>(schema: Schema<I, A>): OptionalSchema<I, A>
+export function optional<I, A>(
+  schema: Schema<I, A>,
+  options?: { _tag: "option" } | { _tag: "default"; value: A }
+): OptionalSchema<I, A, boolean> {
   const out: any = make(schema.ast)
   out["_id"] = OptionalSchemaId
+  out["options"] = options
   return out
 }
 
 /**
  * @since 1.0.0
  */
-export type OptionalKeys<T> = {
-  [K in keyof T]: T[K] extends OptionalSchema<any> ? K : never
-}[keyof T]
+export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
+  [K in keyof Fields]: Fields[K] extends OptionalSchema<any, any, ToIsOptional> ? K : never
+}[keyof Fields]
 
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const struct = <Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any>>>(
+export const struct = <
+  Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any, any, boolean>>
+>(
   fields: Fields
 ): Schema<
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields>]?: From<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, boolean>>]: From<Fields[K]> }
+    & { readonly [K in OptionalKeys<Fields, boolean>]?: From<Fields[K]> }
   >,
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, true>>]: To<Fields[K]> }
+    & { readonly [K in OptionalKeys<Fields, true>]?: To<Fields[K]> }
   >
-> =>
-  make(
-    AST.createTypeLiteral(
-      I.ownKeys(fields).map((key) =>
-        AST.createPropertySignature(
-          key,
-          (fields[key] as any).ast,
-          isOptionalSchema(fields[key]),
-          true
-        )
-      ),
-      []
+> => {
+  const ownKeys = I.ownKeys(fields)
+  const fromPropertySignatures: Array<AST.PropertySignature> = []
+  const toPropertySignatures: Array<AST.PropertySignature> = []
+  const propertySignatureTransformations: Array<AST.PropertySignatureTransformation> = []
+  for (let i = 0; i < ownKeys.length; i++) {
+    const key = ownKeys[i]
+    const schema: Schema<any, any> = fields[key] as any
+    if (isOptionalSchema(schema)) {
+      fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, true, true))
+      const options = schema.options
+      if (options) {
+        switch (options._tag) {
+          case "default":
+            propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
+              key,
+              key,
+              O.orElse(() => O.some(options.value)),
+              identity
+            ))
+            toPropertySignatures.push(
+              AST.createPropertySignature(key, AST.getTo(schema.ast), false, true)
+            )
+            break
+          case "option":
+            propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
+              key,
+              key,
+              O.some,
+              O.flatten
+            ))
+            toPropertySignatures.push(
+              AST.createPropertySignature(key, optionFromSelf(to(schema)).ast, false, true)
+            )
+            break
+        }
+      }
+    } else {
+      fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, false, true))
+      toPropertySignatures.push(
+        AST.createPropertySignature(key, AST.getTo(schema.ast), false, true)
+      )
+    }
+  }
+  const from = AST.createTypeLiteral(fromPropertySignatures, [])
+  if (propertySignatureTransformations.length > 0) {
+    const { decode, encode } = AST.compilePropertySignatureTransformations(
+      propertySignatureTransformations
     )
-  )
+    return make(
+      AST.createTransform(
+        from,
+        AST.createTypeLiteral(toPropertySignatures, []),
+        decode,
+        encode,
+        propertySignatureTransformations
+      )
+    )
+  }
+  return make(from)
+}
 
 /**
  * @category combinators

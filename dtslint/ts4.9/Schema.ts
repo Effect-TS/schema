@@ -245,6 +245,26 @@ S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean) });
 S.struct({ a: S.string, b: S.number, c: S.optional(NumberFromString) });
 
 // ---------------------------------------------
+// optional - default
+// ---------------------------------------------
+
+// $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: boolean; }>
+S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean, { _tag: 'default', value: false }) });
+
+// $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
+S.struct({ a: S.string, b: S.number, c: S.optional(NumberFromString, { _tag: 'default', value: 0 }) });
+
+// ---------------------------------------------
+// optional - option
+// ---------------------------------------------
+
+// $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: Option<boolean>; }>
+S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean, { _tag: 'option' }) });
+
+// $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: Option<number>; }>
+S.struct({ a: S.string, b: S.number, c: S.optional(NumberFromString, { _tag: 'option' }) });
+
+// ---------------------------------------------
 // Pick
 // ---------------------------------------------
 
