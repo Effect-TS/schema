@@ -1,13 +1,24 @@
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
-import * as Effect from "@effect/io/Effect"
+import * as O from "@effect/data/Option"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("dev", () => {
-  it.skip("dev1", async () => {
-    const fa = Effect.fromEither(E.right(1))
-    expect(Effect.runSyncEither(fa)).toEqual(E.right(1))
+  it("all", async () => {
+    const schema = S.struct({
+      a: S.boolean,
+      b: S.optional(S.NumberFromString),
+      c: S.optional(S.Trim, { to: "default", value: "-" }),
+      d: S.optional(S.DateFromString, { to: "Option" })
+    })
+    await Util.expectParseSuccess(schema, { a: true, b: "1" }, {
+      a: true,
+      b: 1,
+      c: "-",
+      d: O.none()
+    })
+    await Util.expectParseSuccess(schema, { a: true }, { a: true, c: "-", d: O.none() })
   })
 
   it.skip("dev2", async () => {

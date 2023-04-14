@@ -22,4 +22,42 @@ describe.concurrent("optional", () => {
     await Util.expectEncodeSuccess(schema, { a: O.some(1) }, { a: "1" })
     await Util.expectEncodeSuccess(schema, { a: O.none() }, {})
   })
+
+  it("all", async () => {
+    const schema = S.struct({
+      a: S.boolean,
+      b: S.optional(S.NumberFromString),
+      c: S.optional(S.Trim, { to: "default", value: "-" }),
+      d: S.optional(S.DateFromString, { to: "Option" })
+    })
+    await Util.expectParseSuccess(schema, { a: true }, { a: true, c: "-", d: O.none() })
+    await Util.expectParseSuccess(schema, { a: true, b: "1" }, {
+      a: true,
+      b: 1,
+      c: "-",
+      d: O.none()
+    })
+    await Util.expectParseSuccess(schema, { a: true, c: "a" }, { a: true, c: "a", d: O.none() })
+    await Util.expectParseSuccess(schema, { a: true, d: "1970-01-01T00:00:00.000Z" }, {
+      a: true,
+      c: "-",
+      d: O.some(new Date(0))
+    })
+    await Util.expectParseSuccess(schema, { a: true, c: "a", d: "1970-01-01T00:00:00.000Z" }, {
+      a: true,
+      c: "a",
+      d: O.some(new Date(0))
+    })
+    await Util.expectParseSuccess(schema, {
+      a: true,
+      c: "a",
+      d: "1970-01-01T00:00:00.000Z",
+      b: "1"
+    }, {
+      a: true,
+      b: 1,
+      c: "a",
+      d: O.some(new Date(0))
+    })
+  })
 })

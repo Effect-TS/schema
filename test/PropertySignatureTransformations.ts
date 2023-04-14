@@ -141,4 +141,28 @@ describe.concurrent("PropertySignatureTransformations", () => {
 
     await Util.expectEncodeSuccess(schema, { b: 1 }, { a: 1 })
   })
+
+  it("reversed default", async () => {
+    const from = S.struct({ a: S.number }).ast
+    const to = S.struct({ a: S.optional(S.number) }).ast
+    const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
+      AST.createPropertySignatureTransformation(
+        "a",
+        "a",
+        identity,
+        O.orElse(() => O.some(0))
+      )
+    ]
+    const { decode, encode } = AST.compilePropertySignatureTransformations(
+      propertySignatureTransformations
+    )
+    const schema: S.Schema<{ readonly a: string }, { readonly a?: number }> = S.make(
+      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+    )
+    await Util.expectParseSuccess(schema, { a: 1 }, { a: 1 })
+    await Util.expectParseSuccess(schema, { a: 0 }, { a: 0 })
+
+    await Util.expectEncodeSuccess(schema, {}, { a: 0 })
+    await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
+  })
 })

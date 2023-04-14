@@ -551,6 +551,10 @@ export const struct = <
             )
             break
         }
+      } else {
+        toPropertySignatures.push(
+          AST.createPropertySignature(key, AST.getTo(schema.ast), true, true)
+        )
       }
     } else {
       fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, false, true))
