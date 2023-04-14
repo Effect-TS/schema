@@ -795,7 +795,7 @@ export const transformResult: {
   to: Schema<I2, A2>,
   decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
   encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
-): Schema<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
+): Schema<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode, [])))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`

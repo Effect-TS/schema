@@ -871,12 +871,35 @@ export interface ParseOptions {
  * @category model
  * @since 1.0.0
  */
+export interface PropertySignatureTransformation {
+  readonly from: PropertyKey
+  readonly to: PropertyKey
+  readonly decode: (o: Option<any>) => Option<any>
+  readonly encode: (o: Option<any>) => Option<any>
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createPropertySignatureTransformation = (
+  from: PropertyKey,
+  to: PropertyKey,
+  decode: (o: Option<any>) => Option<any>,
+  encode: (o: Option<any>) => Option<any>
+): PropertySignatureTransformation => ({ from, to, decode, encode })
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
 export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
 }
 
 /**
@@ -888,8 +911,17 @@ export const createTransform = (
   to: AST,
   decode: Transform["decode"],
   encode: Transform["encode"],
+  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>,
   annotations: Annotated["annotations"] = {}
-): Transform => ({ _tag: "Transform", from, to, decode, encode, annotations })
+): Transform => ({
+  _tag: "Transform",
+  from,
+  to,
+  decode,
+  encode,
+  propertySignatureTransformations,
+  annotations
+})
 
 /**
  * @category guards
@@ -1254,7 +1286,15 @@ export const reverse = (ast: AST): AST => {
     case "Refinement":
       return createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
     case "Transform":
-      return createTransform(reverse(ast.to), reverse(ast.from), ast.encode, ast.decode)
+      return createTransform(
+        reverse(ast.to),
+        reverse(ast.from),
+        ast.encode,
+        ast.decode,
+        ast.propertySignatureTransformations.map((t) =>
+          createPropertySignatureTransformation(t.to, t.from, t.encode, t.decode)
+        )
+      )
   }
   return ast
 }
