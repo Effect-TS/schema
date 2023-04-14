@@ -463,7 +463,7 @@ export interface OptionalSchema<From, To = From, ToIsOptional extends boolean = 
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
   readonly _id: OptionalSchemaId
-  readonly options?: { _tag: "option" } | { _tag: "default"; value: unknown }
+  readonly options?: { to: "Option" } | { to: "default"; value: unknown }
 }
 
 const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> =>
@@ -474,16 +474,16 @@ const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> 
  */
 export function optional<I, A>(
   schema: Schema<I, A>,
-  options: { _tag: "default"; value: A }
+  options: { to: "default"; value: A }
 ): OptionalSchema<I, A, false>
 export function optional<I, A>(
   schema: Schema<I, A>,
-  options: { _tag: "option" }
+  options: { to: "Option" }
 ): OptionalSchema<I, Option<A>, false>
 export function optional<I, A>(schema: Schema<I, A>): OptionalSchema<I, A>
 export function optional<I, A>(
   schema: Schema<I, A>,
-  options?: { _tag: "option" } | { _tag: "default"; value: A }
+  options?: { to: "Option" } | { to: "default"; value: A }
 ): OptionalSchema<I, A, boolean> {
   const out: any = make(schema.ast)
   out["_id"] = OptionalSchemaId
@@ -527,7 +527,7 @@ export const struct = <
       fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, true, true))
       const options = schema.options
       if (options) {
-        switch (options._tag) {
+        switch (options.to) {
           case "default":
             propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
               key,
@@ -539,7 +539,7 @@ export const struct = <
               AST.createPropertySignature(key, AST.getTo(schema.ast), false, true)
             )
             break
-          case "option":
+          case "Option":
             propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
               key,
               key,
