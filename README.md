@@ -843,6 +843,46 @@ S.struct({
 });
 ```
 
+#### Default values
+
+The `optional` constructor can be configured to accept a default value, making the field optional in input and required in output:
+
+```ts
+// $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
+const schema = S.struct({ a. S.optional(S.number, { to: "default", value: 0 }) });
+
+const parse = S.parse(schema)
+
+parse({}) // { a: 0 }
+parse({ a: 1 }) // { a: 1 }
+
+const encode = S.encode(schema)
+
+encode({ a: 0 }) // { a: 0 }
+encode({ a: 1 }) // { a: 1 }
+```
+
+#### Optional fields as `Option`s
+
+The `optional` constructor can be configured to transform an optional value `A` into `Option<A>`, making the field optional in input and required in output:
+
+```ts
+import * as O from "@effect/data/Option"
+
+// $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
+const schema = S.struct({ a. S.optional(S.number, { to: "Option" }) });
+
+const parse = S.parse(schema)
+
+parse({}) // { a: none() }
+parse({ a: 1 }) // { a: some(1) }
+
+const encode = S.encode(schema)
+
+encode({ a: O.none() }) // {}
+encode({ a: O.some(1) }) // { a: 1 }
+```
+
 ### Access the schema for a particular key
 
 The `getPropertySignatures` function takes a `Schema<A>` and returns a new object of type `{ [K in keyof A]: Schema<A[K]> }`. The new object has properties that are the same keys as those in the original object, and each of these properties is a schema for the corresponding property in the original object.

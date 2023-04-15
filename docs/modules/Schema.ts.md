@@ -196,9 +196,9 @@ Added in v1.0.0
 - [utils](#utils)
   - [Join (type alias)](#join-type-alias)
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
-  - [OptionalSchema (interface)](#optionalschema-interface)
-  - [OptionalSchemaId](#optionalschemaid)
-  - [OptionalSchemaId (type alias)](#optionalschemaid-type-alias)
+  - [PropertySignature (interface)](#propertysignature-interface)
+  - [PropertySignatureId](#propertysignatureid)
+  - [PropertySignatureId (type alias)](#propertysignatureid-type-alias)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
   - [from](#from)
@@ -865,7 +865,7 @@ Added in v1.0.0
 
 ```ts
 export declare const struct: <
-  Fields extends Record<string | number | symbol, Schema<any, any> | OptionalSchema<any, any, boolean>>
+  Fields extends Record<string | number | symbol, Schema<any, any> | PropertySignature<any, any, boolean>>
 >(
   fields: Fields
 ) => Schema<
@@ -2260,44 +2260,44 @@ Added in v1.0.0
 
 ```ts
 export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
-  [K in keyof Fields]: Fields[K] extends OptionalSchema<any, any, ToIsOptional> ? K : never
+  [K in keyof Fields]: Fields[K] extends PropertySignature<any, any, ToIsOptional> ? K : never
 }[keyof Fields]
 ```
 
 Added in v1.0.0
 
-## OptionalSchema (interface)
+## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export interface OptionalSchema<From, To = From, ToIsOptional extends boolean = true> {
+export interface PropertySignature<From, To = From, ToIsOptional extends boolean = true> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
-  readonly _id: OptionalSchemaId
+  readonly _id: PropertySignatureId
   readonly options?: { to: 'Option' } | { to: 'default'; value: unknown }
 }
 ```
 
 Added in v1.0.0
 
-## OptionalSchemaId
+## PropertySignatureId
 
 **Signature**
 
 ```ts
-export declare const OptionalSchemaId: typeof OptionalSchemaId
+export declare const PropertySignatureId: typeof PropertySignatureId
 ```
 
 Added in v1.0.0
 
-## OptionalSchemaId (type alias)
+## PropertySignatureId (type alias)
 
 **Signature**
 
 ```ts
-export type OptionalSchemaId = typeof OptionalSchemaId
+export type PropertySignatureId = typeof PropertySignatureId
 ```
 
 Added in v1.0.0
@@ -2378,12 +2378,12 @@ Added in v1.0.0
 export declare function optional<I, A>(
   schema: Schema<I, A>,
   options: { to: 'default'; value: A }
-): OptionalSchema<I, A, false>
+): PropertySignature<I, A, false>
 export declare function optional<I, A>(
   schema: Schema<I, A>,
   options: { to: 'Option' }
-): OptionalSchema<I, Option<A>, false>
-export declare function optional<I, A>(schema: Schema<I, A>): OptionalSchema<I, A>
+): PropertySignature<I, Option<A>, false>
+export declare function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A>
 ```
 
 Added in v1.0.0

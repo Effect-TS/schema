@@ -448,26 +448,29 @@ export type Spread<A> = {
 /**
  * @since 1.0.0
  */
-export const OptionalSchemaId = Symbol.for("@effect/schema/Schema/OptionalSchema")
+export const PropertySignatureId = Symbol.for(
+  "@effect/schema/Schema/PropertySignatureId"
+)
 
 /**
  * @since 1.0.0
  */
-export type OptionalSchemaId = typeof OptionalSchemaId
+export type PropertySignatureId = typeof PropertySignatureId
 
 /**
  * @since 1.0.0
  */
-export interface OptionalSchema<From, To = From, ToIsOptional extends boolean = true> {
+export interface PropertySignature<From, To = From, ToIsOptional extends boolean = true> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
-  readonly _id: OptionalSchemaId
+  readonly _id: PropertySignatureId
   readonly options?: { to: "Option" } | { to: "default"; value: unknown }
 }
 
-const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> =>
-  "_id" in schema && schema["_id"] === OptionalSchemaId
+const isPropertySignature = <I, A>(
+  schema: object
+): schema is PropertySignature<I, A> => "_id" in schema && schema["_id"] === PropertySignatureId
 
 /**
  * @since 1.0.0
@@ -475,18 +478,18 @@ const isOptionalSchema = <I, A>(schema: object): schema is OptionalSchema<I, A> 
 export function optional<I, A>(
   schema: Schema<I, A>,
   options: { to: "default"; value: A }
-): OptionalSchema<I, A, false>
+): PropertySignature<I, A, false>
 export function optional<I, A>(
   schema: Schema<I, A>,
   options: { to: "Option" }
-): OptionalSchema<I, Option<A>, false>
-export function optional<I, A>(schema: Schema<I, A>): OptionalSchema<I, A>
+): PropertySignature<I, Option<A>, false>
+export function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A>
 export function optional<I, A>(
   schema: Schema<I, A>,
   options?: { to: "Option" } | { to: "default"; value: A }
-): OptionalSchema<I, A, boolean> {
+): PropertySignature<I, A, boolean> {
   const out: any = make(schema.ast)
-  out["_id"] = OptionalSchemaId
+  out["_id"] = PropertySignatureId
   out["options"] = options
   return out
 }
@@ -495,7 +498,8 @@ export function optional<I, A>(
  * @since 1.0.0
  */
 export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
-  [K in keyof Fields]: Fields[K] extends OptionalSchema<any, any, ToIsOptional> ? K : never
+  [K in keyof Fields]: Fields[K] extends PropertySignature<any, any, ToIsOptional> ? K
+    : never
 }[keyof Fields]
 
 /**
@@ -503,7 +507,7 @@ export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
  * @since 1.0.0
  */
 export const struct = <
-  Fields extends Record<PropertyKey, Schema<any> | OptionalSchema<any, any, boolean>>
+  Fields extends Record<PropertyKey, Schema<any> | PropertySignature<any, any, boolean>>
 >(
   fields: Fields
 ): Schema<
@@ -523,7 +527,7 @@ export const struct = <
   for (let i = 0; i < ownKeys.length; i++) {
     const key = ownKeys[i]
     const schema: Schema<any, any> = fields[key] as any
-    if (isOptionalSchema(schema)) {
+    if (isPropertySignature(schema)) {
       fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, true, true))
       const options = schema.options
       if (options) {
