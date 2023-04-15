@@ -14,7 +14,7 @@ specifiers:
   '@effect-ts/build-utils': ^0.40.7
   '@effect-ts/core': ^0.60.5
   '@effect/data': ^0.12.2
-  '@effect/io': ^0.20.0
+  '@effect/io': ^0.21.0
   '@effect/language-service': ^0.0.19
   '@repo-tooling/eslint-plugin-dprint': ^0.0.4
   '@types/benchmark': ^2.1.2
@@ -57,7 +57,7 @@ specifiers:
 
 dependencies:
   '@effect/data': 0.12.2
-  '@effect/io': 0.20.0
+  '@effect/io': 0.21.0
   fast-check: 3.8.0
 
 devDependencies:
@@ -631,8 +631,8 @@ packages:
     resolution: {integrity: sha512-bmWRTcsSRG1FlBswT+D8SxW6r3c4B3pKJrjYfitCD03tXHnup5gLHaWqbFgIjiyYITS+UsJRRjVrNxvyGG4ZNQ==}
     dev: false
 
-  /@effect/io/0.20.0:
-    resolution: {integrity: sha512-6ECG566e0ZjvDQO5/KbZtQpplZiSTT+ERnxd7dEC1WjC5cF6uIICMBGWljgL5hBOEpV8p/UHs00anKxTlYomXg==}
+  /@effect/io/0.21.0:
+    resolution: {integrity: sha512-tLusLlTB7zxV+3PW+BqM2agw5jeEp3fyci/lwjWvENOKlY8CrZw+6R8og93Dn3gl/J3tYrGzAUpNJfE4vPN+Ng==}
     dependencies:
       '@effect/data': 0.12.2
     dev: false
