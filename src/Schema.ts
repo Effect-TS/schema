@@ -630,7 +630,8 @@ export const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
 ): { [K in keyof A]: Schema<I[K], A[K]> } => {
   const out: Record<PropertyKey, Schema<any>> = {}
   const propertySignatures = AST.getPropertySignatures(schema.ast)
-  for (const propertySignature of propertySignatures) {
+  for (let i = 0; i < propertySignatures.length; i++) {
+    const propertySignature = propertySignatures[i]
     out[propertySignature.name] = make(propertySignature.type)
   }
   return out as any
