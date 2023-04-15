@@ -39,9 +39,11 @@ Added in v1.0.0
   - [createEnums](#createenums)
   - [createLazy](#createlazy)
   - [createLiteral](#createliteral)
+  - [createPropertySignatureTransformation](#createpropertysignaturetransformation)
   - [createRefinement](#createrefinement)
   - [createTemplateLiteral](#createtemplateliteral)
   - [createTransform](#createtransform)
+  - [createTransformByPropertySignatureTransformations](#createtransformbypropertysignaturetransformations)
   - [createTuple](#createtuple)
   - [createTypeLiteral](#createtypeliteral)
   - [createUnion](#createunion)
@@ -92,6 +94,7 @@ Added in v1.0.0
   - [NumberKeyword (interface)](#numberkeyword-interface)
   - [ObjectKeyword (interface)](#objectkeyword-interface)
   - [ParseOptions (interface)](#parseoptions-interface)
+  - [PropertySignatureTransformation (interface)](#propertysignaturetransformation-interface)
   - [Refinement (interface)](#refinement-interface)
   - [StringKeyword (interface)](#stringkeyword-interface)
   - [SymbolKeyword (interface)](#symbolkeyword-interface)
@@ -394,6 +397,21 @@ export declare const createLiteral: (literal: LiteralValue) => Literal
 
 Added in v1.0.0
 
+## createPropertySignatureTransformation
+
+**Signature**
+
+```ts
+export declare const createPropertySignatureTransformation: (
+  from: PropertyKey,
+  to: PropertyKey,
+  decode: (o: Option<any>) => Option<any>,
+  encode: (o: Option<any>) => Option<any>
+) => PropertySignatureTransformation
+```
+
+Added in v1.0.0
+
 ## createRefinement
 
 **Signature**
@@ -432,6 +450,21 @@ export declare const createTransform: (
   to: AST,
   decode: Transform['decode'],
   encode: Transform['encode'],
+  annotations?: Annotated['annotations']
+) => Transform
+```
+
+Added in v1.0.0
+
+## createTransformByPropertySignatureTransformations
+
+**Signature**
+
+```ts
+export declare const createTransformByPropertySignatureTransformations: (
+  from: AST,
+  to: AST,
+  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>,
   annotations?: Annotated['annotations']
 ) => Transform
 ```
@@ -986,6 +1019,21 @@ export interface ParseOptions {
 
 Added in v1.0.0
 
+## PropertySignatureTransformation (interface)
+
+**Signature**
+
+```ts
+export interface PropertySignatureTransformation {
+  readonly from: PropertyKey
+  readonly to: PropertyKey
+  readonly decode: (o: Option<any>) => Option<any>
+  readonly encode: (o: Option<any>) => Option<any>
+}
+```
+
+Added in v1.0.0
+
 ## Refinement (interface)
 
 **Signature**
@@ -1050,6 +1098,7 @@ export interface Transform extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
+  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
 }
 ```
 
@@ -1380,7 +1429,7 @@ export declare const mergeAnnotations: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      ) => (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1421,7 +1470,7 @@ export declare const mergeAnnotations: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
       isReversed: boolean
     }
   | {
@@ -1429,8 +1478,9 @@ export declare const mergeAnnotations: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
-      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
+      encode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
+      propertySignatureTransformations: readonly PropertySignatureTransformation[]
     }
 ```
 
@@ -1513,7 +1563,7 @@ export declare const setAnnotation: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      ) => (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1554,7 +1604,7 @@ export declare const setAnnotation: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
       isReversed: boolean
     }
   | {
@@ -1562,8 +1612,9 @@ export declare const setAnnotation: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
-      encode: (input: any, options?: ParseOptions | undefined) => IO<ParseError, any>
+      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
+      encode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
+      propertySignatureTransformations: readonly PropertySignatureTransformation[]
     }
 ```
 

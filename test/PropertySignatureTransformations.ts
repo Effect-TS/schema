@@ -9,11 +9,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
     const from = S.struct({ a: S.NumberFromString }).ast
     const to = S.struct({ a: S.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = []
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     const schema: S.Schema<{ readonly a: string }, { readonly a: number }> = S.make(
-      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+      AST.createTransformByPropertySignatureTransformations(
+        from,
+        to,
+        propertySignatureTransformations
+      )
     )
     await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
     await Util.expectParseFailure(schema, { a: "a" }, `/a Expected string -> number, actual "a"`)
@@ -33,11 +34,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
         identity
       )
     ]
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     const schema: S.Schema<{ readonly a?: string }, { readonly a: number }> = S.make(
-      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+      AST.createTransformByPropertySignatureTransformations(
+        from,
+        to,
+        propertySignatureTransformations
+      )
     )
     await Util.expectParseSuccess(schema, {}, { a: 0 })
     await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
@@ -58,11 +60,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
         (o) => O.flatMap(o, O.liftPredicate((v) => v !== 0))
       )
     ]
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     const schema: S.Schema<{ readonly a?: string }, { readonly a: number }> = S.make(
-      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+      AST.createTransformByPropertySignatureTransformations(
+        from,
+        to,
+        propertySignatureTransformations
+      )
     )
     await Util.expectParseSuccess(schema, {}, { a: 0 })
     await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
@@ -83,11 +86,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
         O.flatten
       )
     ]
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     const schema: S.Schema<{ readonly a?: string }, { readonly a: O.Option<number> }> = S.make(
-      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+      AST.createTransformByPropertySignatureTransformations(
+        from,
+        to,
+        propertySignatureTransformations
+      )
     )
     await Util.expectParseSuccess(schema, {}, { a: O.none() })
     await Util.expectParseSuccess(schema, { a: "1" }, { a: O.some(1) })
@@ -108,11 +112,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
         identity
       )
     ]
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     const schema: S.Schema<{ readonly a: string }, { readonly a?: string }> = S.make(
-      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+      AST.createTransformByPropertySignatureTransformations(
+        from,
+        to,
+        propertySignatureTransformations
+      )
     )
     await Util.expectParseSuccess(schema, { a: "" }, {})
     await Util.expectParseSuccess(schema, { a: "a" }, { a: "a" })
@@ -131,11 +136,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
         identity
       )
     ]
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     const schema: S.Schema<{ readonly a: number }, { readonly b: number }> = S.make(
-      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+      AST.createTransformByPropertySignatureTransformations(
+        from,
+        to,
+        propertySignatureTransformations
+      )
     )
     await Util.expectParseSuccess(schema, { a: 1 }, { b: 1 })
 
@@ -153,11 +159,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
         O.orElse(() => O.some(0))
       )
     ]
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     const schema: S.Schema<{ readonly a: string }, { readonly a?: number }> = S.make(
-      AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
+      AST.createTransformByPropertySignatureTransformations(
+        from,
+        to,
+        propertySignatureTransformations
+      )
     )
     await Util.expectParseSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectParseSuccess(schema, { a: 0 }, { a: 0 })

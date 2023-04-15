@@ -890,44 +890,6 @@ export const createPropertySignatureTransformation = (
   encode: (o: Option<any>) => Option<any>
 ): PropertySignatureTransformation => ({ from, to, decode, encode })
 
-/** @internal */
-export const compilePropertySignatureTransformations = (
-  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
-): Pick<Transform, "decode" | "encode"> => {
-  return {
-    decode: (input: any) => {
-      for (let i = 0; i < propertySignatureTransformations.length; i++) {
-        const t = propertySignatureTransformations[i]
-        const name = t.from
-        const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          O.some(input[name]) :
-          O.none()
-        delete input[name]
-        const to = t.decode(from)
-        if (O.isSome(to)) {
-          input[t.to] = to.value
-        }
-      }
-      return PR.success(input)
-    },
-    encode: (input: any) => {
-      for (let i = 0; i < propertySignatureTransformations.length; i++) {
-        const t = propertySignatureTransformations[i]
-        const name = t.to
-        const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          O.some(input[name]) :
-          O.none()
-        delete input[name]
-        const to = t.encode(from)
-        if (O.isSome(to)) {
-          input[t.from] = to.value
-        }
-      }
-      return PR.success(input)
-    }
-  }
-}
-
 /**
  * @category model
  * @since 1.0.0
@@ -941,11 +903,8 @@ export interface Transform extends Annotated {
   readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
 }
 
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const createTransform = (
+/** @internal */
+export const _createTransform = (
   from: AST,
   to: AST,
   decode: Transform["decode"],
@@ -961,6 +920,65 @@ export const createTransform = (
   propertySignatureTransformations,
   annotations
 })
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createTransform = (
+  from: AST,
+  to: AST,
+  decode: Transform["decode"],
+  encode: Transform["encode"],
+  annotations: Annotated["annotations"] = {}
+): Transform => _createTransform(from, to, decode, encode, [], annotations)
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createTransformByPropertySignatureTransformations = (
+  from: AST,
+  to: AST,
+  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>,
+  annotations: Annotated["annotations"] = {}
+): Transform =>
+  _createTransform(
+    from,
+    to,
+    (input: any) => {
+      for (let i = 0; i < propertySignatureTransformations.length; i++) {
+        const t = propertySignatureTransformations[i]
+        const name = t.from
+        const from = Object.prototype.hasOwnProperty.call(input, name) ?
+          O.some(input[name]) :
+          O.none()
+        delete input[name]
+        const to = t.decode(from)
+        if (O.isSome(to)) {
+          input[t.to] = to.value
+        }
+      }
+      return PR.success(input)
+    },
+    (input: any) => {
+      for (let i = 0; i < propertySignatureTransformations.length; i++) {
+        const t = propertySignatureTransformations[i]
+        const name = t.to
+        const from = Object.prototype.hasOwnProperty.call(input, name) ?
+          O.some(input[name]) :
+          O.none()
+        delete input[name]
+        const to = t.encode(from)
+        if (O.isSome(to)) {
+          input[t.from] = to.value
+        }
+      }
+      return PR.success(input)
+    },
+    propertySignatureTransformations,
+    annotations
+  )
 
 /**
  * @category guards
@@ -1325,7 +1343,7 @@ export const reverse = (ast: AST): AST => {
     case "Refinement":
       return createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
     case "Transform":
-      return createTransform(
+      return _createTransform(
         reverse(ast.to),
         reverse(ast.from),
         ast.encode,

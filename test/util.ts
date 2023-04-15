@@ -68,7 +68,7 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
         ast.annotations
       )
     case "Transform":
-      return AST.createTransform(
+      return AST._createTransform(
         effectifyAST(ast.from, mode),
         effectifyAST(ast.to, mode),
         effectifyDecode(ast.decode),
@@ -78,7 +78,7 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
       )
   }
   const decode = S.decodeEffect(S.make(ast))
-  return AST.createTransform(
+  return AST._createTransform(
     ast,
     ast,
     (a, options) => Effect.flatMap(sleep, () => decode(a, options)),

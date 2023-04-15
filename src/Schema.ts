@@ -565,15 +565,10 @@ export const struct = <
   }
   const from = AST.createTypeLiteral(fromPropertySignatures, [])
   if (propertySignatureTransformations.length > 0) {
-    const { decode, encode } = AST.compilePropertySignatureTransformations(
-      propertySignatureTransformations
-    )
     return make(
-      AST.createTransform(
+      AST.createTransformByPropertySignatureTransformations(
         from,
         AST.createTypeLiteral(toPropertySignatures, []),
-        decode,
-        encode,
         propertySignatureTransformations
       )
     )
@@ -742,11 +737,9 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
               x.propertySignatures.concat(y.to.propertySignatures),
               x.indexSignatures.concat(y.to.indexSignatures)
             )
-            return AST.createTransform(
+            return AST.createTransformByPropertySignatureTransformations(
               from,
               to,
-              y.decode,
-              y.encode,
               y.propertySignatureTransformations
             )
           }
@@ -763,11 +756,9 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
               x.to.propertySignatures.concat(y.propertySignatures),
               x.to.indexSignatures.concat(y.indexSignatures)
             )
-            return AST.createTransform(
+            return AST.createTransformByPropertySignatureTransformations(
               from,
               to,
-              x.decode,
-              x.encode,
               x.propertySignatureTransformations
             )
           } else if (
@@ -785,10 +776,11 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
             const propertySignatureTransformations = x.propertySignatureTransformations.concat(
               y.propertySignatureTransformations
             )
-            const { decode, encode } = AST.compilePropertySignatureTransformations(
+            return AST.createTransformByPropertySignatureTransformations(
+              from,
+              to,
               propertySignatureTransformations
             )
-            return AST.createTransform(from, to, decode, encode, propertySignatureTransformations)
           }
         }
         throw new Error("`extend` can only handle type literals or unions of type literals")
@@ -923,7 +915,7 @@ export const transformResult: {
   to: Schema<I2, A2>,
   decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
   encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
-): Schema<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode, [])))
+): Schema<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
