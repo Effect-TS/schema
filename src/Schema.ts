@@ -586,9 +586,9 @@ export const struct = <
  * @since 1.0.0
  */
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  <I extends Record<keyof A, any>>(
+  <I extends { [K in keyof A]: any }>(
     self: Schema<I, A>
-  ): Schema<{ readonly [P in Keys[number]]: I[P] }, { readonly [P in Keys[number]]: A[P] }> =>
+  ): Schema<Spread<Pick<I, Keys[number]>>, Spread<Pick<A, Keys[number]>>> =>
     make(AST.pick(self.ast, keys))
 
 /**
@@ -596,12 +596,10 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  * @since 1.0.0
  */
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  <I extends Record<keyof A, any>>(
+  <I extends { [K in keyof A]: any }>(
     self: Schema<I, A>
-  ): Schema<
-    { readonly [P in Exclude<keyof A, Keys[number]>]: I[P] },
-    { readonly [P in Exclude<keyof A, Keys[number]>]: A[P] }
-  > => make(AST.omit(self.ast, keys))
+  ): Schema<Spread<Omit<I, Keys[number]>>, Spread<Omit<A, Keys[number]>>> =>
+    make(AST.omit(self.ast, keys))
 
 /**
  * Returns an object containing all property signatures of a given schema.
@@ -627,7 +625,7 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  *
  * @since 1.0.0
  */
-export const getPropertySignatures = <I extends Record<keyof A, any>, A>(
+export const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
   schema: Schema<I, A>
 ): { [K in keyof A]: Schema<I[K], A[K]> } => {
   const out: Record<PropertyKey, Schema<any>> = {}

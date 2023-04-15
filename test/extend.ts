@@ -3,7 +3,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("extend", () => {
-  it(`struct with optionals extend struct`, async () => {
+  it(`struct with defaults extend struct`, async () => {
     const schema = pipe(
       S.struct({ a: S.optional(S.string, { to: "default", value: "" }), b: S.string }),
       S.extend(S.struct({ c: S.number }))
@@ -11,7 +11,7 @@ describe.concurrent("extend", () => {
     await Util.expectParseSuccess(schema, { b: "b", c: 1 }, { a: "", b: "b", c: 1 })
   })
 
-  it(`struct extend struct with optionals`, async () => {
+  it(`struct extend struct with defaults`, async () => {
     const schema = pipe(
       S.struct({ a: S.number }),
       S.extend(S.struct({ b: S.string, c: S.optional(S.string, { to: "default", value: "" }) }))
@@ -19,7 +19,7 @@ describe.concurrent("extend", () => {
     await Util.expectParseSuccess(schema, { a: 1, b: "b" }, { a: 1, b: "b", c: "" })
   })
 
-  it(`struct with optionals extend struct with optionals `, async () => {
+  it(`struct with defaults extend struct with defaults `, async () => {
     const schema = pipe(
       S.struct({ a: S.optional(S.string, { to: "default", value: "" }), b: S.string }),
       S.extend(S.struct({ c: S.optional(S.number, { to: "default", value: 0 }), d: S.boolean }))
@@ -27,7 +27,7 @@ describe.concurrent("extend", () => {
     await Util.expectParseSuccess(schema, { b: "b", d: true }, { a: "", b: "b", c: 0, d: true })
   })
 
-  it(`union with optionals extend union with optionals `, async () => {
+  it(`union with defaults extend union with defaults `, async () => {
     const schema = pipe(
       S.union(
         S.struct({
