@@ -1021,6 +1021,18 @@ Added in v1.0.0
 
 ## PropertySignatureTransformation (interface)
 
+Represents a `PropertySignature -> PropertySignature` transformation
+
+The semantic of `decode` is:
+
+- `none()` represents the absence of the key/value pair
+- `some(value)` represents the presence of the key/value pair
+
+The semantic of `encode` is:
+
+- `none()` you don't want to output the key/value pair
+- `some(value)` you want to output the key/value pair
+
 **Signature**
 
 ```ts
@@ -1088,6 +1100,8 @@ export interface TemplateLiteral extends Annotated {
 Added in v1.0.0
 
 ## Transform (interface)
+
+If `propertySignatureTransformations.length > 0` then `decode` / `encode` are derived.
 
 **Signature**
 

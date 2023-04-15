@@ -869,6 +869,16 @@ export interface ParseOptions {
 }
 
 /**
+ * Represents a `PropertySignature -> PropertySignature` transformation
+ *
+ * The semantic of `decode` is:
+ * - `none()` represents the absence of the key/value pair
+ * - `some(value)` represents the presence of the key/value pair
+ *
+ * The semantic of `encode` is:
+ * - `none()` you don't want to output the key/value pair
+ * - `some(value)` you want to output the key/value pair
+ *
  * @category model
  * @since 1.0.0
  */
@@ -891,6 +901,8 @@ export const createPropertySignatureTransformation = (
 ): PropertySignatureTransformation => ({ from, to, decode, encode })
 
 /**
+ * If `propertySignatureTransformations.length > 0` then `decode` / `encode` are derived.
+ *
  * @category model
  * @since 1.0.0
  */
