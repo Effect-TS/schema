@@ -249,10 +249,10 @@ S.struct({ a: S.string, b: S.number, c: S.optional(NumberFromString) });
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: boolean; }>
-S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean, { to: 'default', value: false }) });
+S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean, { to: 'default', value: () => false }) });
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
-S.struct({ a: S.string, b: S.number, c: S.optional(NumberFromString, { to: 'default', value: 0 }) });
+S.struct({ a: S.string, b: S.number, c: S.optional(NumberFromString, { to: 'default', value: () => 0 }) });
 
 // ---------------------------------------------
 // optional - Option

@@ -849,7 +849,7 @@ The `optional` constructor can be configured to accept a default value, making t
 
 ```ts
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
-const schema = S.struct({ a. S.optional(S.number, { to: "default", value: 0 }) });
+const schema = S.struct({ a. S.optional(S.number, { to: "default", value: () => 0 }) });
 
 const parse = S.parse(schema)
 

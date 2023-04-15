@@ -12,6 +12,7 @@ import { untracedMethod } from "@effect/data/Debug"
 import type { Either } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
+import type { LazyArg } from "@effect/data/Function"
 import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
@@ -465,7 +466,7 @@ export interface PropertySignature<From, To = From, ToIsOptional extends boolean
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
   readonly _id: PropertySignatureId
-  readonly options?: { to: "Option" } | { to: "default"; value: unknown }
+  readonly options?: { to: "Option" } | { to: "default"; value: () => unknown }
 }
 
 const isPropertySignature = <I, A>(
@@ -477,7 +478,7 @@ const isPropertySignature = <I, A>(
  */
 export function optional<I, A>(
   schema: Schema<I, A>,
-  options: { to: "default"; value: A }
+  options: { to: "default"; value: LazyArg<A> }
 ): PropertySignature<I, A, false>
 export function optional<I, A>(
   schema: Schema<I, A>,
@@ -486,7 +487,7 @@ export function optional<I, A>(
 export function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A>
 export function optional<I, A>(
   schema: Schema<I, A>,
-  options?: { to: "Option" } | { to: "default"; value: A }
+  options?: { to: "Option" } | { to: "default"; value: LazyArg<A> }
 ): PropertySignature<I, A, boolean> {
   const out: any = make(schema.ast)
   out["_id"] = PropertySignatureId
@@ -536,7 +537,7 @@ export const struct = <
             propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
               key,
               key,
-              O.orElse(() => O.some(options.value)),
+              O.orElse(() => O.some(options.value())),
               identity
             ))
             toPropertySignatures.push(

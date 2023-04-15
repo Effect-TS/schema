@@ -2276,7 +2276,7 @@ export interface PropertySignature<From, To = From, ToIsOptional extends boolean
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
   readonly _id: PropertySignatureId
-  readonly options?: { to: 'Option' } | { to: 'default'; value: unknown }
+  readonly options?: { to: 'Option' } | { to: 'default'; value: () => unknown }
 }
 ```
 
@@ -2377,7 +2377,7 @@ Added in v1.0.0
 ```ts
 export declare function optional<I, A>(
   schema: Schema<I, A>,
-  options: { to: 'default'; value: A }
+  options: { to: 'default'; value: LazyArg<A> }
 ): PropertySignature<I, A, false>
 export declare function optional<I, A>(
   schema: Schema<I, A>,
