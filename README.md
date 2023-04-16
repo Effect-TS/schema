@@ -843,6 +843,46 @@ S.struct({
 });
 ```
 
+#### Default values
+
+The `optional` constructor can be configured to accept a default value, making the field optional in input and required in output:
+
+```ts
+// $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
+const schema = S.struct({ a. S.optional(S.number, { to: "default", value: () => 0 }) });
+
+const parse = S.parse(schema)
+
+parse({}) // { a: 0 }
+parse({ a: 1 }) // { a: 1 }
+
+const encode = S.encode(schema)
+
+encode({ a: 0 }) // { a: 0 }
+encode({ a: 1 }) // { a: 1 }
+```
+
+#### Optional fields as `Option`s
+
+The `optional` constructor can be configured to transform an optional value `A` into `Option<A>`, making the field optional in input and required in output:
+
+```ts
+import * as O from "@effect/data/Option"
+
+// $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
+const schema = S.struct({ a. S.optional(S.number, { to: "Option" }) });
+
+const parse = S.parse(schema)
+
+parse({}) // { a: none() }
+parse({ a: 1 }) // { a: some(1) }
+
+const encode = S.encode(schema)
+
+encode({ a: O.none() }) // {}
+encode({ a: O.some(1) }) // { a: 1 }
+```
+
 ### Access the schema for a particular key
 
 The `getPropertySignatures` function takes a `Schema<A>` and returns a new object of type `{ [K in keyof A]: Schema<A[K]> }`. The new object has properties that are the same keys as those in the original object, and each of these properties is a schema for the corresponding property in the original object.
@@ -1215,52 +1255,6 @@ const encodeOrThrow = S.encode(schema);
 encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
 encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
 ```
-
-### Parsing from optional fields
-
-When working with optional fields that contain values of type `A`, it is possible to parse them into an `Option<A>` by using the `parseOptionals` combinator.
-
-When parsing a nullable field, the `parseOptionals` combinator follows these conversion rules:
-
-- `undefined`, `null` and an absent value parse to `None`
-- `A` parses to `Some<A>`
-
-Here's an example that demonstrates how to use the `parseOptionals` combinator:
-
-```ts
-import * as S from "@effect/schema/Schema";
-
-/*
-const schema: S.Schema<{
-    readonly a: string;
-    readonly b?: number;
-}, {
-    readonly a: string;
-    readonly b: O.Option<number>;
-}>
-*/
-const schema = pipe(
-  S.struct({ a: S.string }),
-  S.optionsFromOptionals({ b: S.number })
-);
-
-// parsing
-const parse = S.parse(schema);
-parse({ a: "hello" }); // { a: "hello", b: none() }
-parse({ a: "hello", b: undefined }); // { a: "hello", b: none() }
-parse({ a: "hello", b: null }); // { a: "hello", b: none() }
-parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
-
-// encoding
-const encodeOrThrow = S.encode(schema);
-
-encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello' }
-encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
-```
-
-In the above example, the `parseOptionals` combinator is used to parse the optional field `b` with values of type `number` into an `Option<number>`. When parsing, `undefined`, `null` and absent values will be parsed as `none()`, and any other value will be parsed as `some(value)`.
-
-To use `parseOptionals`, you should first define your base schema and then apply the `parseOptionals` combinator to add the fields that you want to parse into an `Option`.
 
 ## ReadonlySet
 

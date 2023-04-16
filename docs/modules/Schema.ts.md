@@ -127,7 +127,6 @@ Added in v1.0.0
   - [positive](#positive)
 - [option](#option-1)
   - [optionFromNullable](#optionfromnullable)
-  - [optionsFromOptionals](#optionsfromoptionals)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEffect](#parseeffect)
@@ -197,9 +196,9 @@ Added in v1.0.0
 - [utils](#utils)
   - [Join (type alias)](#join-type-alias)
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
-  - [OptionalSchema (interface)](#optionalschema-interface)
-  - [OptionalSchemaId](#optionalschemaid)
-  - [OptionalSchemaId (type alias)](#optionalschemaid-type-alias)
+  - [PropertySignature (interface)](#propertysignature-interface)
+  - [PropertySignatureId](#propertysignatureid)
+  - [PropertySignatureId (type alias)](#propertysignatureid-type-alias)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
   - [from](#from)
@@ -733,12 +732,9 @@ Added in v1.0.0
 ```ts
 export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
-) => <I extends Record<keyof A, any>>(
+) => <I extends { [K in keyof A]: any }>(
   self: Schema<I, A>
-) => Schema<
-  { readonly [P in Exclude<keyof A, Keys[number]>]: I[P] },
-  { readonly [P in Exclude<keyof A, Keys[number]>]: A[P] }
->
+) => Schema<Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
 ```
 
 Added in v1.0.0
@@ -796,9 +792,9 @@ Added in v1.0.0
 ```ts
 export declare const pick: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
-) => <I extends Record<keyof A, any>>(
+) => <I extends { [K in keyof A]: any }>(
   self: Schema<I, A>
-) => Schema<{ readonly [P in Keys[number]]: I[P] }, { readonly [P in Keys[number]]: A[P] }>
+) => Schema<Spread<Pick<I, Keys[number]>>, Spread<Pick<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -869,18 +865,18 @@ Added in v1.0.0
 
 ```ts
 export declare const struct: <
-  Fields extends Record<string | number | symbol, Schema<any, any> | OptionalSchema<any, any>>
+  Fields extends Record<string | number | symbol, Schema<any, any> | PropertySignature<any, any, boolean>>
 >(
   fields: Fields
 ) => Schema<
   Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: From<Fields[K]> } & {
-      readonly [K in OptionalKeys<Fields>]?: From<Fields[K]> | undefined
+    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, boolean>>]: From<Fields[K]> } & {
+      readonly [K in OptionalKeys<Fields, boolean>]?: From<Fields[K]> | undefined
     }
   >,
   Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields>>]: To<Fields[K]> } & {
-      readonly [K in OptionalKeys<Fields>]?: To<Fields[K]> | undefined
+    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, true>>]: To<Fields[K]> } & {
+      readonly [K in OptionalKeys<Fields, true>]?: To<Fields[K]> | undefined
     }
   >
 >
@@ -1568,23 +1564,6 @@ Added in v1.0.0
 
 ```ts
 export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null | undefined, Option<A>>
-```
-
-Added in v1.0.0
-
-## optionsFromOptionals
-
-**Signature**
-
-```ts
-export declare const optionsFromOptionals: <Fields extends Record<string | number | symbol, Schema<any, any>>>(
-  fields: Fields
-) => <I, A extends object>(
-  schema: Schema<I, A>
-) => Schema<
-  Spread<I & { readonly [K in keyof Fields]?: From<Fields[K]> | undefined }>,
-  Spread<A & { readonly [K in keyof Fields]: Option<To<Fields[K]>> }>
->
 ```
 
 Added in v1.0.0
@@ -2280,43 +2259,45 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type OptionalKeys<T> = {
-  [K in keyof T]: T[K] extends OptionalSchema<any> ? K : never
-}[keyof T]
+export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
+  [K in keyof Fields]: Fields[K] extends PropertySignature<any, any, ToIsOptional> ? K : never
+}[keyof Fields]
 ```
 
 Added in v1.0.0
 
-## OptionalSchema (interface)
+## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export interface OptionalSchema<From, To = From> {
+export interface PropertySignature<From, To = From, ToIsOptional extends boolean = true> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
-  readonly _id: OptionalSchemaId
+  readonly ToIsOptional: ToIsOptional
+  readonly _id: PropertySignatureId
+  readonly options?: { to: 'Option' } | { to: 'default'; value: () => unknown }
 }
 ```
 
 Added in v1.0.0
 
-## OptionalSchemaId
+## PropertySignatureId
 
 **Signature**
 
 ```ts
-export declare const OptionalSchemaId: typeof OptionalSchemaId
+export declare const PropertySignatureId: typeof PropertySignatureId
 ```
 
 Added in v1.0.0
 
-## OptionalSchemaId (type alias)
+## PropertySignatureId (type alias)
 
 **Signature**
 
 ```ts
-export type OptionalSchemaId = typeof OptionalSchemaId
+export type PropertySignatureId = typeof PropertySignatureId
 ```
 
 Added in v1.0.0
@@ -2366,7 +2347,7 @@ Schema<A> -> { [K in keyof A]: Schema<A[K]> }
 **Signature**
 
 ```ts
-export declare const getPropertySignatures: <I extends Record<keyof A, any>, A>(
+export declare const getPropertySignatures: <I extends { [K in keyof A]: any }, A>(
   schema: Schema<I, A>
 ) => { [K in keyof A]: Schema<I[K], A[K]> }
 ```
@@ -2394,7 +2375,15 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optional: <I, A>(schema: Schema<I, A>) => OptionalSchema<I, A>
+export declare function optional<I, A>(
+  schema: Schema<I, A>,
+  options: { to: 'default'; value: LazyArg<A> }
+): PropertySignature<I, A, false>
+export declare function optional<I, A>(
+  schema: Schema<I, A>,
+  options: { to: 'Option' }
+): PropertySignature<I, Option<A>, false>
+export declare function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A>
 ```
 
 Added in v1.0.0
