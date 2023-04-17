@@ -1196,7 +1196,7 @@ parse(3n); // 1n
 
 #### DateFromString
 
-Transforms a `string` into a `Date` by parsing the string using `Date.parse`.
+Transforms a `string` into a `Date`.
 
 ```ts
 import * as S from "@effect/schema/Schema";

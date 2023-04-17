@@ -12,6 +12,12 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [Date](#date)
+  - [DateFromString](#datefromstring)
+  - [ValidDateFromSelf](#validdatefromself)
+  - [date](#date)
+  - [dateFromString](#datefromstring)
+  - [validDate](#validdate)
 - [annotations](#annotations)
   - [description](#description)
   - [documentation](#documentation)
@@ -72,7 +78,6 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [UUID](#uuid)
   - [chunkFromSelf](#chunkfromself)
-  - [date](#date)
   - [enums](#enums)
   - [instanceOf](#instanceof)
   - [json](#json)
@@ -82,9 +87,6 @@ Added in v1.0.0
   - [readonlySetFromSelf](#readonlysetfromself)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
-- [date](#date-1)
-  - [DateFromString](#datefromstring)
-  - [dateFromString](#datefromstring)
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeEffect](#decodeeffect)
@@ -193,6 +195,7 @@ Added in v1.0.0
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
   - [UUIDTypeId](#uuidtypeid)
+  - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [Join (type alias)](#join-type-alias)
   - [OptionalKeys (type alias)](#optionalkeys-type-alias)
@@ -217,6 +220,68 @@ Added in v1.0.0
   - [validateResult](#validateresult)
 
 ---
+
+# Date
+
+## DateFromString
+
+This schema that transforms a `string` into a `Date`.
+
+**Signature**
+
+```ts
+export declare const DateFromString: Schema<string, Date>
+```
+
+Added in v1.0.0
+
+## ValidDateFromSelf
+
+A schema representing valid dates, e.g. `new Date("fail")` even if an instance of `Date` is excluded.
+
+**Signature**
+
+```ts
+export declare const ValidDateFromSelf: Schema<Date, Date>
+```
+
+Added in v1.0.0
+
+## date
+
+**Signature**
+
+```ts
+export declare const date: Schema<Date, Date>
+```
+
+Added in v1.0.0
+
+## dateFromString
+
+This combinator that transforms a `string` into a `Date`.
+
+**Signature**
+
+```ts
+export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
+```
+
+Added in v1.0.0
+
+## validDate
+
+A filter excluding invalid dates (e.g. `new Date("fail")`).
+
+**Signature**
+
+```ts
+export declare const validDate: (
+  options?: AnnotationOptions<Date> | undefined
+) => <I>(self: Schema<I, Date>) => Schema<I, Date>
+```
+
+Added in v1.0.0
 
 # annotations
 
@@ -976,16 +1041,6 @@ export declare const chunkFromSelf: <I, A>(item: Schema<I, A>) => Schema<Chunk<I
 
 Added in v1.0.0
 
-## date
-
-**Signature**
-
-```ts
-export declare const date: Schema<Date, Date>
-```
-
-Added in v1.0.0
-
 ## enums
 
 **Signature**
@@ -1082,32 +1137,6 @@ export declare const uniqueSymbol: <S extends symbol>(
   symbol: S,
   annotations?: Record<string | symbol, unknown> | undefined
 ) => Schema<S, S>
-```
-
-Added in v1.0.0
-
-# date
-
-## DateFromString
-
-This schema transforms a `string` into a `Date` by parsing the string using `Date.parse`.
-
-**Signature**
-
-```ts
-export declare const DateFromString: Schema<string, Date>
-```
-
-Added in v1.0.0
-
-## dateFromString
-
-This combinator transforms a `string` into a `Date` by parsing the string using `Date.parse`.
-
-**Signature**
-
-```ts
-export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
 ```
 
 Added in v1.0.0
@@ -2240,6 +2269,16 @@ export declare const UUIDTypeId: '@effect/schema/UUIDTypeId'
 
 Added in v1.0.0
 
+## ValidDateTypeId
+
+**Signature**
+
+```ts
+export declare const ValidDateTypeId: '@effect/schema/ValidDateTypeId'
+```
+
+Added in v1.0.0
+
 # utils
 
 ## Join (type alias)
@@ -2276,7 +2315,12 @@ export interface PropertySignature<From, To = From, ToIsOptional extends boolean
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
   readonly _id: PropertySignatureId
-  readonly options?: { to: 'Option' } | { to: 'default'; value: () => unknown }
+  readonly options?:
+    | { readonly to: 'Option' }
+    | {
+        readonly to: 'default'
+        readonly value: LazyArg<unknown>
+      }
 }
 ```
 
@@ -2377,11 +2421,11 @@ Added in v1.0.0
 ```ts
 export declare function optional<I, A>(
   schema: Schema<I, A>,
-  options: { to: 'default'; value: LazyArg<A> }
+  options: { readonly to: 'default'; readonly value: LazyArg<A> }
 ): PropertySignature<I, A, false>
 export declare function optional<I, A>(
   schema: Schema<I, A>,
-  options: { to: 'Option' }
+  options: { readonly to: 'Option' }
 ): PropertySignature<I, Option<A>, false>
 export declare function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A>
 ```
