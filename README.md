@@ -845,11 +845,11 @@ S.struct({
 
 #### Default values
 
-The `optional` constructor can be configured to accept a default value, making the field optional in input and required in output:
+Optional fields can be configured to accept a default value, making the field optional in input and required in output:
 
 ```ts
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
-const schema = S.struct({ a. S.optional(S.number, { to: "default", value: () => 0 }) });
+const schema = S.struct({ a. S.optional.withDefault(S.number, () => 0) });
 
 const parse = S.parse(schema)
 
@@ -864,13 +864,13 @@ encode({ a: 1 }) // { a: 1 }
 
 #### Optional fields as `Option`s
 
-The `optional` constructor can be configured to transform an optional value `A` into `Option<A>`, making the field optional in input and required in output:
+Optional fields can be configured to transform a value of type `A` into `Option<A>`, making the field optional in input and required in output:
 
 ```ts
 import * as O from "@effect/data/Option"
 
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
-const schema = S.struct({ a. S.optional(S.number, { to: "Option" }) });
+const schema = S.struct({ a. S.optional.toOption(S.number) });
 
 const parse = S.parse(schema)
 
@@ -1194,7 +1194,7 @@ parse(3n); // 1n
 
 ### Date transformations
 
-#### DateFromString
+#### date
 
 Transforms a `string` into a `Date`.
 
@@ -1202,7 +1202,7 @@ Transforms a `string` into a `Date`.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
-const schema = S.DateFromString;
+const schema = S.date;
 const parse = S.parse(schema);
 
 parse("1970-01-01T00:00:00.000Z"); // new Date(0)

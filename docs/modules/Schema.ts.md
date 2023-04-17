@@ -13,7 +13,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [Date](#date)
-  - [DateFromString](#datefromstring)
+  - [DateFromSelf](#datefromself)
   - [ValidDateFromSelf](#validdatefromself)
   - [date](#date)
   - [dateFromString](#datefromstring)
@@ -223,14 +223,12 @@ Added in v1.0.0
 
 # Date
 
-## DateFromString
-
-This schema that transforms a `string` into a `Date`.
+## DateFromSelf
 
 **Signature**
 
 ```ts
-export declare const DateFromString: Schema<string, Date>
+export declare const DateFromSelf: Schema<Date, Date>
 ```
 
 Added in v1.0.0
@@ -249,17 +247,19 @@ Added in v1.0.0
 
 ## date
 
+A schema that transforms a `string` into a valid `Date`.
+
 **Signature**
 
 ```ts
-export declare const date: Schema<Date, Date>
+export declare const date: Schema<string, Date>
 ```
 
 Added in v1.0.0
 
 ## dateFromString
 
-This combinator that transforms a `string` into a `Date`.
+A combinator that transforms a `string` into a valid `Date`.
 
 **Signature**
 
@@ -2419,15 +2419,14 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function optional<I, A>(
-  schema: Schema<I, A>,
-  options: { readonly to: 'default'; readonly value: LazyArg<A> }
-): PropertySignature<I, A, false>
-export declare function optional<I, A>(
-  schema: Schema<I, A>,
-  options: { readonly to: 'Option' }
-): PropertySignature<I, Option<A>, false>
-export declare function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A>
+export declare const optional: {
+  <I, A>(schema: Schema<I, A>): PropertySignature<I, A, true>
+  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, Option<A>, false>
+  withDefault: {
+    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, A, false>
+    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, A, false>
+  }
+}
 ```
 
 Added in v1.0.0
