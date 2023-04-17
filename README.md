@@ -1192,6 +1192,23 @@ parse(0n); // 0n
 parse(3n); // 1n
 ```
 
+### Boolean transformations
+
+#### not
+
+Negates a boolean value.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// const schema: S.Schema<boolean, boolean>
+const schema = pipe(S.boolean, S.not);
+
+const parse = S.parse(schema);
+parse(true); // false
+parse(false); // true
+```
+
 ### Date transformations
 
 #### Date
