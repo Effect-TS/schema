@@ -417,7 +417,7 @@ S.bigint;
 S.boolean;
 S.symbol;
 S.object;
-S.date; // value must be a Date
+S.Date; // value must be a valid Date
 
 // empty types
 S.undefined;
@@ -1194,7 +1194,7 @@ parse(3n); // 1n
 
 ### Date transformations
 
-#### date
+#### Date
 
 Transforms a `string` into a `Date`.
 
@@ -1202,7 +1202,7 @@ Transforms a `string` into a `Date`.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
-const schema = S.date;
+const schema = S.Date;
 const parse = S.parse(schema);
 
 parse("1970-01-01T00:00:00.000Z"); // new Date(0)
