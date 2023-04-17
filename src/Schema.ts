@@ -476,27 +476,29 @@ const isPropertySignature = <I, A>(
   schema: object
 ): schema is PropertySignature<I, A> => "_id" in schema && schema["_id"] === PropertySignatureId
 
-/**
- * @since 1.0.0
- */
-export function optional<I, A>(
-  schema: Schema<I, A>,
-  options: { readonly to: "default"; readonly value: LazyArg<A> }
-): PropertySignature<I, A, false>
-export function optional<I, A>(
-  schema: Schema<I, A>,
-  options: { readonly to: "Option" }
-): PropertySignature<I, Option<A>, false>
-export function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A, true>
-export function optional<I, A>(
+const _optional = <I, A>(
   schema: Schema<I, A>,
   options?: { readonly to: "Option" } | { readonly to: "default"; readonly value: LazyArg<A> }
-): PropertySignature<I, A, boolean> {
+): PropertySignature<I, A, boolean> => {
   const out: any = make(schema.ast)
   out["_id"] = PropertySignatureId
   out["options"] = options
   return out
 }
+
+/**
+ * @since 1.0.0
+ */
+export const optional: {
+  <I, A>(schema: Schema<I, A>): PropertySignature<I, A, true>
+  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, O.Option<A>, false>
+  withDefault: {
+    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, A, false>
+    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, A, false>
+  }
+} = (<I, A>(schema: Schema<I, A>) => _optional(schema)) as any
+optional.toOption = (schema) => _optional(schema, { to: "Option" }) as any
+optional.withDefault = dual(2, (schema, value) => _optional(schema, { to: "default", value }))
 
 /**
  * @since 1.0.0

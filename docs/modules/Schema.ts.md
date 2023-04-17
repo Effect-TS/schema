@@ -2419,15 +2419,14 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare function optional<I, A>(
-  schema: Schema<I, A>,
-  options: { readonly to: 'default'; readonly value: LazyArg<A> }
-): PropertySignature<I, A, false>
-export declare function optional<I, A>(
-  schema: Schema<I, A>,
-  options: { readonly to: 'Option' }
-): PropertySignature<I, Option<A>, false>
-export declare function optional<I, A>(schema: Schema<I, A>): PropertySignature<I, A>
+export declare const optional: {
+  <I, A>(schema: Schema<I, A>): PropertySignature<I, A, true>
+  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, Option<A>, false>
+  withDefault: {
+    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, A, false>
+    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, A, false>
+  }
+}
 ```
 
 Added in v1.0.0
