@@ -14,7 +14,7 @@ specifiers:
   '@effect-ts/build-utils': ^0.40.7
   '@effect-ts/core': ^0.60.5
   '@effect/data': ^0.12.2
-  '@effect/io': ^0.21.0
+  '@effect/io': ^0.22.2
   '@effect/language-service': ^0.0.19
   '@repo-tooling/eslint-plugin-dprint': ^0.0.4
   '@types/benchmark': ^2.1.2
@@ -57,7 +57,7 @@ specifiers:
 
 dependencies:
   '@effect/data': 0.12.2
-  '@effect/io': 0.21.0
+  '@effect/io': 0.22.2
   fast-check: 3.8.0
 
 devDependencies:
@@ -631,8 +631,8 @@ packages:
     resolution: {integrity: sha512-bmWRTcsSRG1FlBswT+D8SxW6r3c4B3pKJrjYfitCD03tXHnup5gLHaWqbFgIjiyYITS+UsJRRjVrNxvyGG4ZNQ==}
     dev: false
 
-  /@effect/io/0.21.0:
-    resolution: {integrity: sha512-tLusLlTB7zxV+3PW+BqM2agw5jeEp3fyci/lwjWvENOKlY8CrZw+6R8og93Dn3gl/J3tYrGzAUpNJfE4vPN+Ng==}
+  /@effect/io/0.22.2:
+    resolution: {integrity: sha512-6Teo25WVHXiIQoLLVp0BVyjTsQ/Avtr3GtTHPi0R2rgOHrNUzOf9feV7+EHzIjL7I5Xfv7P7kx8MrAc5Gv5QDg==}
     dependencies:
       '@effect/data': 0.12.2
     dev: false
@@ -3883,6 +3883,12 @@ packages:
       has: 1.0.3
     dev: true
 
+  /is-core-module/2.12.0:
+    resolution: {integrity: sha512-RECHCBCd/viahWmwj6enj19sKbHfJrddi/6cBDsNTKbNq0f7VeaUkBo60BqzvPqo/W54ChS62Z5qyun7cfOMqQ==}
+    dependencies:
+      has: 1.0.3
+    dev: true
+
   /is-data-descriptor/0.1.4:
     resolution: {integrity: sha512-+w9D5ulSoBNlmw9OHn3U2v51SyoCd0he+bB3xMl62oijhrspxowjU+AIcDY0N3iEJbUEkB15IlMASQsxYigvXg==}
     engines: {node: '>=0.10.0'}
@@ -5645,6 +5651,15 @@ packages:
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
 
+  /resolve/1.22.2:
+    resolution: {integrity: sha512-Sb+mjNHOULsBv818T40qSPeRiuWLyaGMa5ewydRLFimneixmVy2zdivRl+AF6jaYPC8ERxGDmFSiqui6SfPd+g==}
+    hasBin: true
+    dependencies:
+      is-core-module: 2.12.0
+      path-parse: 1.0.7
+      supports-preserve-symlinks-flag: 1.0.0
+    dev: true
+
   /restore-cursor/3.1.0:
     resolution: {integrity: sha512-l+sSefzHpj5qimhFSE5a8nufZYAM3sBSVMAPtYkmC+4EH2anSGaEMXSD0izRQbu9nfyQ9y5JrVmp7E8oZrUjvA==}
     engines: {node: '>=8'}
@@ -6395,7 +6410,7 @@ packages:
       js-yaml: 3.14.1
       minimatch: 3.1.2
       mkdirp: 0.5.6
-      resolve: 1.22.1
+      resolve: 1.22.2
       semver: 5.7.1
       tslib: 1.14.1
       tsutils: 2.29.0_typescript@4.9.5
