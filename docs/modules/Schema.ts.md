@@ -13,9 +13,9 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [Date](#date)
+  - [DateFromSelf](#datefromself)
   - [DateFromString](#datefromstring)
   - [ValidDateFromSelf](#validdatefromself)
-  - [date](#date)
   - [dateFromString](#datefromstring)
   - [validDate](#validdate)
 - [annotations](#annotations)
@@ -223,6 +223,16 @@ Added in v1.0.0
 
 # Date
 
+## DateFromSelf
+
+**Signature**
+
+```ts
+export declare const DateFromSelf: Schema<Date, Date>
+```
+
+Added in v1.0.0
+
 ## DateFromString
 
 This schema that transforms a `string` into a `Date`.
@@ -243,16 +253,6 @@ A schema representing valid dates, e.g. `new Date("fail")` even if an instance o
 
 ```ts
 export declare const ValidDateFromSelf: Schema<Date, Date>
-```
-
-Added in v1.0.0
-
-## date
-
-**Signature**
-
-```ts
-export declare const date: Schema<Date, Date>
 ```
 
 Added in v1.0.0

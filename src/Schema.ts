@@ -1514,15 +1514,14 @@ const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date()
 
 const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
 
-// TODO: rename to DateFromSelf
 /**
  * @category Date
  * @since 1.0.0
  */
-export const date: Schema<Date> = declare(
+export const DateFromSelf: Schema<Date> = declare(
   [],
   struct({}),
-  () => (u) => !isDate(u) ? PR.failure(PR.type(date.ast, u)) : PR.success(u),
+  () => (u) => !isDate(u) ? PR.failure(PR.type(DateFromSelf.ast, u)) : PR.success(u),
   {
     [AST.IdentifierAnnotationId]: "Date",
     [I.PrettyHookId]: datePretty,
@@ -1559,7 +1558,7 @@ export const validDate = (options?: AnnotationOptions<Date>) =>
  * @category Date
  * @since 1.0.0
  */
-export const ValidDateFromSelf = pipe(date, validDate())
+export const ValidDateFromSelf = pipe(DateFromSelf, validDate())
 
 /**
   This combinator that transforms a `string` into a `Date`.
