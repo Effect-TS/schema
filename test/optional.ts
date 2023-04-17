@@ -30,7 +30,7 @@ describe.concurrent("optional", () => {
       a: S.boolean,
       b: S.optional(S.NumberFromString),
       c: S.optional.withDefault(S.Trim, () => "-"),
-      d: S.optional.toOption(S.DateFromString)
+      d: S.optional.toOption(S.date)
     })
     await Util.expectParseSuccess(schema, { a: true }, { a: true, c: "-", d: O.none() })
     await Util.expectParseSuccess(schema, { a: true, b: "1" }, {

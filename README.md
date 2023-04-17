@@ -1194,7 +1194,7 @@ parse(3n); // 1n
 
 ### Date transformations
 
-#### DateFromString
+#### date
 
 Transforms a `string` into a `Date`.
 
@@ -1202,7 +1202,7 @@ Transforms a `string` into a `Date`.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
-const schema = S.DateFromString;
+const schema = S.date;
 const parse = S.parse(schema);
 
 parse("1970-01-01T00:00:00.000Z"); // new Date(0)

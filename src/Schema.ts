@@ -1561,7 +1561,7 @@ export const validDate = (options?: AnnotationOptions<Date>) =>
 export const ValidDateFromSelf = pipe(DateFromSelf, validDate())
 
 /**
-  This combinator that transforms a `string` into a `Date`.
+  A combinator that transforms a `string` into a valid `Date`.
 
   @category Date
   @since 1.0.0
@@ -1576,14 +1576,13 @@ export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<
   return schema
 }
 
-// TODO: rename to Date
 /**
- * This schema that transforms a `string` into a `Date`.
+ * A schema that transforms a `string` into a valid `Date`.
  *
  * @category Date
  * @since 1.0.0
  */
-export const DateFromString: Schema<string, Date> = dateFromString(string)
+export const date: Schema<string, Date> = dateFromString(string)
 
 // ---------------------------------------------
 // data/Either

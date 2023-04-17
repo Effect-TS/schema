@@ -28,8 +28,8 @@ describe.concurrent("DateFromSelf", () => {
   })
 })
 
-describe.concurrent("DateFromString", () => {
-  const schema = S.DateFromString
+describe.concurrent("date", () => {
+  const schema = S.date
 
   it("property tests", () => {
     Util.roundtrip(schema)

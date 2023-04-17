@@ -14,8 +14,8 @@ Added in v1.0.0
 
 - [Date](#date)
   - [DateFromSelf](#datefromself)
-  - [DateFromString](#datefromstring)
   - [ValidDateFromSelf](#validdatefromself)
+  - [date](#date)
   - [dateFromString](#datefromstring)
   - [validDate](#validdate)
 - [annotations](#annotations)
@@ -233,18 +233,6 @@ export declare const DateFromSelf: Schema<Date, Date>
 
 Added in v1.0.0
 
-## DateFromString
-
-This schema that transforms a `string` into a `Date`.
-
-**Signature**
-
-```ts
-export declare const DateFromString: Schema<string, Date>
-```
-
-Added in v1.0.0
-
 ## ValidDateFromSelf
 
 A schema representing valid dates, e.g. `new Date("fail")` even if an instance of `Date` is excluded.
@@ -257,9 +245,21 @@ export declare const ValidDateFromSelf: Schema<Date, Date>
 
 Added in v1.0.0
 
+## date
+
+A schema that transforms a `string` into a valid `Date`.
+
+**Signature**
+
+```ts
+export declare const date: Schema<string, Date>
+```
+
+Added in v1.0.0
+
 ## dateFromString
 
-This combinator that transforms a `string` into a `Date`.
+A combinator that transforms a `string` into a valid `Date`.
 
 **Signature**
 
