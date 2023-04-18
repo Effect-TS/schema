@@ -51,4 +51,36 @@ describe.concurrent("AST.guards", () => {
     expect(AST.isEnums(S.enums(Fruits).ast)).toEqual(true)
     expect(AST.isEnums(S.unknown.ast)).toEqual(false)
   })
+
+  it("isNeverKeyword", () => {
+    expect(AST.isNeverKeyword(S.never.ast)).toEqual(true)
+    expect(AST.isNeverKeyword(S.unknown.ast)).toEqual(false)
+  })
+
+  it("isUniqueSymbol", () => {
+    expect(AST.isUniqueSymbol(S.uniqueSymbol(Symbol.for("@effect/schema/test/a")).ast)).toEqual(
+      true
+    )
+    expect(AST.isUniqueSymbol(S.unknown.ast)).toEqual(false)
+  })
+
+  it("isUnknownKeyword", () => {
+    expect(AST.isUnknownKeyword(S.unknown.ast)).toEqual(true)
+    expect(AST.isUnknownKeyword(S.any.ast)).toEqual(false)
+  })
+
+  it("isAnyKeyword", () => {
+    expect(AST.isAnyKeyword(S.any.ast)).toEqual(true)
+    expect(AST.isAnyKeyword(S.unknown.ast)).toEqual(false)
+  })
+
+  it("isBooleanKeyword", () => {
+    expect(AST.isBooleanKeyword(S.boolean.ast)).toEqual(true)
+    expect(AST.isBooleanKeyword(S.unknown.ast)).toEqual(false)
+  })
+
+  it("isBigIntKeyword", () => {
+    expect(AST.isBigIntKeyword(S.bigint.ast)).toEqual(true)
+    expect(AST.isBigIntKeyword(S.unknown.ast)).toEqual(false)
+  })
 })

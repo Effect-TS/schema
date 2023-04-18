@@ -1,17 +1,18 @@
+import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("AST", () => {
-  it("exports", () => {
-    expect(AST.isUniqueSymbol).exist
-    expect(AST.isUnknownKeyword).exist
-    expect(AST.isAnyKeyword).exist
-    expect(AST.isBooleanKeyword).exist
-    expect(AST.isBigIntKeyword).exist
-    expect(AST.isTransform).exist
-    expect(AST.isRefinement).exist
-    expect(AST.isNeverKeyword).exist
+  it("isParameter", () => {
+    expect(AST.isParameter(AST.stringKeyword)).toEqual(true)
+    expect(AST.isParameter(AST.symbolKeyword)).toEqual(true)
+    expect(AST.isParameter(S.templateLiteral(S.string, S.literal("-"), S.string).ast))
+      .toEqual(true)
+    expect(AST.isParameter(pipe(S.string, S.minLength(2)).ast)).toEqual(true)
+    expect(AST.isParameter(pipe(S.number, S.int()).ast)).toEqual(false)
+    expect(AST.isParameter(S.NumberFromString.ast)).toEqual(false)
+    expect(AST.isParameter(pipe(S.NumberFromString, S.int()).ast)).toEqual(false)
   })
 
   it("createIndexSignature/ should throw on unsupported ASTs", () => {
