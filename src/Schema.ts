@@ -1553,7 +1553,7 @@ export const validDate = (options?: AnnotationOptions<Date>) =>
     )
 
 /**
- * A schema representing valid dates, e.g. `new Date("fail")` even if an instance of `Date` is excluded.
+ * A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
  *
  * @category Date
  * @since 1.0.0

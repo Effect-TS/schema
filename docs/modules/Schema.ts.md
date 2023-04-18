@@ -247,7 +247,7 @@ Added in v1.0.0
 
 ## ValidDateFromSelf
 
-A schema representing valid dates, e.g. `new Date("fail")` even if an instance of `Date` is excluded.
+A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
 
 **Signature**
 
