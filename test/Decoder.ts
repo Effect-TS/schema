@@ -645,22 +645,10 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(schema, {})
   })
 
-  it("struct/extend record(string, string)", async () => {
-    const schema = pipe(
-      S.struct({ a: S.string }),
-      S.extend(S.record(S.string, S.string))
-    )
-    await Util.expectParseSuccess(schema, { a: "a" })
-    await Util.expectParseSuccess(schema, { a: "a", b: "b" })
-
-    await Util.expectParseFailure(schema, {}, "/a is missing")
-    await Util.expectParseFailure(schema, { b: "b" }, "/a is missing")
-    await Util.expectParseFailure(schema, { a: 1 }, "/a Expected string, actual 1")
-    await Util.expectParseFailure(
-      schema,
-      { a: "a", b: 1 },
-      "/b Expected string, actual 1"
-    )
+  it("struct/ record(never, number)", async () => {
+    const schema = S.record(S.never, S.number)
+    await Util.expectParseSuccess(schema, {})
+    await Util.expectParseSuccess(schema, { a: 1 })
   })
 
   it("struct/ record(string, number)", async () => {

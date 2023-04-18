@@ -34,10 +34,10 @@ export const getKeysForIndexSignature = (
     case "SymbolKeyword":
       return Object.getOwnPropertySymbols(input)
     case "Refinement":
-    case "Transform":
       return getKeysForIndexSignature(input, parameter.from)
+    default:
+      return []
   }
-  return []
 }
 
 // ---------------------------------------------

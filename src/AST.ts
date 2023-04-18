@@ -1500,7 +1500,7 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
     case "TypeLiteral":
       return ast.propertySignatures.map((p): AST =>
         isSymbol(p.name) ? createUniqueSymbol(p.name) : createLiteral(p.name)
-      ).concat(ast.indexSignatures.map((is) => getParameterBaseAST(is.parameter)))
+      ).concat(ast.indexSignatures.map((is) => getFrom(is.parameter)))
     case "Lazy":
       return _keyof(ast.f())
     default:
