@@ -417,7 +417,6 @@ S.bigint;
 S.boolean;
 S.symbol;
 S.object;
-S.Date; // value must be a valid Date
 
 // empty types
 S.undefined;
@@ -1213,7 +1212,7 @@ parse(false); // true
 
 #### Date
 
-Transforms a `string` into a `Date`.
+Transforms a `string` into a valid `Date`.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -1225,6 +1224,11 @@ const parse = S.parse(schema);
 parse("1970-01-01T00:00:00.000Z"); // new Date(0)
 
 parse("a"); // throws
+
+const validate = S.validate(schema);
+
+validate(new Date(0)); // new Date(0)
+validate(new Date("fail")); // throws
 ```
 
 ## Option
