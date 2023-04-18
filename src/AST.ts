@@ -679,8 +679,29 @@ export const createPropertySignature = (
 /**
  * @since 1.0.0
  */
+export type Parameter = StringKeyword | SymbolKeyword | TemplateLiteral | Refinement<Parameter>
+
+/**
+ * @since 1.0.0
+ */
+export const isParameter = (ast: AST): ast is Parameter => {
+  switch (ast._tag) {
+    case "StringKeyword":
+    case "SymbolKeyword":
+    case "TemplateLiteral":
+      return true
+    case "Refinement":
+      return isParameter(ast.from)
+    default:
+      return false
+  }
+}
+
+/**
+ * @since 1.0.0
+ */
 export interface IndexSignature {
-  readonly parameter: AST
+  readonly parameter: Parameter
   readonly type: AST
   readonly isReadonly: boolean
 }
@@ -693,12 +714,12 @@ export const createIndexSignature = (
   type: AST,
   isReadonly: boolean
 ): IndexSignature => {
-  if (isNeverKeyword(getParameterBaseAST(parameter))) {
-    throw new Error(
-      "An index signature parameter type must be 'string', 'symbol', a template literal type or a refinement of the previous types"
-    )
+  if (isParameter(parameter)) {
+    return ({ parameter, type, isReadonly })
   }
-  return ({ parameter, type, isReadonly })
+  throw new Error(
+    "An index signature parameter type must be 'string', 'symbol', a template literal type or a refinement of the previous types"
+  )
 }
 
 /**
@@ -735,7 +756,7 @@ export const createTypeLiteral = (
     symbol: false
   }
   for (let i = 0; i < indexSignatures.length; i++) {
-    const parameter = getParameterBaseAST(indexSignatures[i].parameter)
+    const parameter = getParameterBase(indexSignatures[i].parameter)
     if (isStringKeyword(parameter)) {
       if (parameters.string) {
         throw new Error("Duplicate index signature for type `string`")
@@ -833,9 +854,9 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
  * @category model
  * @since 1.0.0
  */
-export interface Refinement extends Annotated {
+export interface Refinement<From = AST> extends Annotated {
   readonly _tag: "Refinement"
-  readonly from: AST
+  readonly from: From
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly isReversed: boolean
 }
@@ -844,12 +865,12 @@ export interface Refinement extends Annotated {
  * @category constructors
  * @since 1.0.0
  */
-export const createRefinement = (
-  from: AST,
+export const createRefinement = <From extends AST = AST>(
+  from: From,
   decode: Refinement["decode"],
   isReversed: boolean,
   annotations: Annotated["annotations"] = {}
-): Refinement => ({ _tag: "Refinement", from, decode, isReversed, annotations })
+): Refinement<From> => ({ _tag: "Refinement", from, decode, isReversed, annotations })
 
 /**
  * @category guards
@@ -1478,18 +1499,16 @@ const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   return out
 }
 
-const getParameterBaseAST = (
-  ast: AST
-): StringKeyword | SymbolKeyword | TemplateLiteral | NeverKeyword => {
+const getParameterBase = (
+  ast: Parameter
+): StringKeyword | SymbolKeyword | TemplateLiteral => {
   switch (ast._tag) {
     case "StringKeyword":
     case "SymbolKeyword":
     case "TemplateLiteral":
       return ast
     case "Refinement":
-      return getParameterBaseAST(ast.from)
-    default:
-      return neverKeyword
+      return getParameterBase(ast.from)
   }
 }
 

@@ -891,7 +891,7 @@ export function filter<A>(
 ): <I>(self: Schema<I, A>) => Schema<I, A> {
   return (self) => {
     const decode = (a: A) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
-    const ast = AST.createRefinement(
+    const ast: AST.Refinement = AST.createRefinement(
       self.ast,
       decode,
       false,

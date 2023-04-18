@@ -112,6 +112,7 @@ Added in v1.0.0
   - [Element (interface)](#element-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
   - [Match (type alias)](#match-type-alias)
+  - [Parameter (type alias)](#parameter-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
   - [appendElement](#appendelement)
@@ -125,6 +126,7 @@ Added in v1.0.0
   - [getFrom](#getfrom)
   - [getPropertySignatures](#getpropertysignatures)
   - [getTo](#getto)
+  - [isParameter](#isparameter)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
   - [omit](#omit)
@@ -417,12 +419,12 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createRefinement: (
-  from: AST,
+export declare const createRefinement: <From extends AST = AST>(
+  from: From,
   decode: Refinement['decode'],
   isReversed: boolean,
   annotations?: Annotated['annotations']
-) => Refinement
+) => Refinement<From>
 ```
 
 Added in v1.0.0
@@ -707,7 +709,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isRefinement: (ast: AST) => ast is Refinement
+export declare const isRefinement: (ast: AST) => ast is Refinement<AST>
 ```
 
 Added in v1.0.0
@@ -1051,9 +1053,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Refinement extends Annotated {
+export interface Refinement<From = AST> extends Annotated {
   readonly _tag: 'Refinement'
-  readonly from: AST
+  readonly from: From
   readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
   readonly isReversed: boolean
 }
@@ -1240,7 +1242,7 @@ Added in v1.0.0
 
 ```ts
 export interface IndexSignature {
-  readonly parameter: AST
+  readonly parameter: Parameter
   readonly type: AST
   readonly isReadonly: boolean
 }
@@ -1256,6 +1258,16 @@ Added in v1.0.0
 export type Match<A> = {
   [K in AST['_tag']]: (ast: Extract<AST, { _tag: K }>, compile: Compiler<A>) => A
 }
+```
+
+Added in v1.0.0
+
+## Parameter (type alias)
+
+**Signature**
+
+```ts
+export type Parameter = StringKeyword | SymbolKeyword | TemplateLiteral | Refinement<Parameter>
 ```
 
 Added in v1.0.0
@@ -1409,6 +1421,16 @@ Added in v1.0.0
 
 ```ts
 export declare const getTo: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
+## isParameter
+
+**Signature**
+
+```ts
+export declare const isParameter: (ast: AST) => ast is Parameter
 ```
 
 Added in v1.0.0
