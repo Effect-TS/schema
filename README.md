@@ -1063,19 +1063,16 @@ The `transform` combinator takes a target schema, a transformation function from
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// define a function that converts a string into a tuple with one element of type string
-const decode = (s: string): [string] => [s];
-
-// define a function that converts a tuple with one element of type string into a string
-const encode = ([s]: readonly [string]): string => s;
-
 // use the transform combinator to convert the string schema into the tuple schema
-const transformedSchema: S.Schema<string, readonly [string]> = S.transform(
-  S.string,
-  S.tuple(S.string),
-  decode,
-  encode
-);
+export const transformedSchema: S.Schema<string, readonly [string]> =
+  S.transform(
+    S.string,
+    S.tuple(S.string),
+    // define a function that converts a string into a tuple with one element of type string
+    (s) => [s] as const,
+    // define a function that converts a tuple with one element of type string into a string
+    ([s]) => s
+  );
 ```
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to parse values of type `string` into values of type `[string]`.
@@ -1088,25 +1085,67 @@ The `transformResult` combinator works in a similar way, but allows the transfor
 import * as PR from "@effect/schema/ParseResult";
 import * as S from "@effect/schema/Schema";
 
-// define a function that converts a string into a boolean
-const decode = (s: string) =>
-  s === "true"
-    ? PR.success(true)
-    : s === "false"
-    ? PR.success(false)
-    : PR.failure(
-        PR.type(S.union(S.literal("true"), S.literal("false")).ast, s)
-      );
-
-// define a function that converts a boolean into a string
-const encode = (b: boolean) => PR.success(String(b));
-
-const transformedSchema: S.Schema<string, boolean> = S.transformResult(
+export const transformedSchema: S.Schema<string, boolean> = S.transformResult(
   S.string,
   S.boolean,
-  decode,
-  encode
+  // define a function that converts a string into a boolean
+  (s) =>
+    s === "true"
+      ? PR.success(true)
+      : s === "false"
+      ? PR.success(false)
+      : PR.failure(PR.type(S.literal("true", "false").ast, s)),
+  // define a function that converts a boolean into a string
+  (b) => PR.success(String(b))
 );
+```
+
+The transformation may also be async:
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as PR from "@effect/schema/ParseResult";
+import * as Effect from "@effect/io/Effect";
+import fetch from "node-fetch";
+import { pipe } from "@effect/data/Function";
+import * as TF from "@effect/schema/TreeFormatter";
+
+const api = (url: string) =>
+  Effect.tryCatchPromise(
+    () =>
+      fetch(url).then((res) => {
+        if (res.ok) {
+          return res.json() as Promise<unknown>;
+        }
+        throw new Error(String(res.status));
+      }),
+    (e) => new Error(String(e))
+  );
+
+const PeopleId = pipe(S.string, S.brand("PeopleId"));
+
+const PeopleIdFromString = S.transformResult(
+  S.string,
+  PeopleId,
+  (s) =>
+    Effect.mapBoth(
+      api(`https://swapi.dev/api/people/${s}`),
+      (e) => PR.parseError([PR.type(PeopleId.ast, s, e.message)]),
+      () => s
+    ),
+  PR.success
+);
+
+const parse = (id: string) =>
+  Effect.mapError(S.parseEffect(PeopleIdFromString)(id), (e) =>
+    TF.formatErrors(e.errors)
+  );
+
+Effect.runPromiseEither(parse("1")).then(console.log);
+// { _tag: 'Right', right: '1' }
+
+Effect.runPromiseEither(parse("fail")).then(console.log);
+// { _tag: 'Left', left: 'error(s) found\n└─ Error: 404' }
 ```
 
 ### String transformations
