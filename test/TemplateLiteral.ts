@@ -3,9 +3,9 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("TemplateLiteral", () => {
-  it("should throw on Unsupported template literal spans", () => {
+  it("should throw on unsupported template literal spans", () => {
     expect(() => S.templateLiteral(S.boolean)).toThrowError(
-      new Error("Unsupported template literal span BooleanKeyword")
+      new Error("templateLiteral: unsupported template literal span BooleanKeyword")
     )
   })
 

@@ -1130,6 +1130,8 @@ export const createRecord = (key: AST, value: AST, isReadonly: boolean): TypeLit
       case "Literal":
         if (isString(key.literal) || isNumber(key.literal)) {
           propertySignatures.push(createPropertySignature(key.literal, value, false, isReadonly))
+        } else {
+          throw new Error(`createRecord: unsupported literal ${String(key.literal)}`)
         }
         break
       case "UniqueSymbol":
@@ -1139,7 +1141,7 @@ export const createRecord = (key: AST, value: AST, isReadonly: boolean): TypeLit
         key.types.forEach(go)
         break
       default:
-        throw new Error(`createRecord: Unsupported key ${key._tag}`)
+        throw new Error(`createRecord: unsupported key ${key._tag}`)
     }
   }
   go(key)
@@ -1519,7 +1521,7 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
     case "TypeLiteral":
       return ast.propertySignatures.map((p): AST =>
         isSymbol(p.name) ? createUniqueSymbol(p.name) : createLiteral(p.name)
-      ).concat(ast.indexSignatures.map((is) => getFrom(is.parameter)))
+      ).concat(ast.indexSignatures.map((is) => getParameterBase(is.parameter)))
     case "Lazy":
       return _keyof(ast.f())
     default:

@@ -319,7 +319,7 @@ const getTemplateLiterals = (
     case "Union":
       return pipe(ast.types, RA.flatMap(getTemplateLiterals))
     default:
-      throw new Error(`Unsupported template literal span ${ast._tag}`)
+      throw new Error(`templateLiteral: unsupported template literal span ${ast._tag}`)
   }
 }
 

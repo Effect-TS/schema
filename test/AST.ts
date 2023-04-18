@@ -41,7 +41,13 @@ describe.concurrent("AST", () => {
 
   it("createRecord/ should throw on unsupported keys", () => {
     expect(() => AST.createRecord(AST.undefinedKeyword, AST.numberKeyword, true)).toThrowError(
-      new Error("createRecord: Unsupported key UndefinedKeyword")
+      new Error("createRecord: unsupported key UndefinedKeyword")
+    )
+  })
+
+  it("createRecord/ should throw on unsupported literals", () => {
+    expect(() => AST.createRecord(AST.createLiteral(true), AST.numberKeyword, true)).toThrowError(
+      new Error("createRecord: unsupported literal true")
     )
   })
 
