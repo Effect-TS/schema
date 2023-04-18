@@ -40,6 +40,8 @@ Added in v1.0.0
   - [nonNegativeBigint](#nonnegativebigint)
   - [nonPositiveBigint](#nonpositivebigint)
   - [positiveBigint](#positivebigint)
+- [boolean](#boolean)
+  - [not](#not)
 - [combinators](#combinators)
   - [annotations](#annotations-1)
   - [array](#array-1)
@@ -139,7 +141,7 @@ Added in v1.0.0
 - [primitives](#primitives)
   - [any](#any)
   - [bigint](#bigint-1)
-  - [boolean](#boolean)
+  - [boolean](#boolean-1)
   - [never](#never)
   - [null](#null)
   - [number](#number-1)
@@ -515,6 +517,20 @@ Added in v1.0.0
 export declare const positiveBigint: <A extends bigint>(
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+# boolean
+
+## not
+
+Negates a boolean value
+
+**Signature**
+
+```ts
+export declare const not: <I>(self: Schema<I, boolean>) => Schema<I, boolean>
 ```
 
 Added in v1.0.0
@@ -930,7 +946,13 @@ Added in v1.0.0
 
 ```ts
 export declare const struct: <
-  Fields extends Record<string | number | symbol, Schema<any, any> | PropertySignature<any, any, boolean>>
+  Fields extends Record<
+    string | number | symbol,
+    | Schema<any, any>
+    | Schema<never, never>
+    | PropertySignature<any, any, boolean>
+    | PropertySignature<never, never, boolean>
+  >
 >(
   fields: Fields
 ) => Schema<
@@ -2299,7 +2321,11 @@ Added in v1.0.0
 
 ```ts
 export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
-  [K in keyof Fields]: Fields[K] extends PropertySignature<any, any, ToIsOptional> ? K : never
+  [K in keyof Fields]: Fields[K] extends
+    | PropertySignature<any, any, ToIsOptional>
+    | PropertySignature<never, never, ToIsOptional>
+    ? K
+    : never
 }[keyof Fields]
 ```
 
@@ -2310,7 +2336,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface PropertySignature<From, To = From, ToIsOptional extends boolean = true> {
+export interface PropertySignature<From, To = From, ToIsOptional extends boolean = boolean> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
