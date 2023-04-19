@@ -199,13 +199,16 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
+  - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [Join (type alias)](#join-type-alias)
-  - [OptionalKeys (type alias)](#optionalkeys-type-alias)
-  - [PropertySignature (interface)](#propertysignature-interface)
-  - [PropertySignatureId](#propertysignatureid)
-  - [PropertySignatureId (type alias)](#propertysignatureid-type-alias)
+  - [PropertySignature (class)](#propertysignature-class)
+    - [From (property)](#from-property)
+    - [FromIsOptional (property)](#fromisoptional-property)
+    - [To (property)](#to-property)
+    - [ToIsOptional (property)](#toisoptional-property)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
+  - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [from](#from)
   - [getPropertySignatures](#getpropertysignatures)
   - [optional](#optional)
@@ -950,20 +953,20 @@ export declare const struct: <
     string | number | symbol,
     | Schema<any, any>
     | Schema<never, never>
-    | PropertySignature<any, any, boolean>
-    | PropertySignature<never, never, boolean>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
 ) => Schema<
   Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, boolean>>]: From<Fields[K]> } & {
-      readonly [K in OptionalKeys<Fields, boolean>]?: From<Fields[K]> | undefined
+    { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
+      readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
     }
   >,
   Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, true>>]: To<Fields[K]> } & {
-      readonly [K in OptionalKeys<Fields, true>]?: To<Fields[K]> | undefined
+    { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
+      readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
     }
   >
 >
@@ -2303,6 +2306,22 @@ Added in v1.0.0
 
 # utils
 
+## FromOptionalKeys (type alias)
+
+**Signature**
+
+```ts
+export type FromOptionalKeys<Fields> = {
+  [K in keyof Fields]: Fields[K] extends
+    | PropertySignature<any, true, any, boolean>
+    | PropertySignature<never, true, never, boolean>
+    ? K
+    : never
+}[keyof Fields]
+```
+
+Added in v1.0.0
+
 ## Join (type alias)
 
 **Signature**
@@ -2315,59 +2334,63 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
-## OptionalKeys (type alias)
+## PropertySignature (class)
 
 **Signature**
 
 ```ts
-export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
-  [K in keyof Fields]: Fields[K] extends
-    | PropertySignature<any, any, ToIsOptional>
-    | PropertySignature<never, never, ToIsOptional>
-    ? K
-    : never
-}[keyof Fields]
-```
-
-Added in v1.0.0
-
-## PropertySignature (interface)
-
-**Signature**
-
-```ts
-export interface PropertySignature<From, To = From, ToIsOptional extends boolean = boolean> {
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
-  readonly ToIsOptional: ToIsOptional
-  readonly _id: PropertySignatureId
-  readonly options?:
-    | { readonly to: 'Option' }
-    | {
-        readonly to: 'default'
-        readonly value: LazyArg<unknown>
-      }
+export declare class PropertySignature<From, FromIsOptional, To, ToIsOptional> {
+  constructor(
+    readonly from: AST.AST,
+    readonly optional?:
+      | { readonly to: 'optional' }
+      | { readonly to: 'Option' }
+      | {
+          readonly to: 'default'
+          readonly value: LazyArg<To>
+        }
+  )
 }
 ```
 
 Added in v1.0.0
 
-## PropertySignatureId
+### From (property)
 
 **Signature**
 
 ```ts
-export declare const PropertySignatureId: typeof PropertySignatureId
+readonly From: (_: From) => From
 ```
 
 Added in v1.0.0
 
-## PropertySignatureId (type alias)
+### FromIsOptional (property)
 
 **Signature**
 
 ```ts
-export type PropertySignatureId = typeof PropertySignatureId
+readonly FromIsOptional: FromIsOptional
+```
+
+Added in v1.0.0
+
+### To (property)
+
+**Signature**
+
+```ts
+readonly To: (_: To) => To
+```
+
+Added in v1.0.0
+
+### ToIsOptional (property)
+
+**Signature**
+
+```ts
+readonly ToIsOptional: ToIsOptional
 ```
 
 Added in v1.0.0
@@ -2392,6 +2415,22 @@ Added in v1.0.0
 
 ```ts
 export declare const ToAsserts: P.ToAsserts<S>
+```
+
+Added in v1.0.0
+
+## ToOptionalKeys (type alias)
+
+**Signature**
+
+```ts
+export type ToOptionalKeys<Fields> = {
+  [K in keyof Fields]: Fields[K] extends
+    | PropertySignature<any, boolean, any, true>
+    | PropertySignature<never, boolean, never, true>
+    ? K
+    : never
+}[keyof Fields]
 ```
 
 Added in v1.0.0
@@ -2446,11 +2485,11 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: {
-  <I, A>(schema: Schema<I, A>): PropertySignature<I, A, true>
-  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, Option<A>, false>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I, true, A, true>
+  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, true, Option<A>, false>
   withDefault: {
-    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, A, false>
-    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, A, false>
+    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, true, A, false>
+    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, true, A, false>
   }
 }
 ```

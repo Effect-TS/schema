@@ -449,63 +449,79 @@ export type Spread<A> = {
 /**
  * @since 1.0.0
  */
-export const PropertySignatureId = Symbol.for(
-  "@effect/schema/Schema/PropertySignatureId"
-)
-
-/**
- * @since 1.0.0
- */
-export type PropertySignatureId = typeof PropertySignatureId
-
-/**
- * @since 1.0.0
- */
-export interface PropertySignature<From, To = From, ToIsOptional extends boolean = boolean> {
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
-  readonly ToIsOptional: ToIsOptional
-  readonly _id: PropertySignatureId
-  readonly options?: { readonly to: "Option" } | {
-    readonly to: "default"
-    readonly value: LazyArg<unknown>
-  }
+export class PropertySignature<From, FromIsOptional, To, ToIsOptional> {
+  /**
+   * @since 1.0.0
+   */
+  readonly From!: (_: From) => From
+  /**
+   * @since 1.0.0
+   */
+  readonly FromIsOptional!: FromIsOptional
+  /**
+   * @since 1.0.0
+   */
+  readonly To!: (_: To) => To
+  /**
+   * @since 1.0.0
+   */
+  readonly ToIsOptional!: ToIsOptional
+  constructor(
+    readonly from: AST.AST,
+    readonly optional?:
+      | { readonly to: "optional" }
+      | { readonly to: "Option" }
+      | {
+        readonly to: "default"
+        readonly value: LazyArg<To>
+      }
+  ) {}
 }
-
-const isPropertySignature = <I, A>(
-  schema: object
-): schema is PropertySignature<I, A> => "_id" in schema && schema["_id"] === PropertySignatureId
 
 const _optional = <I, A>(
   schema: Schema<I, A>,
-  options?: { readonly to: "Option" } | { readonly to: "default"; readonly value: LazyArg<A> }
-): PropertySignature<I, A, boolean> => {
-  const out: any = make(schema.ast)
-  out["_id"] = PropertySignatureId
-  out["options"] = options
-  return out
+  optional:
+    | { readonly to: "optional" }
+    | { readonly to: "Option" }
+    | {
+      readonly to: "default"
+      readonly value: LazyArg<A>
+    }
+): PropertySignature<I, boolean, A, boolean> => {
+  return new PropertySignature(schema.ast, optional)
 }
 
 /**
  * @since 1.0.0
  */
 export const optional: {
-  <I, A>(schema: Schema<I, A>): PropertySignature<I, A, true>
-  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, O.Option<A>, false>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I, true, A, true>
+  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, true, O.Option<A>, false>
   withDefault: {
-    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, A, false>
-    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, A, false>
+    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, true, A, false>
+    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, true, A, false>
   }
-} = (<I, A>(schema: Schema<I, A>) => _optional(schema)) as any
+} = (<I, A>(schema: Schema<I, A>) => _optional(schema, { to: "optional" })) as any
 optional.toOption = (schema) => _optional(schema, { to: "Option" }) as any
 optional.withDefault = dual(2, (schema, value) => _optional(schema, { to: "default", value }))
 
 /**
  * @since 1.0.0
  */
-export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
+export type ToOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    PropertySignature<any, any, ToIsOptional> | PropertySignature<never, never, ToIsOptional> ? K
+    | PropertySignature<any, boolean, any, true>
+    | PropertySignature<never, boolean, never, true> ? K
+    : never
+}[keyof Fields]
+
+/**
+ * @since 1.0.0
+ */
+export type FromOptionalKeys<Fields> = {
+  [K in keyof Fields]: Fields[K] extends
+    | PropertySignature<any, true, any, boolean>
+    | PropertySignature<never, true, never, boolean> ? K
     : never
 }[keyof Fields]
 
@@ -518,19 +534,19 @@ export const struct = <
     PropertyKey,
     | Schema<any>
     | Schema<never>
-    | PropertySignature<any>
-    | PropertySignature<never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
 ): Schema<
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, boolean>>]: From<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields, boolean>]?: From<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
+    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
   Spread<
-    & { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, true>>]: To<Fields[K]> }
-    & { readonly [K in OptionalKeys<Fields, true>]?: To<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
+    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
 > => {
   const ownKeys = I.ownKeys(fields)
@@ -539,21 +555,29 @@ export const struct = <
   const propertySignatureTransformations: Array<AST.PropertySignatureTransformation> = []
   for (let i = 0; i < ownKeys.length; i++) {
     const key = ownKeys[i]
-    const schema: Schema<any, any> = fields[key] as any
-    if (isPropertySignature(schema)) {
-      fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, true, true))
-      const options = schema.options
-      if (options) {
-        switch (options.to) {
+    const field: Schema<any> | PropertySignature<any, boolean, any, boolean> = fields[key] as any
+    if (field instanceof PropertySignature) {
+      const propertySignature = field
+      fromPropertySignatures.push(
+        AST.createPropertySignature(key, propertySignature.from, true, true)
+      )
+      const optional = propertySignature.optional
+      if (optional) {
+        switch (optional.to) {
+          case "optional":
+            toPropertySignatures.push(
+              AST.createPropertySignature(key, AST.getTo(propertySignature.from), true, true)
+            )
+            break
           case "default":
             propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
               key,
               key,
-              O.orElse(() => O.some(options.value())),
+              O.orElse(() => O.some(optional.value())),
               identity
             ))
             toPropertySignatures.push(
-              AST.createPropertySignature(key, AST.getTo(schema.ast), false, true)
+              AST.createPropertySignature(key, AST.getTo(propertySignature.from), false, true)
             )
             break
           case "Option":
@@ -564,16 +588,18 @@ export const struct = <
               O.flatten
             ))
             toPropertySignatures.push(
-              AST.createPropertySignature(key, optionFromSelf(to(schema)).ast, false, true)
+              AST.createPropertySignature(
+                key,
+                optionFromSelf(make(AST.getTo(propertySignature.from))).ast,
+                false,
+                true
+              )
             )
             break
         }
-      } else {
-        toPropertySignatures.push(
-          AST.createPropertySignature(key, AST.getTo(schema.ast), true, true)
-        )
       }
     } else {
+      const schema = field
       fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, false, true))
       toPropertySignatures.push(
         AST.createPropertySignature(key, AST.getTo(schema.ast), false, true)
