@@ -85,6 +85,7 @@ Added in v1.0.0
   - [json](#json)
   - [literal](#literal)
   - [make](#make)
+  - [propertySignature](#propertysignature)
   - [readonlyMapFromSelf](#readonlymapfromself)
   - [readonlySetFromSelf](#readonlysetfromself)
   - [templateLiteral](#templateliteral)
@@ -201,11 +202,7 @@ Added in v1.0.0
 - [utils](#utils)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [Join (type alias)](#join-type-alias)
-  - [PropertySignature (class)](#propertysignature-class)
-    - [From (property)](#from-property)
-    - [FromIsOptional (property)](#fromisoptional-property)
-    - [To (property)](#to-property)
-    - [ToIsOptional (property)](#toisoptional-property)
+  - [PropertySignature (interface)](#propertysignature-interface)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
@@ -1114,6 +1111,19 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <I, A>(ast: AST.AST) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## propertySignature
+
+**Signature**
+
+```ts
+export declare const propertySignature: <I, A>(
+  schema: Schema<I, A>,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => PropertySignature<I, false, A, false>
 ```
 
 Added in v1.0.0
@@ -2334,63 +2344,20 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
-## PropertySignature (class)
+## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export declare class PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  constructor(
-    readonly from: AST.AST,
-    readonly optional?:
-      | { readonly to: 'optional' }
-      | { readonly to: 'Option' }
-      | {
-          readonly to: 'default'
-          readonly value: LazyArg<To>
-        }
-  )
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
+  readonly From: (_: From) => From
+  readonly FromIsOptional: FromIsOptional
+  readonly To: (_: To) => To
+  readonly ToIsOptional: ToIsOptional
+  readonly optional: () => PropertySignature<From, true, To, true>
+  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
+  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
 }
-```
-
-Added in v1.0.0
-
-### From (property)
-
-**Signature**
-
-```ts
-readonly From: (_: From) => From
-```
-
-Added in v1.0.0
-
-### FromIsOptional (property)
-
-**Signature**
-
-```ts
-readonly FromIsOptional: FromIsOptional
-```
-
-Added in v1.0.0
-
-### To (property)
-
-**Signature**
-
-```ts
-readonly To: (_: To) => To
-```
-
-Added in v1.0.0
-
-### ToIsOptional (property)
-
-**Signature**
-
-```ts
-readonly ToIsOptional: ToIsOptional
 ```
 
 Added in v1.0.0
@@ -2484,14 +2451,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optional: {
-  <I, A>(schema: Schema<I, A>): PropertySignature<I, true, A, true>
-  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, true, Option<A>, false>
-  withDefault: {
-    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, true, A, false>
-    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, true, A, false>
-  }
-}
+export declare const optional: <I, A>(
+  schema: Schema<I, A>,
+  annotations?: Record<string | symbol, unknown> | undefined
+) => PropertySignature<I, true, A, true>
 ```
 
 Added in v1.0.0
