@@ -82,6 +82,7 @@ Added in v1.0.0
 - [model](#model)
   - [AST (type alias)](#ast-type-alias)
   - [Annotated (interface)](#annotated-interface)
+  - [Annotations (interface)](#annotations-interface)
   - [AnyKeyword (interface)](#anykeyword-interface)
   - [BigIntKeyword (interface)](#bigintkeyword-interface)
   - [BooleanKeyword (interface)](#booleankeyword-interface)
@@ -864,8 +865,18 @@ Added in v1.0.0
 
 ```ts
 export interface Annotated {
-  readonly annotations: Record<string | symbol, unknown>
+  readonly annotations: Annotations
 }
+```
+
+Added in v1.0.0
+
+## Annotations (interface)
+
+**Signature**
+
+```ts
+export interface Annotations extends Record<string | symbol, unknown> {}
 ```
 
 Added in v1.0.0

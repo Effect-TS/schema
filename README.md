@@ -848,7 +848,7 @@ Optional fields can be configured to accept a default value, making the field op
 
 ```ts
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
-const schema = S.struct({ a. S.optional.withDefault(S.number, () => 0) });
+const schema = S.struct({ a. S.optional(S.number).withDefault(() => 0) });
 
 const parse = S.parse(schema)
 
@@ -869,7 +869,7 @@ Optional fields can be configured to transform a value of type `A` into `Option<
 import * as O from "@effect/data/Option"
 
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
-const schema = S.struct({ a. S.optional.toOption(S.number) });
+const schema = S.struct({ a. S.optional(S.number).toOption() });
 
 const parse = S.parse(schema)
 

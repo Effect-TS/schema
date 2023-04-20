@@ -85,6 +85,7 @@ Added in v1.0.0
   - [json](#json)
   - [literal](#literal)
   - [make](#make)
+  - [propertySignature](#propertysignature)
   - [readonlyMapFromSelf](#readonlymapfromself)
   - [readonlySetFromSelf](#readonlysetfromself)
   - [templateLiteral](#templateliteral)
@@ -199,13 +200,12 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
+  - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [Join (type alias)](#join-type-alias)
-  - [OptionalKeys (type alias)](#optionalkeys-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
-  - [PropertySignatureId](#propertysignatureid)
-  - [PropertySignatureId (type alias)](#propertysignatureid-type-alias)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
+  - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [from](#from)
   - [getPropertySignatures](#getpropertysignatures)
   - [optional](#optional)
@@ -675,7 +675,7 @@ export declare const declare: (
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
   ) => (input: unknown, options?: ParseOptions | undefined) => ParseResult<any>,
-  annotations?: Record<string | symbol, unknown> | undefined
+  annotations?: AST.Annotations | undefined
 ) => Schema<any>
 ```
 
@@ -778,10 +778,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <I, A = I>(
-  f: () => Schema<I, A>,
-  annotations?: Record<string | symbol, unknown> | undefined
-) => Schema<I, A>
+export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotations | undefined) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -950,20 +947,20 @@ export declare const struct: <
     string | number | symbol,
     | Schema<any, any>
     | Schema<never, never>
-    | PropertySignature<any, any, boolean>
-    | PropertySignature<never, never, boolean>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
 ) => Schema<
   Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, boolean>>]: From<Fields[K]> } & {
-      readonly [K in OptionalKeys<Fields, boolean>]?: From<Fields[K]> | undefined
+    { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
+      readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
     }
   >,
   Spread<
-    { readonly [K in Exclude<keyof Fields, OptionalKeys<Fields, true>>]: To<Fields[K]> } & {
-      readonly [K in OptionalKeys<Fields, true>]?: To<Fields[K]> | undefined
+    { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
+      readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
     }
   >
 >
@@ -1115,6 +1112,19 @@ export declare const make: <I, A>(ast: AST.AST) => Schema<I, A>
 
 Added in v1.0.0
 
+## propertySignature
+
+**Signature**
+
+```ts
+export declare const propertySignature: <I, A>(
+  schema: Schema<I, A>,
+  annotations?: AST.Annotations | undefined
+) => PropertySignature<I, false, A, false>
+```
+
+Added in v1.0.0
+
 ## readonlyMapFromSelf
 
 **Signature**
@@ -1157,7 +1167,7 @@ Added in v1.0.0
 ```ts
 export declare const uniqueSymbol: <S extends symbol>(
   symbol: S,
-  annotations?: Record<string | symbol, unknown> | undefined
+  annotations?: AST.Annotations | undefined
 ) => Schema<S, S>
 ```
 
@@ -2303,6 +2313,22 @@ Added in v1.0.0
 
 # utils
 
+## FromOptionalKeys (type alias)
+
+**Signature**
+
+```ts
+export type FromOptionalKeys<Fields> = {
+  [K in keyof Fields]: Fields[K] extends
+    | PropertySignature<any, true, any, boolean>
+    | PropertySignature<never, true, never, boolean>
+    ? K
+    : never
+}[keyof Fields]
+```
+
+Added in v1.0.0
+
 ## Join (type alias)
 
 **Signature**
@@ -2315,59 +2341,20 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
-## OptionalKeys (type alias)
-
-**Signature**
-
-```ts
-export type OptionalKeys<Fields, ToIsOptional extends boolean> = {
-  [K in keyof Fields]: Fields[K] extends
-    | PropertySignature<any, any, ToIsOptional>
-    | PropertySignature<never, never, ToIsOptional>
-    ? K
-    : never
-}[keyof Fields]
-```
-
-Added in v1.0.0
-
 ## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export interface PropertySignature<From, To = From, ToIsOptional extends boolean = boolean> {
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly From: (_: From) => From
+  readonly FromIsOptional: FromIsOptional
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
-  readonly _id: PropertySignatureId
-  readonly options?:
-    | { readonly to: 'Option' }
-    | {
-        readonly to: 'default'
-        readonly value: LazyArg<unknown>
-      }
+  readonly optional: () => PropertySignature<From, true, To, true>
+  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
+  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
 }
-```
-
-Added in v1.0.0
-
-## PropertySignatureId
-
-**Signature**
-
-```ts
-export declare const PropertySignatureId: typeof PropertySignatureId
-```
-
-Added in v1.0.0
-
-## PropertySignatureId (type alias)
-
-**Signature**
-
-```ts
-export type PropertySignatureId = typeof PropertySignatureId
 ```
 
 Added in v1.0.0
@@ -2392,6 +2379,22 @@ Added in v1.0.0
 
 ```ts
 export declare const ToAsserts: P.ToAsserts<S>
+```
+
+Added in v1.0.0
+
+## ToOptionalKeys (type alias)
+
+**Signature**
+
+```ts
+export type ToOptionalKeys<Fields> = {
+  [K in keyof Fields]: Fields[K] extends
+    | PropertySignature<any, boolean, any, true>
+    | PropertySignature<never, boolean, never, true>
+    ? K
+    : never
+}[keyof Fields]
 ```
 
 Added in v1.0.0
@@ -2445,14 +2448,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optional: {
-  <I, A>(schema: Schema<I, A>): PropertySignature<I, A, true>
-  toOption: <I, A>(schema: Schema<I, A>) => PropertySignature<I, Option<A>, false>
-  withDefault: {
-    <A>(value: LazyArg<A>): <I>(schema: Schema<I, A>) => PropertySignature<I, A, false>
-    <I, A>(schema: Schema<I, A>, value: LazyArg<A>): PropertySignature<I, A, false>
-  }
-}
+export declare const optional: <I, A>(
+  schema: Schema<I, A>,
+  annotations?: AST.Annotations | undefined
+) => PropertySignature<I, true, A, true>
 ```
 
 Added in v1.0.0
