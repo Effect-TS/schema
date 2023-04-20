@@ -675,7 +675,7 @@ export declare const declare: (
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
   ) => (input: unknown, options?: ParseOptions | undefined) => ParseResult<any>,
-  annotations?: Record<string | symbol, unknown> | undefined
+  annotations?: AST.Annotations | undefined
 ) => Schema<any>
 ```
 
@@ -778,10 +778,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <I, A = I>(
-  f: () => Schema<I, A>,
-  annotations?: Record<string | symbol, unknown> | undefined
-) => Schema<I, A>
+export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotations | undefined) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1122,7 +1119,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <I, A>(
   schema: Schema<I, A>,
-  annotations?: Record<string | symbol, unknown> | undefined
+  annotations?: AST.Annotations | undefined
 ) => PropertySignature<I, false, A, false>
 ```
 
@@ -1170,7 +1167,7 @@ Added in v1.0.0
 ```ts
 export declare const uniqueSymbol: <S extends symbol>(
   symbol: S,
-  annotations?: Record<string | symbol, unknown> | undefined
+  annotations?: AST.Annotations | undefined
 ) => Schema<S, S>
 ```
 
@@ -2453,7 +2450,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <I, A>(
   schema: Schema<I, A>,
-  annotations?: Record<string | symbol, unknown> | undefined
+  annotations?: AST.Annotations | undefined
 ) => PropertySignature<I, true, A, true>
 ```
 
