@@ -1,5 +1,4 @@
 import * as Option from "@effect/data/Option"
-import { DescriptionAnnotationId } from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("propertySignature", () => {
@@ -32,8 +31,35 @@ describe.concurrent("propertySignature", () => {
       )
   })
 
-  it("should add annotations", () => {
-    const ps = S.propertySignature(S.string, { [DescriptionAnnotationId]: "my description" })
-    expect((ps as any)._annotations).toEqual({ [DescriptionAnnotationId]: "my description" })
+  it("should add annotations to propertySignature", () => {
+    const schema = S.struct({
+      a: S.propertySignature(S.string, { a: "a" })
+    })
+    const ast: any = schema.ast
+    expect(ast.propertySignatures[0].annotations).toEqual({ a: "a" })
+  })
+
+  it("should add annotations to propertySignature().optional()", () => {
+    const schema = S.struct({
+      a: S.propertySignature(S.string, { a: "a" }).optional()
+    })
+    const ast: any = schema.ast
+    expect(ast.propertySignatures[0].annotations).toEqual({ a: "a" })
+  })
+
+  it("should add annotations to propertySignature().withDefault()", () => {
+    const schema = S.struct({
+      a: S.propertySignature(S.string, { a: "a" }).withDefault(() => "")
+    })
+    const ast: any = schema.ast
+    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
+  })
+
+  it("should add annotations to propertySignature().toOption()", () => {
+    const schema = S.struct({
+      a: S.propertySignature(S.string, { a: "a" }).toOption()
+    })
+    const ast: any = schema.ast
+    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
   })
 })

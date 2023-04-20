@@ -563,6 +563,7 @@ export const struct = <
   >
 > => {
   const ownKeys = I.ownKeys(fields)
+  const propertySignatures: Array<AST.PropertySignature> = []
   const fromPropertySignatures: Array<AST.PropertySignature> = []
   const toPropertySignatures: Array<AST.PropertySignature> = []
   const propertySignatureTransformations: Array<AST.PropertySignatureTransformation> = []
@@ -571,60 +572,77 @@ export const struct = <
     const field: Schema<any> | PropertySignatureImpl<any, boolean, any, boolean> =
       fields[key] as any
     if (field instanceof PropertySignatureImpl) {
-      const prop = field
-      fromPropertySignatures.push(
-        AST.createPropertySignature(key, prop._from, true, true)
-      )
-      const optional = prop._optional
+      const optional = field._optional
       if (optional) {
         switch (optional.to) {
-          case "optional":
+          case "optional": {
+            propertySignatures.push(
+              AST.createPropertySignature(key, field._from, true, true, field._annotations)
+            )
+            fromPropertySignatures.push(AST.createPropertySignature(key, field._from, true, true))
             toPropertySignatures.push(
-              AST.createPropertySignature(key, AST.getTo(prop._from), true, true, prop._annotations)
+              AST.createPropertySignature(
+                key,
+                AST.getTo(field._from),
+                true,
+                true,
+                field._annotations
+              )
             )
             break
-          case "default":
+          }
+          case "default": {
+            fromPropertySignatures.push(AST.createPropertySignature(key, field._from, true, true))
+            toPropertySignatures.push(
+              AST.createPropertySignature(
+                key,
+                AST.getTo(field._from),
+                false,
+                true,
+                field._annotations
+              )
+            )
             propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
               key,
               key,
               O.orElse(() => O.some(optional.value())),
               identity
             ))
+            break
+          }
+          case "Option": {
+            fromPropertySignatures.push(AST.createPropertySignature(key, field._from, true, true))
             toPropertySignatures.push(
               AST.createPropertySignature(
                 key,
-                AST.getTo(prop._from),
+                optionFromSelf(make(AST.getTo(field._from))).ast,
                 false,
                 true,
-                prop._annotations
+                field._annotations
               )
             )
-            break
-          case "Option":
             propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
               key,
               key,
               O.some,
               O.flatten
             ))
-            toPropertySignatures.push(
-              AST.createPropertySignature(
-                key,
-                optionFromSelf(make(AST.getTo(prop._from))).ast,
-                false,
-                true,
-                prop._annotations
-              )
-            )
             break
+          }
         }
+      } else {
+        propertySignatures.push(
+          AST.createPropertySignature(key, field._from, false, true, field._annotations)
+        )
+        fromPropertySignatures.push(AST.createPropertySignature(key, field._from, false, true))
+        toPropertySignatures.push(
+          AST.createPropertySignature(key, AST.getTo(field._from), false, true, field._annotations)
+        )
       }
     } else {
-      const schema = field
-      fromPropertySignatures.push(AST.createPropertySignature(key, schema.ast, false, true))
-      toPropertySignatures.push(
-        AST.createPropertySignature(key, AST.getTo(schema.ast), false, true)
-      )
+      propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+      fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+      toPropertySignatures.push(AST.createPropertySignature(key, AST.getTo(field.ast), false, true))
     }
   }
   if (propertySignatureTransformations.length > 0) {
@@ -635,8 +653,9 @@ export const struct = <
         propertySignatureTransformations
       )
     )
+  } else {
+    return make(AST.createTypeLiteral(propertySignatures, []))
   }
-  return make(AST.createTypeLiteral(fromPropertySignatures, []))
 }
 
 /**
