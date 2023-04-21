@@ -234,7 +234,7 @@ S.parse(Person)(
     age: "abc",
     email: "bob@example.com",
   },
-  { errors: "all" }
+  { errors: "all", onExcessProperty: "error" }
 );
 /*
 throws
