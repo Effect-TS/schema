@@ -22,7 +22,6 @@ specifiers:
   '@types/glob': ^8.1.0
   '@types/jest': ^29.5.0
   '@types/node': ^18.15.11
-  '@types/prettier': 2.7.2
   '@types/rimraf': 4.0.5
   '@typescript-eslint/eslint-plugin': ^5.57.0
   '@typescript-eslint/parser': ^5.57.0
@@ -75,7 +74,6 @@ devDependencies:
   '@types/glob': 8.1.0
   '@types/jest': 29.5.0
   '@types/node': 18.15.11
-  '@types/prettier': 2.7.2
   '@types/rimraf': 4.0.5
   '@typescript-eslint/eslint-plugin': 5.57.1_jwd5v5vphzanfmajybkjq25ld4
   '@typescript-eslint/parser': 5.57.1_vwh6htx42aidho2qgfca5u5rwm
@@ -1179,10 +1177,6 @@ packages:
 
   /@types/normalize-package-data/2.4.1:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
-    dev: true
-
-  /@types/prettier/2.7.2:
-    resolution: {integrity: sha512-KufADq8uQqo1pYKVIYzfKbJfBAc0sOeXqGbFaSpv8MRmC/zXgowNZmFcbngndGk922QDmOASEXUZCaY48gs4cg==}
     dev: true
 
   /@types/rimraf/4.0.5:
