@@ -134,7 +134,6 @@ Added in v1.0.0
   - [partial](#partial)
   - [pick](#pick)
   - [required](#required)
-  - [reverse](#reverse)
   - [setAnnotation](#setannotation)
 
 ---
@@ -1577,16 +1576,6 @@ Equivalent at runtime to the built-in TypeScript utility type `Required`.
 
 ```ts
 export declare const required: (ast: AST) => AST
-```
-
-Added in v1.0.0
-
-## reverse
-
-**Signature**
-
-```ts
-export declare const reverse: (ast: AST) => AST
 ```
 
 Added in v1.0.0

@@ -1344,59 +1344,6 @@ export const getFrom = (ast: AST): AST => {
   return ast
 }
 
-/**
- * @since 1.0.0
- */
-export const reverse = (ast: AST): AST => {
-  switch (ast._tag) {
-    case "Declaration":
-      return createDeclaration(
-        ast.typeParameters.map(reverse),
-        ast.type,
-        ast.decode,
-        ast.annotations
-      )
-    case "Tuple":
-      return createTuple(
-        ast.elements.map((e) => createElement(reverse(e.type), e.isOptional)),
-        O.map(ast.rest, RA.mapNonEmpty(reverse)),
-        ast.isReadonly
-      )
-    case "TypeLiteral":
-      return createTypeLiteral(
-        ast.propertySignatures.map((ps) =>
-          createPropertySignature(
-            ps.name,
-            reverse(ps.type),
-            ps.isOptional,
-            ps.isReadonly,
-            ps.annotations
-          )
-        ),
-        ast.indexSignatures.map((is) =>
-          createIndexSignature(is.parameter, reverse(is.type), is.isReadonly)
-        )
-      )
-    case "Union":
-      return createUnion(ast.types.map(reverse))
-    case "Lazy":
-      return createLazy(() => reverse(ast.f()))
-    case "Refinement":
-      return createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
-    case "Transform":
-      return _createTransform(
-        reverse(ast.to),
-        reverse(ast.from),
-        ast.encode,
-        ast.decode,
-        ast.propertySignatureTransformations.map((t) =>
-          createPropertySignatureTransformation(t.to, t.from, t.encode, t.decode)
-        )
-      )
-  }
-  return ast
-}
-
 /** @internal */
 export const getCardinality = (ast: AST): number => {
   switch (ast._tag) {

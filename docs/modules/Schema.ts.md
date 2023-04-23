@@ -211,7 +211,6 @@ Added in v1.0.0
   - [from](#from)
   - [getPropertySignatures](#getpropertysignatures)
   - [optional](#optional)
-  - [reverse](#reverse)
   - [to](#to)
 - [validation](#validation)
   - [asserts](#asserts)
@@ -2476,16 +2475,6 @@ export declare const optional: <I, A>(
   schema: Schema<I, A>,
   annotations?: AST.Annotations | undefined
 ) => PropertySignature<I, true, A, true>
-```
-
-Added in v1.0.0
-
-## reverse
-
-**Signature**
-
-```ts
-export declare const reverse: <I, A>(schema: Schema<I, A>) => Schema<A, I>
 ```
 
 Added in v1.0.0

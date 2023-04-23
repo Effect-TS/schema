@@ -233,7 +233,7 @@ export const asserts = <_, A>(schema: Schema<_, A>) => {
  * @since 1.0.0
  */
 export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOptions) => I =>
-  get(AST.reverse(schema.ast))
+  get(reverse(schema.ast))
 
 /**
  * @category encoding
@@ -241,7 +241,7 @@ export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOption
  */
 export const encodeOption = <I, A>(
   schema: Schema<I, A>
-): (input: A, options?: ParseOptions) => Option<I> => getOption(AST.reverse(schema.ast))
+): (input: A, options?: ParseOptions) => Option<I> => getOption(reverse(schema.ast))
 
 /**
  * @category encoding
@@ -249,8 +249,7 @@ export const encodeOption = <I, A>(
  */
 export const encodeEither = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => E.Either<PR.ParseError, I> =>
-  getEither(AST.reverse(schema.ast))
+): (a: A, options?: ParseOptions) => E.Either<PR.ParseError, I> => getEither(reverse(schema.ast))
 
 /**
  * @category encoding
@@ -258,7 +257,7 @@ export const encodeEither = <I, A>(
  */
 export const encodeResult = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(AST.reverse(schema.ast))
+): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(reverse(schema.ast))
 
 /**
  * @category encoding
@@ -266,7 +265,7 @@ export const encodeResult = <I, A>(
  */
 export const encodePromise = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => Promise<I> => getPromise(AST.reverse(schema.ast))
+): (a: A, options?: ParseOptions) => Promise<I> => getPromise(reverse(schema.ast))
 
 /**
  * @category encoding
@@ -275,7 +274,7 @@ export const encodePromise = <I, A>(
 export const encodeEffect = <I, A>(
   schema: Schema<I, A>
 ): (a: A, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, I> =>
-  getEffect(AST.reverse(schema.ast))
+  getEffect(reverse(schema.ast))
 
 interface ParseEffectOptions extends ParseOptions {
   readonly isEffectAllowed?: boolean
@@ -291,7 +290,7 @@ const go = untracedMethod(() =>
       case "Refinement": {
         if (ast.isReversed) {
           const from = go(AST.getTo(ast), isBoundary)
-          const to = go(AST.reverse(dropRightRefinement(ast.from)), false)
+          const to = go(reverse(dropRightRefinement(ast.from)), false)
           return (i, options) =>
             handleForbidden(PR.flatMap(from(i, options), (a) => to(a, options)), options)
         } else {
@@ -1061,4 +1060,55 @@ function sortByIndex<T>(es: RA.NonEmptyArray<[number, T]>): RA.NonEmptyArray<T>
 function sortByIndex<T>(es: Array<[number, T]>): Array<T>
 function sortByIndex(es: Array<[number, any]>): any {
   return es.sort(([a], [b]) => a > b ? 1 : a < b ? -1 : 0).map(([_, a]) => a)
+}
+
+/** @internal */
+export const reverse = (ast: AST.AST): AST.AST => {
+  switch (ast._tag) {
+    case "Declaration":
+      return AST.createDeclaration(
+        ast.typeParameters.map(reverse),
+        ast.type,
+        ast.decode,
+        ast.annotations
+      )
+    case "Tuple":
+      return AST.createTuple(
+        ast.elements.map((e) => AST.createElement(reverse(e.type), e.isOptional)),
+        O.map(ast.rest, RA.mapNonEmpty(reverse)),
+        ast.isReadonly
+      )
+    case "TypeLiteral":
+      return AST.createTypeLiteral(
+        ast.propertySignatures.map((ps) =>
+          AST.createPropertySignature(
+            ps.name,
+            reverse(ps.type),
+            ps.isOptional,
+            ps.isReadonly,
+            ps.annotations
+          )
+        ),
+        ast.indexSignatures.map((is) =>
+          AST.createIndexSignature(is.parameter, reverse(is.type), is.isReadonly)
+        )
+      )
+    case "Union":
+      return AST.createUnion(ast.types.map(reverse))
+    case "Lazy":
+      return AST.createLazy(() => reverse(ast.f()))
+    case "Refinement":
+      return AST.createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
+    case "Transform":
+      return AST._createTransform(
+        reverse(ast.to),
+        reverse(ast.from),
+        ast.encode,
+        ast.decode,
+        ast.propertySignatureTransformations.map((t) =>
+          AST.createPropertySignatureTransformation(t.to, t.from, t.encode, t.decode)
+        )
+      )
+  }
+  return ast
 }
