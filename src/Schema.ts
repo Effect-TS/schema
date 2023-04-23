@@ -62,11 +62,6 @@ export const from = <I, A>(schema: Schema<I, A>): Schema<I> => make(AST.getFrom(
  */
 export const to = <I, A>(schema: Schema<I, A>): Schema<A> => make(AST.getTo(schema.ast))
 
-/**
- * @since 1.0.0
- */
-export const reverse = <I, A>(schema: Schema<I, A>): Schema<A, I> => make(AST.reverse(schema.ast))
-
 /* c8 ignore start */
 export {
   /**
