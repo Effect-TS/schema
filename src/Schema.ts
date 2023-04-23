@@ -55,12 +55,12 @@ export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To
 /**
  * @since 1.0.0
  */
-export const from = <I, A>(schema: Schema<I, A>): Schema<I> => make(AST.getFrom(schema.ast))
+export const from = <I, A>(schema: Schema<I, A>): Schema<I> => make(AST.from(schema.ast))
 
 /**
  * @since 1.0.0
  */
-export const to = <I, A>(schema: Schema<I, A>): Schema<A> => make(AST.getTo(schema.ast))
+export const to = <I, A>(schema: Schema<I, A>): Schema<A> => make(AST.to(schema.ast))
 
 /* c8 ignore start */
 export {
@@ -578,7 +578,7 @@ export const struct = <
             toPropertySignatures.push(
               AST.createPropertySignature(
                 key,
-                AST.getTo(field._from),
+                AST.to(field._from),
                 true,
                 true,
                 field._annotations
@@ -591,7 +591,7 @@ export const struct = <
             toPropertySignatures.push(
               AST.createPropertySignature(
                 key,
-                AST.getTo(field._from),
+                AST.to(field._from),
                 false,
                 true,
                 field._annotations
@@ -610,7 +610,7 @@ export const struct = <
             toPropertySignatures.push(
               AST.createPropertySignature(
                 key,
-                optionFromSelf(make(AST.getTo(field._from))).ast,
+                optionFromSelf(make(AST.to(field._from))).ast,
                 false,
                 true,
                 field._annotations
@@ -631,13 +631,13 @@ export const struct = <
         )
         fromPropertySignatures.push(AST.createPropertySignature(key, field._from, false, true))
         toPropertySignatures.push(
-          AST.createPropertySignature(key, AST.getTo(field._from), false, true, field._annotations)
+          AST.createPropertySignature(key, AST.to(field._from), false, true, field._annotations)
         )
       }
     } else {
       propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
       fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-      toPropertySignatures.push(AST.createPropertySignature(key, AST.getTo(field.ast), false, true))
+      toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
     }
   }
   if (propertySignatureTransformations.length > 0) {

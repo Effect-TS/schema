@@ -122,11 +122,10 @@ Added in v1.0.0
   - [createIndexSignature](#createindexsignature)
   - [createPropertySignature](#createpropertysignature)
   - [createRecord](#createrecord)
+  - [from](#from)
   - [getAnnotation](#getannotation)
   - [getCompiler](#getcompiler)
-  - [getFrom](#getfrom)
   - [getPropertySignatures](#getpropertysignatures)
-  - [getTo](#getto)
   - [isParameter](#isparameter)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
@@ -135,6 +134,7 @@ Added in v1.0.0
   - [pick](#pick)
   - [required](#required)
   - [setAnnotation](#setannotation)
+  - [to](#to)
 
 ---
 
@@ -1385,6 +1385,16 @@ export declare const createRecord: (key: AST, value: AST, isReadonly: boolean) =
 
 Added in v1.0.0
 
+## from
+
+**Signature**
+
+```ts
+export declare const from: (ast: AST) => AST
+```
+
+Added in v1.0.0
+
 ## getAnnotation
 
 **Signature**
@@ -1405,32 +1415,12 @@ export declare const getCompiler: <A>(match: Match<A>) => Compiler<A>
 
 Added in v1.0.0
 
-## getFrom
-
-**Signature**
-
-```ts
-export declare const getFrom: (ast: AST) => AST
-```
-
-Added in v1.0.0
-
 ## getPropertySignatures
 
 **Signature**
 
 ```ts
 export declare const getPropertySignatures: (ast: AST) => ReadonlyArray<PropertySignature>
-```
-
-Added in v1.0.0
-
-## getTo
-
-**Signature**
-
-```ts
-export declare const getTo: (ast: AST) => AST
 ```
 
 Added in v1.0.0
@@ -1652,6 +1642,16 @@ export declare const setAnnotation: (
       encode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
       propertySignatureTransformations: readonly PropertySignatureTransformation[]
     }
+```
+
+Added in v1.0.0
+
+## to
+
+**Signature**
+
+```ts
+export declare const to: (ast: AST) => AST
 ```
 
 Added in v1.0.0
