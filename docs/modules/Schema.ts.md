@@ -183,7 +183,9 @@ Added in v1.0.0
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
   - [LessThanTypeId](#lessthantypeid)
   - [MaxItemsTypeId](#maxitemstypeid)
+  - [MaxLengthTypeId](#maxlengthtypeid)
   - [MinItemsTypeId](#minitemstypeid)
+  - [MinLengthTypeId](#minlengthtypeid)
   - [MultipleOfTypeId](#multipleoftypeid)
   - [NegativeBigintTypeId](#negativebiginttypeid)
   - [NegativeTypeId](#negativetypeid)
@@ -2151,12 +2153,32 @@ export declare const MaxItemsTypeId: '@effect/schema/MaxItemsTypeId'
 
 Added in v1.0.0
 
+## MaxLengthTypeId
+
+**Signature**
+
+```ts
+export declare const MaxLengthTypeId: '@effect/schema/MaxLengthTypeId'
+```
+
+Added in v1.0.0
+
 ## MinItemsTypeId
 
 **Signature**
 
 ```ts
 export declare const MinItemsTypeId: '@effect/schema/MinItemsTypeId'
+```
+
+Added in v1.0.0
+
+## MinLengthTypeId
+
+**Signature**
+
+```ts
+export declare const MinLengthTypeId: '@effect/schema/MinLengthTypeId'
 ```
 
 Added in v1.0.0
