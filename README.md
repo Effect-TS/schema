@@ -1493,7 +1493,7 @@ import { pipe } from "@effect/data/Function";
 const DeprecatedId = "some/unique/identifier/for/the/custom/annotation";
 
 const deprecated = <A>(self: S.Schema<A>): S.Schema<A> =>
-  S.make(AST.annotation(self.ast, DeprecatedId, true));
+  S.make(AST.setAnnotation(self.ast, DeprecatedId, true));
 
 const schema = pipe(S.string, deprecated);
 
