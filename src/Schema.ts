@@ -700,42 +700,6 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   }
 
 /**
- * Returns an object containing all property signatures of a given schema.
- *
- * ```
- * Schema<A> -> { [K in keyof A]: Schema<A[K]> }
- * ```
- *
- * @param schema - The schema to extract property signatures from.
- *
- * @example
- * import * as S from "@effect/schema/Schema"
- *
- * const Person = S.struct({
- *   name: S.string,
- *   age: S.number
- * })
- *
- * const shape = S.getPropertySignatures(Person)
- *
- * assert.deepStrictEqual(shape.name, S.string)
- * assert.deepStrictEqual(shape.age, S.number)
- *
- * @since 1.0.0
- */
-export const getPropertySignatures = <I extends { [K in keyof A]: any }, A>(
-  schema: Schema<I, A>
-): { [K in keyof A]: Schema<I[K], A[K]> } => {
-  const out: Record<PropertyKey, Schema<any>> = {}
-  const propertySignatures = AST.getPropertySignatures(schema.ast)
-  for (let i = 0; i < propertySignatures.length; i++) {
-    const propertySignature = propertySignatures[i]
-    out[propertySignature.name] = make(propertySignature.type)
-  }
-  return out as any
-}
-
-/**
  * @category model
  * @since 1.0.0
  */

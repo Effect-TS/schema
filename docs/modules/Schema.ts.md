@@ -209,7 +209,6 @@ Added in v1.0.0
   - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [from](#from)
-  - [getPropertySignatures](#getpropertysignatures)
   - [optional](#optional)
   - [to](#to)
 - [validation](#validation)
@@ -2428,40 +2427,6 @@ Added in v1.0.0
 
 ```ts
 export declare const from: <I, A>(schema: Schema<I, A>) => Schema<I, I>
-```
-
-Added in v1.0.0
-
-## getPropertySignatures
-
-Returns an object containing all property signatures of a given schema.
-
-```
-Schema<A> -> { [K in keyof A]: Schema<A[K]> }
-```
-
-**Signature**
-
-```ts
-export declare const getPropertySignatures: <I extends { [K in keyof A]: any }, A>(
-  schema: Schema<I, A>
-) => { [K in keyof A]: Schema<I[K], A[K]> }
-```
-
-**Example**
-
-```ts
-import * as S from '@effect/schema/Schema'
-
-const Person = S.struct({
-  name: S.string,
-  age: S.number,
-})
-
-const shape = S.getPropertySignatures(Person)
-
-assert.deepStrictEqual(shape.name, S.string)
-assert.deepStrictEqual(shape.age, S.number)
 ```
 
 Added in v1.0.0
