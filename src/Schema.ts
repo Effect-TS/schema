@@ -2730,3 +2730,15 @@ export const length = <A extends string>(
 export const nonEmpty = <A extends string>(
   options?: AnnotationOptions<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> => minLength(1, options)
+
+/**
+  @category combinators
+  @since 1.0.0
+*/
+export const fromUnknown = <I, A>(schema: Schema<I, A>) =>
+  transformResult(
+    unknown,
+    to(schema),
+    P.parseResult(schema),
+    PR.success
+  )

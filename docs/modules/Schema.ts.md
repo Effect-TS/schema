@@ -57,6 +57,7 @@ Added in v1.0.0
   - [extend](#extend)
   - [filter](#filter)
   - [fromBrand](#frombrand)
+  - [fromUnknown](#fromunknown)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
@@ -761,6 +762,16 @@ export declare const fromBrand: <C extends any>(
   constructor: any,
   options?: AnnotationOptions<any> | undefined
 ) => <I, A extends any>(self: Schema<I, A>) => Schema<I, A & C>
+```
+
+Added in v1.0.0
+
+## fromUnknown
+
+**Signature**
+
+```ts
+export declare const fromUnknown: <I, A>(schema: Schema<I, A>) => Schema<unknown, A>
 ```
 
 Added in v1.0.0
