@@ -14,7 +14,7 @@ specifiers:
   '@effect-ts/build-utils': ^0.40.7
   '@effect-ts/core': ^0.60.5
   '@effect/data': ^0.12.2
-  '@effect/io': ^0.25.2
+  '@effect/io': ^0.25.8
   '@effect/language-service': ^0.0.19
   '@repo-tooling/eslint-plugin-dprint': ^0.0.4
   '@types/benchmark': ^2.1.2
@@ -56,7 +56,7 @@ specifiers:
 
 dependencies:
   '@effect/data': 0.12.2
-  '@effect/io': 0.25.2
+  '@effect/io': 0.25.8
   fast-check: 3.8.1
 
 devDependencies:
@@ -629,8 +629,8 @@ packages:
     resolution: {integrity: sha512-bmWRTcsSRG1FlBswT+D8SxW6r3c4B3pKJrjYfitCD03tXHnup5gLHaWqbFgIjiyYITS+UsJRRjVrNxvyGG4ZNQ==}
     dev: false
 
-  /@effect/io/0.25.2:
-    resolution: {integrity: sha512-eGkx616RF3uUqhrHHeLGgZKXR8AXZdWrvwPnPdKSqXcr6Iu+8YqFQ73dCk5ujHfNVDLIHUSrI+kjAzLeKhVITg==}
+  /@effect/io/0.25.8:
+    resolution: {integrity: sha512-fFSf7CdKyqqRyRKIFKoWx63sO1tGDjDIs26Ce+UevD3V/HbT0sKmG2MBThWoO5D2/tWEqwmq8+a/og6gq8KX4w==}
     dependencies:
       '@effect/data': 0.12.2
     dev: false
@@ -3519,7 +3519,7 @@ packages:
     resolution: {integrity: sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw==}
     engines: {node: '>= 4.0'}
     os: [darwin]
-    deprecated: fsevents 1 will break on node v14+ and could be using insecure binaries. Upgrade to fsevents 2.
+    deprecated: The v1 package contains DANGEROUS / INSECURE binaries. Upgrade to safe fsevents v2
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
