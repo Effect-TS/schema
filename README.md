@@ -576,11 +576,20 @@ To define a schema for a branded type from scratch, you can use the `brand` comb
 import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
-const UserIdSchema = pipe(S.string, S.brand("UserId"));
-type UserId = S.To<typeof UserIdSchema>; // string & Brand<"UserId">
+const UserId = pipe(S.string, S.brand("UserId"));
+type UserId = S.To<typeof UserId>; // string & Brand<"UserId">
 ```
 
-In the above example, `UserIdSchema` is a schema for the `UserId` branded type. The `brand` combinator takes a string argument that specifies the name of the brand to attach to the type.
+Note that you can use `unique symbol`s as brands to ensure uniqueness across modules / packages:
+
+```ts
+import { pipe } from "@effect/data/Function";
+import * as S from "@effect/schema/Schema";
+
+const UserIdBrand = Symbol.for("UserId");
+const UserId = pipe(S.string, S.brand(UserIdBrand));
+type UserId = S.To<typeof UserId>; // string & Brand<typeof UserIdBrand>
+```
 
 ### Reusing an existing branded type
 
