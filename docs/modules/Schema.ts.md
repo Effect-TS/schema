@@ -728,9 +728,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const extend: <IB, B>(
-  that: Schema<IB, B>
-) => <I, A>(self: Schema<I, A>) => Schema<Spread<I & IB>, Spread<A & B>>
+export declare const extend: {
+  <IB, B>(that: Schema<IB, B>): <I, A>(self: Schema<I, A>) => Schema<Spread<I & IB>, Spread<A & B>>
+  <I, A, IB, B>(self: Schema<I, A>, that: Schema<IB, B>): Schema<Spread<I & IB>, Spread<A & B>>
+}
 ```
 
 Added in v1.0.0
@@ -1335,6 +1336,7 @@ export type AnnotationOptions<A> = {
   examples?: AST.ExamplesAnnotation
   documentation?: AST.DocumentationAnnotation
   jsonSchema?: AST.JSONSchemaAnnotation
+  arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
 }
 ```
 
