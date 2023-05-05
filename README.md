@@ -1466,7 +1466,7 @@ const Password = pipe(
   // add an error message for non-string values (annotation)
   S.message(() => "not a string"),
   // add a constraint to the schema, only non-empty strings are valid
-  S.nonEmpty,
+  S.nonEmpty(),
   // add an error message for empty strings (annotation)
   S.message(() => "required"),
   // add a constraint to the schema, only strings with a length less or equal than 10 are valid
