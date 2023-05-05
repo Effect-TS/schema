@@ -1466,13 +1466,11 @@ const Password = pipe(
   // add an error message for non-string values (annotation)
   S.message(() => "not a string"),
   // add a constraint to the schema, only non-empty strings are valid
-  S.nonEmpty(),
-  // add an error message for empty strings (annotation)
-  S.message(() => "required"),
+  // and add an error message for empty strings (annotation)
+  S.nonEmpty({ message: () => "required" }),
   // add a constraint to the schema, only strings with a length less or equal than 10 are valid
-  S.maxLength(10),
-  // add an error message for strings that are too long (annotation)
-  S.message((s) => `${s} is too long`),
+  // and add an error message for strings that are too long (annotation)
+  S.maxLength(10, { message: (s) => `${s} is too long` }),
   // add an identifier to the schema (annotation)
   S.identifier("Password"),
   // add a title to the schema (annotation)
