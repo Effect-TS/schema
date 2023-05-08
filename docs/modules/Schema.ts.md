@@ -813,7 +813,7 @@ Added in v1.0.0
 ```ts
 export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
-) => <I extends { [K in keyof A]: any }>(
+) => <I extends { [K in keyof A]?: any }>(
   self: Schema<I, A>
 ) => Schema<Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
 ```
@@ -873,7 +873,7 @@ Added in v1.0.0
 ```ts
 export declare const pick: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
-) => <I extends { [K in keyof A]: any }>(
+) => <I extends { [K in keyof A]?: any }>(
   self: Schema<I, A>
 ) => Schema<Spread<Pick<I, Keys[number]>>, Spread<Pick<A, Keys[number]>>>
 ```
