@@ -1,10 +1,5 @@
 lockfileVersion: 5.4
 
-patchedDependencies:
-  docs-ts@0.6.10:
-    hash: g7hfsee23mnk2i66lqywaix7ge
-    path: patches/docs-ts@0.6.10.patch
-
 specifiers:
   '@babel/cli': ^7.21.0
   '@babel/core': ^7.21.4
@@ -31,7 +26,7 @@ specifiers:
   benchmark: ^2.1.4
   concurrently: ^8.0.1
   cpx: ^1.5.0
-  docs-ts: 0.6.10
+  docs-ts: ^0.8.0
   dtslint: github:gcanti/dtslint
   eslint: ^8.39.0
   eslint-import-resolver-typescript: ^3.5.5
@@ -83,7 +78,7 @@ devDependencies:
   benchmark: 2.1.4
   concurrently: 8.0.1
   cpx: 1.5.0
-  docs-ts: 0.6.10_g7hfsee23mnk2i66lqywaix7ge_j5pxtsccu66l27vudenovfwlqy
+  docs-ts: 0.8.0_j5pxtsccu66l27vudenovfwlqy
   dtslint: github.com/gcanti/dtslint/1558adbeda424fec83a8d314784c18728a970cd4
   eslint: 8.39.0
   eslint-import-resolver-typescript: 3.5.5_oszrz2qxbmgfxy5msqy2c4rqlu
@@ -2682,20 +2677,20 @@ packages:
       path-type: 4.0.0
     dev: true
 
-  /docs-ts/0.6.10_g7hfsee23mnk2i66lqywaix7ge_j5pxtsccu66l27vudenovfwlqy:
-    resolution: {integrity: sha512-DTX9c5AJ92ojMOKqqvwF8t77C8Gdgs9FPB8seymHs+F+Wl6aapc3ZkHUM+p8o+jwcBmPoihxssdK903dfwQ1JQ==}
+  /docs-ts/0.8.0_j5pxtsccu66l27vudenovfwlqy:
+    resolution: {integrity: sha512-Z++SYRAoJJnWrLZNHKkalIyroJQAppqnfrjoc8pmAr/k3wxZvl7YFd9mocVEAhIZwUEkzUl6luBaAlsJip3sdw==}
     hasBin: true
     peerDependencies:
       prettier: ^2.0.0
-      typescript: ^3.3.1 || ^4.x
+      typescript: ^5.x
     dependencies:
       chalk: 2.4.2
       doctrine: 3.0.0
-      fp-ts: 2.13.1
+      fp-ts: 2.15.0
       fs-extra: 7.0.1
       glob: 7.2.3
-      io-ts: 2.2.20_fp-ts@2.13.1
-      logging-ts: 0.3.4_fp-ts@2.13.1
+      io-ts: 2.2.20_fp-ts@2.15.0
+      logging-ts: 0.3.4_fp-ts@2.15.0
       markdown-toc: 1.2.0
       prettier: 2.8.8
       rimraf: 2.7.1
@@ -2703,7 +2698,6 @@ packages:
       ts-node: 8.10.2_typescript@5.0.4
       typescript: 5.0.4
     dev: true
-    patched: true
 
   /doctrine/2.1.0:
     resolution: {integrity: sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==}
@@ -3474,6 +3468,10 @@ packages:
     resolution: {integrity: sha512-0eu5ULPS2c/jsa1lGFneEFFEdTbembJv8e4QKXeVJ3lm/5hyve06dlKZrpxmMwJt6rYen7sxmHHK2CLaXvWuWQ==}
     dev: true
 
+  /fp-ts/2.15.0:
+    resolution: {integrity: sha512-3o6EllAvGuCsDgjM+frscLKDRPR9pqbrg13tJ13z86F4eni913kBV8h85rM6zpu2fEvJ8RWA0ouYlUWwHEmxTg==}
+    dev: true
+
   /fragment-cache/0.2.1:
     resolution: {integrity: sha512-GMBAbW9antB8iZRHLoGw0b3HANt57diZYFO/HL1JGIC1MjKrdmhxvrJbupnVvpys0zsz7yBApXdQyfepKly2kA==}
     engines: {node: '>=0.10.0'}
@@ -3519,7 +3517,7 @@ packages:
     resolution: {integrity: sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw==}
     engines: {node: '>= 4.0'}
     os: [darwin]
-    deprecated: fsevents 1 will break on node v14+ and could be using insecure binaries. Upgrade to fsevents 2.
+    deprecated: The v1 package contains DANGEROUS / INSECURE binaries. Upgrade to safe fsevents v2
     requiresBuild: true
     dependencies:
       bindings: 1.5.0
@@ -3929,6 +3927,14 @@ packages:
       fp-ts: ^2.5.0
     dependencies:
       fp-ts: 2.13.1
+    dev: true
+
+  /io-ts/2.2.20_fp-ts@2.15.0:
+    resolution: {integrity: sha512-Rq2BsYmtwS5vVttie4rqrOCIfHCS9TgpRLFpKQCM1wZBBRY9nWVGmEvm2FnDbSE2un1UE39DvFpTR5UL47YDcA==}
+    peerDependencies:
+      fp-ts: ^2.5.0
+    dependencies:
+      fp-ts: 2.15.0
     dev: true
 
   /is-absolute/1.0.0:
@@ -4652,12 +4658,12 @@ packages:
       is-unicode-supported: 0.1.0
     dev: true
 
-  /logging-ts/0.3.4_fp-ts@2.13.1:
+  /logging-ts/0.3.4_fp-ts@2.15.0:
     resolution: {integrity: sha512-TJYaSB88h8N9/ojruoGZgJeQEwpLmDNWpGf03hDgjPNo5QnwO28vkSH/H8/9aMoX8zeShVJUOnKRM6zs5ifR0A==}
     peerDependencies:
       fp-ts: ^2.0.5
     dependencies:
-      fp-ts: 2.13.1
+      fp-ts: 2.15.0
     dev: true
 
   /loupe/2.3.6:
