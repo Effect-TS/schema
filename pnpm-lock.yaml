@@ -1,10 +1,5 @@
 lockfileVersion: 5.4
 
-patchedDependencies:
-  docs-ts@0.6.10:
-    hash: g7hfsee23mnk2i66lqywaix7ge
-    path: patches/docs-ts@0.6.10.patch
-
 specifiers:
   '@babel/cli': ^7.21.0
   '@babel/core': ^7.21.4
