@@ -1299,7 +1299,7 @@ import * as O from "@effect/data/Option";
 /*
 const schema: S.Schema<{
     readonly a: string;
-    readonly b: number | null | undefined;
+    readonly b: number | null;
 }, {
     readonly a: string;
     readonly b: O.Option<number>;
@@ -1312,11 +1312,11 @@ const schema = S.struct({
 
 // parsing
 const parse = S.parse(schema);
-parse({ a: "hello", b: undefined }); // { a: "hello", b: none() }
 parse({ a: "hello", b: null }); // { a: "hello", b: none() }
 parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
-parse({ a: "hello" }); // throws key "b" is missing
+parse({ a: "hello", b: undefined }); // throws
+parse({ a: "hello" }); // throws (key "b" is missing)
 
 // encoding
 const encodeOrThrow = S.encode(schema);
