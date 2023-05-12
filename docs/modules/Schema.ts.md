@@ -1626,7 +1626,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null | undefined, Option<A>>
+export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option<A>>
 ```
 
 Added in v1.0.0
