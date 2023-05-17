@@ -78,6 +78,7 @@ Added in v1.0.0
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
+  - [JsonNumber](#jsonnumber)
   - [UUID](#uuid)
   - [chunkFromSelf](#chunkfromself)
   - [enums](#enums)
@@ -178,6 +179,7 @@ Added in v1.0.0
   - [InstanceOfTypeId](#instanceoftypeid)
   - [IntTypeId](#inttypeid)
   - [ItemsCountTypeId](#itemscounttypeid)
+  - [JsonNumberTypeId](#jsonnumbertypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
@@ -1040,6 +1042,33 @@ export declare const union: <Members extends readonly Schema<any, any>[]>(
 Added in v1.0.0
 
 # constructors
+
+## JsonNumber
+
+The `JsonNumber` is a schema for representing JSON numbers. It ensures that the provided value is a valid
+number by filtering out `NaN` and `(+/-) Infinity`. This is useful when you want to validate and represent numbers in JSON
+format.
+
+**Signature**
+
+```ts
+export declare const JsonNumber: Schema<number, number>
+```
+
+**Example**
+
+```ts
+import * as S from '@effect/schema/Schema'
+
+const is = S.is(S.JsonNumber)
+
+assert.deepStrictEqual(is(42), true)
+assert.deepStrictEqual(is(Number.NaN), false)
+assert.deepStrictEqual(is(Number.POSITIVE_INFINITY), false)
+assert.deepStrictEqual(is(Number.NEGATIVE_INFINITY), false)
+```
+
+Added in v1.0.0
 
 ## UUID
 
@@ -2099,6 +2128,16 @@ Added in v1.0.0
 
 ```ts
 export declare const ItemsCountTypeId: '@effect/schema/ItemsCountTypeId'
+```
+
+Added in v1.0.0
+
+## JsonNumberTypeId
+
+**Signature**
+
+```ts
+export declare const JsonNumberTypeId: '@effect/schema/JsonNumberTypeId'
 ```
 
 Added in v1.0.0
