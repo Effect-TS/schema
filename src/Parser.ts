@@ -702,78 +702,76 @@ const go = untracedMethod(() =>
           // ---------------------------------------------
           // handle index signatures
           // ---------------------------------------------
-          if (indexSignatures.length > 0) {
-            for (let i = 0; i < indexSignatures.length; i++) {
-              const parameter = indexSignatures[i][0]
-              const type = indexSignatures[i][1]
-              const keys = I.getKeysForIndexSignature(input, ast.indexSignatures[i].parameter)
-              for (const key of keys) {
-                if (Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
-                  continue
-                }
-                // ---------------------------------------------
-                // handle keys
-                // ---------------------------------------------
-                const keu = PR.eitherOrUndefined(parameter(key, options))
-                if (keu) {
-                  if (E.isLeft(keu)) {
-                    const e = PR.key(key, keu.left.errors)
-                    if (allErrors) {
-                      es.push([stepKey++, e])
-                      continue
-                    } else {
-                      return PR.failures(mutableAppend(sortByIndex(es), e))
-                    }
+          for (let i = 0; i < indexSignatures.length; i++) {
+            const parameter = indexSignatures[i][0]
+            const type = indexSignatures[i][1]
+            const keys = I.getKeysForIndexSignature(input, ast.indexSignatures[i].parameter)
+            for (const key of keys) {
+              if (Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
+                continue
+              }
+              // ---------------------------------------------
+              // handle keys
+              // ---------------------------------------------
+              const keu = PR.eitherOrUndefined(parameter(key, options))
+              if (keu) {
+                if (E.isLeft(keu)) {
+                  const e = PR.key(key, keu.left.errors)
+                  if (allErrors) {
+                    es.push([stepKey++, e])
+                    continue
+                  } else {
+                    return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 }
-                // there's no else here because index signature parameters are restricted to primitives
+              }
+              // there's no else here because index signature parameters are restricted to primitives
 
-                // ---------------------------------------------
-                // handle values
-                // ---------------------------------------------
-                const vpr = type(input[key], options)
-                const veu = PR.eitherOrUndefined(vpr)
-                if (veu) {
-                  if (E.isLeft(veu)) {
-                    const e = PR.key(key, veu.left.errors)
-                    if (allErrors) {
-                      es.push([stepKey++, e])
-                      continue
-                    } else {
-                      return PR.failures(mutableAppend(sortByIndex(es), e))
-                    }
+              // ---------------------------------------------
+              // handle values
+              // ---------------------------------------------
+              const vpr = type(input[key], options)
+              const veu = PR.eitherOrUndefined(vpr)
+              if (veu) {
+                if (E.isLeft(veu)) {
+                  const e = PR.key(key, veu.left.errors)
+                  if (allErrors) {
+                    es.push([stepKey++, e])
+                    continue
                   } else {
-                    output[key] = veu.right
+                    return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 } else {
-                  const nk = stepKey++
-                  const index = key
-                  if (!queue) {
-                    queue = []
-                  }
-                  queue.push(
-                    untracedMethod(() =>
-                      ({ es, output }: State) =>
-                        Effect.flatMap(
-                          Effect.either(vpr),
-                          (tv) => {
-                            if (E.isLeft(tv)) {
-                              const e = PR.key(index, tv.left.errors)
-                              if (allErrors) {
-                                es.push([nk, e])
-                                return Effect.unit()
-                              } else {
-                                return PR.failures(mutableAppend(sortByIndex(es), e))
-                              }
-                            } else {
-                              output[key] = tv.right
-                              return Effect.unit()
-                            }
-                          }
-                        )
-                    )
-                  )
+                  output[key] = veu.right
                 }
+              } else {
+                const nk = stepKey++
+                const index = key
+                if (!queue) {
+                  queue = []
+                }
+                queue.push(
+                  untracedMethod(() =>
+                    ({ es, output }: State) =>
+                      Effect.flatMap(
+                        Effect.either(vpr),
+                        (tv) => {
+                          if (E.isLeft(tv)) {
+                            const e = PR.key(index, tv.left.errors)
+                            if (allErrors) {
+                              es.push([nk, e])
+                              return Effect.unit()
+                            } else {
+                              return PR.failures(mutableAppend(sortByIndex(es), e))
+                            }
+                          } else {
+                            output[key] = tv.right
+                            return Effect.unit()
+                          }
+                        }
+                      )
+                  )
+                )
               }
             }
           }
