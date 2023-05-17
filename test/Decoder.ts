@@ -544,8 +544,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(
       schema,
       { a: 1, [b]: "b" },
-      { a: 1 },
-      Util.onExcessPropertyIgnore
+      { a: 1 }
     )
   })
 
@@ -574,8 +573,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(
       schema,
       { [a]: 1, b: "b" },
-      { [a]: 1 },
-      Util.onExcessPropertyIgnore
+      { [a]: 1 }
     )
   })
 
@@ -756,8 +754,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(
       schema,
       { a: "a", c: 1 },
-      { a: "a" },
-      Util.onExcessPropertyIgnore
+      { a: "a" }
     )
     await Util.expectParseSuccess(
       schema,
