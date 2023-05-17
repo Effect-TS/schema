@@ -589,6 +589,9 @@ const go = untracedMethod(() =>
         const indexSignatures = ast.indexSignatures.map((is) =>
           [go(is.parameter, isBoundary), go(is.type, isBoundary)] as const
         )
+        const parameter = go(AST.createUnion(
+          ast.indexSignatures.map((is) => AST.getParameterBase(is.parameter))
+        ))
         const expectedKeys: any = {}
         for (let i = 0; i < propertySignatures.length; i++) {
           expectedKeys[ast.propertySignatures[i].name] = null
@@ -605,15 +608,19 @@ const go = untracedMethod(() =>
           // handle excess properties
           // ---------------------------------------------
           const onExcessPropertyError = options?.onExcessProperty === "error"
-          if (onExcessPropertyError && indexSignatures.length === 0) {
+          if (onExcessPropertyError) {
             for (const key of I.ownKeys(input)) {
               if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
-                const e = PR.key(key, [PR.unexpected(input[key])])
-                if (allErrors) {
-                  es.push([stepKey++, e])
-                  continue
-                } else {
-                  return PR.failures(mutableAppend(sortByIndex(es), e))
+                const te = parameter(key)
+                const eu = PR.eitherOrUndefined(te)
+                if (eu && E.isLeft(eu)) {
+                  const e = PR.key(key, [PR.unexpected(input[key])])
+                  if (allErrors) {
+                    es.push([stepKey++, e])
+                    continue
+                  } else {
+                    return PR.failures(mutableAppend(sortByIndex(es), e))
+                  }
                 }
               }
             }
