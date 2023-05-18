@@ -924,8 +924,7 @@ const go = untracedMethod(() =>
         }
       }
       case "Lazy": {
-        const f = () => go(ast.f(), isBoundary)
-        const get = I.memoizeThunk(f)
+        const get = I.memoizeThunk(() => go(ast.f(), isBoundary))
         return (a, options) => get()(a, options)
       }
     }

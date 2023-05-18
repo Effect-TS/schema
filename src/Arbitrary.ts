@@ -209,8 +209,7 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
         getHook(ast),
         O.match(
           () => {
-            const f = () => go(ast.f())
-            const get = I.memoizeThunk(f)
+            const get = I.memoizeThunk(() => go(ast.f()))
             return (fc) => fc.constant(null).chain(() => get()(fc))
           },
           (handler) => handler()
