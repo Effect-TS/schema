@@ -2,4 +2,4 @@
 "@effect/schema": patch
 ---
 
-Arbitrary: Maximum call stack size exceeded
+Arbitrary: fix maximum call stack size exceeded when producing nested arrays and records that are too deep
