@@ -48,7 +48,7 @@ const record = <K extends PropertyKey, V>(
   key: FastCheck.Arbitrary<K>,
   value: FastCheck.Arbitrary<V>
 ): FastCheck.Arbitrary<{ readonly [k in K]: V }> =>
-  fc.array(fc.tuple(key, value), { maxLength: 10 }).map((tuples) => {
+  fc.array(fc.tuple(key, value), { maxLength: 2 }).map((tuples) => {
     const out: { [k in K]: V } = {} as any
     for (const [k, v] of tuples) {
       out[k] = v
@@ -153,7 +153,7 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
           const head = RA.headNonEmpty(rest.value)
           const tail = RA.tailNonEmpty(rest.value)
           output = output.chain((as) =>
-            fc.array(head(fc), { maxLength: 5 }).map((rest) => [...as, ...rest])
+            fc.array(head(fc), { maxLength: 2 }).map((rest) => [...as, ...rest])
           )
           // ---------------------------------------------
           // handle post rest elements
