@@ -327,7 +327,7 @@ export const declare = (
   type: Schema<any>,
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: unknown, ast: AST.AST, options?: ParseOptions) => ParseResult<any>,
+  ) => (input: unknown, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
   annotations?: AST.Annotated["annotations"]
 ): Schema<any> =>
   make(AST.createDeclaration(
@@ -958,7 +958,7 @@ export function filter<A>(
   return (self) =>
     make(AST.createRefinement(
       self.ast,
-      (a: A, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
+      (a: A, _, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
       false,
       toAnnotations(options)
     ))
@@ -974,20 +974,20 @@ export function filter<A>(
 export const transformResult: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
-    decode: (a1: A1, self: AST.AST, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, self: AST.AST, options?: ParseOptions) => ParseResult<A1>
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
     to: Schema<I2, A2>,
-    decode: (a1: A1, self: AST.AST, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, self: AST.AST, options?: ParseOptions) => ParseResult<A1>
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
   ): Schema<I1, A2>
 } = dual(4, <I1, A1, I2, A2>(
   from: Schema<I1, A1>,
   to: Schema<I2, A2>,
-  decode: (a1: A1, self: AST.AST, options?: ParseOptions) => ParseResult<I2>,
-  encode: (i2: I2, self: AST.AST, options?: ParseOptions) => ParseResult<A1>
+  decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+  encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
 ): Schema<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
 
 /**
@@ -1464,7 +1464,7 @@ export const fromBrand = <C extends Brand<string | symbol>>(
 ) =>
   <I, A extends Brand.Unbranded<C>>(self: Schema<I, A>): Schema<I, A & C> => {
     const decode = untracedMethod(() =>
-      (a: A, self: AST.AST): ParseResult<C> =>
+      (a: A, _, self: AST.AST): ParseResult<C> =>
         E.mapLeft(
           constructor.either(a),
           (brandErrors) =>
@@ -1503,7 +1503,7 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<
     }),
     <A>(item: Schema<A>) => {
       const parse = P.parseResult(array(item))
-      return (u, self, options) =>
+      return (u, options, self) =>
         !C.isChunk(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(parse(C.toReadonlyArray(u), options), C.fromIterable)
@@ -1554,7 +1554,7 @@ export const dataFromSelf = <
       item: Schema<A>
     ) => {
       const parse = P.parseResult(item)
-      return (u, self, options) =>
+      return (u, options, self) =>
         !Equal.isEqual(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(parse(u, options), toData)
@@ -1707,7 +1707,7 @@ export const eitherFromSelf = <IE, E, IA, A>(
     ) => {
       const parseLeft = P.parseResult(left)
       const parseRight = P.parseResult(right)
-      return (u, self, options) =>
+      return (u, options, self) =>
         !E.isEither(u) ?
           PR.failure(PR.type(self, u)) :
           E.isLeft(u) ?
@@ -2139,7 +2139,7 @@ export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schem
   transformResult(
     self,
     number,
-    (s, ast) => {
+    (s, _, ast) => {
       if (s === "NaN") {
         return PR.success(NaN)
       }
@@ -2187,7 +2187,7 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
     [],
     struct({}),
     () =>
-      (input, self) =>
+      (input, _, self) =>
         input instanceof constructor ? PR.success(input) : PR.failure(PR.type(self, input)),
     {
       [AST.TypeAnnotationId]: InstanceOfTypeId,
@@ -2231,7 +2231,7 @@ export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Opt
     optionInline(value),
     <A>(value: Schema<A>) => {
       const parse = P.parseResult(value)
-      return (u, self, options) =>
+      return (u, options, self) =>
         !O.isOption(u) ?
           PR.failure(PR.type(self, u)) :
           O.isNone(u) ?
@@ -2388,7 +2388,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
       value: Schema<V>
     ) => {
       const parse = P.parseResult(array(tuple(key, value)))
-      return (u, self, options) =>
+      return (u, options, self) =>
         !isMap(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(parse(Array.from(u.entries()), options), (as) => new Map(as))
@@ -2441,7 +2441,7 @@ export const readonlySetFromSelf = <I, A>(
     }),
     <A>(item: Schema<A>) => {
       const parse = P.parseResult(array(item))
-      return (u, self, options) =>
+      return (u, options, self) =>
         !isSet(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(parse(Array.from(u.values()), options), (as) => new Set(as))

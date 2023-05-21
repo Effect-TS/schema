@@ -20,10 +20,10 @@ const doRoundtrip = true
 export const sleep = Effect.sleep(Duration.millis(10))
 
 export const effectifyDecode = (
-  decode: (input: any, _self: AST.AST, options?: ParseOptions) => PR.ParseResult<any>,
-  self: AST.AST
-): (input: any, _self: AST.AST, options?: ParseOptions) => PR.ParseResult<any> =>
-  (input, _self, options) => PR.flatMap(sleep, () => decode(input, self, options))
+  decode: (input: any, options: ParseOptions, self: AST.AST) => PR.ParseResult<any>,
+  override: AST.AST
+): (input: any, options: ParseOptions, self: AST.AST) => PR.ParseResult<any> =>
+  (input, options) => PR.flatMap(sleep, () => decode(input, options, override))
 
 let skip = false
 
@@ -64,6 +64,8 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
     case "Refinement":
       return AST.createRefinement(
         effectifyAST(ast.from, mode),
+        // I need to override with the original ast here in order to not change the error message
+        // -------------------------v
         effectifyDecode(ast.decode, ast),
         ast.isReversed,
         ast.annotations
@@ -72,7 +74,11 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
       return AST._createTransform(
         effectifyAST(ast.from, mode),
         effectifyAST(ast.to, mode),
+        // I need to override with the original ast here in order to not change the error message
+        // -------------------------v
         effectifyDecode(ast.decode, ast),
+        // I need to override with the original ast here in order to not change the error message
+        // -------------------------v
         effectifyDecode(ast.encode, ast),
         ast.propertySignatureTransformations,
         ast.annotations
@@ -82,8 +88,8 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
   return AST._createTransform(
     ast,
     ast,
-    (a, _self, options) => Effect.flatMap(sleep, () => decode(a, options)),
-    (a, _self, options) => Effect.flatMap(sleep, () => decode(a, options)),
+    (a, options) => Effect.flatMap(sleep, () => decode(a, options)),
+    (a, options) => Effect.flatMap(sleep, () => decode(a, options)),
     []
   )
 }

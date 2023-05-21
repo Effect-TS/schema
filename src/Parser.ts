@@ -131,7 +131,7 @@ export const decodeEither: <I, A>(
  */
 export const decodeResult: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => ParseResult<A> = parseResult
+) => (i: I, options?: ParseOptions) => ParseResult<A> = parseResult
 
 /**
  * @category decoding
@@ -147,8 +147,7 @@ export const decodePromise: <I, A>(
  */
 export const decodeEffect: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A> =
-  parseEffect
+) => (i: I, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> = parseEffect
 
 /**
  * @category validation
@@ -284,6 +283,11 @@ interface Parser<I, A> {
   (i: I, options?: ParseEffectOptions): ParseResult<A>
 }
 
+/**
+ * @since 1.0.0
+ */
+export const defaultParseOption: ParseOptions = {}
+
 const go = untracedMethod(() =>
   (ast: AST.AST, isBoundary = true): Parser<any, any> => {
     switch (ast._tag) {
@@ -297,7 +301,10 @@ const go = untracedMethod(() =>
           const from = go(ast.from, isBoundary)
           return (i, options) =>
             handleForbidden(
-              PR.flatMap(from(i, options), (a) => ast.decode(a, ast, options)),
+              PR.flatMap(
+                from(i, options),
+                (a) => ast.decode(a, options ?? defaultParseOption, ast)
+              ),
               options
             )
         }
@@ -310,21 +317,25 @@ const go = untracedMethod(() =>
             handleForbidden(
               PR.flatMap(
                 from(i1, options),
-                (a) => PR.flatMap(ast.decode(a, ast, options), (i2) => to(i2, options))
+                (a) =>
+                  PR.flatMap(ast.decode(a, options ?? defaultParseOption, ast), (i2) =>
+                    to(i2, options))
               ),
               options
             )
         } else {
           return (a, options) =>
             handleForbidden(
-              PR.flatMap(ast.decode(a, ast, options), (i2) => to(i2, options)),
+              PR.flatMap(ast.decode(a, options ?? defaultParseOption, ast), (i2) =>
+                to(i2, options)),
               options
             )
         }
       }
       case "Declaration": {
         const decode = ast.decode(...ast.typeParameters)
-        return (i, options) => handleForbidden(decode(i, ast, options), options)
+        return (i, options) =>
+          handleForbidden(decode(i, options ?? defaultParseOption, ast), options)
       }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)

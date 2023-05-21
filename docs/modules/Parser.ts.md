@@ -35,6 +35,7 @@ Added in v1.0.0
   - [parseResult](#parseresult)
 - [utils](#utils)
   - [ToAsserts (type alias)](#toasserts-type-alias)
+  - [defaultParseOption](#defaultparseoption)
 - [validation](#validation)
   - [asserts](#asserts)
   - [is](#is)
@@ -271,6 +272,16 @@ Added in v1.0.0
 
 ```ts
 export type ToAsserts<S extends Schema<any>> = (input: unknown, options?: ParseOptions) => asserts input is To<S>
+```
+
+Added in v1.0.0
+
+## defaultParseOption
+
+**Signature**
+
+```ts
+export declare const defaultParseOption: ParseOptions
 ```
 
 Added in v1.0.0

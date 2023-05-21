@@ -170,9 +170,7 @@ describe.concurrent("Parser", () => {
         S.declare(
           [],
           S.struct({ _tag: S.literal("a") }),
-          () =>
-            (input, _self, options) =>
-              P.parseResult(S.struct({ _tag: S.literal("a") }))(input, options)
+          () => P.parseResult(S.struct({ _tag: S.literal("a") }))
         ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])

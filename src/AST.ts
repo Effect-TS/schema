@@ -195,7 +195,7 @@ export interface Declaration extends Annotated {
   readonly type: AST
   readonly decode: (
     ...typeParameters: ReadonlyArray<AST>
-  ) => (input: any, self: AST, options?: ParseOptions) => ParseResult<any>
+  ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 
 /**
@@ -862,7 +862,7 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
 export interface Refinement<From = AST> extends Annotated {
   readonly _tag: "Refinement"
   readonly from: From
-  readonly decode: (input: any, self: AST, options?: ParseOptions) => ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
   readonly isReversed: boolean
 }
 
@@ -936,8 +936,8 @@ export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, self: AST, options?: ParseOptions) => ParseResult<any>
-  readonly encode: (input: any, self: AST, options?: ParseOptions) => ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
   readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
 }
 

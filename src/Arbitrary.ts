@@ -9,6 +9,7 @@ import { isNumber } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
+import { defaultParseOption } from "@effect/schema/Parser"
 import { eitherOrUndefined } from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import type * as FastCheck from "fast-check"
@@ -229,7 +230,7 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
           () =>
             (fc) =>
               from(fc).filter((a) => {
-                const eu = eitherOrUndefined(ast.decode(a, ast))
+                const eu = eitherOrUndefined(ast.decode(a, defaultParseOption, ast))
                 if (eu) {
                   return E.isRight(eu)
                 }

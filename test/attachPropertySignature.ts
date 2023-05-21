@@ -52,7 +52,7 @@ describe.concurrent("attachPropertySignature", () => {
       S.transformResult(
         From,
         To,
-        (from, _self, options) => S.parseEither(To)(from, options),
+        S.parseEither(To),
         ({ _isVisible, ...rest }) => E.right(rest)
       ),
       S.attachPropertySignature("_tag", "Circle")
