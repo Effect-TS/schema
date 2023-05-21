@@ -52,7 +52,7 @@ describe.concurrent("Number", () => {
     await Util.expectParseFailure(schema, 1, "Expected a non-positive number, actual 1")
   })
 
-  describe.concurrent("numberFromString", () => {
+  describe.concurrent("NumberFromString", () => {
     const schema = S.NumberFromString
 
     it("property tests", () => {
@@ -79,8 +79,6 @@ describe.concurrent("Number", () => {
     })
 
     it("example", async () => {
-      const schema = S.NumberFromString // converts string schema to number schema
-
       // success cases
       await Util.expectParseSuccess(schema, "1", 1)
       await Util.expectParseSuccess(schema, "-1", -1)

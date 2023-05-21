@@ -1098,12 +1098,12 @@ export const transformedSchema: S.Schema<string, boolean> = S.transformResult(
   S.string,
   S.boolean,
   // define a function that converts a string into a boolean
-  (s) =>
+  (s, self) =>
     s === "true"
       ? PR.success(true)
       : s === "false"
       ? PR.success(false)
-      : PR.failure(PR.type(S.literal("true", "false").ast, s)),
+      : PR.failure(PR.type(self, s)),
   // define a function that converts a boolean into a string
   (b) => PR.success(String(b))
 );
@@ -1136,10 +1136,10 @@ const PeopleId = pipe(S.string, S.brand("PeopleId"));
 const PeopleIdFromString = S.transformResult(
   S.string,
   PeopleId,
-  (s) =>
+  (s, self) =>
     Effect.mapBoth(
       api(`https://swapi.dev/api/people/${s}`),
-      (e) => PR.parseError([PR.type(PeopleId.ast, s, e.message)]),
+      (e) => PR.parseError([PR.type(self, s, e.message)]),
       () => s
     ),
   PR.success

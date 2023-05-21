@@ -229,7 +229,7 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
           () =>
             (fc) =>
               from(fc).filter((a) => {
-                const eu = eitherOrUndefined(ast.decode(a))
+                const eu = eitherOrUndefined(ast.decode(a, ast))
                 if (eu) {
                   return E.isRight(eu)
                 }

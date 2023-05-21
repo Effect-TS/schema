@@ -1,14 +1,13 @@
-import * as A from "@effect/schema/Arbitrary"
 import * as S from "@effect/schema/Schema"
-import * as fc from "fast-check"
+import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("dev", () => {
-  it.skip("lazy/ record", () => {
-    type A = {
-      [_: string]: A
-    }
-    const schema: S.Schema<A> = S.lazy(() => S.record(S.string, schema))
-    const arb = A.to(schema)(fc)
-    console.log(JSON.stringify(fc.sample(arb, 10), null, 2))
+  it.skip("dev", async () => {
+    const schema = S.NumberFromString
+    await Util.expectParseFailure(
+      schema,
+      "a",
+      `Expected string -> number, actual "a"`
+    )
   })
 })

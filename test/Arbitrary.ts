@@ -41,7 +41,7 @@ describe.concurrent("Arbitrary", () => {
   it("should throw on effectful refinements", () => {
     const ast = AST.createRefinement(
       S.number.ast,
-      Util.effectifyDecode(PR.success),
+      Util.effectifyDecode(PR.success, S.number.ast),
       false
     )
     expect(() => fc.sample(A.go(ast)(fc), 1)).toThrowError(

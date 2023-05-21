@@ -296,7 +296,10 @@ const go = untracedMethod(() =>
         } else {
           const from = go(ast.from, isBoundary)
           return (i, options) =>
-            handleForbidden(PR.flatMap(from(i, options), (a) => ast.decode(a, options)), options)
+            handleForbidden(
+              PR.flatMap(from(i, options), (a) => ast.decode(a, ast, options)),
+              options
+            )
         }
       }
       case "Transform": {
@@ -307,18 +310,21 @@ const go = untracedMethod(() =>
             handleForbidden(
               PR.flatMap(
                 from(i1, options),
-                (a) => PR.flatMap(ast.decode(a, options), (i2) => to(i2, options))
+                (a) => PR.flatMap(ast.decode(a, ast, options), (i2) => to(i2, options))
               ),
               options
             )
         } else {
           return (a, options) =>
-            handleForbidden(PR.flatMap(ast.decode(a, options), (i2) => to(i2, options)), options)
+            handleForbidden(
+              PR.flatMap(ast.decode(a, ast, options), (i2) => to(i2, options)),
+              options
+            )
         }
       }
       case "Declaration": {
         const decode = ast.decode(...ast.typeParameters)
-        return (i, options) => handleForbidden(decode(i, options), options)
+        return (i, options) => handleForbidden(decode(i, ast, options), options)
       }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)

@@ -1,3 +1,5 @@
+import { pipe } from "@effect/data/Function"
+import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as _ from "@effect/schema/TreeFormatter"
@@ -13,6 +15,26 @@ describe.concurrent("formatExpected", () => {
 })
 
 describe.concurrent("formatErrors", () => {
+  it("refinement", () => {
+    const schema = pipe(
+      S.NumberFromString,
+      S.filter((n) => n > 0),
+      S.annotations({ [AST.MessageAnnotationId]: () => "mymessage" })
+    )
+    expect(() => S.parse(schema)("a")).toThrowError(
+      new Error(`error(s) found
+└─ Expected string -> number, actual "a"`)
+    )
+    expect(() => S.parse(schema)("-1")).toThrowError(
+      new Error(`error(s) found
+└─ mymessage`)
+    )
+    expect(() => S.encode(schema)(-1)).toThrowError(
+      new Error(`error(s) found
+└─ mymessage`)
+    )
+  })
+
   it("forbidden", async () => {
     const schema = Util.effectify(S.struct({ a: S.string }), "all")
     expect(() => S.parse(schema)({ a: "a" })).toThrowError(
