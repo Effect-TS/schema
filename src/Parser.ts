@@ -20,7 +20,7 @@ import type { Schema, To } from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 const get = (ast: AST.AST) => {
-  const parser = go(ast)
+  const parser = go(ast, true)
   return (input: unknown, options?: ParseOptions) => {
     const result = parser(input, options)
     // @ts-expect-error
@@ -33,24 +33,24 @@ const get = (ast: AST.AST) => {
 }
 
 const getOption = (ast: AST.AST) => {
-  const parser = go(ast)
+  const parser = go(ast, true)
   return (input: unknown, options?: ParseOptions) =>
     O.fromEither<any, any>(parser(input, options) as any)
 }
 
 const getEither = (ast: AST.AST) => {
-  const parser = go(ast)
+  const parser = go(ast, true)
   return (input: unknown, options?: ParseOptions) => parser(input, options) as any
 }
 
 const getPromise = (ast: AST.AST) => {
-  const parser = go(ast)
+  const parser = go(ast, true)
   return (input: unknown, options?: ParseOptions) =>
     Effect.runPromise(parser(input, { ...options, isEffectAllowed: true }))
 }
 
 const getEffect = (ast: AST.AST) => {
-  const parser = go(ast)
+  const parser = go(ast, true)
   return (input: unknown, options?: ParseOptions) =>
     parser(input, { ...options, isEffectAllowed: true })
 }
@@ -84,7 +84,7 @@ export const parseEither = <_, A>(
  */
 export const parseResult = <_, A>(
   schema: Schema<_, A>
-): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast)
+): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true)
 
 /**
  * @category parsing
@@ -180,7 +180,7 @@ export const validateEither = <_, A>(
  */
 export const validateResult = <_, A>(
   schema: Schema<_, A>
-): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.to(schema.ast))
+): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.to(schema.ast), true)
 
 /**
  * @category validation
@@ -256,7 +256,7 @@ export const encodeEither = <I, A>(
  */
 export const encodeResult = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(reverse(schema.ast))
+): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(reverse(schema.ast), true)
 
 /**
  * @category encoding
@@ -289,7 +289,7 @@ interface Parser<I, A> {
 export const defaultParseOption: ParseOptions = {}
 
 const go = untracedMethod(() =>
-  (ast: AST.AST, isBoundary = true): Parser<any, any> => {
+  (ast: AST.AST, isBoundary): Parser<any, any> => {
     switch (ast._tag) {
       case "Refinement": {
         if (ast.isReversed) {
@@ -312,7 +312,7 @@ const go = untracedMethod(() =>
       case "Transform": {
         const to = go(ast.to, false)
         if (isBoundary) {
-          const from = go(ast.from)
+          const from = go(ast.from, true)
           return (i1, options) =>
             handleForbidden(
               PR.flatMap(
@@ -370,7 +370,7 @@ const go = untracedMethod(() =>
       }
       case "Tuple": {
         const elements = ast.elements.map((e) => go(e.type, isBoundary))
-        const rest = pipe(ast.rest, O.map(RA.mapNonEmpty((ast) => go(ast))))
+        const rest = pipe(ast.rest, O.map(RA.mapNonEmpty((ast) => go(ast, isBoundary))))
         let requiredLen = ast.elements.filter((e) => !e.isOptional).length
         if (O.isSome(ast.rest)) {
           requiredLen += ast.rest.value.length - 1
@@ -606,9 +606,12 @@ const go = untracedMethod(() =>
         const indexSignatures = ast.indexSignatures.map((is) =>
           [go(is.parameter, isBoundary), go(is.type, isBoundary)] as const
         )
-        const parameter = go(AST.createUnion(
-          ast.indexSignatures.map((is) => AST.getParameterBase(is.parameter))
-        ))
+        const parameter = go(
+          AST.createUnion(
+            ast.indexSignatures.map((is) => AST.getParameterBase(is.parameter))
+          ),
+          isBoundary
+        )
         const expectedKeys: any = {}
         for (let i = 0; i < propertySignatures.length; i++) {
           expectedKeys[ast.propertySignatures[i].name] = null
@@ -823,7 +826,7 @@ const go = untracedMethod(() =>
         const len = ownKeys.length
         const map = new Map<any, Parser<any, any>>()
         for (let i = 0; i < ast.types.length; i++) {
-          map.set(ast.types[i], go(ast.types[i], true)) // <= this must be true
+          map.set(ast.types[i], go(ast.types[i], isBoundary))
         }
         return (input, options) => {
           const es: Array<[number, PR.ParseErrors]> = []
