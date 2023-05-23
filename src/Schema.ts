@@ -327,15 +327,21 @@ export const declare = (
   type: Schema<any>,
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: unknown, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
+  encode: (
+    ...typeParameters: ReadonlyArray<Schema<any>>
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
   annotations?: AST.Annotated["annotations"]
 ): Schema<any> =>
-  make(AST.createDeclaration(
-    typeParameters.map((tp) => tp.ast),
-    type.ast,
-    (...typeParameters) => decode(...typeParameters.map(make)),
-    annotations
-  ))
+  make(
+    AST.createDeclaration(
+      typeParameters.map((schema) => schema.ast),
+      type.ast,
+      (...typeParameters) => decode(...typeParameters.map(make)),
+      (...typeParameters) => encode(...typeParameters.map(make)),
+      annotations
+    )
+  )
 
 // ---------------------------------------------
 // combinators
@@ -959,7 +965,6 @@ export function filter<A>(
     make(AST.createRefinement(
       self.ast,
       (a: A, _, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
-      false,
       toAnnotations(options)
     ))
 }
@@ -1474,7 +1479,6 @@ export const fromBrand = <C extends Brand<string | symbol>>(
     const ast = AST.createRefinement(
       self.ast,
       decode,
-      false,
       toAnnotations({ typeId: BrandTypeId, ...options })
     )
     return make(ast)
@@ -1494,19 +1498,30 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
  * @category constructors
  * @since 1.0.0
  */
-export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<A>> =>
-  declare(
+export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<A>> => {
+  return declare(
     [item],
     struct({
       _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
       length: number
     }),
-    <A>(item: Schema<A>) => {
-      const parse = P.parseResult(array(item))
-      return (u, options, self) =>
+    <I, A>(item: Schema<I, A>) => {
+      const parseResult = P.parseResult(array(item))
+      return (u: unknown, options, self) =>
         !C.isChunk(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parse(C.toReadonlyArray(u), options), C.fromIterable)
+          PR.map(
+            parseResult(C.toReadonlyArray(u), options),
+            C.fromIterable
+          )
+    },
+    <I, A>(item: Schema<I, A>) => {
+      const encodeResult = P.encodeResult(array(item))
+      return (a: Chunk<A>, options) =>
+        PR.map(
+          encodeResult(C.toReadonlyArray(a), options),
+          C.fromIterable
+        )
     },
     {
       [AST.IdentifierAnnotationId]: "Chunk",
@@ -1514,6 +1529,7 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<
       [I.ArbitraryHookId]: chunkArbitrary
     }
   )
+}
 
 /**
  * @category combinators
@@ -1546,18 +1562,30 @@ export const dataFromSelf = <
   A extends Readonly<Record<string, any>> | ReadonlyArray<any>
 >(
   item: Schema<I, A>
-): Schema<D.Data<I>, D.Data<A>> =>
-  declare(
+): Schema<D.Data<I>, D.Data<A>> => {
+  return declare(
     [item],
     item,
-    <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-      item: Schema<A>
+    <
+      I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
+      A extends Readonly<Record<string, any>> | ReadonlyArray<any>
+    >(
+      item: Schema<I, A>
     ) => {
-      const parse = P.parseResult(item)
-      return (u, options, self) =>
+      const parseResult = P.parseResult(item)
+      return (u: unknown, options, self) =>
         !Equal.isEqual(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parse(u, options), toData)
+          PR.map(parseResult(u, options), toData)
+    },
+    <
+      I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
+      A extends Readonly<Record<string, any>> | ReadonlyArray<any>
+    >(
+      item: Schema<I, A>
+    ) => {
+      const encodeResult = P.encodeResult(item)
+      return (a: A, options) => PR.map(encodeResult(a, options), toData)
     },
     {
       [AST.IdentifierAnnotationId]: "Data",
@@ -1565,6 +1593,7 @@ export const dataFromSelf = <
       [I.ArbitraryHookId]: dataArbitrary
     }
   )
+}
 
 /**
  * @category combinators
@@ -1598,7 +1627,8 @@ const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date
 export const DateFromSelf: Schema<Date> = declare(
   [],
   struct({}),
-  () => (u) => !isDate(u) ? PR.failure(PR.type(DateFromSelf.ast, u)) : PR.success(u),
+  () => (u: unknown) => !isDate(u) ? PR.failure(PR.type(DateFromSelf.ast, u)) : PR.success(u),
+  () => PR.success,
   {
     [AST.IdentifierAnnotationId]: "Date",
     [I.PrettyHookId]: datePretty,
@@ -1697,22 +1727,27 @@ const eitherInline = <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) =
 export const eitherFromSelf = <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
-): Schema<Either<IE, IA>, Either<E, A>> =>
-  declare(
+): Schema<Either<IE, IA>, Either<E, A>> => {
+  return declare(
     [left, right],
     eitherInline(left, right),
-    <E, A>(
-      left: Schema<E>,
-      right: Schema<A>
-    ) => {
-      const parseLeft = P.parseResult(left)
-      const parseRight = P.parseResult(right)
-      return (u, options, self) =>
+    <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) => {
+      const parseResultLeft = P.parseResult(left)
+      const parseResultRight = P.parseResult(right)
+      return (u: unknown, options, self) =>
         !E.isEither(u) ?
           PR.failure(PR.type(self, u)) :
           E.isLeft(u) ?
-          PR.map(parseLeft(u.left, options), E.left) :
-          PR.map(parseRight(u.right, options), E.right)
+          PR.map(parseResultLeft(u.left, options), E.left) :
+          PR.map(parseResultRight(u.right, options), E.right)
+    },
+    <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) => {
+      const encodeResultLeft = P.encodeResult(left)
+      const encodeResultRight = P.encodeResult(right)
+      return (a: Either<E, A>, options) =>
+        E.isLeft(a) ?
+          PR.map(encodeResultLeft(a.left, options), E.left) :
+          PR.map(encodeResultRight(a.right, options), E.right)
     },
     {
       [AST.IdentifierAnnotationId]: "Either",
@@ -1720,6 +1755,7 @@ export const eitherFromSelf = <IE, E, IA, A>(
       [I.ArbitraryHookId]: eitherArbitrary
     }
   )
+}
 
 /**
  * @category combinators
@@ -2189,6 +2225,7 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
     () =>
       (input, _, self) =>
         input instanceof constructor ? PR.success(input) : PR.failure(PR.type(self, input)),
+    () => PR.success,
     {
       [AST.TypeAnnotationId]: InstanceOfTypeId,
       [InstanceOfTypeId]: { constructor },
@@ -2225,18 +2262,25 @@ const optionInline = <I, A>(value: Schema<I, A>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Option<A>> =>
-  declare(
+export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Option<A>> => {
+  return declare(
     [value],
     optionInline(value),
-    <A>(value: Schema<A>) => {
-      const parse = P.parseResult(value)
-      return (u, options, self) =>
+    <I, A>(value: Schema<I, A>) => {
+      const parseResult = P.parseResult(value)
+      return (u: unknown, options, self) =>
         !O.isOption(u) ?
           PR.failure(PR.type(self, u)) :
           O.isNone(u) ?
           PR.success(O.none()) :
-          PR.map(parse(u.value, options), O.some)
+          PR.map(parseResult(u.value, options), O.some)
+    },
+    <I, A>(value: Schema<I, A>) => {
+      const encodeResult = P.encodeResult(value)
+      return (a: Option<A>, options) =>
+        O.isNone(a) ?
+          PR.success(O.none()) :
+          PR.map(encodeResult(a.value, options), O.some)
     },
     {
       [AST.IdentifierAnnotationId]: "Option",
@@ -2244,6 +2288,7 @@ export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Opt
       [I.ArbitraryHookId]: optionArbitrary
     }
   )
+}
 
 /**
  * @category combinators
@@ -2377,21 +2422,23 @@ const readonlyMapPretty = <K, V>(
 export const readonlyMapFromSelf = <IK, K, IV, V>(
   key: Schema<IK, K>,
   value: Schema<IV, V>
-): Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> =>
-  declare(
+): Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> => {
+  return declare(
     [key, value],
     struct({
       size: number
     }),
-    <K, V>(
-      key: Schema<K>,
-      value: Schema<V>
-    ) => {
-      const parse = P.parseResult(array(tuple(key, value)))
-      return (u, options, self) =>
+    <IK, K, IV, V>(key: Schema<IK, K>, value: Schema<IV, V>) => {
+      const parseResult = P.parseResult(array(tuple(key, value)))
+      return (u: unknown, options, self) =>
         !isMap(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parse(Array.from(u.entries()), options), (as) => new Map(as))
+          PR.map(parseResult(Array.from(u.entries()), options), (as) => new Map(as))
+    },
+    <IK, K, IV, V>(key: Schema<IK, K>, value: Schema<IV, V>) => {
+      const encodeResult = P.encodeResult(array(tuple(key, value)))
+      return (a: ReadonlyMap<K, V>, options) =>
+        PR.map(encodeResult(Array.from(a.entries()), options), (as) => new Map(as))
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
@@ -2399,6 +2446,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
       [I.ArbitraryHookId]: readonlyMapArbitrary
     }
   )
+}
 
 /**
  * @category combinators
@@ -2433,25 +2481,31 @@ const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
  */
 export const readonlySetFromSelf = <I, A>(
   item: Schema<I, A>
-): Schema<ReadonlySet<I>, ReadonlySet<A>> =>
-  declare(
+): Schema<ReadonlySet<I>, ReadonlySet<A>> => {
+  return declare(
     [item],
     struct({
       size: number
     }),
-    <A>(item: Schema<A>) => {
-      const parse = P.parseResult(array(item))
-      return (u, options, self) =>
-        !isSet(u) ?
+    <I, A>(item: Schema<I, A>) =>
+      (u: unknown, options, self) => {
+        const parseResult = P.parseResult(array(item))
+        return !isSet(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parse(Array.from(u.values()), options), (as) => new Set(as))
-    },
+          PR.map(parseResult(Array.from(u.values()), options), (as) => new Set(as))
+      },
+    <I, A>(item: Schema<I, A>) =>
+      (a: ReadonlySet<A>, options) => {
+        const encodeResult = P.encodeResult(array(item))
+        return PR.map(encodeResult(Array.from(a.values()), options), (as) => new Set(as))
+      },
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
       [I.PrettyHookId]: readonlySetPretty,
       [I.ArbitraryHookId]: readonlySetArbitrary
     }
   )
+}
 
 /**
  * @category combinators

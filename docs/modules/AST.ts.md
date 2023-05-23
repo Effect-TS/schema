@@ -361,6 +361,7 @@ export declare const createDeclaration: (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
   decode: Declaration['decode'],
+  encode: Declaration['encode'],
   annotations?: Annotated['annotations']
 ) => Declaration
 ```
@@ -420,7 +421,6 @@ Added in v1.0.0
 export declare const createRefinement: <From extends AST = AST>(
   from: From,
   decode: Refinement['decode'],
-  isReversed: boolean,
   annotations?: Annotated['annotations']
 ) => Refinement<From>
 ```
@@ -926,6 +926,9 @@ export interface Declaration extends Annotated {
   readonly decode: (
     ...typeParameters: ReadonlyArray<AST>
   ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly encode: (
+    ...typeParameters: ReadonlyArray<AST>
+  ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 ```
 
@@ -1067,7 +1070,6 @@ export interface Refinement<From = AST> extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: From
   readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-  readonly isReversed: boolean
 }
 ```
 
@@ -1466,6 +1468,9 @@ export declare const mergeAnnotations: (
       decode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      encode: (
+        ...typeParameters: readonly AST[]
+      ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1507,7 +1512,6 @@ export declare const mergeAnnotations: (
       _tag: 'Refinement'
       from: AST
       decode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
-      isReversed: boolean
     }
   | {
       annotations: { [x: string]: unknown }
@@ -1590,6 +1594,9 @@ export declare const setAnnotation: (
       decode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      encode: (
+        ...typeParameters: readonly AST[]
+      ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1631,7 +1638,6 @@ export declare const setAnnotation: (
       _tag: 'Refinement'
       from: AST
       decode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
-      isReversed: boolean
     }
   | {
       annotations: { [x: string]: unknown }

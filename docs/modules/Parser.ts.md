@@ -284,7 +284,7 @@ Added in v1.0.0
 export declare const defaultParseOption: ParseOptions
 ```
 
-Added in v1.0.0
+Added in v1.0.0"decoding" | "encoding"
 
 # validation
 

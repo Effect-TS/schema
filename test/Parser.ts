@@ -170,7 +170,8 @@ describe.concurrent("Parser", () => {
         S.declare(
           [],
           S.struct({ _tag: S.literal("a") }),
-          () => P.parseResult(S.struct({ _tag: S.literal("a") }))
+          () => P.parseResult(S.struct({ _tag: S.literal("a") })),
+          () => P.encodeResult(S.struct({ _tag: S.literal("a") }))
         ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])
@@ -181,14 +182,6 @@ describe.concurrent("Parser", () => {
         pipe(S.struct({ radius: S.number }), S.attachPropertySignature("kind", "circle")).ast
       )
     ).toEqual([])
-    // simulate encoding
-    const ast = P.reverse(
-      pipe(
-        S.struct({ radius: S.number }),
-        S.attachPropertySignature("kind", "circle")
-      ).ast
-    )
-    expect(P._getLiterals(ast)).toEqual([["kind", AST.createLiteral("circle")]])
   })
 
   it("_getSearchTree", () => {

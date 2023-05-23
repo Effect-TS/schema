@@ -43,8 +43,7 @@ describe.concurrent("Arbitrary", () => {
       S.number.ast,
       // I need to override with the original ast here in order to not change the error message
       // ------------------------------v
-      Util.effectifyDecode(PR.success, S.number.ast),
-      false
+      Util.effectifyDecode(PR.success, S.number.ast)
     )
     expect(() => fc.sample(A.go(ast)(fc), 1)).toThrowError(
       new Error("cannot build an Arbitrary for effectful refinements")

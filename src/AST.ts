@@ -196,6 +196,9 @@ export interface Declaration extends Annotated {
   readonly decode: (
     ...typeParameters: ReadonlyArray<AST>
   ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly encode: (
+    ...typeParameters: ReadonlyArray<AST>
+  ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 
 /**
@@ -206,14 +209,9 @@ export const createDeclaration = (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
   decode: Declaration["decode"],
+  encode: Declaration["encode"],
   annotations: Annotated["annotations"] = {}
-): Declaration => ({
-  _tag: "Declaration",
-  typeParameters,
-  type,
-  decode,
-  annotations
-})
+): Declaration => ({ _tag: "Declaration", typeParameters, type, decode, encode, annotations })
 
 /**
  * @category guards
@@ -863,7 +861,6 @@ export interface Refinement<From = AST> extends Annotated {
   readonly _tag: "Refinement"
   readonly from: From
   readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-  readonly isReversed: boolean
 }
 
 /**
@@ -873,9 +870,8 @@ export interface Refinement<From = AST> extends Annotated {
 export const createRefinement = <From extends AST = AST>(
   from: From,
   decode: Refinement["decode"],
-  isReversed: boolean,
   annotations: Annotated["annotations"] = {}
-): Refinement<From> => ({ _tag: "Refinement", from, decode, isReversed, annotations })
+): Refinement<From> => ({ _tag: "Refinement", from, decode, annotations })
 
 /**
  * @category guards
@@ -1282,6 +1278,7 @@ export const to = (ast: AST): AST => {
         ast.typeParameters.map(to),
         to(ast.type),
         ast.decode,
+        ast.encode,
         ast.annotations
       )
     case "Tuple":
@@ -1306,7 +1303,7 @@ export const to = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => to(ast.f()), ast.annotations)
     case "Refinement":
-      return createRefinement(to(ast.from), ast.decode, false, ast.annotations)
+      return createRefinement(to(ast.from), ast.decode, ast.annotations)
     case "Transform":
       return to(ast.to)
   }
@@ -1323,6 +1320,7 @@ export const from = (ast: AST): AST => {
         ast.typeParameters.map(from),
         from(ast.type),
         ast.decode,
+        ast.encode,
         ast.annotations
       )
     case "Tuple":

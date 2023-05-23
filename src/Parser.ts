@@ -19,8 +19,8 @@ import * as PR from "@effect/schema/ParseResult"
 import type { Schema, To } from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
-const get = (ast: AST.AST) => {
-  const parser = go(ast, true)
+const get = (ast: AST.AST, isDecoding: boolean) => {
+  const parser = go(ast, true, isDecoding)
   return (input: unknown, options?: ParseOptions) => {
     const result = parser(input, options)
     // @ts-expect-error
@@ -32,25 +32,25 @@ const get = (ast: AST.AST) => {
   }
 }
 
-const getOption = (ast: AST.AST) => {
-  const parser = go(ast, true)
+const getOption = (ast: AST.AST, isDecoding: boolean) => {
+  const parser = go(ast, true, isDecoding)
   return (input: unknown, options?: ParseOptions) =>
     O.fromEither<any, any>(parser(input, options) as any)
 }
 
-const getEither = (ast: AST.AST) => {
-  const parser = go(ast, true)
+const getEither = (ast: AST.AST, isDecoding: boolean) => {
+  const parser = go(ast, true, isDecoding)
   return (input: unknown, options?: ParseOptions) => parser(input, options) as any
 }
 
-const getPromise = (ast: AST.AST) => {
-  const parser = go(ast, true)
+const getPromise = (ast: AST.AST, isDecoding: boolean) => {
+  const parser = go(ast, true, isDecoding)
   return (input: unknown, options?: ParseOptions) =>
     Effect.runPromise(parser(input, { ...options, isEffectAllowed: true }))
 }
 
-const getEffect = (ast: AST.AST) => {
-  const parser = go(ast, true)
+const getEffect = (ast: AST.AST, isDecoding: boolean) => {
+  const parser = go(ast, true, isDecoding)
   return (input: unknown, options?: ParseOptions) =>
     parser(input, { ...options, isEffectAllowed: true })
 }
@@ -60,7 +60,7 @@ const getEffect = (ast: AST.AST) => {
  * @since 1.0.0
  */
 export const parse = <_, A>(schema: Schema<_, A>): (i: unknown, options?: ParseOptions) => A =>
-  get(schema.ast)
+  get(schema.ast, true)
 
 /**
  * @category parsing
@@ -68,7 +68,7 @@ export const parse = <_, A>(schema: Schema<_, A>): (i: unknown, options?: ParseO
  */
 export const parseOption = <_, A>(
   schema: Schema<_, A>
-): (i: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast)
+): (i: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast, true)
 
 /**
  * @category parsing
@@ -76,7 +76,7 @@ export const parseOption = <_, A>(
  */
 export const parseEither = <_, A>(
   schema: Schema<_, A>
-): (i: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> => getEither(schema.ast)
+): (i: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> => getEither(schema.ast, true)
 
 /**
  * @category parsing
@@ -84,7 +84,7 @@ export const parseEither = <_, A>(
  */
 export const parseResult = <_, A>(
   schema: Schema<_, A>
-): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true)
+): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true, true)
 
 /**
  * @category parsing
@@ -92,7 +92,7 @@ export const parseResult = <_, A>(
  */
 export const parsePromise = <_, A>(
   schema: Schema<_, A>
-): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(schema.ast)
+): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(schema.ast, true)
 
 /**
  * @category parsing
@@ -101,7 +101,7 @@ export const parsePromise = <_, A>(
 export const parseEffect = <_, A>(
   schema: Schema<_, A>
 ): (i: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> =>
-  getEffect(schema.ast)
+  getEffect(schema.ast, true)
 
 /**
  * @category decoding
@@ -155,7 +155,7 @@ export const decodeEffect: <I, A>(
  */
 export const validate = <_, A>(
   schema: Schema<_, A>
-): (a: unknown, options?: ParseOptions) => A => get(AST.to(schema.ast))
+): (a: unknown, options?: ParseOptions) => A => get(AST.to(schema.ast), true)
 
 /**
  * @category validation
@@ -163,7 +163,7 @@ export const validate = <_, A>(
  */
 export const validateOption = <_, A>(
   schema: Schema<_, A>
-): (a: unknown, options?: ParseOptions) => Option<A> => getOption(AST.to(schema.ast))
+): (a: unknown, options?: ParseOptions) => Option<A> => getOption(AST.to(schema.ast), true)
 
 /**
  * @category validation
@@ -172,7 +172,7 @@ export const validateOption = <_, A>(
 export const validateEither = <_, A>(
   schema: Schema<_, A>
 ): (a: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> =>
-  getEither(AST.to(schema.ast))
+  getEither(AST.to(schema.ast), true)
 
 /**
  * @category validation
@@ -180,7 +180,7 @@ export const validateEither = <_, A>(
  */
 export const validateResult = <_, A>(
   schema: Schema<_, A>
-): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.to(schema.ast), true)
+): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.to(schema.ast), true, true)
 
 /**
  * @category validation
@@ -188,7 +188,7 @@ export const validateResult = <_, A>(
  */
 export const validatePromise = <_, A>(
   schema: Schema<_, A>
-): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(AST.to(schema.ast))
+): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(AST.to(schema.ast), true)
 
 /**
  * @category validation
@@ -197,7 +197,7 @@ export const validatePromise = <_, A>(
 export const validateEffect = <_, A>(
   schema: Schema<_, A>
 ): (a: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> =>
-  getEffect(AST.to(schema.ast))
+  getEffect(AST.to(schema.ast), true)
 
 /**
  * @category validation
@@ -232,7 +232,7 @@ export const asserts = <_, A>(schema: Schema<_, A>) => {
  * @since 1.0.0
  */
 export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOptions) => I =>
-  get(reverse(schema.ast))
+  get(schema.ast, false)
 
 /**
  * @category encoding
@@ -240,7 +240,7 @@ export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOption
  */
 export const encodeOption = <I, A>(
   schema: Schema<I, A>
-): (input: A, options?: ParseOptions) => Option<I> => getOption(reverse(schema.ast))
+): (input: A, options?: ParseOptions) => Option<I> => getOption(schema.ast, false)
 
 /**
  * @category encoding
@@ -248,7 +248,7 @@ export const encodeOption = <I, A>(
  */
 export const encodeEither = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => E.Either<PR.ParseError, I> => getEither(reverse(schema.ast))
+): (a: A, options?: ParseOptions) => E.Either<PR.ParseError, I> => getEither(schema.ast, false)
 
 /**
  * @category encoding
@@ -256,7 +256,7 @@ export const encodeEither = <I, A>(
  */
 export const encodeResult = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(reverse(schema.ast), true)
+): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(schema.ast, true, false)
 
 /**
  * @category encoding
@@ -264,7 +264,7 @@ export const encodeResult = <I, A>(
  */
 export const encodePromise = <I, A>(
   schema: Schema<I, A>
-): (a: A, options?: ParseOptions) => Promise<I> => getPromise(reverse(schema.ast))
+): (a: A, options?: ParseOptions) => Promise<I> => getPromise(schema.ast, false)
 
 /**
  * @category encoding
@@ -273,7 +273,7 @@ export const encodePromise = <I, A>(
 export const encodeEffect = <I, A>(
   schema: Schema<I, A>
 ): (a: A, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, I> =>
-  getEffect(reverse(schema.ast))
+  getEffect(schema.ast, false)
 
 interface ParseEffectOptions extends ParseOptions {
   readonly isEffectAllowed?: boolean
@@ -284,21 +284,16 @@ interface Parser<I, A> {
 }
 
 /**
- * @since 1.0.0
+ * @since 1.0.0"decoding" | "encoding"
  */
 export const defaultParseOption: ParseOptions = {}
 
 const go = untracedMethod(() =>
-  (ast: AST.AST, isBoundary): Parser<any, any> => {
+  (ast: AST.AST, isBoundary, isDecoding: boolean): Parser<any, any> => {
     switch (ast._tag) {
       case "Refinement": {
-        if (ast.isReversed) {
-          const from = go(AST.to(ast), isBoundary)
-          const to = go(reverse(dropRightRefinement(ast.from)), false)
-          return (i, options) =>
-            handleForbidden(PR.flatMap(from(i, options), (a) => to(a, options)), options)
-        } else {
-          const from = go(ast.from, isBoundary)
+        if (isDecoding) {
+          const from = go(ast.from, isBoundary, true)
           return (i, options) =>
             handleForbidden(
               PR.flatMap(
@@ -307,35 +302,47 @@ const go = untracedMethod(() =>
               ),
               options
             )
+        } else {
+          const from = go(AST.to(ast), isBoundary, true)
+          const to = go(dropRightRefinement(ast.from), false, false)
+          return (i, options) =>
+            handleForbidden(PR.flatMap(from(i, options), (a) => to(a, options)), options)
         }
       }
       case "Transform": {
-        const to = go(ast.to, false)
+        const to = isDecoding ? go(ast.to, false, true) : go(ast.from, false, false)
+        const decode = isDecoding ? ast.decode : ast.encode
         if (isBoundary) {
-          const from = go(ast.from, true)
+          const from = isDecoding ? go(ast.from, true, true) : go(ast.to, true, false)
           return (i1, options) =>
             handleForbidden(
               PR.flatMap(
                 from(i1, options),
                 (a) =>
-                  PR.flatMap(ast.decode(a, options ?? defaultParseOption, ast), (i2) =>
-                    to(i2, options))
+                  PR.flatMap(
+                    decode(a, options ?? defaultParseOption, ast),
+                    (i2) => to(i2, options)
+                  )
               ),
               options
             )
         } else {
           return (a, options) =>
             handleForbidden(
-              PR.flatMap(ast.decode(a, options ?? defaultParseOption, ast), (i2) =>
-                to(i2, options)),
+              PR.flatMap(
+                decode(a, options ?? defaultParseOption, ast),
+                (i2) => to(i2, options)
+              ),
               options
             )
         }
       }
       case "Declaration": {
-        const decode = ast.decode(...ast.typeParameters)
+        const parse = isDecoding ?
+          ast.decode(...ast.typeParameters) :
+          ast.encode(...ast.typeParameters)
         return (i, options) =>
-          handleForbidden(decode(i, options ?? defaultParseOption, ast), options)
+          handleForbidden(parse(i, options ?? defaultParseOption, ast), options)
       }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)
@@ -369,8 +376,8 @@ const go = untracedMethod(() =>
         return fromRefinement(ast, (u): u is any => P.isString(u) && regex.test(u))
       }
       case "Tuple": {
-        const elements = ast.elements.map((e) => go(e.type, isBoundary))
-        const rest = pipe(ast.rest, O.map(RA.mapNonEmpty((ast) => go(ast, isBoundary))))
+        const elements = ast.elements.map((e) => go(e.type, isBoundary, isDecoding))
+        const rest = pipe(ast.rest, O.map(RA.mapNonEmpty((ast) => go(ast, isBoundary, isDecoding))))
         let requiredLen = ast.elements.filter((e) => !e.isOptional).length
         if (O.isSome(ast.rest)) {
           requiredLen += ast.rest.value.length - 1
@@ -602,15 +609,18 @@ const go = untracedMethod(() =>
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
           return fromRefinement(ast, P.isNotNullable)
         }
-        const propertySignatures = ast.propertySignatures.map((ps) => go(ps.type, isBoundary))
+        const propertySignatures = ast.propertySignatures.map((ps) =>
+          go(ps.type, isBoundary, isDecoding)
+        )
         const indexSignatures = ast.indexSignatures.map((is) =>
-          [go(is.parameter, isBoundary), go(is.type, isBoundary)] as const
+          [go(is.parameter, isBoundary, isDecoding), go(is.type, isBoundary, isDecoding)] as const
         )
         const parameter = go(
           AST.createUnion(
             ast.indexSignatures.map((is) => AST.getParameterBase(is.parameter))
           ),
-          isBoundary
+          isBoundary,
+          isDecoding
         )
         const expectedKeys: any = {}
         for (let i = 0; i < propertySignatures.length; i++) {
@@ -826,7 +836,7 @@ const go = untracedMethod(() =>
         const len = ownKeys.length
         const map = new Map<any, Parser<any, any>>()
         for (let i = 0; i < ast.types.length; i++) {
-          map.set(ast.types[i], go(ast.types[i], isBoundary))
+          map.set(ast.types[i], go(ast.types[i], isBoundary, isDecoding))
         }
         return (input, options) => {
           const es: Array<[number, PR.ParseErrors]> = []
@@ -944,7 +954,7 @@ const go = untracedMethod(() =>
         }
       }
       case "Lazy": {
-        const get = I.memoizeThunk(() => go(ast.f(), isBoundary))
+        const get = I.memoizeThunk(() => go(ast.f(), isBoundary, isDecoding))
         return (a, options) => get()(a, options)
       }
     }
@@ -1084,55 +1094,4 @@ function sortByIndex<T>(es: RA.NonEmptyArray<[number, T]>): RA.NonEmptyArray<T>
 function sortByIndex<T>(es: Array<[number, T]>): Array<T>
 function sortByIndex(es: Array<[number, any]>): any {
   return es.sort(([a], [b]) => a > b ? 1 : a < b ? -1 : 0).map(([_, a]) => a)
-}
-
-/** @internal */
-export const reverse = (ast: AST.AST): AST.AST => {
-  switch (ast._tag) {
-    case "Declaration":
-      return AST.createDeclaration(
-        ast.typeParameters.map(reverse),
-        ast.type,
-        ast.decode,
-        ast.annotations
-      )
-    case "Tuple":
-      return AST.createTuple(
-        ast.elements.map((e) => AST.createElement(reverse(e.type), e.isOptional)),
-        O.map(ast.rest, RA.mapNonEmpty(reverse)),
-        ast.isReadonly
-      )
-    case "TypeLiteral":
-      return AST.createTypeLiteral(
-        ast.propertySignatures.map((ps) =>
-          AST.createPropertySignature(
-            ps.name,
-            reverse(ps.type),
-            ps.isOptional,
-            ps.isReadonly,
-            ps.annotations
-          )
-        ),
-        ast.indexSignatures.map((is) =>
-          AST.createIndexSignature(is.parameter, reverse(is.type), is.isReadonly)
-        )
-      )
-    case "Union":
-      return AST.createUnion(ast.types.map(reverse))
-    case "Lazy":
-      return AST.createLazy(() => reverse(ast.f()))
-    case "Refinement":
-      return AST.createRefinement(ast.from, ast.decode, !ast.isReversed, ast.annotations)
-    case "Transform":
-      return AST._createTransform(
-        reverse(ast.to),
-        reverse(ast.from),
-        ast.encode,
-        ast.decode,
-        ast.propertySignatureTransformations.map((t) =>
-          AST.createPropertySignatureTransformation(t.to, t.from, t.encode, t.decode)
-        )
-      )
-  }
-  return ast
 }

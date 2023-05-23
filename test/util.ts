@@ -40,6 +40,7 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
         ast.typeParameters.map((ast) => effectifyAST(ast, mode)),
         ast.type,
         ast.decode,
+        ast.encode,
         ast.annotations
       )
     case "Tuple":
@@ -67,7 +68,6 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
         // I need to override with the original ast here in order to not change the error message
         // -------------------------v
         effectifyDecode(ast.decode, ast),
-        ast.isReversed,
         ast.annotations
       )
     case "Transform":

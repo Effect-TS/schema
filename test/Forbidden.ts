@@ -52,7 +52,8 @@ describe.concurrent("Forbidden", () => {
     const schema = S.declare(
       [],
       S.number,
-      () => S.parseEffect(Util.effectify(S.number, "all"))
+      () => S.parseEffect(Util.effectify(S.number, "all")),
+      () => S.encodeEffect(Util.effectify(S.number, "all"))
     )
     expectMessage(
       schema,
@@ -85,8 +86,7 @@ describe.concurrent("Forbidden", () => {
   it("refinement", () => {
     const ast = AST.createRefinement(
       S.string.ast,
-      (input) => PR.flatMap(Util.sleep, () => PR.success(input)),
-      false
+      (input) => PR.flatMap(Util.sleep, () => PR.success(input))
     )
     const schema: S.Schema<string, string> = S.make(ast)
     expectMessage(
