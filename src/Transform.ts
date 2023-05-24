@@ -19,7 +19,6 @@ import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import { isDate } from "@effect/data/Predicate"
-import * as RA from "@effect/data/ReadonlyArray"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -28,6 +27,7 @@ import * as P from "@effect/schema/Parser"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 /**
@@ -202,6 +202,89 @@ export type {
    */
   ToAsserts
 } from "@effect/schema/Parser"
+
+export {
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  any,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  bigint,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  boolean,
+  /**
+   * @category constructors
+   * @since 1.0.0
+   */
+  enums,
+  /**
+   * @category constructors
+   * @since 1.0.0
+   */
+  literal,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  never,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  null,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  number,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  object,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  string,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  symbol,
+  /**
+   * @category constructors
+   * @since 1.0.0
+   */
+  templateLiteral,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  undefined,
+  /**
+   * @category constructors
+   * @since 1.0.0
+   */
+  uniqueSymbol,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  unknown,
+  /**
+   * @category primitives
+   * @since 1.0.0
+   */
+  void
+} from "@effect/schema/Schema"
 /* c8 ignore end */
 
 // ---------------------------------------------
@@ -213,112 +296,6 @@ export type {
  * @since 1.0.0
  */
 export const make = <I, A>(ast: AST.AST): Transform<I, A> => ({ ast }) as any
-
-const makeLiteral = <Literal extends AST.LiteralValue>(
-  value: Literal
-): Transform<Literal, Literal> => make(AST.createLiteral(value))
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const literal = <Literals extends ReadonlyArray<AST.LiteralValue>>(
-  ...literals: Literals
-): Transform<Literals[number], Literals[number]> =>
-  union(...literals.map((literal) => makeLiteral(literal)))
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const uniqueSymbol = <S extends symbol>(
-  symbol: S,
-  annotations?: AST.Annotated["annotations"]
-): Transform<S, S> => make(AST.createUniqueSymbol(symbol, annotations))
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const enums = <A extends { [x: string]: string | number }>(
-  enums: A
-): Transform<A[keyof A], A[keyof A]> =>
-  make(
-    AST.createEnums(
-      Object.keys(enums).filter(
-        (key) => typeof enums[enums[key]] !== "number"
-      ).map((key) => [key, enums[key]])
-    )
-  )
-
-/**
- * @since 1.0.0
- */
-export type Join<T> = T extends [infer Head, ...infer Tail]
-  ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? ""
-    : Join<Tail>}`
-  : never
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const templateLiteral = <T extends [Transform<any, any>, ...Array<Transform<any, any>>]>(
-  ...[head, ...tail]: T
-): Transform<Join<{ [K in keyof T]: To<T[K]> }>, Join<{ [K in keyof T]: To<T[K]> }>> => {
-  let types: ReadonlyArray<AST.TemplateLiteral | AST.Literal> = getTemplateLiterals(head.ast)
-  for (const span of tail) {
-    types = pipe(
-      types,
-      RA.flatMap((a) => getTemplateLiterals(span.ast).map((b) => combineTemplateLiterals(a, b)))
-    )
-  }
-  return make(AST.createUnion(types))
-}
-
-const combineTemplateLiterals = (
-  a: AST.TemplateLiteral | AST.Literal,
-  b: AST.TemplateLiteral | AST.Literal
-): AST.TemplateLiteral | AST.Literal => {
-  if (AST.isLiteral(a)) {
-    return AST.isLiteral(b) ?
-      AST.createLiteral(String(a.literal) + String(b.literal)) :
-      AST.createTemplateLiteral(String(a.literal) + b.head, b.spans)
-  }
-  if (AST.isLiteral(b)) {
-    return AST.createTemplateLiteral(
-      a.head,
-      pipe(
-        a.spans,
-        RA.modifyNonEmptyLast((span) => ({ ...span, literal: span.literal + String(b.literal) }))
-      )
-    )
-  }
-  return AST.createTemplateLiteral(
-    a.head,
-    pipe(
-      a.spans,
-      RA.modifyNonEmptyLast((span) => ({ ...span, literal: span.literal + String(b.head) })),
-      RA.appendAll(b.spans)
-    )
-  )
-}
-
-const getTemplateLiterals = (
-  ast: AST.AST
-): ReadonlyArray<AST.TemplateLiteral | AST.Literal> => {
-  switch (ast._tag) {
-    case "Literal":
-      return [ast]
-    case "NumberKeyword":
-    case "StringKeyword":
-      return [AST.createTemplateLiteral("", [{ type: ast, literal: "" }])]
-    case "Union":
-      return pipe(ast.types, RA.flatMap(getTemplateLiterals))
-    default:
-      throw new Error(`templateLiteral: unsupported template literal span ${ast._tag}`)
-  }
-}
 
 /**
   @category combinators
@@ -363,7 +340,7 @@ export const union = <Members extends ReadonlyArray<Transform<any, any>>>(
  * @since 1.0.0
  */
 export const nullable = <From, To>(self: Transform<From, To>): Transform<From | null, To | null> =>
-  union(_null, self)
+  union(S.null, self)
 
 /**
  * @category combinators
@@ -1074,7 +1051,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   ): Transform<I, Spread<A & { readonly [k in K]: V }>> =>
     make(AST.createTransformByPropertySignatureTransformations(
       schema.ast,
-      pipe(to(schema), extend(struct({ [key]: literal(value) }))).ast,
+      pipe(to(schema), extend(struct({ [key]: S.literal(value) }))).ast,
       [AST.createPropertySignatureTransformation(
         key,
         key,
@@ -1142,88 +1119,6 @@ export const examples = (examples: AST.ExamplesAnnotation) =>
 export const documentation = (documentation: AST.DocumentationAnnotation) =>
   <I, A>(self: Transform<I, A>): Transform<I, A> =>
     make(AST.setAnnotation(self.ast, AST.DocumentationAnnotationId, documentation))
-
-// ---------------------------------------------
-// data
-// ---------------------------------------------
-
-const _undefined: Transform<undefined, undefined> = make(AST.undefinedKeyword)
-
-const _void: Transform<void, void> = make(AST.voidKeyword)
-
-const _null: Transform<null, null> = make(AST.createLiteral(null))
-
-export {
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  _null as null,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  _undefined as undefined,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  _void as void
-}
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const never: Transform<never, never> = make(AST.neverKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const unknown: Transform<unknown, unknown> = make(AST.unknownKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const any: Transform<any, any> = make(AST.anyKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const string: Transform<string, string> = make(AST.stringKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const number: Transform<number, number> = make(AST.numberKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const boolean: Transform<boolean, boolean> = make(AST.booleanKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const bigint: Transform<bigint, bigint> = make(AST.bigIntKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const symbol: Transform<symbol, symbol> = make(AST.symbolKeyword)
-
-/**
- * @category primitives
- * @since 1.0.0
- */
-export const object: Transform<object, object> = make(AST.objectKeyword)
 
 // ---------------------------------------------
 // data/Bigint
@@ -1517,8 +1412,8 @@ export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, 
   return declare(
     [item],
     struct({
-      _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
-      length: number
+      _id: S.uniqueSymbol(Symbol.for("@effect/data/Chunk")),
+      length: S.number
     }),
     <I, A>(item: Transform<I, A>) => {
       const parseResult = P.parseResult(array(item))
@@ -1696,7 +1591,7 @@ export const dateFromString = <I>(self: Transform<I, string>): Transform<I, Date
     (date) => PR.success(date.toISOString())
   )
 
-const _Date: Transform<string, Date> = dateFromString(string)
+const _Date: Transform<string, Date> = dateFromString(S.string)
 
 export {
   /**
@@ -1726,11 +1621,11 @@ const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E,
 const eitherInline = <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) =>
   union(
     struct({
-      _tag: literal("Left"),
+      _tag: S.literal("Left"),
       left
     }),
     struct({
-      _tag: literal("Right"),
+      _tag: S.literal("Right"),
       right
     })
   )
@@ -1848,7 +1743,7 @@ export const JsonNumberTypeId = "@effect/schema/JsonNumberTypeId"
  * @since 1.0.0
  */
 export const JsonNumber = pipe(
-  number,
+  S.number,
   filter((n) => !isNaN(n) && isFinite(n), {
     typeId: JsonNumberTypeId,
     description: "a JSON number"
@@ -1861,12 +1756,12 @@ export const JsonNumber = pipe(
  */
 export const json: Transform<Json, Json> = lazy(() =>
   union(
-    _null,
-    string,
+    S.null,
+    S.string,
     JsonNumber,
-    boolean,
+    S.boolean,
     array(json),
-    record(string, json)
+    record(S.string, json)
   ), {
   [I.ArbitraryHookId]: () => arbitraryJson
 })
@@ -2189,7 +2084,7 @@ export const clamp = (min: number, max: number) =>
 export const numberFromString = <I>(self: Transform<I, string>): Transform<I, number> =>
   transformResult(
     self,
-    number,
+    S.number,
     (s, _, ast) => {
       if (s === "NaN") {
         return PR.success(NaN)
@@ -2214,7 +2109,7 @@ export const numberFromString = <I>(self: Transform<I, string>): Transform<I, nu
  * @category number
  * @since 1.0.0
  */
-export const NumberFromString: Transform<string, number> = numberFromString(string)
+export const NumberFromString: Transform<string, number> = numberFromString(S.string)
 
 // ---------------------------------------------
 // data/Object
@@ -2265,10 +2160,10 @@ const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
 const optionInline = <I, A>(value: Transform<I, A>) =>
   union(
     struct({
-      _tag: literal("None")
+      _tag: S.literal("None")
     }),
     struct({
-      _tag: literal("Some"),
+      _tag: S.literal("Some"),
       value
     })
   )
@@ -2441,7 +2336,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
   return declare(
     [key, value],
     struct({
-      size: number
+      size: S.number
     }),
     <IK, K, IV, V>(key: Transform<IK, K>, value: Transform<IV, V>) => {
       const parseResult = P.parseResult(array(tuple(key, value)))
@@ -2500,7 +2395,7 @@ export const readonlySetFromSelf = <I, A>(
   return declare(
     [item],
     struct({
-      size: number
+      size: S.number
     }),
     <I, A>(item: Transform<I, A>) =>
       (u: unknown, options, self) => {
@@ -2766,7 +2661,7 @@ export const trim = <I>(self: Transform<I, string>): Transform<I, string> =>
  * @category string
  * @since 1.0.0
  */
-export const Trim: Transform<string, string> = trim(string)
+export const Trim: Transform<string, string> = trim(S.string)
 
 /**
  * @category type id
@@ -2781,7 +2676,7 @@ const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
  * @since 1.0.0
  */
 export const UUID: Transform<string, string> = pipe(
-  string,
+  S.string,
   pattern(uuidRegex, {
     typeId: UUIDTypeId,
     arbitrary: (): Arbitrary<string> => (fc) => fc.uuid()

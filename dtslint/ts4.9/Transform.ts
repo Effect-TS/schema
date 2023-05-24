@@ -1,6 +1,7 @@
 import { Brand } from "@effect/data/Brand";
 import { pipe } from "@effect/data/Function";
 import * as T from "@effect/schema/Transform";
+import * as S from "@effect/schema/Schema";
 
 declare const NumberFromString: T.Transform<string, number>
 
@@ -17,65 +18,6 @@ export type FromNever = T.From<typeof T.never>
 
 // $ExpectType never
 export type ToNever = T.To<typeof T.never>
-
-// ---------------------------------------------
-// Primitives
-// ---------------------------------------------
-
-// $ExpectType Transform<void, void>
-T.void;
-
-// $ExpectType Transform<undefined, undefined>
-T.undefined;
-
-// $ExpectType Transform<string, string>
-T.string;
-
-// $ExpectType Transform<number, number>
-T.number;
-
-// $ExpectType Transform<boolean, boolean>
-T.boolean;
-
-// $ExpectType Transform<bigint, bigint>
-T.bigint;
-
-// $ExpectType Transform<symbol, symbol>
-T.symbol;
-
-// $ExpectType Transform<unknown, unknown>
-T.unknown;
-
-// $ExpectType Transform<any, any>
-T.any;
-
-// $ExpectType Transform<object, object>
-T.object;
-
-// ---------------------------------------------
-// literals
-// ---------------------------------------------
-
-// $ExpectType Transform<null, null>
-T.null;
-
-// $ExpectType Transform<never, never>
-T.literal();
-
-// $ExpectType Transform<"a", "a">
-T.literal("a");
-
-// $ExpectType Transform<"a" | "b" | "c", "a" | "b" | "c">
-T.literal("a", "b", "c");
-
-// $ExpectType Transform<1, 1>
-T.literal(1);
-
-// $ExpectType Transform<2n, 2n>
-T.literal(2n); // bigint literal
-
-// $ExpectType Transform<true, true>
-T.literal(true);
 
 // ---------------------------------------------
 // strings
@@ -123,18 +65,6 @@ pipe(T.number, T.nonNaN()); // not NaN
 // $ExpectType Transform<number, number>
 pipe(T.number, T.finite()); // value must be finite, not Infinity or -Infinity
 
-// ---------------------------------------------
-// Native enums
-// ---------------------------------------------
-
-enum Fruits {
-  Apple,
-  Banana,
-}
-
-// $ExpectType Transform<Fruits, Fruits>
-T.enums(Fruits);
-
 //
 // Nullables
 //
@@ -148,9 +78,6 @@ T.nullable(NumberFromString)
 // ---------------------------------------------
 // Unions
 // ---------------------------------------------
-
-// $ExpectType Transform<string | number, string | number>
-T.union(T.string, T.number);
 
 // $ExpectType Transform<string | boolean, number | boolean>
 T.union(T.boolean, NumberFromString);
@@ -461,20 +388,6 @@ class Test {
 
 // $ExpectType Transform<Test, Test>
 T.instanceOf(Test);
-
-// ---------------------------------------------
-// Template literals
-// ---------------------------------------------
-
-// $ExpectType Transform<`a${string}`, `a${string}`>
-T.templateLiteral(T.literal('a'), T.string)
-
-// example from https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html
-const EmailLocaleIDs = T.literal("welcome_email", "email_heading")
-const FooterLocaleIDs = T.literal("footer_title", "footer_sendoff")
-
-// $ExpectType Transform<"welcome_email_id" | "email_heading_id" | "footer_title_id" | "footer_sendoff_id", "welcome_email_id" | "email_heading_id" | "footer_title_id" | "footer_sendoff_id">
-T.templateLiteral(T.union(EmailLocaleIDs, FooterLocaleIDs), T.literal("_id"))
 
 // ---------------------------------------------
 // attachPropertySignature

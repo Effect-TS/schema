@@ -205,7 +205,6 @@ Added in v1.0.0
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
-  - [Join (type alias)](#join-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
@@ -1114,7 +1113,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Transform<A[keyof A], A[keyof A]>
+export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => S.Schema<A[keyof A]>
 ```
 
 Added in v1.0.0
@@ -1146,7 +1145,7 @@ Added in v1.0.0
 ```ts
 export declare const literal: <Literals extends readonly AST.LiteralValue[]>(
   ...literals: Literals
-) => Transform<Literals[number], Literals[number]>
+) => S.Schema<Literals[number]>
 ```
 
 Added in v1.0.0
@@ -1202,9 +1201,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const templateLiteral: <T extends [Transform<any, any>, ...Transform<any, any>[]]>(
+export declare const templateLiteral: <T extends [S.Schema<any>, ...S.Schema<any>[]]>(
   ...[head, ...tail]: T
-) => Transform<Join<{ [K in keyof T]: To<T[K]> }>, Join<{ [K in keyof T]: To<T[K]> }>>
+) => S.Schema<S.Join<{ [K in keyof T]: S.To<T[K]> }>>
 ```
 
 Added in v1.0.0
@@ -1217,7 +1216,7 @@ Added in v1.0.0
 export declare const uniqueSymbol: <S extends symbol>(
   symbol: S,
   annotations?: AST.Annotations | undefined
-) => Transform<S, S>
+) => S.Schema<S>
 ```
 
 Added in v1.0.0
@@ -1758,7 +1757,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const any: Transform<any, any>
+export declare const any: S.Schema<any>
 ```
 
 Added in v1.0.0
@@ -1768,7 +1767,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const bigint: Transform<bigint, bigint>
+export declare const bigint: S.Schema<bigint>
 ```
 
 Added in v1.0.0
@@ -1778,7 +1777,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const boolean: Transform<boolean, boolean>
+export declare const boolean: S.Schema<boolean>
 ```
 
 Added in v1.0.0
@@ -1788,7 +1787,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const never: Transform<never, never>
+export declare const never: S.Schema<never>
 ```
 
 Added in v1.0.0
@@ -1798,7 +1797,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const null: Transform<null, null>
+export declare const null: S.Schema<null>
 ```
 
 Added in v1.0.0
@@ -1808,7 +1807,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const number: Transform<number, number>
+export declare const number: S.Schema<number>
 ```
 
 Added in v1.0.0
@@ -1818,7 +1817,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const object: Transform<object, object>
+export declare const object: S.Schema<object>
 ```
 
 Added in v1.0.0
@@ -1828,7 +1827,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const string: Transform<string, string>
+export declare const string: S.Schema<string>
 ```
 
 Added in v1.0.0
@@ -1838,7 +1837,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const symbol: Transform<symbol, symbol>
+export declare const symbol: S.Schema<symbol>
 ```
 
 Added in v1.0.0
@@ -1848,7 +1847,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const undefined: Transform<undefined, undefined>
+export declare const undefined: S.Schema<undefined>
 ```
 
 Added in v1.0.0
@@ -1858,7 +1857,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unknown: Transform<unknown, unknown>
+export declare const unknown: S.Schema<unknown>
 ```
 
 Added in v1.0.0
@@ -1868,7 +1867,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const void: Transform<void, void>
+export declare const void: S.Schema<void>
 ```
 
 Added in v1.0.0
@@ -2405,18 +2404,6 @@ export type FromOptionalKeys<Fields> = {
     ? K
     : never
 }[keyof Fields]
-```
-
-Added in v1.0.0
-
-## Join (type alias)
-
-**Signature**
-
-```ts
-export type Join<T> = T extends [infer Head, ...infer Tail]
-  ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? '' : Join<Tail>}`
-  : never
 ```
 
 Added in v1.0.0

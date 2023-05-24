@@ -5,6 +5,7 @@ import * as RA from "@effect/data/ReadonlyArray"
 import type * as applicative from "@effect/data/typeclass/Applicative"
 import * as covariant from "@effect/data/typeclass/Covariant"
 import * as AST from "@effect/schema/AST"
+import * as S from "@effect/schema/Schema"
 import * as T from "@effect/schema/Transform"
 import ts from "typescript"
 
@@ -381,39 +382,39 @@ const typeScriptFor = <A>(schema: T.Transform<A, A>): TypeScript<A> => {
 
 describe.concurrent("TypeScript", () => {
   it("templateLiteral. a", () => {
-    const schema = T.templateLiteral(T.literal("a"))
+    const schema = S.templateLiteral(S.literal("a"))
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual([`"a"`])
   })
 
   it("templateLiteral. a b", () => {
-    const schema = T.templateLiteral(T.literal("a"), T.literal(" "), T.literal("b"))
+    const schema = S.templateLiteral(S.literal("a"), S.literal(" "), S.literal("b"))
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual([`"a b"`])
   })
 
   it("templateLiteral. a${string}", () => {
-    const schema = T.templateLiteral(T.literal("a"), T.string)
+    const schema = S.templateLiteral(S.literal("a"), T.string)
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["`a${string}`"])
   })
 
   it("templateLiteral. ${string}", () => {
-    const schema = T.templateLiteral(T.string)
+    const schema = S.templateLiteral(T.string)
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["`${string}`"])
   })
 
   it("templateLiteral. a${string}b", () => {
-    const schema = T.templateLiteral(T.literal("a"), T.string, T.literal("b"))
+    const schema = S.templateLiteral(S.literal("a"), T.string, S.literal("b"))
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["`a${string}b`"])
   })
 
   it("templateLiteral. https://www.typescriptlang.org/docs/handbook/2/template-literal-types.html", () => {
-    const EmailLocaleIDs = T.literal("welcome_email", "email_heading")
-    const FooterLocaleIDs = T.literal("footer_title", "footer_sendoff")
-    const schema = T.templateLiteral(T.union(EmailLocaleIDs, FooterLocaleIDs), T.literal("_id"))
+    const EmailLocaleIDs = S.literal("welcome_email", "email_heading")
+    const FooterLocaleIDs = S.literal("footer_title", "footer_sendoff")
+    const schema = S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"))
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual([
       `"welcome_email_id" | "email_heading_id" | "footer_title_id" | "footer_sendoff_id"`
@@ -482,31 +483,31 @@ describe.concurrent("TypeScript", () => {
 
   describe.concurrent("literal", () => {
     it("string", () => {
-      const schema = T.literal("a")
+      const schema = S.literal("a")
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`"a"`])
     })
 
     it("number", () => {
-      const schema = T.literal(1)
+      const schema = S.literal(1)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual(["1"])
     })
 
     it("true", () => {
-      const schema = T.literal(true)
+      const schema = S.literal(true)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`true`])
     })
 
     it("false", () => {
-      const schema = T.literal(false)
+      const schema = S.literal(false)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`false`])
     })
 
     it("null", () => {
-      const schema = T.literal(null)
+      const schema = S.literal(null)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`null`])
     })

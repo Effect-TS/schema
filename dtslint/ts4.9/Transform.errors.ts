@@ -1,8 +1,8 @@
 import { pipe } from "@effect/data/Function";
-import * as S from "@effect/schema/Transform";
+import * as T from "@effect/schema/Transform";
 
 // optional/ should not allow combinators afterwards
 // $ExpectError
-pipe(S.boolean, S.optional, S.description('...'))
+pipe(T.boolean, T.optional, T.description('...'))
 // $ExpectError
-pipe(S.boolean, S.optional, S.nullable)
+pipe(T.boolean, T.optional, T.nullable)
