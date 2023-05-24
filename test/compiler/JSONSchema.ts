@@ -246,7 +246,7 @@ const jsonSchemaFor = <A>(schema: Transform<A, A>): JsonSchema7Type => {
 }
 
 const property = <A>(schema: Transform<A, A>) => {
-  const arbitrary = A.to(schema)
+  const arbitrary = A.get(T.to(schema))
   const is = P.is(schema)
   const validate = new Ajv({ strict: false }).compile(jsonSchemaFor(schema))
   const arb = arbitrary(fc).filter(isJson)

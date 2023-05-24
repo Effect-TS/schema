@@ -2,27 +2,19 @@ import { pipe } from "@effect/data/Function"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import * as PR from "@effect/schema/ParseResult"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 import * as fc from "fast-check"
 
 const doProperty = true
 
-export const propertyTo = <I, A>(schema: T.Transform<I, A>) => {
+export const property = <A>(schema: S.Schema<A>) => {
   if (!doProperty) {
     return
   }
-  const arbitrary = A.to(schema)
+  const arbitrary = A.get(T.to(schema))
   const is = T.is(schema)
-  fc.assert(fc.property(arbitrary(fc), (a) => is(a)))
-}
-
-export const propertyFrom = <I, A>(schema: T.Transform<I, A>) => {
-  if (!doProperty) {
-    return
-  }
-  const arbitrary = A.from(schema)
-  const is = T.is(T.from(schema))
   fc.assert(fc.property(arbitrary(fc), (a) => is(a)))
 }
 
@@ -40,10 +32,10 @@ describe.concurrent("Arbitrary", () => {
 
   it("should throw on effectful refinements", () => {
     const ast = AST.createRefinement(
-      T.number.ast,
+      S.number.ast,
       // I need to override with the original ast here in order to not change the error message
       // ------------------------------v
-      Util.effectifyDecode(PR.success, T.number.ast)
+      Util.effectifyDecode(PR.success, S.number.ast)
     )
     expect(() => fc.sample(A.go(ast)(fc), 1)).toThrowError(
       new Error("cannot build an Arbitrary for effectful refinements")
@@ -52,7 +44,7 @@ describe.concurrent("Arbitrary", () => {
 
   it("to", () => {
     const schema = T.NumberFromString
-    propertyTo(schema)
+    property(T.to(schema))
   })
 
   it("from", () => {
@@ -60,11 +52,11 @@ describe.concurrent("Arbitrary", () => {
     const schema = T.struct({
       a: NumberFromString,
       b: T.tuple(NumberFromString),
-      c: T.union(NumberFromString, T.boolean),
+      c: T.union(NumberFromString, S.boolean),
       d: pipe(NumberFromString, T.positive()),
       e: T.optionFromSelf(NumberFromString)
     })
-    propertyFrom(schema)
+    property(T.from(schema))
   })
 
   it("from/ lazy", () => {
@@ -80,93 +72,93 @@ describe.concurrent("Arbitrary", () => {
         a: T.union(NumberFromString, schema)
       })
     )
-    propertyFrom(schema)
+    property(T.from(schema))
   })
 
   it("templateLiteral. a", () => {
-    const schema = T.templateLiteral(T.literal("a"))
-    propertyTo(schema)
+    const schema = S.templateLiteral(S.literal("a"))
+    property(schema)
   })
 
   it("templateLiteral. a b", () => {
-    const schema = T.templateLiteral(T.literal("a"), T.literal(" "), T.literal("b"))
-    propertyTo(schema)
+    const schema = S.templateLiteral(S.literal("a"), S.literal(" "), S.literal("b"))
+    property(schema)
   })
 
   it("templateLiteral. a${string}", () => {
-    const schema = T.templateLiteral(T.literal("a"), T.string)
-    propertyTo(schema)
+    const schema = S.templateLiteral(S.literal("a"), S.string)
+    property(schema)
   })
 
   it("templateLiteral. a", () => {
-    const schema = T.templateLiteral(T.literal("a"))
-    propertyTo(schema)
+    const schema = S.templateLiteral(S.literal("a"))
+    property(schema)
   })
 
   it("templateLiteral. ${string}", () => {
-    const schema = T.templateLiteral(T.string)
-    propertyTo(schema)
+    const schema = S.templateLiteral(S.string)
+    property(schema)
   })
 
   it("templateLiteral. a${string}b", () => {
-    const schema = T.templateLiteral(T.literal("a"), T.string, T.literal("b"))
-    propertyTo(schema)
+    const schema = S.templateLiteral(S.literal("a"), S.string, S.literal("b"))
+    property(schema)
   })
 
   it("never", () => {
-    expect(() => A.to(T.never)(fc)).toThrowError(
+    expect(() => A.get(S.never)(fc)).toThrowError(
       new Error("cannot build an Arbitrary for `never`")
     )
   })
 
   it("string", () => {
-    propertyTo(T.string)
+    property(S.string)
   })
 
   it("void", () => {
-    propertyTo(T.void)
+    property(S.void)
   })
 
   it("number", () => {
-    propertyTo(T.number)
+    property(S.number)
   })
 
   it("boolean", () => {
-    propertyTo(T.boolean)
+    property(S.boolean)
   })
 
   it("bigint", () => {
-    propertyTo(T.bigint)
+    property(S.bigint)
   })
 
   it("symbol", () => {
-    propertyTo(T.symbol)
+    property(S.symbol)
   })
 
   it("object", () => {
-    propertyTo(T.object)
+    property(S.object)
   })
 
   it("literal 1 member", () => {
-    const schema = T.literal(1)
-    propertyTo(schema)
+    const schema = S.literal(1)
+    property(schema)
   })
 
   it("literal 2 members", () => {
-    const schema = T.literal(1, "a")
-    propertyTo(schema)
+    const schema = S.literal(1, "a")
+    property(schema)
   })
 
   it("uniqueSymbol", () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = T.uniqueSymbol(a)
-    propertyTo(schema)
+    const schema = S.uniqueSymbol(a)
+    property(schema)
   })
 
   it("empty enums should throw", () => {
     enum Fruits {}
-    const schema = T.enums(Fruits)
-    expect(() => A.to(schema)(fc)).toThrowError(
+    const schema = S.enums(Fruits)
+    expect(() => A.get(schema)(fc)).toThrowError(
       new Error("cannot build an Arbitrary for an empty enum")
     )
   })
@@ -176,8 +168,8 @@ describe.concurrent("Arbitrary", () => {
       Apple,
       Banana
     }
-    const schema = T.enums(Fruits)
-    propertyTo(schema)
+    const schema = S.enums(Fruits)
+    property(schema)
   })
 
   it("String enums", () => {
@@ -186,8 +178,8 @@ describe.concurrent("Arbitrary", () => {
       Banana = "banana",
       Cantaloupe = 0
     }
-    const schema = T.enums(Fruits)
-    propertyTo(schema)
+    const schema = S.enums(Fruits)
+    property(schema)
   })
 
   it("Const enums", () => {
@@ -196,71 +188,71 @@ describe.concurrent("Arbitrary", () => {
       Banana: "banana",
       Cantaloupe: 3
     } as const
-    const schema = T.enums(Fruits)
-    propertyTo(schema)
+    const schema = S.enums(Fruits)
+    property(schema)
   })
 
   it("tuple. empty", () => {
     const schema = T.tuple()
-    propertyTo(schema)
+    property(T.to(schema))
   })
 
   it("tuple. required element", () => {
-    const schema = T.tuple(T.number)
-    propertyTo(schema)
+    const schema = T.tuple(S.number)
+    property(T.to(schema))
   })
 
   it("tuple. required element with undefined", () => {
-    const schema = T.tuple(T.union(T.number, T.undefined))
-    propertyTo(schema)
+    const schema = T.tuple(S.union(S.number, S.undefined))
+    property(T.to(schema))
   })
 
   it("tuple. optional element", () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.number))
-    propertyTo(schema)
+    const schema = pipe(T.tuple(), T.optionalElement(S.number))
+    property(T.to(schema))
   })
 
   it("tuple. optional element with undefined", () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.union(T.number, T.undefined)))
-    propertyTo(schema)
+    const schema = pipe(T.tuple(), T.optionalElement(S.union(S.number, S.undefined)))
+    property(T.to(schema))
   })
 
   it("tuple. e + e?", () => {
-    const schema = pipe(T.tuple(T.string), T.optionalElement(T.number))
-    propertyTo(schema)
+    const schema = pipe(T.tuple(S.string), T.optionalElement(S.number))
+    property(T.to(schema))
   })
 
   it("tuple. e + r", () => {
-    const schema = pipe(T.tuple(T.string), T.rest(T.number))
-    propertyTo(schema)
+    const schema = pipe(T.tuple(S.string), T.rest(S.number))
+    property(T.to(schema))
   })
 
   it("tuple. e? + r", () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.string), T.rest(T.number))
-    propertyTo(schema)
+    const schema = pipe(T.tuple(), T.optionalElement(S.string), T.rest(S.number))
+    property(T.to(schema))
   })
 
   it("tuple. r", () => {
-    const schema = T.array(T.number)
-    propertyTo(schema)
+    const schema = T.array(S.number)
+    property(T.to(schema))
   })
 
   it("tuple. r + e", () => {
-    const schema = pipe(T.array(T.string), T.element(T.number))
-    propertyTo(schema)
+    const schema = pipe(T.array(S.string), T.element(S.number))
+    property(T.to(schema))
   })
 
   it("tuple. e + r + e", () => {
-    const schema = pipe(T.tuple(T.string), T.rest(T.number), T.element(T.boolean))
-    propertyTo(schema)
+    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(S.boolean))
+    property(T.to(schema))
   })
 
   it("lazy/to tuple", () => {
     type A = readonly [number, A | null]
     const schema: T.Transform<A, A> = T.lazy(
-      () => T.tuple(T.number, T.union(schema, T.literal(null)))
+      () => T.tuple(S.number, T.union(schema, S.literal(null)))
     )
-    propertyTo(schema)
+    property(T.to(schema))
   })
 
   it("lazy/to struct", () => {
@@ -270,133 +262,133 @@ describe.concurrent("Arbitrary", () => {
     }
     const schema: T.Transform<A, A> = T.lazy(() =>
       T.struct({
-        a: T.string,
+        a: S.string,
         as: T.array(schema)
       })
     )
-    propertyTo(schema)
+    property(T.to(schema))
   })
 
   it("lazy/to record", () => {
     type A = {
       [_: string]: A
     }
-    const schema: T.Transform<A, A> = T.lazy(() => T.record(T.string, schema))
-    propertyTo(schema)
+    const schema: T.Transform<A, A> = T.lazy(() => T.record(S.string, schema))
+    property(T.to(schema))
   })
 
   describe.concurrent("struct", () => {
     it("required property signature", () => {
-      const schema = T.struct({ a: T.number })
-      propertyTo(schema)
+      const schema = T.struct({ a: S.number })
+      property(T.to(schema))
     })
 
     it("required property signature with undefined", () => {
-      const schema = T.struct({ a: T.union(T.number, T.undefined) })
-      propertyTo(schema)
+      const schema = T.struct({ a: S.union(S.number, S.undefined) })
+      property(T.to(schema))
     })
 
     it("optional property signature", () => {
-      const schema = T.struct({ a: T.optional(T.number) })
-      propertyTo(schema)
+      const schema = T.struct({ a: T.optional(S.number) })
+      property(T.to(schema))
     })
 
     it("optional property signature with undefined", () => {
-      const schema = T.struct({ a: T.optional(T.union(T.number, T.undefined)) })
-      propertyTo(schema)
+      const schema = T.struct({ a: T.optional(S.union(S.number, S.undefined)) })
+      property(T.to(schema))
     })
 
     it("baseline", () => {
-      const schema = T.struct({ a: T.string, b: T.number })
-      propertyTo(schema)
+      const schema = T.struct({ a: S.string, b: S.number })
+      property(T.to(schema))
     })
   })
 
   it("union", () => {
-    const schema = T.union(T.string, T.number)
-    propertyTo(schema)
+    const schema = S.union(S.string, S.number)
+    property(schema)
   })
 
   it("record(string, string)", () => {
-    const schema = T.record(T.string, T.string)
-    propertyTo(schema)
+    const schema = T.record(S.string, S.string)
+    property(T.to(schema))
   })
 
   it("record(symbol, string)", () => {
-    const schema = T.record(T.symbol, T.string)
-    propertyTo(schema)
+    const schema = T.record(S.symbol, S.string)
+    property(T.to(schema))
   })
 
   it("minLength", () => {
-    const schema = pipe(T.string, T.minLength(1))
-    propertyTo(schema)
+    const schema = pipe(S.string, T.minLength(1))
+    property(T.to(schema))
   })
 
   it("maxLength", () => {
-    const schema = pipe(T.string, T.maxLength(2))
-    propertyTo(schema)
+    const schema = pipe(S.string, T.maxLength(2))
+    property(T.to(schema))
   })
 
   it("lessThanOrEqualTo", () => {
-    const schema = pipe(T.number, T.lessThanOrEqualTo(1))
-    propertyTo(schema)
+    const schema = pipe(S.number, T.lessThanOrEqualTo(1))
+    property(T.to(schema))
   })
 
   it("greaterThanOrEqualTo", () => {
-    const schema = pipe(T.number, T.greaterThanOrEqualTo(1))
-    propertyTo(schema)
+    const schema = pipe(S.number, T.greaterThanOrEqualTo(1))
+    property(T.to(schema))
   })
 
   it("lessThan", () => {
-    const schema = pipe(T.number, T.lessThan(1))
-    propertyTo(schema)
+    const schema = pipe(S.number, T.lessThan(1))
+    property(T.to(schema))
   })
 
   it("greaterThan", () => {
-    const schema = pipe(T.number, T.greaterThan(1))
-    propertyTo(schema)
+    const schema = pipe(S.number, T.greaterThan(1))
+    property(T.to(schema))
   })
 
   it("startsWith", () => {
-    const schema = pipe(T.string, T.startsWith("a"))
-    propertyTo(schema)
+    const schema = pipe(S.string, T.startsWith("a"))
+    property(T.to(schema))
   })
 
   it("endsWith", () => {
-    const schema = pipe(T.string, T.endsWith("a"))
-    propertyTo(schema)
+    const schema = pipe(S.string, T.endsWith("a"))
+    property(T.to(schema))
   })
 
   it("int", () => {
-    const schema = pipe(T.number, T.int())
-    propertyTo(schema)
+    const schema = pipe(S.number, T.int())
+    property(T.to(schema))
   })
 
   it("nonNaN", () => {
-    const schema = pipe(T.number, T.nonNaN())
-    propertyTo(schema)
+    const schema = pipe(S.number, T.nonNaN())
+    property(T.to(schema))
   })
 
   it("finite", () => {
-    const schema = pipe(T.number, T.finite())
-    propertyTo(schema)
+    const schema = pipe(S.number, T.finite())
+    property(T.to(schema))
   })
 
   it("extend/ struct + record", () => {
     const schema = pipe(
-      T.struct({ a: T.string }),
-      T.extend(T.record(T.string, T.union(T.string, T.number)))
+      T.struct({ a: S.string }),
+      T.extend(T.record(S.string, S.union(S.string, S.number)))
     )
-    propertyTo(schema)
+    property(T.to(schema))
   })
 
   it("between + int", () => {
-    const schema = pipe(T.number, T.between(1, 10), T.int())
-    propertyTo(schema)
+    const schema = pipe(S.number, T.between(1, 10), T.int())
+    property(T.to(schema))
   })
 
   it("int + between", () => {
-    const schema = pipe(T.number, T.int(), T.between(1, 10))
-    propertyTo(schema)
+    const schema = pipe(S.number, T.int(), T.between(1, 10))
+    property(T.to(schema))
   })
 })

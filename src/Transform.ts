@@ -55,12 +55,12 @@ export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To
 /**
  * @since 1.0.0
  */
-export const from = <I, A>(schema: Transform<I, A>): Transform<I, I> => make(AST.from(schema.ast))
+export const from = <I, A>(schema: Transform<I, A>): S.Schema<I> => S.make(AST.from(schema.ast))
 
 /**
  * @since 1.0.0
  */
-export const to = <I, A>(schema: Transform<I, A>): Transform<A, A> => make(AST.to(schema.ast))
+export const to = <I, A>(schema: Transform<I, A>): S.Schema<A> => S.make(AST.to(schema.ast))
 
 /* c8 ignore start */
 export {

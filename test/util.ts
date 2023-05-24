@@ -102,7 +102,7 @@ export const roundtrip = <I, A>(schema: Transform<I, A>) => {
     return
   }
   const to = T.to(schema)
-  const arb = A.to(to)
+  const arb = A.get(to)
   const is = T.is(to)
   fc.assert(fc.property(arb(fc), (a) => {
     if (!is(a)) {

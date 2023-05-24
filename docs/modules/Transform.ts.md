@@ -2471,7 +2471,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: Transform<I, A>) => Transform<I, I>
+export declare const from: <I, A>(schema: Transform<I, A>) => S.Schema<I>
 ```
 
 Added in v1.0.0
@@ -2494,7 +2494,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(schema: Transform<I, A>) => Transform<A, A>
+export declare const to: <I, A>(schema: Transform<I, A>) => S.Schema<A>
 ```
 
 Added in v1.0.0

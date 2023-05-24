@@ -11,6 +11,7 @@ import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import { defaultParseOption } from "@effect/schema/Parser"
 import { eitherOrUndefined } from "@effect/schema/ParseResult"
+import type * as S from "@effect/schema/Schema"
 import * as T from "@effect/schema/Transform"
 import type * as FastCheck from "fast-check"
 
@@ -32,17 +33,9 @@ export const ArbitraryHookId = I.ArbitraryHookId
  * @category arbitrary
  * @since 1.0.0
  */
-export const to = <I, A>(
-  schema: T.Transform<I, A>
-): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(AST.to(schema.ast))
-
-/**
- * @category arbitrary
- * @since 1.0.0
- */
-export const from = <I, A>(
-  schema: T.Transform<I, A>
-): (fc: typeof FastCheck) => FastCheck.Arbitrary<I> => go(AST.from(schema.ast))
+export const get = <A>(
+  schema: S.Schema<A>
+): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(schema.ast)
 
 const record = <K extends PropertyKey, V>(
   fc: typeof FastCheck,
