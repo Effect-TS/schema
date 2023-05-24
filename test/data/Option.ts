@@ -1,25 +1,25 @@
 import * as O from "@effect/data/Option"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
-const NumberFromString = S.NumberFromString
+const NumberFromString = T.NumberFromString
 
 describe.concurrent("Option", () => {
   describe.concurrent("option", () => {
     it("property tests", () => {
-      Util.roundtrip(S.option(S.number))
+      Util.roundtrip(T.option(T.number))
     })
 
     it("Decoder", async () => {
-      const schema = S.option(NumberFromString)
+      const schema = T.option(NumberFromString)
       await Util.expectParseSuccess(schema, JSON.parse(JSON.stringify(O.none())), O.none())
       await Util.expectParseSuccess(schema, JSON.parse(JSON.stringify(O.some("1"))), O.some(1))
     })
 
     it("Encoder", async () => {
-      const schema = S.option(NumberFromString)
+      const schema = T.option(NumberFromString)
       await Util.expectEncodeSuccess(schema, O.none(), { _tag: "None" })
       await Util.expectEncodeSuccess(schema, O.some(1), { _tag: "Some", value: "1" })
     })
@@ -27,11 +27,11 @@ describe.concurrent("Option", () => {
 
   describe.concurrent("optionFromSelf", () => {
     it("property tests", () => {
-      Util.roundtrip(S.optionFromSelf(NumberFromString))
+      Util.roundtrip(T.optionFromSelf(NumberFromString))
     })
 
     it("Guard", () => {
-      const schema = S.optionFromSelf(S.number)
+      const schema = T.optionFromSelf(T.number)
       const is = P.is(schema)
       expect(is(O.none())).toEqual(true)
       expect(is(O.some(1))).toEqual(true)
@@ -43,13 +43,13 @@ describe.concurrent("Option", () => {
     })
 
     it("Decoder", async () => {
-      const schema = S.optionFromSelf(NumberFromString)
+      const schema = T.optionFromSelf(NumberFromString)
       await Util.expectParseSuccess(schema, O.none(), O.none())
       await Util.expectParseSuccess(schema, O.some("1"), O.some(1))
     })
 
     it("Pretty", () => {
-      const schema = S.optionFromSelf(S.number)
+      const schema = T.optionFromSelf(T.number)
       const pretty = Pretty.to(schema)
       expect(pretty(O.none())).toEqual("none()")
       expect(pretty(O.some(1))).toEqual("some(1)")
@@ -58,16 +58,16 @@ describe.concurrent("Option", () => {
 
   describe.concurrent("optionFromNullable", () => {
     it("property tests", () => {
-      Util.roundtrip(S.optionFromNullable(S.number))
+      Util.roundtrip(T.optionFromNullable(T.number))
     })
 
     it("Decoder", async () => {
-      const schema = S.optionFromNullable(NumberFromString)
+      const schema = T.optionFromNullable(NumberFromString)
       await Util.expectParseSuccess(schema, null, O.none())
       await Util.expectParseSuccess(schema, "1", O.some(1))
 
-      expect(O.isOption(S.decode(schema)(null))).toEqual(true)
-      expect(O.isOption(S.decode(schema)("1"))).toEqual(true)
+      expect(O.isOption(T.decode(schema)(null))).toEqual(true)
+      expect(O.isOption(T.decode(schema)("1"))).toEqual(true)
 
       await Util.expectParseFailure(
         schema,
@@ -82,7 +82,7 @@ describe.concurrent("Option", () => {
     })
 
     it("Encoder", async () => {
-      const schema = S.optionFromNullable(NumberFromString)
+      const schema = T.optionFromNullable(NumberFromString)
       await Util.expectEncodeSuccess(schema, O.none(), null)
       await Util.expectEncodeSuccess(schema, O.some(1), "1")
     })

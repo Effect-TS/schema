@@ -1,10 +1,10 @@
 import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Boolean", () => {
   it("not", async () => {
-    const schema = pipe(S.boolean, S.not)
+    const schema = pipe(T.boolean, T.not)
 
     await Util.expectParseSuccess(schema, true, false)
     await Util.expectParseSuccess(schema, false, true)

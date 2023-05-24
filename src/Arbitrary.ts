@@ -11,7 +11,7 @@ import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import { defaultParseOption } from "@effect/schema/Parser"
 import { eitherOrUndefined } from "@effect/schema/ParseResult"
-import * as S from "@effect/schema/Schema"
+import * as T from "@effect/schema/Transform"
 import type * as FastCheck from "fast-check"
 
 /**
@@ -33,7 +33,7 @@ export const ArbitraryHookId = I.ArbitraryHookId
  * @since 1.0.0
  */
 export const to = <I, A>(
-  schema: S.Schema<I, A>
+  schema: T.Transform<I, A>
 ): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(AST.to(schema.ast))
 
 /**
@@ -41,7 +41,7 @@ export const to = <I, A>(
  * @since 1.0.0
  */
 export const from = <I, A>(
-  schema: S.Schema<I, A>
+  schema: T.Transform<I, A>
 ): (fc: typeof FastCheck) => FastCheck.Arbitrary<I> => go(AST.from(schema.ast))
 
 const record = <K extends PropertyKey, V>(
@@ -267,27 +267,27 @@ export const getConstraints = (ast: AST.Refinement): Constraints | undefined => 
   const TypeAnnotationId = ast.annotations[AST.TypeAnnotationId]
   const jsonSchema: any = ast.annotations[AST.JSONSchemaAnnotationId]
   switch (TypeAnnotationId) {
-    case S.GreaterThanTypeId:
-    case S.GreaterThanOrEqualToTypeId:
+    case T.GreaterThanTypeId:
+    case T.GreaterThanOrEqualToTypeId:
       return {
         _tag: "NumberConstraints",
         constraints: { min: jsonSchema.exclusiveMinimum ?? jsonSchema.minimum }
       }
-    case S.LessThanTypeId:
-    case S.LessThanOrEqualToTypeId:
+    case T.LessThanTypeId:
+    case T.LessThanOrEqualToTypeId:
       return {
         _tag: "NumberConstraints",
         constraints: { max: jsonSchema.exclusiveMaximum ?? jsonSchema.maximum }
       }
-    case S.PositiveTypeId:
-    case S.NonNegativeTypeId:
+    case T.PositiveTypeId:
+    case T.NonNegativeTypeId:
       return { _tag: "NumberConstraints", constraints: { min: 0 } }
-    case S.NegativeTypeId:
-    case S.NonPositiveTypeId:
+    case T.NegativeTypeId:
+    case T.NonPositiveTypeId:
       return { _tag: "NumberConstraints", constraints: { max: 0 } }
-    case S.IntTypeId:
+    case T.IntTypeId:
       return { _tag: "IntegerConstraints", constraints: {} }
-    case S.BetweenTypeId: {
+    case T.BetweenTypeId: {
       const min = jsonSchema.minimum
       const max = jsonSchema.maximum
       const constraints: NumberConstraints["constraints"] = {}
@@ -299,9 +299,9 @@ export const getConstraints = (ast: AST.Refinement): Constraints | undefined => 
       }
       return { _tag: "NumberConstraints", constraints }
     }
-    case S.MinLengthTypeId:
+    case T.MinLengthTypeId:
       return { _tag: "StringConstraints", constraints: { minLength: jsonSchema.minLength } }
-    case S.MaxLengthTypeId:
+    case T.MaxLengthTypeId:
       return { _tag: "StringConstraints", constraints: { maxLength: jsonSchema.maxLength } }
   }
 }

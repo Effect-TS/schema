@@ -1,14 +1,14 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 import * as _ from "@effect/schema/TreeFormatter"
 
 describe.concurrent("formatExpected", () => {
   it("lazy", () => {
     type A = readonly [number, A | null]
-    const schema: S.Schema<A> = S.lazy<A>(
-      () => S.tuple(S.number, S.union(schema, S.literal(null)))
+    const schema: T.Transform<A, A> = T.lazy(
+      () => T.tuple(T.number, T.union(schema, T.literal(null)))
     )
     expect(_.formatExpected(schema.ast)).toEqual("<anonymous lazy schema>")
   })
@@ -17,27 +17,27 @@ describe.concurrent("formatExpected", () => {
 describe.concurrent("formatErrors", () => {
   it("refinement", () => {
     const schema = pipe(
-      S.NumberFromString,
-      S.filter((n) => n > 0),
-      S.annotations({ [AST.MessageAnnotationId]: () => "mymessage" })
+      T.NumberFromString,
+      T.filter((n) => n > 0),
+      T.annotations({ [AST.MessageAnnotationId]: () => "mymessage" })
     )
-    expect(() => S.parse(schema)("a")).toThrowError(
+    expect(() => T.parse(schema)("a")).toThrowError(
       new Error(`error(s) found
 └─ Expected string -> number, actual "a"`)
     )
-    expect(() => S.parse(schema)("-1")).toThrowError(
+    expect(() => T.parse(schema)("-1")).toThrowError(
       new Error(`error(s) found
 └─ mymessage`)
     )
-    expect(() => S.encode(schema)(-1)).toThrowError(
+    expect(() => T.encode(schema)(-1)).toThrowError(
       new Error(`error(s) found
 └─ mymessage`)
     )
   })
 
   it("forbidden", async () => {
-    const schema = Util.effectify(S.struct({ a: S.string }), "all")
-    expect(() => S.parse(schema)({ a: "a" })).toThrowError(
+    const schema = Util.effectify(T.struct({ a: T.string }), "all")
+    expect(() => T.parse(schema)({ a: "a" })).toThrowError(
       new Error(`error(s) found
 └─ ["a"]
    └─ is forbidden`)
@@ -45,7 +45,7 @@ describe.concurrent("formatErrors", () => {
   })
 
   it("missing", async () => {
-    const schema = S.struct({ a: S.string })
+    const schema = T.struct({ a: T.string })
     await Util.expectParseFailureTree(
       schema,
       {},
@@ -56,7 +56,7 @@ describe.concurrent("formatErrors", () => {
   })
 
   it("excess property", async () => {
-    const schema = S.struct({ a: S.string })
+    const schema = T.struct({ a: T.string })
     await Util.expectParseFailureTree(
       schema,
       { a: "a", b: 1 },
@@ -68,8 +68,8 @@ describe.concurrent("formatErrors", () => {
   })
 
   it("should collapse trees that have a branching factor of 1", async () => {
-    const schema = S.struct({
-      a: S.struct({ b: S.struct({ c: S.array(S.struct({ d: S.string })) }) })
+    const schema = T.struct({
+      a: T.struct({ b: T.struct({ c: T.array(T.struct({ d: T.string })) }) })
     })
     Util.expectParseFailureTree(
       schema,

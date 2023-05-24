@@ -57,7 +57,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: Schema<I, A>) => (i: I) => string
+export declare const from: <I, A>(schema: Transform<I, A>) => (i: I) => string
 ```
 
 Added in v1.0.0
@@ -67,7 +67,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(schema: Schema<I, A>) => (a: A) => string
+export declare const to: <I, A>(schema: Transform<I, A>) => (a: A) => string
 ```
 
 Added in v1.0.0

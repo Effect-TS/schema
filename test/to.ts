@@ -1,32 +1,32 @@
 import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("to", () => {
   it("transform", () => {
     const schema = pipe(
-      S.string,
-      S.transform(
-        S.tuple(S.NumberFromString, S.NumberFromString),
+      T.string,
+      T.transform(
+        T.tuple(T.NumberFromString, T.NumberFromString),
         (s) => [s, s] as const,
         ([s]) => s
       ),
-      S.to
+      T.to
     )
-    expect(S.parse(schema)([1, 2])).toEqual([1, 2])
+    expect(T.parse(schema)([1, 2])).toEqual([1, 2])
   })
 
   it("refinement", () => {
     const schema = pipe(
-      S.NumberFromString,
-      S.greaterThanOrEqualTo(1),
-      S.lessThanOrEqualTo(2),
-      S.to
+      T.NumberFromString,
+      T.greaterThanOrEqualTo(1),
+      T.lessThanOrEqualTo(2),
+      T.to
     )
-    expect(S.is(schema)(0)).toEqual(false)
-    expect(S.is(schema)(1)).toEqual(true)
-    expect(S.is(schema)(2)).toEqual(true)
-    expect(S.is(schema)(3)).toEqual(false)
+    expect(T.is(schema)(0)).toEqual(false)
+    expect(T.is(schema)(1)).toEqual(true)
+    expect(T.is(schema)(2)).toEqual(true)
+    expect(T.is(schema)(3)).toEqual(false)
   })
 
   it("lazy", async () => {
@@ -36,12 +36,12 @@ describe.concurrent("to", () => {
     interface A {
       prop: A | number
     }
-    const schema: S.Schema<I, A> = S.lazy(() =>
-      S.struct({
-        prop: S.union(S.NumberFromString, schema)
+    const schema: T.Transform<I, A> = T.lazy(() =>
+      T.struct({
+        prop: T.union(T.NumberFromString, schema)
       })
     )
-    const to = S.to(schema)
+    const to = T.to(schema)
     await Util.expectParseSuccess(to, { prop: 1 })
     await Util.expectParseSuccess(to, { prop: { prop: 1 } })
   })

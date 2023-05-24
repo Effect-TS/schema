@@ -1,21 +1,21 @@
 import { pipe } from "@effect/data/Function"
 import * as P from "@effect/schema/Parser"
-import * as S from "@effect/schema/Schema"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("is", () => {
   it("never", () => {
-    const is = P.is(S.never)
+    const is = P.is(T.never)
     expect(is(1)).toEqual(false)
   })
 
   it("string", () => {
-    const is = P.is(S.string)
+    const is = P.is(T.string)
     expect(is("a")).toEqual(true)
     expect(is(1)).toEqual(false)
   })
 
   it("number", () => {
-    const is = P.is(S.number)
+    const is = P.is(T.number)
     expect(is(1)).toEqual(true)
     expect(is(NaN)).toEqual(true)
     expect(is(Infinity)).toEqual(true)
@@ -24,14 +24,14 @@ describe.concurrent("is", () => {
   })
 
   it("boolean", () => {
-    const is = P.is(S.boolean)
+    const is = P.is(T.boolean)
     expect(is(true)).toEqual(true)
     expect(is(false)).toEqual(true)
     expect(is(1)).toEqual(false)
   })
 
   it("bigint", () => {
-    const is = P.is(S.bigint)
+    const is = P.is(T.bigint)
     expect(is(0n)).toEqual(true)
     expect(is(1n)).toEqual(true)
     expect(is(BigInt("1"))).toEqual(true)
@@ -41,13 +41,13 @@ describe.concurrent("is", () => {
 
   it("symbol", () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const is = P.is(S.symbol)
+    const is = P.is(T.symbol)
     expect(is(a)).toEqual(true)
     expect(is("@effect/schema/test/a")).toEqual(false)
   })
 
   it("object", () => {
-    const is = P.is(S.object)
+    const is = P.is(T.object)
     expect(is({})).toEqual(true)
     expect(is([])).toEqual(true)
     expect(is(null)).toEqual(false)
@@ -57,7 +57,7 @@ describe.concurrent("is", () => {
   })
 
   it("literal 1 member", () => {
-    const schema = S.literal(1)
+    const schema = T.literal(1)
     const is = P.is(schema)
     expect(is(1)).toEqual(true)
     expect(is("a")).toEqual(false)
@@ -65,7 +65,7 @@ describe.concurrent("is", () => {
   })
 
   it("literal 2 members", () => {
-    const schema = S.literal(1, "a")
+    const schema = T.literal(1, "a")
     const is = P.is(schema)
     expect(is(1)).toEqual(true)
     expect(is("a")).toEqual(true)
@@ -74,7 +74,7 @@ describe.concurrent("is", () => {
 
   it("uniqueSymbol", () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = S.uniqueSymbol(a)
+    const schema = T.uniqueSymbol(a)
     const is = P.is(schema)
     expect(is(a)).toEqual(true)
     expect(is(Symbol.for("@effect/schema/test/a"))).toEqual(true)
@@ -86,7 +86,7 @@ describe.concurrent("is", () => {
       Apple,
       Banana
     }
-    const schema = S.enums(Fruits)
+    const schema = T.enums(Fruits)
     const is = P.is(schema)
     expect(is(Fruits.Apple)).toEqual(true)
     expect(is(Fruits.Banana)).toEqual(true)
@@ -101,7 +101,7 @@ describe.concurrent("is", () => {
       Banana = "banana",
       Cantaloupe = 0
     }
-    const schema = S.enums(Fruits)
+    const schema = T.enums(Fruits)
     const is = P.is(schema)
     expect(is(Fruits.Apple)).toEqual(true)
     expect(is(Fruits.Cantaloupe)).toEqual(true)
@@ -117,7 +117,7 @@ describe.concurrent("is", () => {
       Banana: "banana",
       Cantaloupe: 3
     } as const
-    const schema = S.enums(Fruits)
+    const schema = T.enums(Fruits)
     const is = P.is(schema)
     expect(is("apple")).toEqual(true)
     expect(is("banana")).toEqual(true)
@@ -126,7 +126,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. empty", () => {
-    const schema = S.tuple()
+    const schema = T.tuple()
     const is = P.is(schema)
     expect(is([])).toEqual(true)
 
@@ -137,7 +137,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. required element", () => {
-    const schema = S.tuple(S.number)
+    const schema = T.tuple(T.number)
     const is = P.is(schema)
     expect(is([1])).toEqual(true)
 
@@ -149,7 +149,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. required element with undefined", () => {
-    const schema = S.tuple(S.union(S.number, S.undefined))
+    const schema = T.tuple(T.union(T.number, T.undefined))
     const is = P.is(schema)
     expect(is([1])).toEqual(true)
     expect(is([undefined])).toEqual(true)
@@ -161,7 +161,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. optional element", () => {
-    const schema = pipe(S.tuple(), S.optionalElement(S.number))
+    const schema = pipe(T.tuple(), T.optionalElement(T.number))
     const is = P.is(schema)
     expect(is([])).toEqual(true)
     expect(is([1])).toEqual(true)
@@ -173,7 +173,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. optional element with undefined", () => {
-    const schema = pipe(S.tuple(), S.optionalElement(S.union(S.number, S.undefined)))
+    const schema = pipe(T.tuple(), T.optionalElement(T.union(T.number, T.undefined)))
     const is = P.is(schema)
     expect(is([])).toEqual(true)
     expect(is([1])).toEqual(true)
@@ -185,7 +185,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. e + e?", () => {
-    const schema = pipe(S.tuple(S.string), S.optionalElement(S.number))
+    const schema = pipe(T.tuple(T.string), T.optionalElement(T.number))
     const is = P.is(schema)
     expect(is(["a"])).toEqual(true)
     expect(is(["a", 1])).toEqual(true)
@@ -195,7 +195,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. e + r", () => {
-    const schema = pipe(S.tuple(S.string), S.rest(S.number))
+    const schema = pipe(T.tuple(T.string), T.rest(T.number))
     const is = P.is(schema)
     expect(is(["a"])).toEqual(true)
     expect(is(["a", 1])).toEqual(true)
@@ -205,7 +205,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. e? + r", () => {
-    const schema = pipe(S.tuple(), S.optionalElement(S.string), S.rest(S.number))
+    const schema = pipe(T.tuple(), T.optionalElement(T.string), T.rest(T.number))
     const is = P.is(schema)
     expect(is([])).toEqual(true)
     expect(is(["a"])).toEqual(true)
@@ -216,7 +216,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. r", () => {
-    const schema = S.array(S.number)
+    const schema = T.array(T.number)
     const is = P.is(schema)
     expect(is([])).toEqual(true)
     expect(is([1])).toEqual(true)
@@ -227,7 +227,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. r + e", () => {
-    const schema = pipe(S.array(S.string), S.element(S.number))
+    const schema = pipe(T.array(T.string), T.element(T.number))
     const is = P.is(schema)
     expect(is([1])).toEqual(true)
     expect(is(["a", 1])).toEqual(true)
@@ -239,7 +239,7 @@ describe.concurrent("is", () => {
   })
 
   it("tuple. e + r + e", () => {
-    const schema = pipe(S.tuple(S.string), S.rest(S.number), S.element(S.boolean))
+    const schema = pipe(T.tuple(T.string), T.rest(T.number), T.element(T.boolean))
     const is = P.is(schema)
     expect(is(["a", true])).toEqual(true)
     expect(is(["a", 1, true])).toEqual(true)
@@ -253,7 +253,7 @@ describe.concurrent("is", () => {
   })
 
   it("struct. empty", () => {
-    const schema = S.struct({})
+    const schema = T.struct({})
     const is = P.is(schema)
     expect(is({})).toEqual(true)
     expect(is({ a: 1 })).toEqual(true)
@@ -265,7 +265,7 @@ describe.concurrent("is", () => {
 
   describe.concurrent("struct", () => {
     it("required property signature", () => {
-      const schema = S.struct({ a: S.number })
+      const schema = T.struct({ a: T.number })
       const is = P.is(schema)
       expect(is({ a: 1 })).toEqual(true)
       expect(is({ a: 1, b: "b" })).toEqual(true)
@@ -277,7 +277,7 @@ describe.concurrent("is", () => {
     })
 
     it("required property signature with undefined", () => {
-      const schema = S.struct({ a: S.union(S.number, S.undefined) })
+      const schema = T.struct({ a: T.union(T.number, T.undefined) })
       const is = P.is(schema)
       expect(is({ a: 1 })).toEqual(true)
       expect(is({ a: undefined })).toEqual(true)
@@ -289,7 +289,7 @@ describe.concurrent("is", () => {
     })
 
     it("optional property signature", () => {
-      const schema = S.struct({ a: S.optional(S.number) })
+      const schema = T.struct({ a: T.optional(T.number) })
       const is = P.is(schema)
       expect(is({})).toEqual(true)
       expect(is({ a: 1 })).toEqual(true)
@@ -301,7 +301,7 @@ describe.concurrent("is", () => {
     })
 
     it("optional property signature with undefined", () => {
-      const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
+      const schema = T.struct({ a: T.optional(T.union(T.number, T.undefined)) })
       const is = P.is(schema)
       expect(is({})).toEqual(true)
       expect(is({ a: 1 })).toEqual(true)
@@ -315,7 +315,7 @@ describe.concurrent("is", () => {
 
   it("record(string, string)", () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = S.record(S.string, S.string)
+    const schema = T.record(T.string, T.string)
     const is = P.is(schema)
     expect(is(null)).toEqual(false)
     expect(is({})).toEqual(true)
@@ -330,7 +330,7 @@ describe.concurrent("is", () => {
   it("record(symbol, string)", () => {
     const a = Symbol.for("@effect/schema/test/a")
     const b = Symbol.for("@effect/schema/test/b")
-    const schema = S.record(S.symbol, S.string)
+    const schema = T.record(T.symbol, T.string)
     const is = P.is(schema)
     expect(is(null)).toEqual(false)
     expect(is({})).toEqual(true)
@@ -343,14 +343,14 @@ describe.concurrent("is", () => {
   })
 
   it("record(never, number)", () => {
-    const schema = S.record(S.never, S.number)
+    const schema = T.record(T.never, T.number)
     const is = P.is(schema)
     expect(is({})).toEqual(true)
     expect(is({ a: 1 })).toEqual(true)
   })
 
   it("record('a' | 'b', number)", () => {
-    const schema = S.record(S.union(S.literal("a"), S.literal("b")), S.number)
+    const schema = T.record(T.union(T.literal("a"), T.literal("b")), T.number)
     const is = P.is(schema)
     expect(is({ a: 1, b: 2 })).toEqual(true)
 
@@ -360,7 +360,7 @@ describe.concurrent("is", () => {
   })
 
   it("record(keyof struct({ a, b }), number)", () => {
-    const schema = S.record(S.keyof(S.struct({ a: S.string, b: S.string })), S.number)
+    const schema = T.record(T.keyof(T.struct({ a: T.string, b: T.string })), T.number)
     const is = P.is(schema)
     expect(is({ a: 1, b: 2 })).toEqual(true)
 
@@ -371,9 +371,9 @@ describe.concurrent("is", () => {
   })
 
   it("record(keyof struct({ a, b } & Record<string, string>), number)", () => {
-    const schema = S.record(
-      S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.string, S.string)))),
-      S.number
+    const schema = T.record(
+      T.keyof(pipe(T.struct({ a: T.string, b: T.string }), T.extend(T.record(T.string, T.string)))),
+      T.number
     )
     const is = P.is(schema)
     expect(is({ a: 1, b: 2 })).toEqual(true)
@@ -385,9 +385,9 @@ describe.concurrent("is", () => {
   })
 
   it("record(keyof struct({ a, b } & Record<symbol, string>), number)", () => {
-    const schema = S.record(
-      S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.symbol, S.string)))),
-      S.number
+    const schema = T.record(
+      T.keyof(pipe(T.struct({ a: T.string, b: T.string }), T.extend(T.record(T.symbol, T.string)))),
+      T.number
     )
     const is = P.is(schema)
     expect(is({ a: 1, b: 2 })).toEqual(true)
@@ -404,7 +404,7 @@ describe.concurrent("is", () => {
   it("record(Symbol('a') | Symbol('b'), number)", () => {
     const a = Symbol.for("@effect/schema/test/a")
     const b = Symbol.for("@effect/schema/test/b")
-    const schema = S.record(S.union(S.uniqueSymbol(a), S.uniqueSymbol(b)), S.number)
+    const schema = T.record(T.union(T.uniqueSymbol(a), T.uniqueSymbol(b)), T.number)
     const is = P.is(schema)
     expect(is({ [a]: 1, [b]: 2 })).toEqual(true)
 
@@ -414,7 +414,7 @@ describe.concurrent("is", () => {
   })
 
   it("record(${string}-${string}, number)", () => {
-    const schema = S.record(S.templateLiteral(S.string, S.literal("-"), S.string), S.number)
+    const schema = T.record(T.templateLiteral(T.string, T.literal("-"), T.string), T.number)
     const is = P.is(schema)
     expect(is({})).toEqual(true)
     expect(is({ "-": 1 })).toEqual(true)
@@ -427,7 +427,7 @@ describe.concurrent("is", () => {
   })
 
   it("record(minLength(1), number)", () => {
-    const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
+    const schema = T.record(pipe(T.string, T.minLength(2)), T.number)
     const is = P.is(schema)
     expect(is({})).toEqual(true)
     expect(is({ "aa": 1 })).toEqual(true)
@@ -438,7 +438,7 @@ describe.concurrent("is", () => {
   })
 
   it("union", () => {
-    const schema = S.union(S.string, S.number)
+    const schema = T.union(T.string, T.number)
     const is = P.is(schema)
     expect(is(null)).toEqual(false)
     expect(is(1)).toEqual(true)
@@ -451,10 +451,10 @@ describe.concurrent("is", () => {
         readonly name: string
         readonly categories: ReadonlyArray<Category>
       }
-      const schema: S.Schema<Category> = S.lazy<Category>(() =>
-        S.struct({
-          name: S.string,
-          categories: S.array(schema)
+      const schema: T.Transform<Category, Category> = T.lazy(() =>
+        T.struct({
+          name: T.string,
+          categories: T.array(schema)
         })
       )
       const is = P.is(schema)
@@ -480,16 +480,16 @@ describe.concurrent("is", () => {
         readonly b: number
         readonly as: ReadonlyArray<A>
       }
-      const schemaA: S.Schema<A> = S.lazy<A>(() =>
-        S.struct({
-          a: S.string,
-          bs: S.array(schemaB)
+      const schemaA: T.Transform<A, A> = T.lazy(() =>
+        T.struct({
+          a: T.string,
+          bs: T.array(schemaB)
         })
       )
-      const schemaB: S.Schema<B> = S.lazy<B>(() =>
-        S.struct({
-          b: S.number,
-          as: S.array(schemaA)
+      const schemaB: T.Transform<B, B> = T.lazy(() =>
+        T.struct({
+          b: T.number,
+          as: T.array(schemaA)
         })
       )
       const isA = P.is(schemaA)
@@ -505,7 +505,7 @@ describe.concurrent("is", () => {
   })
 
   it("union", () => {
-    const schema = S.union(S.string, S.number)
+    const schema = T.union(T.string, T.number)
     const is = P.is(schema)
     expect(is(null)).toEqual(false)
     expect(is(1)).toEqual(true)
@@ -514,7 +514,7 @@ describe.concurrent("is", () => {
 
   describe.concurrent("rest", () => {
     it("baseline", () => {
-      const schema = pipe(S.tuple(S.string, S.number), S.rest(S.boolean))
+      const schema = pipe(T.tuple(T.string, T.number), T.rest(T.boolean))
       const is = P.is(schema)
       expect(is(["a", 1])).toEqual(true)
       expect(is(["a", 1, true])).toEqual(true)
@@ -527,8 +527,8 @@ describe.concurrent("is", () => {
   describe.concurrent("extend", () => {
     it("struct", () => {
       const schema = pipe(
-        S.struct({ a: S.string }),
-        S.extend(S.struct({ b: S.number }))
+        T.struct({ a: T.string }),
+        T.extend(T.struct({ b: T.number }))
       )
       const is = P.is(schema)
       expect(is({ a: "a", b: 1 })).toEqual(true)
@@ -539,8 +539,8 @@ describe.concurrent("is", () => {
 
     it("record(string, string)", () => {
       const schema = pipe(
-        S.struct({ a: S.string }),
-        S.extend(S.record(S.string, S.string))
+        T.struct({ a: T.string }),
+        T.extend(T.record(T.string, T.string))
       )
       const is = P.is(schema)
       expect(is({ a: "a" })).toEqual(true)
@@ -554,7 +554,7 @@ describe.concurrent("is", () => {
   })
 
   it("nonEmpty", () => {
-    const schema = pipe(S.string, S.nonEmpty())
+    const schema = pipe(T.string, T.nonEmpty())
     const is = P.is(schema)
     expect(is("a")).toEqual(true)
     expect(is("aa")).toEqual(true)

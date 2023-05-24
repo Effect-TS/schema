@@ -1,43 +1,43 @@
 import * as AST from "@effect/schema/AST"
-import * as S from "@effect/schema/Schema"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("AST.getCardinality", () => {
   it("order", () => {
-    const struct = S.struct({ a: S.string })
+    const struct = T.struct({ a: T.string })
     const actual = [
       struct.ast,
-      S.unknown.ast,
-      S.any.ast,
-      S.object.ast,
-      S.symbol.ast,
-      S.bigint.ast,
-      S.number.ast,
-      S.string.ast,
-      S.boolean.ast,
-      S.uniqueSymbol(Symbol.for("a")).ast,
-      S.undefined.ast,
-      S.void.ast,
-      S.literal("a").ast,
-      S.never.ast
+      T.unknown.ast,
+      T.any.ast,
+      T.object.ast,
+      T.symbol.ast,
+      T.bigint.ast,
+      T.number.ast,
+      T.string.ast,
+      T.boolean.ast,
+      T.uniqueSymbol(Symbol.for("a")).ast,
+      T.undefined.ast,
+      T.void.ast,
+      T.literal("a").ast,
+      T.never.ast
     ].map(
       AST.getCardinality
     )
       .sort()
     const expected = [
-      S.never.ast,
-      S.uniqueSymbol(Symbol.for("a")).ast,
-      S.undefined.ast,
-      S.void.ast,
-      S.literal("a").ast,
-      S.boolean.ast,
-      S.symbol.ast,
-      S.bigint.ast,
-      S.number.ast,
-      S.string.ast,
+      T.never.ast,
+      T.uniqueSymbol(Symbol.for("a")).ast,
+      T.undefined.ast,
+      T.void.ast,
+      T.literal("a").ast,
+      T.boolean.ast,
+      T.symbol.ast,
+      T.bigint.ast,
+      T.number.ast,
+      T.string.ast,
       struct.ast,
-      S.object.ast,
-      S.unknown.ast,
-      S.any.ast
+      T.object.ast,
+      T.unknown.ast,
+      T.any.ast
     ].map(AST.getCardinality)
     expect(actual).toEqual(expected)
   })

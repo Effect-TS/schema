@@ -1,10 +1,10 @@
 import { pipe } from "@effect/data/Function"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
-const schema = pipe(S.number, S.nonNaN())
+const schema = pipe(T.number, T.nonNaN())
 
 describe.concurrent("nonNaN", () => {
   it("property tests", () => {

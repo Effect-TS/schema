@@ -5,8 +5,8 @@ import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
-import type { Schema } from "@effect/schema/Schema"
-import * as S from "@effect/schema/Schema"
+import type { Transform } from "@effect/schema/Transform"
+import * as T from "@effect/schema/Transform"
 import Ajv from "ajv"
 import * as fc from "fast-check"
 
@@ -78,12 +78,12 @@ export type JsonSchema7Type =
   | JsonSchema7AllOfType
   | JsonSchema7ObjectType
 
-const isJsonArray = (u: unknown): u is S.JsonArray => Array.isArray(u) && u.every(isJson)
+const isJsonArray = (u: unknown): u is T.JsonArray => Array.isArray(u) && u.every(isJson)
 
-const isJsonObject = (u: unknown): u is S.JsonObject =>
+const isJsonObject = (u: unknown): u is T.JsonObject =>
   isRecord(u) && Object.keys(u).every((key) => isJson(u[key]))
 
-export const isJson = (u: unknown): u is S.Json =>
+export const isJson = (u: unknown): u is T.Json =>
   u === null || typeof u === "string" || (typeof u === "number" && !isNaN(u) && isFinite(u)) ||
   typeof u === "boolean" ||
   isJsonArray(u) ||
@@ -93,7 +93,7 @@ const getJSONSchemaAnnotation = AST.getAnnotation<AST.JSONSchemaAnnotation>(
   AST.JSONSchemaAnnotationId
 )
 
-const jsonSchemaFor = <A>(schema: Schema<A>): JsonSchema7Type => {
+const jsonSchemaFor = <A>(schema: Transform<A, A>): JsonSchema7Type => {
   const go = (ast: AST.AST): JsonSchema7Type => {
     switch (ast._tag) {
       case "Declaration":
@@ -245,7 +245,7 @@ const jsonSchemaFor = <A>(schema: Schema<A>): JsonSchema7Type => {
   return go(schema.ast)
 }
 
-const property = <A>(schema: Schema<A>) => {
+const property = <A>(schema: Transform<A, A>) => {
   const arbitrary = A.to(schema)
   const is = P.is(schema)
   const validate = new Ajv({ strict: false }).compile(jsonSchemaFor(schema))
@@ -258,7 +258,7 @@ const property = <A>(schema: Schema<A>) => {
 
 const ajv = new Ajv({ strict: false })
 
-export const assertTrue = <A>(schema: Schema<A>, input: unknown) => {
+export const assertTrue = <A>(schema: Transform<A, A>, input: unknown) => {
   const is = P.is(schema)
   const jsonschema = jsonSchemaFor(schema)
   const validate = ajv.compile(jsonschema)
@@ -266,7 +266,7 @@ export const assertTrue = <A>(schema: Schema<A>, input: unknown) => {
   expect(validate(input)).toEqual(true)
 }
 
-export const assertFalse = <A>(schema: Schema<A>, input: unknown) => {
+export const assertFalse = <A>(schema: Transform<A, A>, input: unknown) => {
   const is = P.is(schema)
   const jsonschema = jsonSchemaFor(schema)
   const validate = ajv.compile(jsonschema)
@@ -276,48 +276,48 @@ export const assertFalse = <A>(schema: Schema<A>, input: unknown) => {
 
 describe("jsonSchemaFor", () => {
   it("any", () => {
-    property(S.any)
+    property(T.any)
   })
 
   it("unknown", () => {
-    property(S.unknown)
+    property(T.unknown)
   })
 
   it("object", () => {
-    property(S.object)
+    property(T.object)
   })
 
   it("string", () => {
-    property(S.string)
+    property(T.string)
   })
 
   it("number", () => {
-    property(S.number)
+    property(T.number)
   })
 
   it("boolean", () => {
-    property(S.boolean)
+    property(T.boolean)
   })
 
   it("literal. null", () => {
-    property(S.null)
+    property(T.null)
   })
 
   it("literal. string", () => {
-    property(S.literal("a"))
+    property(T.literal("a"))
   })
 
   it("literal. number", () => {
-    property(S.literal(1))
+    property(T.literal(1))
   })
 
   it("literal. boolean", () => {
-    property(S.literal(true))
-    property(S.literal(false))
+    property(T.literal(true))
+    property(T.literal(false))
   })
 
   it("literals", () => {
-    property(S.literal(1, "a"))
+    property(T.literal(1, "a"))
   })
 
   it("Numeric enums", () => {
@@ -325,7 +325,7 @@ describe("jsonSchemaFor", () => {
       Apple,
       Banana
     }
-    property(S.enums(Fruits))
+    property(T.enums(Fruits))
   })
 
   it("String enums", () => {
@@ -334,7 +334,7 @@ describe("jsonSchemaFor", () => {
       Banana = "banana",
       Cantaloupe = 0
     }
-    property(S.enums(Fruits))
+    property(T.enums(Fruits))
   })
 
   it("Const enums", () => {
@@ -343,118 +343,118 @@ describe("jsonSchemaFor", () => {
       Banana: "banana",
       Cantaloupe: 3
     } as const
-    property(S.enums(Fruits))
+    property(T.enums(Fruits))
   })
 
   it("union", () => {
-    property(S.union(S.string, S.number))
+    property(T.union(T.string, T.number))
   })
 
   it("tuple. empty", () => {
-    property(S.tuple())
+    property(T.tuple())
   })
 
   it("tuple. required element", () => {
-    const schema = S.tuple(S.number)
+    const schema = T.tuple(T.number)
     property(schema)
   })
 
   it("tuple. optional element", () => {
-    const schema = pipe(S.tuple(), S.optionalElement(S.number))
+    const schema = pipe(T.tuple(), T.optionalElement(T.number))
     property(schema)
   })
 
   it("tuple. e + e?", () => {
-    const schema = pipe(S.tuple(S.string), S.optionalElement(S.number))
+    const schema = pipe(T.tuple(T.string), T.optionalElement(T.number))
     property(schema)
   })
 
   it("tuple. e + r", () => {
-    const schema = pipe(S.tuple(S.string), S.rest(S.number))
+    const schema = pipe(T.tuple(T.string), T.rest(T.number))
     property(schema)
   })
 
   it("tuple. e? + r", () => {
-    const schema = pipe(S.tuple(), S.optionalElement(S.string), S.rest(S.number))
+    const schema = pipe(T.tuple(), T.optionalElement(T.string), T.rest(T.number))
     property(schema)
   })
 
   it("tuple. r", () => {
-    const schema = S.array(S.number)
+    const schema = T.array(T.number)
     property(schema)
   })
 
   it("struct. empty", () => {
-    const schema = S.struct({})
+    const schema = T.struct({})
     property(schema)
   })
 
   it("struct", () => {
-    property(S.struct({ a: S.string, b: S.number }))
+    property(T.struct({ a: T.string, b: T.number }))
   })
 
   it("struct. optional property signature", () => {
-    property(S.struct({ a: S.string, b: S.optional(S.number) }))
+    property(T.struct({ a: T.string, b: T.optional(T.number) }))
   })
 
   it("record(string, string)", () => {
-    property(S.record(S.string, S.string))
+    property(T.record(T.string, T.string))
   })
 
   it("record('a' | 'b', number)", () => {
-    const schema = S.record(S.union(S.literal("a"), S.literal("b")), S.number)
+    const schema = T.record(T.union(T.literal("a"), T.literal("b")), T.number)
     property(schema)
   })
 
   it("minLength", () => {
-    const schema = pipe(S.string, S.minLength(1))
+    const schema = pipe(T.string, T.minLength(1))
     const jsonSchema = jsonSchemaFor(schema)
     expect(jsonSchema).toEqual({ type: "string", minLength: 1 })
     property(schema)
   })
 
   it("maxLength", () => {
-    const schema = pipe(S.string, S.maxLength(1))
+    const schema = pipe(T.string, T.maxLength(1))
     const jsonSchema = jsonSchemaFor(schema)
     expect(jsonSchema).toEqual({ type: "string", maxLength: 1 })
     property(schema)
   })
 
   it("greaterThan", () => {
-    const schema = pipe(S.number, S.greaterThan(1))
+    const schema = pipe(T.number, T.greaterThan(1))
     const jsonSchema = jsonSchemaFor(schema)
     expect(jsonSchema).toEqual({ type: "number", exclusiveMinimum: 1 })
     property(schema)
   })
 
   it("greaterThanOrEqualTo", () => {
-    const schema = pipe(S.number, S.greaterThanOrEqualTo(1))
+    const schema = pipe(T.number, T.greaterThanOrEqualTo(1))
     const jsonSchema = jsonSchemaFor(schema)
     expect(jsonSchema).toEqual({ type: "number", minimum: 1 })
     property(schema)
   })
 
   it("lessThan", () => {
-    const schema = pipe(S.number, S.lessThan(1))
+    const schema = pipe(T.number, T.lessThan(1))
     const jsonSchema = jsonSchemaFor(schema)
     expect(jsonSchema).toEqual({ type: "number", exclusiveMaximum: 1 })
     property(schema)
   })
 
   it("lessThanOrEqualTo", () => {
-    const schema = pipe(S.number, S.lessThanOrEqualTo(1))
+    const schema = pipe(T.number, T.lessThanOrEqualTo(1))
     const jsonSchema = jsonSchemaFor(schema)
     expect(jsonSchema).toEqual({ type: "number", maximum: 1 })
     property(schema)
   })
 
   it("pattern", () => {
-    const schema = pipe(S.string, S.pattern(/^abb+$/))
+    const schema = pipe(T.string, T.pattern(/^abb+$/))
     const jsonSchema = jsonSchemaFor(schema)
     expect(jsonSchema).toEqual({ "pattern": "^abb+$", "type": "string" })
   })
 
   it("integer", () => {
-    property(pipe(S.number, S.int()))
+    property(pipe(T.number, T.int()))
   })
 })

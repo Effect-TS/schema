@@ -1,22 +1,22 @@
 import * as Data from "@effect/data/Data"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Data", () => {
   it("dataFromSelf. keyof", () => {
-    const schema1 = S.keyof(S.dataFromSelf(S.struct({ a: S.string, b: S.string })))
-    expect(schema1).toEqual(S.union(S.literal("a"), S.literal("b")))
+    const schema1 = T.keyof(T.dataFromSelf(T.struct({ a: T.string, b: T.string })))
+    expect(schema1).toEqual(T.union(T.literal("a"), T.literal("b")))
   })
 
   it("dataFromSelf. property tests", () => {
-    Util.roundtrip(S.dataFromSelf(S.struct({ a: S.string, b: S.number })))
-    Util.roundtrip(S.dataFromSelf(S.array(S.number)))
+    Util.roundtrip(T.dataFromSelf(T.struct({ a: T.string, b: T.number })))
+    Util.roundtrip(T.dataFromSelf(T.array(T.number)))
   })
 
   it("dataFromSelf. decoder", async () => {
-    const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
+    const schema = T.dataFromSelf(T.struct({ a: T.string, b: T.number }))
     await Util.expectParseSuccess(
       schema,
       Data.struct({ a: "ok", b: 0 }),
@@ -35,7 +35,7 @@ describe.concurrent("Data", () => {
   })
 
   it("dataFromSelf. encoder", async () => {
-    const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
+    const schema = T.dataFromSelf(T.struct({ a: T.string, b: T.number }))
     await Util.expectEncodeSuccess(
       schema,
       Data.struct({ a: "ok", b: 0 }),
@@ -44,7 +44,7 @@ describe.concurrent("Data", () => {
   })
 
   it("dataFromSelf. guard", () => {
-    const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
+    const schema = T.dataFromSelf(T.struct({ a: T.string, b: T.number }))
     const is = P.is(schema)
     expect(is(Data.struct({ a: "ok", b: 0 }))).toEqual(true)
     expect(is({ a: "ok", b: 0 })).toEqual(false)
@@ -52,18 +52,18 @@ describe.concurrent("Data", () => {
   })
 
   it("dataFromSelf. pretty", () => {
-    const schema = S.dataFromSelf(S.struct({ a: S.string, b: S.number }))
+    const schema = T.dataFromSelf(T.struct({ a: T.string, b: T.number }))
     const pretty = Pretty.to(schema)
     expect(pretty(Data.struct({ a: "ok", b: 0 }))).toEqual("Data({ \"a\": \"ok\", \"b\": 0 })")
   })
 
   it("data. property tests", () => {
-    Util.roundtrip(S.data(S.struct({ a: S.string, b: S.number })))
-    Util.roundtrip(S.data(S.array(S.number)))
+    Util.roundtrip(T.data(T.struct({ a: T.string, b: T.number })))
+    Util.roundtrip(T.data(T.array(T.number)))
   })
 
   it("data. decoder", async () => {
-    const schema = S.data(S.struct({ a: S.string, b: S.number }))
+    const schema = T.data(T.struct({ a: T.string, b: T.number }))
     await Util.expectParseSuccess(
       schema,
       { a: "ok", b: 0 },
@@ -77,7 +77,7 @@ describe.concurrent("Data", () => {
   })
 
   it("data. encoder", async () => {
-    const schema = S.data(S.struct({ a: S.string, b: S.number }))
+    const schema = T.data(T.struct({ a: T.string, b: T.number }))
     await Util.expectEncodeSuccess(schema, Data.struct({ a: "ok", b: 0 }), { a: "ok", b: 0 })
   })
 })

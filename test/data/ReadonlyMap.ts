@@ -1,21 +1,21 @@
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
-const NumberFromString = S.NumberFromString
+const NumberFromString = T.NumberFromString
 
 describe.concurrent("ReadonlyMap", () => {
   it("readonlyMapFromSelf. keyof", () => {
-    expect(S.keyof(S.readonlyMapFromSelf(S.number, S.string))).toEqual(S.literal("size"))
+    expect(T.keyof(T.readonlyMapFromSelf(T.number, T.string))).toEqual(T.literal("size"))
   })
 
   it("readonlyMapFromSelf. property tests", () => {
-    Util.roundtrip(S.readonlyMapFromSelf(S.number, S.string))
+    Util.roundtrip(T.readonlyMapFromSelf(T.number, T.string))
   })
 
   it("readonlyMapFromSelf. decoder", async () => {
-    const schema = S.readonlyMapFromSelf(NumberFromString, S.string)
+    const schema = T.readonlyMapFromSelf(NumberFromString, T.string)
     await Util.expectParseSuccess(schema, new Map(), new Map())
     await Util.expectParseSuccess(
       schema,
@@ -36,7 +36,7 @@ describe.concurrent("ReadonlyMap", () => {
   })
 
   it("readonlyMapFromSelf. encoder", async () => {
-    const schema = S.readonlyMapFromSelf(NumberFromString, S.string)
+    const schema = T.readonlyMapFromSelf(NumberFromString, T.string)
     await Util.expectEncodeSuccess(schema, new Map(), new Map())
     await Util.expectEncodeSuccess(
       schema,
@@ -46,7 +46,7 @@ describe.concurrent("ReadonlyMap", () => {
   })
 
   it("readonlyMapFromSelf. guard", () => {
-    const schema = S.readonlyMapFromSelf(S.number, S.string)
+    const schema = T.readonlyMapFromSelf(T.number, T.string)
     const is = P.is(schema)
     expect(is(new Map())).toEqual(true)
     expect(is(new Map([[1, "a"], [2, "b"], [3, "c"]]))).toEqual(true)
@@ -61,7 +61,7 @@ describe.concurrent("ReadonlyMap", () => {
   })
 
   it("readonlyMapFromSelf. pretty", () => {
-    const schema = S.readonlyMapFromSelf(S.number, S.string)
+    const schema = T.readonlyMapFromSelf(T.number, T.string)
     const pretty = Pretty.to(schema)
     expect(pretty(new Map())).toEqual("new Map([])")
     expect(pretty(new Map([[1, "a"], [2, "b"]]))).toEqual(
@@ -70,11 +70,11 @@ describe.concurrent("ReadonlyMap", () => {
   })
 
   it("readonlyMap. property tests", () => {
-    Util.roundtrip(S.readonlyMap(S.number, S.string))
+    Util.roundtrip(T.readonlyMap(T.number, T.string))
   })
 
   it("readonlyMap. decoder", async () => {
-    const schema = S.readonlyMap(S.number, S.string)
+    const schema = T.readonlyMap(T.number, T.string)
     await Util.expectParseSuccess(schema, [], new Map())
     await Util.expectParseSuccess(
       schema,
@@ -95,7 +95,7 @@ describe.concurrent("ReadonlyMap", () => {
   })
 
   it("readonlyMap. encoder", async () => {
-    const schema = S.readonlyMap(S.number, S.string)
+    const schema = T.readonlyMap(T.number, T.string)
     await Util.expectEncodeSuccess(schema, new Map(), [])
     await Util.expectEncodeSuccess(schema, new Map([[1, "a"], [2, "b"], [3, "c"]]), [[1, "a"], [
       2,

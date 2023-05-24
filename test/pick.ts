@@ -1,13 +1,13 @@
 import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("pick", () => {
   it("struct", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const schema = pipe(
-      S.struct({ [a]: S.string, b: S.NumberFromString, c: S.boolean }),
-      S.pick(a, "b")
+      T.struct({ [a]: T.string, b: T.NumberFromString, c: T.boolean }),
+      T.pick(a, "b")
     )
     await Util.expectParseSuccess(schema, { [a]: "a", b: "1" }, { [a]: "a", b: 1 })
 
@@ -22,8 +22,8 @@ describe.concurrent("pick", () => {
 
   it("struct with optionals", async () => {
     const schema = pipe(
-      S.struct({ a: S.optional(S.string), b: S.NumberFromString, c: S.boolean }),
-      S.pick("a", "b")
+      T.struct({ a: T.optional(T.string), b: T.NumberFromString, c: T.boolean }),
+      T.pick("a", "b")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
     await Util.expectParseSuccess(schema, { b: "1" }, { b: 1 })
@@ -37,13 +37,13 @@ describe.concurrent("pick", () => {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const A: S.Schema<A> = S.lazy<A>(() =>
-      S.struct({
-        a: S.string,
-        as: S.array(A)
+    const A: T.Transform<A, A> = T.lazy(() =>
+      T.struct({
+        a: T.string,
+        as: T.array(A)
       })
     )
-    const schema = pipe(A, S.pick("as"))
+    const schema = pipe(A, T.pick("as"))
     await Util.expectParseSuccess(schema, { as: [] })
     await Util.expectParseSuccess(schema, { as: [{ a: "a", as: [] }] })
 
@@ -52,12 +52,12 @@ describe.concurrent("pick", () => {
 
   it("struct with property signature transformations", async () => {
     const schema = pipe(
-      S.struct({
-        a: S.optional(S.string).withDefault(() => ""),
-        b: S.NumberFromString,
-        c: S.boolean
+      T.struct({
+        a: T.optional(T.string).withDefault(() => ""),
+        b: T.NumberFromString,
+        c: T.boolean
       }),
-      S.pick("a", "b")
+      T.pick("a", "b")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
     await Util.expectParseSuccess(schema, { b: "1" }, { a: "", b: 1 })

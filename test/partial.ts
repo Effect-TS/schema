@@ -1,12 +1,12 @@
 import { identity, pipe } from "@effect/data/Function"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
-const NumberFromString = S.NumberFromString
+const NumberFromString = T.NumberFromString
 
 describe.concurrent("partial", () => {
   it("struct", async () => {
-    const schema = S.partial(S.struct({ a: S.number }))
+    const schema = T.partial(T.struct({ a: T.number }))
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
 
@@ -18,14 +18,14 @@ describe.concurrent("partial", () => {
   })
 
   it("tuple", async () => {
-    const schema = S.partial(S.tuple(S.string, S.number))
+    const schema = T.partial(T.tuple(T.string, T.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
   })
 
   it("array", async () => {
-    const schema = S.partial(S.array(S.number))
+    const schema = T.partial(T.array(T.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [undefined])
@@ -43,7 +43,7 @@ describe.concurrent("partial", () => {
   })
 
   it("union", async () => {
-    const schema = S.partial(S.union(S.string, S.array(S.number)))
+    const schema = T.partial(T.union(T.string, T.array(T.number)))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
@@ -65,13 +65,13 @@ describe.concurrent("partial", () => {
   })
 
   it("tuple/ e", async () => {
-    const schema = S.partial(S.tuple(NumberFromString))
+    const schema = T.partial(T.tuple(NumberFromString))
     await Util.expectParseSuccess(schema, ["1"], [1])
     await Util.expectParseSuccess(schema, [], [])
   })
 
   it("tuple/ e + r", async () => {
-    const schema = S.partial(pipe(S.tuple(NumberFromString), S.rest(NumberFromString)))
+    const schema = T.partial(pipe(T.tuple(NumberFromString), T.rest(NumberFromString)))
     await Util.expectParseSuccess(schema, ["1"], [1])
     await Util.expectParseSuccess(schema, [], [])
     await Util.expectParseSuccess(schema, ["1", "2"], [1, 2])
@@ -79,7 +79,7 @@ describe.concurrent("partial", () => {
   })
 
   it("record", async () => {
-    const schema = S.partial(S.record(S.string, NumberFromString))
+    const schema = T.partial(T.record(T.string, NumberFromString))
     await Util.expectParseSuccess(schema, {}, {})
     await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
   })
@@ -88,9 +88,9 @@ describe.concurrent("partial", () => {
     interface A {
       readonly a?: null | A
     }
-    const schema: S.Schema<A> = S.partial(S.lazy(() =>
-      S.struct({
-        a: S.union(S.null, schema)
+    const schema: T.Transform<A, A> = T.partial(T.lazy(() =>
+      T.struct({
+        a: T.union(T.null, schema)
       })
     ))
     await Util.expectParseSuccess(schema, {})
@@ -105,19 +105,19 @@ describe.concurrent("partial", () => {
   })
 
   it("declarations should throw", async () => {
-    expect(() => S.partial(S.optionFromSelf(S.string))).toThrowError(
+    expect(() => T.partial(T.optionFromSelf(T.string))).toThrowError(
       new Error("`partial` cannot handle declarations")
     )
   })
 
   it("refinements should throw", async () => {
-    expect(() => S.partial(pipe(S.string, S.minLength(2)))).toThrowError(
+    expect(() => T.partial(pipe(T.string, T.minLength(2)))).toThrowError(
       new Error("`partial` cannot handle refinements")
     )
   })
 
   it("transformations should throw", async () => {
-    expect(() => S.partial(S.transform(S.string, S.string, identity, identity))).toThrowError(
+    expect(() => T.partial(T.transform(T.string, T.string, identity, identity))).toThrowError(
       new Error("`partial` cannot handle transformations")
     )
   })

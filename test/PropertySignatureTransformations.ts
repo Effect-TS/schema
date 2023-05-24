@@ -1,15 +1,15 @@
 import { identity } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("PropertySignatureTransformations", () => {
   it("identity", async () => {
-    const from = S.struct({ a: S.NumberFromString }).ast
-    const to = S.struct({ a: S.number }).ast
+    const from = T.struct({ a: T.NumberFromString }).ast
+    const to = T.struct({ a: T.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = []
-    const schema: S.Schema<{ readonly a: string }, { readonly a: number }> = S.make(
+    const schema: T.Transform<{ readonly a: string }, { readonly a: number }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
         from,
         to,
@@ -24,8 +24,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("default", async () => {
-    const from = S.struct({ a: S.optional(S.NumberFromString) }).ast
-    const to = S.struct({ a: S.number }).ast
+    const from = T.struct({ a: T.optional(T.NumberFromString) }).ast
+    const to = T.struct({ a: T.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -34,7 +34,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
         identity
       )
     ]
-    const schema: S.Schema<{ readonly a?: string }, { readonly a: number }> = S.make(
+    const schema: T.Transform<{ readonly a?: string }, { readonly a: number }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
         from,
         to,
@@ -50,8 +50,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("bidirectional default", async () => {
-    const from = S.struct({ a: S.optional(S.NumberFromString) }).ast
-    const to = S.struct({ a: S.number }).ast
+    const from = T.struct({ a: T.optional(T.NumberFromString) }).ast
+    const to = T.struct({ a: T.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -60,7 +60,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
         (o) => O.flatMap(o, O.liftPredicate((v) => v !== 0))
       )
     ]
-    const schema: S.Schema<{ readonly a?: string }, { readonly a: number }> = S.make(
+    const schema: T.Transform<{ readonly a?: string }, { readonly a: number }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
         from,
         to,
@@ -76,8 +76,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("optional -> Option", async () => {
-    const from = S.struct({ a: S.optional(S.NumberFromString) }).ast
-    const to = S.struct({ a: S.optionFromSelf(S.number) }).ast
+    const from = T.struct({ a: T.optional(T.NumberFromString) }).ast
+    const to = T.struct({ a: T.optionFromSelf(T.number) }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -86,7 +86,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
         O.flatten
       )
     ]
-    const schema: S.Schema<{ readonly a?: string }, { readonly a: O.Option<number> }> = S.make(
+    const schema: T.Transform<{ readonly a?: string }, { readonly a: O.Option<number> }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
         from,
         to,
@@ -102,8 +102,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("empty string as optional", async () => {
-    const from = S.struct({ a: S.string }).ast
-    const to = S.struct({ a: S.optional(S.string) }).ast
+    const from = T.struct({ a: T.string }).ast
+    const to = T.struct({ a: T.optional(T.string) }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -112,7 +112,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
         identity
       )
     ]
-    const schema: S.Schema<{ readonly a: string }, { readonly a?: string }> = S.make(
+    const schema: T.Transform<{ readonly a: string }, { readonly a?: string }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
         from,
         to,
@@ -126,8 +126,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("rename", async () => {
-    const from = S.struct({ a: S.number }).ast
-    const to = S.struct({ b: S.number }).ast
+    const from = T.struct({ a: T.number }).ast
+    const to = T.struct({ b: T.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -136,7 +136,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
         identity
       )
     ]
-    const schema: S.Schema<{ readonly a: number }, { readonly b: number }> = S.make(
+    const schema: T.Transform<{ readonly a: number }, { readonly b: number }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
         from,
         to,
@@ -149,8 +149,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("reversed default", async () => {
-    const from = S.struct({ a: S.number }).ast
-    const to = S.struct({ a: S.optional(S.number) }).ast
+    const from = T.struct({ a: T.number }).ast
+    const to = T.struct({ a: T.optional(T.number) }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -159,7 +159,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
         O.orElse(() => O.some(0))
       )
     ]
-    const schema: S.Schema<{ readonly a: string }, { readonly a?: number }> = S.make(
+    const schema: T.Transform<{ readonly a: string }, { readonly a?: number }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
         from,
         to,

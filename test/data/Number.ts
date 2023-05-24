@@ -1,10 +1,10 @@
 import { pipe } from "@effect/data/Function"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Number", () => {
   it("clamp", async () => {
-    const schema = pipe(S.number, S.clamp(-1, 1))
+    const schema = pipe(T.number, T.clamp(-1, 1))
 
     await Util.expectParseSuccess(schema, 3, 1)
     await Util.expectParseSuccess(schema, 0, 0)
@@ -12,7 +12,7 @@ describe.concurrent("Number", () => {
   })
 
   it("between", async () => {
-    const schema = pipe(S.number, S.between(-1, 1))
+    const schema = pipe(T.number, T.between(-1, 1))
 
     await Util.expectParseFailure(schema, -2, "Expected a number between -1 and 1, actual -2")
     await Util.expectParseSuccess(schema, 0, 0)
@@ -21,7 +21,7 @@ describe.concurrent("Number", () => {
   })
 
   it("positive", async () => {
-    const schema = pipe(S.number, S.positive())
+    const schema = pipe(T.number, T.positive())
 
     await Util.expectParseFailure(schema, -1, "Expected a positive number, actual -1")
     await Util.expectParseFailure(schema, 0, "Expected a positive number, actual 0")
@@ -29,7 +29,7 @@ describe.concurrent("Number", () => {
   })
 
   it("negative", async () => {
-    const schema = pipe(S.number, S.negative())
+    const schema = pipe(T.number, T.negative())
 
     await Util.expectEncodeSuccess(schema, -1, -1)
     await Util.expectParseFailure(schema, 0, "Expected a negative number, actual 0")
@@ -37,7 +37,7 @@ describe.concurrent("Number", () => {
   })
 
   it("nonNegative", async () => {
-    const schema = pipe(S.number, S.nonNegative())
+    const schema = pipe(T.number, T.nonNegative())
 
     await Util.expectEncodeFailure(schema, -1, "Expected a non-negative number, actual -1")
     await Util.expectParseSuccess(schema, 0, 0)
@@ -45,7 +45,7 @@ describe.concurrent("Number", () => {
   })
 
   it("nonPositive", async () => {
-    const schema = pipe(S.number, S.nonPositive())
+    const schema = pipe(T.number, T.nonPositive())
 
     await Util.expectEncodeSuccess(schema, -1, -1)
     await Util.expectParseSuccess(schema, 0, 0)
@@ -53,7 +53,7 @@ describe.concurrent("Number", () => {
   })
 
   describe.concurrent("NumberFromString", () => {
-    const schema = S.NumberFromString
+    const schema = T.NumberFromString
 
     it("property tests", () => {
       Util.roundtrip(schema)

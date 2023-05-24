@@ -7,8 +7,8 @@ import * as RA from "@effect/data/ReadonlyArray"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
-import type { Schema } from "@effect/schema/Schema"
-import * as S from "@effect/schema/Schema"
+import type { Transform } from "@effect/schema/Transform"
+import * as T from "@effect/schema/Transform"
 import { formatActual } from "@effect/schema/TreeFormatter"
 
 /**
@@ -29,13 +29,14 @@ export const PrettyHookId = I.PrettyHookId
  * @category prettify
  * @since 1.0.0
  */
-export const to = <I, A>(schema: Schema<I, A>): (a: A) => string => compile(schema.ast)
+export const to = <I, A>(schema: Transform<I, A>): (a: A) => string => compile(schema.ast)
 
 /**
  * @category prettify
  * @since 1.0.0
  */
-export const from = <I, A>(schema: Schema<I, A>): (i: I) => string => compile(AST.from(schema.ast))
+export const from = <I, A>(schema: Transform<I, A>): (i: I) => string =>
+  compile(AST.from(schema.ast))
 
 const getHook = AST.getAnnotation<(...args: ReadonlyArray<Pretty<any>>) => Pretty<any>>(
   PrettyHookId
@@ -162,7 +163,7 @@ export const match: AST.Match<Pretty<any>> = {
     }
   },
   "Union": (ast, go) => {
-    const types = ast.types.map((ast) => [P.is(S.make(ast)), go(ast)] as const)
+    const types = ast.types.map((ast) => [P.is(T.make(ast)), go(ast)] as const)
     return (a) => {
       const index = types.findIndex(([is]) => is(a))
       return types[index][1](a)

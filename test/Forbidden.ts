@@ -2,21 +2,21 @@ import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
 import * as PR from "@effect/schema/ParseResult"
-import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
+import * as T from "@effect/schema/Transform"
 
 const expectMessage = <I, A>(
-  schema: S.Schema<I, A>,
+  schema: T.Transform<I, A>,
   u: unknown,
   message: string
 ) => {
-  expect(E.mapLeft(S.parseEither(schema)(u), (e) => Util.formatAll(e.errors))).toEqual(
+  expect(E.mapLeft(T.parseEither(schema)(u), (e) => Util.formatAll(e.errors))).toEqual(
     E.left(message)
   )
 }
 
 export const expectForbidden = <I, A>(
-  schema: S.Schema<I, A>,
+  schema: T.Transform<I, A>,
   u: unknown,
   message: string
 ) => {
@@ -25,35 +25,35 @@ export const expectForbidden = <I, A>(
 
 describe.concurrent("Forbidden", () => {
   it("tuple", () => {
-    expectForbidden(S.tuple(S.string), ["a"], "/0 is forbidden")
+    expectForbidden(T.tuple(T.string), ["a"], "/0 is forbidden")
   })
 
   it("array", () => {
-    expectForbidden(S.array(S.string), ["a"], "/0 is forbidden")
+    expectForbidden(T.array(T.string), ["a"], "/0 is forbidden")
   })
 
   it("struct", () => {
-    expectForbidden(S.struct({ a: S.string }), { a: "a" }, "/a is forbidden")
+    expectForbidden(T.struct({ a: T.string }), { a: "a" }, "/a is forbidden")
   })
 
   it("record", () => {
-    expectForbidden(S.record(S.string, S.string), { a: "a" }, "/a is forbidden")
+    expectForbidden(T.record(T.string, T.string), { a: "a" }, "/a is forbidden")
   })
 
   it("union", () => {
     expectForbidden(
-      S.union(S.string, pipe(S.string, S.minLength(2))),
+      T.union(T.string, pipe(T.string, T.minLength(2))),
       "a",
       `union member: is forbidden, union member: is forbidden`
     )
   })
 
   it("declaration", () => {
-    const schema = S.declare(
+    const schema = T.declare(
       [],
-      S.number,
-      () => S.parseEffect(Util.effectify(S.number, "all")),
-      () => S.encodeEffect(Util.effectify(S.number, "all"))
+      T.number,
+      () => T.parseEffect(Util.effectify(T.number, "all")),
+      () => T.encodeEffect(Util.effectify(T.number, "all"))
     )
     expectMessage(
       schema,
@@ -64,11 +64,11 @@ describe.concurrent("Forbidden", () => {
 
   it("transform", () => {
     const schema = pipe(
-      S.transformResult(
-        S.string,
-        S.transformResult(
-          S.string,
-          S.string,
+      T.transformResult(
+        T.string,
+        T.transformResult(
+          T.string,
+          T.string,
           (s) => PR.flatMap(Util.sleep, () => PR.success(s)),
           (s) => PR.flatMap(Util.sleep, () => PR.success(s))
         ),
@@ -85,10 +85,10 @@ describe.concurrent("Forbidden", () => {
 
   it("refinement", () => {
     const ast = AST.createRefinement(
-      S.string.ast,
+      T.string.ast,
       (input) => PR.flatMap(Util.sleep, () => PR.success(input))
     )
-    const schema: S.Schema<string, string> = S.make(ast)
+    const schema: T.Transform<string, string> = T.make(ast)
     expectMessage(
       schema,
       "a",

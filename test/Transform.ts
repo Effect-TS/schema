@@ -3,77 +3,77 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
-import * as S from "@effect/schema/Schema"
+import * as T from "@effect/schema/Transform"
 
-describe.concurrent("Schema", () => {
+describe.concurrent("Transform", () => {
   it("exports", () => {
-    expect(S.parse).exist
-    expect(S.parseOption).exist
-    expect(S.parseEither).exist
+    expect(T.parse).exist
+    expect(T.parseOption).exist
+    expect(T.parseEither).exist
 
-    expect(S.GreaterThanBigintTypeId).exist
-    expect(S.GreaterThanOrEqualToBigintTypeId).exist
-    expect(S.LessThanBigintTypeId).exist
-    expect(S.LessThanOrEqualToBigintTypeId).exist
-    expect(S.BetweenBigintTypeId).exist
-    expect(S.PositiveBigintTypeId).exist
-    expect(S.NegativeBigintTypeId).exist
-    expect(S.NonNegativeBigintTypeId).exist
-    expect(S.NonPositiveBigintTypeId).exist
-    expect(S.BrandTypeId).exist
-    expect(S.FiniteTypeId).exist
-    expect(S.GreaterThanTypeId).exist
-    expect(S.GreaterThanOrEqualToTypeId).exist
-    expect(S.MultipleOfTypeId).exist
-    expect(S.IntTypeId).exist
-    expect(S.LessThanTypeId).exist
-    expect(S.LessThanOrEqualToTypeId).exist
-    expect(S.BetweenTypeId).exist
-    expect(S.NonNaNTypeId).exist
-    expect(S.PositiveTypeId).exist
-    expect(S.NegativeTypeId).exist
-    expect(S.NonNegativeTypeId).exist
-    expect(S.NonPositiveTypeId).exist
-    expect(S.InstanceOfTypeId).exist
-    expect(S.MinItemsTypeId).exist
-    expect(S.MaxItemsTypeId).exist
-    expect(S.ItemsCountTypeId).exist
-    expect(S.TrimmedTypeId).exist
-    expect(S.PatternTypeId).exist
-    expect(S.StartsWithTypeId).exist
-    expect(S.EndsWithTypeId).exist
-    expect(S.IncludesTypeId).exist
-    expect(S.UUIDTypeId).exist
+    expect(T.GreaterThanBigintTypeId).exist
+    expect(T.GreaterThanOrEqualToBigintTypeId).exist
+    expect(T.LessThanBigintTypeId).exist
+    expect(T.LessThanOrEqualToBigintTypeId).exist
+    expect(T.BetweenBigintTypeId).exist
+    expect(T.PositiveBigintTypeId).exist
+    expect(T.NegativeBigintTypeId).exist
+    expect(T.NonNegativeBigintTypeId).exist
+    expect(T.NonPositiveBigintTypeId).exist
+    expect(T.BrandTypeId).exist
+    expect(T.FiniteTypeId).exist
+    expect(T.GreaterThanTypeId).exist
+    expect(T.GreaterThanOrEqualToTypeId).exist
+    expect(T.MultipleOfTypeId).exist
+    expect(T.IntTypeId).exist
+    expect(T.LessThanTypeId).exist
+    expect(T.LessThanOrEqualToTypeId).exist
+    expect(T.BetweenTypeId).exist
+    expect(T.NonNaNTypeId).exist
+    expect(T.PositiveTypeId).exist
+    expect(T.NegativeTypeId).exist
+    expect(T.NonNegativeTypeId).exist
+    expect(T.NonPositiveTypeId).exist
+    expect(T.InstanceOfTypeId).exist
+    expect(T.MinItemsTypeId).exist
+    expect(T.MaxItemsTypeId).exist
+    expect(T.ItemsCountTypeId).exist
+    expect(T.TrimmedTypeId).exist
+    expect(T.PatternTypeId).exist
+    expect(T.StartsWithTypeId).exist
+    expect(T.EndsWithTypeId).exist
+    expect(T.IncludesTypeId).exist
+    expect(T.UUIDTypeId).exist
 
-    expect(S.nullable).exist
+    expect(T.nullable).exist
 
-    expect(S.parseResult).exist
-    expect(S.decodeResult).exist
-    expect(S.validateResult).exist
-    expect(S.encodeResult).exist
-    expect(S.parsePromise).exist
-    expect(S.decodePromise).exist
-    expect(S.validatePromise).exist
-    expect(S.encodePromise).exist
+    expect(T.parseResult).exist
+    expect(T.decodeResult).exist
+    expect(T.validateResult).exist
+    expect(T.encodeResult).exist
+    expect(T.parsePromise).exist
+    expect(T.decodePromise).exist
+    expect(T.validatePromise).exist
+    expect(T.encodePromise).exist
 
-    expect(S.partial).exist
-    expect(S.required).exist
+    expect(T.partial).exist
+    expect(T.required).exist
 
-    expect(S.numberFromString).exist
-    expect(S.dateFromString).exist
-    expect(S.trim).exist
-    expect(S.clamp).exist
-    expect(S.clampBigint).exist
+    expect(T.numberFromString).exist
+    expect(T.dateFromString).exist
+    expect(T.trim).exist
+    expect(T.clamp).exist
+    expect(T.clampBigint).exist
   })
 
   it("brand/ annotations", () => {
     // const Branded: S.Schema<number & Brand<"A"> & Brand<"B">>
     const Branded = pipe(
-      S.string,
-      S.numberFromString,
-      S.int(),
-      S.brand("A"),
-      S.brand("B", {
+      T.string,
+      T.numberFromString,
+      T.int(),
+      T.brand("A"),
+      T.brand("B", {
         description: "a B brand"
       })
     )
@@ -89,11 +89,11 @@ describe.concurrent("Schema", () => {
     const A = Symbol.for("A")
     const B = Symbol.for("B")
     const Branded = pipe(
-      S.string,
-      S.numberFromString,
-      S.int(),
-      S.brand(A),
-      S.brand(B, {
+      T.string,
+      T.numberFromString,
+      T.int(),
+      T.brand(A),
+      T.brand(B, {
         description: "a B brand"
       })
     )
@@ -106,7 +106,7 @@ describe.concurrent("Schema", () => {
   })
 
   it("brand/ ()", () => {
-    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
+    const Int = pipe(T.string, T.numberFromString, T.int(), T.brand("Int"))
     expect(Int(1)).toEqual(1)
     expect(() => Int(1.2)).toThrowError(
       new Error(`error(s) found
@@ -115,13 +115,13 @@ describe.concurrent("Schema", () => {
   })
 
   it("brand/ option", () => {
-    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
+    const Int = pipe(T.string, T.numberFromString, T.int(), T.brand("Int"))
     expect(Int.option(1)).toEqual(O.some(1))
     expect(Int.option(1.2)).toEqual(O.none())
   })
 
   it("brand/ either", () => {
-    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
+    const Int = pipe(T.string, T.numberFromString, T.int(), T.brand("Int"))
     expect(Int.either(1)).toEqual(E.right(1))
     expect(Int.either(1.2)).toEqual(E.left([{
       meta: 1.2,
@@ -131,18 +131,19 @@ describe.concurrent("Schema", () => {
   })
 
   it("brand/ refine", () => {
-    const Int = pipe(S.string, S.numberFromString, S.int(), S.brand("Int"))
+    const Int = pipe(T.string, T.numberFromString, T.int(), T.brand("Int"))
     expect(Int.refine(1)).toEqual(true)
     expect(Int.refine(1.2)).toEqual(false)
   })
 
   it("brand/ composition", () => {
-    const int = <I, A extends number>(self: S.Schema<I, A>) => pipe(self, S.int(), S.brand("Int"))
+    const int = <I, A extends number>(self: T.Transform<I, A>) =>
+      pipe(self, T.int(), T.brand("Int"))
 
-    const positive = <I, A extends number>(self: S.Schema<I, A>) =>
-      pipe(self, S.positive(), S.brand("Positive"))
+    const positive = <I, A extends number>(self: T.Transform<I, A>) =>
+      pipe(self, T.positive(), T.brand("Positive"))
 
-    const PositiveInt = pipe(S.string, S.numberFromString, int, positive)
+    const PositiveInt = pipe(T.string, T.numberFromString, int, positive)
 
     expect(PositiveInt.refine(1)).toEqual(true)
     expect(PositiveInt.refine(-1)).toEqual(false)
@@ -150,27 +151,27 @@ describe.concurrent("Schema", () => {
   })
 
   it("title", () => {
-    expect(pipe(S.string, S.title("MyString")).ast.annotations).toEqual({
+    expect(pipe(T.string, T.title("MyString")).ast.annotations).toEqual({
       [AST.TitleAnnotationId]: "MyString"
     })
   })
 
   it("description", () => {
-    expect(pipe(S.string, S.description("description")).ast.annotations).toEqual({
+    expect(pipe(T.string, T.description("description")).ast.annotations).toEqual({
       [AST.DescriptionAnnotationId]: "description",
       [AST.TitleAnnotationId]: "string"
     })
   })
 
   it("examples", () => {
-    expect(pipe(S.string, S.examples(["example"])).ast.annotations).toEqual({
+    expect(pipe(T.string, T.examples(["example"])).ast.annotations).toEqual({
       [AST.ExamplesAnnotationId]: ["example"],
       [AST.TitleAnnotationId]: "string"
     })
   })
 
   it("documentation", () => {
-    expect(pipe(S.string, S.documentation("documentation")).ast.annotations).toEqual({
+    expect(pipe(T.string, T.documentation("documentation")).ast.annotations).toEqual({
       [AST.DocumentationAnnotationId]: "documentation",
       [AST.TitleAnnotationId]: "string"
     })
@@ -178,15 +179,15 @@ describe.concurrent("Schema", () => {
 
   describe.concurrent("literal", () => {
     it("should return never with no literals", () => {
-      expect(S.literal().ast).toEqual(AST.neverKeyword)
+      expect(T.literal().ast).toEqual(AST.neverKeyword)
     })
 
     it("should return an unwrapped AST with exactly one literal", () => {
-      expect(S.literal(1).ast).toEqual(AST.createLiteral(1))
+      expect(T.literal(1).ast).toEqual(AST.createLiteral(1))
     })
 
     it("should return a union with more than one literal", () => {
-      expect(S.literal(1, 2).ast).toEqual(
+      expect(T.literal(1, 2).ast).toEqual(
         AST.createUnion([AST.createLiteral(1), AST.createLiteral(2)])
       )
     })
@@ -197,7 +198,7 @@ describe.concurrent("Schema", () => {
       Apple,
       Banana
     }
-    const schema = S.enums(Fruits)
+    const schema = T.enums(Fruits)
     const is = P.is(schema)
     expect(is(Fruits.Apple)).toEqual(true)
     expect(is(Fruits.Banana)).toEqual(true)
@@ -212,7 +213,12 @@ describe.concurrent("Schema", () => {
         from: From,
         to: To
       ) =>
-        (schema: S.Schema<A>): S.Schema<Omit<A, From> & { [K in To]: A[From] }> => {
+        (
+          schema: T.Transform<A, A>
+        ): T.Transform<
+          Omit<A, From> & { [K in To]: A[From] },
+          Omit<A, From> & { [K in To]: A[From] }
+        > => {
           if (AST.isTypeLiteral(schema.ast)) {
             const propertySignatures = schema.ast.propertySignatures.slice()
             const i = propertySignatures.findIndex((ps) => ps.name === from)
@@ -222,7 +228,7 @@ describe.concurrent("Schema", () => {
               propertySignatures[i].isOptional,
               propertySignatures[i].isReadonly
             )
-            return S.make(
+            return T.make(
               AST.createTypeLiteral(propertySignatures, schema.ast.indexSignatures)
             )
           }
@@ -230,9 +236,9 @@ describe.concurrent("Schema", () => {
         }
 
       const schema = pipe(
-        S.struct({
-          a: S.string,
-          b: S.number
+        T.struct({
+          a: T.string,
+          b: T.number
         }),
         rename("a", "aa")
       )
@@ -250,19 +256,27 @@ describe.concurrent("Schema", () => {
         [K in keyof A]: K extends `${string}?` ? never : K
       }[keyof A]
 
-      const struct = <Fields extends Record<PropertyKey, S.Schema<any>>>(
+      const struct = <Fields extends Record<PropertyKey, T.Transform<any, any>>>(
         fields: Fields
-      ): S.Schema<
-        S.Spread<
-          & { readonly [K in RequiredKeys<Fields>]: S.To<Fields[K]> }
+      ): T.Transform<
+        T.Spread<
+          & { readonly [K in RequiredKeys<Fields>]: T.To<Fields[K]> }
           & {
-            readonly [K in OptionalKeys<Fields> as K extends `${infer S}?` ? S : K]+?: S.To<
+            readonly [K in OptionalKeys<Fields> as K extends `${infer S}?` ? S : K]+?: T.To<
+              Fields[K]
+            >
+          }
+        >,
+        T.Spread<
+          & { readonly [K in RequiredKeys<Fields>]: T.To<Fields[K]> }
+          & {
+            readonly [K in OptionalKeys<Fields> as K extends `${infer S}?` ? S : K]+?: T.To<
               Fields[K]
             >
           }
         >
       > =>
-        S.make(
+        T.make(
           AST.createTypeLiteral(
             Object.keys(fields).map((key) => {
               const isOptional = key.endsWith("?")
@@ -285,9 +299,9 @@ describe.concurrent("Schema", () => {
       }>
       */
       const schema = struct({
-        a: S.string,
-        b: S.number,
-        "c?": S.boolean
+        a: T.string,
+        b: T.number,
+        "c?": T.boolean
       })
 
       const is = P.is(schema)
@@ -301,8 +315,8 @@ describe.concurrent("Schema", () => {
 
   it("filter/ annotation options", () => {
     const schema = pipe(
-      S.string,
-      S.filter((s): s is string => s.length === 1, {
+      T.string,
+      T.filter((s): s is string => s.length === 1, {
         typeId: "Char",
         description: "description",
         documentation: "documentation",
@@ -329,22 +343,22 @@ describe.concurrent("Schema", () => {
   })
 
   it("rest/ should throw on unsupported schemas", () => {
-    const schema = pipe(S.tuple(), S.filter(() => true))
-    expect(() => pipe(schema, S.rest(S.number))).toThrowError(
+    const schema = pipe(T.tuple(), T.filter(() => true))
+    expect(() => pipe(schema, T.rest(T.number))).toThrowError(
       new Error("`rest` is not supported on this schema")
     )
   })
 
   it("element/ should throw on unsupported schemas", () => {
-    const schema = pipe(S.tuple(), S.filter(() => true))
-    expect(() => pipe(schema, S.element(S.number))).toThrowError(
+    const schema = pipe(T.tuple(), T.filter(() => true))
+    expect(() => pipe(schema, T.element(T.number))).toThrowError(
       new Error("`element` is not supported on this schema")
     )
   })
 
   it("optionalElement/ should throw on unsupported schemas", () => {
-    const schema = pipe(S.tuple(), S.filter(() => true))
-    expect(() => pipe(schema, S.optionalElement(S.number))).toThrowError(
+    const schema = pipe(T.tuple(), T.filter(() => true))
+    expect(() => pipe(schema, T.optionalElement(T.number))).toThrowError(
       new Error("`optionalElement` is not supported on this schema")
     )
   })

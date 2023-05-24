@@ -16,7 +16,7 @@ import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
-import type { Schema, To } from "@effect/schema/Schema"
+import type { To, Transform } from "@effect/schema/Transform"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 const get = (ast: AST.AST, isDecoding: boolean) => {
@@ -59,7 +59,7 @@ const getEffect = (ast: AST.AST, isDecoding: boolean) => {
  * @category parsing
  * @since 1.0.0
  */
-export const parse = <_, A>(schema: Schema<_, A>): (i: unknown, options?: ParseOptions) => A =>
+export const parse = <_, A>(schema: Transform<_, A>): (i: unknown, options?: ParseOptions) => A =>
   get(schema.ast, true)
 
 /**
@@ -67,7 +67,7 @@ export const parse = <_, A>(schema: Schema<_, A>): (i: unknown, options?: ParseO
  * @since 1.0.0
  */
 export const parseOption = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (i: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast, true)
 
 /**
@@ -75,7 +75,7 @@ export const parseOption = <_, A>(
  * @since 1.0.0
  */
 export const parseEither = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (i: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> => getEither(schema.ast, true)
 
 /**
@@ -83,7 +83,7 @@ export const parseEither = <_, A>(
  * @since 1.0.0
  */
 export const parseResult = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true, true)
 
 /**
@@ -91,7 +91,7 @@ export const parseResult = <_, A>(
  * @since 1.0.0
  */
 export const parsePromise = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(schema.ast, true)
 
 /**
@@ -99,7 +99,7 @@ export const parsePromise = <_, A>(
  * @since 1.0.0
  */
 export const parseEffect = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (i: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> =>
   getEffect(schema.ast, true)
 
@@ -107,14 +107,14 @@ export const parseEffect = <_, A>(
  * @category decoding
  * @since 1.0.0
  */
-export const decode: <I, A>(schema: Schema<I, A>) => (i: I, options?: ParseOptions) => A = parse
+export const decode: <I, A>(schema: Transform<I, A>) => (i: I, options?: ParseOptions) => A = parse
 
 /**
  * @category decoding
  * @since 1.0.0
  */
 export const decodeOption: <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ) => (i: I, options?: ParseOptions) => Option<A> = parseOption
 
 /**
@@ -122,7 +122,7 @@ export const decodeOption: <I, A>(
  * @since 1.0.0
  */
 export const decodeEither: <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ) => (i: I, options?: ParseOptions) => E.Either<PR.ParseError, A> = parseEither
 
 /**
@@ -130,7 +130,7 @@ export const decodeEither: <I, A>(
  * @since 1.0.0
  */
 export const decodeResult: <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ) => (i: I, options?: ParseOptions) => ParseResult<A> = parseResult
 
 /**
@@ -138,7 +138,7 @@ export const decodeResult: <I, A>(
  * @since 1.0.0
  */
 export const decodePromise: <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ) => (i: I, options?: ParseOptions) => Promise<A> = parsePromise
 
 /**
@@ -146,7 +146,7 @@ export const decodePromise: <I, A>(
  * @since 1.0.0
  */
 export const decodeEffect: <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ) => (i: I, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> = parseEffect
 
 /**
@@ -154,7 +154,7 @@ export const decodeEffect: <I, A>(
  * @since 1.0.0
  */
 export const validate = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (a: unknown, options?: ParseOptions) => A => get(AST.to(schema.ast), true)
 
 /**
@@ -162,7 +162,7 @@ export const validate = <_, A>(
  * @since 1.0.0
  */
 export const validateOption = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (a: unknown, options?: ParseOptions) => Option<A> => getOption(AST.to(schema.ast), true)
 
 /**
@@ -170,7 +170,7 @@ export const validateOption = <_, A>(
  * @since 1.0.0
  */
 export const validateEither = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (a: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> =>
   getEither(AST.to(schema.ast), true)
 
@@ -179,7 +179,7 @@ export const validateEither = <_, A>(
  * @since 1.0.0
  */
 export const validateResult = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.to(schema.ast), true, true)
 
 /**
@@ -187,7 +187,7 @@ export const validateResult = <_, A>(
  * @since 1.0.0
  */
 export const validatePromise = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(AST.to(schema.ast), true)
 
 /**
@@ -195,7 +195,7 @@ export const validatePromise = <_, A>(
  * @since 1.0.0
  */
 export const validateEffect = <_, A>(
-  schema: Schema<_, A>
+  schema: Transform<_, A>
 ): (a: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> =>
   getEffect(AST.to(schema.ast), true)
 
@@ -203,7 +203,7 @@ export const validateEffect = <_, A>(
  * @category validation
  * @since 1.0.0
  */
-export const is = <_, A>(schema: Schema<_, A>) => {
+export const is = <_, A>(schema: Transform<_, A>) => {
   const getEither = validateEither(schema)
   return (a: unknown): a is A => E.isRight(getEither(a))
 }
@@ -211,7 +211,7 @@ export const is = <_, A>(schema: Schema<_, A>) => {
 /**
  * @since 1.0.0
  */
-export type ToAsserts<S extends Schema<any>> = (
+export type ToAsserts<S extends Transform<any, any>> = (
   input: unknown,
   options?: ParseOptions
 ) => asserts input is To<S>
@@ -220,7 +220,7 @@ export type ToAsserts<S extends Schema<any>> = (
  * @category validation
  * @since 1.0.0
  */
-export const asserts = <_, A>(schema: Schema<_, A>) => {
+export const asserts = <_, A>(schema: Transform<_, A>) => {
   const get = validate(schema)
   return (a: unknown, options?: ParseOptions): asserts a is A => {
     get(a, options)
@@ -231,7 +231,7 @@ export const asserts = <_, A>(schema: Schema<_, A>) => {
  * @category encoding
  * @since 1.0.0
  */
-export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOptions) => I =>
+export const encode = <I, A>(schema: Transform<I, A>): (a: A, options?: ParseOptions) => I =>
   get(schema.ast, false)
 
 /**
@@ -239,7 +239,7 @@ export const encode = <I, A>(schema: Schema<I, A>): (a: A, options?: ParseOption
  * @since 1.0.0
  */
 export const encodeOption = <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ): (input: A, options?: ParseOptions) => Option<I> => getOption(schema.ast, false)
 
 /**
@@ -247,7 +247,7 @@ export const encodeOption = <I, A>(
  * @since 1.0.0
  */
 export const encodeEither = <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ): (a: A, options?: ParseOptions) => E.Either<PR.ParseError, I> => getEither(schema.ast, false)
 
 /**
@@ -255,7 +255,7 @@ export const encodeEither = <I, A>(
  * @since 1.0.0
  */
 export const encodeResult = <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(schema.ast, true, false)
 
 /**
@@ -263,7 +263,7 @@ export const encodeResult = <I, A>(
  * @since 1.0.0
  */
 export const encodePromise = <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ): (a: A, options?: ParseOptions) => Promise<I> => getPromise(schema.ast, false)
 
 /**
@@ -271,7 +271,7 @@ export const encodePromise = <I, A>(
  * @since 1.0.0
  */
 export const encodeEffect = <I, A>(
-  schema: Schema<I, A>
+  schema: Transform<I, A>
 ): (a: A, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, I> =>
   getEffect(schema.ast, false)
 
