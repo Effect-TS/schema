@@ -1423,11 +1423,11 @@ export const nonPositiveBigint = <A extends bigint>(
  * @since 1.0.0
  */
 export const clampBigint = (min: bigint, max: bigint) =>
-  <I, A extends bigint>(self: Schema<I, A>): Schema<I, A> =>
+  <I>(self: Schema<I, bigint>): Schema<I, bigint> =>
     transform(
       self,
-      pipe(self, to, betweenBigint(min, max)),
-      (input) => B.clamp(input, min, max) as A, // this is safe because `pipe(self, to, betweenBigint(min, max))` will check its input anyway
+      pipe(to(self), betweenBigint(min, max)),
+      (input) => B.clamp(input, min, max),
       identity
     )
 
@@ -1673,12 +1673,12 @@ export const ValidDateFromSelf = pipe(DateFromSelf, validDate())
   @category Date
   @since 1.0.0
 */
-export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, Date> =>
+export const dateFromString = <I>(self: Schema<I, string>): Schema<I, Date> =>
   transformResult(
     self,
     ValidDateFromSelf,
     (input) => PR.success(new Date(input)),
-    (date) => PR.success(date.toISOString() as A) // this is safe because `self` will check its input anyway
+    (date) => PR.success(date.toISOString())
   )
 
 const _Date: Schema<string, Date> = dateFromString(string)
@@ -2155,11 +2155,11 @@ export const nonPositive = <A extends number>(
  * @since 1.0.0
  */
 export const clamp = (min: number, max: number) =>
-  <I, A extends number>(self: Schema<I, A>): Schema<I, A> =>
+  <I>(self: Schema<I, number>): Schema<I, number> =>
     transform(
       self,
-      pipe(self, to, between(min, max)),
-      (n) => N.clamp(n, min, max) as A, // this is safe because `pipe(self, to, between(min, max))` will check its input anyway
+      pipe(to(self), between(min, max)),
+      (n) => N.clamp(n, min, max),
       identity
     )
 
@@ -2171,7 +2171,7 @@ export const clamp = (min: number, max: number) =>
   @category number
   @since 1.0.0
 */
-export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, number> =>
+export const numberFromString = <I>(self: Schema<I, string>): Schema<I, number> =>
   transformResult(
     self,
     number,
@@ -2188,7 +2188,7 @@ export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schem
       const n = parseFloat(s)
       return isNaN(n) ? PR.failure(PR.type(ast, s)) : PR.success(n)
     },
-    (n) => PR.success(String(n) as A) // this is safe because `self` will check its input anyway
+    (n) => PR.success(String(n))
   )
 
 /**
@@ -2735,11 +2735,11 @@ export const includes = <A extends string>(
  * @category string
  * @since 1.0.0
  */
-export const trim = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
+export const trim = <I>(self: Schema<I, string>): Schema<I, string> =>
   transform(
     self,
     pipe(to(self), trimmed()),
-    (s) => s.trim() as A, // this is safe because `pipe(to(self), trimmed())` will check its input anyway
+    (s) => s.trim(),
     identity
   )
 

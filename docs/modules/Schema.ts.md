@@ -268,7 +268,7 @@ A combinator that transforms a `string` into a `Date`.
 **Signature**
 
 ```ts
-export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
+export declare const dateFromString: <I>(self: Schema<I, string>) => Schema<I, Date>
 ```
 
 Added in v1.0.0
@@ -415,10 +415,7 @@ Clamps a bigint between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clampBigint: (
-  min: bigint,
-  max: bigint
-) => <I, A extends bigint>(self: Schema<I, A>) => Schema<I, A>
+export declare const clampBigint: (min: bigint, max: bigint) => <I>(self: Schema<I, bigint>) => Schema<I, bigint>
 ```
 
 Added in v1.0.0
@@ -1483,7 +1480,7 @@ Clamps a number between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clamp: (min: number, max: number) => <I, A extends number>(self: Schema<I, A>) => Schema<I, A>
+export declare const clamp: (min: number, max: number) => <I>(self: Schema<I, number>) => Schema<I, number>
 ```
 
 Added in v1.0.0
@@ -1634,7 +1631,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 **Signature**
 
 ```ts
-export declare const numberFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, number>
+export declare const numberFromString: <I>(self: Schema<I, string>) => Schema<I, number>
 ```
 
 Added in v1.0.0
@@ -1981,7 +1978,7 @@ This combinator allows removing whitespaces from the beginning and end of a stri
 **Signature**
 
 ```ts
-export declare const trim: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
+export declare const trim: <I>(self: Schema<I, string>) => Schema<I, string>
 ```
 
 Added in v1.0.0
