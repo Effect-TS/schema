@@ -91,27 +91,27 @@ describe.concurrent("Transform", () => {
   })
 
   it("title", () => {
-    expect(pipe(S.string, T.title("MyString")).ast.annotations).toEqual({
+    expect(pipe(S.string, S.title("MyString")).ast.annotations).toEqual({
       [AST.TitleAnnotationId]: "MyString"
     })
   })
 
   it("description", () => {
-    expect(pipe(S.string, T.description("description")).ast.annotations).toEqual({
+    expect(pipe(S.string, S.description("description")).ast.annotations).toEqual({
       [AST.DescriptionAnnotationId]: "description",
       [AST.TitleAnnotationId]: "string"
     })
   })
 
   it("examples", () => {
-    expect(pipe(S.string, T.examples(["example"])).ast.annotations).toEqual({
+    expect(pipe(S.string, S.examples(["example"])).ast.annotations).toEqual({
       [AST.ExamplesAnnotationId]: ["example"],
       [AST.TitleAnnotationId]: "string"
     })
   })
 
   it("documentation", () => {
-    expect(pipe(S.string, T.documentation("documentation")).ast.annotations).toEqual({
+    expect(pipe(S.string, S.documentation("documentation")).ast.annotations).toEqual({
       [AST.DocumentationAnnotationId]: "documentation",
       [AST.TitleAnnotationId]: "string"
     })

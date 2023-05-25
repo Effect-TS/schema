@@ -18,19 +18,15 @@ describe.concurrent("formatExpected", () => {
 describe.concurrent("formatErrors", () => {
   it("refinement", () => {
     const schema = pipe(
-      T.NumberFromString,
-      T.filter((n) => n > 0),
-      T.annotations({ [AST.MessageAnnotationId]: () => "mymessage" })
+      S.number,
+      S.filter((n) => n > 0),
+      S.annotations({ [AST.MessageAnnotationId]: () => "mymessage" })
     )
-    expect(() => T.parse(schema)("a")).toThrowError(
+    expect(() => S.validate(schema)("a")).toThrowError(
       new Error(`error(s) found
-└─ Expected string -> number, actual "a"`)
+└─ Expected number, actual "a"`)
     )
-    expect(() => T.parse(schema)("-1")).toThrowError(
-      new Error(`error(s) found
-└─ mymessage`)
-    )
-    expect(() => T.encode(schema)(-1)).toThrowError(
+    expect(() => S.validate(schema)(-1)).toThrowError(
       new Error(`error(s) found
 └─ mymessage`)
     )

@@ -893,66 +893,6 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
     ))
 
 // ---------------------------------------------
-// annotations
-// ---------------------------------------------
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const annotations = (annotations: AST.Annotated["annotations"]) =>
-  <I, A>(self: Transform<I, A>): Transform<I, A> =>
-    make(AST.mergeAnnotations(self.ast, annotations))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const message = (message: AST.MessageAnnotation<unknown>) =>
-  <I, A>(self: Transform<I, A>): Transform<I, A> =>
-    make(AST.setAnnotation(self.ast, AST.MessageAnnotationId, message))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const identifier = (identifier: AST.IdentifierAnnotation) =>
-  <I, A>(self: Transform<I, A>): Transform<I, A> =>
-    make(AST.setAnnotation(self.ast, AST.IdentifierAnnotationId, identifier))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const title = (title: AST.TitleAnnotation) =>
-  <I, A>(self: Transform<I, A>): Transform<I, A> =>
-    make(AST.setAnnotation(self.ast, AST.TitleAnnotationId, title))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const description = (description: AST.DescriptionAnnotation) =>
-  <I, A>(self: Transform<I, A>): Transform<I, A> =>
-    make(AST.setAnnotation(self.ast, AST.DescriptionAnnotationId, description))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const examples = (examples: AST.ExamplesAnnotation) =>
-  <I, A>(self: Transform<I, A>): Transform<I, A> =>
-    make(AST.setAnnotation(self.ast, AST.ExamplesAnnotationId, examples))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const documentation = (documentation: AST.DocumentationAnnotation) =>
-  <I, A>(self: Transform<I, A>): Transform<I, A> =>
-    make(AST.setAnnotation(self.ast, AST.DocumentationAnnotationId, documentation))
-
-// ---------------------------------------------
 // data/Bigint
 // ---------------------------------------------
 

@@ -23,11 +23,11 @@ describe.concurrent("Decoder", () => {
       // initial schema, a string
       S.string,
       // add an error message for non-string values
-      T.message(() => "not a string"),
+      S.message(() => "not a string"),
       // add a constraint to the schema, only non-empty strings are valid
-      T.nonEmpty({ message: () => "required" }),
+      S.nonEmpty({ message: () => "required" }),
       // add a constraint to the schema, only strings with a length less or equal than 10 are valid
-      T.maxLength(10, { message: (s) => `${s} is too long` })
+      S.maxLength(10, { message: (s) => `${s} is too long` })
     )
 
     await Util.expectParseFailure(schema, null, "not a string")

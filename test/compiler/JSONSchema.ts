@@ -249,7 +249,6 @@ const property = <A>(schema: S.Schema<A>) => {
   const is = P.is(schema)
   const validate = new Ajv({ strict: false }).compile(jsonSchemaFor(schema))
   const arb = arbitrary(fc).filter(isJson)
-  // console.log(fc.sample(arb, 2))
   fc.assert(fc.property(arb, (a) => {
     return is(a) && validate(a)
   }))

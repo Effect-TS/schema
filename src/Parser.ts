@@ -154,9 +154,8 @@ export const decodeEffect: <I, A>(
  * @category validation
  * @since 1.0.0
  */
-export const validate = <A>(
-  schema: Schema<A>
-): (a: unknown, options?: ParseOptions) => A => get(AST.to(schema.ast), true)
+export const validate = <A>(schema: Schema<A>): (a: unknown, options?: ParseOptions) => A =>
+  get(schema.ast, true)
 
 /**
  * @category validation
@@ -164,7 +163,7 @@ export const validate = <A>(
  */
 export const validateOption = <A>(
   schema: Schema<A>
-): (a: unknown, options?: ParseOptions) => Option<A> => getOption(AST.to(schema.ast), true)
+): (a: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast, true)
 
 /**
  * @category validation
@@ -172,8 +171,7 @@ export const validateOption = <A>(
  */
 export const validateEither = <A>(
   schema: Schema<A>
-): (a: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> =>
-  getEither(AST.to(schema.ast), true)
+): (a: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> => getEither(schema.ast, true)
 
 /**
  * @category validation
@@ -181,7 +179,7 @@ export const validateEither = <A>(
  */
 export const validateResult = <A>(
   schema: Schema<A>
-): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.to(schema.ast), true, true)
+): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true, true)
 
 /**
  * @category validation
@@ -189,7 +187,7 @@ export const validateResult = <A>(
  */
 export const validatePromise = <A>(
   schema: Schema<A>
-): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(AST.to(schema.ast), true)
+): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(schema.ast, true)
 
 /**
  * @category validation
@@ -198,7 +196,7 @@ export const validatePromise = <A>(
 export const validateEffect = <A>(
   schema: Schema<A>
 ): (a: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> =>
-  getEffect(AST.to(schema.ast), true)
+  getEffect(schema.ast, true)
 
 /**
  * @category validation
