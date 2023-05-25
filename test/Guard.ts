@@ -1,5 +1,6 @@
 import { pipe } from "@effect/data/Function"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 import * as T from "@effect/schema/Transform"
 
 describe.concurrent("is", () => {
@@ -350,7 +351,7 @@ describe.concurrent("is", () => {
   })
 
   it("record('a' | 'b', number)", () => {
-    const schema = T.record(T.union(T.literal("a"), T.literal("b")), T.number)
+    const schema = T.record(S.union(S.literal("a"), S.literal("b")), T.number)
     const is = P.is(schema)
     expect(is({ a: 1, b: 2 })).toEqual(true)
 
@@ -360,7 +361,7 @@ describe.concurrent("is", () => {
   })
 
   it("record(keyof struct({ a, b }), number)", () => {
-    const schema = T.record(T.keyof(T.struct({ a: T.string, b: T.string })), T.number)
+    const schema = T.record(S.keyof(S.struct({ a: T.string, b: T.string })), T.number)
     const is = P.is(schema)
     expect(is({ a: 1, b: 2 })).toEqual(true)
 
@@ -372,7 +373,7 @@ describe.concurrent("is", () => {
 
   it("record(keyof struct({ a, b } & Record<string, string>), number)", () => {
     const schema = T.record(
-      T.keyof(pipe(T.struct({ a: T.string, b: T.string }), T.extend(T.record(T.string, T.string)))),
+      S.keyof(pipe(S.struct({ a: T.string, b: T.string }), S.extend(S.record(T.string, T.string)))),
       T.number
     )
     const is = P.is(schema)
@@ -386,8 +387,8 @@ describe.concurrent("is", () => {
 
   it("record(keyof struct({ a, b } & Record<symbol, string>), number)", () => {
     const schema = T.record(
-      T.keyof(pipe(T.struct({ a: T.string, b: T.string }), T.extend(T.record(T.symbol, T.string)))),
-      T.number
+      S.keyof(pipe(S.struct({ a: T.string, b: T.string }), S.extend(S.record(T.symbol, T.string)))),
+      S.number
     )
     const is = P.is(schema)
     expect(is({ a: 1, b: 2 })).toEqual(true)
@@ -404,7 +405,7 @@ describe.concurrent("is", () => {
   it("record(Symbol('a') | Symbol('b'), number)", () => {
     const a = Symbol.for("@effect/schema/test/a")
     const b = Symbol.for("@effect/schema/test/b")
-    const schema = T.record(T.union(T.uniqueSymbol(a), T.uniqueSymbol(b)), T.number)
+    const schema = T.record(S.union(S.uniqueSymbol(a), S.uniqueSymbol(b)), T.number)
     const is = P.is(schema)
     expect(is({ [a]: 1, [b]: 2 })).toEqual(true)
 
@@ -427,7 +428,7 @@ describe.concurrent("is", () => {
   })
 
   it("record(minLength(1), number)", () => {
-    const schema = T.record(pipe(T.string, T.minLength(2)), T.number)
+    const schema = T.record(pipe(S.string, S.minLength(2)), T.number)
     const is = P.is(schema)
     expect(is({})).toEqual(true)
     expect(is({ "aa": 1 })).toEqual(true)

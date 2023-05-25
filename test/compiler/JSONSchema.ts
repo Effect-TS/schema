@@ -5,6 +5,7 @@ import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 import type { Transform } from "@effect/schema/Transform"
 import * as T from "@effect/schema/Transform"
 import Ajv from "ajv"
@@ -402,7 +403,7 @@ describe("jsonSchemaFor", () => {
   })
 
   it("record('a' | 'b', number)", () => {
-    const schema = T.record(T.union(T.literal("a"), T.literal("b")), T.number)
+    const schema = T.record(S.union(S.literal("a"), S.literal("b")), T.number)
     property(schema)
   })
 

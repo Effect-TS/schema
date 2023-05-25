@@ -1,13 +1,9 @@
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("dev", () => {
   it.skip("dev", async () => {
-    const schema = T.NumberFromString
-    await Util.expectParseFailure(
-      schema,
-      "a",
-      `Expected string -> number, actual "a"`
-    )
+    const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
+    await Util.expectParseSuccess(schema, {})
   })
 })

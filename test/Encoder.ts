@@ -1,6 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
@@ -8,7 +9,7 @@ import * as T from "@effect/schema/Transform"
 const NumberFromChar = pipe(T.string, T.maxLength(1), T.numberFromString)
 
 // raises an error while encoding if the string is not a char
-const Char = pipe(T.string, T.maxLength(1))
+const Char = pipe(S.string, S.maxLength(1))
 
 describe.concurrent("Encoder", () => {
   it("encode", () => {

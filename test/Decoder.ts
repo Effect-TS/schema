@@ -1,4 +1,5 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
@@ -20,7 +21,7 @@ describe.concurrent("Decoder", () => {
   it("annotations/message refinement", async () => {
     const schema = pipe(
       // initial schema, a string
-      T.string,
+      S.string,
       // add an error message for non-string values
       T.message(() => "not a string"),
       // add a constraint to the schema, only non-empty strings are valid
@@ -69,13 +70,13 @@ describe.concurrent("Decoder", () => {
   })
 
   it("string", async () => {
-    const schema = T.string
+    const schema = S.string
     await Util.expectParseSuccess(schema, "a", "a")
     await Util.expectParseFailure(schema, 1, "Expected string, actual 1")
   })
 
   it("number", async () => {
-    const schema = T.number
+    const schema = S.number
     await Util.expectParseSuccess(schema, 1, 1)
     await Util.expectParseSuccess(schema, NaN, NaN)
     await Util.expectParseSuccess(schema, Infinity, Infinity)
@@ -109,7 +110,7 @@ describe.concurrent("Decoder", () => {
 
   it("symbol", async () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = T.symbol
+    const schema = S.symbol
     await Util.expectParseSuccess(schema, a)
     await Util.expectParseFailure(
       schema,
@@ -129,7 +130,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("literal 1 member", async () => {
-    const schema = T.literal(1)
+    const schema = S.literal(1)
     await Util.expectParseSuccess(schema, 1)
 
     await Util.expectParseFailure(schema, "a", `Expected 1, actual "a"`)
@@ -137,7 +138,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("literal 2 members", async () => {
-    const schema = T.literal(1, "a")
+    const schema = S.literal(1, "a")
     await Util.expectParseSuccess(schema, 1)
     await Util.expectParseSuccess(schema, "a")
 
@@ -154,7 +155,7 @@ describe.concurrent("Decoder", () => {
 
   it("uniqueSymbol", async () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = T.uniqueSymbol(a)
+    const schema = S.uniqueSymbol(a)
     await Util.expectParseSuccess(schema, a)
     await Util.expectParseSuccess(schema, Symbol.for("@effect/schema/test/a"))
     await Util.expectParseFailure(
@@ -221,7 +222,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("brand/ decoding", async () => {
-    const schema = pipe(T.string, T.numberFromString, T.int(), T.brand("Int"))
+    const schema = pipe(S.string, T.numberFromString, T.int(), T.brand("Int"))
     await Util.expectParseSuccess(schema, "1", 1 as any)
     await Util.expectParseFailure(
       schema,
@@ -232,7 +233,7 @@ describe.concurrent("Decoder", () => {
 
   it("brand/symbol decoding", async () => {
     const Int = Symbol.for("Int")
-    const schema = pipe(T.string, T.numberFromString, T.int(), T.brand(Int))
+    const schema = pipe(S.string, T.numberFromString, T.int(), T.brand(Int))
     await Util.expectParseSuccess(schema, "1", 1 as any)
     await Util.expectParseFailure(
       schema,
@@ -260,7 +261,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. required element", async () => {
-    const schema = T.tuple(T.number)
+    const schema = T.tuple(S.number)
     await Util.expectParseSuccess(schema, [1])
 
     await Util.expectParseFailure(
@@ -279,7 +280,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. required element with undefined", async () => {
-    const schema = T.tuple(T.union(T.number, T.undefined))
+    const schema = T.tuple(S.union(S.number, S.undefined))
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [undefined])
 
@@ -298,7 +299,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. optional element", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.number))
+    const schema = pipe(T.tuple(), T.optionalElement(S.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
 
@@ -316,7 +317,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. optional element with undefined", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.union(T.number, T.undefined)))
+    const schema = pipe(T.tuple(), T.optionalElement(S.union(S.number, S.undefined)))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [undefined])
@@ -335,7 +336,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e e?", async () => {
-    const schema = pipe(T.tuple(T.string), T.optionalElement(T.number))
+    const schema = pipe(T.tuple(S.string), T.optionalElement(S.number))
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
 
@@ -344,7 +345,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e r", async () => {
-    const schema = pipe(T.tuple(T.string), T.rest(T.number))
+    const schema = pipe(T.tuple(S.string), T.rest(S.number))
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
     await Util.expectParseSuccess(schema, ["a", 1, 2])
@@ -353,7 +354,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e? r", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.string), T.rest(T.number))
+    const schema = pipe(T.tuple(), T.optionalElement(S.string), T.rest(S.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
@@ -363,7 +364,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. r", async () => {
-    const schema = T.array(T.number)
+    const schema = T.array(S.number)
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [1, 2])
@@ -373,7 +374,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. r e", async () => {
-    const schema = pipe(T.array(T.string), T.element(T.number))
+    const schema = pipe(T.array(S.string), T.element(S.number))
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, ["a", 1])
     await Util.expectParseSuccess(schema, ["a", "b", 1])
@@ -384,7 +385,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e r e", async () => {
-    const schema = pipe(T.tuple(T.string), T.rest(T.number), T.element(T.boolean))
+    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(T.boolean))
     await Util.expectParseSuccess(schema, ["a", true])
     await Util.expectParseSuccess(schema, ["a", 1, true])
     await Util.expectParseSuccess(schema, ["a", 1, 2, true])
@@ -397,7 +398,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ empty", async () => {
-    const schema = T.struct({})
+    const schema = S.struct({})
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
     await Util.expectParseSuccess(schema, [])
@@ -410,7 +411,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ required property signature", async () => {
-    const schema = T.struct({ a: T.number })
+    const schema = S.struct({ a: S.number })
     await Util.expectParseSuccess(schema, { a: 1 })
 
     await Util.expectParseFailure(
@@ -433,7 +434,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ required property signature with undefined", async () => {
-    const schema = T.struct({ a: T.union(T.number, T.undefined) })
+    const schema = S.struct({ a: S.union(S.number, S.undefined) })
     await Util.expectParseSuccess(schema, { a: 1 })
     await Util.expectParseSuccess(schema, { a: undefined })
 
@@ -457,7 +458,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ optional property signature", async () => {
-    const schema = T.struct({ a: T.optional(T.number) })
+    const schema = S.struct({ a: S.optional(S.number) })
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
 
@@ -485,7 +486,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ optional property signature with undefined", async () => {
-    const schema = T.struct({ a: T.optional(T.union(T.number, T.undefined)) })
+    const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
     await Util.expectParseSuccess(schema, { a: undefined })
@@ -509,18 +510,18 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ should not add optional keys", async () => {
-    const schema = T.struct({ a: T.optional(T.string), b: T.optional(T.number) })
+    const schema = S.struct({ a: S.optional(S.string), b: S.optional(S.number) })
     await Util.expectParseSuccess(schema, {})
   })
 
   it("struct/ record(never, number)", async () => {
-    const schema = T.record(T.never, T.number)
+    const schema = S.record(T.never, S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
   })
 
   it("struct/ record(string, number)", async () => {
-    const schema = T.record(T.string, T.number)
+    const schema = S.record(S.string, S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
 
@@ -550,7 +551,7 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ record(symbol, number)", async () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = T.record(T.symbol, T.number)
+    const schema = S.record(S.symbol, S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { [a]: 1 })
 
@@ -578,13 +579,13 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(never, number)", async () => {
-    const schema = T.record(T.never, T.number)
+    const schema = S.record(T.never, S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
   })
 
   it("struct/ record('a' | 'b', number)", async () => {
-    const schema = T.record(T.union(T.literal("a"), T.literal("b")), T.number)
+    const schema = S.record(S.union(S.literal("a"), S.literal("b")), S.number)
     await Util.expectParseSuccess(schema, { a: 1, b: 2 })
 
     await Util.expectParseFailure(schema, {}, `/a is missing`)
@@ -593,7 +594,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(keyof struct({ a, b }), number)", async () => {
-    const schema = T.record(T.keyof(T.struct({ a: T.string, b: T.string })), T.number)
+    const schema = S.record(S.keyof(S.struct({ a: S.string, b: S.string })), S.number)
     await Util.expectParseSuccess(schema, { a: 1, b: 2 })
 
     await Util.expectParseFailure(schema, {}, `/a is missing`)
@@ -603,9 +604,9 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(keyof struct({ a, b } & Record<string, string>), number)", async () => {
-    const schema = T.record(
-      T.keyof(pipe(T.struct({ a: T.string, b: T.string }), T.extend(T.record(T.string, T.string)))),
-      T.number
+    const schema = S.record(
+      S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.string, S.string)))),
+      S.number
     )
     await Util.expectParseSuccess(schema, { a: 1, b: 2 })
     await Util.expectParseSuccess(schema, {})
@@ -616,9 +617,9 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(keyof struct({ a, b } & Record<symbol, string>), number)", async () => {
-    const schema = T.record(
-      T.keyof(pipe(T.struct({ a: T.string, b: T.string }), T.extend(T.record(T.symbol, T.string)))),
-      T.number
+    const schema = S.record(
+      S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.symbol, S.string)))),
+      S.number
     )
     await Util.expectParseSuccess(schema, { a: 1, b: 2 })
     const c = Symbol.for("@effect/schema/test/c")
@@ -638,7 +639,7 @@ describe.concurrent("Decoder", () => {
   it("struct/ record(Symbol('a') | Symbol('b'), number)", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const b = Symbol.for("@effect/schema/test/b")
-    const schema = T.record(T.union(T.uniqueSymbol(a), T.uniqueSymbol(b)), T.number)
+    const schema = S.record(S.union(S.uniqueSymbol(a), S.uniqueSymbol(b)), S.number)
     await Util.expectParseSuccess(schema, { [a]: 1, [b]: 2 })
 
     await Util.expectParseFailure(schema, {}, `/Symbol(@effect/schema/test/a) is missing`)
@@ -655,7 +656,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(${string}-${string}, number)", async () => {
-    const schema = T.record(T.templateLiteral(T.string, T.literal("-"), T.string), T.number)
+    const schema = S.record(T.templateLiteral(S.string, S.literal("-"), S.string), S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { "-": 1 })
     await Util.expectParseSuccess(schema, { "a-": 1 })
@@ -675,7 +676,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(minLength(1), number)", async () => {
-    const schema = T.record(pipe(T.string, T.minLength(2)), T.number)
+    const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { "aa": 1 })
     await Util.expectParseSuccess(schema, { "aaa": 1 })
@@ -693,14 +694,14 @@ describe.concurrent("Decoder", () => {
   })
 
   it("union/ empty union", async () => {
-    const schema = T.union()
+    const schema = S.union()
     await Util.expectParseFailure(schema, 1, "Expected never, actual 1")
   })
 
   it("union/ members with literals but the input doesn't have any", async () => {
-    const schema = T.union(
-      T.struct({ a: T.literal(1), c: T.string }),
-      T.struct({ b: T.literal(2), d: T.number })
+    const schema = S.union(
+      S.struct({ a: S.literal(1), c: S.string }),
+      S.struct({ b: S.literal(2), d: S.number })
     )
     await Util.expectParseFailure(
       schema,
@@ -717,10 +718,10 @@ describe.concurrent("Decoder", () => {
   })
 
   it("union/ members with multiple tags", async () => {
-    const schema = T.union(
-      T.struct({ category: T.literal("catA"), tag: T.literal("a") }),
-      T.struct({ category: T.literal("catA"), tag: T.literal("b") }),
-      T.struct({ category: T.literal("catA"), tag: T.literal("c") })
+    const schema = S.union(
+      S.struct({ category: S.literal("catA"), tag: S.literal("a") }),
+      S.struct({ category: S.literal("catA"), tag: S.literal("b") }),
+      S.struct({ category: S.literal("catA"), tag: S.literal("c") })
     )
     await Util.expectParseFailure(
       schema,
@@ -741,16 +742,16 @@ describe.concurrent("Decoder", () => {
   })
 
   it("union/required property signatures: should return the best output", async () => {
-    const a = T.struct({ a: T.string })
-    const ab = T.struct({ a: T.string, b: T.number })
-    const schema = T.union(a, ab)
+    const a = S.struct({ a: S.string })
+    const ab = S.struct({ a: S.string, b: S.number })
+    const schema = S.union(a, ab)
     await Util.expectParseSuccess(schema, { a: "a", b: 1 })
   })
 
   it("union/optional property signatures: should return the best output", async () => {
-    const ab = T.struct({ a: T.string, b: T.optional(T.number) })
-    const ac = T.struct({ a: T.string, c: T.optional(T.number) })
-    const schema = T.union(ab, ac)
+    const ab = S.struct({ a: S.string, b: S.optional(S.number) })
+    const ac = S.struct({ a: S.string, c: S.optional(S.number) })
+    const schema = S.union(ab, ac)
     await Util.expectParseSuccess(
       schema,
       { a: "a", c: 1 },
@@ -769,10 +770,10 @@ describe.concurrent("Decoder", () => {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const schema: T.Transform<A, A> = T.lazy(() =>
-      T.struct({
-        a: T.string,
-        as: T.array(schema)
+    const schema: S.Schema<A> = S.lazy(() =>
+      S.struct({
+        a: S.string,
+        as: S.array(schema)
       })
     )
 
@@ -809,17 +810,17 @@ describe.concurrent("Decoder", () => {
       readonly right: Expression
     }
 
-    const Expression: T.Transform<Expression, Expression> = T.lazy(() =>
-      T.struct({
-        type: T.literal("expression"),
-        value: T.union(T.number, Operation)
+    const Expression: S.Schema<Expression> = S.lazy(() =>
+      S.struct({
+        type: S.literal("expression"),
+        value: S.union(S.number, Operation)
       })
     )
 
-    const Operation: T.Transform<Operation, Operation> = T.lazy(() =>
-      T.struct({
-        type: T.literal("operation"),
-        operator: T.union(T.literal("+"), T.literal("-")),
+    const Operation: S.Schema<Operation> = S.lazy(() =>
+      S.struct({
+        type: S.literal("operation"),
+        operator: S.union(S.literal("+"), S.literal("-")),
         left: Expression,
         right: Expression
       })
@@ -853,7 +854,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("maxLength", async () => {
-    const schema = pipe(T.string, T.maxLength(1))
+    const schema = pipe(S.string, T.maxLength(1))
     await Util.expectParseSuccess(schema, "")
     await Util.expectParseSuccess(schema, "a")
 
@@ -865,7 +866,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("nonEmpty", async () => {
-    const schema = pipe(T.string, T.nonEmpty())
+    const schema = pipe(S.string, T.nonEmpty())
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "aa")
 
@@ -877,7 +878,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("length", async () => {
-    const schema = pipe(T.string, T.length(1))
+    const schema = pipe(S.string, T.length(1))
     await Util.expectParseSuccess(schema, "a")
 
     await Util.expectParseFailure(
@@ -893,7 +894,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("startsWith", async () => {
-    const schema = pipe(T.string, T.startsWith("a"))
+    const schema = pipe(S.string, T.startsWith("a"))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "ab")
 
@@ -910,7 +911,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("endsWith", async () => {
-    const schema = pipe(T.string, T.endsWith("a"))
+    const schema = pipe(S.string, T.endsWith("a"))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "ba")
 
@@ -927,7 +928,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("pattern", async () => {
-    const schema = pipe(T.string, T.pattern(/^abb+$/))
+    const schema = pipe(S.string, T.pattern(/^abb+$/))
     await Util.expectParseSuccess(schema, "abb")
     await Util.expectParseSuccess(schema, "abbb")
 
@@ -948,7 +949,7 @@ describe.concurrent("Decoder", () => {
   // ---------------------------------------------
 
   it("allErrors/tuple. e r e", async () => {
-    const schema = pipe(T.tuple(T.string), T.rest(T.number), T.element(T.boolean))
+    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(T.boolean))
     await Util.expectParseFailure(
       schema,
       [true],
@@ -958,12 +959,12 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple: missing element", async () => {
-    const schema = T.tuple(T.string, T.number)
+    const schema = T.tuple(S.string, S.number)
     await Util.expectParseFailure(schema, [], `/0 is missing, /1 is missing`, Util.allErrors)
   })
 
   it("allErrors/tuple: wrong type for values", async () => {
-    const schema = T.tuple(T.string, T.number)
+    const schema = T.tuple(S.string, S.number)
     await Util.expectParseFailure(
       schema,
       [1, "b"],
@@ -983,7 +984,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple/rest: wrong type for values", async () => {
-    const schema = pipe(T.tuple(T.string), T.rest(T.number))
+    const schema = pipe(T.tuple(S.string), T.rest(S.number))
     await Util.expectParseFailure(
       schema,
       ["a", "b", "c"],
@@ -993,7 +994,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple/post rest elements: wrong type for values", async () => {
-    const schema = pipe(T.array(T.boolean), T.element(T.number), T.element(T.number))
+    const schema = pipe(T.array(T.boolean), T.element(S.number), T.element(S.number))
     await Util.expectParseFailure(
       schema,
       ["a", "b"],
@@ -1003,12 +1004,12 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/struct: missing keys", async () => {
-    const schema = T.struct({ a: T.string, b: T.number })
+    const schema = S.struct({ a: S.string, b: S.number })
     await Util.expectParseFailure(schema, {}, `/a is missing, /b is missing`, Util.allErrors)
   })
 
   it("allErrors/struct: wrong type for values", async () => {
-    const schema = T.struct({ a: T.string, b: T.number })
+    const schema = S.struct({ a: S.string, b: S.number })
     await Util.expectParseFailure(
       schema,
       { a: 1, b: "b" },
@@ -1018,7 +1019,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/struct: unexpected keys", async () => {
-    const schema = T.struct({ a: T.number })
+    const schema = S.struct({ a: S.number })
     await Util.expectParseFailure(
       schema,
       { a: 1, b: "b", c: "c" },
@@ -1028,7 +1029,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/record: wrong type for keys", async () => {
-    const schema = T.record(pipe(T.string, T.minLength(2)), T.number)
+    const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
     await Util.expectParseFailure(
       schema,
       { a: 1, b: 2 },
@@ -1038,7 +1039,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/record: wrong type for values", async () => {
-    const schema = T.record(T.string, T.number)
+    const schema = S.record(S.string, S.number)
     await Util.expectParseFailure(
       schema,
       { a: "a", b: "b" },

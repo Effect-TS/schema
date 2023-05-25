@@ -430,18 +430,18 @@ export type Spread<A> = {
 /**
  * @since 1.0.0
  */
-export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
+export interface TransformPropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly From: (_: From) => From
   readonly FromIsOptional: FromIsOptional
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
-  readonly optional: () => PropertySignature<From, true, To, true>
-  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
-  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
+  readonly optional: () => TransformPropertySignature<From, true, To, true>
+  readonly withDefault: (value: () => To) => TransformPropertySignature<From, true, To, false>
+  readonly toOption: () => TransformPropertySignature<From, true, Option<To>, false>
 }
 
-class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
-  implements PropertySignature<From, FromIsOptional, To, ToIsOptional>
+class TransformPropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
+  implements TransformPropertySignature<From, FromIsOptional, To, ToIsOptional>
 {
   readonly From!: (_: From) => From
   readonly FromIsOptional!: FromIsOptional
@@ -460,25 +460,28 @@ class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
       }
   ) {}
 
-  optional(): PropertySignature<From, true, To, true> {
+  optional(): TransformPropertySignature<From, true, To, true> {
     if (this._optional) {
       throw new Error(`duplicate optional configuration`)
     }
-    return new PropertySignatureImpl(this._from, this._annotations, { to: "optional" })
+    return new TransformPropertySignatureImpl(this._from, this._annotations, { to: "optional" })
   }
 
-  withDefault(value: () => To): PropertySignature<From, true, To, false> {
+  withDefault(value: () => To): TransformPropertySignature<From, true, To, false> {
     if (this._optional && this._optional.to !== "optional") {
       throw new Error(`duplicate optional configuration`)
     }
-    return new PropertySignatureImpl(this._from, this._annotations, { to: "default", value })
+    return new TransformPropertySignatureImpl(this._from, this._annotations, {
+      to: "default",
+      value
+    })
   }
 
-  toOption(): PropertySignature<From, true, Option<To>, false> {
+  toOption(): TransformPropertySignature<From, true, Option<To>, false> {
     if (this._optional && this._optional.to !== "optional") {
       throw new Error(`duplicate optional configuration`)
     }
-    return new PropertySignatureImpl(this._from, this._annotations, { to: "Option" })
+    return new TransformPropertySignatureImpl(this._from, this._annotations, { to: "Option" })
   }
 }
 
@@ -489,7 +492,8 @@ class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
 export const propertySignature = <I, A>(
   schema: Transform<I, A>,
   annotations?: AST.Annotated["annotations"]
-): PropertySignature<I, false, A, false> => new PropertySignatureImpl(schema.ast, annotations)
+): TransformPropertySignature<I, false, A, false> =>
+  new TransformPropertySignatureImpl(schema.ast, annotations)
 
 /**
  * @since 1.0.0
@@ -497,15 +501,15 @@ export const propertySignature = <I, A>(
 export const optional = <I, A>(
   schema: Transform<I, A>,
   annotations?: AST.Annotated["annotations"]
-): PropertySignature<I, true, A, true> => propertySignature(schema, annotations).optional()
+): TransformPropertySignature<I, true, A, true> => propertySignature(schema, annotations).optional()
 
 /**
  * @since 1.0.0
  */
 export type ToOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | PropertySignature<any, boolean, any, true>
-    | PropertySignature<never, boolean, never, true> ? K
+    | TransformPropertySignature<any, boolean, any, true>
+    | TransformPropertySignature<never, boolean, never, true> ? K
     : never
 }[keyof Fields]
 
@@ -514,8 +518,8 @@ export type ToOptionalKeys<Fields> = {
  */
 export type FromOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | PropertySignature<any, true, any, boolean>
-    | PropertySignature<never, true, never, boolean> ? K
+    | TransformPropertySignature<any, true, any, boolean>
+    | TransformPropertySignature<never, true, never, boolean> ? K
     : never
 }[keyof Fields]
 
@@ -528,8 +532,8 @@ export const struct = <
     PropertyKey,
     | Transform<any, any>
     | Transform<never, never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
+    | TransformPropertySignature<any, boolean, any, boolean>
+    | TransformPropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
@@ -550,9 +554,8 @@ export const struct = <
   const propertySignatureTransformations: Array<AST.PropertySignatureTransformation> = []
   for (let i = 0; i < ownKeys.length; i++) {
     const key = ownKeys[i]
-    const field: Transform<any, any> | PropertySignatureImpl<any, boolean, any, boolean> =
-      fields[key] as any
-    if (field instanceof PropertySignatureImpl) {
+    const field = fields[key] as any
+    if ("_from" in field) {
       const optional = field._optional
       if (optional) {
         switch (optional.to) {
@@ -718,7 +721,7 @@ export const brand = <B extends string | symbol, A>(
   options?: AnnotationOptions<A>
 ) =>
   <I>(self: Transform<I, A>): BrandTransform<I, A & Brand<B>> => {
-    const annotations = toAnnotations(options)
+    const annotations = S.toAnnotations(options)
     annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
     const schema = make(ast)
@@ -764,84 +767,10 @@ export const required = <I, A>(
  * @since 1.0.0
  */
 export const record = <K extends string | symbol, I, A>(
-  key: Transform<K, K>,
+  key: S.Schema<K>,
   value: Transform<I, A>
 ): Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
   make(AST.createRecord(key.ast, value.ast, true))
-
-const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST.AST>) => {
-  return AST.createUnion(
-    xs.flatMap((x) => {
-      return ys.map((y) => {
-        if (AST.isTypeLiteral(x)) {
-          if (AST.isTypeLiteral(y)) {
-            return AST.createTypeLiteral(
-              x.propertySignatures.concat(y.propertySignatures),
-              x.indexSignatures.concat(y.indexSignatures)
-            )
-          } else if (
-            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
-            AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
-          ) {
-            const from = AST.createTypeLiteral(
-              x.propertySignatures.concat(y.from.propertySignatures),
-              x.indexSignatures.concat(y.from.indexSignatures)
-            )
-            const to = AST.createTypeLiteral(
-              x.propertySignatures.concat(y.to.propertySignatures),
-              x.indexSignatures.concat(y.to.indexSignatures)
-            )
-            return AST.createTransformByPropertySignatureTransformations(
-              from,
-              to,
-              y.propertySignatureTransformations
-            )
-          }
-        } else if (
-          AST.isTransform(x) && x.propertySignatureTransformations.length > 0 &&
-          AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
-        ) {
-          if (AST.isTypeLiteral(y)) {
-            const from = AST.createTypeLiteral(
-              x.from.propertySignatures.concat(y.propertySignatures),
-              x.from.indexSignatures.concat(y.indexSignatures)
-            )
-            const to = AST.createTypeLiteral(
-              x.to.propertySignatures.concat(y.propertySignatures),
-              x.to.indexSignatures.concat(y.indexSignatures)
-            )
-            return AST.createTransformByPropertySignatureTransformations(
-              from,
-              to,
-              x.propertySignatureTransformations
-            )
-          } else if (
-            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
-            AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
-          ) {
-            const from = AST.createTypeLiteral(
-              x.from.propertySignatures.concat(y.from.propertySignatures),
-              x.from.indexSignatures.concat(y.from.indexSignatures)
-            )
-            const to = AST.createTypeLiteral(
-              x.to.propertySignatures.concat(y.to.propertySignatures),
-              x.to.indexSignatures.concat(y.to.indexSignatures)
-            )
-            const propertySignatureTransformations = x.propertySignatureTransformations.concat(
-              y.propertySignatureTransformations
-            )
-            return AST.createTransformByPropertySignatureTransformations(
-              from,
-              to,
-              propertySignatureTransformations
-            )
-          }
-        }
-        throw new Error("`extend` can only handle type literals or unions of type literals")
-      })
-    })
-  )
-}
 
 /**
  * @category combinators
@@ -862,7 +791,7 @@ export const extend: {
     that: Transform<IB, B>
   ): Transform<Spread<I & IB>, Spread<A & B>> =>
     make(
-      intersectUnionMembers(
+      S.intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
         AST.isUnion(that.ast) ? that.ast.types : [that.ast]
       )
@@ -894,46 +823,6 @@ export type AnnotationOptions<A> = {
   arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
 }
 
-const toAnnotations = <A>(
-  options?: AnnotationOptions<A>
-): AST.Annotated["annotations"] => {
-  const annotations: AST.Annotated["annotations"] = {}
-  if (options?.typeId !== undefined) {
-    const typeId = options?.typeId
-    if (typeof typeId === "object") {
-      annotations[AST.TypeAnnotationId] = typeId.id
-      annotations[typeId.id] = typeId.params
-    } else {
-      annotations[AST.TypeAnnotationId] = typeId
-    }
-  }
-  if (options?.message !== undefined) {
-    annotations[AST.MessageAnnotationId] = options?.message
-  }
-  if (options?.identifier !== undefined) {
-    annotations[AST.IdentifierAnnotationId] = options?.identifier
-  }
-  if (options?.title !== undefined) {
-    annotations[AST.TitleAnnotationId] = options?.title
-  }
-  if (options?.description !== undefined) {
-    annotations[AST.DescriptionAnnotationId] = options?.description
-  }
-  if (options?.examples !== undefined) {
-    annotations[AST.ExamplesAnnotationId] = options?.examples
-  }
-  if (options?.documentation !== undefined) {
-    annotations[AST.DocumentationAnnotationId] = options?.documentation
-  }
-  if (options?.jsonSchema !== undefined) {
-    annotations[AST.JSONSchemaAnnotationId] = options?.jsonSchema
-  }
-  if (options?.arbitrary !== undefined) {
-    annotations[I.ArbitraryHookId] = options?.arbitrary
-  }
-  return annotations
-}
-
 /**
  * @category combinators
  * @since 1.0.0
@@ -954,7 +843,7 @@ export function filter<A>(
     make(AST.createRefinement(
       self.ast,
       (a: A, _, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
-      toAnnotations(options)
+      S.toAnnotations(options)
     ))
 }
 
@@ -1389,7 +1278,7 @@ export const fromBrand = <C extends Brand<string | symbol>>(
     const ast = AST.createRefinement(
       self.ast,
       decode,
-      toAnnotations({ typeId: BrandTypeId, ...options })
+      S.toAnnotations({ typeId: BrandTypeId, ...options })
     )
     return make(ast)
   }

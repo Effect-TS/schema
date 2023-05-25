@@ -1,4 +1,5 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
@@ -167,7 +168,7 @@ describe.concurrent("extend", () => {
     expect(() =>
       pipe(
         T.record(T.string, T.number),
-        T.extend(T.record(pipe(T.string, T.minLength(2)), T.boolean))
+        T.extend(T.record(pipe(S.string, S.minLength(2)), T.boolean))
       )
     ).toThrowError(new Error("Duplicate index signature for type `string`"))
   })
