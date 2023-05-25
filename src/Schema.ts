@@ -208,7 +208,6 @@ export const declare = (
       typeParameters.map((schema) => schema.ast),
       type.ast,
       (...typeParameters) => decode(...typeParameters.map(make)),
-      (...typeParameters) => encode(...typeParameters.map(make)),
       annotations
     )
   )

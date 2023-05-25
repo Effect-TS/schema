@@ -337,11 +337,12 @@ const go = untracedMethod(() =>
         }
       }
       case "Declaration": {
-        const parse = isDecoding ?
-          ast.decode(...ast.typeParameters) :
-          ast.encode(...ast.typeParameters)
-        return (i, options) =>
-          handleForbidden(parse(i, options ?? defaultParseOption, ast), options)
+        if (isDecoding) {
+          const parse = ast.decode(...ast.typeParameters)
+          return (i, options) =>
+            handleForbidden(parse(i, options ?? defaultParseOption, ast), options)
+        }
+        return PR.success
       }
       case "Literal":
         return fromRefinement(ast, (u): u is typeof ast.literal => u === ast.literal)

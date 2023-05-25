@@ -43,7 +43,6 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
         ast.typeParameters.map((ast) => effectifyAST(ast, mode)),
         ast.type,
         ast.decode,
-        ast.encode,
         ast.annotations
       )
     case "Tuple":

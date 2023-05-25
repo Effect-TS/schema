@@ -361,7 +361,6 @@ export declare const createDeclaration: (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
   decode: Declaration['decode'],
-  encode: Declaration['encode'],
   annotations?: Annotated['annotations']
 ) => Declaration
 ```
@@ -926,9 +925,6 @@ export interface Declaration extends Annotated {
   readonly decode: (
     ...typeParameters: ReadonlyArray<AST>
   ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-  readonly encode: (
-    ...typeParameters: ReadonlyArray<AST>
-  ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 ```
 
@@ -1468,9 +1464,6 @@ export declare const mergeAnnotations: (
       decode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
-      encode: (
-        ...typeParameters: readonly AST[]
-      ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1592,9 +1585,6 @@ export declare const setAnnotation: (
       typeParameters: readonly AST[]
       type: AST
       decode: (
-        ...typeParameters: readonly AST[]
-      ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
-      encode: (
         ...typeParameters: readonly AST[]
       ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
     }
