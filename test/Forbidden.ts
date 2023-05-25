@@ -50,7 +50,7 @@ describe.concurrent("Forbidden", () => {
   })
 
   it("declaration", () => {
-    const transform = T.declare(
+    const transform = S.declare(
       [],
       S.number,
       () => T.parseEffect(Util.effectify(S.number, "all")),

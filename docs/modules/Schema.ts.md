@@ -22,6 +22,13 @@ Added in v1.0.0
   - [JsonNumber](#jsonnumber)
   - [JsonObject (type alias)](#jsonobject-type-alias)
   - [json](#json)
+- [annotations](#annotations)
+  - [description](#description)
+  - [documentation](#documentation)
+  - [examples](#examples)
+  - [identifier](#identifier)
+  - [message](#message)
+  - [title](#title)
 - [array](#array)
   - [itemsCount](#itemscount)
   - [maxItems](#maxitems)
@@ -41,6 +48,7 @@ Added in v1.0.0
   - [nonPositiveBigint](#nonpositivebigint)
   - [positiveBigint](#positivebigint)
 - [combinators](#combinators)
+  - [annotations](#annotations-1)
   - [array](#array-1)
   - [brand](#brand)
   - [data](#data)
@@ -290,6 +298,68 @@ export declare const json: Schema<Json>
 
 Added in v1.0.0
 
+# annotations
+
+## description
+
+**Signature**
+
+```ts
+export declare const description: (description: AST.DescriptionAnnotation) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## documentation
+
+**Signature**
+
+```ts
+export declare const documentation: (documentation: AST.DocumentationAnnotation) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## examples
+
+**Signature**
+
+```ts
+export declare const examples: (examples: AST.ExamplesAnnotation) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## identifier
+
+**Signature**
+
+```ts
+export declare const identifier: (identifier: AST.IdentifierAnnotation) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## message
+
+**Signature**
+
+```ts
+export declare const message: (message: AST.MessageAnnotation<unknown>) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## title
+
+**Signature**
+
+```ts
+export declare const title: (title: AST.TitleAnnotation) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
 # array
 
 ## itemsCount
@@ -488,6 +558,16 @@ export declare const positiveBigint: <A extends bigint>(
 Added in v1.0.0
 
 # combinators
+
+## annotations
+
+**Signature**
+
+```ts
+export declare const annotations: (annotations: AST.Annotated['annotations']) => <A>(self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
 
 ## array
 

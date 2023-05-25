@@ -165,9 +165,9 @@ describe.concurrent("Parser", () => {
     // declare
     expect(
       P._getLiterals(
-        T.declare(
+        S.declare(
           [],
-          T.struct({ _tag: S.literal("a") }),
+          S.struct({ _tag: S.literal("a") }),
           () => P.parseResult(T.struct({ _tag: S.literal("a") })),
           () => P.encodeResult(T.struct({ _tag: S.literal("a") }))
         ).ast

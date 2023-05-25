@@ -1892,8 +1892,10 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
     }
   )
 
-const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): D.Data<A> =>
-  Array.isArray(a) ? D.array(a) : D.struct(a)
+/** @internal */
+export const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  a: A
+): D.Data<A> => Array.isArray(a) ? D.array(a) : D.struct(a)
 
 /** @internal */
 export const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(

@@ -104,7 +104,7 @@ describe.concurrent("partial", () => {
   })
 
   it("declarations should throw", async () => {
-    expect(() => T.partial(T.optionFromSelf(S.string))).toThrowError(
+    expect(() => S.partial(S.option(S.string))).toThrowError(
       new Error("`partial` cannot handle declarations")
     )
   })

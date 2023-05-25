@@ -16,13 +16,6 @@ Added in v1.0.0
   - [Date](#date-1)
   - [dateFromString](#datefromstring)
   - [validDate](#validdate)
-- [annotations](#annotations)
-  - [description](#description)
-  - [documentation](#documentation)
-  - [examples](#examples)
-  - [identifier](#identifier)
-  - [message](#message)
-  - [title](#title)
 - [array](#array)
   - [itemsCount](#itemscount)
   - [maxItems](#maxitems)
@@ -41,7 +34,6 @@ Added in v1.0.0
 - [boolean](#boolean)
   - [not](#not)
 - [combinators](#combinators)
-  - [annotations](#annotations-1)
   - [array](#array-1)
   - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
@@ -54,7 +46,6 @@ Added in v1.0.0
   - [extend](#extend)
   - [filter](#filter)
   - [fromBrand](#frombrand)
-  - [keyof](#keyof)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
@@ -76,7 +67,6 @@ Added in v1.0.0
   - [union](#union)
 - [constructors](#constructors)
   - [chunkFromSelf](#chunkfromself)
-  - [declare](#declare)
   - [make](#make)
   - [propertySignature](#propertysignature)
   - [readonlyMapFromSelf](#readonlymapfromself)
@@ -221,76 +211,6 @@ A filter excluding invalid dates (e.g. `new Date("fail")`).
 export declare const validDate: (
   options?: AnnotationOptions<Date> | undefined
 ) => <I>(self: Transform<I, Date>) => Transform<I, Date>
-```
-
-Added in v1.0.0
-
-# annotations
-
-## description
-
-**Signature**
-
-```ts
-export declare const description: (
-  description: AST.DescriptionAnnotation
-) => <I, A>(self: Transform<I, A>) => Transform<I, A>
-```
-
-Added in v1.0.0
-
-## documentation
-
-**Signature**
-
-```ts
-export declare const documentation: (
-  documentation: AST.DocumentationAnnotation
-) => <I, A>(self: Transform<I, A>) => Transform<I, A>
-```
-
-Added in v1.0.0
-
-## examples
-
-**Signature**
-
-```ts
-export declare const examples: (examples: AST.ExamplesAnnotation) => <I, A>(self: Transform<I, A>) => Transform<I, A>
-```
-
-Added in v1.0.0
-
-## identifier
-
-**Signature**
-
-```ts
-export declare const identifier: (
-  identifier: AST.IdentifierAnnotation
-) => <I, A>(self: Transform<I, A>) => Transform<I, A>
-```
-
-Added in v1.0.0
-
-## message
-
-**Signature**
-
-```ts
-export declare const message: (
-  message: AST.MessageAnnotation<unknown>
-) => <I, A>(self: Transform<I, A>) => Transform<I, A>
-```
-
-Added in v1.0.0
-
-## title
-
-**Signature**
-
-```ts
-export declare const title: (title: AST.TitleAnnotation) => <I, A>(self: Transform<I, A>) => Transform<I, A>
 ```
 
 Added in v1.0.0
@@ -480,18 +400,6 @@ Added in v1.0.0
 
 # combinators
 
-## annotations
-
-**Signature**
-
-```ts
-export declare const annotations: (
-  annotations: AST.Annotated['annotations']
-) => <I, A>(self: Transform<I, A>) => Transform<I, A>
-```
-
-Added in v1.0.0
-
 ## array
 
 **Signature**
@@ -680,16 +588,6 @@ export declare const fromBrand: <C extends any>(
   constructor: any,
   options?: AnnotationOptions<any> | undefined
 ) => <I, A extends any>(self: Transform<I, A>) => Transform<I, A & C>
-```
-
-Added in v1.0.0
-
-## keyof
-
-**Signature**
-
-```ts
-export declare const keyof: <I, A>(schema: Transform<I, A>) => Transform<keyof A, keyof A>
 ```
 
 Added in v1.0.0
@@ -977,26 +875,6 @@ Added in v1.0.0
 
 ```ts
 export declare const chunkFromSelf: <I, A>(item: Transform<I, A>) => Transform<Chunk<I>, Chunk<A>>
-```
-
-Added in v1.0.0
-
-## declare
-
-**Signature**
-
-```ts
-export declare const declare: (
-  typeParameters: ReadonlyArray<Transform<any, any>>,
-  type: Transform<any, any>,
-  decode: (
-    ...typeParameters: ReadonlyArray<Transform<any, any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  encode: (
-    ...typeParameters: ReadonlyArray<Transform<any, any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  annotations?: AST.Annotations | undefined
-) => Transform<any, any>
 ```
 
 Added in v1.0.0

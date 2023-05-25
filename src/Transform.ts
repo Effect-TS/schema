@@ -7,11 +7,10 @@ import type { Brand } from "@effect/data/Brand"
 import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
-import * as D from "@effect/data/Data"
+import type * as D from "@effect/data/Data"
 import { untracedMethod } from "@effect/data/Debug"
 import type { Either } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
-import * as Equal from "@effect/data/Equal"
 import type { LazyArg } from "@effect/data/Function"
 import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
@@ -247,31 +246,6 @@ export {
  * @since 1.0.0
  */
 export const make = <I, A>(ast: AST.AST): Transform<I, A> => ({ ast }) as any
-
-/**
-  @category constructors
-  @since 1.0.0
-*/
-export const declare = (
-  typeParameters: ReadonlyArray<Transform<any, any>>,
-  type: Transform<any, any>,
-  decode: (
-    ...typeParameters: ReadonlyArray<Transform<any, any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  encode: (
-    ...typeParameters: ReadonlyArray<Transform<any, any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  annotations?: AST.Annotated["annotations"]
-): Transform<any, any> =>
-  make(
-    AST.createDeclaration(
-      typeParameters.map((schema) => schema.ast),
-      type.ast,
-      (...typeParameters) => decode(...typeParameters.map(make)),
-      (...typeParameters) => encode(...typeParameters.map(make)),
-      annotations
-    )
-  )
 
 // ---------------------------------------------
 // combinators
@@ -1160,7 +1134,7 @@ export const fromBrand = <C extends Brand<string | symbol>>(
   }
 
 // ---------------------------------------------
-// data/Chunk
+// Chunk
 // ---------------------------------------------
 
 /**
@@ -1173,8 +1147,8 @@ export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, 
   return transformResult(
     S.chunk(from(item)),
     S.chunk(to(item)),
-    (c, options) => PR.map(parseResult(C.toReadonlyArray(c), options), C.fromIterable),
-    (c, options) => PR.map(encodeResult(C.toReadonlyArray(c), options), C.fromIterable)
+    (chunk, options) => PR.map(parseResult(C.toReadonlyArray(chunk), options), C.fromIterable),
+    (chunk, options) => PR.map(encodeResult(C.toReadonlyArray(chunk), options), C.fromIterable)
   )
 }
 
@@ -1189,8 +1163,9 @@ export const chunk = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, 
 // data/Data
 // ---------------------------------------------
 
-const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): D.Data<A> =>
-  Array.isArray(a) ? D.array(a) : D.struct(a)
+const fromData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  data: D.Data<A>
+): A => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
 
 /**
  * @category combinators
@@ -1202,35 +1177,13 @@ export const dataFromSelf = <
 >(
   item: Transform<I, A>
 ): Transform<D.Data<I>, D.Data<A>> => {
-  return declare(
-    [item],
-    item,
-    <
-      I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
-      A extends Readonly<Record<string, any>> | ReadonlyArray<any>
-    >(
-      item: Transform<I, A>
-    ) => {
-      const parseResult = P.parseResult(item)
-      return (u: unknown, options, self) =>
-        !Equal.isEqual(u) ?
-          PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(u, options), toData)
-    },
-    <
-      I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
-      A extends Readonly<Record<string, any>> | ReadonlyArray<any>
-    >(
-      item: Transform<I, A>
-    ) => {
-      const encodeResult = P.encodeResult(item)
-      return (a: A, options) => PR.map(encodeResult(a, options), toData)
-    },
-    {
-      [AST.IdentifierAnnotationId]: "Data",
-      [I.PrettyHookId]: S.dataPretty,
-      [I.ArbitraryHookId]: S.dataArbitrary
-    }
+  const parseResult = P.parseResult(item)
+  const encodeResult = P.encodeResult(item)
+  return transformResult(
+    S.data(from(item)),
+    S.data(to(item)),
+    (data, options) => PR.map(parseResult(fromData(data), options), S.toData),
+    (data, options) => PR.map(encodeResult(fromData(data), options), S.toData)
   )
 }
 
@@ -1247,8 +1200,8 @@ export const data = <
   transform(
     item,
     to(dataFromSelf(item)),
-    toData,
-    (a) => Array.isArray(a) ? Array.from(a) : Object.assign({}, a) as any
+    S.toData,
+    (data) => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
   )
 
 // ---------------------------------------------
@@ -1328,32 +1281,21 @@ export const eitherFromSelf = <IE, E, IA, A>(
   left: Transform<IE, E>,
   right: Transform<IA, A>
 ): Transform<Either<IE, IA>, Either<E, A>> => {
-  return declare(
-    [left, right],
-    eitherInline(left, right),
-    <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) => {
-      const parseResultLeft = P.parseResult(left)
-      const parseResultRight = P.parseResult(right)
-      return (u: unknown, options, self) =>
-        !E.isEither(u) ?
-          PR.failure(PR.type(self, u)) :
-          E.isLeft(u) ?
-          PR.map(parseResultLeft(u.left, options), E.left) :
-          PR.map(parseResultRight(u.right, options), E.right)
-    },
-    <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) => {
-      const encodeResultLeft = P.encodeResult(left)
-      const encodeResultRight = P.encodeResult(right)
-      return (a: Either<E, A>, options) =>
-        E.isLeft(a) ?
-          PR.map(encodeResultLeft(a.left, options), E.left) :
-          PR.map(encodeResultRight(a.right, options), E.right)
-    },
-    {
-      [AST.IdentifierAnnotationId]: "Either",
-      [I.PrettyHookId]: S.eitherPretty,
-      [I.ArbitraryHookId]: S.eitherArbitrary
-    }
+  const parseResultLeft = P.parseResult(left)
+  const parseResultRight = P.parseResult(right)
+  const encodeResultLeft = P.encodeResult(left)
+  const encodeResultRight = P.encodeResult(right)
+  return transformResult(
+    S.either(from(left), from(right)),
+    S.either(to(left), to(right)),
+    (either, options) =>
+      E.isLeft(either) ?
+        PR.map(parseResultLeft(either.left, options), E.left) :
+        PR.map(parseResultRight(either.right, options), E.right),
+    (either, options) =>
+      E.isLeft(either) ?
+        PR.map(encodeResultLeft(either.left, options), E.left) :
+        PR.map(encodeResultRight(either.right, options), E.right)
   )
 }
 
@@ -1743,30 +1685,19 @@ const optionInline = <I, A>(value: Transform<I, A>) =>
  * @since 1.0.0
  */
 export const optionFromSelf = <I, A>(value: Transform<I, A>): Transform<Option<I>, Option<A>> => {
-  return declare(
-    [value],
-    optionInline(value),
-    <I, A>(value: Transform<I, A>) => {
-      const parseResult = P.parseResult(value)
-      return (u: unknown, options, self) =>
-        !O.isOption(u) ?
-          PR.failure(PR.type(self, u)) :
-          O.isNone(u) ?
-          PR.success(O.none()) :
-          PR.map(parseResult(u.value, options), O.some)
-    },
-    <I, A>(value: Transform<I, A>) => {
-      const encodeResult = P.encodeResult(value)
-      return (a: Option<A>, options) =>
-        O.isNone(a) ?
-          PR.success(O.none()) :
-          PR.map(encodeResult(a.value, options), O.some)
-    },
-    {
-      [AST.IdentifierAnnotationId]: "Option",
-      [I.PrettyHookId]: S.optionPretty,
-      [I.ArbitraryHookId]: S.optionArbitrary
-    }
+  const parseResult = P.parseResult(value)
+  const encodeResult = P.encodeResult(value)
+  return transformResult(
+    S.option(from(value)),
+    S.option(to(value)),
+    (option, options) =>
+      O.isNone(option) ?
+        PR.success(O.none()) :
+        PR.map(parseResult(option.value, options), O.some),
+    (option, options) =>
+      O.isNone(option) ?
+        PR.success(O.none()) :
+        PR.map(encodeResult(option.value, options), O.some)
   )
 }
 
@@ -1884,28 +1815,13 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
   key: Transform<IK, K>,
   value: Transform<IV, V>
 ): Transform<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> => {
-  return declare(
-    [key, value],
-    struct({
-      size: S.number
-    }),
-    <IK, K, IV, V>(key: Transform<IK, K>, value: Transform<IV, V>) => {
-      const parseResult = P.parseResult(array(tuple(key, value)))
-      return (u: unknown, options, self) =>
-        !S.isMap(u) ?
-          PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(Array.from(u.entries()), options), (as) => new Map(as))
-    },
-    <IK, K, IV, V>(key: Transform<IK, K>, value: Transform<IV, V>) => {
-      const encodeResult = P.encodeResult(array(tuple(key, value)))
-      return (a: ReadonlyMap<K, V>, options) =>
-        PR.map(encodeResult(Array.from(a.entries()), options), (as) => new Map(as))
-    },
-    {
-      [AST.IdentifierAnnotationId]: "ReadonlyMap",
-      [I.PrettyHookId]: S.readonlyMapPretty,
-      [I.ArbitraryHookId]: S.readonlyMapArbitrary
-    }
+  const parseResult = P.parseResult(array(tuple(key, value)))
+  const encodeResult = P.encodeResult(array(tuple(key, value)))
+  return transformResult(
+    S.readonlyMap(from(key), from(value)),
+    S.readonlyMap(to(key), to(value)),
+    (map, options) => PR.map(parseResult(Array.from(map.entries()), options), (as) => new Map(as)),
+    (map, options) => PR.map(encodeResult(Array.from(map.entries()), options), (as) => new Map(as))
   )
 }
 
@@ -1935,28 +1851,13 @@ export const readonlyMap = <IK, K, IV, V>(
 export const readonlySetFromSelf = <I, A>(
   item: Transform<I, A>
 ): Transform<ReadonlySet<I>, ReadonlySet<A>> => {
-  return declare(
-    [item],
-    struct({
-      size: S.number
-    }),
-    <I, A>(item: Transform<I, A>) =>
-      (u: unknown, options, self) => {
-        const parseResult = P.parseResult(array(item))
-        return !S.isSet(u) ?
-          PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(Array.from(u.values()), options), (as) => new Set(as))
-      },
-    <I, A>(item: Transform<I, A>) =>
-      (a: ReadonlySet<A>, options) => {
-        const encodeResult = P.encodeResult(array(item))
-        return PR.map(encodeResult(Array.from(a.values()), options), (as) => new Set(as))
-      },
-    {
-      [AST.IdentifierAnnotationId]: "ReadonlySet",
-      [I.PrettyHookId]: S.readonlySetPretty,
-      [I.ArbitraryHookId]: S.readonlySetArbitrary
-    }
+  const parseResult = P.parseResult(array(item))
+  const encodeResult = P.encodeResult(array(item))
+  return transformResult(
+    S.readonlySet(from(item)),
+    S.readonlySet(to(item)),
+    (set, options) => PR.map(parseResult(Array.from(set.values()), options), (as) => new Set(as)),
+    (set, options) => PR.map(encodeResult(Array.from(set.values()), options), (as) => new Set(as))
   )
 }
 

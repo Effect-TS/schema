@@ -5,7 +5,7 @@ import * as T from "@effect/schema/Transform"
 
 describe.concurrent("AST.guards", () => {
   it("isDeclaration", () => {
-    expect(AST.isDeclaration(T.optionFromSelf(S.number).ast)).toEqual(true)
+    expect(AST.isDeclaration(S.option(S.number).ast)).toEqual(true)
     expect(AST.isDeclaration(S.number.ast)).toEqual(false)
   })
 

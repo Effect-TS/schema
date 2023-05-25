@@ -109,7 +109,7 @@ describe.concurrent("required", () => {
   })
 
   it("declarations should throw", async () => {
-    expect(() => T.required(T.optionFromSelf(S.string))).toThrowError(
+    expect(() => S.required(S.option(S.string))).toThrowError(
       new Error("`required` cannot handle declarations")
     )
   })
