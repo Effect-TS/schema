@@ -1,19 +1,14 @@
 import * as E from "@effect/data/Either"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
-const NumberFromString = T.NumberFromString
-
 describe.concurrent("Either", () => {
-  describe.concurrent("eitherFromSelf", () => {
-    it("property tests", () => {
-      Util.roundtrip(T.eitherFromSelf(T.string, T.number))
-    })
-
-    it("Guard", () => {
-      const schema = T.eitherFromSelf(T.string, T.number)
+  describe.concurrent("Schema", () => {
+    it("is", () => {
+      const schema = S.either(S.string, S.number)
       const is = P.is(schema)
       expect(is(E.left("a"))).toEqual(true)
       expect(is(E.right(1))).toEqual(true)
@@ -25,43 +20,51 @@ describe.concurrent("Either", () => {
       expect(is({ _tag: "Left", left: "a" })).toEqual(false)
     })
 
-    it("Decoder", async () => {
-      const schema = T.eitherFromSelf(T.string, NumberFromString)
-      await Util.expectParseSuccess(schema, E.left("a"), E.left("a"))
-      await Util.expectParseSuccess(schema, E.right("1"), E.right(1))
-    })
-
-    it("Pretty", () => {
-      const schema = T.eitherFromSelf(T.string, T.number)
-      const pretty = Pretty.to(schema)
+    it("pretty", () => {
+      const schema = S.either(S.string, S.number)
+      const pretty = Pretty.build(schema)
       expect(pretty(E.left("a"))).toEqual(`left("a")`)
       expect(pretty(E.right(1))).toEqual("right(1)")
     })
   })
 
-  describe.concurrent("either", () => {
-    it("property tests", () => {
-      Util.roundtrip(T.either(T.string, T.number))
+  describe.concurrent("Transform", () => {
+    describe.concurrent("eitherFromSelf", () => {
+      it("property tests", () => {
+        Util.roundtrip(T.eitherFromSelf(S.string, S.number))
+      })
+
+      it("parse", async () => {
+        const transform = T.eitherFromSelf(S.string, T.NumberFromString)
+        await Util.expectParseSuccess(transform, E.left("a"), E.left("a"))
+        await Util.expectParseSuccess(transform, E.right("1"), E.right(1))
+      })
     })
 
-    it("Decoder", async () => {
-      const schema = T.either(T.string, NumberFromString)
-      await Util.expectParseSuccess(
-        schema,
-        JSON.parse(JSON.stringify(E.left("a"))),
-        E.left("a")
-      )
-      await Util.expectParseSuccess(
-        schema,
-        JSON.parse(JSON.stringify(E.right("1"))),
-        E.right(1)
-      )
-    })
+    describe.concurrent("either", () => {
+      it("property tests", () => {
+        Util.roundtrip(T.either(S.string, S.number))
+      })
 
-    it("Encoder", async () => {
-      const schema = T.either(T.string, NumberFromString)
-      await Util.expectEncodeSuccess(schema, E.left("a"), { _tag: "Left", left: "a" })
-      await Util.expectEncodeSuccess(schema, E.right(1), { _tag: "Right", right: "1" })
+      it("parse", async () => {
+        const transform = T.either(S.string, T.NumberFromString)
+        await Util.expectParseSuccess(
+          transform,
+          JSON.parse(JSON.stringify(E.left("a"))),
+          E.left("a")
+        )
+        await Util.expectParseSuccess(
+          transform,
+          JSON.parse(JSON.stringify(E.right("1"))),
+          E.right(1)
+        )
+      })
+
+      it("encode", async () => {
+        const transform = T.either(S.string, T.NumberFromString)
+        await Util.expectEncodeSuccess(transform, E.left("a"), { _tag: "Left", left: "a" })
+        await Util.expectEncodeSuccess(transform, E.right(1), { _tag: "Right", right: "1" })
+      })
     })
   })
 })

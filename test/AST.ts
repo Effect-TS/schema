@@ -1,7 +1,7 @@
 import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("AST", () => {
   it("createIndexSignature/ should throw on unsupported ASTs", () => {
@@ -53,40 +53,40 @@ describe.concurrent("AST", () => {
   })
 
   it("union/ should unify any with anything", () => {
-    expect(T.union(T.literal("a"), T.any).ast).toEqual(T.any.ast)
+    expect(S.union(S.literal("a"), S.any).ast).toEqual(S.any.ast)
   })
 
   it("union/ should unify unknown with anything", () => {
-    expect(T.union(T.literal("a"), T.unknown).ast).toEqual(T.unknown.ast)
+    expect(S.union(S.literal("a"), S.unknown).ast).toEqual(S.unknown.ast)
   })
 
   it("union/ should unify string literals with string", () => {
-    expect(T.union(T.literal("a"), T.string).ast).toEqual(T.string.ast)
+    expect(S.union(S.literal("a"), S.string).ast).toEqual(S.string.ast)
   })
 
   it("union/ should unify number literals with number", () => {
-    expect(T.union(T.literal(1), T.number).ast).toEqual(T.number.ast)
+    expect(S.union(S.literal(1), S.number).ast).toEqual(S.number.ast)
   })
 
   it("union/ should unify boolean literals with boolean", () => {
-    expect(T.union(T.literal(true), T.boolean).ast).toEqual(T.boolean.ast)
+    expect(S.union(S.literal(true), S.boolean).ast).toEqual(S.boolean.ast)
   })
 
   it("union/ should unify bigint literals with bigint", () => {
-    expect(T.union(T.literal(1n), T.bigint).ast).toEqual(T.bigint.ast)
+    expect(S.union(S.literal(1n), S.bigint).ast).toEqual(S.bigint.ast)
   })
 
   it("union/ should unify symbol literals with symbol", () => {
-    expect(T.union(T.uniqueSymbol(Symbol.for("@effect/schema/test/a")), T.symbol).ast).toEqual(
-      T.symbol.ast
+    expect(S.union(S.uniqueSymbol(Symbol.for("@effect/schema/test/a")), S.symbol).ast).toEqual(
+      S.symbol.ast
     )
   })
 
   describe.concurrent("union/ should give precedence to schemas containing more infos", () => {
     it("1 required vs 2 required", () => {
-      const a = T.struct({ a: T.string })
-      const ab = T.struct({ a: T.string, b: T.number })
-      const schema = T.union(a, ab)
+      const a = S.struct({ a: S.string })
+      const ab = S.struct({ a: S.string, b: S.number })
+      const schema = S.union(a, ab)
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [ab.ast, a.ast],
@@ -95,9 +95,9 @@ describe.concurrent("AST", () => {
     })
 
     it("1 required vs 2 optional", () => {
-      const a = T.struct({ a: T.string })
-      const ab = T.struct({ a: T.optional(T.string), b: T.optional(T.number) })
-      const schema = T.union(a, ab)
+      const a = S.struct({ a: S.string })
+      const ab = S.struct({ a: S.optional(S.string), b: S.optional(S.number) })
+      const schema = S.union(a, ab)
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [ab.ast, a.ast],
@@ -106,9 +106,9 @@ describe.concurrent("AST", () => {
     })
 
     it("struct({}) should go in last position in a union", () => {
-      const a = T.object
-      const b = T.struct({})
-      const schema = T.union(b, a)
+      const a = S.object
+      const b = S.struct({})
+      const schema = S.union(b, a)
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [a.ast, b.ast],
@@ -117,9 +117,9 @@ describe.concurrent("AST", () => {
     })
 
     it("object precedence should be low", () => {
-      const a = T.tuple()
-      const b = T.object
-      const schema = T.union(b, a)
+      const a = S.tuple()
+      const b = S.object
+      const schema = S.union(b, a)
       expect(schema.ast).toEqual({
         _tag: "Union",
         types: [a.ast, b.ast],
@@ -242,7 +242,7 @@ describe.concurrent("AST", () => {
 
   describe.concurrent("struct/ should give precedence to property signatures / index signatures containing less inhabitants", () => {
     it("literal vs string", () => {
-      const schema = T.struct({ a: T.string, b: T.literal("b") })
+      const schema = S.struct({ a: S.string, b: S.literal("b") })
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
@@ -255,7 +255,7 @@ describe.concurrent("AST", () => {
     })
 
     it("undefined vs string", () => {
-      const schema = T.struct({ a: T.string, b: T.undefined })
+      const schema = S.struct({ a: S.string, b: S.undefined })
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
@@ -268,7 +268,7 @@ describe.concurrent("AST", () => {
     })
 
     it("boolean vs string", () => {
-      const schema = T.struct({ a: T.string, b: T.boolean })
+      const schema = S.struct({ a: S.string, b: S.boolean })
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
@@ -281,7 +281,7 @@ describe.concurrent("AST", () => {
     })
 
     it("literal vs boolean", () => {
-      const schema = T.struct({ a: T.boolean, b: T.literal(null) })
+      const schema = S.struct({ a: S.boolean, b: S.literal(null) })
       expect(schema.ast).toEqual({
         _tag: "TypeLiteral",
         propertySignatures: [
@@ -300,11 +300,11 @@ describe.concurrent("AST", () => {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const schema: T.Transform<A, A> = T.lazy(() => {
+    const schema: S.Schema<A> = S.lazy(() => {
       log++
-      return T.struct({
-        a: T.string,
-        as: T.array(schema)
+      return S.struct({
+        a: S.string,
+        as: S.array(schema)
       })
     })
     await Util.expectParseSuccess(schema, { a: "a1", as: [] })

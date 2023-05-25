@@ -1,37 +1,37 @@
-import * as P from "@effect/schema/Pretty"
+import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Json", () => {
-  it("property tests. json", () => {
-    Util.roundtrip(T.json)
+  it("property tests", () => {
+    Util.roundtrip(S.json)
   })
 
   it("should exclude NaN", () => {
-    expect(T.is(T.json)(NaN)).toEqual(false)
-    Util.expectParseFailure(T.JsonNumber, NaN, "Expected a JSON number, actual NaN")
-    Util.expectParseFailure(T.JsonNumber, Number.NaN, "Expected a JSON number, actual NaN")
+    expect(S.is(S.json)(NaN)).toEqual(false)
+    Util.expectParseFailure(S.JsonNumber, NaN, "Expected a JSON number, actual NaN")
+    Util.expectParseFailure(S.JsonNumber, Number.NaN, "Expected a JSON number, actual NaN")
   })
 
   it("should exclude +/- Infinity", () => {
-    expect(T.is(T.json)(Infinity)).toEqual(false)
-    expect(T.is(T.json)(-Infinity)).toEqual(false)
-    Util.expectParseFailure(T.JsonNumber, Infinity, "Expected a JSON number, actual Infinity")
-    Util.expectParseFailure(T.JsonNumber, -Infinity, "Expected a JSON number, actual -Infinity")
+    expect(S.is(S.json)(Infinity)).toEqual(false)
+    expect(S.is(S.json)(-Infinity)).toEqual(false)
+    Util.expectParseFailure(S.JsonNumber, Infinity, "Expected a JSON number, actual Infinity")
+    Util.expectParseFailure(S.JsonNumber, -Infinity, "Expected a JSON number, actual -Infinity")
     Util.expectParseFailure(
-      T.JsonNumber,
+      S.JsonNumber,
       Number.POSITIVE_INFINITY,
       "Expected a JSON number, actual Infinity"
     )
     Util.expectParseFailure(
-      T.JsonNumber,
+      S.JsonNumber,
       Number.NEGATIVE_INFINITY,
       "Expected a JSON number, actual -Infinity"
     )
   })
 
-  it("Pretty", () => {
-    const pretty = P.to(T.json)
+  it("pretty", () => {
+    const pretty = Pretty.build(S.json)
     expect(pretty({ a: [1, true] })).toEqual(`{ "a": [1, true] }`)
   })
 })

@@ -1,15 +1,16 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
+import * as S from "@effect/schema/Schema"
 import * as T from "@effect/schema/Transform"
 
 describe.concurrent("keyof", () => {
   it("struct/ string keys", () => {
-    const schema = T.struct({
-      a: T.string,
-      b: T.number
+    const schema = S.struct({
+      a: S.string,
+      b: S.number
     })
-    const keyOf = T.keyof(schema)
+    const keyOf = S.keyof(schema)
     const is = P.is(keyOf)
     expect(is("a")).toEqual(true)
     expect(is("b")).toEqual(true)
@@ -19,11 +20,11 @@ describe.concurrent("keyof", () => {
   it("struct/ symbol keys", () => {
     const a = Symbol.for("@effect/schema/test/a")
     const b = Symbol.for("@effect/schema/test/b")
-    const schema = T.struct({
-      [a]: T.string,
-      [b]: T.number
+    const schema = S.struct({
+      [a]: S.string,
+      [b]: S.number
     })
-    const keyOf = T.keyof(schema)
+    const keyOf = S.keyof(schema)
     const is = P.is(keyOf)
     expect(is(a)).toEqual(true)
     expect(is(b)).toEqual(true)
@@ -32,14 +33,14 @@ describe.concurrent("keyof", () => {
   })
 
   it("should unify string literals with string", () => {
-    const schema = pipe(T.struct({ a: T.string }), T.extend(T.record(T.string, T.string)))
-    expect(AST.keyof(schema.ast)).toEqual(T.string.ast)
+    const schema = pipe(S.struct({ a: S.string }), S.extend(S.record(S.string, S.string)))
+    expect(AST.keyof(schema.ast)).toEqual(S.string.ast)
   })
 
   it("should unify symbol literals with symbol", () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = pipe(T.struct({ [a]: T.string }), T.extend(T.record(T.symbol, T.string)))
-    expect(AST.keyof(schema.ast)).toEqual(T.symbol.ast)
+    const schema = pipe(S.struct({ [a]: S.string }), S.extend(S.record(S.symbol, S.string)))
+    expect(AST.keyof(schema.ast)).toEqual(S.symbol.ast)
   })
 
   it("lazy", () => {
@@ -47,13 +48,13 @@ describe.concurrent("keyof", () => {
       readonly name: string
       readonly categories: ReadonlyArray<Category>
     }
-    const schema: T.Transform<Category, Category> = T.lazy(() =>
-      T.struct({
-        name: T.string,
-        categories: T.array(schema)
+    const schema: S.Schema<Category> = S.lazy(() =>
+      S.struct({
+        name: S.string,
+        categories: S.array(schema)
       })
     )
-    expect(AST.keyof(schema.ast)).toEqual(T.literal("name", "categories").ast)
+    expect(AST.keyof(schema.ast)).toEqual(S.literal("name", "categories").ast)
   })
 
   it("should throw on unsupported schemas", () => {

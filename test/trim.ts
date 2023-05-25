@@ -1,5 +1,4 @@
 import { pipe } from "@effect/data/Function"
-import * as P from "@effect/schema/Parser"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
@@ -9,18 +8,7 @@ describe.concurrent("trim", () => {
     Util.roundtrip(schema)
   })
 
-  it("Guard", () => {
-    const schema = T.Trim
-    const is = P.is(schema)
-    expect(is("a")).toEqual(true)
-    expect(is("")).toEqual(true)
-    expect(is("a ")).toEqual(false)
-    expect(is(" a")).toEqual(false)
-    expect(is(" a ")).toEqual(false)
-    expect(is(" ")).toEqual(false)
-  })
-
-  it("decoding", async () => {
+  it("parse", async () => {
     const schema = pipe(T.string, T.minLength(1), T.trim)
     await Util.expectParseSuccess(schema, "a", "a")
     await Util.expectParseSuccess(schema, "a ", "a")
@@ -38,7 +26,7 @@ describe.concurrent("trim", () => {
     )
   })
 
-  it("encoding", async () => {
+  it("encode", async () => {
     const schema = pipe(T.string, T.minLength(1), T.trim)
     await Util.expectEncodeSuccess(schema, "a", "a")
 

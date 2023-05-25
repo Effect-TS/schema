@@ -1,5 +1,6 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
+import * as S from "@effect/schema/Schema"
 import * as T from "@effect/schema/Transform"
 
 describe.concurrent("AST.guards", () => {
@@ -14,7 +15,7 @@ describe.concurrent("AST.guards", () => {
   })
 
   it("isLazy", () => {
-    expect(AST.isLazy(T.json.ast)).toEqual(true)
+    expect(AST.isLazy(S.json.ast)).toEqual(true)
     expect(AST.isLazy(T.number.ast)).toEqual(false)
   })
 

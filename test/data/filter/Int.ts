@@ -1,10 +1,10 @@
 import { pipe } from "@effect/data/Function"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
-const schema = pipe(T.number, T.int())
+const schema = pipe(S.number, S.int())
 
 describe.concurrent("int", () => {
   it("property tests", () => {
@@ -25,7 +25,7 @@ describe.concurrent("int", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.to(schema)
+    const pretty = Pretty.build(schema)
     expect(pretty(1)).toEqual("1")
   })
 })

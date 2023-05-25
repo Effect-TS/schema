@@ -17,8 +17,7 @@ Added in v1.0.0
 - [model](#model)
   - [Pretty (interface)](#pretty-interface)
 - [prettify](#prettify)
-  - [from](#from)
-  - [to](#to)
+  - [build](#build)
 - [utils](#utils)
   - [match](#match)
 
@@ -52,22 +51,12 @@ Added in v1.0.0
 
 # prettify
 
-## from
+## build
 
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: Transform<I, A>) => (i: I) => string
-```
-
-Added in v1.0.0
-
-## to
-
-**Signature**
-
-```ts
-export declare const to: <I, A>(schema: Transform<I, A>) => (a: A) => string
+export declare const build: <A>(schema: S.Schema<A>) => (a: A) => string
 ```
 
 Added in v1.0.0

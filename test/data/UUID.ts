@@ -1,13 +1,14 @@
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("UUID", () => {
+  const schema = S.UUID
+
   it("property tests", () => {
-    Util.roundtrip(T.UUID)
+    Util.roundtrip(schema)
   })
 
   it("Decoder", async () => {
-    const schema = T.UUID
     await Util.expectParseSuccess(schema, "123e4567-e89b-12d3-a456-426614174000")
     await Util.expectParseFailure(
       schema,

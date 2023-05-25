@@ -1,17 +1,16 @@
-import { pipe } from "@effect/data/Function"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
-
-const schema = pipe(T.string, T.trimmed())
 
 describe.concurrent("trimmed", () => {
+  const schema = S.Trimmed
+
   it("property tests", () => {
     Util.roundtrip(schema)
   })
 
-  it("Guard", () => {
+  it("is", () => {
     const is = P.is(schema)
     expect(is("a")).toEqual(true)
     expect(is("")).toEqual(true)
@@ -21,7 +20,7 @@ describe.concurrent("trimmed", () => {
     expect(is(" ")).toEqual(false)
   })
 
-  it("Decoder", async () => {
+  it("parse", async () => {
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "")
     await Util.expectParseFailure(
@@ -41,7 +40,7 @@ describe.concurrent("trimmed", () => {
     )
   })
 
-  it("Encoder", async () => {
+  it("encode", async () => {
     await Util.expectEncodeSuccess(schema, "a", "a")
     await Util.expectEncodeSuccess(schema, "", "")
     await Util.expectEncodeFailure(
@@ -61,8 +60,8 @@ describe.concurrent("trimmed", () => {
     )
   })
 
-  it("Pretty", () => {
-    const pretty = Pretty.to(schema)
+  it("pretty", () => {
+    const pretty = Pretty.build(schema)
     expect(pretty("a")).toEqual(`"a"`)
     expect(pretty("")).toEqual(`""`)
   })

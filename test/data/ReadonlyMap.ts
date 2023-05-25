@@ -1,105 +1,115 @@
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
-const NumberFromString = T.NumberFromString
-
 describe.concurrent("ReadonlyMap", () => {
-  it("readonlyMapFromSelf. keyof", () => {
-    expect(T.keyof(T.readonlyMapFromSelf(T.number, T.string))).toEqual(T.literal("size"))
+  describe.concurrent("Schema", () => {
+    it("is", () => {
+      const schema = S.readonlyMap(S.number, S.string)
+      const is = P.is(schema)
+      expect(is(new Map())).toEqual(true)
+      expect(is(new Map([[1, "a"], [2, "b"], [3, "c"]]))).toEqual(true)
+
+      expect(is(null)).toEqual(false)
+      expect(is(undefined)).toEqual(false)
+      expect(is(new Map<number, string | number>([[1, "a"], [2, 1]]))).toEqual(false)
+      expect(is(new Map<number, string | number>([[1, 1], [2, "b"]]))).toEqual(false)
+      expect(is(new Map([[1, 1], [2, 2]]))).toEqual(false)
+      expect(is(new Map<string | number, number>([["a", 1], ["b", 2], [3, 1]]))).toEqual(false)
+      expect(is(new Map<number, string | number>([[1, "a"], [2, "b"], [3, 1]]))).toEqual(false)
+    })
+
+    it("pretty", () => {
+      const schema = S.readonlyMap(S.number, S.string)
+      const pretty = Pretty.build(schema)
+      expect(pretty(new Map())).toEqual("new Map([])")
+      expect(pretty(new Map([[1, "a"], [2, "b"]]))).toEqual(
+        `new Map([[1, "a"], [2, "b"]])`
+      )
+    })
   })
 
-  it("readonlyMapFromSelf. property tests", () => {
-    Util.roundtrip(T.readonlyMapFromSelf(T.number, T.string))
-  })
+  describe.concurrent("Transform", () => {
+    describe.concurrent("readonlyMapFromSelf", () => {
+      it("keyof", () => {
+        expect(T.keyof(T.readonlyMapFromSelf(S.number, S.string))).toEqual(T.literal("size"))
+      })
 
-  it("readonlyMapFromSelf. decoder", async () => {
-    const schema = T.readonlyMapFromSelf(NumberFromString, T.string)
-    await Util.expectParseSuccess(schema, new Map(), new Map())
-    await Util.expectParseSuccess(
-      schema,
-      new Map([["1", "a"], ["2", "b"], ["3", "c"]]),
-      new Map([[1, "a"], [2, "b"], [3, "c"]])
-    )
+      it("property tests", () => {
+        Util.roundtrip(T.readonlyMapFromSelf(S.number, S.string))
+      })
 
-    await Util.expectParseFailure(
-      schema,
-      null,
-      `Expected ReadonlyMap, actual null`
-    )
-    await Util.expectParseFailure(
-      schema,
-      new Map([["1", "a"], ["a", "b"]]),
-      `/1 /0 Expected string -> number, actual "a"`
-    )
-  })
+      it("parse", async () => {
+        const transform = T.readonlyMapFromSelf(T.NumberFromString, S.string)
+        await Util.expectParseSuccess(transform, new Map(), new Map())
+        await Util.expectParseSuccess(
+          transform,
+          new Map([["1", "a"], ["2", "b"], ["3", "c"]]),
+          new Map([[1, "a"], [2, "b"], [3, "c"]])
+        )
 
-  it("readonlyMapFromSelf. encoder", async () => {
-    const schema = T.readonlyMapFromSelf(NumberFromString, T.string)
-    await Util.expectEncodeSuccess(schema, new Map(), new Map())
-    await Util.expectEncodeSuccess(
-      schema,
-      new Map([[1, "a"], [2, "b"], [3, "c"]]),
-      new Map([["1", "a"], ["2", "b"], ["3", "c"]])
-    )
-  })
+        await Util.expectParseFailure(
+          transform,
+          null,
+          `Expected ReadonlyMap, actual null`
+        )
+        await Util.expectParseFailure(
+          transform,
+          new Map([["1", "a"], ["a", "b"]]),
+          `/1 /0 Expected string -> number, actual "a"`
+        )
+      })
 
-  it("readonlyMapFromSelf. guard", () => {
-    const schema = T.readonlyMapFromSelf(T.number, T.string)
-    const is = P.is(schema)
-    expect(is(new Map())).toEqual(true)
-    expect(is(new Map([[1, "a"], [2, "b"], [3, "c"]]))).toEqual(true)
+      it("encode", async () => {
+        const transform = T.readonlyMapFromSelf(T.NumberFromString, S.string)
+        await Util.expectEncodeSuccess(transform, new Map(), new Map())
+        await Util.expectEncodeSuccess(
+          transform,
+          new Map([[1, "a"], [2, "b"], [3, "c"]]),
+          new Map([["1", "a"], ["2", "b"], ["3", "c"]])
+        )
+      })
+    })
 
-    expect(is(null)).toEqual(false)
-    expect(is(undefined)).toEqual(false)
-    expect(is(new Map<number, string | number>([[1, "a"], [2, 1]]))).toEqual(false)
-    expect(is(new Map<number, string | number>([[1, 1], [2, "b"]]))).toEqual(false)
-    expect(is(new Map([[1, 1], [2, 2]]))).toEqual(false)
-    expect(is(new Map<string | number, number>([["a", 1], ["b", 2], [3, 1]]))).toEqual(false)
-    expect(is(new Map<number, string | number>([[1, "a"], [2, "b"], [3, 1]]))).toEqual(false)
-  })
+    describe.concurrent("readonlyMap", () => {
+      it("property tests", () => {
+        Util.roundtrip(T.readonlyMap(S.number, S.string))
+      })
 
-  it("readonlyMapFromSelf. pretty", () => {
-    const schema = T.readonlyMapFromSelf(T.number, T.string)
-    const pretty = Pretty.to(schema)
-    expect(pretty(new Map())).toEqual("new Map([])")
-    expect(pretty(new Map([[1, "a"], [2, "b"]]))).toEqual(
-      `new Map([[1, "a"], [2, "b"]])`
-    )
-  })
+      it("parse", async () => {
+        const transform = T.readonlyMap(S.number, S.string)
+        await Util.expectParseSuccess(transform, [], new Map())
+        await Util.expectParseSuccess(
+          transform,
+          [[1, "a"], [2, "b"], [3, "c"]],
+          new Map([[1, "a"], [2, "b"], [3, "c"]])
+        )
 
-  it("readonlyMap. property tests", () => {
-    Util.roundtrip(T.readonlyMap(T.number, T.string))
-  })
+        await Util.expectParseFailure(
+          transform,
+          null,
+          `Expected a generic array, actual null`
+        )
+        await Util.expectParseFailure(
+          transform,
+          [[1, "a"], [2, 1]],
+          `/1 /1 Expected string, actual 1`
+        )
+      })
 
-  it("readonlyMap. decoder", async () => {
-    const schema = T.readonlyMap(T.number, T.string)
-    await Util.expectParseSuccess(schema, [], new Map())
-    await Util.expectParseSuccess(
-      schema,
-      [[1, "a"], [2, "b"], [3, "c"]],
-      new Map([[1, "a"], [2, "b"], [3, "c"]])
-    )
-
-    await Util.expectParseFailure(
-      schema,
-      null,
-      `Expected a generic array, actual null`
-    )
-    await Util.expectParseFailure(
-      schema,
-      [[1, "a"], [2, 1]],
-      `/1 /1 Expected string, actual 1`
-    )
-  })
-
-  it("readonlyMap. encoder", async () => {
-    const schema = T.readonlyMap(T.number, T.string)
-    await Util.expectEncodeSuccess(schema, new Map(), [])
-    await Util.expectEncodeSuccess(schema, new Map([[1, "a"], [2, "b"], [3, "c"]]), [[1, "a"], [
-      2,
-      "b"
-    ], [3, "c"]])
+      it("encode", async () => {
+        const transform = T.readonlyMap(S.number, S.string)
+        await Util.expectEncodeSuccess(transform, new Map(), [])
+        await Util.expectEncodeSuccess(transform, new Map([[1, "a"], [2, "b"], [3, "c"]]), [[
+          1,
+          "a"
+        ], [
+          2,
+          "b"
+        ], [3, "c"]])
+      })
+    })
   })
 })

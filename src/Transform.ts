@@ -18,7 +18,6 @@ import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
-import { isDate } from "@effect/data/Predicate"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -26,7 +25,6 @@ import * as I from "@effect/schema/internal/common"
 import * as P from "@effect/schema/Parser"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
-import type { Pretty } from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
@@ -64,11 +62,6 @@ export const to = <I, A>(schema: Transform<I, A>): S.Schema<A> => S.make(AST.to(
 
 /* c8 ignore start */
 export {
-  /**
-   * @category validation
-   * @since 1.0.0
-   */
-  asserts,
   /**
    * @category decoding
    * @since 1.0.0
@@ -130,11 +123,6 @@ export {
    */
   encodeResult,
   /**
-   * @category validation
-   * @since 1.0.0
-   */
-  is,
-  /**
    * @category parsing
    * @since 1.0.0
    */
@@ -163,44 +151,7 @@ export {
    * @category parsing
    * @since 1.0.0
    */
-  parseResult,
-  /**
-   * @category validation
-   * @since 1.0.0
-   */
-  validate,
-  /**
-   * @category validation
-   * @since 1.0.0
-   */
-  validateEffect,
-  /**
-   * @category validation
-   * @since 1.0.0
-   */
-  validateEither,
-  /**
-   * @category validation
-   * @since 1.0.0
-   */
-  validateOption,
-  /**
-   * @category validation
-   * @since 1.0.0
-   */
-  validatePromise,
-  /**
-   * @category validation
-   * @since 1.0.0
-   */
-  validateResult
-} from "@effect/schema/Parser"
-
-export type {
-  /**
-   * @since 1.0.0
-   */
-  ToAsserts
+  parseResult
 } from "@effect/schema/Parser"
 
 export {
@@ -298,7 +249,7 @@ export {
 export const make = <I, A>(ast: AST.AST): Transform<I, A> => ({ ast }) as any
 
 /**
-  @category combinators
+  @category constructors
   @since 1.0.0
 */
 export const declare = (
@@ -722,9 +673,10 @@ export const brand = <B extends string | symbol, A>(
 ) =>
   <I>(self: Transform<I, A>): BrandTransform<I, A & Brand<B>> => {
     const annotations = S.toAnnotations(options)
-    annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
+    annotations[AST.BrandAnnotationId] = [...S.getBrands(self.ast), brand]
     const ast = AST.mergeAnnotations(self.ast, annotations)
-    const schema = make(ast)
+    const transform = make(ast)
+    const schema = to(transform)
     const validate = P.validate(schema)
     const validateOption = P.validateOption(schema)
     const validateEither = P.validateEither(schema)
@@ -742,9 +694,6 @@ export const brand = <B extends string | symbol, A>(
     })
     return out
   }
-
-const getBrands = (ast: AST.AST): Array<string> =>
-  (ast.annotations[AST.BrandAnnotationId] as Array<string> | undefined) || []
 
 /**
  * @category combinators
@@ -1287,18 +1236,12 @@ export const fromBrand = <C extends Brand<string | symbol>>(
 // data/Chunk
 // ---------------------------------------------
 
-const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
-  (fc) => fc.array(item(fc)).map(C.fromIterable)
-
-const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
-  (c) => `Chunk(${C.toReadonlyArray(c).map(item).join(", ")})`
-
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> => {
-  return declare(
+export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> =>
+  declare(
     [item],
     struct({
       _id: S.uniqueSymbol(Symbol.for("@effect/data/Chunk")),
@@ -1324,11 +1267,10 @@ export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, 
     },
     {
       [AST.IdentifierAnnotationId]: "Chunk",
-      [I.PrettyHookId]: chunkPretty,
-      [I.ArbitraryHookId]: chunkArbitrary
+      [I.PrettyHookId]: S.chunkPretty,
+      [I.ArbitraryHookId]: S.chunkArbitrary
     }
   )
-}
 
 /**
  * @category combinators
@@ -1343,14 +1285,6 @@ export const chunk = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, 
 
 const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): D.Data<A> =>
   Array.isArray(a) ? D.array(a) : D.struct(a)
-
-const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: Arbitrary<A>
-): Arbitrary<D.Data<A>> => (fc) => item(fc).map(toData)
-
-const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: Pretty<A>
-): Pretty<D.Data<A>> => (d) => `Data(${item(d)})`
 
 /**
  * @category combinators
@@ -1388,8 +1322,8 @@ export const dataFromSelf = <
     },
     {
       [AST.IdentifierAnnotationId]: "Data",
-      [I.PrettyHookId]: dataPretty,
-      [I.ArbitraryHookId]: dataArbitrary
+      [I.PrettyHookId]: S.dataPretty,
+      [I.ArbitraryHookId]: S.dataArbitrary
     }
   )
 }
@@ -1415,26 +1349,6 @@ export const data = <
 // data/Date
 // ---------------------------------------------
 
-const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date()
-
-const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
-
-/**
- * @category Date
- * @since 1.0.0
- */
-export const DateFromSelf: Transform<Date, Date> = declare(
-  [],
-  struct({}),
-  () => (u: unknown) => !isDate(u) ? PR.failure(PR.type(DateFromSelf.ast, u)) : PR.success(u),
-  () => PR.success,
-  {
-    [AST.IdentifierAnnotationId]: "Date",
-    [I.PrettyHookId]: datePretty,
-    [I.ArbitraryHookId]: dateArbitrary
-  }
-)
-
 /**
  * @category type id
  * @since 1.0.0
@@ -1459,15 +1373,7 @@ export const validDate = (options?: AnnotationOptions<Date>) =>
     )
 
 /**
- * A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
- *
- * @category Date
- * @since 1.0.0
- */
-export const ValidDateFromSelf = pipe(DateFromSelf, validDate())
-
-/**
-  A combinator that transforms a `string` into a `Date`.
+  A combinator that transforms a `string` into a valid `Date`.
 
   @category Date
   @since 1.0.0
@@ -1475,7 +1381,7 @@ export const ValidDateFromSelf = pipe(DateFromSelf, validDate())
 export const dateFromString = <I>(self: Transform<I, string>): Transform<I, Date> =>
   transformResult(
     self,
-    ValidDateFromSelf,
+    S.ValidDate,
     (input) => PR.success(new Date(input)),
     (date) => PR.success(date.toISOString())
   )
@@ -1495,17 +1401,6 @@ export {
 // ---------------------------------------------
 // data/Either
 // ---------------------------------------------
-
-const eitherArbitrary = <E, A>(
-  left: Arbitrary<E>,
-  right: Arbitrary<A>
-): Arbitrary<Either<E, A>> => (fc) => fc.oneof(left(fc).map(E.left), right(fc).map(E.right))
-
-const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
-  E.match(
-    (e) => `left(${left(e)})`,
-    (a) => `right(${right(a)})`
-  )
 
 const eitherInline = <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) =>
   union(
@@ -1550,8 +1445,8 @@ export const eitherFromSelf = <IE, E, IA, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "Either",
-      [I.PrettyHookId]: eitherPretty,
-      [I.ArbitraryHookId]: eitherArbitrary
+      [I.PrettyHookId]: S.eitherPretty,
+      [I.ArbitraryHookId]: S.eitherArbitrary
     }
   )
 }
@@ -1576,84 +1471,6 @@ export const either = <IE, E, IA, A>(
       (right) => ({ _tag: "Right" as const, right })
     )
   )
-
-// ---------------------------------------------
-// data/Json
-// ---------------------------------------------
-
-/**
- * @category model
- * @since 1.0.0
- */
-export type JsonArray = ReadonlyArray<Json>
-
-/**
- * @category model
- * @since 1.0.0
- */
-export type JsonObject = { readonly [key: string]: Json }
-
-/**
- * @category model
- * @since 1.0.0
- */
-export type Json =
-  | null
-  | boolean
-  | number
-  | string
-  | JsonArray
-  | JsonObject
-
-const arbitraryJson: Arbitrary<Json> = (fc) => fc.jsonValue().map((json) => json as Json)
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const JsonNumberTypeId = "@effect/schema/JsonNumberTypeId"
-
-/**
- * The `JsonNumber` is a schema for representing JSON numbers. It ensures that the provided value is a valid
- * number by filtering out `NaN` and `(+/-) Infinity`. This is useful when you want to validate and represent numbers in JSON
- * format.
- *
- * @example
- * import * as S from "@effect/schema/Transform"
- *
- * const is = S.is(S.JsonNumber)
- *
- * assert.deepStrictEqual(is(42), true)
- * assert.deepStrictEqual(is(Number.NaN), false)
- * assert.deepStrictEqual(is(Number.POSITIVE_INFINITY), false)
- * assert.deepStrictEqual(is(Number.NEGATIVE_INFINITY), false)
- *
- * @category constructors
- * @since 1.0.0
- */
-export const JsonNumber = pipe(
-  S.number,
-  filter((n) => !isNaN(n) && isFinite(n), {
-    typeId: JsonNumberTypeId,
-    description: "a JSON number"
-  })
-)
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const json: Transform<Json, Json> = lazy(() =>
-  union(
-    S.null,
-    S.string,
-    JsonNumber,
-    S.boolean,
-    array(json),
-    record(S.string, json)
-  ), {
-  [I.ArbitraryHookId]: () => arbitraryJson
-})
 
 // ---------------------------------------------
 // data/Number
@@ -2001,50 +1818,8 @@ export const numberFromString = <I>(self: Transform<I, string>): Transform<I, nu
 export const NumberFromString: Transform<string, number> = numberFromString(S.string)
 
 // ---------------------------------------------
-// data/Object
-// ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const InstanceOfTypeId = "@effect/schema/InstanceOfTypeId"
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const instanceOf = <A extends abstract new(...args: any) => any>(
-  constructor: A,
-  options?: AnnotationOptions<object>
-): Transform<InstanceType<A>, InstanceType<A>> =>
-  declare(
-    [],
-    struct({}),
-    () =>
-      (input, _, self) =>
-        input instanceof constructor ? PR.success(input) : PR.failure(PR.type(self, input)),
-    () => PR.success,
-    {
-      [AST.TypeAnnotationId]: InstanceOfTypeId,
-      [InstanceOfTypeId]: { constructor },
-      [AST.DescriptionAnnotationId]: `an instance of ${constructor.name}`,
-      ...options
-    }
-  )
-
-// ---------------------------------------------
 // data/Option
 // ---------------------------------------------
-
-const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> =>
-  (fc) => fc.oneof(fc.constant(O.none()), value(fc).map(O.some))
-
-const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
-  O.match(
-    () => "none()",
-    (a) => `some(${value(a)})`
-  )
 
 const optionInline = <I, A>(value: Transform<I, A>) =>
   union(
@@ -2083,8 +1858,8 @@ export const optionFromSelf = <I, A>(value: Transform<I, A>): Transform<Option<I
     },
     {
       [AST.IdentifierAnnotationId]: "Option",
-      [I.PrettyHookId]: optionPretty,
-      [I.ArbitraryHookId]: optionArbitrary
+      [I.PrettyHookId]: S.optionPretty,
+      [I.ArbitraryHookId]: S.optionArbitrary
     }
   )
 }
@@ -2195,25 +1970,6 @@ export const itemsCount = <A>(
 // data/ReadonlyMap
 // ---------------------------------------------
 
-const isMap = (u: unknown): u is Map<unknown, unknown> => u instanceof Map
-
-const readonlyMapArbitrary = <K, V>(
-  key: Arbitrary<K>,
-  value: Arbitrary<V>
-): Arbitrary<ReadonlyMap<K, V>> =>
-  (fc) => fc.array(fc.tuple(key(fc), value(fc))).map((as) => new Map(as))
-
-const readonlyMapPretty = <K, V>(
-  key: Pretty<K>,
-  value: Pretty<V>
-): Pretty<ReadonlyMap<K, V>> =>
-  (map) =>
-    `new Map([${
-      Array.from(map.entries())
-        .map(([k, v]) => `[${key(k)}, ${value(v)}]`)
-        .join(", ")
-    }])`
-
 /**
  * @category constructors
  * @since 1.0.0
@@ -2230,7 +1986,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
     <IK, K, IV, V>(key: Transform<IK, K>, value: Transform<IV, V>) => {
       const parseResult = P.parseResult(array(tuple(key, value)))
       return (u: unknown, options, self) =>
-        !isMap(u) ?
+        !S.isMap(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(parseResult(Array.from(u.entries()), options), (as) => new Map(as))
     },
@@ -2241,8 +1997,8 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
-      [I.PrettyHookId]: readonlyMapPretty,
-      [I.ArbitraryHookId]: readonlyMapArbitrary
+      [I.PrettyHookId]: S.readonlyMapPretty,
+      [I.ArbitraryHookId]: S.readonlyMapArbitrary
     }
   )
 }
@@ -2266,14 +2022,6 @@ export const readonlyMap = <IK, K, IV, V>(
 // data/ReadonlySet
 // ---------------------------------------------
 
-const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
-
-const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
-  (fc) => fc.array(item(fc)).map((as) => new Set(as))
-
-const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
-  (set) => `new Set([${Array.from(set.values()).map((a) => item(a)).join(", ")}])`
-
 /**
  * @category constructors
  * @since 1.0.0
@@ -2289,7 +2037,7 @@ export const readonlySetFromSelf = <I, A>(
     <I, A>(item: Transform<I, A>) =>
       (u: unknown, options, self) => {
         const parseResult = P.parseResult(array(item))
-        return !isSet(u) ?
+        return !S.isSet(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(parseResult(Array.from(u.values()), options), (as) => new Set(as))
       },
@@ -2300,8 +2048,8 @@ export const readonlySetFromSelf = <I, A>(
       },
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
-      [I.PrettyHookId]: readonlySetPretty,
-      [I.ArbitraryHookId]: readonlySetArbitrary
+      [I.PrettyHookId]: S.readonlySetPretty,
+      [I.ArbitraryHookId]: S.readonlySetArbitrary
     }
   )
 }
@@ -2551,26 +2299,6 @@ export const trim = <I>(self: Transform<I, string>): Transform<I, string> =>
  * @since 1.0.0
  */
 export const Trim: Transform<string, string> = trim(S.string)
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const UUIDTypeId = "@effect/schema/UUIDTypeId"
-
-const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const UUID: Transform<string, string> = pipe(
-  S.string,
-  pattern(uuidRegex, {
-    typeId: UUIDTypeId,
-    arbitrary: (): Arbitrary<string> => (fc) => fc.uuid()
-  })
-)
 
 /**
  * @category string

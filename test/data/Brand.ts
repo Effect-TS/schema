@@ -1,7 +1,7 @@
 import * as B from "@effect/data/Brand"
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 type Int = number & B.Brand<"Int">
 const Int = B.refined<Int>(
@@ -23,19 +23,19 @@ const Eur = B.nominal<Eur>()
 
 describe.concurrent("Brand", () => {
   it("property tests", () => {
-    Util.roundtrip(T.fromBrand(Int)(T.number)) // refined
-    Util.roundtrip(T.fromBrand(Eur)(T.number)) // nominal
+    Util.roundtrip(S.fromBrand(Int)(S.number)) // refined
+    Util.roundtrip(S.fromBrand(Eur)(S.number)) // nominal
   })
 
   it("refined", async () => {
-    const schema = pipe(T.number, T.fromBrand(B.all(Positive, Int)))
+    const schema = pipe(S.number, S.fromBrand(B.all(Positive, Int)))
 
     await Util.expectParseFailure(
       schema,
       -0.5,
       "Expected -0.5 to be positive, Expected -0.5 to be an integer"
     )
-    expect(() => T.parse(schema)(-0.5)).toThrowError(
+    expect(() => S.validate(schema)(-0.5)).toThrowError(
       new Error(`error(s) found
 └─ Expected -0.5 to be positive, Expected -0.5 to be an integer`)
     )

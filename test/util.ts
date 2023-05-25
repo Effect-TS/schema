@@ -9,6 +9,7 @@ import * as A from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
 import * as PR from "@effect/schema/ParseResult"
+import * as S from "@effect/schema/Schema"
 import type { Transform } from "@effect/schema/Transform"
 import * as T from "@effect/schema/Transform"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
@@ -102,8 +103,8 @@ export const roundtrip = <I, A>(schema: Transform<I, A>) => {
     return
   }
   const to = T.to(schema)
-  const arb = A.get(to)
-  const is = T.is(to)
+  const arb = A.build(to)
+  const is = S.is(to)
   fc.assert(fc.property(arb(fc), (a) => {
     if (!is(a)) {
       return false

@@ -1,18 +1,19 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Bigint", () => {
   it("clampBigint", async () => {
-    const schema = pipe(T.bigint, T.clampBigint(-1n, 1n))
+    const transform = pipe(S.bigint, T.clampBigint(-1n, 1n))
 
-    await Util.expectParseSuccess(schema, 3n, 1n)
-    await Util.expectParseSuccess(schema, 0n, 0n)
-    await Util.expectParseSuccess(schema, -3n, -1n)
+    await Util.expectParseSuccess(transform, 3n, 1n)
+    await Util.expectParseSuccess(transform, 0n, 0n)
+    await Util.expectParseSuccess(transform, -3n, -1n)
   })
 
   it("greaterThanBigint", async () => {
-    const schema = pipe(T.bigint, T.greaterThanBigint(0n))
+    const schema = pipe(S.bigint, S.greaterThanBigint(0n))
 
     await Util.expectParseFailure(schema, -1n, "Expected a bigint greater than 0n, actual -1n")
     await Util.expectParseFailure(schema, 0n, "Expected a bigint greater than 0n, actual 0n")
@@ -20,7 +21,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("greaterThanOrEqualToBigint", async () => {
-    const schema = pipe(T.bigint, T.greaterThanOrEqualToBigint(0n))
+    const schema = pipe(S.bigint, S.greaterThanOrEqualToBigint(0n))
 
     await Util.expectParseFailure(
       schema,
@@ -32,7 +33,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("lessThanBigint", async () => {
-    const schema = pipe(T.bigint, T.lessThanBigint(0n))
+    const schema = pipe(S.bigint, S.lessThanBigint(0n))
 
     await Util.expectEncodeSuccess(schema, -1n, -1n)
     await Util.expectParseFailure(schema, 0n, "Expected a bigint less than 0n, actual 0n")
@@ -40,7 +41,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("lessThanOrEqualToBigint", async () => {
-    const schema = pipe(T.bigint, T.lessThanOrEqualToBigint(0n))
+    const schema = pipe(S.bigint, S.lessThanOrEqualToBigint(0n))
 
     await Util.expectEncodeSuccess(schema, -1n, -1n)
     await Util.expectParseSuccess(schema, 0n, 0n)
@@ -52,7 +53,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("betweenBigint", async () => {
-    const schema = pipe(T.bigint, T.betweenBigint(-1n, 1n))
+    const schema = pipe(S.bigint, S.betweenBigint(-1n, 1n))
 
     await Util.expectParseFailure(
       schema,
@@ -65,7 +66,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("positiveBigint", async () => {
-    const schema = pipe(T.bigint, T.positiveBigint())
+    const schema = pipe(S.bigint, S.positiveBigint())
 
     await Util.expectParseFailure(schema, -1n, "Expected a positive bigint, actual -1n")
     await Util.expectParseFailure(schema, 0n, "Expected a positive bigint, actual 0n")
@@ -73,7 +74,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("negativeBigint", async () => {
-    const schema = pipe(T.bigint, T.negativeBigint())
+    const schema = pipe(S.bigint, S.negativeBigint())
 
     await Util.expectEncodeSuccess(schema, -1n, -1n)
     await Util.expectParseFailure(schema, 0n, "Expected a negative bigint, actual 0n")
@@ -81,7 +82,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("nonNegativeBigint", async () => {
-    const schema = pipe(T.bigint, T.nonNegativeBigint())
+    const schema = pipe(S.bigint, S.nonNegativeBigint())
 
     await Util.expectEncodeFailure(schema, -1n, "Expected a non-negative bigint, actual -1n")
     await Util.expectParseSuccess(schema, 0n, 0n)
@@ -89,7 +90,7 @@ describe.concurrent("Bigint", () => {
   })
 
   it("nonPositiveBigint", async () => {
-    const schema = pipe(T.bigint, T.nonPositiveBigint())
+    const schema = pipe(S.bigint, S.nonPositiveBigint())
 
     await Util.expectEncodeSuccess(schema, -1n, -1n)
     await Util.expectParseSuccess(schema, 0n, 0n)

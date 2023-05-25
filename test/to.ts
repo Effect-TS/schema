@@ -1,4 +1,5 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
@@ -23,10 +24,10 @@ describe.concurrent("to", () => {
       T.lessThanOrEqualTo(2),
       T.to
     )
-    expect(T.is(schema)(0)).toEqual(false)
-    expect(T.is(schema)(1)).toEqual(true)
-    expect(T.is(schema)(2)).toEqual(true)
-    expect(T.is(schema)(3)).toEqual(false)
+    expect(S.is(schema)(0)).toEqual(false)
+    expect(S.is(schema)(1)).toEqual(true)
+    expect(S.is(schema)(2)).toEqual(true)
+    expect(S.is(schema)(3)).toEqual(false)
   })
 
   it("lazy", async () => {

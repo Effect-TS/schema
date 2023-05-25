@@ -5,23 +5,23 @@ import * as T from "@effect/schema/Transform"
 
 describe.concurrent("extend", () => {
   it(`struct extend struct (dual)`, async () => {
-    const schema = T.extend(T.struct({ a: T.string }), T.struct({ b: T.number }))
+    const schema = S.extend(S.struct({ a: S.string }), S.struct({ b: S.number }))
     await Util.expectParseSuccess(schema, { a: "a", b: 1 })
   })
 
   it(`struct with defaults extend struct`, async () => {
     const schema = pipe(
-      T.struct({ a: T.optional(T.string).withDefault(() => ""), b: T.string }),
-      T.extend(T.struct({ c: T.number }))
+      T.struct({ a: T.optional(S.string).withDefault(() => ""), b: S.string }),
+      T.extend(S.struct({ c: S.number }))
     )
     await Util.expectParseSuccess(schema, { b: "b", c: 1 }, { a: "", b: "b", c: 1 })
   })
 
   it(`struct extend struct with defaults`, async () => {
     const schema = pipe(
-      T.struct({ a: T.number }),
+      S.struct({ a: T.number }),
       T.extend(
-        T.struct({ b: T.string, c: T.optional(T.string).withDefault(() => "") })
+        T.struct({ b: S.string, c: T.optional(S.string).withDefault(() => "") })
       )
     )
     await Util.expectParseSuccess(schema, { a: 1, b: "b" }, { a: 1, b: "b", c: "" })
@@ -29,9 +29,9 @@ describe.concurrent("extend", () => {
 
   it(`struct with defaults extend struct with defaults `, async () => {
     const schema = pipe(
-      T.struct({ a: T.optional(T.string).withDefault(() => ""), b: T.string }),
+      T.struct({ a: T.optional(S.string).withDefault(() => ""), b: S.string }),
       T.extend(
-        T.struct({ c: T.optional(T.number).withDefault(() => 0), d: T.boolean })
+        T.struct({ c: T.optional(S.number).withDefault(() => 0), d: S.boolean })
       )
     )
     await Util.expectParseSuccess(schema, { b: "b", d: true }, { a: "", b: "b", c: 0, d: true })
@@ -41,23 +41,23 @@ describe.concurrent("extend", () => {
     const schema = pipe(
       T.union(
         T.struct({
-          a: T.optional(T.string).withDefault(() => "a"),
-          b: T.string
+          a: T.optional(S.string).withDefault(() => "a"),
+          b: S.string
         }),
         T.struct({
-          c: T.optional(T.string).withDefault(() => "c"),
-          d: T.string
+          c: T.optional(S.string).withDefault(() => "c"),
+          d: S.string
         })
       ),
       T.extend(
         T.union(
           T.struct({
-            e: T.optional(T.string).withDefault(() => "e"),
-            f: T.string
+            e: T.optional(S.string).withDefault(() => "e"),
+            f: S.string
           }),
           T.struct({
-            g: T.optional(T.string).withDefault(() => "g"),
-            h: T.string
+            g: T.optional(S.string).withDefault(() => "g"),
+            h: S.string
           })
         )
       )
@@ -78,13 +78,13 @@ describe.concurrent("extend", () => {
 
   it(`struct extend union`, () => {
     const schema = pipe(
-      T.struct({ b: T.boolean }),
-      T.extend(T.union(
-        T.struct({ a: T.literal("a") }),
-        T.struct({ a: T.literal("b") })
+      S.struct({ b: S.boolean }),
+      S.extend(S.union(
+        S.struct({ a: S.literal("a") }),
+        S.struct({ a: S.literal("b") })
       ))
     )
-    const is = T.is(schema)
+    const is = S.is(schema)
 
     expect(is({ a: "a", b: false })).toBe(true)
     expect(is({ a: "b", b: false })).toBe(true)
@@ -95,13 +95,13 @@ describe.concurrent("extend", () => {
 
   it(`union extend struct`, () => {
     const schema = pipe(
-      T.union(
-        T.struct({ a: T.literal("a") }),
-        T.struct({ b: T.literal("b") })
+      S.union(
+        S.struct({ a: S.literal("a") }),
+        S.struct({ b: S.literal("b") })
       ),
-      T.extend(T.struct({ c: T.boolean }))
+      S.extend(S.struct({ c: S.boolean }))
     )
-    const is = T.is(schema)
+    const is = S.is(schema)
 
     expect(is({ a: "a", c: false })).toBe(true)
     expect(is({ b: "b", c: false })).toBe(true)
@@ -112,18 +112,18 @@ describe.concurrent("extend", () => {
 
   it(`union extend union`, () => {
     const schema = pipe(
-      T.union(
-        T.struct({ a: T.literal("a") }),
-        T.struct({ a: T.literal("b") })
+      S.union(
+        S.struct({ a: S.literal("a") }),
+        S.struct({ a: S.literal("b") })
       ),
-      T.extend(
-        T.union(
-          T.struct({ c: T.boolean }),
-          T.struct({ d: T.number })
+      S.extend(
+        S.union(
+          S.struct({ c: T.boolean }),
+          S.struct({ d: T.number })
         )
       )
     )
-    const is = T.is(schema)
+    const is = S.is(schema)
 
     expect(is({ a: "a", c: false })).toBe(true)
     expect(is({ a: "b", d: 69 })).toBe(true)
@@ -141,7 +141,7 @@ describe.concurrent("extend", () => {
   // -------------------------------------------------------------------------------------
 
   it("can only handle type literals or unions of type literals", () => {
-    expect(() => pipe(T.string, T.extend(T.number))).toThrowError(
+    expect(() => pipe(S.string, T.extend(T.number))).toThrowError(
       new Error("`extend` can only handle type literals or unions of type literals")
     )
   })
@@ -149,8 +149,8 @@ describe.concurrent("extend", () => {
   it(`extend/overlapping index signatures/ string`, () => {
     expect(() =>
       pipe(
-        T.record(T.string, T.number),
-        T.extend(T.record(T.string, T.boolean))
+        T.record(S.string, T.number),
+        T.extend(T.record(S.string, T.boolean))
       )
     ).toThrowError(new Error("Duplicate index signature for type `string`"))
   })
@@ -167,7 +167,7 @@ describe.concurrent("extend", () => {
   it("extend/overlapping index signatures/ refinements", () => {
     expect(() =>
       pipe(
-        T.record(T.string, T.number),
+        T.record(S.string, T.number),
         T.extend(T.record(pipe(S.string, S.minLength(2)), T.boolean))
       )
     ).toThrowError(new Error("Duplicate index signature for type `string`"))
@@ -176,17 +176,17 @@ describe.concurrent("extend", () => {
   it(`overlapping property signatures`, () => {
     expect(() =>
       pipe(
-        T.struct({ a: T.literal("a") }),
-        T.extend(T.struct({ a: T.string }))
+        S.struct({ a: S.literal("a") }),
+        T.extend(S.struct({ a: S.string }))
       )
     ).toThrowError(new Error("Duplicate property signature a"))
     expect(() =>
       pipe(
-        T.struct({ a: T.literal("a") }),
+        S.struct({ a: S.literal("a") }),
         T.extend(
-          T.union(
-            T.struct({ a: T.string }),
-            T.struct({ b: T.number })
+          S.union(
+            S.struct({ a: S.string }),
+            S.struct({ b: T.number })
           )
         )
       )
@@ -195,8 +195,8 @@ describe.concurrent("extend", () => {
 
   it("struct extend record(string, string)", async () => {
     const schema = pipe(
-      T.struct({ a: T.string }),
-      T.extend(T.record(T.string, T.string))
+      S.struct({ a: S.string }),
+      T.extend(T.record(S.string, S.string))
     )
     await Util.expectParseSuccess(schema, { a: "a" })
     await Util.expectParseSuccess(schema, { a: "a", b: "b" })

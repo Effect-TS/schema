@@ -16,6 +16,7 @@ import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
+import type { Schema } from "@effect/schema/Schema"
 import type { To, Transform } from "@effect/schema/Transform"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
@@ -59,47 +60,47 @@ const getEffect = (ast: AST.AST, isDecoding: boolean) => {
  * @category parsing
  * @since 1.0.0
  */
-export const parse = <_, A>(schema: Transform<_, A>): (i: unknown, options?: ParseOptions) => A =>
+export const parse = <I, A>(schema: Transform<I, A>): (i: unknown, options?: ParseOptions) => A =>
   get(schema.ast, true)
 
 /**
  * @category parsing
  * @since 1.0.0
  */
-export const parseOption = <_, A>(
-  schema: Transform<_, A>
+export const parseOption = <I, A>(
+  schema: Transform<I, A>
 ): (i: unknown, options?: ParseOptions) => Option<A> => getOption(schema.ast, true)
 
 /**
  * @category parsing
  * @since 1.0.0
  */
-export const parseEither = <_, A>(
-  schema: Transform<_, A>
+export const parseEither = <I, A>(
+  schema: Transform<I, A>
 ): (i: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> => getEither(schema.ast, true)
 
 /**
  * @category parsing
  * @since 1.0.0
  */
-export const parseResult = <_, A>(
-  schema: Transform<_, A>
+export const parseResult = <I, A>(
+  schema: Transform<I, A>
 ): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true, true)
 
 /**
  * @category parsing
  * @since 1.0.0
  */
-export const parsePromise = <_, A>(
-  schema: Transform<_, A>
+export const parsePromise = <I, A>(
+  schema: Transform<I, A>
 ): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(schema.ast, true)
 
 /**
  * @category parsing
  * @since 1.0.0
  */
-export const parseEffect = <_, A>(
-  schema: Transform<_, A>
+export const parseEffect = <I, A>(
+  schema: Transform<I, A>
 ): (i: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> =>
   getEffect(schema.ast, true)
 
@@ -153,24 +154,24 @@ export const decodeEffect: <I, A>(
  * @category validation
  * @since 1.0.0
  */
-export const validate = <_, A>(
-  schema: Transform<_, A>
+export const validate = <A>(
+  schema: Schema<A>
 ): (a: unknown, options?: ParseOptions) => A => get(AST.to(schema.ast), true)
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validateOption = <_, A>(
-  schema: Transform<_, A>
+export const validateOption = <A>(
+  schema: Schema<A>
 ): (a: unknown, options?: ParseOptions) => Option<A> => getOption(AST.to(schema.ast), true)
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validateEither = <_, A>(
-  schema: Transform<_, A>
+export const validateEither = <A>(
+  schema: Schema<A>
 ): (a: unknown, options?: ParseOptions) => E.Either<PR.ParseError, A> =>
   getEither(AST.to(schema.ast), true)
 
@@ -178,24 +179,24 @@ export const validateEither = <_, A>(
  * @category validation
  * @since 1.0.0
  */
-export const validateResult = <_, A>(
-  schema: Transform<_, A>
+export const validateResult = <A>(
+  schema: Schema<A>
 ): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(AST.to(schema.ast), true, true)
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validatePromise = <_, A>(
-  schema: Transform<_, A>
+export const validatePromise = <A>(
+  schema: Schema<A>
 ): (i: unknown, options?: ParseOptions) => Promise<A> => getPromise(AST.to(schema.ast), true)
 
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validateEffect = <_, A>(
-  schema: Transform<_, A>
+export const validateEffect = <A>(
+  schema: Schema<A>
 ): (a: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A> =>
   getEffect(AST.to(schema.ast), true)
 
@@ -203,7 +204,7 @@ export const validateEffect = <_, A>(
  * @category validation
  * @since 1.0.0
  */
-export const is = <_, A>(schema: Transform<_, A>) => {
+export const is = <A>(schema: Schema<A>) => {
   const getEither = validateEither(schema)
   return (a: unknown): a is A => E.isRight(getEither(a))
 }
@@ -220,7 +221,7 @@ export type ToAsserts<S extends Transform<any, any>> = (
  * @category validation
  * @since 1.0.0
  */
-export const asserts = <_, A>(schema: Transform<_, A>) => {
+export const asserts = <A>(schema: Schema<A>) => {
   const get = validate(schema)
   return (a: unknown, options?: ParseOptions): asserts a is A => {
     get(a, options)

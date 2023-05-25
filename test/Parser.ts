@@ -5,18 +5,12 @@ import * as Effect from "@effect/io/Effect"
 import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
+import * as S from "@effect/schema/Schema"
 import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Parser", () => {
-  it("exports", () => {
-    expect(T.parseResult).exist
-    expect(T.decodeResult).exist
-    expect(T.validateResult).exist
-    expect(T.encodeResult).exist
-  })
-
   it("asserts", () => {
-    const schema = T.string
+    const schema = S.string
     expect(P.asserts(schema)("a")).toEqual(undefined)
     expect(() => P.asserts(schema)(1)).toThrowError(
       new Error(`error(s) found
@@ -25,77 +19,81 @@ describe.concurrent("Parser", () => {
   })
 
   it("parse", () => {
-    const schema = T.NumberFromString
-    expect(P.parse(schema)("1")).toEqual(1)
-    expect(() => P.parse(schema)("a")).toThrowError(
+    const transform = T.NumberFromString
+    expect(P.parse(transform)("1")).toEqual(1)
+    expect(() => P.parse(transform)("a")).toThrowError(
       new Error(`error(s) found
 └─ Expected string -> number, actual "a"`)
     )
   })
 
   it("parseOption", () => {
-    const schema = T.NumberFromString
-    expect(P.parseOption(schema)("1")).toEqual(O.some(1))
-    expect(P.parseOption(schema)("a")).toEqual(O.none())
+    const transform = T.NumberFromString
+    expect(P.parseOption(transform)("1")).toEqual(O.some(1))
+    expect(P.parseOption(transform)("a")).toEqual(O.none())
   })
 
   it("parseEither", () => {
-    const schema = T.NumberFromString
-    expect(P.parseEither(schema)("1")).toEqual(E.right(1))
-    expect(P.parseEither(schema)("a")).toEqual(E.left(PR.parseError([PR.type(schema.ast, "a")])))
+    const transform = T.NumberFromString
+    expect(P.parseEither(transform)("1")).toEqual(E.right(1))
+    expect(P.parseEither(transform)("a")).toEqual(
+      E.left(PR.parseError([PR.type(transform.ast, "a")]))
+    )
   })
 
   it("parsePromise", async () => {
-    const schema = T.NumberFromString
-    await expect(P.parsePromise(schema)("1")).resolves.toEqual(1)
-    await expect(P.parsePromise(schema)("a")).rejects.toThrow()
+    const transform = T.NumberFromString
+    await expect(P.parsePromise(transform)("1")).resolves.toEqual(1)
+    await expect(P.parsePromise(transform)("a")).rejects.toThrow()
   })
 
   it("parseEffect", async () => {
-    const schema = T.NumberFromString
-    expect(await Effect.runPromiseEither(P.parseEffect(schema)("1"))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.parseEffect(schema)("a"))).toEqual(
-      E.left(PR.parseError([PR.type(schema.ast, "a")]))
+    const transform = T.NumberFromString
+    expect(await Effect.runPromiseEither(P.parseEffect(transform)("1"))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(P.parseEffect(transform)("a"))).toEqual(
+      E.left(PR.parseError([PR.type(transform.ast, "a")]))
     )
   })
 
   it("decode", () => {
-    const schema = T.NumberFromString
-    expect(P.decode(schema)("1")).toEqual(1)
-    expect(() => P.decode(schema)("a")).toThrowError(
+    const transform = T.NumberFromString
+    expect(P.decode(transform)("1")).toEqual(1)
+    expect(() => P.decode(transform)("a")).toThrowError(
       new Error(`error(s) found
 └─ Expected string -> number, actual "a"`)
     )
   })
 
   it("decodeOption", () => {
-    const schema = T.NumberFromString
-    expect(P.decodeOption(schema)("1")).toEqual(O.some(1))
-    expect(P.decodeOption(schema)("a")).toEqual(O.none())
+    const transform = T.NumberFromString
+    expect(P.decodeOption(transform)("1")).toEqual(O.some(1))
+    expect(P.decodeOption(transform)("a")).toEqual(O.none())
   })
 
   it("decodeEither", () => {
-    const schema = T.NumberFromString
-    expect(P.decodeEither(schema)("1")).toEqual(E.right(1))
-    expect(P.decodeEither(schema)("a")).toEqual(E.left(PR.parseError([PR.type(schema.ast, "a")])))
+    const transform = T.NumberFromString
+    expect(P.decodeEither(transform)("1")).toEqual(E.right(1))
+    expect(P.decodeEither(transform)("a")).toEqual(
+      E.left(PR.parseError([PR.type(transform.ast, "a")]))
+    )
   })
 
   it("decodePromise", async () => {
-    const schema = T.NumberFromString
-    await expect(P.decodePromise(schema)("1")).resolves.toEqual(1)
-    await expect(P.decodePromise(schema)("a")).rejects.toThrow()
+    const transform = T.NumberFromString
+    await expect(P.decodePromise(transform)("1")).resolves.toEqual(1)
+    await expect(P.decodePromise(transform)("a")).rejects.toThrow()
   })
 
   it("decodeEffect", async () => {
-    const schema = T.NumberFromString
-    expect(await Effect.runPromiseEither(P.decodeEffect(schema)("1"))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.decodeEffect(schema)("a"))).toEqual(
-      E.left(PR.parseError([PR.type(schema.ast, "a")]))
+    const transform = T.NumberFromString
+    expect(await Effect.runPromiseEither(P.decodeEffect(transform)("1"))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(P.decodeEffect(transform)("a"))).toEqual(
+      E.left(PR.parseError([PR.type(transform.ast, "a")]))
     )
   })
 
   it("validate", () => {
-    const schema = T.NumberFromString
+    const schema = S.number
     expect(P.validate(schema)(1)).toEqual(1)
     expect(() => P.validate(schema)("1")).toThrowError(
       new Error(`error(s) found
@@ -104,13 +102,13 @@ describe.concurrent("Parser", () => {
   })
 
   it("validateOption", () => {
-    const schema = T.NumberFromString
+    const schema = S.number
     expect(P.validateOption(schema)(1)).toEqual(O.some(1))
     expect(P.validateOption(schema)("1")).toEqual(O.none())
   })
 
   it("validateEither", () => {
-    const schema = T.NumberFromString
+    const schema = S.number
     expect(P.validateEither(schema)(1)).toEqual(E.right(1))
     expect(P.validateEither(schema)("1")).toEqual(
       E.left(PR.parseError([PR.type(T.number.ast, "1")]))
@@ -118,7 +116,7 @@ describe.concurrent("Parser", () => {
   })
 
   it("validateResult", () => {
-    const schema = T.NumberFromString
+    const schema = S.number
     expect(P.validateResult(schema)(1)).toEqual(E.right(1))
     expect(P.validateResult(schema)("1")).toEqual(
       E.left(PR.parseError([PR.type(T.number.ast, "1")]))
@@ -126,14 +124,14 @@ describe.concurrent("Parser", () => {
   })
 
   it("validatePromise", async () => {
-    const schema = T.NumberFromString
+    const schema = S.number
     await expect(P.validatePromise(schema)(1)).resolves.toEqual(1)
     await expect(P.validatePromise(schema)("1")).rejects.toThrow()
     await expect(P.validatePromise(schema)("a")).rejects.toThrow()
   })
 
   it("validateEffect", async () => {
-    const schema = T.NumberFromString
+    const schema = S.number
     expect(await Effect.runPromiseEither(P.validateEffect(schema)(1))).toEqual(E.right(1))
     expect(await Effect.runPromiseEither(P.validateEffect(schema)("1"))).toEqual(
       E.left(PR.parseError([PR.type(T.number.ast, "1")]))
@@ -141,17 +139,17 @@ describe.concurrent("Parser", () => {
   })
 
   it("encodeResult", () => {
-    const schema = T.NumberFromString
-    expect(P.encodeResult(schema)(1)).toEqual(E.right("1"))
+    const transform = T.NumberFromString
+    expect(P.encodeResult(transform)(1)).toEqual(E.right("1"))
   })
 
   it("encodePromise", async () => {
-    const schema = T.NumberFromString
-    await expect(P.encodePromise(schema)(1)).resolves.toEqual("1")
+    const transform = T.NumberFromString
+    await expect(P.encodePromise(transform)(1)).resolves.toEqual("1")
   })
 
   it("_getLiterals", () => {
-    expect(P._getLiterals(T.string.ast)).toEqual([])
+    expect(P._getLiterals(S.string.ast)).toEqual([])
     // TypeLiteral
     expect(P._getLiterals(T.struct({ _tag: T.literal("a") }).ast))
       .toEqual([["_tag", AST.createLiteral("a")]])
@@ -185,9 +183,9 @@ describe.concurrent("Parser", () => {
   })
 
   it("_getSearchTree", () => {
-    expect(P._getSearchTree([T.string.ast, T.number.ast])).toEqual({
+    expect(P._getSearchTree([S.string.ast, T.number.ast])).toEqual({
       keys: {},
-      otherwise: [T.string.ast, T.number.ast]
+      otherwise: [S.string.ast, T.number.ast]
     })
 
     expect(P._getSearchTree([T.struct({ _tag: T.literal("a") }).ast, T.number.ast])).toEqual(
@@ -224,14 +222,14 @@ describe.concurrent("Parser", () => {
 
     expect(
       P._getSearchTree([
-        T.struct({ a: T.literal("A"), c: T.string }).ast,
+        T.struct({ a: T.literal("A"), c: S.string }).ast,
         T.struct({ b: T.literal("B"), d: T.number }).ast
       ])
     ).toEqual({
       keys: {
         a: {
           buckets: {
-            A: [T.struct({ a: T.literal("A"), c: T.string }).ast]
+            A: [T.struct({ a: T.literal("A"), c: S.string }).ast]
           },
           ast: AST.createLiteral("A")
         },
@@ -273,15 +271,15 @@ describe.concurrent("Parser", () => {
   })
 
   const schema = T.union(
-    T.struct({ type: T.literal("a"), value: T.string }),
-    T.struct({ type: T.literal("b"), value: T.string }),
-    T.struct({ type: T.literal("c"), value: T.string }),
-    T.struct({ type: T.string, value: T.string }),
-    T.struct({ type: T.literal(null), value: T.string }),
-    T.struct({ type: T.undefined, value: T.string }),
-    T.struct({ type: T.literal("d", "e"), value: T.string }),
-    T.struct({ type: T.struct({ nested: T.string }), value: T.string }),
-    T.struct({ type: T.array(T.number), value: T.string })
+    T.struct({ type: T.literal("a"), value: S.string }),
+    T.struct({ type: T.literal("b"), value: S.string }),
+    T.struct({ type: T.literal("c"), value: S.string }),
+    T.struct({ type: S.string, value: S.string }),
+    T.struct({ type: T.literal(null), value: S.string }),
+    T.struct({ type: T.undefined, value: S.string }),
+    T.struct({ type: T.literal("d", "e"), value: S.string }),
+    T.struct({ type: T.struct({ nested: S.string }), value: S.string }),
+    T.struct({ type: T.array(T.number), value: S.string })
   )
   const types = (schema.ast as AST.Union).types
   expect(
@@ -290,10 +288,10 @@ describe.concurrent("Parser", () => {
     keys: {
       type: {
         buckets: {
-          a: [T.struct({ type: T.literal("a"), value: T.string }).ast],
-          b: [T.struct({ type: T.literal("b"), value: T.string }).ast],
-          c: [T.struct({ type: T.literal("c"), value: T.string }).ast],
-          null: [T.struct({ type: T.literal(null), value: T.string }).ast]
+          a: [T.struct({ type: T.literal("a"), value: S.string }).ast],
+          b: [T.struct({ type: T.literal("b"), value: S.string }).ast],
+          c: [T.struct({ type: T.literal("c"), value: S.string }).ast],
+          null: [T.struct({ type: T.literal(null), value: S.string }).ast]
         },
         ast: AST.createUnion([
           AST.createLiteral("a"),
@@ -304,11 +302,11 @@ describe.concurrent("Parser", () => {
       }
     },
     otherwise: [
-      T.struct({ type: T.string, value: T.string }).ast,
-      T.struct({ type: T.undefined, value: T.string }).ast,
-      T.struct({ type: T.literal("d", "e"), value: T.string }).ast,
-      T.struct({ type: T.struct({ nested: T.string }), value: T.string }).ast,
-      T.struct({ type: T.array(T.number), value: T.string }).ast
+      T.struct({ type: S.string, value: S.string }).ast,
+      T.struct({ type: T.undefined, value: S.string }).ast,
+      T.struct({ type: T.literal("d", "e"), value: S.string }).ast,
+      T.struct({ type: T.struct({ nested: S.string }), value: S.string }).ast,
+      T.struct({ type: T.array(T.number), value: S.string }).ast
     ]
   })
 })

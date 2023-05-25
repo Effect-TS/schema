@@ -1,10 +1,10 @@
 import { pipe } from "@effect/data/Function"
 import * as P from "@effect/schema/Parser"
-import * as T from "@effect/schema/Transform"
+import * as S from "@effect/schema/Schema"
 
 describe.concurrent("endsWith", () => {
   it("Guard", () => {
-    const schema = pipe(T.string, T.endsWith("a"))
+    const schema = pipe(S.string, S.endsWith("a"))
     const is = P.is(schema)
     expect(is("a")).toEqual(true)
     expect(is("ba")).toEqual(true)

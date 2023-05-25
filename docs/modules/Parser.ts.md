@@ -199,7 +199,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parse: <_, A>(schema: Transform<_, A>) => (i: unknown, options?: ParseOptions | undefined) => A
+export declare const parse: <I, A>(schema: Transform<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -209,8 +209,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseEffect: <_, A>(
-  schema: Transform<_, A>
+export declare const parseEffect: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
@@ -221,8 +221,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseEither: <_, A>(
-  schema: Transform<_, A>
+export declare const parseEither: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => E.Either<PR.ParseError, A>
 ```
 
@@ -233,8 +233,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseOption: <_, A>(
-  schema: Transform<_, A>
+export declare const parseOption: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Option<A>
 ```
 
@@ -245,8 +245,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parsePromise: <_, A>(
-  schema: Transform<_, A>
+export declare const parsePromise: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Promise<A>
 ```
 
@@ -257,8 +257,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseResult: <_, A>(
-  schema: Transform<_, A>
+export declare const parseResult: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
@@ -296,8 +296,8 @@ Added in v1.0.0"decoding" | "encoding"
 **Signature**
 
 ```ts
-export declare const asserts: <_, A>(
-  schema: Transform<_, A>
+export declare const asserts: <A>(
+  schema: Schema<A>
 ) => (a: unknown, options?: ParseOptions | undefined) => asserts a is A
 ```
 
@@ -308,7 +308,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const is: <_, A>(schema: Transform<_, A>) => (a: unknown) => a is A
+export declare const is: <A>(schema: Schema<A>) => (a: unknown) => a is A
 ```
 
 Added in v1.0.0
@@ -318,7 +318,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validate: <_, A>(schema: Transform<_, A>) => (a: unknown, options?: ParseOptions | undefined) => A
+export declare const validate: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -328,8 +328,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateEffect: <_, A>(
-  schema: Transform<_, A>
+export declare const validateEffect: <A>(
+  schema: Schema<A>
 ) => (a: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
@@ -340,8 +340,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateEither: <_, A>(
-  schema: Transform<_, A>
+export declare const validateEither: <A>(
+  schema: Schema<A>
 ) => (a: unknown, options?: ParseOptions | undefined) => E.Either<PR.ParseError, A>
 ```
 
@@ -352,8 +352,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateOption: <_, A>(
-  schema: Transform<_, A>
+export declare const validateOption: <A>(
+  schema: Schema<A>
 ) => (a: unknown, options?: ParseOptions | undefined) => Option<A>
 ```
 
@@ -364,8 +364,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validatePromise: <_, A>(
-  schema: Transform<_, A>
+export declare const validatePromise: <A>(
+  schema: Schema<A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Promise<A>
 ```
 
@@ -376,8 +376,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validateResult: <_, A>(
-  schema: Transform<_, A>
+export declare const validateResult: <A>(
+  schema: Schema<A>
 ) => (a: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 

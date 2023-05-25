@@ -13,7 +13,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [arbitrary](#arbitrary)
-  - [get](#get)
+  - [build](#build)
 - [hooks](#hooks)
   - [ArbitraryHookId](#arbitraryhookid)
 - [model](#model)
@@ -23,12 +23,12 @@ Added in v1.0.0
 
 # arbitrary
 
-## get
+## build
 
 **Signature**
 
 ```ts
-export declare const get: <A>(schema: S.Schema<A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
+export declare const build: <A>(schema: S.Schema<A>) => (fc: typeof FastCheck) => FastCheck.Arbitrary<A>
 ```
 
 Added in v1.0.0

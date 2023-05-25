@@ -14,8 +14,6 @@ Added in v1.0.0
 
 - [Date](#date)
   - [Date](#date-1)
-  - [DateFromSelf](#datefromself)
-  - [ValidDateFromSelf](#validdatefromself)
   - [dateFromString](#datefromstring)
   - [validDate](#validdate)
 - [annotations](#annotations)
@@ -50,7 +48,6 @@ Added in v1.0.0
   - [chunk](#chunk)
   - [data](#data)
   - [dataFromSelf](#datafromself)
-  - [declare](#declare)
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
   - [element](#element)
@@ -78,12 +75,9 @@ Added in v1.0.0
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
-  - [JsonNumber](#jsonnumber)
-  - [UUID](#uuid)
   - [chunkFromSelf](#chunkfromself)
+  - [declare](#declare)
   - [enums](#enums)
-  - [instanceOf](#instanceof)
-  - [json](#json)
   - [literal](#literal)
   - [make](#make)
   - [propertySignature](#propertysignature)
@@ -109,9 +103,6 @@ Added in v1.0.0
   - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [BrandTransform (interface)](#brandtransform-interface)
   - [From (type alias)](#from-type-alias)
-  - [Json (type alias)](#json-type-alias)
-  - [JsonArray (type alias)](#jsonarray-type-alias)
-  - [JsonObject (type alias)](#jsonobject-type-alias)
   - [To (type alias)](#to-type-alias)
   - [Transform (interface)](#transform-interface)
 - [number](#number)
@@ -176,10 +167,8 @@ Added in v1.0.0
   - [GreaterThanOrEqualToTypeId](#greaterthanorequaltotypeid)
   - [GreaterThanTypeId](#greaterthantypeid)
   - [IncludesTypeId](#includestypeid)
-  - [InstanceOfTypeId](#instanceoftypeid)
   - [IntTypeId](#inttypeid)
   - [ItemsCountTypeId](#itemscounttypeid)
-  - [JsonNumberTypeId](#jsonnumbertypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
@@ -201,26 +190,15 @@ Added in v1.0.0
   - [PositiveTypeId](#positivetypeid)
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
-  - [UUIDTypeId](#uuidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
-  - [PropertySignature (interface)](#propertysignature-interface)
   - [Spread (type alias)](#spread-type-alias)
-  - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
+  - [TransformPropertySignature (interface)](#transformpropertysignature-interface)
   - [from](#from)
   - [optional](#optional)
   - [to](#to)
-- [validation](#validation)
-  - [asserts](#asserts)
-  - [is](#is)
-  - [validate](#validate)
-  - [validateEffect](#validateeffect)
-  - [validateEither](#validateeither)
-  - [validateOption](#validateoption)
-  - [validatePromise](#validatepromise)
-  - [validateResult](#validateresult)
 
 ---
 
@@ -238,31 +216,9 @@ export declare const Date: Transform<string, Date>
 
 Added in v1.0.0
 
-## DateFromSelf
-
-**Signature**
-
-```ts
-export declare const DateFromSelf: Transform<Date, Date>
-```
-
-Added in v1.0.0
-
-## ValidDateFromSelf
-
-A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
-
-**Signature**
-
-```ts
-export declare const ValidDateFromSelf: Transform<Date, Date>
-```
-
-Added in v1.0.0
-
 ## dateFromString
 
-A combinator that transforms a `string` into a `Date`.
+A combinator that transforms a `string` into a valid `Date`.
 
 **Signature**
 
@@ -668,26 +624,6 @@ export declare const dataFromSelf: <
 
 Added in v1.0.0
 
-## declare
-
-**Signature**
-
-```ts
-export declare const declare: (
-  typeParameters: ReadonlyArray<Transform<any, any>>,
-  type: Transform<any, any>,
-  decode: (
-    ...typeParameters: ReadonlyArray<Transform<any, any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  encode: (
-    ...typeParameters: ReadonlyArray<Transform<any, any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  annotations?: AST.Annotations | undefined
-) => Transform<any, any>
-```
-
-Added in v1.0.0
-
 ## either
 
 **Signature**
@@ -922,7 +858,7 @@ Added in v1.0.0
 
 ```ts
 export declare const record: <K extends string | symbol, I, A>(
-  key: Transform<K, K>,
+  key: S.Schema<K>,
   value: Transform<I, A>
 ) => Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }>
 ```
@@ -963,8 +899,8 @@ export declare const struct: <
     string | number | symbol,
     | Transform<any, any>
     | Transform<never, never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
+    | TransformPropertySignature<any, boolean, any, boolean>
+    | TransformPropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
@@ -1061,43 +997,6 @@ Added in v1.0.0
 
 # constructors
 
-## JsonNumber
-
-The `JsonNumber` is a schema for representing JSON numbers. It ensures that the provided value is a valid
-number by filtering out `NaN` and `(+/-) Infinity`. This is useful when you want to validate and represent numbers in JSON
-format.
-
-**Signature**
-
-```ts
-export declare const JsonNumber: Transform<number, number>
-```
-
-**Example**
-
-```ts
-import * as S from '@effect/schema/Transform'
-
-const is = S.is(S.JsonNumber)
-
-assert.deepStrictEqual(is(42), true)
-assert.deepStrictEqual(is(Number.NaN), false)
-assert.deepStrictEqual(is(Number.POSITIVE_INFINITY), false)
-assert.deepStrictEqual(is(Number.NEGATIVE_INFINITY), false)
-```
-
-Added in v1.0.0
-
-## UUID
-
-**Signature**
-
-```ts
-export declare const UUID: Transform<string, string>
-```
-
-Added in v1.0.0
-
 ## chunkFromSelf
 
 **Signature**
@@ -1108,32 +1007,32 @@ export declare const chunkFromSelf: <I, A>(item: Transform<I, A>) => Transform<C
 
 Added in v1.0.0
 
+## declare
+
+**Signature**
+
+```ts
+export declare const declare: (
+  typeParameters: ReadonlyArray<Transform<any, any>>,
+  type: Transform<any, any>,
+  decode: (
+    ...typeParameters: ReadonlyArray<Transform<any, any>>
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
+  encode: (
+    ...typeParameters: ReadonlyArray<Transform<any, any>>
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
+  annotations?: AST.Annotations | undefined
+) => Transform<any, any>
+```
+
+Added in v1.0.0
+
 ## enums
 
 **Signature**
 
 ```ts
 export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => S.Schema<A[keyof A]>
-```
-
-Added in v1.0.0
-
-## instanceOf
-
-**Signature**
-
-```ts
-export declare const instanceOf: new (...args: any) => any
-```
-
-Added in v1.0.0
-
-## json
-
-**Signature**
-
-```ts
-export declare const json: Transform<Json, Json>
 ```
 
 Added in v1.0.0
@@ -1168,7 +1067,7 @@ Added in v1.0.0
 export declare const propertySignature: <I, A>(
   schema: Transform<I, A>,
   annotations?: AST.Annotations | undefined
-) => PropertySignature<I, false, A, false>
+) => TransformPropertySignature<I, false, A, false>
 ```
 
 Added in v1.0.0
@@ -1403,36 +1302,6 @@ Added in v1.0.0
 
 ```ts
 export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S['From']>[0]
-```
-
-Added in v1.0.0
-
-## Json (type alias)
-
-**Signature**
-
-```ts
-export type Json = null | boolean | number | string | JsonArray | JsonObject
-```
-
-Added in v1.0.0
-
-## JsonArray (type alias)
-
-**Signature**
-
-```ts
-export type JsonArray = ReadonlyArray<Json>
-```
-
-Added in v1.0.0
-
-## JsonObject (type alias)
-
-**Signature**
-
-```ts
-export type JsonObject = { readonly [key: string]: Json }
 ```
 
 Added in v1.0.0
@@ -1685,7 +1554,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parse: <_, A>(schema: Transform<_, A>) => (i: unknown, options?: ParseOptions | undefined) => A
+export declare const parse: <I, A>(schema: Transform<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -1695,8 +1564,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseEffect: <_, A>(
-  schema: Transform<_, A>
+export declare const parseEffect: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
 
@@ -1707,8 +1576,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseEither: <_, A>(
-  schema: Transform<_, A>
+export declare const parseEither: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
 ```
 
@@ -1719,8 +1588,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseOption: <_, A>(
-  schema: Transform<_, A>
+export declare const parseOption: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Option<A>
 ```
 
@@ -1731,8 +1600,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parsePromise: <_, A>(
-  schema: Transform<_, A>
+export declare const parsePromise: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Promise<A>
 ```
 
@@ -1743,8 +1612,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseResult: <_, A>(
-  schema: Transform<_, A>
+export declare const parseResult: <I, A>(
+  schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
@@ -2120,16 +1989,6 @@ export declare const IncludesTypeId: '@effect/schema/IncludesTypeId'
 
 Added in v1.0.0
 
-## InstanceOfTypeId
-
-**Signature**
-
-```ts
-export declare const InstanceOfTypeId: '@effect/schema/InstanceOfTypeId'
-```
-
-Added in v1.0.0
-
 ## IntTypeId
 
 **Signature**
@@ -2146,16 +2005,6 @@ Added in v1.0.0
 
 ```ts
 export declare const ItemsCountTypeId: '@effect/schema/ItemsCountTypeId'
-```
-
-Added in v1.0.0
-
-## JsonNumberTypeId
-
-**Signature**
-
-```ts
-export declare const JsonNumberTypeId: '@effect/schema/JsonNumberTypeId'
 ```
 
 Added in v1.0.0
@@ -2370,16 +2219,6 @@ export declare const TrimmedTypeId: '@effect/schema/TrimmedTypeId'
 
 Added in v1.0.0
 
-## UUIDTypeId
-
-**Signature**
-
-```ts
-export declare const UUIDTypeId: '@effect/schema/UUIDTypeId'
-```
-
-Added in v1.0.0
-
 ## ValidDateTypeId
 
 **Signature**
@@ -2399,29 +2238,11 @@ Added in v1.0.0
 ```ts
 export type FromOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | PropertySignature<any, true, any, boolean>
-    | PropertySignature<never, true, never, boolean>
+    | TransformPropertySignature<any, true, any, boolean>
+    | TransformPropertySignature<never, true, never, boolean>
     ? K
     : never
 }[keyof Fields]
-```
-
-Added in v1.0.0
-
-## PropertySignature (interface)
-
-**Signature**
-
-```ts
-export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly From: (_: From) => From
-  readonly FromIsOptional: FromIsOptional
-  readonly To: (_: To) => To
-  readonly ToIsOptional: ToIsOptional
-  readonly optional: () => PropertySignature<From, true, To, true>
-  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
-  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
-}
 ```
 
 Added in v1.0.0
@@ -2440,16 +2261,6 @@ export type Spread<A> = {
 
 Added in v1.0.0
 
-## ToAsserts
-
-**Signature**
-
-```ts
-export declare const ToAsserts: P.ToAsserts<S>
-```
-
-Added in v1.0.0
-
 ## ToOptionalKeys (type alias)
 
 **Signature**
@@ -2457,11 +2268,29 @@ Added in v1.0.0
 ```ts
 export type ToOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | PropertySignature<any, boolean, any, true>
-    | PropertySignature<never, boolean, never, true>
+    | TransformPropertySignature<any, boolean, any, true>
+    | TransformPropertySignature<never, boolean, never, true>
     ? K
     : never
 }[keyof Fields]
+```
+
+Added in v1.0.0
+
+## TransformPropertySignature (interface)
+
+**Signature**
+
+```ts
+export interface TransformPropertySignature<From, FromIsOptional, To, ToIsOptional> {
+  readonly From: (_: From) => From
+  readonly FromIsOptional: FromIsOptional
+  readonly To: (_: To) => To
+  readonly ToIsOptional: ToIsOptional
+  readonly optional: () => TransformPropertySignature<From, true, To, true>
+  readonly withDefault: (value: () => To) => TransformPropertySignature<From, true, To, false>
+  readonly toOption: () => TransformPropertySignature<From, true, Option<To>, false>
+}
 ```
 
 Added in v1.0.0
@@ -2484,7 +2313,7 @@ Added in v1.0.0
 export declare const optional: <I, A>(
   schema: Transform<I, A>,
   annotations?: AST.Annotations | undefined
-) => PropertySignature<I, true, A, true>
+) => TransformPropertySignature<I, true, A, true>
 ```
 
 Added in v1.0.0
@@ -2495,100 +2324,6 @@ Added in v1.0.0
 
 ```ts
 export declare const to: <I, A>(schema: Transform<I, A>) => S.Schema<A>
-```
-
-Added in v1.0.0
-
-# validation
-
-## asserts
-
-**Signature**
-
-```ts
-export declare const asserts: <_, A>(
-  schema: Transform<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => asserts a is A
-```
-
-Added in v1.0.0
-
-## is
-
-**Signature**
-
-```ts
-export declare const is: <_, A>(schema: Transform<_, A>) => (a: unknown) => a is A
-```
-
-Added in v1.0.0
-
-## validate
-
-**Signature**
-
-```ts
-export declare const validate: <_, A>(schema: Transform<_, A>) => (a: unknown, options?: ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
-## validateEffect
-
-**Signature**
-
-```ts
-export declare const validateEffect: <_, A>(
-  schema: Transform<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
-```
-
-Added in v1.0.0
-
-## validateEither
-
-**Signature**
-
-```ts
-export declare const validateEither: <_, A>(
-  schema: Transform<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
-```
-
-Added in v1.0.0
-
-## validateOption
-
-**Signature**
-
-```ts
-export declare const validateOption: <_, A>(
-  schema: Transform<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Option<A>
-```
-
-Added in v1.0.0
-
-## validatePromise
-
-**Signature**
-
-```ts
-export declare const validatePromise: <_, A>(
-  schema: Transform<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Promise<A>
-```
-
-Added in v1.0.0
-
-## validateResult
-
-**Signature**
-
-```ts
-export declare const validateResult: <_, A>(
-  schema: Transform<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
 Added in v1.0.0

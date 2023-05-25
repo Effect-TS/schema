@@ -1,12 +1,11 @@
-import { pipe } from "@effect/data/Function"
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
-const schema = pipe(T.number, T.nonNaN())
+describe.concurrent("NonNaN", () => {
+  const schema = S.NonNaN
 
-describe.concurrent("nonNaN", () => {
   it("property tests", () => {
     Util.roundtrip(schema)
   })
@@ -23,7 +22,7 @@ describe.concurrent("nonNaN", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.to(schema)
+    const pretty = Pretty.build(schema)
     expect(pretty(1)).toEqual("1")
     expect(pretty(NaN)).toEqual("NaN")
   })

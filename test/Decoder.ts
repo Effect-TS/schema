@@ -37,13 +37,13 @@ describe.concurrent("Decoder", () => {
   })
 
   it("void", async () => {
-    const schema = T.void
+    const schema = S.void
     await Util.expectParseSuccess(schema, undefined, undefined)
     await Util.expectParseFailure(schema, 1, `Expected void, actual 1`)
   })
 
   it("any", async () => {
-    const schema = T.any
+    const schema = S.any
     await Util.expectParseSuccess(schema, undefined, undefined)
     await Util.expectParseSuccess(schema, null, null)
     await Util.expectParseSuccess(schema, "a", "a")
@@ -54,7 +54,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("unknown", async () => {
-    const schema = T.unknown
+    const schema = S.unknown
     await Util.expectParseSuccess(schema, undefined, undefined)
     await Util.expectParseSuccess(schema, null, null)
     await Util.expectParseSuccess(schema, "a", "a")
@@ -65,7 +65,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("never", async () => {
-    const schema = T.never
+    const schema = S.never
     await Util.expectParseFailure(schema, 1, "Expected never, actual 1")
   })
 
@@ -85,14 +85,14 @@ describe.concurrent("Decoder", () => {
   })
 
   it("boolean", async () => {
-    const schema = T.boolean
+    const schema = S.boolean
     await Util.expectParseSuccess(schema, true, true)
     await Util.expectParseSuccess(schema, false, false)
     await Util.expectParseFailure(schema, 1, `Expected boolean, actual 1`)
   })
 
   it("bigint", async () => {
-    const schema = T.bigint
+    const schema = S.bigint
     await Util.expectParseSuccess(schema, 0n, 0n)
     await Util.expectParseSuccess(schema, 1n, 1n)
 
@@ -120,7 +120,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("object", async () => {
-    const schema = T.object
+    const schema = S.object
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseFailure(schema, null, `Expected object, actual null`)
@@ -170,7 +170,7 @@ describe.concurrent("Decoder", () => {
       Apple,
       Banana
     }
-    const schema = T.enums(Fruits)
+    const schema = S.enums(Fruits)
     await Util.expectParseSuccess(schema, Fruits.Apple)
     await Util.expectParseSuccess(schema, Fruits.Banana)
     await Util.expectParseSuccess(schema, 0)
@@ -189,7 +189,7 @@ describe.concurrent("Decoder", () => {
       Banana = "banana",
       Cantaloupe = 0
     }
-    const schema = T.enums(Fruits)
+    const schema = S.enums(Fruits)
     await Util.expectParseSuccess(schema, Fruits.Apple)
     await Util.expectParseSuccess(schema, Fruits.Cantaloupe)
     await Util.expectParseSuccess(schema, "apple")
@@ -209,7 +209,7 @@ describe.concurrent("Decoder", () => {
       Banana: "banana",
       Cantaloupe: 3
     } as const
-    const schema = T.enums(Fruits)
+    const schema = S.enums(Fruits)
     await Util.expectParseSuccess(schema, "apple")
     await Util.expectParseSuccess(schema, "banana")
     await Util.expectParseSuccess(schema, 3)

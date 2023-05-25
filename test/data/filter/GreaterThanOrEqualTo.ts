@@ -1,22 +1,22 @@
 import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("greaterThanOrEqualTo", () => {
   it("property tests", () => {
-    Util.roundtrip(T.greaterThanOrEqualTo(0)(T.number))
+    Util.roundtrip(S.greaterThanOrEqualTo(0)(S.number))
   })
 
   it("Guard", () => {
-    const is = P.is(T.greaterThanOrEqualTo(0)(T.number))
+    const is = P.is(S.greaterThanOrEqualTo(0)(S.number))
     expect(is(0)).toEqual(true)
     expect(is(1)).toEqual(true)
     expect(is(-1)).toEqual(false)
   })
 
   it("Decoder", async () => {
-    const schema = T.greaterThanOrEqualTo(0)(T.number)
+    const schema = S.greaterThanOrEqualTo(0)(S.number)
     await Util.expectParseSuccess(schema, 0)
     await Util.expectParseSuccess(schema, 1)
     await Util.expectParseFailure(
@@ -27,7 +27,7 @@ describe.concurrent("greaterThanOrEqualTo", () => {
   })
 
   it("Pretty", () => {
-    const pretty = Pretty.to(T.greaterThanOrEqualTo(0)(T.number))
+    const pretty = Pretty.build(S.greaterThanOrEqualTo(0)(S.number))
     expect(pretty(1)).toEqual("1")
   })
 })

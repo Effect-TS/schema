@@ -33,7 +33,7 @@ export const ArbitraryHookId = I.ArbitraryHookId
  * @category arbitrary
  * @since 1.0.0
  */
-export const get = <A>(
+export const build = <A>(
   schema: S.Schema<A>
 ): (fc: typeof FastCheck) => FastCheck.Arbitrary<A> => go(schema.ast)
 

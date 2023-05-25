@@ -13,8 +13,8 @@ export const property = <A>(schema: S.Schema<A>) => {
   if (!doProperty) {
     return
   }
-  const arbitrary = A.get(schema)
-  const is = T.is(schema)
+  const arbitrary = A.build(schema)
+  const is = S.is(schema)
   fc.assert(fc.property(arbitrary(fc), (a) => is(a)))
 }
 
@@ -106,7 +106,7 @@ describe.concurrent("Arbitrary", () => {
   })
 
   it("never", () => {
-    expect(() => A.get(S.never)(fc)).toThrowError(
+    expect(() => A.build(S.never)(fc)).toThrowError(
       new Error("cannot build an Arbitrary for `never`")
     )
   })
@@ -158,7 +158,7 @@ describe.concurrent("Arbitrary", () => {
   it("empty enums should throw", () => {
     enum Fruits {}
     const schema = S.enums(Fruits)
-    expect(() => A.get(schema)(fc)).toThrowError(
+    expect(() => A.build(schema)(fc)).toThrowError(
       new Error("cannot build an Arbitrary for an empty enum")
     )
   })
