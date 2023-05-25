@@ -6,6 +6,10 @@ import * as T from "@effect/schema/Transform"
 
 describe.concurrent("ReadonlySet", () => {
   describe.concurrent("Schema", () => {
+    it("keyof", () => {
+      expect(S.keyof(S.readonlySet(S.number))).toEqual(S.literal("size"))
+    })
+
     it("is", () => {
       const schema = S.readonlySet(S.string)
       const is = P.is(schema)
@@ -29,10 +33,6 @@ describe.concurrent("ReadonlySet", () => {
 
   describe.concurrent("Transform", () => {
     describe.concurrent("readonlySetFromSelf", () => {
-      it("keyof", () => {
-        expect(T.keyof(T.readonlySetFromSelf(S.number))).toEqual(S.literal("size"))
-      })
-
       it("property tests", () => {
         Util.roundtrip(T.readonlySetFromSelf(S.number))
       })

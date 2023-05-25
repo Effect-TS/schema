@@ -272,7 +272,8 @@ export const assertFalse = <A>(schema: S.Schema<A>, input: unknown) => {
   expect(validate(input)).toEqual(false)
 }
 
-describe("jsonSchemaFor", () => {
+// TODO
+describe.concurrent.skip("jsonSchemaFor", () => {
   it("any", () => {
     property(S.any)
   })

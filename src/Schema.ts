@@ -1814,7 +1814,7 @@ export const validDate = (options?: AnnotationOptions<Date>) =>
  * @category Date
  * @since 1.0.0
  */
-export const ValidDate = pipe(Date, validDate())
+export const ValidDate: Schema<Date> = pipe(Date, validDate())
 
 // ---------------------------------------------
 // Brand

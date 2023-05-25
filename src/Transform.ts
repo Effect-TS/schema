@@ -297,13 +297,6 @@ export const nullable = <From, To>(self: Transform<From, To>): Transform<From | 
  * @category combinators
  * @since 1.0.0
  */
-export const keyof = <I, A>(schema: Transform<I, A>): Transform<keyof A, keyof A> =>
-  make(AST.keyof(schema.ast))
-
-/**
- * @category combinators
- * @since 1.0.0
- */
 export const tuple = <Elements extends ReadonlyArray<Transform<any, any>>>(
   ...elements: Elements
 ): Transform<
@@ -1174,37 +1167,16 @@ export const fromBrand = <C extends Brand<string | symbol>>(
  * @category constructors
  * @since 1.0.0
  */
-export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> =>
-  declare(
-    [item],
-    struct({
-      _id: S.uniqueSymbol(Symbol.for("@effect/data/Chunk")),
-      length: S.number
-    }),
-    <I, A>(item: Transform<I, A>) => {
-      const parseResult = P.parseResult(array(item))
-      return (u: unknown, options, self) =>
-        !C.isChunk(u) ?
-          PR.failure(PR.type(self, u)) :
-          PR.map(
-            parseResult(C.toReadonlyArray(u), options),
-            C.fromIterable
-          )
-    },
-    <I, A>(item: Transform<I, A>) => {
-      const encodeResult = P.encodeResult(array(item))
-      return (a: Chunk<A>, options) =>
-        PR.map(
-          encodeResult(C.toReadonlyArray(a), options),
-          C.fromIterable
-        )
-    },
-    {
-      [AST.IdentifierAnnotationId]: "Chunk",
-      [I.PrettyHookId]: S.chunkPretty,
-      [I.ArbitraryHookId]: S.chunkArbitrary
-    }
+export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> => {
+  const parseResult = P.parseResult(array(item))
+  const encodeResult = P.encodeResult(array(item))
+  return transformResult(
+    S.chunk(from(item)),
+    S.chunk(to(item)),
+    (c, options) => PR.map(parseResult(C.toReadonlyArray(c), options), C.fromIterable),
+    (c, options) => PR.map(encodeResult(C.toReadonlyArray(c), options), C.fromIterable)
   )
+}
 
 /**
  * @category combinators

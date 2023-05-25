@@ -7,7 +7,7 @@ describe.concurrent("Schema.Date", () => {
   const schema = S.Date
 
   it("keyof", () => {
-    expect(T.keyof(schema)).toEqual(S.never)
+    expect(S.keyof(schema)).toEqual(S.never)
   })
 
   it("property tests", () => {

@@ -7,6 +7,12 @@ import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Chunk", () => {
   describe.concurrent("Schema", () => {
+    it("keyof", () => {
+      expect(S.keyof(S.chunk(S.string))).toEqual(
+        S.union(S.literal("_id"), S.literal("length"))
+      )
+    })
+
     it("is", () => {
       const schema = S.chunk(S.string)
       const is = P.is(schema)
@@ -29,12 +35,6 @@ describe.concurrent("Chunk", () => {
 
   describe.concurrent("Transform", () => {
     describe.concurrent("chunkFromSelf", () => {
-      it("keyof", () => {
-        expect(T.keyof(T.chunkFromSelf(S.string))).toEqual(
-          S.union(S.literal("_id"), S.literal("length"))
-        )
-      })
-
       it("property tests", () => {
         Util.roundtrip(T.chunkFromSelf(S.number))
       })

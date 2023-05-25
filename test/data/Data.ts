@@ -7,6 +7,11 @@ import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Data", () => {
   describe.concurrent("Schema", () => {
+    it("keyof", () => {
+      const transform = S.keyof(S.data(S.struct({ a: S.string, b: S.string })))
+      expect(transform).toEqual(S.union(S.literal("a"), S.literal("b")))
+    })
+
     it("is", () => {
       const schema = S.data(S.struct({ a: S.string, b: S.number }))
       const is = P.is(schema)
@@ -24,11 +29,6 @@ describe.concurrent("Data", () => {
 
   describe.concurrent("Transform", () => {
     describe.concurrent("dataFromSelf", () => {
-      it("keyof", () => {
-        const transform = T.keyof(T.dataFromSelf(S.struct({ a: S.string, b: S.string })))
-        expect(transform).toEqual(T.union(S.literal("a"), S.literal("b")))
-      })
-
       it("property tests", () => {
         Util.roundtrip(T.dataFromSelf(S.struct({ a: S.string, b: S.number })))
         Util.roundtrip(T.dataFromSelf(T.array(S.number)))
