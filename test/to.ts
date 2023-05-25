@@ -6,7 +6,7 @@ import * as T from "@effect/schema/Transform"
 describe.concurrent("to", () => {
   it("transform", () => {
     const schema = pipe(
-      T.string,
+      S.string,
       T.transform(
         T.tuple(T.NumberFromString, T.NumberFromString),
         (s) => [s, s] as const,

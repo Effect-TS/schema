@@ -1,5 +1,6 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 import * as _ from "@effect/schema/TreeFormatter"
@@ -7,8 +8,8 @@ import * as _ from "@effect/schema/TreeFormatter"
 describe.concurrent("formatExpected", () => {
   it("lazy", () => {
     type A = readonly [number, A | null]
-    const schema: T.Transform<A, A> = T.lazy(
-      () => T.tuple(T.number, T.union(schema, T.literal(null)))
+    const schema: S.Schema<A> = S.lazy(
+      () => S.tuple(S.number, S.union(schema, S.literal(null)))
     )
     expect(_.formatExpected(schema.ast)).toEqual("<anonymous lazy schema>")
   })
@@ -36,7 +37,7 @@ describe.concurrent("formatErrors", () => {
   })
 
   it("forbidden", async () => {
-    const schema = Util.effectify(T.struct({ a: T.string }), "all")
+    const schema = Util.effectify(S.struct({ a: S.string }), "all")
     expect(() => T.parse(schema)({ a: "a" })).toThrowError(
       new Error(`error(s) found
 └─ ["a"]
@@ -45,7 +46,7 @@ describe.concurrent("formatErrors", () => {
   })
 
   it("missing", async () => {
-    const schema = T.struct({ a: T.string })
+    const schema = S.struct({ a: S.string })
     await Util.expectParseFailureTree(
       schema,
       {},
@@ -56,7 +57,7 @@ describe.concurrent("formatErrors", () => {
   })
 
   it("excess property", async () => {
-    const schema = T.struct({ a: T.string })
+    const schema = S.struct({ a: S.string })
     await Util.expectParseFailureTree(
       schema,
       { a: "a", b: 1 },
@@ -68,8 +69,8 @@ describe.concurrent("formatErrors", () => {
   })
 
   it("should collapse trees that have a branching factor of 1", async () => {
-    const schema = T.struct({
-      a: T.struct({ b: T.struct({ c: T.array(T.struct({ d: T.string })) }) })
+    const schema = S.struct({
+      a: S.struct({ b: S.struct({ c: S.array(S.struct({ d: S.string })) }) })
     })
     Util.expectParseFailureTree(
       schema,

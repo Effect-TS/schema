@@ -77,14 +77,10 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [chunkFromSelf](#chunkfromself)
   - [declare](#declare)
-  - [enums](#enums)
-  - [literal](#literal)
   - [make](#make)
   - [propertySignature](#propertysignature)
   - [readonlyMapFromSelf](#readonlymapfromself)
   - [readonlySetFromSelf](#readonlysetfromself)
-  - [templateLiteral](#templateliteral)
-  - [uniqueSymbol](#uniquesymbol)
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeEffect](#decodeeffect)
@@ -131,20 +127,7 @@ Added in v1.0.0
   - [parseOption](#parseoption)
   - [parsePromise](#parsepromise)
   - [parseResult](#parseresult)
-- [primitives](#primitives)
-  - [any](#any)
-  - [bigint](#bigint-1)
-  - [boolean](#boolean-1)
-  - [never](#never)
-  - [null](#null)
-  - [number](#number-1)
-  - [object](#object)
-  - [string](#string)
-  - [symbol](#symbol)
-  - [undefined](#undefined)
-  - [unknown](#unknown)
-  - [void](#void)
-- [string](#string-1)
+- [string](#string)
   - [Trim](#trim)
   - [endsWith](#endswith)
   - [includes](#includes)
@@ -537,17 +520,18 @@ export declare const attachPropertySignature: <K extends string | number | symbo
 **Example**
 
 ```ts
-import * as S from '@effect/schema/Transform'
+import * as S from '@effect/schema/Schema'
+import * as T from '@effect/schema/Transform'
 import { pipe } from '@effect/data/Function'
 
 const Circle = S.struct({ radius: S.number })
 const Square = S.struct({ sideLength: S.number })
-const Shape = S.union(
-  pipe(Circle, S.attachPropertySignature('kind', 'circle')),
-  pipe(Square, S.attachPropertySignature('kind', 'square'))
+const Shape = T.union(
+  pipe(Circle, T.attachPropertySignature('kind', 'circle')),
+  pipe(Square, T.attachPropertySignature('kind', 'square'))
 )
 
-assert.deepStrictEqual(S.decode(Shape)({ radius: 10 }), {
+assert.deepStrictEqual(T.decode(Shape)({ radius: 10 }), {
   kind: 'circle',
   radius: 10,
 })
@@ -570,16 +554,6 @@ export declare const brand: <B extends string | symbol, A>(
   brand: B,
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Transform<I, A>) => BrandTransform<I, any>
-```
-
-**Example**
-
-```ts
-import * as T from '@effect/schema/Transform'
-import { pipe } from '@effect/data/Function'
-
-const Int = pipe(T.number, T.int(), T.brand('Int'))
-type Int = T.To<typeof Int> // number & Brand<"Int">
 ```
 
 Added in v1.0.0
@@ -1027,28 +1001,6 @@ export declare const declare: (
 
 Added in v1.0.0
 
-## enums
-
-**Signature**
-
-```ts
-export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => S.Schema<A[keyof A]>
-```
-
-Added in v1.0.0
-
-## literal
-
-**Signature**
-
-```ts
-export declare const literal: <Literals extends readonly AST.LiteralValue[]>(
-  ...literals: Literals
-) => S.Schema<Literals[number]>
-```
-
-Added in v1.0.0
-
 ## make
 
 **Signature**
@@ -1091,31 +1043,6 @@ Added in v1.0.0
 
 ```ts
 export declare const readonlySetFromSelf: <I, A>(item: Transform<I, A>) => Transform<ReadonlySet<I>, ReadonlySet<A>>
-```
-
-Added in v1.0.0
-
-## templateLiteral
-
-**Signature**
-
-```ts
-export declare const templateLiteral: <T extends [S.Schema<any>, ...S.Schema<any>[]]>(
-  ...[head, ...tail]: T
-) => S.Schema<S.Join<{ [K in keyof T]: S.To<T[K]> }>>
-```
-
-Added in v1.0.0
-
-## uniqueSymbol
-
-**Signature**
-
-```ts
-export declare const uniqueSymbol: <S extends symbol>(
-  symbol: S,
-  annotations?: AST.Annotations | undefined
-) => S.Schema<S>
 ```
 
 Added in v1.0.0
@@ -1615,128 +1542,6 @@ Added in v1.0.0
 export declare const parseResult: <I, A>(
   schema: Transform<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
-```
-
-Added in v1.0.0
-
-# primitives
-
-## any
-
-**Signature**
-
-```ts
-export declare const any: S.Schema<any>
-```
-
-Added in v1.0.0
-
-## bigint
-
-**Signature**
-
-```ts
-export declare const bigint: S.Schema<bigint>
-```
-
-Added in v1.0.0
-
-## boolean
-
-**Signature**
-
-```ts
-export declare const boolean: S.Schema<boolean>
-```
-
-Added in v1.0.0
-
-## never
-
-**Signature**
-
-```ts
-export declare const never: S.Schema<never>
-```
-
-Added in v1.0.0
-
-## null
-
-**Signature**
-
-```ts
-export declare const null: S.Schema<null>
-```
-
-Added in v1.0.0
-
-## number
-
-**Signature**
-
-```ts
-export declare const number: S.Schema<number>
-```
-
-Added in v1.0.0
-
-## object
-
-**Signature**
-
-```ts
-export declare const object: S.Schema<object>
-```
-
-Added in v1.0.0
-
-## string
-
-**Signature**
-
-```ts
-export declare const string: S.Schema<string>
-```
-
-Added in v1.0.0
-
-## symbol
-
-**Signature**
-
-```ts
-export declare const symbol: S.Schema<symbol>
-```
-
-Added in v1.0.0
-
-## undefined
-
-**Signature**
-
-```ts
-export declare const undefined: S.Schema<undefined>
-```
-
-Added in v1.0.0
-
-## unknown
-
-**Signature**
-
-```ts
-export declare const unknown: S.Schema<unknown>
-```
-
-Added in v1.0.0
-
-## void
-
-**Signature**
-
-```ts
-export declare const void: S.Schema<void>
 ```
 
 Added in v1.0.0

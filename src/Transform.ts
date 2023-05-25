@@ -154,88 +154,88 @@ export {
   parseResult
 } from "@effect/schema/Parser"
 
-export {
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  any,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  bigint,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  boolean,
-  /**
-   * @category constructors
-   * @since 1.0.0
-   */
-  enums,
-  /**
-   * @category constructors
-   * @since 1.0.0
-   */
-  literal,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  never,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  null,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  number,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  object,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  string,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  symbol,
-  /**
-   * @category constructors
-   * @since 1.0.0
-   */
-  templateLiteral,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  undefined,
-  /**
-   * @category constructors
-   * @since 1.0.0
-   */
-  uniqueSymbol,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  unknown,
-  /**
-   * @category primitives
-   * @since 1.0.0
-   */
-  void
-} from "@effect/schema/Schema"
+// export {
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   any,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   bigint,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   boolean,
+//   /**
+//    * @category constructors
+//    * @since 1.0.0
+//    */
+//   enums,
+//   /**
+//    * @category constructors
+//    * @since 1.0.0
+//    */
+//   literal,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   never,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   null,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   number,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   object,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   string,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   symbol,
+//   /**
+//    * @category constructors
+//    * @since 1.0.0
+//    */
+//   templateLiteral,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   undefined,
+//   /**
+//    * @category constructors
+//    * @since 1.0.0
+//    */
+//   uniqueSymbol,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   unknown,
+//   /**
+//    * @category primitives
+//    * @since 1.0.0
+//    */
+//   void
+// } from "@effect/schema/Schema"
 /* c8 ignore end */
 
 // ---------------------------------------------
@@ -657,13 +657,6 @@ export interface BrandTransform<From, To extends Brand<any>>
  * @param self - The input schema to be combined with the brand.
  * @param brand - The brand to apply.
  *
- * @example
- * import * as T from "@effect/schema/Transform"
- * import { pipe } from "@effect/data/Function"
- *
- * const Int = pipe(T.number, T.int(), T.brand("Int"))
- * type Int = T.To<typeof Int> // number & Brand<"Int">
- *
  * @category combinators
  * @since 1.0.0
  */
@@ -862,17 +855,18 @@ export const transform: {
  * @param value - The value of the property to add to the schema.
  *
  * @example
- * import * as S from "@effect/schema/Transform"
+ * import * as S from "@effect/schema/Schema"
+ * import * as T from "@effect/schema/Transform"
  * import { pipe } from "@effect/data/Function"
  *
  * const Circle = S.struct({ radius: S.number })
  * const Square = S.struct({ sideLength: S.number })
- * const Shape = S.union(
- *   pipe(Circle, S.attachPropertySignature("kind", "circle")),
- *   pipe(Square, S.attachPropertySignature("kind", "square"))
+ * const Shape = T.union(
+ *   pipe(Circle, T.attachPropertySignature("kind", "circle")),
+ *   pipe(Square, T.attachPropertySignature("kind", "square"))
  * )
  *
- * assert.deepStrictEqual(S.decode(Shape)({ radius: 10 }), {
+ * assert.deepStrictEqual(T.decode(Shape)({ radius: 10 }), {
  *   kind: "circle",
  *   radius: 10
  * })

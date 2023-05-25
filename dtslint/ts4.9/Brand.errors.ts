@@ -1,4 +1,4 @@
-import * as S from "@effect/schema/Transform";
+import * as S from "@effect/schema/Schema";
 import { pipe } from "@effect/data/Function";
 
 const Int1 = Symbol.for('Int')

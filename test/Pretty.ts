@@ -23,13 +23,13 @@ describe.concurrent("Pretty", () => {
   })
 
   it("templateLiteral. a${string}b", () => {
-    const schema = T.templateLiteral(T.literal("a"), S.string, T.literal("b"))
+    const schema = S.templateLiteral(S.literal("a"), S.string, S.literal("b"))
     const pretty = P.build(schema)
     expect(pretty("acb")).toEqual(`"acb"`)
   })
 
   it("never", () => {
-    const schema = T.never
+    const schema = S.never
     const pretty = P.build(schema)
     expect(() => pretty("a" as any as never)).toThrowError(
       new Error("cannot pretty print a `never` value")
@@ -65,35 +65,35 @@ describe.concurrent("Pretty", () => {
   })
 
   it("bigint", () => {
-    const pretty = P.build(T.bigint)
+    const pretty = P.build(S.bigint)
     expect(pretty(1n)).toEqual("1n")
   })
 
   it("symbol", () => {
-    const pretty = P.build(T.symbol)
+    const pretty = P.build(S.symbol)
     expect(pretty(Symbol.for("@effect/data/test/a"))).toEqual("Symbol(@effect/data/test/a)")
   })
 
   it("void", () => {
-    const pretty = P.build(T.void)
+    const pretty = P.build(S.void)
     expect(pretty(undefined)).toEqual("void(0)")
   })
 
   it("literal/ null", () => {
-    const schema = T.literal(null)
+    const schema = S.literal(null)
     const pretty = P.build(schema)
     expect(pretty(null)).toEqual("null")
   })
 
   it("literal/ bigint", () => {
-    const schema = T.literal(1n)
+    const schema = S.literal(1n)
     const pretty = P.build(schema)
     expect(pretty(1n)).toEqual("1n")
   })
 
   it("uniqueSymbol", () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = T.uniqueSymbol(a)
+    const schema = S.uniqueSymbol(a)
     const pretty = P.build(schema)
     expect(pretty(a)).toEqual("Symbol(@effect/schema/test/a)")
   })
@@ -103,7 +103,7 @@ describe.concurrent("Pretty", () => {
       Apple,
       Banana
     }
-    const schema = T.enums(Fruits)
+    const schema = S.enums(Fruits)
     const pretty = P.build(schema)
     expect(pretty(Fruits.Apple)).toEqual(`0`)
     expect(pretty(Fruits.Banana)).toEqual(`1`)
@@ -115,7 +115,7 @@ describe.concurrent("Pretty", () => {
       Banana = "banana",
       Cantaloupe = 0
     }
-    const schema = T.enums(Fruits)
+    const schema = S.enums(Fruits)
     const pretty = P.build(schema)
     expect(pretty(Fruits.Apple)).toEqual(`"apple"`)
     expect(pretty(Fruits.Banana)).toEqual(`"banana"`)
@@ -128,7 +128,7 @@ describe.concurrent("Pretty", () => {
       Banana: "banana",
       Cantaloupe: 3
     } as const
-    const schema = T.enums(Fruits)
+    const schema = S.enums(Fruits)
     const pretty = P.build(schema)
     expect(pretty(Fruits.Apple)).toEqual(`"apple"`)
     expect(pretty(Fruits.Banana)).toEqual(`"banana"`)
@@ -161,7 +161,7 @@ describe.concurrent("Pretty", () => {
 
   it("record(symbol, string)", () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = S.record(T.symbol, S.string)
+    const schema = S.record(S.symbol, S.string)
     const pretty = P.build(schema)
     expect(pretty({ [a]: "a" })).toEqual(
       `{ Symbol(@effect/schema/test/a): "a" }`
@@ -337,7 +337,7 @@ describe.concurrent("Pretty", () => {
   })
 
   it("tuple/ ReadonlyArray<any>", () => {
-    const schema = S.array(T.any)
+    const schema = S.array(S.any)
     const pretty = P.build(schema)
     expect(pretty([])).toEqual(`[]`)
     expect(pretty(["a", 1, true])).toEqual(`["a", 1, true]`)
@@ -356,8 +356,8 @@ describe.concurrent("Pretty", () => {
 
   it("union/ discriminated", () => {
     const schema = S.union(
-      S.struct({ tag: T.literal("a"), a: S.string }),
-      S.struct({ tag: T.literal("b"), b: S.number })
+      S.struct({ tag: S.literal("a"), a: S.string }),
+      S.struct({ tag: S.literal("b"), b: S.number })
     )
     const pretty = P.build(schema)
     expect(pretty({ tag: "a", a: "-" })).toEqual(

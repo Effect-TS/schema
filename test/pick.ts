@@ -1,4 +1,5 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
@@ -6,7 +7,7 @@ describe.concurrent("pick", () => {
   it("struct", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const schema = pipe(
-      T.struct({ [a]: T.string, b: T.NumberFromString, c: T.boolean }),
+      T.struct({ [a]: S.string, b: T.NumberFromString, c: S.boolean }),
       T.pick(a, "b")
     )
     await Util.expectParseSuccess(schema, { [a]: "a", b: "1" }, { [a]: "a", b: 1 })
@@ -22,7 +23,7 @@ describe.concurrent("pick", () => {
 
   it("struct with optionals", async () => {
     const schema = pipe(
-      T.struct({ a: T.optional(T.string), b: T.NumberFromString, c: T.boolean }),
+      T.struct({ a: T.optional(S.string), b: T.NumberFromString, c: S.boolean }),
       T.pick("a", "b")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
@@ -39,7 +40,7 @@ describe.concurrent("pick", () => {
     }
     const A: T.Transform<A, A> = T.lazy(() =>
       T.struct({
-        a: T.string,
+        a: S.string,
         as: T.array(A)
       })
     )
@@ -53,9 +54,9 @@ describe.concurrent("pick", () => {
   it("struct with property signature transformations", async () => {
     const schema = pipe(
       T.struct({
-        a: T.optional(T.string).withDefault(() => ""),
+        a: T.optional(S.string).withDefault(() => ""),
         b: T.NumberFromString,
-        c: T.boolean
+        c: S.boolean
       }),
       T.pick("a", "b")
     )

@@ -1,13 +1,14 @@
 import { identity } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
 describe.concurrent("PropertySignatureTransformations", () => {
   it("identity", async () => {
     const from = T.struct({ a: T.NumberFromString }).ast
-    const to = T.struct({ a: T.number }).ast
+    const to = S.struct({ a: S.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = []
     const schema: T.Transform<{ readonly a: string }, { readonly a: number }> = T.make(
       AST.createTransformByPropertySignatureTransformations(
@@ -25,7 +26,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
 
   it("default", async () => {
     const from = T.struct({ a: T.optional(T.NumberFromString) }).ast
-    const to = T.struct({ a: T.number }).ast
+    const to = S.struct({ a: S.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -51,7 +52,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
 
   it("bidirectional default", async () => {
     const from = T.struct({ a: T.optional(T.NumberFromString) }).ast
-    const to = T.struct({ a: T.number }).ast
+    const to = S.struct({ a: S.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -77,7 +78,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
 
   it("optional -> Option", async () => {
     const from = T.struct({ a: T.optional(T.NumberFromString) }).ast
-    const to = T.struct({ a: T.optionFromSelf(T.number) }).ast
+    const to = T.struct({ a: T.optionFromSelf(S.number) }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -102,8 +103,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("empty string as optional", async () => {
-    const from = T.struct({ a: T.string }).ast
-    const to = T.struct({ a: T.optional(T.string) }).ast
+    const from = S.struct({ a: S.string }).ast
+    const to = S.struct({ a: S.optional(S.string) }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -126,8 +127,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("rename", async () => {
-    const from = T.struct({ a: T.number }).ast
-    const to = T.struct({ b: T.number }).ast
+    const from = S.struct({ a: S.number }).ast
+    const to = S.struct({ b: S.number }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",
@@ -149,8 +150,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("reversed default", async () => {
-    const from = T.struct({ a: T.number }).ast
-    const to = T.struct({ a: T.optional(T.number) }).ast
+    const from = S.struct({ a: S.number }).ast
+    const to = S.struct({ a: S.optional(S.number) }).ast
     const propertySignatureTransformations: AST.Transform["propertySignatureTransformations"] = [
       AST.createPropertySignatureTransformation(
         "a",

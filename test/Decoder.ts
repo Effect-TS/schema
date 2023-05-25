@@ -385,7 +385,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e r e", async () => {
-    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(T.boolean))
+    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(S.boolean))
     await Util.expectParseSuccess(schema, ["a", true])
     await Util.expectParseSuccess(schema, ["a", 1, true])
     await Util.expectParseSuccess(schema, ["a", 1, 2, true])
@@ -515,7 +515,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(never, number)", async () => {
-    const schema = S.record(T.never, S.number)
+    const schema = S.record(S.never, S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
   })
@@ -579,7 +579,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(never, number)", async () => {
-    const schema = S.record(T.never, S.number)
+    const schema = S.record(S.never, S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: 1 })
   })
@@ -656,7 +656,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(${string}-${string}, number)", async () => {
-    const schema = S.record(T.templateLiteral(S.string, S.literal("-"), S.string), S.number)
+    const schema = S.record(S.templateLiteral(S.string, S.literal("-"), S.string), S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { "-": 1 })
     await Util.expectParseSuccess(schema, { "a-": 1 })
@@ -949,7 +949,7 @@ describe.concurrent("Decoder", () => {
   // ---------------------------------------------
 
   it("allErrors/tuple. e r e", async () => {
-    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(T.boolean))
+    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(S.boolean))
     await Util.expectParseFailure(
       schema,
       [true],
@@ -994,7 +994,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple/post rest elements: wrong type for values", async () => {
-    const schema = pipe(T.array(T.boolean), T.element(S.number), T.element(S.number))
+    const schema = pipe(T.array(S.boolean), T.element(S.number), T.element(S.number))
     await Util.expectParseFailure(
       schema,
       ["a", "b"],

@@ -30,7 +30,7 @@ describe.concurrent("ReadonlySet", () => {
   describe.concurrent("Transform", () => {
     describe.concurrent("readonlySetFromSelf", () => {
       it("keyof", () => {
-        expect(T.keyof(T.readonlySetFromSelf(S.number))).toEqual(T.literal("size"))
+        expect(T.keyof(T.readonlySetFromSelf(S.number))).toEqual(S.literal("size"))
       })
 
       it("property tests", () => {

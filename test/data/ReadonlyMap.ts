@@ -34,7 +34,7 @@ describe.concurrent("ReadonlyMap", () => {
   describe.concurrent("Transform", () => {
     describe.concurrent("readonlyMapFromSelf", () => {
       it("keyof", () => {
-        expect(T.keyof(T.readonlyMapFromSelf(S.number, S.string))).toEqual(T.literal("size"))
+        expect(T.keyof(T.readonlyMapFromSelf(S.number, S.string))).toEqual(S.literal("size"))
       })
 
       it("property tests", () => {

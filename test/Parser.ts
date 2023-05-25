@@ -111,7 +111,7 @@ describe.concurrent("Parser", () => {
     const schema = S.number
     expect(P.validateEither(schema)(1)).toEqual(E.right(1))
     expect(P.validateEither(schema)("1")).toEqual(
-      E.left(PR.parseError([PR.type(T.number.ast, "1")]))
+      E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })
 
@@ -119,7 +119,7 @@ describe.concurrent("Parser", () => {
     const schema = S.number
     expect(P.validateResult(schema)(1)).toEqual(E.right(1))
     expect(P.validateResult(schema)("1")).toEqual(
-      E.left(PR.parseError([PR.type(T.number.ast, "1")]))
+      E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })
 
@@ -134,7 +134,7 @@ describe.concurrent("Parser", () => {
     const schema = S.number
     expect(await Effect.runPromiseEither(P.validateEffect(schema)(1))).toEqual(E.right(1))
     expect(await Effect.runPromiseEither(P.validateEffect(schema)("1"))).toEqual(
-      E.left(PR.parseError([PR.type(T.number.ast, "1")]))
+      E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })
 
@@ -151,13 +151,13 @@ describe.concurrent("Parser", () => {
   it("_getLiterals", () => {
     expect(P._getLiterals(S.string.ast)).toEqual([])
     // TypeLiteral
-    expect(P._getLiterals(T.struct({ _tag: T.literal("a") }).ast))
+    expect(P._getLiterals(T.struct({ _tag: S.literal("a") }).ast))
       .toEqual([["_tag", AST.createLiteral("a")]])
     // Refinement
     expect(
       P._getLiterals(
         pipe(
-          T.struct({ _tag: T.literal("a") }),
+          T.struct({ _tag: S.literal("a") }),
           T.filter(() => true)
         ).ast
       )
@@ -167,9 +167,9 @@ describe.concurrent("Parser", () => {
       P._getLiterals(
         T.declare(
           [],
-          T.struct({ _tag: T.literal("a") }),
-          () => P.parseResult(T.struct({ _tag: T.literal("a") })),
-          () => P.encodeResult(T.struct({ _tag: T.literal("a") }))
+          T.struct({ _tag: S.literal("a") }),
+          () => P.parseResult(T.struct({ _tag: S.literal("a") })),
+          () => P.encodeResult(T.struct({ _tag: S.literal("a") }))
         ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])
@@ -177,42 +177,42 @@ describe.concurrent("Parser", () => {
     // Transform
     expect(
       P._getLiterals(
-        pipe(T.struct({ radius: T.number }), T.attachPropertySignature("kind", "circle")).ast
+        pipe(T.struct({ radius: S.number }), T.attachPropertySignature("kind", "circle")).ast
       )
     ).toEqual([])
   })
 
   it("_getSearchTree", () => {
-    expect(P._getSearchTree([S.string.ast, T.number.ast])).toEqual({
+    expect(P._getSearchTree([S.string.ast, S.number.ast])).toEqual({
       keys: {},
-      otherwise: [S.string.ast, T.number.ast]
+      otherwise: [S.string.ast, S.number.ast]
     })
 
-    expect(P._getSearchTree([T.struct({ _tag: T.literal("a") }).ast, T.number.ast])).toEqual(
+    expect(P._getSearchTree([T.struct({ _tag: S.literal("a") }).ast, S.number.ast])).toEqual(
       {
         keys: {
           _tag: {
             buckets: {
-              a: [T.struct({ _tag: T.literal("a") }).ast]
+              a: [T.struct({ _tag: S.literal("a") }).ast]
             },
             ast: AST.createLiteral("a")
           }
         },
-        otherwise: [T.number.ast]
+        otherwise: [S.number.ast]
       }
     )
 
     expect(
       P._getSearchTree([
-        T.struct({ _tag: T.literal("a") }).ast,
-        T.struct({ _tag: T.literal("b") }).ast
+        T.struct({ _tag: S.literal("a") }).ast,
+        T.struct({ _tag: S.literal("b") }).ast
       ])
     ).toEqual({
       keys: {
         _tag: {
           buckets: {
-            a: [T.struct({ _tag: T.literal("a") }).ast],
-            b: [T.struct({ _tag: T.literal("b") }).ast]
+            a: [T.struct({ _tag: S.literal("a") }).ast],
+            b: [T.struct({ _tag: S.literal("b") }).ast]
           },
           ast: AST.createUnion([AST.createLiteral("a"), AST.createLiteral("b")])
         }
@@ -222,20 +222,20 @@ describe.concurrent("Parser", () => {
 
     expect(
       P._getSearchTree([
-        T.struct({ a: T.literal("A"), c: S.string }).ast,
-        T.struct({ b: T.literal("B"), d: T.number }).ast
+        T.struct({ a: S.literal("A"), c: S.string }).ast,
+        T.struct({ b: S.literal("B"), d: S.number }).ast
       ])
     ).toEqual({
       keys: {
         a: {
           buckets: {
-            A: [T.struct({ a: T.literal("A"), c: S.string }).ast]
+            A: [T.struct({ a: S.literal("A"), c: S.string }).ast]
           },
           ast: AST.createLiteral("A")
         },
         b: {
           buckets: {
-            B: [T.struct({ b: T.literal("B"), d: T.number }).ast]
+            B: [T.struct({ b: S.literal("B"), d: S.number }).ast]
           },
           ast: AST.createLiteral("B")
         }
@@ -246,22 +246,22 @@ describe.concurrent("Parser", () => {
     // should handle multiple tags
     expect(
       P._getSearchTree([
-        T.struct({ category: T.literal("catA"), tag: T.literal("a") }).ast,
-        T.struct({ category: T.literal("catA"), tag: T.literal("b") }).ast,
-        T.struct({ category: T.literal("catA"), tag: T.literal("c") }).ast
+        T.struct({ category: S.literal("catA"), tag: S.literal("a") }).ast,
+        T.struct({ category: S.literal("catA"), tag: S.literal("b") }).ast,
+        T.struct({ category: S.literal("catA"), tag: S.literal("c") }).ast
       ])
     ).toEqual({
       keys: {
         category: {
           buckets: {
-            catA: [T.struct({ category: T.literal("catA"), tag: T.literal("a") }).ast]
+            catA: [T.struct({ category: S.literal("catA"), tag: S.literal("a") }).ast]
           },
           ast: AST.createLiteral("catA")
         },
         tag: {
           buckets: {
-            b: [T.struct({ category: T.literal("catA"), tag: T.literal("b") }).ast],
-            c: [T.struct({ category: T.literal("catA"), tag: T.literal("c") }).ast]
+            b: [T.struct({ category: S.literal("catA"), tag: S.literal("b") }).ast],
+            c: [T.struct({ category: S.literal("catA"), tag: S.literal("c") }).ast]
           },
           ast: AST.createUnion([AST.createLiteral("b"), AST.createLiteral("c")])
         }
@@ -271,15 +271,15 @@ describe.concurrent("Parser", () => {
   })
 
   const schema = T.union(
-    T.struct({ type: T.literal("a"), value: S.string }),
-    T.struct({ type: T.literal("b"), value: S.string }),
-    T.struct({ type: T.literal("c"), value: S.string }),
+    T.struct({ type: S.literal("a"), value: S.string }),
+    T.struct({ type: S.literal("b"), value: S.string }),
+    T.struct({ type: S.literal("c"), value: S.string }),
     T.struct({ type: S.string, value: S.string }),
-    T.struct({ type: T.literal(null), value: S.string }),
-    T.struct({ type: T.undefined, value: S.string }),
-    T.struct({ type: T.literal("d", "e"), value: S.string }),
+    T.struct({ type: S.literal(null), value: S.string }),
+    T.struct({ type: S.undefined, value: S.string }),
+    T.struct({ type: S.literal("d", "e"), value: S.string }),
     T.struct({ type: T.struct({ nested: S.string }), value: S.string }),
-    T.struct({ type: T.array(T.number), value: S.string })
+    T.struct({ type: T.array(S.number), value: S.string })
   )
   const types = (schema.ast as AST.Union).types
   expect(
@@ -288,10 +288,10 @@ describe.concurrent("Parser", () => {
     keys: {
       type: {
         buckets: {
-          a: [T.struct({ type: T.literal("a"), value: S.string }).ast],
-          b: [T.struct({ type: T.literal("b"), value: S.string }).ast],
-          c: [T.struct({ type: T.literal("c"), value: S.string }).ast],
-          null: [T.struct({ type: T.literal(null), value: S.string }).ast]
+          a: [T.struct({ type: S.literal("a"), value: S.string }).ast],
+          b: [T.struct({ type: S.literal("b"), value: S.string }).ast],
+          c: [T.struct({ type: S.literal("c"), value: S.string }).ast],
+          null: [T.struct({ type: S.literal(null), value: S.string }).ast]
         },
         ast: AST.createUnion([
           AST.createLiteral("a"),
@@ -303,10 +303,10 @@ describe.concurrent("Parser", () => {
     },
     otherwise: [
       T.struct({ type: S.string, value: S.string }).ast,
-      T.struct({ type: T.undefined, value: S.string }).ast,
-      T.struct({ type: T.literal("d", "e"), value: S.string }).ast,
+      T.struct({ type: S.undefined, value: S.string }).ast,
+      T.struct({ type: S.literal("d", "e"), value: S.string }).ast,
       T.struct({ type: T.struct({ nested: S.string }), value: S.string }).ast,
-      T.struct({ type: T.array(T.number), value: S.string }).ast
+      T.struct({ type: T.array(S.number), value: S.string }).ast
     ]
   })
 })

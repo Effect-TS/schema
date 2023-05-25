@@ -519,11 +519,11 @@ export declare const brand: <B extends string | symbol, A>(
 **Example**
 
 ```ts
-import * as T from '@effect/schema/Transform'
+import * as S from '@effect/schema/Schema'
 import { pipe } from '@effect/data/Function'
 
-const Int = pipe(T.number, T.int(), T.brand('Int'))
-type Int = T.To<typeof Int> // number & Brand<"Int">
+const Int = pipe(S.number, S.int(), S.brand('Int'))
+type Int = S.To<typeof Int> // number & Brand<"Int">
 ```
 
 Added in v1.0.0

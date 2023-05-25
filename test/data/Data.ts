@@ -26,7 +26,7 @@ describe.concurrent("Data", () => {
     describe.concurrent("dataFromSelf", () => {
       it("keyof", () => {
         const transform = T.keyof(T.dataFromSelf(S.struct({ a: S.string, b: S.string })))
-        expect(transform).toEqual(T.union(T.literal("a"), T.literal("b")))
+        expect(transform).toEqual(T.union(S.literal("a"), S.literal("b")))
       })
 
       it("property tests", () => {

@@ -1,10 +1,10 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("onExcess", () => {
   it("ignore should not change tuple behaviour", async () => {
-    const schema = T.tuple(T.number)
+    const schema = S.tuple(S.number)
     await Util.expectParseFailure(schema, [1, "b"], "/1 is unexpected")
     await Util.expectEncodeFailure(
       schema,
@@ -15,9 +15,9 @@ describe.concurrent("onExcess", () => {
 
   describe.concurrent("union should choose the output with more info", () => {
     it("structs", async () => {
-      const a = T.struct({ a: T.optional(T.number) })
-      const b = T.struct({ a: T.optional(T.number), b: T.optional(T.string) })
-      const schema = T.union(a, b)
+      const a = S.struct({ a: S.optional(S.number) })
+      const b = S.struct({ a: S.optional(S.number), b: S.optional(S.string) })
+      const schema = S.union(a, b)
       await Util.expectParseSuccess(
         schema,
         { a: 1, b: "b", c: true },
@@ -43,9 +43,9 @@ describe.concurrent("onExcess", () => {
     })
 
     it("tuples", async () => {
-      const a = T.tuple(T.number)
-      const b = pipe(T.tuple(T.number), T.optionalElement(T.string))
-      const schema = T.union(a, b)
+      const a = S.tuple(S.number)
+      const b = pipe(S.tuple(S.number), S.optionalElement(S.string))
+      const schema = S.union(a, b)
       await Util.expectParseFailure(
         schema,
         [1, "b", true],
@@ -73,7 +73,7 @@ describe.concurrent("onExcess", () => {
 
   describe.concurrent(`onExcessProperty = "ignore" option`, () => {
     it("tuple of a struct", async () => {
-      const schema = T.tuple(T.struct({ b: T.number }))
+      const schema = S.tuple(S.struct({ b: S.number }))
       await Util.expectParseSuccess(
         schema,
         [{ b: 1, c: "c" }],
@@ -82,7 +82,7 @@ describe.concurrent("onExcess", () => {
     })
 
     it("tuple rest element of a struct", async () => {
-      const schema = T.array(T.struct({ b: T.number }))
+      const schema = S.array(S.struct({ b: S.number }))
       await Util.expectParseSuccess(
         schema,
         [{ b: 1, c: "c" }],
@@ -91,7 +91,7 @@ describe.concurrent("onExcess", () => {
     })
 
     it("tuple. post rest elements of a struct", async () => {
-      const schema = pipe(T.array(T.string), T.element(T.struct({ b: T.number })))
+      const schema = pipe(S.array(S.string), S.element(S.struct({ b: S.number })))
       await Util.expectParseSuccess(schema, [{ b: 1 }])
       await Util.expectParseSuccess(
         schema,
@@ -101,7 +101,7 @@ describe.concurrent("onExcess", () => {
     })
 
     it("struct excess property signatures", async () => {
-      const schema = T.struct({ a: T.number })
+      const schema = S.struct({ a: S.number })
       await Util.expectParseSuccess(
         schema,
         { a: 1, b: "b" },
@@ -110,7 +110,7 @@ describe.concurrent("onExcess", () => {
     })
 
     it("struct nested struct", async () => {
-      const schema = T.struct({ a: T.struct({ b: T.number }) })
+      const schema = S.struct({ a: S.struct({ b: S.number }) })
       await Util.expectParseSuccess(
         schema,
         { a: { b: 1, c: "c" } },
@@ -121,7 +121,7 @@ describe.concurrent("onExcess", () => {
     })
 
     it("record of struct", async () => {
-      const schema = T.record(T.string, T.struct({ b: T.number }))
+      const schema = S.record(S.string, S.struct({ b: S.number }))
       await Util.expectParseSuccess(
         schema,
         { a: { b: 1, c: "c" } },

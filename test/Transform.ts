@@ -7,7 +7,7 @@ import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Transform", () => {
   it("brand/ annotations", () => {
-    // const Branded: S.Schema<number & Brand<"A"> & Brand<"B">>
+    // const Branded: T.BrandTransform<string, number & Brand<"A"> & Brand<"B">>
     const Branded = pipe(
       S.string,
       T.numberFromString,
@@ -136,7 +136,7 @@ describe.concurrent("Transform", () => {
   it("filter/ annotation options", () => {
     const schema = pipe(
       S.string,
-      T.filter((s): s is string => s.length === 1, {
+      S.filter((s): s is string => s.length === 1, {
         typeId: "Char",
         description: "description",
         documentation: "documentation",
@@ -163,22 +163,22 @@ describe.concurrent("Transform", () => {
   })
 
   it("rest/ should throw on unsupported schemas", () => {
-    const schema = pipe(T.tuple(), T.filter(() => true))
-    expect(() => pipe(schema, T.rest(T.number))).toThrowError(
+    const schema = pipe(S.tuple(), S.filter(() => true))
+    expect(() => pipe(schema, S.rest(S.number))).toThrowError(
       new Error("`rest` is not supported on this schema")
     )
   })
 
   it("element/ should throw on unsupported schemas", () => {
-    const schema = pipe(T.tuple(), T.filter(() => true))
-    expect(() => pipe(schema, T.element(T.number))).toThrowError(
+    const schema = pipe(S.tuple(), S.filter(() => true))
+    expect(() => pipe(schema, S.element(S.number))).toThrowError(
       new Error("`element` is not supported on this schema")
     )
   })
 
   it("optionalElement/ should throw on unsupported schemas", () => {
-    const schema = pipe(T.tuple(), T.filter(() => true))
-    expect(() => pipe(schema, T.optionalElement(T.number))).toThrowError(
+    const schema = pipe(S.tuple(), S.filter(() => true))
+    expect(() => pipe(schema, S.optionalElement(S.number))).toThrowError(
       new Error("`optionalElement` is not supported on this schema")
     )
   })

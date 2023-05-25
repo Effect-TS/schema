@@ -734,11 +734,11 @@ export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Co
  * @param brand - The brand to apply.
  *
  * @example
- * import * as T from "@effect/schema/Transform"
+ * import * as S from "@effect/schema/Schema"
  * import { pipe } from "@effect/data/Function"
  *
- * const Int = pipe(T.number, T.int(), T.brand("Int"))
- * type Int = T.To<typeof Int> // number & Brand<"Int">
+ * const Int = pipe(S.number, S.int(), S.brand("Int"))
+ * type Int = S.To<typeof Int> // number & Brand<"Int">
  *
  * @category combinators
  * @since 1.0.0

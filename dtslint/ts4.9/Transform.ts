@@ -8,14 +8,14 @@ import * as S from "@effect/schema/Schema";
 // ---------------------------------------------
 
 // $ExpectType never
-export type FromNever = T.From<typeof T.never>
+export type FromNever = T.From<typeof S.never>
 
 // ---------------------------------------------
 // To
 // ---------------------------------------------
 
 // $ExpectType never
-export type ToNever = T.To<typeof T.never>
+export type ToNever = T.To<typeof S.never>
 
 // ---------------------------------------------
 // strings
@@ -75,7 +75,7 @@ T.nullable(T.NumberFromString)
 // ---------------------------------------------
 
 // $ExpectType Transform<string | boolean, number | boolean>
-T.union(T.boolean, T.NumberFromString);
+T.union(S.boolean, T.NumberFromString);
 
 // ---------------------------------------------
 // keyof
@@ -151,7 +151,7 @@ T.struct({ a: pipe(T.NumberFromString, T.optional) })
 // ---------------------------------------------
 
 // $ExpectType Transform<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: boolean; }>
-T.struct({ a: S.string, b: S.number, c: T.optional(T.boolean).withDefault(() => false) });
+T.struct({ a: S.string, b: S.number, c: T.optional(S.boolean).withDefault(() => false) });
 
 // $ExpectType Transform<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
 T.struct({ a: S.string, b: S.number, c: T.optional(T.NumberFromString).withDefault(() => 0) });
@@ -165,7 +165,7 @@ T.struct({ a: pipe(S.string, T.optional).withDefault(() => '') })
 // ---------------------------------------------
 
 // $ExpectType Transform<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: Option<boolean>; }>
-T.struct({ a: S.string, b: S.number, c: T.optional(T.boolean).toOption() });
+T.struct({ a: S.string, b: S.number, c: T.optional(S.boolean).toOption() });
 
 // $ExpectType Transform<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: Option<number>; }>
 T.struct({ a: S.string, b: S.number, c: T.optional(T.NumberFromString).toOption() });
@@ -179,34 +179,34 @@ T.struct({ a: pipe(S.string, T.optional).toOption() })
 // ---------------------------------------------
 
 // $ExpectType Transform<{ readonly a: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(T.struct({ a: S.string,  b: T.NumberFromString, c: T.boolean }), T.pick('a', 'b'));
+pipe(T.struct({ a: S.string,  b: T.NumberFromString, c: S.boolean }), T.pick('a', 'b'));
 
 // ---------------------------------------------
 // pick - optional
 // ---------------------------------------------
 
 // $ExpectType Transform<{ readonly a?: string; readonly b: string; }, { readonly a?: string; readonly b: number; }>
-pipe(T.struct({ a: T.optional(S.string),  b: T.NumberFromString, c: T.boolean }), T.pick('a', 'b'));
+pipe(T.struct({ a: T.optional(S.string),  b: T.NumberFromString, c: S.boolean }), T.pick('a', 'b'));
 
 // $ExpectType Transform<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromString, c: T.boolean }), T.pick('a', 'b'));
+pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromString, c: S.boolean }), T.pick('a', 'b'));
 
 // ---------------------------------------------
 // omit
 // ---------------------------------------------
 
 // $ExpectType Transform<{ readonly a: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(T.struct({ a: S.string,  b: T.NumberFromString, c: T.boolean }), T.omit('c'));
+pipe(T.struct({ a: S.string,  b: T.NumberFromString, c: S.boolean }), T.omit('c'));
 
 // ---------------------------------------------
 // omit - optional
 // ---------------------------------------------
 
 // $ExpectType Transform<{ readonly a?: string; readonly b: string; }, { readonly a?: string; readonly b: number; }>
-pipe(T.struct({ a: T.optional(S.string),  b: T.NumberFromString, c: T.boolean }), T.omit('c'));
+pipe(T.struct({ a: T.optional(S.string),  b: T.NumberFromString, c: S.boolean }), T.omit('c'));
 
 // $ExpectType Transform<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromString, c: T.boolean }), T.omit('c'));
+pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromString, c: S.boolean }), T.omit('c'));
 
 // ---------------------------------------------
 // brand

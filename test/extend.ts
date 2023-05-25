@@ -19,7 +19,7 @@ describe.concurrent("extend", () => {
 
   it(`struct extend struct with defaults`, async () => {
     const schema = pipe(
-      S.struct({ a: T.number }),
+      S.struct({ a: S.number }),
       T.extend(
         T.struct({ b: S.string, c: T.optional(S.string).withDefault(() => "") })
       )
@@ -118,8 +118,8 @@ describe.concurrent("extend", () => {
       ),
       S.extend(
         S.union(
-          S.struct({ c: T.boolean }),
-          S.struct({ d: T.number })
+          S.struct({ c: S.boolean }),
+          S.struct({ d: S.number })
         )
       )
     )
@@ -141,7 +141,7 @@ describe.concurrent("extend", () => {
   // -------------------------------------------------------------------------------------
 
   it("can only handle type literals or unions of type literals", () => {
-    expect(() => pipe(S.string, T.extend(T.number))).toThrowError(
+    expect(() => pipe(S.string, T.extend(S.number))).toThrowError(
       new Error("`extend` can only handle type literals or unions of type literals")
     )
   })
@@ -149,8 +149,8 @@ describe.concurrent("extend", () => {
   it(`extend/overlapping index signatures/ string`, () => {
     expect(() =>
       pipe(
-        T.record(S.string, T.number),
-        T.extend(T.record(S.string, T.boolean))
+        T.record(S.string, S.number),
+        T.extend(T.record(S.string, S.boolean))
       )
     ).toThrowError(new Error("Duplicate index signature for type `string`"))
   })
@@ -158,8 +158,8 @@ describe.concurrent("extend", () => {
   it(`extend/overlapping index signatures/ symbol`, () => {
     expect(() =>
       pipe(
-        T.record(T.symbol, T.number),
-        T.extend(T.record(T.symbol, T.boolean))
+        T.record(S.symbol, S.number),
+        T.extend(T.record(S.symbol, S.boolean))
       )
     ).toThrowError(new Error("Duplicate index signature for type `symbol`"))
   })
@@ -167,8 +167,8 @@ describe.concurrent("extend", () => {
   it("extend/overlapping index signatures/ refinements", () => {
     expect(() =>
       pipe(
-        T.record(S.string, T.number),
-        T.extend(T.record(pipe(S.string, S.minLength(2)), T.boolean))
+        T.record(S.string, S.number),
+        T.extend(T.record(pipe(S.string, S.minLength(2)), S.boolean))
       )
     ).toThrowError(new Error("Duplicate index signature for type `string`"))
   })
@@ -186,7 +186,7 @@ describe.concurrent("extend", () => {
         T.extend(
           S.union(
             S.struct({ a: S.string }),
-            S.struct({ b: T.number })
+            S.struct({ b: S.number })
           )
         )
       )

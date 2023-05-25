@@ -61,7 +61,7 @@ const Applicative: applicative.Applicative<WriterLambda> = {
   of: (a) => [a, []]
 }
 
-interface TypeScript<A> extends T.Transform<A, A> {
+interface TypeScript<A> extends S.Schema<A> {
   readonly nodes: Writer<ts.TypeNode>
 }
 
@@ -124,7 +124,7 @@ const getDocumentationAnnotation = AST.getAnnotation<AST.DocumentationAnnotation
   AST.DocumentationAnnotationId
 )
 
-const typeScriptFor = <A>(schema: T.Transform<A, A>): TypeScript<A> => {
+const typeScriptFor = <A>(schema: S.Schema<A>): TypeScript<A> => {
   const go = (ast: AST.AST): TypeScript<any> => {
     switch (ast._tag) {
       case "Declaration":
@@ -394,19 +394,19 @@ describe.concurrent("TypeScript", () => {
   })
 
   it("templateLiteral. a${string}", () => {
-    const schema = S.templateLiteral(S.literal("a"), T.string)
+    const schema = S.templateLiteral(S.literal("a"), S.string)
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["`a${string}`"])
   })
 
   it("templateLiteral. ${string}", () => {
-    const schema = S.templateLiteral(T.string)
+    const schema = S.templateLiteral(S.string)
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["`${string}`"])
   })
 
   it("templateLiteral. a${string}b", () => {
-    const schema = S.templateLiteral(S.literal("a"), T.string, S.literal("b"))
+    const schema = S.templateLiteral(S.literal("a"), S.string, S.literal("b"))
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["`a${string}b`"])
   })
@@ -422,61 +422,61 @@ describe.concurrent("TypeScript", () => {
   })
 
   it("never", () => {
-    const schema = T.never
+    const schema = S.never
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["never"])
   })
 
   it("undefined", () => {
-    const schema = T.undefined
+    const schema = S.undefined
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["undefined"])
   })
 
   it("void", () => {
-    const schema = T.void
+    const schema = S.void
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["void"])
   })
 
   it("string", () => {
-    const schema = T.string
+    const schema = S.string
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["string"])
   })
 
   it("number", () => {
-    const schema = T.number
+    const schema = S.number
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["number"])
   })
 
   it("boolean", () => {
-    const schema = T.boolean
+    const schema = S.boolean
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["boolean"])
   })
 
   it("bigint", () => {
-    const schema = T.bigint
+    const schema = S.bigint
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["bigint"])
   })
 
   it("symbol", () => {
-    const schema = T.symbol
+    const schema = S.symbol
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["symbol"])
   })
 
   it("object", () => {
-    const schema = T.object
+    const schema = S.object
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["object"])
   })
 
   it("undefined", () => {
-    const schema = T.undefined
+    const schema = S.undefined
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual(["undefined"])
   })
@@ -514,7 +514,7 @@ describe.concurrent("TypeScript", () => {
   })
 
   it("uniqueSymbol", () => {
-    const schema = T.uniqueSymbol(Symbol.for("@effect/schema/test/a"), {
+    const schema = S.uniqueSymbol(Symbol.for("@effect/schema/test/a"), {
       [AST.IdentifierAnnotationId]: "a"
     })
     const ts = typeScriptFor(schema)
@@ -526,8 +526,8 @@ describe.concurrent("TypeScript", () => {
       Apple,
       Banana
     }
-    const schema = pipe(T.enums(Fruits), T.identifier("Fruits"))
-    const ts = typeScriptFor(schema)
+    const transform = pipe(S.enums(Fruits), T.identifier("Fruits"))
+    const ts = typeScriptFor(T.to(transform))
     expect(printNodes(ts.nodes)).toEqual([
       `enum Fruits {
     Apple = 0,
@@ -539,7 +539,7 @@ describe.concurrent("TypeScript", () => {
 
   describe.concurrent("tuple", () => {
     it("required element", () => {
-      const schema = T.tuple(T.number)
+      const schema = S.tuple(S.number)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     number
@@ -547,7 +547,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("required element with undefined", () => {
-      const schema = T.tuple(T.union(T.number, T.undefined))
+      const schema = S.tuple(S.union(S.number, S.undefined))
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     number | undefined
@@ -555,7 +555,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("optional element", () => {
-      const schema = pipe(T.tuple(), T.optionalElement(T.number))
+      const schema = pipe(S.tuple(), S.optionalElement(S.number))
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     number?
@@ -563,7 +563,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("optional element with undefined", () => {
-      const schema = pipe(T.tuple(), T.optionalElement(T.union(T.number, T.undefined)))
+      const schema = pipe(S.tuple(), S.optionalElement(S.union(S.number, S.undefined)))
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     (number | undefined)?
@@ -571,7 +571,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("baseline", () => {
-      const schema = T.tuple(T.string, T.number)
+      const schema = S.tuple(S.string, S.number)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     string,
@@ -580,14 +580,14 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("empty tuple", () => {
-      const schema = T.tuple()
+      const schema = S.tuple()
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
 ]`])
     })
 
     it("optional elements", () => {
-      const schema = pipe(T.tuple(), T.optionalElement(T.string), T.optionalElement(T.number))
+      const schema = pipe(S.tuple(), S.optionalElement(S.string), S.optionalElement(S.number))
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     string?,
@@ -596,13 +596,13 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("array", () => {
-      const schema = T.array(T.string)
+      const schema = S.array(S.string)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly string[]`])
     })
 
     it("post rest element", () => {
-      const schema = pipe(T.array(T.number), T.element(T.boolean))
+      const schema = pipe(S.array(S.number), S.element(S.boolean))
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     ...number[],
@@ -612,9 +612,9 @@ describe.concurrent("TypeScript", () => {
 
     it("post rest elements", () => {
       const schema = pipe(
-        T.array(T.number),
-        T.element(T.boolean),
-        T.element(T.union(T.string, T.undefined))
+        S.array(S.number),
+        S.element(S.boolean),
+        S.element(S.union(S.string, S.undefined))
       )
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
@@ -625,7 +625,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("post rest elements when rest is unknown", () => {
-      const schema = pipe(T.array(T.unknown), T.element(T.boolean))
+      const schema = pipe(S.array(S.unknown), S.element(S.boolean))
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     ...unknown[],
@@ -635,9 +635,9 @@ describe.concurrent("TypeScript", () => {
 
     it("all", () => {
       const schema = pipe(
-        T.tuple(T.string),
-        T.rest(T.number),
-        T.element(T.boolean)
+        S.tuple(S.string),
+        S.rest(S.number),
+        S.element(S.boolean)
       )
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
@@ -649,15 +649,15 @@ describe.concurrent("TypeScript", () => {
 
     it("all with symbols", () => {
       const schema = pipe(
-        T.tuple(
-          T.uniqueSymbol(Symbol.for("@effect/schema/test/a"), {
+        S.tuple(
+          S.uniqueSymbol(Symbol.for("@effect/schema/test/a"), {
             [AST.IdentifierAnnotationId]: "a"
           })
         ),
-        T.rest(T.uniqueSymbol(Symbol.for("@effect/schema/test/b"), {
+        S.rest(S.uniqueSymbol(Symbol.for("@effect/schema/test/b"), {
           [AST.IdentifierAnnotationId]: "b"
         })),
-        T.element(T.uniqueSymbol(Symbol.for("@effect/schema/test/c"), {
+        S.element(S.uniqueSymbol(Symbol.for("@effect/schema/test/c"), {
           [AST.IdentifierAnnotationId]: "c"
         }))
       )
@@ -675,7 +675,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("nonEmptyArray", () => {
-      const schema = T.nonEmptyArray(T.number)
+      const schema = S.nonEmptyArray(S.number)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly [
     number,
@@ -684,13 +684,13 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("ReadonlyArray<unknown>", () => {
-      const schema = T.array(T.unknown)
+      const schema = S.array(S.unknown)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly unknown[]`])
     })
 
     it("ReadonlyArray<any>", () => {
-      const schema = T.array(T.any)
+      const schema = S.array(S.any)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`readonly any[]`])
     })
@@ -698,7 +698,7 @@ describe.concurrent("TypeScript", () => {
 
   describe.concurrent("struct", () => {
     it("required property signature", () => {
-      const schema = T.struct({ a: T.number })
+      const schema = S.struct({ a: S.number })
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly a: number;
@@ -706,7 +706,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("required property signature with undefined", () => {
-      const schema = T.struct({ a: T.union(T.number, T.undefined) })
+      const schema = S.struct({ a: S.union(S.number, S.undefined) })
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly a: number | undefined;
@@ -714,7 +714,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("optional property signature", () => {
-      const schema = T.struct({ a: T.optional(T.number) })
+      const schema = S.struct({ a: S.optional(S.number) })
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly a?: number;
@@ -722,7 +722,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("optional property signature with undefined", () => {
-      const schema = T.struct({ a: T.optional(T.union(T.number, T.undefined)) })
+      const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly a?: number | undefined;
@@ -730,7 +730,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("record(string, unknown)", () => {
-      const schema = T.record(T.string, T.unknown)
+      const schema = S.record(S.string, S.unknown)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly [x: string]: unknown;
@@ -738,7 +738,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("record(string, any)", () => {
-      const schema = T.record(T.string, T.any)
+      const schema = S.record(S.string, S.any)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly [x: string]: any;
@@ -746,7 +746,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("record(string, string)", () => {
-      const schema = T.record(T.string, T.string)
+      const schema = S.record(S.string, S.string)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly [x: string]: string;
@@ -754,7 +754,7 @@ describe.concurrent("TypeScript", () => {
     })
 
     it("record(symbol, string)", () => {
-      const schema = T.record(T.symbol, T.string)
+      const schema = S.record(S.symbol, S.string)
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly [x: symbol]: string;
@@ -765,16 +765,16 @@ describe.concurrent("TypeScript", () => {
       const a = Symbol.for("@effect/schema/test/a")
       const b = Symbol.for("@effect/schema/test/b")
       const schema = pipe(
-        T.struct({
-          [a]: T.uniqueSymbol(b, {
+        S.struct({
+          [a]: S.uniqueSymbol(b, {
             [AST.IdentifierAnnotationId]: "b"
           }),
-          c: T.number
+          c: S.number
         }),
-        T.extend(
-          T.record(
-            T.string,
-            T.uniqueSymbol(Symbol.for("@effect/schema/test/d"), {
+        S.extend(
+          S.record(
+            S.string,
+            S.uniqueSymbol(Symbol.for("@effect/schema/test/d"), {
               [AST.IdentifierAnnotationId]: "d"
             })
           )
@@ -794,10 +794,10 @@ describe.concurrent("TypeScript", () => {
   })
 
   it("union", () => {
-    const schema = T.union(
-      T.string,
-      T.number,
-      T.uniqueSymbol(Symbol.for("@effect/schema/test/a"), {
+    const schema = S.union(
+      S.string,
+      S.number,
+      S.uniqueSymbol(Symbol.for("@effect/schema/test/a"), {
         [AST.IdentifierAnnotationId]: "a"
       })
     )
@@ -809,17 +809,17 @@ describe.concurrent("TypeScript", () => {
   })
 
   it("optionFromOption", () => {
-    const schema = T.optionFromSelf(T.struct({ a: T.string }))
-    const ts = typeScriptFor(schema)
+    const transform = T.optionFromSelf(S.struct({ a: S.string }))
+    const ts = typeScriptFor(T.to(transform))
     expect(printNodes(ts.nodes)).toEqual([`Option<{
     readonly a: string;
 }>`])
   })
 
   it("example: compile to TypeScript AST", () => {
-    const schema = T.struct({
-      name: T.string,
-      age: T.number
+    const schema = S.struct({
+      name: S.string,
+      age: S.number
     })
     // const typeNode: ts.TypeNode
     const ts = typeScriptFor(schema)
@@ -830,14 +830,14 @@ describe.concurrent("TypeScript", () => {
   })
 
   it("int", () => {
-    const schema = pipe(T.number, T.int())
+    const schema = pipe(S.number, S.int())
     const ts = typeScriptFor(schema)
     expect(printNodes(ts.nodes)).toEqual([`number`])
   })
 
   describe.concurrent("jsDoc", () => {
     it("property signatures", () => {
-      const schema = T.make(AST.createTypeLiteral(
+      const schema = S.make(AST.createTypeLiteral(
         [
           AST.createPropertySignature("a", AST.stringKeyword, false, true, {
             [AST.DocumentationAnnotationId]: "description"

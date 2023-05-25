@@ -332,67 +332,67 @@ describe.concurrent("Arbitrary", () => {
   // ---------------------------------------------
 
   it("minLength", () => {
-    const schema = pipe(S.string, T.minLength(1))
-    property(T.to(schema))
+    const schema = pipe(S.string, S.minLength(1))
+    property(schema)
   })
 
   it("maxLength", () => {
-    const schema = pipe(S.string, T.maxLength(2))
-    property(T.to(schema))
+    const schema = pipe(S.string, S.maxLength(2))
+    property(schema)
   })
 
   it("lessThanOrEqualTo", () => {
-    const schema = pipe(S.number, T.lessThanOrEqualTo(1))
-    property(T.to(schema))
+    const schema = pipe(S.number, S.lessThanOrEqualTo(1))
+    property(schema)
   })
 
   it("greaterThanOrEqualTo", () => {
-    const schema = pipe(S.number, T.greaterThanOrEqualTo(1))
-    property(T.to(schema))
+    const schema = pipe(S.number, S.greaterThanOrEqualTo(1))
+    property(schema)
   })
 
   it("lessThan", () => {
-    const schema = pipe(S.number, T.lessThan(1))
-    property(T.to(schema))
+    const schema = pipe(S.number, S.lessThan(1))
+    property(schema)
   })
 
   it("greaterThan", () => {
-    const schema = pipe(S.number, T.greaterThan(1))
-    property(T.to(schema))
+    const schema = pipe(S.number, S.greaterThan(1))
+    property(schema)
   })
 
   it("startsWith", () => {
-    const schema = pipe(S.string, T.startsWith("a"))
-    property(T.to(schema))
+    const schema = pipe(S.string, S.startsWith("a"))
+    property(schema)
   })
 
   it("endsWith", () => {
-    const schema = pipe(S.string, T.endsWith("a"))
-    property(T.to(schema))
+    const schema = pipe(S.string, S.endsWith("a"))
+    property(schema)
   })
 
   it("int", () => {
-    const schema = pipe(S.number, T.int())
-    property(T.to(schema))
+    const schema = pipe(S.number, S.int())
+    property(schema)
   })
 
   it("nonNaN", () => {
-    const schema = pipe(S.number, T.nonNaN())
-    property(T.to(schema))
+    const schema = pipe(S.number, S.nonNaN())
+    property(schema)
   })
 
   it("finite", () => {
-    const schema = pipe(S.number, T.finite())
-    property(T.to(schema))
+    const schema = pipe(S.number, S.finite())
+    property(schema)
   })
 
   it("between + int", () => {
-    const schema = pipe(S.number, T.between(1, 10), T.int())
-    property(T.to(schema))
+    const schema = pipe(S.number, S.between(1, 10), S.int())
+    property(schema)
   })
 
   it("int + between", () => {
-    const schema = pipe(S.number, T.int(), T.between(1, 10))
-    property(T.to(schema))
+    const schema = pipe(S.number, S.int(), S.between(1, 10))
+    property(schema)
   })
 })

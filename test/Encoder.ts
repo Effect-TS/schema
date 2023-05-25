@@ -6,7 +6,7 @@ import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
 // raises an error while encoding from a number if the string is not a char
-const NumberFromChar = pipe(T.string, T.maxLength(1), T.numberFromString)
+const NumberFromChar = pipe(S.string, T.maxLength(1), T.numberFromString)
 
 // raises an error while encoding if the string is not a char
 const Char = pipe(S.string, S.maxLength(1))
@@ -22,52 +22,52 @@ describe.concurrent("Encoder", () => {
   })
 
   it("encodeOption", () => {
-    const schema = pipe(T.string, T.maxLength(1), T.numberFromString)
+    const schema = pipe(S.string, T.maxLength(1), T.numberFromString)
     expect(P.encodeOption(schema)(1)).toEqual(O.some("1"))
     expect(P.encodeOption(schema)(10)).toEqual(O.none())
   })
 
   it("never", async () => {
-    const schema = T.never
+    const schema = S.never
     await Util.expectEncodeFailure(schema, 1 as any as never, "Expected never, actual 1")
   })
 
   it("string", async () => {
-    const schema = T.string
+    const schema = S.string
     await Util.expectEncodeSuccess(schema, "a", "a")
   })
 
   it("number", async () => {
-    const schema = T.number
+    const schema = S.number
     await Util.expectEncodeSuccess(schema, 1, 1)
   })
 
   it("boolean", async () => {
-    const schema = T.boolean
+    const schema = S.boolean
     await Util.expectEncodeSuccess(schema, true, true)
     await Util.expectEncodeSuccess(schema, false, false)
   })
 
   it("bigint", async () => {
-    const schema = T.bigint
+    const schema = S.bigint
     await Util.expectEncodeSuccess(schema, 1n, 1n)
   })
 
   it("symbol", async () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = T.symbol
+    const schema = S.symbol
     await Util.expectEncodeSuccess(schema, a, a)
   })
 
   it("object", async () => {
-    const schema = T.object
+    const schema = S.object
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, [], [])
     await Util.expectEncodeSuccess(schema, [1, 2, 3], [1, 2, 3])
   })
 
   it("literal", async () => {
-    const schema = T.literal(null)
+    const schema = S.literal(null)
     await Util.expectEncodeSuccess(schema, null, null)
   })
 
@@ -77,7 +77,7 @@ describe.concurrent("Encoder", () => {
         Apple,
         Banana
       }
-      const schema = T.enums(Fruits)
+      const schema = S.enums(Fruits)
       await Util.expectEncodeSuccess(schema, Fruits.Apple, 0)
       await Util.expectEncodeSuccess(schema, Fruits.Banana, 1)
     })
@@ -88,7 +88,7 @@ describe.concurrent("Encoder", () => {
         Banana = "banana",
         Cantaloupe = 0
       }
-      const schema = T.enums(Fruits)
+      const schema = S.enums(Fruits)
       await Util.expectEncodeSuccess(schema, Fruits.Apple, "apple")
       await Util.expectEncodeSuccess(schema, Fruits.Banana, "banana")
       await Util.expectEncodeSuccess(schema, Fruits.Cantaloupe, 0)
@@ -100,7 +100,7 @@ describe.concurrent("Encoder", () => {
         Banana: "banana",
         Cantaloupe: 3
       } as const
-      const schema = T.enums(Fruits)
+      const schema = S.enums(Fruits)
       await Util.expectEncodeSuccess(schema, Fruits.Apple, "apple")
       await Util.expectEncodeSuccess(schema, Fruits.Banana, "banana")
       await Util.expectEncodeSuccess(schema, Fruits.Cantaloupe, 3)
@@ -124,7 +124,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e with undefined", async () => {
-    const schema = T.tuple(T.union(NumberFromChar, T.undefined))
+    const schema = T.tuple(T.union(NumberFromChar, S.undefined))
     await Util.expectEncodeSuccess(schema, [1], ["1"])
     await Util.expectEncodeSuccess(schema, [undefined], [undefined])
     await Util.expectEncodeFailure(schema, [1, "b"] as any, `/1 is unexpected`)
@@ -143,7 +143,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e? with undefined", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.union(NumberFromChar, T.undefined)))
+    const schema = pipe(T.tuple(), T.optionalElement(T.union(NumberFromChar, S.undefined)))
     await Util.expectEncodeSuccess(schema, [], [])
     await Util.expectEncodeSuccess(schema, [1], ["1"])
     await Util.expectEncodeSuccess(schema, [undefined], [undefined])
@@ -151,20 +151,20 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e + e?", async () => {
-    const schema = pipe(T.tuple(T.string), T.optionalElement(NumberFromChar))
+    const schema = pipe(T.tuple(S.string), T.optionalElement(NumberFromChar))
     await Util.expectEncodeSuccess(schema, ["a"], ["a"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
   })
 
   it("tuple/e + r", async () => {
-    const schema = pipe(T.tuple(T.string), T.rest(NumberFromChar))
+    const schema = pipe(T.tuple(S.string), T.rest(NumberFromChar))
     await Util.expectEncodeSuccess(schema, ["a"], ["a"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
     await Util.expectEncodeSuccess(schema, ["a", 1, 2], ["a", "1", "2"])
   })
 
   it("tuple/e? + r", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(T.string), T.rest(NumberFromChar))
+    const schema = pipe(T.tuple(), T.optionalElement(S.string), T.rest(NumberFromChar))
     await Util.expectEncodeSuccess(schema, [], [])
     await Util.expectEncodeSuccess(schema, ["a"], ["a"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
@@ -184,7 +184,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/r + e", async () => {
-    const schema = pipe(T.array(T.string), T.element(NumberFromChar))
+    const schema = pipe(T.array(S.string), T.element(NumberFromChar))
     await Util.expectEncodeSuccess(schema, [1], ["1"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
     await Util.expectEncodeSuccess(schema, ["a", "b", 1], ["a", "b", "1"])
@@ -197,14 +197,14 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e + r + e", async () => {
-    const schema = pipe(T.tuple(T.string), T.rest(NumberFromChar), T.element(T.boolean))
+    const schema = pipe(T.tuple(S.string), T.rest(NumberFromChar), T.element(S.boolean))
     await Util.expectEncodeSuccess(schema, ["a", true], ["a", true])
     await Util.expectEncodeSuccess(schema, ["a", 1, true], ["a", "1", true])
     await Util.expectEncodeSuccess(schema, ["a", 1, 2, true], ["a", "1", "2", true])
   })
 
   it("struct/ required property signature", async () => {
-    const schema = T.struct({ a: T.number })
+    const schema = T.struct({ a: S.number })
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeFailure(
       schema,
@@ -215,7 +215,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("struct/ required property signature with undefined", async () => {
-    const schema = T.struct({ a: T.union(T.number, T.undefined) })
+    const schema = T.struct({ a: T.union(S.number, S.undefined) })
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: undefined }, { a: undefined })
     await Util.expectEncodeFailure(
@@ -227,7 +227,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("struct/ optional property signature", async () => {
-    const schema = T.struct({ a: T.optional(T.number) })
+    const schema = T.struct({ a: T.optional(S.number) })
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeFailure(
@@ -239,7 +239,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("struct/ optional property signature with undefined", async () => {
-    const schema = T.struct({ a: T.optional(T.union(T.number, T.undefined)) })
+    const schema = T.struct({ a: T.optional(T.union(S.number, S.undefined)) })
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: undefined }, { a: undefined })
@@ -253,12 +253,12 @@ describe.concurrent("Encoder", () => {
 
   it("struct/ should handle symbols as keys", async () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = T.struct({ [a]: T.string })
+    const schema = T.struct({ [a]: S.string })
     await Util.expectEncodeSuccess(schema, { [a]: "a" }, { [a]: "a" })
   })
 
   it("record/ key error", async () => {
-    const schema = T.record(Char, T.string)
+    const schema = T.record(Char, S.string)
     await Util.expectEncodeFailure(
       schema,
       { aa: "a" },
@@ -267,7 +267,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("record/ value error", async () => {
-    const schema = T.record(T.string, Char)
+    const schema = T.record(S.string, Char)
     await Util.expectEncodeFailure(
       schema,
       { a: "aa" },
@@ -277,8 +277,8 @@ describe.concurrent("Encoder", () => {
 
   it("extend/record/ record(string, NumberFromString)", async () => {
     const schema = pipe(
-      T.struct({ a: T.number }),
-      T.extend(T.record(T.string, NumberFromChar))
+      T.struct({ a: S.number }),
+      T.extend(T.record(S.string, NumberFromChar))
     )
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: 1, b: 1 }, { a: 1, b: "1" })
@@ -287,29 +287,29 @@ describe.concurrent("Encoder", () => {
   it("extend/record/ record(symbol, NumberFromString)", async () => {
     const b = Symbol.for("@effect/schema/test/b")
     const schema = pipe(
-      T.struct({ a: T.number }),
-      T.extend(T.record(T.symbol, NumberFromChar))
+      S.struct({ a: S.number }),
+      T.extend(T.record(S.symbol, NumberFromChar))
     )
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: 1, [b]: 1 }, { a: 1, [b]: "1" })
   })
 
   it("union", async () => {
-    const schema = T.union(T.string, NumberFromChar)
+    const schema = T.union(S.string, NumberFromChar)
     await Util.expectEncodeSuccess(schema, "a", "a")
     await Util.expectEncodeSuccess(schema, 1, "1")
   })
 
   it("union/ more required property signatures", async () => {
-    const a = T.struct({ a: T.string })
-    const ab = T.struct({ a: T.string, b: T.number })
+    const a = T.struct({ a: S.string })
+    const ab = T.struct({ a: S.string, b: S.number })
     const schema = T.union(a, ab)
     await Util.expectEncodeSuccess(schema, { a: "a", b: 1 }, { a: "a", b: 1 })
   })
 
   it("union/ optional property signatures", async () => {
-    const ab = T.struct({ a: T.string, b: T.optional(T.number) })
-    const ac = T.struct({ a: T.string, c: T.optional(T.number) })
+    const ab = T.struct({ a: S.string, b: T.optional(S.number) })
+    const ac = T.struct({ a: S.string, c: T.optional(S.number) })
     const schema = T.union(ab, ac)
     await Util.expectEncodeSuccess(
       schema,
@@ -394,7 +394,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("allErrors/tuple/post rest elements: wrong type for values", async () => {
-    const schema = pipe(T.array(T.string), T.element(NumberFromChar), T.element(NumberFromChar))
+    const schema = pipe(T.array(S.string), T.element(NumberFromChar), T.element(NumberFromChar))
     await Util.expectEncodeFailure(
       schema,
       [10, 10],
@@ -414,7 +414,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("allErrors/record/ all key errors", async () => {
-    const schema = T.record(Char, T.string)
+    const schema = T.record(Char, S.string)
     await Util.expectEncodeFailure(
       schema,
       { aa: "a", bb: "bb" },
@@ -424,7 +424,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("allErrors/record/ all value errors", async () => {
-    const schema = T.record(T.string, Char)
+    const schema = T.record(S.string, Char)
     await Util.expectEncodeFailure(
       schema,
       { a: "aa", b: "bb" },
