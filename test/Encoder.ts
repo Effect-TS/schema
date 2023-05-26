@@ -227,7 +227,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("struct/ optional property signature", async () => {
-    const schema = T.struct({ a: T.optional(S.number) })
+    const schema = T.struct({ a: S.optional(S.number) })
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeFailure(
@@ -239,7 +239,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("struct/ optional property signature with undefined", async () => {
-    const schema = T.struct({ a: T.optional(T.union(S.number, S.undefined)) })
+    const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: undefined }, { a: undefined })
@@ -308,9 +308,9 @@ describe.concurrent("Encoder", () => {
   })
 
   it("union/ optional property signatures", async () => {
-    const ab = T.struct({ a: S.string, b: T.optional(S.number) })
-    const ac = T.struct({ a: S.string, c: T.optional(S.number) })
-    const schema = T.union(ab, ac)
+    const ab = S.struct({ a: S.string, b: S.optional(S.number) })
+    const ac = S.struct({ a: S.string, c: S.optional(S.number) })
+    const schema = S.union(ab, ac)
     await Util.expectEncodeSuccess(
       schema,
       { a: "a", c: 1 },

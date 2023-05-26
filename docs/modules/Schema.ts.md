@@ -176,6 +176,7 @@ Added in v1.0.0
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [Join (type alias)](#join-type-alias)
+  - [PropertySignature (interface)](#propertysignature-interface)
   - [SchemaPropertySignature (interface)](#schemapropertysignature-interface)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
@@ -824,10 +825,10 @@ Added in v1.0.0
 export declare const struct: <
   Fields extends Record<
     string | number | symbol,
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
     | Schema<any>
     | Schema<never>
-    | SchemaPropertySignature<any, boolean, any, boolean>
-    | SchemaPropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
@@ -1937,17 +1938,28 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
+## PropertySignature (interface)
+
+**Signature**
+
+```ts
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
+  readonly From: (_: From) => From
+  readonly FromIsOptional: FromIsOptional
+  readonly To: (_: To) => To
+  readonly ToIsOptional: ToIsOptional
+}
+```
+
+Added in v1.0.0
+
 ## SchemaPropertySignature (interface)
 
 **Signature**
 
 ```ts
-export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly [SchemaTypeId]: (_: From) => From
-  readonly From: (_: From) => From
-  readonly FromIsOptional: FromIsOptional
-  readonly To: (_: To) => To
-  readonly ToIsOptional: ToIsOptional
+export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly optional: () => SchemaPropertySignature<From, true, To, true>
 }
 ```
@@ -1985,8 +1997,8 @@ Added in v1.0.0
 ```ts
 export type ToOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | SchemaPropertySignature<any, boolean, any, true>
-    | SchemaPropertySignature<never, boolean, never, true>
+    | PropertySignature<any, boolean, any, true>
+    | PropertySignature<never, boolean, never, true>
     ? K
     : never
 }[keyof Fields]

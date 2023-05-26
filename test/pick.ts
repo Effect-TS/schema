@@ -23,7 +23,7 @@ describe.concurrent("pick", () => {
 
   it("struct with optionals", async () => {
     const schema = pipe(
-      T.struct({ a: T.optional(S.string), b: T.NumberFromString, c: S.boolean }),
+      T.struct({ a: S.optional(S.string), b: T.NumberFromString, c: S.boolean }),
       T.pick("a", "b")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })

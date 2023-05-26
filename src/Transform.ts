@@ -147,89 +147,6 @@ export {
    */
   parseResult
 } from "@effect/schema/Parser"
-
-// export {
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   any,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   bigint,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   boolean,
-//   /**
-//    * @category constructors
-//    * @since 1.0.0
-//    */
-//   enums,
-//   /**
-//    * @category constructors
-//    * @since 1.0.0
-//    */
-//   literal,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   never,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   null,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   number,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   object,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   string,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   symbol,
-//   /**
-//    * @category constructors
-//    * @since 1.0.0
-//    */
-//   templateLiteral,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   undefined,
-//   /**
-//    * @category constructors
-//    * @since 1.0.0
-//    */
-//   uniqueSymbol,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   unknown,
-//   /**
-//    * @category primitives
-//    * @since 1.0.0
-//    */
-//   void
-// } from "@effect/schema/Schema"
 /* c8 ignore end */
 
 // ---------------------------------------------
@@ -336,18 +253,9 @@ export const nonEmptyArray = <I, A>(
 /**
  * @since 1.0.0
  */
-export type Spread<A> = {
-  [K in keyof A]: A[K]
-} extends infer B ? B : never
-
-/**
- * @since 1.0.0
- */
-export interface TransformPropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly From: (_: From) => From
-  readonly FromIsOptional: FromIsOptional
-  readonly To: (_: To) => To
-  readonly ToIsOptional: ToIsOptional
+export interface TransformPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends S.PropertySignature<From, FromIsOptional, To, ToIsOptional>
+{
   readonly optional: () => TransformPropertySignature<From, true, To, true>
   readonly withDefault: (value: () => To) => TransformPropertySignature<From, true, To, false>
   readonly toOption: () => TransformPropertySignature<From, true, Option<To>, false>
@@ -419,20 +327,10 @@ export const optional = <I, A>(
 /**
  * @since 1.0.0
  */
-export type ToOptionalKeys<Fields> = {
-  [K in keyof Fields]: Fields[K] extends
-    | TransformPropertySignature<any, boolean, any, true>
-    | TransformPropertySignature<never, boolean, never, true> ? K
-    : never
-}[keyof Fields]
-
-/**
- * @since 1.0.0
- */
 export type FromOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | TransformPropertySignature<any, true, any, boolean>
-    | TransformPropertySignature<never, true, never, boolean> ? K
+    | S.PropertySignature<any, true, any, boolean>
+    | S.PropertySignature<never, true, never, boolean> ? K
     : never
 }[keyof Fields]
 
@@ -445,19 +343,19 @@ export const struct = <
     PropertyKey,
     | Transform<any, any>
     | Transform<never, never>
-    | TransformPropertySignature<any, boolean, any, boolean>
-    | TransformPropertySignature<never, boolean, never, boolean>
+    | S.PropertySignature<any, boolean, any, boolean>
+    | S.PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
 ): Transform<
-  Spread<
+  S.Spread<
     & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
     & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
-  Spread<
-    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  S.Spread<
+    & { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> }
+    & { readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
 > => {
   const ownKeys = I.ownKeys(fields)
@@ -562,7 +460,7 @@ export const struct = <
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Transform<I, A>
-  ): Transform<Spread<Pick<I, Keys[number]>>, Spread<Pick<A, Keys[number]>>> => {
+  ): Transform<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
       return make(
@@ -585,7 +483,7 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Transform<I, A>
-  ): Transform<Spread<Omit<I, Keys[number]>>, Spread<Omit<A, Keys[number]>>> => {
+  ): Transform<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
       return make(
@@ -607,7 +505,7 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  */
 export const partial = <I, A>(
   self: Transform<I, A>
-): Transform<Spread<Partial<I>>, Spread<Partial<A>>> => make(AST.partial(self.ast))
+): Transform<S.Spread<Partial<I>>, S.Spread<Partial<A>>> => make(AST.partial(self.ast))
 
 /**
  * @category combinators
@@ -615,7 +513,7 @@ export const partial = <I, A>(
  */
 export const required = <I, A>(
   self: Transform<I, A>
-): Transform<Spread<Required<I>>, Spread<Required<A>>> => make(AST.required(self.ast))
+): Transform<S.Spread<Required<I>>, S.Spread<Required<A>>> => make(AST.required(self.ast))
 
 /**
  * @category combinators
@@ -634,17 +532,17 @@ export const record = <K extends string | symbol, I, A>(
 export const extend: {
   <IB, B>(
     that: Transform<IB, B>
-  ): <I, A>(self: Transform<I, A>) => Transform<Spread<I & IB>, Spread<A & B>>
+  ): <I, A>(self: Transform<I, A>) => Transform<S.Spread<I & IB>, S.Spread<A & B>>
   <I, A, IB, B>(
     self: Transform<I, A>,
     that: Transform<IB, B>
-  ): Transform<Spread<I & IB>, Spread<A & B>>
+  ): Transform<S.Spread<I & IB>, S.Spread<A & B>>
 } = dual(
   2,
   <I, A, IB, B>(
     self: Transform<I, A>,
     that: Transform<IB, B>
-  ): Transform<Spread<I & IB>, Spread<A & B>> =>
+  ): Transform<S.Spread<I & IB>, S.Spread<A & B>> =>
     make(
       S.intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -786,7 +684,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
 ) =>
   <I, A extends object>(
     schema: Transform<I, A>
-  ): Transform<I, Spread<A & { readonly [k in K]: V }>> =>
+  ): Transform<I, S.Spread<A & { readonly [k in K]: V }>> =>
     make(AST.createTransformByPropertySignatureTransformations(
       schema.ast,
       pipe(to(schema), extend(struct({ [key]: S.literal(value) }))).ast,

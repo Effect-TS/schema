@@ -92,8 +92,6 @@ Added in v1.0.0
   - [trim](#trim)
 - [utils](#utils)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
-  - [Spread (type alias)](#spread-type-alias)
-  - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [TransformPropertySignature (interface)](#transformpropertysignature-interface)
   - [from](#from)
   - [optional](#optional)
@@ -179,7 +177,7 @@ but rather maps to another schema, for example when you want to add a discrimina
 export declare const attachPropertySignature: <K extends string | number | symbol, V extends AST.LiteralValue>(
   key: K,
   value: V
-) => <I, A extends object>(schema: Transform<I, A>) => Transform<I, Spread<A & { readonly [k in K]: V }>>
+) => <I, A extends object>(schema: Transform<I, A>) => Transform<I, S.Spread<A & { readonly [k in K]: V }>>
 ```
 
 **Example**
@@ -293,8 +291,8 @@ Added in v1.0.0
 
 ```ts
 export declare const extend: {
-  <IB, B>(that: Transform<IB, B>): <I, A>(self: Transform<I, A>) => Transform<Spread<I & IB>, Spread<A & B>>
-  <I, A, IB, B>(self: Transform<I, A>, that: Transform<IB, B>): Transform<Spread<I & IB>, Spread<A & B>>
+  <IB, B>(that: Transform<IB, B>): <I, A>(self: Transform<I, A>) => Transform<S.Spread<I & IB>, S.Spread<A & B>>
+  <I, A, IB, B>(self: Transform<I, A>, that: Transform<IB, B>): Transform<S.Spread<I & IB>, S.Spread<A & B>>
 }
 ```
 
@@ -358,7 +356,7 @@ export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Transform<I, A>
-) => Transform<Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
+) => Transform<S.Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, S.Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
 ```
 
 Added in v1.0.0
@@ -404,7 +402,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: <I, A>(self: Transform<I, A>) => Transform<Spread<Partial<I>>, Spread<Partial<A>>>
+export declare const partial: <I, A>(self: Transform<I, A>) => Transform<S.Spread<Partial<I>>, S.Spread<Partial<A>>>
 ```
 
 Added in v1.0.0
@@ -418,7 +416,7 @@ export declare const pick: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Transform<I, A>
-) => Transform<Spread<Pick<I, Keys[number]>>, Spread<Pick<A, Keys[number]>>>
+) => Transform<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -464,7 +462,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const required: <I, A>(self: Transform<I, A>) => Transform<Spread<Required<I>>, Spread<Required<A>>>
+export declare const required: <I, A>(self: Transform<I, A>) => Transform<S.Spread<Required<I>>, S.Spread<Required<A>>>
 ```
 
 Added in v1.0.0
@@ -493,20 +491,20 @@ export declare const struct: <
     string | number | symbol,
     | Transform<any, any>
     | Transform<never, never>
-    | TransformPropertySignature<any, boolean, any, boolean>
-    | TransformPropertySignature<never, boolean, never, boolean>
+    | S.PropertySignature<any, boolean, any, boolean>
+    | S.PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
 ) => Transform<
-  Spread<
+  S.Spread<
     { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
       readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
     }
   >,
-  Spread<
-    { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
-      readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
+  S.Spread<
+    { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
+      readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
     }
   >
 >
@@ -1008,38 +1006,8 @@ Added in v1.0.0
 ```ts
 export type FromOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | TransformPropertySignature<any, true, any, boolean>
-    | TransformPropertySignature<never, true, never, boolean>
-    ? K
-    : never
-}[keyof Fields]
-```
-
-Added in v1.0.0
-
-## Spread (type alias)
-
-**Signature**
-
-```ts
-export type Spread<A> = {
-  [K in keyof A]: A[K]
-} extends infer B
-  ? B
-  : never
-```
-
-Added in v1.0.0
-
-## ToOptionalKeys (type alias)
-
-**Signature**
-
-```ts
-export type ToOptionalKeys<Fields> = {
-  [K in keyof Fields]: Fields[K] extends
-    | TransformPropertySignature<any, boolean, any, true>
-    | TransformPropertySignature<never, boolean, never, true>
+    | S.PropertySignature<any, true, any, boolean>
+    | S.PropertySignature<never, true, never, boolean>
     ? K
     : never
 }[keyof Fields]
@@ -1052,11 +1020,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface TransformPropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly From: (_: From) => From
-  readonly FromIsOptional: FromIsOptional
-  readonly To: (_: To) => To
-  readonly ToIsOptional: ToIsOptional
+export interface TransformPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends S.PropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly optional: () => TransformPropertySignature<From, true, To, true>
   readonly withDefault: (value: () => To) => TransformPropertySignature<From, true, To, false>
   readonly toOption: () => TransformPropertySignature<From, true, Option<To>, false>

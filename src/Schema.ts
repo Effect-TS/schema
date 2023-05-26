@@ -529,12 +529,19 @@ export const lazy = <A>(
 /**
  * @since 1.0.0
  */
-export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly [SchemaTypeId]: (_: From) => From
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly From: (_: From) => From
   readonly FromIsOptional: FromIsOptional
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
+}
+
+/**
+ * @since 1.0.0
+ */
+export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
+{
   readonly optional: () => SchemaPropertySignature<From, true, To, true>
 }
 
@@ -591,8 +598,8 @@ export type Spread<A> = {
  */
 export type ToOptionalKeys<Fields> = {
   [K in keyof Fields]: Fields[K] extends
-    | SchemaPropertySignature<any, boolean, any, true>
-    | SchemaPropertySignature<never, boolean, never, true> ? K
+    | PropertySignature<any, boolean, any, true>
+    | PropertySignature<never, boolean, never, true> ? K
     : never
 }[keyof Fields]
 
@@ -605,8 +612,8 @@ export const struct = <
     PropertyKey,
     | Schema<any>
     | Schema<never>
-    | SchemaPropertySignature<any, boolean, any, boolean>
-    | SchemaPropertySignature<never, boolean, never, boolean>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
