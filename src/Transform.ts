@@ -3,12 +3,9 @@
  */
 
 import * as B from "@effect/data/Bigint"
-import type { Brand } from "@effect/data/Brand"
-import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
 import type * as D from "@effect/data/Data"
-import { untracedMethod } from "@effect/data/Debug"
 import type { Either } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
 import type { LazyArg } from "@effect/data/Function"
@@ -24,7 +21,6 @@ import * as P from "@effect/schema/Parser"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
-import { formatErrors } from "@effect/schema/TreeFormatter"
 
 /**
  * @category model
@@ -801,86 +797,6 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
         () => O.none()
       )]
     ))
-
-// ---------------------------------------------
-// Brand
-// ---------------------------------------------
-
-/**
- * @category model
- * @since 1.0.0
- */
-export interface BrandTransform<From, To extends Brand<any>>
-  extends Transform<From, To>, Brand.Constructor<To>
-{}
-
-// TODO: can be removed?
-/**
- * Returns a nominal branded schema by applying a brand to a given schema.
- *
- * ```
- * Schema<A> + B -> Schema<A & Brand<B>>
- * ```
- *
- * @param self - The input schema to be combined with the brand.
- * @param brand - The brand to apply.
- *
- * @category combinators
- * @since 1.0.0
- */
-export const brand = <B extends string | symbol, A>(
-  brand: B,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): BrandTransform<I, A & Brand<B>> => {
-    const annotations = S.toAnnotations(options)
-    annotations[AST.BrandAnnotationId] = [...S.getBrands(self.ast), brand]
-    const ast = AST.mergeAnnotations(self.ast, annotations)
-    const transform = make(ast)
-    const schema = to(transform)
-    const validate = P.validate(schema)
-    const validateOption = P.validateOption(schema)
-    const validateEither = P.validateEither(schema)
-    const is = P.is(schema)
-    const out: any = Object.assign((input: unknown) => validate(input), {
-      [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
-      ast,
-      option: (input: unknown) => validateOption(input),
-      either: (input: unknown) =>
-        E.mapLeft(
-          validateEither(input),
-          (e) => [{ meta: input, message: formatErrors(e.errors) }]
-        ),
-      refine: (input: unknown): input is A & Brand<B> => is(input)
-    })
-    return out
-  }
-
-// TODO: can be removed?
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const fromBrand = <C extends Brand<string | symbol>>(
-  constructor: Brand.Constructor<C>,
-  options?: AnnotationOptions<Brand.Unbranded<C>>
-) =>
-  <I, A extends Brand.Unbranded<C>>(self: Transform<I, A>): Transform<I, A & C> => {
-    const decode = untracedMethod(() =>
-      (a: A, _, self: AST.AST): ParseResult<C> =>
-        E.mapLeft(
-          constructor.either(a),
-          (brandErrors) =>
-            PR.parseError([PR.type(self, a, brandErrors.map((v) => v.message).join(", "))])
-        )
-    )
-    const ast = AST.createRefinement(
-      self.ast,
-      decode,
-      S.toAnnotations({ typeId: S.BrandTypeId, ...options })
-    )
-    return make(ast)
-  }
 
 // ---------------------------------------------
 // Chunk

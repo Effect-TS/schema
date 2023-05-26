@@ -202,13 +202,6 @@ pipe(T.struct({ a: T.optional(S.string),  b: T.NumberFromString, c: S.boolean })
 pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromString, c: S.boolean }), T.omit('c'));
 
 // ---------------------------------------------
-// brand
-// ---------------------------------------------
-
-// $ExpectType BrandTransform<string, number & Brand<"Int">>
-pipe(T.NumberFromString, T.filter(S.int()), T.filter(S.brand('Int')))
-
-// ---------------------------------------------
 // Partial
 // ---------------------------------------------
 

@@ -1,6 +1,4 @@
-import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
-import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -17,91 +15,6 @@ describe.concurrent("Transform", () => {
     const schema = pipe(S.number, T.filter(S.int()))
     await Util.expectParseSuccess(schema, 1)
     await Util.expectParseFailure(schema, 1.2, "Expected integer, actual 1.2")
-  })
-
-  it("brand/ annotations", () => {
-    // const Branded: T.BrandTransform<string, number & Brand<"A"> & Brand<"B">>
-    const Branded = pipe(
-      S.string,
-      T.numberFromString,
-      T.filter(S.int()),
-      T.brand("A"),
-      T.brand("B", {
-        description: "a B brand"
-      })
-    )
-
-    expect(Branded.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "@effect/schema/IntTypeId",
-      [AST.BrandAnnotationId]: ["A", "B"],
-      [AST.DescriptionAnnotationId]: "a B brand",
-      [AST.JSONSchemaAnnotationId]: { type: "integer" }
-    })
-  })
-
-  it("brand/symbol annotations", () => {
-    const A = Symbol.for("A")
-    const B = Symbol.for("B")
-    const Branded = pipe(
-      S.string,
-      T.numberFromString,
-      T.filter(S.int()),
-      T.brand(A),
-      T.brand(B, {
-        description: "a B brand"
-      })
-    )
-    expect(Branded.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "@effect/schema/IntTypeId",
-      [AST.BrandAnnotationId]: [A, B],
-      [AST.DescriptionAnnotationId]: "a B brand",
-      [AST.JSONSchemaAnnotationId]: { type: "integer" }
-    })
-  })
-
-  it("brand/ ()", () => {
-    const Int = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand("Int"))
-    expect(Int(1)).toEqual(1)
-    expect(() => Int(1.2)).toThrowError(
-      new Error(`error(s) found
-└─ Expected integer, actual 1.2`)
-    )
-  })
-
-  it("brand/ option", () => {
-    const Int = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand("Int"))
-    expect(Int.option(1)).toEqual(O.some(1))
-    expect(Int.option(1.2)).toEqual(O.none())
-  })
-
-  it("brand/ either", () => {
-    const Int = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand("Int"))
-    expect(Int.either(1)).toEqual(E.right(1))
-    expect(Int.either(1.2)).toEqual(E.left([{
-      meta: 1.2,
-      message: `error(s) found
-└─ Expected integer, actual 1.2`
-    }]))
-  })
-
-  it("brand/ refine", () => {
-    const Int = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand("Int"))
-    expect(Int.refine(1)).toEqual(true)
-    expect(Int.refine(1.2)).toEqual(false)
-  })
-
-  it("brand/ composition", () => {
-    const int = <I, A extends number>(self: T.Transform<I, A>) =>
-      pipe(self, T.filter(S.int()), T.brand("Int"))
-
-    const positive = <I, A extends number>(self: T.Transform<I, A>) =>
-      pipe(self, T.filter(S.positive()), T.brand("Positive"))
-
-    const PositiveInt = pipe(S.string, T.numberFromString, int, positive)
-
-    expect(PositiveInt.refine(1)).toEqual(true)
-    expect(PositiveInt.refine(-1)).toEqual(false)
-    expect(PositiveInt.refine(1.2)).toEqual(false)
   })
 
   it("title", () => {

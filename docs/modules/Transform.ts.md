@@ -22,7 +22,6 @@ Added in v1.0.0
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
-  - [brand](#brand)
   - [chunk](#chunk)
   - [data](#data)
   - [dataFromSelf](#datafromself)
@@ -31,7 +30,6 @@ Added in v1.0.0
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
-  - [fromBrand](#frombrand)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
@@ -73,7 +71,6 @@ Added in v1.0.0
   - [encodeResult](#encoderesult)
 - [model](#model)
   - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
-  - [BrandTransform (interface)](#brandtransform-interface)
   - [From (type alias)](#from-type-alias)
   - [To (type alias)](#to-type-alias)
   - [Transform (interface)](#transform-interface)
@@ -207,25 +204,6 @@ assert.deepStrictEqual(T.decode(Shape)({ radius: 10 }), {
 
 Added in v1.0.0
 
-## brand
-
-Returns a nominal branded schema by applying a brand to a given schema.
-
-```
-Schema<A> + B -> Schema<A & Brand<B>>
-```
-
-**Signature**
-
-```ts
-export declare const brand: <B extends string | symbol, A>(
-  brand: B,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Transform<I, A>) => BrandTransform<I, any>
-```
-
-Added in v1.0.0
-
 ## chunk
 
 **Signature**
@@ -332,19 +310,6 @@ Applies a `Schema` transformation.
 export declare const filter: <A, B extends A>(
   f: (schema: S.Schema<A>) => S.Schema<B>
 ) => <I>(transform: Transform<I, A>) => Transform<I, B>
-```
-
-Added in v1.0.0
-
-## fromBrand
-
-**Signature**
-
-```ts
-export declare const fromBrand: <C extends any>(
-  constructor: any,
-  options?: AnnotationOptions<any> | undefined
-) => <I, A extends any>(self: Transform<I, A>) => Transform<I, A & C>
 ```
 
 Added in v1.0.0
@@ -844,16 +809,6 @@ export type AnnotationOptions<A> = {
   jsonSchema?: AST.JSONSchemaAnnotation
   arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
 }
-```
-
-Added in v1.0.0
-
-## BrandTransform (interface)
-
-**Signature**
-
-```ts
-export interface BrandTransform<From, To extends Brand<any>> extends Transform<From, To>, Brand.Constructor<To> {}
 ```
 
 Added in v1.0.0

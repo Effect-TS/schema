@@ -221,27 +221,6 @@ describe.concurrent("Decoder", () => {
     )
   })
 
-  it("brand/ decoding", async () => {
-    const schema = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand("Int"))
-    await Util.expectParseSuccess(schema, "1", 1 as any)
-    await Util.expectParseFailure(
-      schema,
-      null,
-      `Expected string, actual null`
-    )
-  })
-
-  it("brand/symbol decoding", async () => {
-    const Int = Symbol.for("Int")
-    const schema = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand(Int))
-    await Util.expectParseSuccess(schema, "1", 1 as any)
-    await Util.expectParseFailure(
-      schema,
-      null,
-      `Expected string, actual null`
-    )
-  })
-
   it("tuple. empty", async () => {
     const schema = T.tuple()
     await Util.expectParseSuccess(schema, [])
