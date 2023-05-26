@@ -68,7 +68,6 @@ Added in v1.0.0
   - [encodePromise](#encodepromise)
   - [encodeResult](#encoderesult)
 - [model](#model)
-  - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [From (type alias)](#from-type-alias)
   - [To (type alias)](#to-type-alias)
   - [Transform (interface)](#transform-interface)
@@ -768,26 +767,6 @@ export declare const encodeResult: <I, A>(
 Added in v1.0.0
 
 # model
-
-## AnnotationOptions (type alias)
-
-**Signature**
-
-```ts
-export type AnnotationOptions<A> = {
-  typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
-  message?: AST.MessageAnnotation<A>
-  identifier?: AST.IdentifierAnnotation
-  title?: AST.TitleAnnotation
-  description?: AST.DescriptionAnnotation
-  examples?: AST.ExamplesAnnotation
-  documentation?: AST.DocumentationAnnotation
-  jsonSchema?: AST.JSONSchemaAnnotation
-  arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-}
-```
-
-Added in v1.0.0
 
 ## From (type alias)
 

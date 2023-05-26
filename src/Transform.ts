@@ -13,7 +13,6 @@ import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
-import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
@@ -545,22 +544,6 @@ export const lazy = <I, A>(
 ): Transform<I, A> => make(AST.createLazy(() => f().ast, annotations))
 
 /**
- * @category model
- * @since 1.0.0
- */
-export type AnnotationOptions<A> = {
-  typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
-  message?: AST.MessageAnnotation<A>
-  identifier?: AST.IdentifierAnnotation
-  title?: AST.TitleAnnotation
-  description?: AST.DescriptionAnnotation
-  examples?: AST.ExamplesAnnotation
-  documentation?: AST.DocumentationAnnotation
-  jsonSchema?: AST.JSONSchemaAnnotation
-  arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-}
-
-/**
  * Applies a `Schema` transformation.
  *
  * @category combinators
@@ -681,168 +664,30 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
     ))
 
 // ---------------------------------------------
-// Chunk
+// string
 // ---------------------------------------------
 
 /**
- * @category constructors
+ * This combinator allows removing whitespaces from the beginning and end of a string.
+ *
+ * @category string
  * @since 1.0.0
  */
-export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> => {
-  const parseResult = P.parseResult(array(item))
-  const encodeResult = P.encodeResult(array(item))
-  return transformResult(
-    S.chunk(from(item)),
-    S.chunk(to(item)),
-    (chunk, options) => PR.map(parseResult(C.toReadonlyArray(chunk), options), C.fromIterable),
-    (chunk, options) => PR.map(encodeResult(C.toReadonlyArray(chunk), options), C.fromIterable)
-  )
-}
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const chunk = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, Chunk<A>> =>
-  transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray)
-
-// ---------------------------------------------
-// Data
-// ---------------------------------------------
-
-const fromData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  data: D.Data<A>
-): A => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const dataFromSelf = <
-  I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
-  A extends Readonly<Record<string, any>> | ReadonlyArray<any>
->(
-  item: Transform<I, A>
-): Transform<D.Data<I>, D.Data<A>> => {
-  const parseResult = P.parseResult(item)
-  const encodeResult = P.encodeResult(item)
-  return transformResult(
-    S.data(from(item)),
-    S.data(to(item)),
-    (data, options) => PR.map(parseResult(fromData(data), options), S.toData),
-    (data, options) => PR.map(encodeResult(fromData(data), options), S.toData)
-  )
-}
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const data = <
-  I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
-  A extends Readonly<Record<string, any>> | ReadonlyArray<any>
->(
-  item: Transform<I, A>
-): Transform<I, D.Data<A>> =>
+export const trim = <I>(self: Transform<I, string>): Transform<I, string> =>
   transform(
-    item,
-    S.data(to(item)),
-    S.toData,
-    (data) => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
-  )
-
-// ---------------------------------------------
-// Date
-// ---------------------------------------------
-
-/**
-  A combinator that transforms a `string` into a valid `Date`.
-
-  @category Date
-  @since 1.0.0
-*/
-export const dateFromString = <I>(self: Transform<I, string>): Transform<I, Date> =>
-  transformResult(
     self,
-    S.ValidDate,
-    (input) => PR.success(new Date(input)),
-    (date) => PR.success(date.toISOString())
-  )
-
-const _Date: Transform<string, Date> = dateFromString(S.string)
-
-export {
-  /**
-   * A schema that transforms a `string` into a `Date`.
-   *
-   * @category Date
-   * @since 1.0.0
-   */
-  _Date as Date
-}
-
-// ---------------------------------------------
-// Either
-// ---------------------------------------------
-
-const eitherInline = <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) =>
-  union(
-    struct({
-      _tag: S.literal("Left"),
-      left
-    }),
-    struct({
-      _tag: S.literal("Right"),
-      right
-    })
+    pipe(to(self), S.trimmed()),
+    (s) => s.trim(),
+    identity
   )
 
 /**
- * @category combinators
+ * This transformation allows removing whitespaces from the beginning and end of a string.
+ *
+ * @category string
  * @since 1.0.0
  */
-export const eitherFromSelf = <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-): Transform<Either<IE, IA>, Either<E, A>> => {
-  const parseResultLeft = P.parseResult(left)
-  const parseResultRight = P.parseResult(right)
-  const encodeResultLeft = P.encodeResult(left)
-  const encodeResultRight = P.encodeResult(right)
-  return transformResult(
-    S.either(from(left), from(right)),
-    S.either(to(left), to(right)),
-    (either, options) =>
-      E.isLeft(either) ?
-        PR.map(parseResultLeft(either.left, options), E.left) :
-        PR.map(parseResultRight(either.right, options), E.right),
-    (either, options) =>
-      E.isLeft(either) ?
-        PR.map(encodeResultLeft(either.left, options), E.left) :
-        PR.map(encodeResultRight(either.right, options), E.right)
-  )
-}
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const either = <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-): Transform<
-  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
-  Either<E, A>
-> =>
-  transform(
-    eitherInline(left, right),
-    S.either(to(left), to(right)),
-    (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
-    E.match(
-      (left) => ({ _tag: "Left" as const, left }),
-      (right) => ({ _tag: "Right" as const, right })
-    )
-  )
+export const Trim: Transform<string, string> = trim(S.string)
 
 // ---------------------------------------------
 // number
@@ -939,6 +784,36 @@ export const clampBigint = (min: bigint, max: bigint) =>
     )
 
 // ---------------------------------------------
+// Date
+// ---------------------------------------------
+
+/**
+  A combinator that transforms a `string` into a valid `Date`.
+
+  @category Date
+  @since 1.0.0
+*/
+export const dateFromString = <I>(self: Transform<I, string>): Transform<I, Date> =>
+  transformResult(
+    self,
+    S.ValidDate,
+    (input) => PR.success(new Date(input)),
+    (date) => PR.success(date.toISOString())
+  )
+
+const _Date: Transform<string, Date> = dateFromString(S.string)
+
+export {
+  /**
+   * A schema that transforms a `string` into a `Date`.
+   *
+   * @category Date
+   * @since 1.0.0
+   */
+  _Date as Date
+}
+
+// ---------------------------------------------
 // Option
 // ---------------------------------------------
 
@@ -996,6 +871,69 @@ export const optionFromNullable = <I, A>(
   value: Transform<I, A>
 ): Transform<I | null, Option<A>> =>
   transform(nullable(value), S.option(to(value)), O.fromNullable, O.getOrNull)
+
+// ---------------------------------------------
+// Either
+// ---------------------------------------------
+
+const eitherInline = <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) =>
+  union(
+    struct({
+      _tag: S.literal("Left"),
+      left
+    }),
+    struct({
+      _tag: S.literal("Right"),
+      right
+    })
+  )
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const eitherFromSelf = <IE, E, IA, A>(
+  left: Transform<IE, E>,
+  right: Transform<IA, A>
+): Transform<Either<IE, IA>, Either<E, A>> => {
+  const parseResultLeft = P.parseResult(left)
+  const parseResultRight = P.parseResult(right)
+  const encodeResultLeft = P.encodeResult(left)
+  const encodeResultRight = P.encodeResult(right)
+  return transformResult(
+    S.either(from(left), from(right)),
+    S.either(to(left), to(right)),
+    (either, options) =>
+      E.isLeft(either) ?
+        PR.map(parseResultLeft(either.left, options), E.left) :
+        PR.map(parseResultRight(either.right, options), E.right),
+    (either, options) =>
+      E.isLeft(either) ?
+        PR.map(encodeResultLeft(either.left, options), E.left) :
+        PR.map(encodeResultRight(either.right, options), E.right)
+  )
+}
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const either = <IE, E, IA, A>(
+  left: Transform<IE, E>,
+  right: Transform<IA, A>
+): Transform<
+  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
+  Either<E, A>
+> =>
+  transform(
+    eitherInline(left, right),
+    S.either(to(left), to(right)),
+    (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
+    E.match(
+      (left) => ({ _tag: "Left" as const, left }),
+      (right) => ({ _tag: "Right" as const, right })
+    )
+  )
 
 // ---------------------------------------------
 // ReadonlyMap
@@ -1070,27 +1008,72 @@ export const readonlySet = <I, A>(
   )
 
 // ---------------------------------------------
-// string
+// Chunk
 // ---------------------------------------------
 
 /**
- * This combinator allows removing whitespaces from the beginning and end of a string.
- *
- * @category string
+ * @category constructors
  * @since 1.0.0
  */
-export const trim = <I>(self: Transform<I, string>): Transform<I, string> =>
-  transform(
-    self,
-    pipe(to(self), S.trimmed()),
-    (s) => s.trim(),
-    identity
+export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> => {
+  const parseResult = P.parseResult(array(item))
+  const encodeResult = P.encodeResult(array(item))
+  return transformResult(
+    S.chunk(from(item)),
+    S.chunk(to(item)),
+    (chunk, options) => PR.map(parseResult(C.toReadonlyArray(chunk), options), C.fromIterable),
+    (chunk, options) => PR.map(encodeResult(C.toReadonlyArray(chunk), options), C.fromIterable)
   )
+}
 
 /**
- * This transformation allows removing whitespaces from the beginning and end of a string.
- *
- * @category string
+ * @category combinators
  * @since 1.0.0
  */
-export const Trim: Transform<string, string> = trim(S.string)
+export const chunk = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, Chunk<A>> =>
+  transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray)
+
+// ---------------------------------------------
+// Data
+// ---------------------------------------------
+
+const fromData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
+  data: D.Data<A>
+): A => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const dataFromSelf = <
+  I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
+  A extends Readonly<Record<string, any>> | ReadonlyArray<any>
+>(
+  item: Transform<I, A>
+): Transform<D.Data<I>, D.Data<A>> => {
+  const parseResult = P.parseResult(item)
+  const encodeResult = P.encodeResult(item)
+  return transformResult(
+    S.data(from(item)),
+    S.data(to(item)),
+    (data, options) => PR.map(parseResult(fromData(data), options), S.toData),
+    (data, options) => PR.map(encodeResult(fromData(data), options), S.toData)
+  )
+}
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const data = <
+  I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
+  A extends Readonly<Record<string, any>> | ReadonlyArray<any>
+>(
+  item: Transform<I, A>
+): Transform<I, D.Data<A>> =>
+  transform(
+    item,
+    S.data(to(item)),
+    S.toData,
+    (data) => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
+  )
