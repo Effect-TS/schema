@@ -64,23 +64,23 @@ describe.concurrent("partial", () => {
   })
 
   it("tuple/ e", async () => {
-    const schema = T.partial(T.tuple(T.NumberFromString))
-    await Util.expectParseSuccess(schema, ["1"], [1])
+    const schema = S.partial(S.tuple(S.number))
+    await Util.expectParseSuccess(schema, [1], [1])
     await Util.expectParseSuccess(schema, [], [])
   })
 
   it("tuple/ e + r", async () => {
-    const schema = T.partial(pipe(T.tuple(T.NumberFromString), T.rest(T.NumberFromString)))
-    await Util.expectParseSuccess(schema, ["1"], [1])
+    const schema = S.partial(pipe(S.tuple(S.number), S.rest(S.number)))
+    await Util.expectParseSuccess(schema, [1], [1])
     await Util.expectParseSuccess(schema, [], [])
-    await Util.expectParseSuccess(schema, ["1", "2"], [1, 2])
-    await Util.expectParseSuccess(schema, ["1", undefined], [1, undefined])
+    await Util.expectParseSuccess(schema, [1, 2], [1, 2])
+    await Util.expectParseSuccess(schema, [1, undefined], [1, undefined])
   })
 
   it("record", async () => {
-    const schema = T.partial(T.record(S.string, T.NumberFromString))
+    const schema = S.partial(S.record(S.string, S.number))
     await Util.expectParseSuccess(schema, {}, {})
-    await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
+    await Util.expectParseSuccess(schema, { a: 1 }, { a: 1 })
   })
 
   it("lazy", async () => {
@@ -116,8 +116,9 @@ describe.concurrent("partial", () => {
   })
 
   it("transformations should throw", async () => {
-    expect(() => T.partial(T.transform(S.string, S.string, identity, identity))).toThrowError(
-      new Error("`partial` cannot handle transformations")
-    )
+    expect(() => S.partial(T.transform(S.string, S.string, identity, identity) as any))
+      .toThrowError(
+        new Error("`partial` cannot handle transformations")
+      )
   })
 })

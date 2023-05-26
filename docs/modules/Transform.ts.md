@@ -37,12 +37,10 @@ Added in v1.0.0
   - [option](#option)
   - [optionFromSelf](#optionfromself)
   - [optionalElement](#optionalelement)
-  - [partial](#partial)
   - [pick](#pick)
   - [readonlyMap](#readonlymap)
   - [readonlySet](#readonlyset)
   - [record](#record)
-  - [required](#required)
   - [rest](#rest)
   - [struct](#struct)
   - [transform](#transform)
@@ -397,16 +395,6 @@ export declare const optionalElement: <IE, E>(
 
 Added in v1.0.0
 
-## partial
-
-**Signature**
-
-```ts
-export declare const partial: <I, A>(self: Transform<I, A>) => Transform<S.Spread<Partial<I>>, S.Spread<Partial<A>>>
-```
-
-Added in v1.0.0
-
 ## pick
 
 **Signature**
@@ -453,16 +441,6 @@ export declare const record: <K extends string | symbol, I, A>(
   key: S.Schema<K>,
   value: Transform<I, A>
 ) => Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }>
-```
-
-Added in v1.0.0
-
-## required
-
-**Signature**
-
-```ts
-export declare const required: <I, A>(self: Transform<I, A>) => Transform<S.Spread<Required<I>>, S.Spread<Required<A>>>
 ```
 
 Added in v1.0.0

@@ -9,15 +9,15 @@ describe.concurrent("required", () => {
   })
 
   it("struct", async () => {
-    const transform = T.required(T.struct({
-      a: T.optional(pipe(T.NumberFromString, T.filter(S.greaterThan(0))))
+    const transform = S.required(S.struct({
+      a: S.optional(pipe(S.number, S.greaterThan(0)))
     }))
 
-    await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
+    await Util.expectParseSuccess(transform, { a: 1 }, { a: 1 })
     await Util.expectParseFailure(transform, {}, "/a is missing")
     await Util.expectParseFailure(
       transform,
-      { a: "-1" },
+      { a: -1 },
       "/a Expected a number greater than 0, actual -1"
     )
   })
@@ -25,17 +25,17 @@ describe.concurrent("required", () => {
   it("tuple/ e?", async () => {
     // type A = [string?]
     // type B = Required<A>
-    const transform = T.required(pipe(S.tuple(), T.optionalElement(T.NumberFromString)))
+    const transform = S.required(pipe(S.tuple(), S.optionalElement(S.number)))
 
-    await Util.expectParseSuccess(transform, ["1"], [1])
+    await Util.expectParseSuccess(transform, [1], [1])
     await Util.expectParseFailure(transform, [], "/0 is missing")
   })
 
   it("tuple/ e + e?", async () => {
-    const transform = T.required(pipe(T.tuple(T.NumberFromString), T.optionalElement(S.string)))
+    const transform = S.required(pipe(S.tuple(S.number), S.optionalElement(S.string)))
 
-    await Util.expectParseSuccess(transform, ["0", ""], [0, ""])
-    await Util.expectParseFailure(transform, ["0"], "/1 is missing")
+    await Util.expectParseSuccess(transform, [0, ""], [0, ""])
+    await Util.expectParseFailure(transform, [0], "/1 is missing")
   })
 
   it("tuple/ e + r + e", async () => {
@@ -121,8 +121,9 @@ describe.concurrent("required", () => {
   })
 
   it("transformations should throw", async () => {
-    expect(() => T.required(T.transform(S.string, S.string, identity, identity))).toThrowError(
-      new Error("`required` cannot handle transformations")
-    )
+    expect(() => S.required(T.transform(S.string, S.string, identity, identity) as any))
+      .toThrowError(
+        new Error("`required` cannot handle transformations")
+      )
   })
 })

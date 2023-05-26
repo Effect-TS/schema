@@ -503,22 +503,6 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  * @category combinators
  * @since 1.0.0
  */
-export const partial = <I, A>(
-  self: Transform<I, A>
-): Transform<S.Spread<Partial<I>>, S.Spread<Partial<A>>> => make(AST.partial(self.ast))
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const required = <I, A>(
-  self: Transform<I, A>
-): Transform<S.Spread<Required<I>>, S.Spread<Required<A>>> => make(AST.required(self.ast))
-
-/**
- * @category combinators
- * @since 1.0.0
- */
 export const record = <K extends string | symbol, I, A>(
   key: S.Schema<K>,
   value: Transform<I, A>
