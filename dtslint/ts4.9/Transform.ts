@@ -22,46 +22,46 @@ export type ToNever = T.To<typeof S.never>
 // ---------------------------------------------
 
 // $ExpectType Transform<string, string>
-pipe(S.string, T.maxLength(5));
+pipe(S.string, T.filter(S.maxLength(5)));
 
 // $ExpectType Transform<string, string>
-pipe(S.string, T.minLength(5));
+pipe(S.string, T.filter(S.minLength(5)));
 
 // $ExpectType Transform<string, string>
-pipe(S.string, T.length(5));
+pipe(S.string, T.filter(S.length(5)));
 
 // $ExpectType Transform<string, string>
-pipe(S.string, T.pattern(/a/));
+pipe(S.string, T.filter(S.pattern(/a/)));
 
 // $ExpectType Transform<string, string>
-pipe(S.string, T.startsWith('a'));
+pipe(S.string, T.filter(S.startsWith('a')));
 
 // $ExpectType Transform<string, string>
-pipe(S.string, T.endsWith('a'));
+pipe(S.string, T.filter(S.endsWith('a')));
 
 // $ExpectType Transform<string, string>
-pipe(S.string, T.includes('a'));
+pipe(S.string, T.filter(S.includes('a')));
 
 // $ExpectType Transform<number, number>
-pipe(S.number, T.greaterThan(5));
+pipe(S.number, T.filter(S.greaterThan(5)));
 
 // $ExpectType Transform<number, number>
-pipe(S.number, T.greaterThanOrEqualTo(5));
+pipe(S.number, T.filter(S.greaterThanOrEqualTo(5)));
 
 // $ExpectType Transform<number, number>
-pipe(S.number, T.lessThan(5));
+pipe(S.number, T.filter(S.lessThan(5)));
 
 // $ExpectType Transform<number, number>
-pipe(S.number, T.lessThanOrEqualTo(5));
+pipe(S.number, T.filter(S.lessThanOrEqualTo(5)));
 
 // $ExpectType Transform<number, number>
-pipe(S.number, T.int());
+pipe(S.number, T.filter(S.int()));
 
 // $ExpectType Transform<number, number>
-pipe(S.number, T.nonNaN()); // not NaN
+pipe(S.number, T.filter(S.nonNaN())); // not NaN
 
 // $ExpectType Transform<number, number>
-pipe(S.number, T.finite()); // value must be finite, not Infinity or -Infinity
+pipe(S.number, T.filter(S.finite())); // value must be finite, not Infinity or -Infinity
 
 // ---------------------------------------------
 // nullable
@@ -76,13 +76,6 @@ T.nullable(T.NumberFromString)
 
 // $ExpectType Transform<string | boolean, number | boolean>
 T.union(S.boolean, T.NumberFromString);
-
-// ---------------------------------------------
-// keyof
-// ---------------------------------------------
-
-// $ExpectType Transform<"a" | "b", "a" | "b">
-T.keyof(T.struct({ a: S.string,  b: T.NumberFromString }));
 
 // ---------------------------------------------
 // Tuples
@@ -213,7 +206,7 @@ pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromS
 // ---------------------------------------------
 
 // $ExpectType BrandTransform<string, number & Brand<"Int">>
-pipe(T.NumberFromString, T.int(), T.brand('Int'))
+pipe(T.NumberFromString, T.filter(S.int()), T.filter(S.brand('Int')))
 
 // ---------------------------------------------
 // Partial
@@ -322,32 +315,32 @@ pipe(T.struct({ radius: T.NumberFromString }), T.attachPropertySignature("kind",
 // ---------------------------------------------
 
 const predicateFilter1 = (u: unknown) => typeof u === 'string'
-const FromFilter = T.union(S.string, S.number)
+const FromFilter = S.union(S.string, S.number)
 
 // $ExpectType Transform<string | number, string | number>
-pipe(FromFilter, T.filter(predicateFilter1))
+pipe(FromFilter, T.filter(S.filter(predicateFilter1)))
 
-const FromRefinement = T.struct({ a: T.optional(S.string), b: T.optional(S.number) })
+const FromRefinement = S.struct({ a: S.optional(S.string), b: S.optional(S.number) })
 
 // $ExpectType Transform<{ readonly a?: string; readonly b?: number; }, { readonly a?: string; readonly b?: number; } & { readonly b: number; }>
-pipe(FromRefinement, T.filter(S.is(S.struct({ b: S.number }))))
+pipe(FromRefinement, T.filter(S.filter(S.is(S.struct({ b: S.number })))))
 
 const LiteralFilter = S.literal('a', 'b')
 const predicateFilter2 = (u: unknown): u is 'a' => typeof u === 'string' && u === 'a'
 
 // $ExpectType Transform<"a" | "b", "a">
-pipe(LiteralFilter, T.filter(predicateFilter2))
+pipe(LiteralFilter, T.filter(S.filter(predicateFilter2)))
 
 // $ExpectType Transform<"a" | "b", "a">
-pipe(LiteralFilter, T.filter(S.is(S.literal('a'))))
+pipe(LiteralFilter, T.filter(S.filter(S.is(S.literal('a')))))
 
 // $ExpectType Transform<"a" | "b", never>
-pipe(LiteralFilter, T.filter(S.is(S.literal('c'))))
+pipe(LiteralFilter, T.filter(S.filter(S.is(S.literal('c')))))
 
 declare const UnionFilter: T.Transform<{ readonly a: string } | { readonly b: string }, { readonly a: string } | { readonly b: string }>
 
 // $ExpectType Transform<{ readonly a: string; } | { readonly b: string; }, ({ readonly a: string; } | { readonly b: string; }) & { readonly b: string; }>
-pipe(UnionFilter, T.filter(S.is(S.struct({ b: S.string }))))
+pipe(UnionFilter, T.filter(S.filter(S.is(S.struct({ b: S.string })))))
 
 // $ExpectType Transform<number, number & Brand<"MyNumber">>
-pipe(S.number, T.filter((n): n is number & Brand<"MyNumber"> => n > 0))
+pipe(S.number, T.filter(S.filter((n): n is number & Brand<"MyNumber"> => n > 0)))

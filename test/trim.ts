@@ -10,7 +10,7 @@ describe.concurrent("trim", () => {
   })
 
   it("parse", async () => {
-    const transform = pipe(S.string, T.minLength(1), T.trim)
+    const transform = pipe(S.string, S.minLength(1), T.trim)
     await Util.expectParseSuccess(transform, "a", "a")
     await Util.expectParseSuccess(transform, "a ", "a")
     await Util.expectParseSuccess(transform, " a ", "a")
@@ -28,7 +28,7 @@ describe.concurrent("trim", () => {
   })
 
   it("encode", async () => {
-    const transform = pipe(S.string, T.minLength(1), T.trim)
+    const transform = pipe(S.string, S.minLength(1), T.trim)
     await Util.expectEncodeSuccess(transform, "a", "a")
 
     await Util.expectEncodeFailure(

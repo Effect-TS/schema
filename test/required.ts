@@ -10,7 +10,7 @@ describe.concurrent("required", () => {
 
   it("struct", async () => {
     const transform = T.required(T.struct({
-      a: T.optional(pipe(T.NumberFromString, T.greaterThan(0)))
+      a: T.optional(pipe(T.NumberFromString, T.filter(S.greaterThan(0))))
     }))
 
     await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })

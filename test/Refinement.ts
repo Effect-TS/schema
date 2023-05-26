@@ -1,4 +1,5 @@
 import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
@@ -6,8 +7,8 @@ describe.concurrent("Refinement", () => {
   it("refinement", async () => {
     const schema = pipe(
       T.NumberFromString,
-      T.greaterThanOrEqualTo(1),
-      T.lessThanOrEqualTo(2)
+      T.filter(S.greaterThanOrEqualTo(1)),
+      T.filter(S.lessThanOrEqualTo(2))
     )
     await Util.expectParseSuccess(schema, "1", 1)
     await Util.expectParseFailure(

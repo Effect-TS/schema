@@ -3,11 +3,15 @@
  */
 
 import type { Brand } from "@effect/data/Brand"
+import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
+import * as D from "@effect/data/Data"
 import { untracedMethod } from "@effect/data/Debug"
 import * as E from "@effect/data/Either"
-import { dual, pipe } from "@effect/data/Function"
+import type { Either } from "@effect/data/Either"
+import * as Equal from "@effect/data/Equal"
+import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
@@ -22,23 +26,7 @@ import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
-
-// ---------------------------------------------
-// Data
-// ---------------------------------------------
-
-import * as D from "@effect/data/Data"
-
-import type { Either } from "@effect/data/Either"
-import * as Equal from "@effect/data/Equal"
-
-import { RefinedConstructorsTypeId } from "@effect/data/Brand"
-
 import { formatErrors } from "@effect/schema/TreeFormatter"
-
-// ---------------------------------------------
-// Option
-// ---------------------------------------------
 
 /**
  * @category symbols
@@ -186,7 +174,7 @@ export const documentation = (documentation: AST.DocumentationAnnotation) =>
  * @category constructors
  * @since 1.0.0
  */
-export const make = <A>(ast: AST.AST): Schema<A> => ({ ast }) as any
+export const make = <A>(ast: AST.AST): Schema<A> => ({ [SchemaTypeId]: identity, ast }) as any
 
 /**
   @category constructors
@@ -1891,6 +1879,10 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
     }
   )
 
+// ---------------------------------------------
+// Data
+// ---------------------------------------------
+
 /** @internal */
 export const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   a: A
@@ -2068,6 +2060,10 @@ export const json: Schema<Json> = lazy(() =>
   ), {
   [I.ArbitraryHookId]: () => arbitraryJson
 })
+
+// ---------------------------------------------
+// Option
+// ---------------------------------------------
 
 /** @internal */
 export const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> =>

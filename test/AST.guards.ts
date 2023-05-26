@@ -90,10 +90,10 @@ describe.concurrent("AST.guards", () => {
     expect(AST.isParameter(AST.symbolKeyword)).toEqual(true)
     expect(AST.isParameter(S.templateLiteral(S.string, S.literal("-"), S.string).ast))
       .toEqual(true)
-    expect(AST.isParameter(pipe(S.string, T.minLength(2)).ast)).toEqual(true)
-    expect(AST.isParameter(pipe(S.number, T.int()).ast)).toEqual(false)
+    expect(AST.isParameter(pipe(S.string, S.minLength(2)).ast)).toEqual(true)
+    expect(AST.isParameter(pipe(S.number, S.int()).ast)).toEqual(false)
     expect(AST.isParameter(T.NumberFromString.ast)).toEqual(false)
-    expect(AST.isParameter(pipe(T.NumberFromString, T.int()).ast))
+    expect(AST.isParameter(pipe(T.NumberFromString, T.filter(S.int())).ast))
     expect(AST.isParameter(S.templateLiteral(S.literal("a", "b"), S.literal("c")).ast)).toEqual(
       false
     )

@@ -16,7 +16,6 @@ import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
-import type { Predicate, Refinement } from "@effect/data/Predicate"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -292,7 +291,7 @@ export const rest = <IR, R>(rest: Transform<IR, R>) =>
     if (AST.isTuple(self.ast)) {
       return make(AST.appendRestElement(self.ast, rest.ast))
     }
-    throw new Error("`rest` is not supported on this schema")
+    throw new Error("`rest` is not supported on this transformation")
   }
 
 /**
@@ -306,7 +305,7 @@ export const element = <IE, E>(element: Transform<IE, E>) =>
     if (AST.isTuple(self.ast)) {
       return make(AST.appendElement(self.ast, AST.createElement(element.ast, false)))
     }
-    throw new Error("`element` is not supported on this schema")
+    throw new Error("`element` is not supported on this transformation")
   }
 
 /**
@@ -320,7 +319,7 @@ export const optionalElement = <IE, E>(element: Transform<IE, E>) =>
     if (AST.isTuple(self.ast)) {
       return make(AST.appendElement(self.ast, AST.createElement(element.ast, true)))
     }
-    throw new Error("`optionalElement` is not supported on this schema")
+    throw new Error("`optionalElement` is not supported on this transformation")
   }
 
 /**
@@ -517,7 +516,7 @@ export const struct = <
             toPropertySignatures.push(
               AST.createPropertySignature(
                 key,
-                optionFromSelf(make(AST.to(field._from))).ast,
+                S.option(S.make(AST.to(field._from))).ast,
                 false,
                 true,
                 field._annotations
@@ -607,55 +606,6 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   }
 
 /**
- * @category model
- * @since 1.0.0
- */
-export interface BrandTransform<From, To extends Brand<any>>
-  extends Transform<From, To>, Brand.Constructor<To>
-{}
-
-/**
- * Returns a nominal branded schema by applying a brand to a given schema.
- *
- * ```
- * Schema<A> + B -> Schema<A & Brand<B>>
- * ```
- *
- * @param self - The input schema to be combined with the brand.
- * @param brand - The brand to apply.
- *
- * @category combinators
- * @since 1.0.0
- */
-export const brand = <B extends string | symbol, A>(
-  brand: B,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): BrandTransform<I, A & Brand<B>> => {
-    const annotations = S.toAnnotations(options)
-    annotations[AST.BrandAnnotationId] = [...S.getBrands(self.ast), brand]
-    const ast = AST.mergeAnnotations(self.ast, annotations)
-    const transform = make(ast)
-    const schema = to(transform)
-    const validate = P.validate(schema)
-    const validateOption = P.validateOption(schema)
-    const validateEither = P.validateEither(schema)
-    const is = P.is(schema)
-    const out: any = Object.assign((input: unknown) => validate(input), {
-      [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
-      ast,
-      option: (input: unknown) => validateOption(input),
-      either: (input: unknown) =>
-        E.mapLeft(
-          validateEither(input),
-          (e) => [{ meta: input, message: formatErrors(e.errors) }]
-        ),
-      refine: (input: unknown): input is A & Brand<B> => is(input)
-    })
-    return out
-  }
-
-/**
  * @category combinators
  * @since 1.0.0
  */
@@ -733,28 +683,21 @@ export type AnnotationOptions<A> = {
 }
 
 /**
+ * Applies a `Schema` transformation.
+ *
  * @category combinators
  * @since 1.0.0
  */
-export function filter<C extends A, B extends A, A = C>(
-  refinement: Refinement<A, B>,
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, C>) => Transform<I, C & B>
-export function filter<B extends A, A = B>(
-  predicate: Predicate<A>,
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, B>) => Transform<I, B>
-export function filter<A>(
-  predicate: Predicate<A>,
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> {
-  return (self) =>
-    make(AST.createRefinement(
-      self.ast,
-      (a: A, _, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
-      S.toAnnotations(options)
-    ))
-}
+export const filter = <A, B extends A>(
+  f: (schema: S.Schema<A>) => S.Schema<B>
+) =>
+  <I>(transform: Transform<I, A>): Transform<I, B> => {
+    const schema = f(to(transform))
+    if (AST.isRefinement(schema.ast)) {
+      return make(AST.createRefinement(transform.ast, schema.ast.decode, schema.ast.annotations))
+    }
+    return make(AST.createTransform(transform.ast, schema.ast, PR.success, PR.success))
+  }
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -860,254 +803,60 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
     ))
 
 // ---------------------------------------------
-// data/Bigint
+// Brand
 // ---------------------------------------------
 
 /**
- * @category type id
+ * @category model
  * @since 1.0.0
  */
-export const GreaterThanBigintTypeId = "@effect/schema/GreaterThanBigintTypeId"
+export interface BrandTransform<From, To extends Brand<any>>
+  extends Transform<From, To>, Brand.Constructor<To>
+{}
 
+// TODO: can be removed?
 /**
- * @category bigint
- * @since 1.0.0
- */
-export const greaterThanBigint = <A extends bigint>(
-  min: bigint,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a > min, {
-        typeId: GreaterThanBigintTypeId,
-        description: `a bigint greater than ${min}n`,
-        jsonSchema: { exclusiveMinimum: min },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const GreaterThanOrEqualToBigintTypeId = "@effect/schema/GreaterThanOrEqualToBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const greaterThanOrEqualToBigint = <A extends bigint>(
-  min: bigint,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min, {
-        typeId: GreaterThanOrEqualToBigintTypeId,
-        description: `a bigint greater than or equal to ${min}n`,
-        jsonSchema: { minimum: min },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const LessThanBigintTypeId = "@effect/schema/LessThanBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const lessThanBigint = <A extends bigint>(
-  max: bigint,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a < max, {
-        typeId: LessThanBigintTypeId,
-        description: `a bigint less than ${max}n`,
-        jsonSchema: { exclusiveMaximum: max },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const LessThanOrEqualToBigintTypeId = "@effect/schema/LessThanOrEqualToBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const lessThanOrEqualToBigint = <A extends bigint>(
-  max: bigint,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a <= max, {
-        typeId: LessThanOrEqualToBigintTypeId,
-        description: `a bigint less than or equal to ${max}n`,
-        jsonSchema: { maximum: max },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const BetweenBigintTypeId = "@effect/schema/BetweenBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const betweenBigint = <A extends bigint>(
-  min: bigint,
-  max: bigint,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min && a <= max, {
-        typeId: BetweenBigintTypeId,
-        description: `a bigint between ${min}n and ${max}n`,
-        jsonSchema: { maximum: max, minimum: min },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const PositiveBigintTypeId = "@effect/schema/PositiveBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const positiveBigint = <A extends bigint>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  greaterThanBigint(0n, {
-    typeId: PositiveBigintTypeId,
-    description: "a positive bigint",
-    ...options
-  })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NegativeBigintTypeId = "@effect/schema/NegativeBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const negativeBigint = <A extends bigint>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  lessThanBigint(0n, {
-    typeId: NegativeBigintTypeId,
-    description: "a negative bigint",
-    ...options
-  })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonNegativeBigintTypeId = "@effect/schema/NonNegativeBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const nonNegativeBigint = <A extends bigint>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  greaterThanOrEqualToBigint(0n, {
-    typeId: NonNegativeBigintTypeId,
-    description: "a non-negative bigint",
-    ...options
-  })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonPositiveBigintTypeId = "@effect/schema/NonPositiveBigintTypeId"
-
-/**
- * @category bigint
- * @since 1.0.0
- */
-export const nonPositiveBigint = <A extends bigint>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  lessThanOrEqualToBigint(0n, {
-    typeId: NonPositiveBigintTypeId,
-    description: "a non-positive bigint",
-    ...options
-  })
-
-/**
- * Clamps a bigint between a minimum and a maximum value.
+ * Returns a nominal branded schema by applying a brand to a given schema.
  *
- * @category bigint
- * @since 1.0.0
- */
-export const clampBigint = (min: bigint, max: bigint) =>
-  <I>(self: Transform<I, bigint>): Transform<I, bigint> =>
-    transform(
-      self,
-      pipe(to(self), betweenBigint(min, max)),
-      (input) => B.clamp(input, min, max),
-      identity
-    )
-
-// ---------------------------------------------
-// data/Boolean
-// ---------------------------------------------
-
-/**
- * Negates a boolean value
+ * ```
+ * Schema<A> + B -> Schema<A & Brand<B>>
+ * ```
  *
- * @category boolean
+ * @param self - The input schema to be combined with the brand.
+ * @param brand - The brand to apply.
+ *
+ * @category combinators
  * @since 1.0.0
  */
-export const not = <I>(self: Transform<I, boolean>): Transform<I, boolean> =>
-  transform(
-    self,
-    to(self),
-    (b) => !b,
-    (b) => !b
-  )
+export const brand = <B extends string | symbol, A>(
+  brand: B,
+  options?: AnnotationOptions<A>
+) =>
+  <I>(self: Transform<I, A>): BrandTransform<I, A & Brand<B>> => {
+    const annotations = S.toAnnotations(options)
+    annotations[AST.BrandAnnotationId] = [...S.getBrands(self.ast), brand]
+    const ast = AST.mergeAnnotations(self.ast, annotations)
+    const transform = make(ast)
+    const schema = to(transform)
+    const validate = P.validate(schema)
+    const validateOption = P.validateOption(schema)
+    const validateEither = P.validateEither(schema)
+    const is = P.is(schema)
+    const out: any = Object.assign((input: unknown) => validate(input), {
+      [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
+      ast,
+      option: (input: unknown) => validateOption(input),
+      either: (input: unknown) =>
+        E.mapLeft(
+          validateEither(input),
+          (e) => [{ meta: input, message: formatErrors(e.errors) }]
+        ),
+      refine: (input: unknown): input is A & Brand<B> => is(input)
+    })
+    return out
+  }
 
-// ---------------------------------------------
-// data/Brand
-// ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const BrandTypeId = "@effect/schema/BrandTypeId"
-
+// TODO: can be removed?
 /**
  * @category combinators
  * @since 1.0.0
@@ -1128,7 +877,7 @@ export const fromBrand = <C extends Brand<string | symbol>>(
     const ast = AST.createRefinement(
       self.ast,
       decode,
-      S.toAnnotations({ typeId: BrandTypeId, ...options })
+      S.toAnnotations({ typeId: S.BrandTypeId, ...options })
     )
     return make(ast)
   }
@@ -1157,10 +906,10 @@ export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, 
  * @since 1.0.0
  */
 export const chunk = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, Chunk<A>> =>
-  transform(array(item), to(chunkFromSelf(item)), C.fromIterable, C.toReadonlyArray)
+  transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray)
 
 // ---------------------------------------------
-// data/Data
+// Data
 // ---------------------------------------------
 
 const fromData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
@@ -1199,37 +948,14 @@ export const data = <
 ): Transform<I, D.Data<A>> =>
   transform(
     item,
-    to(dataFromSelf(item)),
+    S.data(to(item)),
     S.toData,
     (data) => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
   )
 
 // ---------------------------------------------
-// data/Date
+// Date
 // ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const ValidDateTypeId = "@effect/schema/ValidDateTypeId"
-
-/**
- * A filter excluding invalid dates (e.g. `new Date("fail")`).
- *
- * @category Date
- * @since 1.0.0
- */
-export const validDate = (options?: AnnotationOptions<Date>) =>
-  <I>(self: Transform<I, Date>): Transform<I, Date> =>
-    pipe(
-      self,
-      filter((a) => !isNaN(a.getTime()), {
-        typeId: ValidDateTypeId,
-        description: "a valid Date",
-        ...options
-      })
-    )
 
 /**
   A combinator that transforms a `string` into a valid `Date`.
@@ -1258,7 +984,7 @@ export {
 }
 
 // ---------------------------------------------
-// data/Either
+// Either
 // ---------------------------------------------
 
 const eitherInline = <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) =>
@@ -1312,7 +1038,7 @@ export const either = <IE, E, IA, A>(
 > =>
   transform(
     eitherInline(left, right),
-    to(eitherFromSelf(left, right)),
+    S.either(to(left), to(right)),
     (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
     E.match(
       (left) => ({ _tag: "Left" as const, left }),
@@ -1321,296 +1047,8 @@ export const either = <IE, E, IA, A>(
   )
 
 // ---------------------------------------------
-// data/Number
+// number
 // ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const FiniteTypeId = "@effect/schema/FiniteTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const finite = <A extends number>(options?: AnnotationOptions<A>) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => Number.isFinite(a), {
-        typeId: FiniteTypeId,
-        description: "a finite number",
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const GreaterThanTypeId = "@effect/schema/GreaterThanTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const greaterThan = <A extends number>(
-  min: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a > min, {
-        typeId: GreaterThanTypeId,
-        description: `a number greater than ${min}`,
-        jsonSchema: { exclusiveMinimum: min },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const GreaterThanOrEqualToTypeId = "@effect/schema/GreaterThanOrEqualToTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const greaterThanOrEqualTo = <A extends number>(
-  min: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min, {
-        typeId: GreaterThanOrEqualToTypeId,
-        description: `a number greater than or equal to ${min}`,
-        jsonSchema: { minimum: min },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const MultipleOfTypeId = "@effect/schema/MultipleOfTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const multipleOf = <A extends number>(
-  divisor: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => N.remainder(a, divisor) === 0, {
-        typeId: MultipleOfTypeId,
-        description: `a number divisible by ${divisor}`,
-        jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const IntTypeId = "@effect/schema/IntTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const int = <A extends number>(options?: AnnotationOptions<A>) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => Number.isInteger(a), {
-        typeId: IntTypeId,
-        description: "integer",
-        jsonSchema: { type: "integer" },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const LessThanTypeId = "@effect/schema/LessThanTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const lessThan = <A extends number>(max: number, options?: AnnotationOptions<A>) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a < max, {
-        typeId: LessThanTypeId,
-        description: `a number less than ${max}`,
-        jsonSchema: { exclusiveMaximum: max },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const LessThanOrEqualToTypeId = "@effect/schema/LessThanOrEqualToTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const lessThanOrEqualTo = <A extends number>(
-  max: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a <= max, {
-        typeId: LessThanOrEqualToTypeId,
-        description: `a number less than or equal to ${max}`,
-        jsonSchema: { maximum: max },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const BetweenTypeId = "@effect/schema/BetweenTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const between = <A extends number>(
-  min: number,
-  max: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min && a <= max, {
-        typeId: BetweenTypeId,
-        description: `a number between ${min} and ${max}`,
-        jsonSchema: { maximum: max, minimum: min },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonNaNTypeId = "@effect/schema/NonNaNTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const nonNaN = <A extends number>(options?: AnnotationOptions<A>) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => !Number.isNaN(a), {
-        typeId: NonNaNTypeId,
-        description: "a number NaN excluded",
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const PositiveTypeId = "@effect/schema/PositiveTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const positive = <A extends number>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  greaterThan(0, {
-    typeId: PositiveTypeId,
-    description: "a positive number",
-    ...options
-  })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NegativeTypeId = "@effect/schema/NegativeTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const negative = <A extends number>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  lessThan(0, {
-    typeId: NegativeTypeId,
-    description: "a negative number",
-    ...options
-  })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonNegativeTypeId = "@effect/schema/NonNegativeTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const nonNegative = <A extends number>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  greaterThanOrEqualTo(0, {
-    typeId: NonNegativeTypeId,
-    description: "a non-negative number",
-    ...options
-  })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonPositiveTypeId = "@effect/schema/NonPositiveTypeId"
-
-/**
- * @category number
- * @since 1.0.0
- */
-export const nonPositive = <A extends number>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> =>
-  lessThanOrEqualTo(0, {
-    typeId: NonPositiveTypeId,
-    description: "a non-positive number",
-    ...options
-  })
 
 /**
  * Clamps a number between a minimum and a maximum value.
@@ -1622,7 +1060,7 @@ export const clamp = (min: number, max: number) =>
   <I>(self: Transform<I, number>): Transform<I, number> =>
     transform(
       self,
-      pipe(to(self), between(min, max)),
+      pipe(to(self), S.between(min, max)),
       (n) => N.clamp(n, min, max),
       identity
     )
@@ -1656,7 +1094,7 @@ export const numberFromString = <I>(self: Transform<I, string>): Transform<I, nu
   )
 
 /**
- * This schema transforms a `string` into a `number` by parsing the string using `parseFloat`.
+ * This transformation converts a `string` into a `number` by parsing the string using `parseFloat`.
  *
  * The following special string values are supported: "NaN", "Infinity", "-Infinity".
  *
@@ -1666,7 +1104,44 @@ export const numberFromString = <I>(self: Transform<I, string>): Transform<I, nu
 export const NumberFromString: Transform<string, number> = numberFromString(S.string)
 
 // ---------------------------------------------
-// data/Option
+// boolean
+// ---------------------------------------------
+
+/**
+ * Negates a boolean value
+ *
+ * @category boolean
+ * @since 1.0.0
+ */
+export const not = <I>(self: Transform<I, boolean>): Transform<I, boolean> =>
+  transform(
+    self,
+    to(self),
+    (b) => !b,
+    (b) => !b
+  )
+
+// ---------------------------------------------
+// bigint
+// ---------------------------------------------
+
+/**
+ * Clamps a bigint between a minimum and a maximum value.
+ *
+ * @category bigint
+ * @since 1.0.0
+ */
+export const clampBigint = (min: bigint, max: bigint) =>
+  <I>(self: Transform<I, bigint>): Transform<I, bigint> =>
+    transform(
+      self,
+      pipe(to(self), S.betweenBigint(min, max)),
+      (input) => B.clamp(input, min, max),
+      identity
+    )
+
+// ---------------------------------------------
+// Option
 // ---------------------------------------------
 
 const optionInline = <I, A>(value: Transform<I, A>) =>
@@ -1710,7 +1185,7 @@ export const option = <I, A>(
 ): Transform<{ readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I }, Option<A>> =>
   transform(
     optionInline(value),
-    to(optionFromSelf(value)),
+    S.option(to(value)),
     (o) => o._tag === "None" ? O.none() : O.some(o.value),
     O.match(() => ({ _tag: "None" as const }), (value) => ({ _tag: "Some" as const, value }))
   )
@@ -1722,89 +1197,10 @@ export const option = <I, A>(
 export const optionFromNullable = <I, A>(
   value: Transform<I, A>
 ): Transform<I | null, Option<A>> =>
-  transform(nullable(value), to(optionFromSelf(value)), O.fromNullable, O.getOrNull)
+  transform(nullable(value), S.option(to(value)), O.fromNullable, O.getOrNull)
 
 // ---------------------------------------------
-// data/ReadonlyArray
-// ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const MinItemsTypeId = "@effect/schema/MinItemsTypeId"
-
-/**
- * @category array
- * @since 1.0.0
- */
-export const minItems = <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) =>
-  <I>(self: Transform<I, ReadonlyArray<A>>): Transform<I, ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length >= n, {
-        typeId: MinItemsTypeId,
-        description: `an array of at least ${n} items`,
-        jsonSchema: { minItems: n },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const MaxItemsTypeId = "@effect/schema/MaxItemsTypeId"
-
-/**
- * @category array
- * @since 1.0.0
- */
-export const maxItems = <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) =>
-  <I>(self: Transform<I, ReadonlyArray<A>>): Transform<I, ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length <= n, {
-        typeId: MaxItemsTypeId,
-        description: `an array of at most ${n} items`,
-        jsonSchema: { maxItems: n },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const ItemsCountTypeId = "@effect/schema/ItemsCountTypeId"
-
-/**
- * @category array
- * @since 1.0.0
- */
-export const itemsCount = <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) =>
-  <I>(self: Transform<I, ReadonlyArray<A>>): Transform<I, ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length === n, {
-        typeId: ItemsCountTypeId,
-        description: `an array of exactly ${n} items`,
-        jsonSchema: { minItems: n, maxItems: n },
-        ...options
-      })
-    )
-
-// ---------------------------------------------
-// data/ReadonlyMap
+// ReadonlyMap
 // ---------------------------------------------
 
 /**
@@ -1835,13 +1231,13 @@ export const readonlyMap = <IK, K, IV, V>(
 ): Transform<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
   transform(
     array(tuple(key, value)),
-    to(readonlyMapFromSelf(key, value)),
+    S.readonlyMap(to(key), to(value)),
     (entries) => new Map(entries),
     (map) => Array.from(map.entries())
   )
 
 // ---------------------------------------------
-// data/ReadonlySet
+// ReadonlySet
 // ---------------------------------------------
 
 /**
@@ -1870,220 +1266,14 @@ export const readonlySet = <I, A>(
 ): Transform<ReadonlyArray<I>, ReadonlySet<A>> =>
   transform(
     array(item),
-    to(readonlySetFromSelf(item)),
+    S.readonlySet(to(item)),
     (as) => new Set(as),
     (set) => Array.from(set)
   )
 
 // ---------------------------------------------
-// data/String
+// string
 // ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const TrimmedTypeId = "@effect/schema/TrimmedTypeId"
-
-const trimmedRegex = /^\S.*\S$|^\S$|^$/
-
-/**
- * Verifies that a string contains no leading or trailing whitespaces.
- *
- * Note. This combinator does not make any transformations, it only validates.
- * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
- *
- * @category string
- * @since 1.0.0
- */
-export const trimmed = <A extends string>(options?: AnnotationOptions<A>) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter((a): a is A => trimmedRegex.test(a), {
-        typeId: TrimmedTypeId,
-        description: "a string with no leading or trailing whitespace",
-        jsonSchema: {
-          type: "string",
-          pattern: trimmedRegex.source
-        },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const MaxLengthTypeId = "@effect/schema/MaxLengthTypeId"
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const maxLength = <A extends string>(
-  maxLength: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.length <= maxLength,
-        {
-          typeId: MaxLengthTypeId,
-          description: `a string at most ${maxLength} character(s) long`,
-          jsonSchema: { maxLength },
-          ...options
-        }
-      )
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const MinLengthTypeId = "@effect/schema/MinLengthTypeId"
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const minLength = <A extends string>(
-  minLength: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.length >= minLength,
-        {
-          typeId: MinLengthTypeId,
-          description: `a string at least ${minLength} character(s) long`,
-          jsonSchema: { minLength },
-          ...options
-        }
-      )
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const PatternTypeId = "@effect/schema/PatternTypeId"
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const pattern = <A extends string>(
-  regex: RegExp,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> => {
-    const pattern = regex.source
-    return pipe(
-      self,
-      filter(
-        (a): a is A => {
-          // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
-          regex.lastIndex = 0
-          return regex.test(a)
-        },
-        {
-          typeId: { id: PatternTypeId, params: { regex } },
-          description: `a string matching the pattern ${pattern}`,
-          jsonSchema: { pattern },
-          ...options
-        }
-      )
-    )
-  }
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const StartsWithTypeId = "@effect/schema/StartsWithTypeId"
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const startsWith = <A extends string>(
-  startsWith: string,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.startsWith(startsWith),
-        {
-          typeId: { id: StartsWithTypeId, params: { startsWith } },
-          description: `a string starting with ${JSON.stringify(startsWith)}`,
-          jsonSchema: { pattern: `^${startsWith}` },
-          ...options
-        }
-      )
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const EndsWithTypeId = "@effect/schema/EndsWithTypeId"
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const endsWith = <A extends string>(
-  endsWith: string,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.endsWith(endsWith),
-        {
-          typeId: { id: EndsWithTypeId, params: { endsWith } },
-          description: `a string ending with ${JSON.stringify(endsWith)}`,
-          jsonSchema: { pattern: `^.*${endsWith}$` },
-          ...options
-        }
-      )
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const IncludesTypeId = "@effect/schema/IncludesTypeId"
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const includes = <A extends string>(
-  searchString: string,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.includes(searchString),
-        {
-          typeId: { id: IncludesTypeId, params: { includes: searchString } },
-          description: `a string including ${JSON.stringify(searchString)}`,
-          jsonSchema: { pattern: `.*${searchString}.*` },
-          ...options
-        }
-      )
-    )
 
 /**
  * This combinator allows removing whitespaces from the beginning and end of a string.
@@ -2094,34 +1284,15 @@ export const includes = <A extends string>(
 export const trim = <I>(self: Transform<I, string>): Transform<I, string> =>
   transform(
     self,
-    pipe(to(self), trimmed()),
+    pipe(to(self), S.trimmed()),
     (s) => s.trim(),
     identity
   )
 
 /**
- * This schema allows removing whitespaces from the beginning and end of a string.
+ * This transformation allows removing whitespaces from the beginning and end of a string.
  *
  * @category string
  * @since 1.0.0
  */
 export const Trim: Transform<string, string> = trim(S.string)
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const length = <A extends string>(
-  length: number,
-  options?: AnnotationOptions<A>
-) =>
-  <I>(self: Transform<I, A>): Transform<I, A> =>
-    minLength(length, options)(maxLength<A>(length)(self))
-
-/**
- * @category string
- * @since 1.0.0
- */
-export const nonEmpty = <A extends string>(
-  options?: AnnotationOptions<A>
-): <I>(self: Transform<I, A>) => Transform<I, A> => minLength(1, options)

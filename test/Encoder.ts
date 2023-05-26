@@ -6,7 +6,7 @@ import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
 // raises an error while encoding from a number if the string is not a char
-const NumberFromChar = pipe(S.string, T.maxLength(1), T.numberFromString)
+const NumberFromChar = pipe(S.string, S.maxLength(1), T.numberFromString)
 
 // raises an error while encoding if the string is not a char
 const Char = pipe(S.string, S.maxLength(1))
@@ -22,7 +22,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("encodeOption", () => {
-    const schema = pipe(S.string, T.maxLength(1), T.numberFromString)
+    const schema = pipe(S.string, S.maxLength(1), T.numberFromString)
     expect(P.encodeOption(schema)(1)).toEqual(O.some("1"))
     expect(P.encodeOption(schema)(10)).toEqual(O.none())
   })

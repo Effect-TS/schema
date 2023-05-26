@@ -222,7 +222,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("brand/ decoding", async () => {
-    const schema = pipe(S.string, T.numberFromString, T.int(), T.brand("Int"))
+    const schema = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand("Int"))
     await Util.expectParseSuccess(schema, "1", 1 as any)
     await Util.expectParseFailure(
       schema,
@@ -233,7 +233,7 @@ describe.concurrent("Decoder", () => {
 
   it("brand/symbol decoding", async () => {
     const Int = Symbol.for("Int")
-    const schema = pipe(S.string, T.numberFromString, T.int(), T.brand(Int))
+    const schema = pipe(S.string, T.numberFromString, T.filter(S.int()), T.brand(Int))
     await Util.expectParseSuccess(schema, "1", 1 as any)
     await Util.expectParseFailure(
       schema,
@@ -854,7 +854,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("maxLength", async () => {
-    const schema = pipe(S.string, T.maxLength(1))
+    const schema = pipe(S.string, S.maxLength(1))
     await Util.expectParseSuccess(schema, "")
     await Util.expectParseSuccess(schema, "a")
 
@@ -866,7 +866,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("nonEmpty", async () => {
-    const schema = pipe(S.string, T.nonEmpty())
+    const schema = pipe(S.string, S.nonEmpty())
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "aa")
 
@@ -878,7 +878,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("length", async () => {
-    const schema = pipe(S.string, T.length(1))
+    const schema = pipe(S.string, S.length(1))
     await Util.expectParseSuccess(schema, "a")
 
     await Util.expectParseFailure(
@@ -894,7 +894,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("startsWith", async () => {
-    const schema = pipe(S.string, T.startsWith("a"))
+    const schema = pipe(S.string, S.startsWith("a"))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "ab")
 
@@ -911,7 +911,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("endsWith", async () => {
-    const schema = pipe(S.string, T.endsWith("a"))
+    const schema = pipe(S.string, S.endsWith("a"))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "ba")
 
@@ -928,7 +928,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("pattern", async () => {
-    const schema = pipe(S.string, T.pattern(/^abb+$/))
+    const schema = pipe(S.string, S.pattern(/^abb+$/))
     await Util.expectParseSuccess(schema, "abb")
     await Util.expectParseSuccess(schema, "abbb")
 
