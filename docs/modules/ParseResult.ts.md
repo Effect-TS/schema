@@ -33,6 +33,7 @@ Added in v1.0.0
   - [Unexpected (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
 - [optimisation](#optimisation)
+  - [bimap](#bimap)
   - [eitherOrUndefined](#eitherorundefined)
   - [flatMap](#flatmap)
   - [map](#map)
@@ -281,6 +282,16 @@ Added in v1.0.0
 
 # optimisation
 
+## bimap
+
+**Signature**
+
+```ts
+export declare const bimap: <E1, E2, A, B>(self: IO<E1, A>, f: (e1: E1) => E2, g: (a: A) => B) => IO<E2, B>
+```
+
+Added in v1.0.0
+
 ## eitherOrUndefined
 
 **Signature**
@@ -296,7 +307,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const flatMap: <E, E1, A, B>(self: IO<E, A>, f: (self: A) => IO<E1, B>) => IO<E | E1, B>
+export declare const flatMap: <E, E1, A, B>(self: IO<E, A>, f: (a: A) => IO<E1, B>) => IO<E | E1, B>
 ```
 
 Added in v1.0.0
@@ -306,7 +317,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const map: <E, A, B>(self: IO<E, A>, f: (self: A) => B) => IO<E, B>
+export declare const map: <E, A, B>(self: IO<E, A>, f: (a: A) => B) => IO<E, B>
 ```
 
 Added in v1.0.0
@@ -316,7 +327,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const mapLeft: <E, A, G>(self: IO<E, A>, f: (self: E) => G) => IO<G, A>
+export declare const mapLeft: <E1, A, E2>(self: IO<E1, A>, f: (e1: E1) => E2) => IO<E2, A>
 ```
 
 Added in v1.0.0

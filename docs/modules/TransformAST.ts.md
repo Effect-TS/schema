@@ -13,22 +13,36 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [constructors](#constructors)
+  - [createAndThenTransformation](#createandthentransformation)
   - [createFinalPropertySignatureTransformation](#createfinalpropertysignaturetransformation)
   - [createFinalTransformation](#createfinaltransformation)
   - [createPropertySignatureTransformation](#createpropertysignaturetransformation)
+  - [createTupleTransformation](#createtupletransformation)
   - [createTypeLiteralTransformation](#createtypeliteraltransformation)
 - [guard](#guard)
   - [isTypeLiteralTransformation](#istypeliteraltransformation)
 - [model](#model)
+  - [AndThenTransformation (interface)](#andthentransformation-interface)
   - [FinalPropertySignatureTransformation (interface)](#finalpropertysignaturetransformation-interface)
   - [FinalTransformation (interface)](#finaltransformation-interface)
   - [PropertySignatureTransformation (interface)](#propertysignaturetransformation-interface)
   - [TransformAST (type alias)](#transformast-type-alias)
+  - [TupleTransformation (interface)](#tupletransformation-interface)
   - [TypeLiteralTransformation (interface)](#typeliteraltransformation-interface)
 
 ---
 
 # constructors
+
+## createAndThenTransformation
+
+**Signature**
+
+```ts
+export declare const createAndThenTransformation: (from: TransformAST, to: TransformAST) => AndThenTransformation
+```
+
+Added in v1.0.0
 
 ## createFinalPropertySignatureTransformation
 
@@ -70,13 +84,24 @@ export declare const createPropertySignatureTransformation: (
 
 Added in v1.0.0
 
+## createTupleTransformation
+
+**Signature**
+
+```ts
+export declare const createTupleTransformation: (elements: TupleTransformation['elements']) => TupleTransformation
+```
+
+Added in v1.0.0
+
 ## createTypeLiteralTransformation
 
 **Signature**
 
 ```ts
 export declare const createTypeLiteralTransformation: (
-  propertySignatureTransformations: TypeLiteralTransformation['propertySignatureTransformations']
+  propertySignatureTransformations: TypeLiteralTransformation['propertySignatureTransformations'],
+  indexSignatureTransformations: ReadonlyArray<TransformAST>
 ) => TypeLiteralTransformation
 ```
 
@@ -95,6 +120,20 @@ export declare const isTypeLiteralTransformation: (ast: TransformAST) => ast is 
 Added in v1.0.0
 
 # model
+
+## AndThenTransformation (interface)
+
+**Signature**
+
+```ts
+export interface AndThenTransformation {
+  readonly _tag: 'AndThenTransformation'
+  readonly from: TransformAST
+  readonly to: TransformAST
+}
+```
+
+Added in v1.0.0
 
 ## FinalPropertySignatureTransformation (interface)
 
@@ -115,8 +154,8 @@ The semantic of `encode` is:
 ```ts
 export interface FinalPropertySignatureTransformation {
   readonly _tag: 'FinalPropertySignatureTransformation'
-  decode: (o: Option<any>) => Option<any>
-  encode: (o: Option<any>) => Option<any>
+  readonly decode: (o: Option<any>) => Option<any>
+  readonly encode: (o: Option<any>) => Option<any>
 }
 ```
 
@@ -129,8 +168,8 @@ Added in v1.0.0
 ```ts
 export interface FinalTransformation {
   readonly _tag: 'FinalTransformation'
-  decode: Transform['decode']
-  encode: Transform['encode']
+  readonly decode: Transform['decode']
+  readonly encode: Transform['encode']
 }
 ```
 
@@ -155,7 +194,21 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type TransformAST = FinalTransformation | TypeLiteralTransformation
+export type TransformAST = FinalTransformation | AndThenTransformation | TypeLiteralTransformation | TupleTransformation
+```
+
+Added in v1.0.0
+
+## TupleTransformation (interface)
+
+**Signature**
+
+```ts
+export interface TupleTransformation {
+  readonly _tag: 'TupleTransformation'
+  readonly elements: ReadonlyArray.NonEmptyReadonlyArray<TransformAST>
+  // TODO: handle rest
+}
 ```
 
 Added in v1.0.0
@@ -167,7 +220,8 @@ Added in v1.0.0
 ```ts
 export interface TypeLiteralTransformation {
   readonly _tag: 'TypeLiteralTransformation'
-  readonly propertySignatureTransformations: RA.NonEmptyReadonlyArray<PropertySignatureTransformation>
+  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
+  readonly indexSignatureTransformations: ReadonlyArray<TransformAST>
 }
 ```
 

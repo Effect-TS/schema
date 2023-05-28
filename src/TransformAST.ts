@@ -2,9 +2,12 @@
  * @since 1.0.0
  */
 
+import * as E from "@effect/data/Either"
+import * as O from "@effect/data/Option"
 import type { Option } from "@effect/data/Option"
-import type * as RA from "@effect/data/ReadonlyArray"
+import type * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import type { Transform } from "@effect/schema/AST"
+import * as ParseResult from "@effect/schema/ParseResult"
 
 /**
  * @category model
@@ -113,10 +116,10 @@ export const createPropertySignatureTransformation = (
  */
 export interface TypeLiteralTransformation {
   readonly _tag: "TypeLiteralTransformation"
-  readonly propertySignatureTransformations: RA.NonEmptyReadonlyArray<
+  readonly propertySignatureTransformations: ReadonlyArray<
     PropertySignatureTransformation
   >
-  // TODO: handle IndexSignatures
+  readonly indexSignatureTransformations: ReadonlyArray<TransformAST>
 }
 
 /**
@@ -124,10 +127,12 @@ export interface TypeLiteralTransformation {
  * @since 1.0.0
  */
 export const createTypeLiteralTransformation = (
-  propertySignatureTransformations: TypeLiteralTransformation["propertySignatureTransformations"]
+  propertySignatureTransformations: TypeLiteralTransformation["propertySignatureTransformations"],
+  indexSignatureTransformations: ReadonlyArray<TransformAST>
 ): TypeLiteralTransformation => ({
   _tag: "TypeLiteralTransformation",
-  propertySignatureTransformations
+  propertySignatureTransformations,
+  indexSignatureTransformations
 })
 
 /**
@@ -143,7 +148,7 @@ export const isTypeLiteralTransformation = (ast: TransformAST): ast is TypeLiter
  */
 export interface TupleTransformation {
   readonly _tag: "TupleTransformation"
-  readonly elements: RA.NonEmptyReadonlyArray<TransformAST>
+  readonly elements: ReadonlyArray.NonEmptyReadonlyArray<TransformAST>
   // TODO: handle rest
 }
 
@@ -154,3 +159,92 @@ export interface TupleTransformation {
 export const createTupleTransformation = (
   elements: TupleTransformation["elements"]
 ): TupleTransformation => ({ _tag: "TupleTransformation", elements })
+
+const isFinalPropertySignatureTransformation = (
+  ast: FinalPropertySignatureTransformation | TransformAST
+): ast is FinalPropertySignatureTransformation =>
+  ast._tag === "FinalPropertySignatureTransformation"
+
+/** @internal */
+export const go = (transform: TransformAST, isDecoding: boolean): Transform["decode"] => {
+  switch (transform._tag) {
+    case "FinalTransformation":
+      return isDecoding ? transform.decode : transform.encode
+    case "AndThenTransformation": {
+      const from = isDecoding ? go(transform.from, true) : go(transform.to, false)
+      const to = isDecoding ? go(transform.to, true) : go(transform.from, false)
+      return (input, options, ast) =>
+        ParseResult.flatMap(from(input, options, ast), (input) => to(input, options, ast))
+    }
+    case "TypeLiteralTransformation":
+      return (input, options, ast) => {
+        let out: ParseResult.ParseResult<any> = E.right(input)
+
+        // ---------------------------------------------
+        // handle property signature transformations
+        // ---------------------------------------------
+        for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
+          const propertySignatureTransformation = transform.propertySignatureTransformations[i]
+          const from = isDecoding ?
+            propertySignatureTransformation.from :
+            propertySignatureTransformation.to
+          const to = isDecoding ?
+            propertySignatureTransformation.to :
+            propertySignatureTransformation.from
+          const transformation = propertySignatureTransformation.transformation
+          if (isFinalPropertySignatureTransformation(transformation)) {
+            const parse = isDecoding ? transformation.decode : transformation.encode
+            const f = (input: any) => {
+              const o = parse(
+                Object.prototype.hasOwnProperty.call(input, from) ?
+                  O.some(input[from]) :
+                  O.none()
+              )
+              if (O.isSome(o)) {
+                input[to] = o.value
+              } else {
+                delete input[from]
+              }
+              return input
+            }
+            out = ParseResult.map(out, f)
+          } else {
+            const parse = go(transformation, isDecoding)
+            out = ParseResult.flatMap(
+              out,
+              (input) =>
+                ParseResult.bimap(
+                  parse(input[from], options, ast),
+                  (e) => ParseResult.parseError([ParseResult.key(from, e.errors)]),
+                  (value) => {
+                    input[to] = value
+                    return input
+                  }
+                )
+            )
+          }
+        }
+        return out
+      }
+    case "TupleTransformation":
+      return (input, options, ast) => {
+        let out: ParseResult.ParseResult<any> = E.right(input)
+        for (let i = 0; i < transform.elements.length; i++) {
+          const parse = go(transform.elements[i], isDecoding)
+          out = ParseResult.flatMap(
+            out,
+            (input) =>
+              ParseResult.bimap(
+                parse(input[i], options, ast),
+                (e) => ParseResult.parseError([ParseResult.index(i, e.errors)]),
+                (value) => {
+                  input[i] = value
+                  return input
+                }
+              )
+          )
+        }
+        return out
+      }
+  }
+}

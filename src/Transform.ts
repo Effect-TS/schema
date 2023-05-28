@@ -594,7 +594,7 @@ export const struct = <
       AST.createTransform(
         AST.createTypeLiteral(fromPropertySignatures, []),
         AST.createTypeLiteral(toPropertySignatures, []),
-        TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
+        TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [])
       )
     )
   } else {
@@ -620,7 +620,7 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
             AST.createTransform(
               AST.pick(ast.from, keys),
               AST.pick(ast.to, keys),
-              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [])
             )
           )
         } else {
@@ -650,7 +650,7 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
             AST.createTransform(
               AST.omit(ast.from, keys),
               AST.omit(ast.to, keys),
-              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [])
             )
           )
         } else {
@@ -669,8 +669,20 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
 export const record = <K extends string | symbol, I, A>(
   key: S.Schema<K>,
   value: Transform<I, A>
-): Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
-  make(AST.createRecord(key.ast, value.ast, true))
+): Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }> => {
+  // if (AST.isTransform(value.ast)) {
+  //   const from = AST.createRecord(key.ast, AST.from(value.ast), true)
+  //   const to = AST.createRecord(key.ast, AST.to(value.ast), true)
+  //   return make(
+  //     AST.createTransform(
+  //       from,
+  //       to,
+  //       TransformAST.createTypeLiteralTransformation([], [value.ast.transformAST])
+  //     )
+  //   )
+  // }
+  return make(AST.createRecord(key.ast, value.ast, true))
+}
 
 /**
  * @category combinators
@@ -787,7 +799,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
             () => O.none()
           )
         )
-      ])
+      ], [])
     ))
 
 // ---------------------------------------------

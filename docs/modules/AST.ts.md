@@ -443,7 +443,7 @@ Added in v1.0.0
 ```ts
 export declare const createTuple: (
   elements: ReadonlyArray<Element>,
-  rest: Option<RA.NonEmptyReadonlyArray<AST>>,
+  rest: Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>,
   isReadonly: boolean,
   annotations?: Annotated['annotations']
 ) => Tuple
@@ -890,7 +890,7 @@ export interface Declaration extends Annotated {
   readonly type: AST
   readonly decode: (
     ...typeParameters: ReadonlyArray<AST>
-  ) => (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 ```
 
@@ -1004,7 +1004,7 @@ Added in v1.0.0
 export interface Refinement<From = AST> extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: From
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 ```
 
@@ -1042,7 +1042,7 @@ Added in v1.0.0
 export interface TemplateLiteral extends Annotated {
   readonly _tag: 'TemplateLiteral'
   readonly head: string
-  readonly spans: RA.NonEmptyReadonlyArray<TemplateLiteralSpan>
+  readonly spans: ReadonlyArray.NonEmptyReadonlyArray<TemplateLiteralSpan>
 }
 ```
 
@@ -1059,8 +1059,8 @@ export interface Transform extends Annotated {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
-  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
   readonly transformAST: TransformAST.TransformAST
 }
 ```
@@ -1075,7 +1075,7 @@ Added in v1.0.0
 export interface Tuple extends Annotated {
   readonly _tag: 'Tuple'
   readonly elements: ReadonlyArray<Element>
-  readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
+  readonly rest: Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
 }
 ```
@@ -1400,8 +1400,8 @@ export declare const mergeAnnotations: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
-      encode: (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
+      encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
       transformAST: TransformAST.TransformAST
     }
   | {
@@ -1411,7 +1411,7 @@ export declare const mergeAnnotations: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
+      ) => (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1452,7 +1452,7 @@ export declare const mergeAnnotations: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      decode: (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
 ```
 
@@ -1523,8 +1523,8 @@ export declare const setAnnotation: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
-      encode: (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
+      encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
       transformAST: TransformAST.TransformAST
     }
   | {
@@ -1534,7 +1534,7 @@ export declare const setAnnotation: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
+      ) => (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1575,7 +1575,7 @@ export declare const setAnnotation: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      decode: (input: any, options: ParseOptions, self: AST) => ParseResult.IO<ParseResult.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
 ```
 

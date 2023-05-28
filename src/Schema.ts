@@ -675,7 +675,8 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               from,
               to,
               TransformAST.createTypeLiteralTransformation(
-                y.transformAST.propertySignatureTransformations
+                y.transformAST.propertySignatureTransformations,
+                []
               )
             )
           }
@@ -696,7 +697,8 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               from,
               to,
               TransformAST.createTypeLiteralTransformation(
-                x.transformAST.propertySignatureTransformations
+                x.transformAST.propertySignatureTransformations,
+                []
               )
             )
           } else if (
@@ -711,14 +713,14 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.to.propertySignatures.concat(y.to.propertySignatures),
               x.to.indexSignatures.concat(y.to.indexSignatures)
             )
-            const propertySignatureTransformations = ReadonlyArray.appendAllNonEmpty(
+            const propertySignatureTransformations = ReadonlyArray.appendAll(
               x.transformAST.propertySignatureTransformations,
               y.transformAST.propertySignatureTransformations
             )
             return AST.createTransform(
               from,
               to,
-              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [])
             )
           }
         }

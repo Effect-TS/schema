@@ -2,18 +2,17 @@
  * @since 1.0.0
  */
 
-import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
 import { isString, isSymbol } from "@effect/data/Predicate"
-import * as RA from "@effect/data/ReadonlyArray"
+import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
 import { memoizeThunk } from "@effect/schema/internal/common"
-import * as ParseResult from "@effect/schema/ParseResult"
-import type * as TransformAST from "@effect/schema/TransformAST"
+import type { ParseResult } from "@effect/schema/ParseResult"
+import * as TransformAST from "@effect/schema/TransformAST"
 
 // -------------------------------------------------------------------------------------
 // model
@@ -196,7 +195,7 @@ export interface Declaration extends Annotated {
   readonly type: AST
   readonly decode: (
     ...typeParameters: ReadonlyArray<AST>
-  ) => (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 
 /**
@@ -583,7 +582,7 @@ export interface TemplateLiteralSpan {
 export interface TemplateLiteral extends Annotated {
   readonly _tag: "TemplateLiteral"
   readonly head: string
-  readonly spans: RA.NonEmptyReadonlyArray<TemplateLiteralSpan>
+  readonly spans: ReadonlyArray.NonEmptyReadonlyArray<TemplateLiteralSpan>
 }
 
 /**
@@ -594,7 +593,7 @@ export const createTemplateLiteral = (
   head: string,
   spans: ReadonlyArray<TemplateLiteralSpan>
 ): TemplateLiteral | Literal =>
-  RA.isNonEmptyReadonlyArray(spans) ?
+  ReadonlyArray.isNonEmptyReadonlyArray(spans) ?
     { _tag: "TemplateLiteral", head, spans, annotations: {} } :
     createLiteral(head)
 
@@ -628,7 +627,7 @@ export const createElement = (
 export interface Tuple extends Annotated {
   readonly _tag: "Tuple"
   readonly elements: ReadonlyArray<Element>
-  readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
+  readonly rest: Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
 }
 
@@ -638,7 +637,7 @@ export interface Tuple extends Annotated {
  */
 export const createTuple = (
   elements: ReadonlyArray<Element>,
-  rest: Option<RA.NonEmptyReadonlyArray<AST>>,
+  rest: Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>,
   isReadonly: boolean,
   annotations: Annotated["annotations"] = {}
 ): Tuple => ({
@@ -857,7 +856,7 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
 export interface Refinement<From = AST> extends Annotated {
   readonly _tag: "Refinement"
   readonly from: From
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
 }
 
 /**
@@ -897,8 +896,8 @@ export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
-  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
   readonly transformAST: TransformAST.TransformAST
 }
 
@@ -911,165 +910,15 @@ export const createTransform = (
   to: AST,
   transformAST: TransformAST.TransformAST,
   annotations: Annotated["annotations"] = {}
-): Transform => {
-  return {
-    _tag: "Transform",
-    from,
-    to,
-    decode: getDecode(transformAST),
-    encode: getEncode(transformAST),
-    transformAST,
-    annotations
-  }
-}
-
-const getDecode = (transform: TransformAST.TransformAST): Transform["decode"] => {
-  switch (transform._tag) {
-    case "FinalTransformation":
-      return transform.decode
-    case "AndThenTransformation": {
-      const from = getDecode(transform.from)
-      const to = getDecode(transform.to)
-      return (input, options, ast) =>
-        ParseResult.flatMap(from(input, options, ast), (input) => to(input, options, ast))
-    }
-    case "TypeLiteralTransformation":
-      return (input, options, ast) => {
-        let out: ParseResult.ParseResult<any> = E.right(input)
-        for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
-          const t = transform.propertySignatureTransformations[i]
-          const from = t.from
-          const to = t.to
-          const transformation = t.transformation
-          if (transformation._tag === "FinalPropertySignatureTransformation") {
-            const f = (input: any) => {
-              const o = transformation.decode(
-                Object.prototype.hasOwnProperty.call(input, from) ?
-                  O.some(input[from]) :
-                  O.none()
-              )
-              if (O.isSome(o)) {
-                input[to] = o.value
-              } else {
-                delete input[from]
-              }
-              return input
-            }
-            out = ParseResult.map(out, f)
-          } else {
-            const decode = getDecode(transformation)
-            out = ParseResult.flatMap(
-              out,
-              (input) =>
-                ParseResult.bimap(
-                  decode(input[from], options, ast),
-                  (e) => ParseResult.parseError([ParseResult.key(from, e.errors)]),
-                  (value) => {
-                    input[to] = value
-                    return input
-                  }
-                )
-            )
-          }
-        }
-        return out
-      }
-    case "TupleTransformation":
-      return (input, options, ast) => {
-        let out: ParseResult.ParseResult<any> = E.right(input)
-        for (let i = 0; i < transform.elements.length; i++) {
-          const decode = getDecode(transform.elements[i])
-          out = ParseResult.flatMap(
-            out,
-            (input) =>
-              ParseResult.bimap(
-                decode(input[i], options, ast),
-                (e) => ParseResult.parseError([ParseResult.index(i, e.errors)]),
-                (value) => {
-                  input[i] = value
-                  return input
-                }
-              )
-          )
-        }
-        return out
-      }
-  }
-}
-
-const getEncode = (transform: TransformAST.TransformAST): Transform["encode"] => {
-  switch (transform._tag) {
-    case "FinalTransformation":
-      return transform.encode
-    case "AndThenTransformation": {
-      const from = getEncode(transform.to)
-      const to = getEncode(transform.from)
-      return (input, options, ast) =>
-        ParseResult.flatMap(from(input, options, ast), (input) => to(input, options, ast))
-    }
-    case "TypeLiteralTransformation":
-      return (input, options, ast) => {
-        let out: ParseResult.ParseResult<any> = E.right(input)
-        for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
-          const t = transform.propertySignatureTransformations[i]
-          const from = t.to
-          const to = t.from
-          const transformation = t.transformation
-          if (transformation._tag === "FinalPropertySignatureTransformation") {
-            const f = (input: any) => {
-              const o = transformation.encode(
-                Object.prototype.hasOwnProperty.call(input, from) ?
-                  O.some(input[from]) :
-                  O.none()
-              )
-              if (O.isSome(o)) {
-                input[to] = o.value
-              } else {
-                delete input[from]
-              }
-              return input
-            }
-            out = ParseResult.map(out, f)
-          } else {
-            const encode = getEncode(transformation)
-            out = ParseResult.flatMap(
-              out,
-              (input) =>
-                ParseResult.bimap(
-                  encode(input[from], options, ast),
-                  (e) => ParseResult.parseError([ParseResult.key(from, e.errors)]),
-                  (value) => {
-                    input[to] = value
-                    return input
-                  }
-                )
-            )
-          }
-        }
-        return out
-      }
-    case "TupleTransformation":
-      return (input, options, ast) => {
-        let out: ParseResult.ParseResult<any> = E.right(input)
-        for (let i = 0; i < transform.elements.length; i++) {
-          const encode = getEncode(transform.elements[i])
-          out = ParseResult.flatMap(
-            out,
-            (input) =>
-              ParseResult.bimap(
-                encode(input[i], options, ast),
-                (e) => ParseResult.parseError([ParseResult.index(i, e.errors)]),
-                (value) => {
-                  input[i] = value
-                  return input
-                }
-              )
-          )
-        }
-        return out
-      }
-  }
-}
+): Transform => ({
+  _tag: "Transform",
+  from,
+  to,
+  decode: TransformAST.go(transformAST, true),
+  encode: TransformAST.go(transformAST, false),
+  transformAST,
+  annotations
+})
 
 /**
  * @category guards
@@ -1274,7 +1123,7 @@ export const required = (ast: AST): AST => {
           ast.rest,
           O.map((rest) => {
             const u = createUnion([...rest])
-            return RA.mapNonEmpty(rest, () => u)
+            return ReadonlyArray.mapNonEmpty(rest, () => u)
           })
         ),
         ast.isReadonly
@@ -1340,7 +1189,7 @@ export const to = (ast: AST): AST => {
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(to(e.type), e.isOptional)),
-        O.map(ast.rest, RA.mapNonEmpty(to)),
+        O.map(ast.rest, ReadonlyArray.mapNonEmpty(to)),
         ast.isReadonly,
         ast.annotations
       )
@@ -1381,7 +1230,7 @@ export const from = (ast: AST): AST => {
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(from(e.type), e.isOptional)),
-        O.map(ast.rest, RA.mapNonEmpty(from)),
+        O.map(ast.rest, ReadonlyArray.mapNonEmpty(from)),
         ast.isReadonly
       )
     case "TypeLiteral":
@@ -1432,7 +1281,7 @@ export const getCardinality = (ast: AST): number => {
   }
 }
 
-const sortPropertySignatures = RA.sort(
+const sortPropertySignatures = ReadonlyArray.sort(
   pipe(Number.Order, Order.contramap((ps: PropertySignature) => getCardinality(ps.type)))
 )
 
@@ -1464,12 +1313,12 @@ export const getWeight = (ast: AST): number => {
   }
 }
 
-const sortUnionMembers = RA.sort(Order.reverse(Order.contramap(Number.Order, getWeight)))
+const sortUnionMembers = ReadonlyArray.sort(Order.reverse(Order.contramap(Number.Order, getWeight)))
 
 const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   let out = pipe(
     candidates,
-    RA.flatMap((ast: AST): ReadonlyArray<AST> => {
+    ReadonlyArray.flatMap((ast: AST): ReadonlyArray<AST> => {
       switch (ast._tag) {
         case "NeverKeyword":
           return []
