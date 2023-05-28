@@ -1,6 +1,5 @@
 import * as D from "@effect/data/Debug"
 import type { ParseOptions } from "@effect/schema/AST"
-import * as P from "@effect/schema/Parser"
 import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
@@ -8,11 +7,11 @@ import { z } from "zod"
 D.runtimeDebug.tracingEnabled = true
 
 /*
-parseEither (good) x 283,841 ops/sec ±0.55% (86 runs sampled)
+validateEither (good) x 283,841 ops/sec ±0.55% (86 runs sampled)
 zod (good) x 176,785 ops/sec ±6.98% (81 runs sampled)
-parseEither (bad) x 231,839 ops/sec ±3.18% (83 runs sampled)
+validateEither (bad) x 231,839 ops/sec ±3.18% (83 runs sampled)
 zod (bad) x 55,584 ops/sec ±4.29% (83 runs sampled)
-parseEither (bad2) x 220,214 ops/sec ±9.78% (78 runs sampled)
+validateEither (bad2) x 220,214 ops/sec ±9.78% (78 runs sampled)
 zod (bad2) x 185,401 ops/sec ±0.85% (85 runs sampled)
 */
 
@@ -91,7 +90,7 @@ const ShipZod = z.object({
 export const schema = t.union(Asteroid, Planet, Ship)
 export const schemaZod = z.discriminatedUnion("type", [AsteroidZod, PlanetZod, ShipZod])
 
-export const parseEither = P.parseEither(schema)
+export const validateEither = t.validateEither(schema)
 const options: ParseOptions = { errors: "all" }
 
 const good = {
@@ -158,24 +157,24 @@ const bad2 = {
   excess: 1
 }
 
-// console.log(parseEither(good))
-// console.log(parseEither(bad))
+// console.log(validateEither(good))
+// console.log(validateEither(bad))
 
 suite
-  .add("parseEither (good)", function() {
-    parseEither(good, options)
+  .add("validateEither (good)", function() {
+    validateEither(good, options)
   })
   .add("zod (good)", function() {
     schemaZod.safeParse(good)
   })
-  .add("parseEither (bad)", function() {
-    parseEither(bad, options)
+  .add("validateEither (bad)", function() {
+    validateEither(bad, options)
   })
   .add("zod (bad)", function() {
     schemaZod.safeParse(bad)
   })
-  .add("parseEither (bad2)", function() {
-    parseEither(bad2, options)
+  .add("validateEither (bad2)", function() {
+    validateEither(bad2, options)
   })
   .add("zod (bad2)", function() {
     schemaZod.safeParse(bad2)

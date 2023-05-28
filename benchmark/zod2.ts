@@ -34,24 +34,24 @@ const bad = {
   age: 13
 }
 
-const parseEither = S.parseEither(schema)
+const validateEither = S.validateEither(schema)
 const options: ParseOptions = { errors: "all" }
 
-// parseEither(good, options)
+// validateEither(good, options)
 // console.log(UserZod.safeParse(good))
-// console.log(parseEither(good))
+// console.log(validateEither(good))
 // console.log(JSON.stringify(UserZod.safeParse(bad), null, 2))
-// console.log(JSON.stringify(parseEither(bad), null, 2))
+// console.log(JSON.stringify(validateEither(bad), null, 2))
 
 suite
   .add("schema (good)", function() {
-    parseEither(good, options)
+    validateEither(good, options)
   })
   .add("zod (good)", function() {
     UserZod.safeParse(good)
   })
   .add("schema (bad)", function() {
-    parseEither(bad, options)
+    validateEither(bad, options)
   })
   .add("zod (bad)", function() {
     UserZod.safeParse(bad)

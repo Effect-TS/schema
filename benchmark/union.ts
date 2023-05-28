@@ -9,9 +9,9 @@ D.runtimeDebug.tracingEnabled = true
 
 /*
 n = 100
-parseEither (good) x 1,777,205 ops/sec ±0.49% (89 runs sampled)
+validateEither (good) x 1,777,205 ops/sec ±0.49% (89 runs sampled)
 zod (good) x 797,123 ops/sec ±7.51% (80 runs sampled)
-parseEither (bad) x 1,103,955 ops/sec ±5.06% (80 runs sampled)
+validateEither (bad) x 1,103,955 ops/sec ±5.06% (80 runs sampled)
 zod (bad) x 929,104 ops/sec ±2.03% (88 runs sampled)
 */
 
@@ -37,7 +37,7 @@ const x = RA.makeBy(n, (i) =>
 
 const schemaZod = z.discriminatedUnion("kind", x)
 
-const parseEither = S.parseEither(schema)
+const validateEither = S.validateEither(schema)
 const options: ParseOptions = { errors: "all" }
 
 const good = {
@@ -54,18 +54,18 @@ const bad = {
   c: "c"
 }
 
-// console.log(parseEither(good))
-// console.log(parseEither(bad))
+// console.log(validateEither(good))
+// console.log(validateEither(bad))
 
 suite
-  .add("parseEither (good)", function() {
-    parseEither(good, options)
+  .add("validateEither (good)", function() {
+    validateEither(good, options)
   })
   .add("zod (good)", function() {
     schemaZod.safeParse(good)
   })
-  .add("parseEither (bad)", function() {
-    parseEither(bad, options)
+  .add("validateEither (bad)", function() {
+    validateEither(bad, options)
   })
   .add("zod (bad)", function() {
     schemaZod.safeParse(good)
