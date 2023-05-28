@@ -250,7 +250,7 @@ export const eitherOrUndefined = <E, A>(self: IO<E, A>): E.Either<E, A> | undefi
  */
 export const flatMap = <E, E1, A, B>(
   self: IO<E, A>,
-  f: (self: A) => IO<E1, B>
+  f: (a: A) => IO<E1, B>
 ): IO<E | E1, B> => {
   const s: any = self
   if (s["_tag"] === "Left") {
@@ -270,7 +270,7 @@ export const flatMap = <E, E1, A, B>(
  */
 export const map = <E, A, B>(
   self: IO<E, A>,
-  f: (self: A) => B
+  f: (a: A) => B
 ): IO<E, B> => {
   const s: any = self
   if (s["_tag"] === "Left") {
@@ -286,10 +286,10 @@ export const map = <E, A, B>(
  * @category optimisation
  * @since 1.0.0
  */
-export const mapLeft = <E, A, G>(
-  self: IO<E, A>,
-  f: (self: E) => G
-): IO<G, A> => {
+export const mapLeft = <E1, A, E2>(
+  self: IO<E1, A>,
+  f: (e1: E1) => E2
+): IO<E2, A> => {
   const s: any = self
   if (s["_tag"] === "Left") {
     return E.left(f(s.left))
@@ -298,4 +298,21 @@ export const mapLeft = <E, A, G>(
     s
   }
   return Debug.bodyWithTrace((trace, restore) => Effect.mapError(self, restore(f)).traced(trace))
+}
+
+/**
+ * @category optimisation
+ * @since 1.0.0
+ */
+export const bimap = <E1, E2, A, B>(
+  self: IO<E1, A>,
+  f: (e1: E1) => E2,
+  g: (a: A) => B
+): IO<E2, B> => {
+  if (E.isEither(self)) {
+    return E.bimap(self, f, g)
+  }
+  return Debug.bodyWithTrace((trace, restore) =>
+    Effect.mapBoth(self, restore(f), restore(g)).traced(trace)
+  )
 }

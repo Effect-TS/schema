@@ -1,13 +1,9 @@
-import * as O from "@effect/data/Option"
-import * as Util from "@effect/schema/test/util"
+import * as S from "@effect/schema/Schema"
 import * as T from "@effect/schema/Transform"
 
 describe.concurrent("dev", () => {
   it.skip("dev", async () => {
-    const transform = T.struct({
-      c: T.optional(T.Trim).withDefault(() => "-"),
-      d: T.optional(T.Date).toOption()
-    })
-    await Util.expectParseSuccess(transform, { a: true }, { c: "-", d: O.none() })
+    const transform = T.tuple(S.string, T.NumberFromString)
+    console.log(JSON.stringify(transform.ast, null, 2))
   })
 })

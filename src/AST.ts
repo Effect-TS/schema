@@ -11,7 +11,6 @@ import * as O from "@effect/data/Option"
 import { isString, isSymbol } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
-import * as Effect from "@effect/io/Effect"
 import { memoizeThunk } from "@effect/schema/internal/common"
 import * as ParseResult from "@effect/schema/ParseResult"
 import type * as TransformAST from "@effect/schema/TransformAST"
@@ -959,15 +958,39 @@ const getDecode = (transform: TransformAST.TransformAST): Transform["decode"] =>
             out = ParseResult.map(out, f)
           } else {
             const decode = getDecode(transformation)
-            out = Effect.flatMap(
+            out = ParseResult.flatMap(
               out,
               (input) =>
-                Effect.map(decode(input[from], options, ast), (value) => {
-                  input[to] = value
-                  return input
-                })
+                ParseResult.bimap(
+                  decode(input[from], options, ast),
+                  (e) => ParseResult.parseError([ParseResult.key(from, e.errors)]),
+                  (value) => {
+                    input[to] = value
+                    return input
+                  }
+                )
             )
           }
+        }
+        return out
+      }
+    case "TupleTransformation":
+      return (input, options, ast) => {
+        let out: ParseResult.ParseResult<any> = E.right(input)
+        for (let i = 0; i < transform.elements.length; i++) {
+          const decode = getDecode(transform.elements[i])
+          out = ParseResult.flatMap(
+            out,
+            (input) =>
+              ParseResult.bimap(
+                decode(input[i], options, ast),
+                (e) => ParseResult.parseError([ParseResult.index(i, e.errors)]),
+                (value) => {
+                  input[i] = value
+                  return input
+                }
+              )
+          )
         }
         return out
       }
@@ -1009,15 +1032,39 @@ const getEncode = (transform: TransformAST.TransformAST): Transform["encode"] =>
             out = ParseResult.map(out, f)
           } else {
             const encode = getEncode(transformation)
-            out = Effect.flatMap(
+            out = ParseResult.flatMap(
               out,
               (input) =>
-                Effect.map(encode(input[from], options, ast), (value) => {
-                  input[to] = value
-                  return input
-                })
+                ParseResult.bimap(
+                  encode(input[from], options, ast),
+                  (e) => ParseResult.parseError([ParseResult.key(from, e.errors)]),
+                  (value) => {
+                    input[to] = value
+                    return input
+                  }
+                )
             )
           }
+        }
+        return out
+      }
+    case "TupleTransformation":
+      return (input, options, ast) => {
+        let out: ParseResult.ParseResult<any> = E.right(input)
+        for (let i = 0; i < transform.elements.length; i++) {
+          const encode = getEncode(transform.elements[i])
+          out = ParseResult.flatMap(
+            out,
+            (input) =>
+              ParseResult.bimap(
+                encode(input[i], options, ast),
+                (e) => ParseResult.parseError([ParseResult.index(i, e.errors)]),
+                (value) => {
+                  input[i] = value
+                  return input
+                }
+              )
+          )
         }
         return out
       }

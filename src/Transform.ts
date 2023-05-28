@@ -287,10 +287,35 @@ export const tuple = <Elements extends ReadonlyArray<Transform<any, any>>>(
 ): Transform<
   { readonly [K in keyof Elements]: From<Elements[K]> },
   { readonly [K in keyof Elements]: To<Elements[K]> }
-> =>
-  make(
+> => {
+  const fromElements: Array<AST.Element> = []
+  const toElements: Array<AST.Element> = []
+  const tansformations: Array<TransformAST.TransformAST> = []
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i]
+    if (AST.isTransform(element.ast)) {
+      fromElements.push(AST.createElement(element.ast.from, false))
+      toElements.push(AST.createElement(element.ast.to, false))
+      tansformations.push(element.ast.transformAST)
+    } else {
+      fromElements.push(AST.createElement(element.ast, false))
+      toElements.push(AST.createElement(element.ast, false))
+    }
+  }
+
+  if (RA.isNonEmptyReadonlyArray(tansformations)) {
+    return make(
+      AST.createTransform(
+        AST.createTuple(fromElements, O.none(), true),
+        AST.createTuple(toElements, O.none(), true),
+        TransformAST.createTupleTransformation(tansformations)
+      )
+    )
+  }
+  return make(
     AST.createTuple(elements.map((schema) => AST.createElement(schema.ast, false)), O.none(), true)
   )
+}
 
 /**
  * @category combinators
@@ -1049,8 +1074,9 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
   key: Transform<IK, K>,
   value: Transform<IV, V>
 ): Transform<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> => {
-  const parseResult = P.parseResult(array(tuple(key, value)))
-  const encodeResult = P.encodeResult(array(tuple(key, value)))
+  const entries = array(tuple(key, value))
+  const parseResult = P.parseResult(entries)
+  const encodeResult = P.encodeResult(entries)
   return transformResult(
     S.readonlyMap(from(key), from(value)),
     S.readonlyMap(to(key), to(value)),

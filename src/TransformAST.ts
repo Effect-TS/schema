@@ -10,7 +10,11 @@ import type { Transform } from "@effect/schema/AST"
  * @category model
  * @since 1.0.0
  */
-export type TransformAST = FinalTransformation | AndThenTransformation | TypeLiteralTransformation
+export type TransformAST =
+  | FinalTransformation
+  | AndThenTransformation
+  | TypeLiteralTransformation
+  | TupleTransformation
 
 /**
  * @category model
@@ -18,8 +22,8 @@ export type TransformAST = FinalTransformation | AndThenTransformation | TypeLit
  */
 export interface FinalTransformation {
   readonly _tag: "FinalTransformation"
-  decode: Transform["decode"]
-  encode: Transform["encode"]
+  readonly decode: Transform["decode"]
+  readonly encode: Transform["encode"]
 }
 
 /**
@@ -66,8 +70,8 @@ export const createAndThenTransformation = (
  */
 export interface FinalPropertySignatureTransformation {
   readonly _tag: "FinalPropertySignatureTransformation"
-  decode: (o: Option<any>) => Option<any>
-  encode: (o: Option<any>) => Option<any>
+  readonly decode: (o: Option<any>) => Option<any>
+  readonly encode: (o: Option<any>) => Option<any>
 }
 
 /**
@@ -112,6 +116,7 @@ export interface TypeLiteralTransformation {
   readonly propertySignatureTransformations: RA.NonEmptyReadonlyArray<
     PropertySignatureTransformation
   >
+  // TODO: handle IndexSignatures
 }
 
 /**
@@ -131,3 +136,21 @@ export const createTypeLiteralTransformation = (
  */
 export const isTypeLiteralTransformation = (ast: TransformAST): ast is TypeLiteralTransformation =>
   ast._tag === "TypeLiteralTransformation"
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface TupleTransformation {
+  readonly _tag: "TupleTransformation"
+  readonly elements: RA.NonEmptyReadonlyArray<TransformAST>
+  // TODO: handle rest
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createTupleTransformation = (
+  elements: TupleTransformation["elements"]
+): TupleTransformation => ({ _tag: "TupleTransformation", elements })
