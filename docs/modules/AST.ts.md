@@ -1400,8 +1400,8 @@ export declare const mergeAnnotations: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
-      encode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
+      encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
       transformAST: TransformAST.TransformAST
     }
   | {
@@ -1411,7 +1411,7 @@ export declare const mergeAnnotations: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      ) => (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1452,7 +1452,7 @@ export declare const mergeAnnotations: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      decode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
 ```
 
@@ -1523,8 +1523,8 @@ export declare const setAnnotation: (
       _tag: 'Transform'
       from: AST
       to: AST
-      decode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
-      encode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
+      encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
       transformAST: TransformAST.TransformAST
     }
   | {
@@ -1534,7 +1534,7 @@ export declare const setAnnotation: (
       type: AST
       decode: (
         ...typeParameters: readonly AST[]
-      ) => (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      ) => (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
   | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
   | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
@@ -1575,7 +1575,7 @@ export declare const setAnnotation: (
       annotations: { [x: string]: unknown }
       _tag: 'Refinement'
       from: AST
-      decode: (input: any, options: ParseOptions, self: AST) => PR.IO<PR.ParseError, any>
+      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
 ```
 

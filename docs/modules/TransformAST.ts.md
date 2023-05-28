@@ -13,12 +13,14 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [constructors](#constructors)
+  - [createFinalPropertySignatureTransformation](#createfinalpropertysignaturetransformation)
   - [createFinalTransformation](#createfinaltransformation)
   - [createPropertySignatureTransformation](#createpropertysignaturetransformation)
   - [createTypeLiteralTransformation](#createtypeliteraltransformation)
 - [guard](#guard)
   - [isTypeLiteralTransformation](#istypeliteraltransformation)
 - [model](#model)
+  - [FinalPropertySignatureTransformation (interface)](#finalpropertysignaturetransformation-interface)
   - [FinalTransformation (interface)](#finaltransformation-interface)
   - [PropertySignatureTransformation (interface)](#propertysignaturetransformation-interface)
   - [TransformAST (type alias)](#transformast-type-alias)
@@ -27,6 +29,19 @@ Added in v1.0.0
 ---
 
 # constructors
+
+## createFinalPropertySignatureTransformation
+
+**Signature**
+
+```ts
+export declare const createFinalPropertySignatureTransformation: (
+  decode: FinalPropertySignatureTransformation['decode'],
+  encode: FinalPropertySignatureTransformation['encode']
+) => FinalPropertySignatureTransformation
+```
+
+Added in v1.0.0
 
 ## createFinalTransformation
 
@@ -49,8 +64,7 @@ Added in v1.0.0
 export declare const createPropertySignatureTransformation: (
   from: PropertyKey,
   to: PropertyKey,
-  decode: PropertySignatureTransformation['decode'],
-  encode: PropertySignatureTransformation['encode']
+  transformation: PropertySignatureTransformation['transformation']
 ) => PropertySignatureTransformation
 ```
 
@@ -82,21 +96,7 @@ Added in v1.0.0
 
 # model
 
-## FinalTransformation (interface)
-
-**Signature**
-
-```ts
-export interface FinalTransformation {
-  readonly _tag: 'FinalTransformation'
-  decode: Transform['decode']
-  encode: Transform['encode']
-}
-```
-
-Added in v1.0.0
-
-## PropertySignatureTransformation (interface)
+## FinalPropertySignatureTransformation (interface)
 
 Represents a `PropertySignature -> PropertySignature` transformation
 
@@ -113,11 +113,38 @@ The semantic of `encode` is:
 **Signature**
 
 ```ts
+export interface FinalPropertySignatureTransformation {
+  readonly _tag: 'FinalPropertySignatureTransformation'
+  decode: (o: Option<any>) => Option<any>
+  encode: (o: Option<any>) => Option<any>
+}
+```
+
+Added in v1.0.0
+
+## FinalTransformation (interface)
+
+**Signature**
+
+```ts
+export interface FinalTransformation {
+  readonly _tag: 'FinalTransformation'
+  decode: Transform['decode']
+  encode: Transform['encode']
+}
+```
+
+Added in v1.0.0
+
+## PropertySignatureTransformation (interface)
+
+**Signature**
+
+```ts
 export interface PropertySignatureTransformation {
   readonly from: PropertyKey
   readonly to: PropertyKey
-  readonly decode: (o: Option<any>) => Option<any>
-  readonly encode: (o: Option<any>) => Option<any>
+  readonly transformation: FinalPropertySignatureTransformation | TransformAST
 }
 ```
 

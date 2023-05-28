@@ -161,6 +161,18 @@ export const expectParseSuccess = async <I, A>(
   }
 }
 
+export const expectTransformParseSuccess = async <I, A>(
+  transform: Transform<I, A>,
+  u: unknown,
+  a: A = u as any,
+  options?: ParseOptions
+) => {
+  const parseEffectResult = await Effect.runPromiseEither(
+    T.parseEffect(transform)(u, options)
+  )
+  expect(parseEffectResult).toStrictEqual(E.right(a))
+}
+
 export const expectParseFailure = async <I, A>(
   schema: Transform<I, A>,
   u: unknown,
@@ -226,6 +238,18 @@ export const expectEncodeSuccess = async <I, A>(
     )
     expect(randomEncodeEffectResult).toStrictEqual(encodeEitherResult)
   }
+}
+
+export const expectTransformEncodeSuccess = async <I, A>(
+  transform: Transform<I, A>,
+  a: A,
+  o: unknown,
+  options?: ParseOptions
+) => {
+  const encodeEffectResult = await Effect.runPromiseEither(
+    T.encodeEffect(transform)(a, options)
+  )
+  expect(encodeEffectResult).toStrictEqual(E.right(o))
 }
 
 export const expectEncodeFailure = async <I, A>(

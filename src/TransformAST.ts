@@ -45,11 +45,33 @@ export const createFinalTransformation = (
  * @category model
  * @since 1.0.0
  */
+export interface FinalPropertySignatureTransformation {
+  readonly _tag: "FinalPropertySignatureTransformation"
+  decode: (o: Option<any>) => Option<any>
+  encode: (o: Option<any>) => Option<any>
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createFinalPropertySignatureTransformation = (
+  decode: FinalPropertySignatureTransformation["decode"],
+  encode: FinalPropertySignatureTransformation["encode"]
+): FinalPropertySignatureTransformation => ({
+  _tag: "FinalPropertySignatureTransformation",
+  decode,
+  encode
+})
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
 export interface PropertySignatureTransformation {
   readonly from: PropertyKey
   readonly to: PropertyKey
-  readonly decode: (o: Option<any>) => Option<any>
-  readonly encode: (o: Option<any>) => Option<any>
+  readonly transformation: FinalPropertySignatureTransformation | TransformAST
 }
 
 /**
@@ -59,9 +81,8 @@ export interface PropertySignatureTransformation {
 export const createPropertySignatureTransformation = (
   from: PropertyKey,
   to: PropertyKey,
-  decode: PropertySignatureTransformation["decode"],
-  encode: PropertySignatureTransformation["encode"]
-): PropertySignatureTransformation => ({ from, to, decode, encode })
+  transformation: PropertySignatureTransformation["transformation"]
+): PropertySignatureTransformation => ({ from, to, transformation })
 
 /**
  * @category model

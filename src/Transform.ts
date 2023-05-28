@@ -462,8 +462,10 @@ export const struct = <
               TransformAST.createPropertySignatureTransformation(
                 key,
                 key,
-                O.orElse(() => O.some(optional.value())),
-                identity
+                TransformAST.createFinalPropertySignatureTransformation(
+                  O.orElse(() => O.some(optional.value())),
+                  identity
+                )
               )
             )
             break
@@ -483,8 +485,10 @@ export const struct = <
               TransformAST.createPropertySignatureTransformation(
                 key,
                 key,
-                O.some,
-                O.flatten
+                TransformAST.createFinalPropertySignatureTransformation(
+                  O.some,
+                  O.flatten
+                )
               )
             )
             break
@@ -689,8 +693,10 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
         TransformAST.createPropertySignatureTransformation(
           key,
           key,
-          () => O.some(value),
-          () => O.none()
+          TransformAST.createFinalPropertySignatureTransformation(
+            () => O.some(value),
+            () => O.none()
+          )
         )
       ])
     ))

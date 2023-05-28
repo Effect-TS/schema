@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
@@ -10,9 +11,9 @@ import * as O from "@effect/data/Option"
 import { isString, isSymbol } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
+import * as Effect from "@effect/io/Effect"
 import { memoizeThunk } from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
-import * as PR from "@effect/schema/ParseResult"
 import type * as TransformAST from "@effect/schema/TransformAST"
 
 // -------------------------------------------------------------------------------------
@@ -912,62 +913,102 @@ export const createTransform = (
   transformAST: TransformAST.TransformAST,
   annotations: Annotated["annotations"] = {}
 ): Transform => {
-  const { decode, encode } = fromTransformAST(transformAST)
   return {
     _tag: "Transform",
     from,
     to,
-    decode,
-    encode,
+    decode: getDecode(transformAST),
+    encode: getEncode(transformAST),
     transformAST,
     annotations
   }
 }
 
-const fromTransformAST = (
-  ast: TransformAST.TransformAST
-): { decode: Transform["decode"]; encode: Transform["encode"] } => {
-  switch (ast._tag) {
+const getDecode = (transform: TransformAST.TransformAST): Transform["decode"] => {
+  switch (transform._tag) {
     case "FinalTransformation":
-      return {
-        decode: ast.decode,
-        encode: ast.encode
-      }
-    case "TypeLiteralTransformation": {
-      const propertySignatureTransformations = ast.propertySignatureTransformations
-      return {
-        decode: (input: any) => {
-          for (let i = 0; i < propertySignatureTransformations.length; i++) {
-            const t = propertySignatureTransformations[i]
-            const name = t.from
-            const from = Object.prototype.hasOwnProperty.call(input, name) ?
-              O.some(input[name]) :
-              O.none()
-            delete input[name]
-            const to = t.decode(from)
-            if (O.isSome(to)) {
-              input[t.to] = to.value
+      return transform.decode
+    case "TypeLiteralTransformation":
+      return (input, options, ast) => {
+        let out: ParseResult<any> = E.right(input)
+        for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
+          const t = transform.propertySignatureTransformations[i]
+          const from = t.from
+          const to = t.to
+          const transformation = t.transformation
+          if (transformation._tag === "FinalPropertySignatureTransformation") {
+            const f = (input: any) => {
+              const o = transformation.decode(
+                Object.prototype.hasOwnProperty.call(input, from) ?
+                  O.some(input[from]) :
+                  O.none()
+              )
+              if (O.isSome(o)) {
+                input[to] = o.value
+              } else {
+                delete input[from]
+              }
+              return input
             }
+            out = E.isEither(out) ? E.map(out, f) : Effect.map(out, f)
+          } else {
+            const decode = getDecode(transformation)
+            out = Effect.flatMap(
+              out,
+              (input) =>
+                Effect.map(decode(input[from], options, ast), (value) => {
+                  input[to] = value
+                  return input
+                })
+            )
           }
-          return PR.success(input)
-        },
-        encode: (input: any) => {
-          for (let i = 0; i < propertySignatureTransformations.length; i++) {
-            const t = propertySignatureTransformations[i]
-            const name = t.to
-            const from = Object.prototype.hasOwnProperty.call(input, name) ?
-              O.some(input[name]) :
-              O.none()
-            delete input[name]
-            const to = t.encode(from)
-            if (O.isSome(to)) {
-              input[t.from] = to.value
-            }
-          }
-          return PR.success(input)
         }
+        return out
       }
-    }
+  }
+}
+
+const getEncode = (transform: TransformAST.TransformAST): Transform["encode"] => {
+  switch (transform._tag) {
+    case "FinalTransformation":
+      return transform.encode
+    case "TypeLiteralTransformation":
+      return (input, options, ast) => {
+        let out: ParseResult<any> = E.right(input)
+        for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
+          const t = transform.propertySignatureTransformations[i]
+          const from = t.to
+          const to = t.from
+          const transformation = t.transformation
+          if (transformation._tag === "FinalPropertySignatureTransformation") {
+            const f = (input: any) => {
+              const o = transformation.encode(
+                Object.prototype.hasOwnProperty.call(input, from) ?
+                  O.some(input[from]) :
+                  O.none()
+              )
+              if (O.isSome(o)) {
+                input[to] = o.value
+              } else {
+                delete input[from]
+              }
+              return input
+            }
+            out = E.isEither(out) ? E.map(out, f) : Effect.map(out, f)
+          } else {
+            const encode = getEncode(transformation)
+            out = Effect.flatMap(
+              out,
+              (input) =>
+                Effect.map(encode(input[from], options, ast), (value) => {
+                  input[to] = value
+                  return input
+                })
+            )
+          }
+        }
+        return out
+      }
   }
 }
 
