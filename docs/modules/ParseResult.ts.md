@@ -36,6 +36,7 @@ Added in v1.0.0
   - [eitherOrUndefined](#eitherorundefined)
   - [flatMap](#flatmap)
   - [map](#map)
+  - [mapLeft](#mapleft)
 - [utils](#utils)
   - [IO (type alias)](#io-type-alias)
   - [ParseError (interface)](#parseerror-interface)
@@ -306,6 +307,16 @@ Added in v1.0.0
 
 ```ts
 export declare const map: <E, A, B>(self: IO<E, A>, f: (self: A) => B) => IO<E, B>
+```
+
+Added in v1.0.0
+
+## mapLeft
+
+**Signature**
+
+```ts
+export declare const mapLeft: <E, A, G>(self: IO<E, A>, f: (self: E) => G) => IO<G, A>
 ```
 
 Added in v1.0.0

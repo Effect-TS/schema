@@ -170,9 +170,9 @@ describe.concurrent("PropertySignatureTransformations", () => {
         ])
       )
     )
-    await Util.expectTransformParseSuccess(transform, { a: "1" }, { a: 1 })
+    await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
 
-    await Util.expectTransformEncodeSuccess(transform, { a: 1 }, { a: "1" })
+    await Util.expectEncodeSuccess(transform, { a: 1 }, { a: "1" })
   })
 
   it("string -> number (nested)", async () => {
@@ -202,8 +202,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
         ])
       )
     )
-    await Util.expectTransformParseSuccess(transform, { a: { b: "1" } }, { a: { b: 1 } })
+    await Util.expectParseSuccess(transform, { a: { b: "1" } }, { a: { b: 1 } })
 
-    await Util.expectTransformEncodeSuccess(transform, { a: { b: 1 } }, { a: { b: "1" } })
+    await Util.expectEncodeSuccess(transform, { a: { b: 1 } }, { a: { b: "1" } })
   })
 })

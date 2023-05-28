@@ -281,3 +281,21 @@ export const map = <E, A, B>(
   }
   return Debug.bodyWithTrace((trace, restore) => Effect.map(self, restore(f)).traced(trace))
 }
+
+/**
+ * @category optimisation
+ * @since 1.0.0
+ */
+export const mapLeft = <E, A, G>(
+  self: IO<E, A>,
+  f: (self: E) => G
+): IO<G, A> => {
+  const s: any = self
+  if (s["_tag"] === "Left") {
+    return E.left(f(s.left))
+  }
+  if (s["_tag"] === "Right") {
+    s
+  }
+  return Debug.bodyWithTrace((trace, restore) => Effect.mapError(self, restore(f)).traced(trace))
+}

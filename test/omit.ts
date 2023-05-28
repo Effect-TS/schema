@@ -20,7 +20,7 @@ describe.concurrent("omit", () => {
     await Util.expectParseFailure(schema, { [a]: "a" }, `/b is missing`)
     await Util.expectParseFailure(
       schema,
-      { b: 1 },
+      { b: "1" },
       `/Symbol(@effect/schema/test/a) is missing`
     )
   })

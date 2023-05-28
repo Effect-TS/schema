@@ -13,7 +13,7 @@ import * as RA from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
 import * as Effect from "@effect/io/Effect"
 import { memoizeThunk } from "@effect/schema/internal/common"
-import type { ParseResult } from "@effect/schema/ParseResult"
+import * as ParseResult from "@effect/schema/ParseResult"
 import type * as TransformAST from "@effect/schema/TransformAST"
 
 // -------------------------------------------------------------------------------------
@@ -197,7 +197,7 @@ export interface Declaration extends Annotated {
   readonly type: AST
   readonly decode: (
     ...typeParameters: ReadonlyArray<AST>
-  ) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  ) => (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
 }
 
 /**
@@ -858,7 +858,7 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
 export interface Refinement<From = AST> extends Annotated {
   readonly _tag: "Refinement"
   readonly from: From
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
 }
 
 /**
@@ -898,8 +898,8 @@ export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
   readonly transformAST: TransformAST.TransformAST
 }
 
@@ -930,7 +930,7 @@ const getDecode = (transform: TransformAST.TransformAST): Transform["decode"] =>
       return transform.decode
     case "TypeLiteralTransformation":
       return (input, options, ast) => {
-        let out: ParseResult<any> = E.right(input)
+        let out: ParseResult.ParseResult<any> = E.right(input)
         for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
           const t = transform.propertySignatureTransformations[i]
           const from = t.from
@@ -950,7 +950,7 @@ const getDecode = (transform: TransformAST.TransformAST): Transform["decode"] =>
               }
               return input
             }
-            out = E.isEither(out) ? E.map(out, f) : Effect.map(out, f)
+            out = ParseResult.map(out, f)
           } else {
             const decode = getDecode(transformation)
             out = Effect.flatMap(
@@ -974,7 +974,7 @@ const getEncode = (transform: TransformAST.TransformAST): Transform["encode"] =>
       return transform.encode
     case "TypeLiteralTransformation":
       return (input, options, ast) => {
-        let out: ParseResult<any> = E.right(input)
+        let out: ParseResult.ParseResult<any> = E.right(input)
         for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
           const t = transform.propertySignatureTransformations[i]
           const from = t.to
@@ -994,7 +994,7 @@ const getEncode = (transform: TransformAST.TransformAST): Transform["encode"] =>
               }
               return input
             }
-            out = E.isEither(out) ? E.map(out, f) : Effect.map(out, f)
+            out = ParseResult.map(out, f)
           } else {
             const encode = getEncode(transformation)
             out = Effect.flatMap(
@@ -1338,7 +1338,6 @@ export const from = (ast: AST): AST => {
       return createUnion(ast.types.map(from))
     case "Lazy":
       return createLazy(() => from(ast.f()))
-    case "Refinement":
     case "Transform":
       return from(ast.from)
   }

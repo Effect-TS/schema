@@ -504,9 +504,26 @@ export const struct = <
         )
       }
     } else {
-      propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-      fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-      toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
+      // propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+      // fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+      // toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
+      if (AST.isTransform(field.ast)) {
+        fromPropertySignatures.push(
+          AST.createPropertySignature(key, AST.from(field.ast), false, true)
+        )
+        toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
+        propertySignatureTransformations.push(
+          TransformAST.createPropertySignatureTransformation(
+            key,
+            key,
+            field.ast.transformAST
+          )
+        )
+      } else {
+        propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+        fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+        toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
+      }
     }
   }
   if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
