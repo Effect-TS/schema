@@ -46,12 +46,13 @@ export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To
 /**
  * @since 1.0.0
  */
-export const from = <I, A>(schema: Transform<I, A>): S.Schema<I> => S.make(AST.from(schema.ast))
+export const from = <I, A>(transform: Transform<I, A>): S.Schema<I> =>
+  S.make(AST.from(transform.ast))
 
 /**
  * @since 1.0.0
  */
-export const to = <I, A>(schema: Transform<I, A>): S.Schema<A> => S.make(AST.to(schema.ast))
+export const to = <I, A>(transform: Transform<I, A>): S.Schema<A> => S.make(AST.to(transform.ast))
 
 /* c8 ignore start */
 export {
@@ -157,6 +158,62 @@ export {
  * @since 1.0.0
  */
 export const make = <I, A>(ast: AST.AST): Transform<I, A> => ({ ast }) as any
+
+/**
+  Create a new `Transform` by transforming the input and output of an existing `Schema`
+  using the provided decoding functions.
+
+  @category constructors
+  @since 1.0.0
+ */
+export const transformResult: {
+  <I2, A2, A1>(
+    to: Transform<I2, A2>,
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Transform<I1, A1>,
+    to: Transform<I2, A2>,
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+  ): Transform<I1, A2>
+} = dual(4, <I1, A1, I2, A2>(
+  from: Transform<I1, A1>,
+  to: Transform<I2, A2>,
+  decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+  encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+): Transform<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
+
+/**
+    Create a new `Transform` by transforming the input and output of an existing `Schema`
+    using the provided mapping functions.
+
+    @category constructors
+    @since 1.0.0
+  */
+export const transform: {
+  <I2, A2, A1>(
+    to: Transform<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1
+  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Transform<I1, A1>,
+    to: Transform<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1
+  ): Transform<I1, A2>
+} = dual(
+  4,
+  <I1, A1, I2, A2>(
+    from: Transform<I1, A1>,
+    to: Transform<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1
+  ): Transform<I1, A2> =>
+    transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)))
+)
 
 // ---------------------------------------------
 // combinators
@@ -307,21 +364,21 @@ class TransformPropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
 
 /**
  * @since 1.0.0
- * @category constructors
  */
 export const propertySignature = <I, A>(
-  schema: Transform<I, A>,
+  transform: Transform<I, A>,
   annotations?: AST.Annotated["annotations"]
 ): TransformPropertySignature<I, false, A, false> =>
-  new TransformPropertySignatureImpl(schema.ast, annotations)
+  new TransformPropertySignatureImpl(transform.ast, annotations)
 
 /**
  * @since 1.0.0
  */
 export const optional = <I, A>(
-  schema: Transform<I, A>,
+  transform: Transform<I, A>,
   annotations?: AST.Annotated["annotations"]
-): TransformPropertySignature<I, true, A, true> => propertySignature(schema, annotations).optional()
+): TransformPropertySignature<I, true, A, true> =>
+  propertySignature(transform, annotations).optional()
 
 /**
  * @since 1.0.0
@@ -561,62 +618,6 @@ export const filter = <A, B extends A>(
   }
 
 /**
-  Create a new `Schema` by transforming the input and output of an existing `Schema`
-  using the provided decoding functions.
-
-  @category combinators
-  @since 1.0.0
- */
-export const transformResult: {
-  <I2, A2, A1>(
-    to: Transform<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-  ): Transform<I1, A2>
-} = dual(4, <I1, A1, I2, A2>(
-  from: Transform<I1, A1>,
-  to: Transform<I2, A2>,
-  decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-  encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-): Transform<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
-
-/**
-  Create a new `Schema` by transforming the input and output of an existing `Schema`
-  using the provided mapping functions.
-
-  @category combinators
-  @since 1.0.0
-*/
-export const transform: {
-  <I2, A2, A1>(
-    to: Transform<I2, A2>,
-    decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
-  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
-    decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
-  ): Transform<I1, A2>
-} = dual(
-  4,
-  <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
-    decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
-  ): Transform<I1, A2> =>
-    transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)))
-)
-
-/**
  * Attaches a property signature with the specified key and value to the schema.
  * This API is useful when you want to add a property to your schema which doesn't describe the shape of the input,
  * but rather maps to another schema, for example when you want to add a discriminant to a simple union.
@@ -650,11 +651,11 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   value: V
 ) =>
   <I, A extends object>(
-    schema: Transform<I, A>
+    transform: Transform<I, A>
   ): Transform<I, S.Spread<A & { readonly [k in K]: V }>> =>
     make(AST.createTransformByPropertySignatureTransformations(
-      schema.ast,
-      pipe(to(schema), extend(struct({ [key]: S.literal(value) }))).ast,
+      transform.ast,
+      pipe(to(transform), extend(struct({ [key]: S.literal(value) }))).ast,
       [AST.createPropertySignatureTransformation(
         key,
         key,
@@ -829,7 +830,7 @@ const optionInline = <I, A>(value: Transform<I, A>) =>
   )
 
 /**
- * @category combinators
+ * @category Option
  * @since 1.0.0
  */
 export const optionFromSelf = <I, A>(value: Transform<I, A>): Transform<Option<I>, Option<A>> => {
@@ -850,7 +851,7 @@ export const optionFromSelf = <I, A>(value: Transform<I, A>): Transform<Option<I
 }
 
 /**
- * @category combinators
+ * @category Option
  * @since 1.0.0
  */
 export const option = <I, A>(
@@ -889,7 +890,7 @@ const eitherInline = <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA,
   )
 
 /**
- * @category combinators
+ * @category Either
  * @since 1.0.0
  */
 export const eitherFromSelf = <IE, E, IA, A>(
@@ -915,7 +916,7 @@ export const eitherFromSelf = <IE, E, IA, A>(
 }
 
 /**
- * @category combinators
+ * @category Either
  * @since 1.0.0
  */
 export const either = <IE, E, IA, A>(
@@ -940,7 +941,7 @@ export const either = <IE, E, IA, A>(
 // ---------------------------------------------
 
 /**
- * @category constructors
+ * @category ReadonlyMap
  * @since 1.0.0
  */
 export const readonlyMapFromSelf = <IK, K, IV, V>(
@@ -958,7 +959,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
 }
 
 /**
- * @category combinators
+ * @category ReadonlyMap
  * @since 1.0.0
  */
 export const readonlyMap = <IK, K, IV, V>(
@@ -977,7 +978,7 @@ export const readonlyMap = <IK, K, IV, V>(
 // ---------------------------------------------
 
 /**
- * @category constructors
+ * @category ReadonlySet
  * @since 1.0.0
  */
 export const readonlySetFromSelf = <I, A>(
@@ -994,7 +995,7 @@ export const readonlySetFromSelf = <I, A>(
 }
 
 /**
- * @category combinators
+ * @category ReadonlySet
  * @since 1.0.0
  */
 export const readonlySet = <I, A>(
@@ -1012,7 +1013,7 @@ export const readonlySet = <I, A>(
 // ---------------------------------------------
 
 /**
- * @category constructors
+ * @category Chunk
  * @since 1.0.0
  */
 export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> => {
@@ -1027,7 +1028,7 @@ export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, 
 }
 
 /**
- * @category combinators
+ * @category Chunk
  * @since 1.0.0
  */
 export const chunk = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, Chunk<A>> =>
@@ -1042,7 +1043,7 @@ const fromData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
 ): A => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
 
 /**
- * @category combinators
+ * @category Data
  * @since 1.0.0
  */
 export const dataFromSelf = <
@@ -1062,7 +1063,7 @@ export const dataFromSelf = <
 }
 
 /**
- * @category combinators
+ * @category Data
  * @since 1.0.0
  */
 export const data = <

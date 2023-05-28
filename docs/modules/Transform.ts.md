@@ -12,9 +12,27 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [Chunk](#chunk)
+  - [chunk](#chunk)
+  - [chunkFromSelf](#chunkfromself)
+- [Data](#data)
+  - [data](#data)
+  - [dataFromSelf](#datafromself)
 - [Date](#date)
   - [Date](#date-1)
   - [dateFromString](#datefromstring)
+- [Either](#either)
+  - [either](#either)
+  - [eitherFromSelf](#eitherfromself)
+- [Option](#option)
+  - [option](#option)
+  - [optionFromSelf](#optionfromself)
+- [ReadonlyMap](#readonlymap)
+  - [readonlyMap](#readonlymap)
+  - [readonlyMapFromSelf](#readonlymapfromself)
+- [ReadonlySet](#readonlyset)
+  - [readonlySet](#readonlyset)
+  - [readonlySetFromSelf](#readonlysetfromself)
 - [bigint](#bigint)
   - [clampBigint](#clampbigint)
 - [boolean](#boolean)
@@ -22,11 +40,6 @@ Added in v1.0.0
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
-  - [chunk](#chunk)
-  - [data](#data)
-  - [dataFromSelf](#datafromself)
-  - [either](#either)
-  - [eitherFromSelf](#eitherfromself)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
@@ -34,25 +47,17 @@ Added in v1.0.0
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
   - [omit](#omit)
-  - [option](#option)
-  - [optionFromSelf](#optionfromself)
   - [optionalElement](#optionalelement)
   - [pick](#pick)
-  - [readonlyMap](#readonlymap)
-  - [readonlySet](#readonlyset)
   - [record](#record)
   - [rest](#rest)
   - [struct](#struct)
-  - [transform](#transform)
-  - [transformResult](#transformresult)
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
-  - [chunkFromSelf](#chunkfromself)
   - [make](#make)
-  - [propertySignature](#propertysignature)
-  - [readonlyMapFromSelf](#readonlymapfromself)
-  - [readonlySetFromSelf](#readonlysetfromself)
+  - [transform](#transform)
+  - [transformResult](#transformresult)
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeEffect](#decodeeffect)
@@ -92,9 +97,64 @@ Added in v1.0.0
   - [TransformPropertySignature (interface)](#transformpropertysignature-interface)
   - [from](#from)
   - [optional](#optional)
+  - [propertySignature](#propertysignature)
   - [to](#to)
 
 ---
+
+# Chunk
+
+## chunk
+
+**Signature**
+
+```ts
+export declare const chunk: <I, A>(item: Transform<I, A>) => Transform<readonly I[], Chunk<A>>
+```
+
+Added in v1.0.0
+
+## chunkFromSelf
+
+**Signature**
+
+```ts
+export declare const chunkFromSelf: <I, A>(item: Transform<I, A>) => Transform<Chunk<I>, Chunk<A>>
+```
+
+Added in v1.0.0
+
+# Data
+
+## data
+
+**Signature**
+
+```ts
+export declare const data: <
+  I extends readonly any[] | Readonly<Record<string, any>>,
+  A extends readonly any[] | Readonly<Record<string, any>>
+>(
+  item: Transform<I, A>
+) => Transform<I, D.Data<A>>
+```
+
+Added in v1.0.0
+
+## dataFromSelf
+
+**Signature**
+
+```ts
+export declare const dataFromSelf: <
+  I extends readonly any[] | Readonly<Record<string, any>>,
+  A extends readonly any[] | Readonly<Record<string, any>>
+>(
+  item: Transform<I, A>
+) => Transform<D.Data<I>, D.Data<A>>
+```
+
+Added in v1.0.0
 
 # Date
 
@@ -118,6 +178,111 @@ A combinator that transforms a `string` into a valid `Date`.
 
 ```ts
 export declare const dateFromString: <I>(self: Transform<I, string>) => Transform<I, Date>
+```
+
+Added in v1.0.0
+
+# Either
+
+## either
+
+**Signature**
+
+```ts
+export declare const either: <IE, E, IA, A>(
+  left: Transform<IE, E>,
+  right: Transform<IA, A>
+) => Transform<
+  { readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA },
+  Either<E, A>
+>
+```
+
+Added in v1.0.0
+
+## eitherFromSelf
+
+**Signature**
+
+```ts
+export declare const eitherFromSelf: <IE, E, IA, A>(
+  left: Transform<IE, E>,
+  right: Transform<IA, A>
+) => Transform<Either<IE, IA>, Either<E, A>>
+```
+
+Added in v1.0.0
+
+# Option
+
+## option
+
+**Signature**
+
+```ts
+export declare const option: <I, A>(
+  value: Transform<I, A>
+) => Transform<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
+```
+
+Added in v1.0.0
+
+## optionFromSelf
+
+**Signature**
+
+```ts
+export declare const optionFromSelf: <I, A>(value: Transform<I, A>) => Transform<Option<I>, Option<A>>
+```
+
+Added in v1.0.0
+
+# ReadonlyMap
+
+## readonlyMap
+
+**Signature**
+
+```ts
+export declare const readonlyMap: <IK, K, IV, V>(
+  key: Transform<IK, K>,
+  value: Transform<IV, V>
+) => Transform<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
+```
+
+Added in v1.0.0
+
+## readonlyMapFromSelf
+
+**Signature**
+
+```ts
+export declare const readonlyMapFromSelf: <IK, K, IV, V>(
+  key: Transform<IK, K>,
+  value: Transform<IV, V>
+) => Transform<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
+```
+
+Added in v1.0.0
+
+# ReadonlySet
+
+## readonlySet
+
+**Signature**
+
+```ts
+export declare const readonlySet: <I, A>(item: Transform<I, A>) => Transform<readonly I[], ReadonlySet<A>>
+```
+
+Added in v1.0.0
+
+## readonlySetFromSelf
+
+**Signature**
+
+```ts
+export declare const readonlySetFromSelf: <I, A>(item: Transform<I, A>) => Transform<ReadonlySet<I>, ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -174,7 +339,7 @@ but rather maps to another schema, for example when you want to add a discrimina
 export declare const attachPropertySignature: <K extends string | number | symbol, V extends AST.LiteralValue>(
   key: K,
   value: V
-) => <I, A extends object>(schema: Transform<I, A>) => Transform<I, S.Spread<A & { readonly [k in K]: V }>>
+) => <I, A extends object>(transform: Transform<I, A>) => Transform<I, S.Spread<A & { readonly [k in K]: V }>>
 ```
 
 **Example**
@@ -195,75 +360,6 @@ assert.deepStrictEqual(T.decode(Shape)({ radius: 10 }), {
   kind: 'circle',
   radius: 10,
 })
-```
-
-Added in v1.0.0
-
-## chunk
-
-**Signature**
-
-```ts
-export declare const chunk: <I, A>(item: Transform<I, A>) => Transform<readonly I[], Chunk<A>>
-```
-
-Added in v1.0.0
-
-## data
-
-**Signature**
-
-```ts
-export declare const data: <
-  I extends readonly any[] | Readonly<Record<string, any>>,
-  A extends readonly any[] | Readonly<Record<string, any>>
->(
-  item: Transform<I, A>
-) => Transform<I, D.Data<A>>
-```
-
-Added in v1.0.0
-
-## dataFromSelf
-
-**Signature**
-
-```ts
-export declare const dataFromSelf: <
-  I extends readonly any[] | Readonly<Record<string, any>>,
-  A extends readonly any[] | Readonly<Record<string, any>>
->(
-  item: Transform<I, A>
-) => Transform<D.Data<I>, D.Data<A>>
-```
-
-Added in v1.0.0
-
-## either
-
-**Signature**
-
-```ts
-export declare const either: <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-) => Transform<
-  { readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA },
-  Either<E, A>
->
-```
-
-Added in v1.0.0
-
-## eitherFromSelf
-
-**Signature**
-
-```ts
-export declare const eitherFromSelf: <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-) => Transform<Either<IE, IA>, Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -358,28 +454,6 @@ export declare const omit: <A, Keys extends readonly (keyof A)[]>(
 
 Added in v1.0.0
 
-## option
-
-**Signature**
-
-```ts
-export declare const option: <I, A>(
-  value: Transform<I, A>
-) => Transform<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
-```
-
-Added in v1.0.0
-
-## optionFromSelf
-
-**Signature**
-
-```ts
-export declare const optionFromSelf: <I, A>(value: Transform<I, A>) => Transform<Option<I>, Option<A>>
-```
-
-Added in v1.0.0
-
 ## optionalElement
 
 **Signature**
@@ -404,29 +478,6 @@ export declare const pick: <A, Keys extends readonly (keyof A)[]>(
 ) => <I extends { [K in keyof A]?: any }>(
   self: Transform<I, A>
 ) => Transform<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>>
-```
-
-Added in v1.0.0
-
-## readonlyMap
-
-**Signature**
-
-```ts
-export declare const readonlyMap: <IK, K, IV, V>(
-  key: Transform<IK, K>,
-  value: Transform<IV, V>
-) => Transform<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
-```
-
-Added in v1.0.0
-
-## readonlySet
-
-**Signature**
-
-```ts
-export declare const readonlySet: <I, A>(item: Transform<I, A>) => Transform<readonly I[], ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -489,54 +540,6 @@ export declare const struct: <
 
 Added in v1.0.0
 
-## transform
-
-Create a new `Schema` by transforming the input and output of an existing `Schema`
-using the provided mapping functions.
-
-**Signature**
-
-```ts
-export declare const transform: {
-  <I2, A2, A1>(to: Transform<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): <I1>(
-    self: Transform<I1, A1>
-  ) => Transform<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
-    decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
-  ): Transform<I1, A2>
-}
-```
-
-Added in v1.0.0
-
-## transformResult
-
-Create a new `Schema` by transforming the input and output of an existing `Schema`
-using the provided decoding functions.
-
-**Signature**
-
-```ts
-export declare const transformResult: {
-  <I2, A2, A1>(
-    to: Transform<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
-  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
-  ): Transform<I1, A2>
-}
-```
-
-Added in v1.0.0
-
 ## tuple
 
 **Signature**
@@ -566,16 +569,6 @@ Added in v1.0.0
 
 # constructors
 
-## chunkFromSelf
-
-**Signature**
-
-```ts
-export declare const chunkFromSelf: <I, A>(item: Transform<I, A>) => Transform<Chunk<I>, Chunk<A>>
-```
-
-Added in v1.0.0
-
 ## make
 
 **Signature**
@@ -586,38 +579,50 @@ export declare const make: <I, A>(ast: AST.AST) => Transform<I, A>
 
 Added in v1.0.0
 
-## propertySignature
+## transform
+
+Create a new `Transform` by transforming the input and output of an existing `Schema`
+using the provided mapping functions.
 
 **Signature**
 
 ```ts
-export declare const propertySignature: <I, A>(
-  schema: Transform<I, A>,
-  annotations?: AST.Annotations | undefined
-) => TransformPropertySignature<I, false, A, false>
+export declare const transform: {
+  <I2, A2, A1>(to: Transform<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): <I1>(
+    self: Transform<I1, A1>
+  ) => Transform<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Transform<I1, A1>,
+    to: Transform<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1
+  ): Transform<I1, A2>
+}
 ```
 
 Added in v1.0.0
 
-## readonlyMapFromSelf
+## transformResult
+
+Create a new `Transform` by transforming the input and output of an existing `Schema`
+using the provided decoding functions.
 
 **Signature**
 
 ```ts
-export declare const readonlyMapFromSelf: <IK, K, IV, V>(
-  key: Transform<IK, K>,
-  value: Transform<IV, V>
-) => Transform<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
-```
-
-Added in v1.0.0
-
-## readonlySetFromSelf
-
-**Signature**
-
-```ts
-export declare const readonlySetFromSelf: <I, A>(item: Transform<I, A>) => Transform<ReadonlySet<I>, ReadonlySet<A>>
+export declare const transformResult: {
+  <I2, A2, A1>(
+    to: Transform<I2, A2>,
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
+  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Transform<I1, A1>,
+    to: Transform<I2, A2>,
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
+  ): Transform<I1, A2>
+}
 ```
 
 Added in v1.0.0
@@ -992,7 +997,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: Transform<I, A>) => S.Schema<I>
+export declare const from: <I, A>(transform: Transform<I, A>) => S.Schema<I>
 ```
 
 Added in v1.0.0
@@ -1003,9 +1008,22 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: <I, A>(
-  schema: Transform<I, A>,
+  transform: Transform<I, A>,
   annotations?: AST.Annotations | undefined
 ) => TransformPropertySignature<I, true, A, true>
+```
+
+Added in v1.0.0
+
+## propertySignature
+
+**Signature**
+
+```ts
+export declare const propertySignature: <I, A>(
+  transform: Transform<I, A>,
+  annotations?: AST.Annotations | undefined
+) => TransformPropertySignature<I, false, A, false>
 ```
 
 Added in v1.0.0
@@ -1015,7 +1033,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(schema: Transform<I, A>) => S.Schema<A>
+export declare const to: <I, A>(transform: Transform<I, A>) => S.Schema<A>
 ```
 
 Added in v1.0.0
