@@ -202,20 +202,6 @@ pipe(T.struct({ a: T.optional(S.string),  b: T.NumberFromString, c: S.boolean })
 pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromString, c: S.boolean }), T.omit('c'));
 
 // ---------------------------------------------
-// Partial
-// ---------------------------------------------
-
-// $ExpectType Transform<{ readonly a?: string; readonly b?: string; }, { readonly a?: string; readonly b?: number; }>
-T.partial(T.struct({ a: S.string,  b: T.NumberFromString }));
-
-// ---------------------------------------------
-// Required
-// ---------------------------------------------
-
-// $ExpectType Transform<{ readonly b: string; readonly a: string; readonly c: string; }, { readonly b: number; readonly a: string; readonly c: number; }>
-T.required(T.struct({ a: T.optional(S.string),  b: T.NumberFromString, c: T.optional(T.NumberFromString) }));
-
-// ---------------------------------------------
 // Records
 // ---------------------------------------------
 

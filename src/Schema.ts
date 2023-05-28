@@ -26,6 +26,7 @@ import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
+import * as TransformAST from "@effect/schema/TransformAST"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 /**
@@ -659,7 +660,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.indexSignatures.concat(y.indexSignatures)
             )
           } else if (
-            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
+            AST.isTransform(y) && TransformAST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             const from = AST.createTypeLiteral(
@@ -670,14 +671,16 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.propertySignatures.concat(y.to.propertySignatures),
               x.indexSignatures.concat(y.to.indexSignatures)
             )
-            return AST.createTransformByPropertySignatureTransformations(
+            return AST.createTransform(
               from,
               to,
-              y.propertySignatureTransformations
+              TransformAST.createTypeLiteralTransformation(
+                y.transformAST.propertySignatureTransformations
+              )
             )
           }
         } else if (
-          AST.isTransform(x) && x.propertySignatureTransformations.length > 0 &&
+          AST.isTransform(x) && TransformAST.isTypeLiteralTransformation(x.transformAST) &&
           AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
         ) {
           if (AST.isTypeLiteral(y)) {
@@ -689,13 +692,15 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.to.propertySignatures.concat(y.propertySignatures),
               x.to.indexSignatures.concat(y.indexSignatures)
             )
-            return AST.createTransformByPropertySignatureTransformations(
+            return AST.createTransform(
               from,
               to,
-              x.propertySignatureTransformations
+              TransformAST.createTypeLiteralTransformation(
+                x.transformAST.propertySignatureTransformations
+              )
             )
           } else if (
-            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
+            AST.isTransform(y) && TransformAST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             const from = AST.createTypeLiteral(
@@ -706,13 +711,14 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.to.propertySignatures.concat(y.to.propertySignatures),
               x.to.indexSignatures.concat(y.to.indexSignatures)
             )
-            const propertySignatureTransformations = x.propertySignatureTransformations.concat(
-              y.propertySignatureTransformations
+            const propertySignatureTransformations = ReadonlyArray.appendAllNonEmpty(
+              x.transformAST.propertySignatureTransformations,
+              y.transformAST.propertySignatureTransformations
             )
-            return AST.createTransformByPropertySignatureTransformations(
+            return AST.createTransform(
               from,
               to,
-              propertySignatureTransformations
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
             )
           }
         }
@@ -753,21 +759,14 @@ export const extend: {
  * @since 1.0.0
  */
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (self: Schema<A>): Schema<Spread<Pick<A, Keys[number]>>> => {
-    const ast = self.ast
-    if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
-      return make(
-        AST.createTransformByPropertySignatureTransformations(
-          AST.pick(ast.from, keys),
-          AST.pick(ast.to, keys),
-          ast.propertySignatureTransformations.filter((t) =>
-            (keys as ReadonlyArray<PropertyKey>).includes(t.to)
-          )
-        )
-      )
-    }
-    return make(AST.pick(ast, keys))
-  }
+  (self: Schema<A>): Schema<Spread<Pick<A, Keys[number]>>> => make(AST.pick(self.ast, keys))
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
+  (self: Schema<A>): Schema<Spread<Omit<A, Keys[number]>>> => make(AST.omit(self.ast, keys))
 
 /**
  * @category model
@@ -841,29 +840,6 @@ export const partial = <A>(
 export const required = <A>(
   self: Schema<A>
 ): Schema<Spread<Required<A>>> => make(AST.required(self.ast))
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (
-    self: Schema<A>
-  ): Schema<Spread<Omit<A, Keys[number]>>> => {
-    const ast = self.ast
-    if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
-      return make(
-        AST.createTransformByPropertySignatureTransformations(
-          AST.omit(ast.from, keys),
-          AST.omit(ast.to, keys),
-          ast.propertySignatureTransformations.filter((t) =>
-            !(keys as ReadonlyArray<PropertyKey>).includes(t.to)
-          )
-        )
-      )
-    }
-    return make(AST.omit(ast, keys))
-  }
 
 /** @internal */
 export const toAnnotations = <A>(

@@ -13,6 +13,7 @@ import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
@@ -20,6 +21,7 @@ import * as P from "@effect/schema/Parser"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
+import * as TransformAST from "@effect/schema/TransformAST"
 
 /**
  * @category model
@@ -183,7 +185,10 @@ export const transformResult: {
   to: Transform<I2, A2>,
   decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
   encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-): Transform<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
+): Transform<I1, A2> =>
+  make(
+    AST.createTransform(from.ast, to.ast, TransformAST.createFinalTransformation(decode, encode))
+  ))
 
 /**
     Create a new `Transform` by transforming the input and output of an existing `Schema`
@@ -418,7 +423,7 @@ export const struct = <
   const propertySignatures: Array<AST.PropertySignature> = []
   const fromPropertySignatures: Array<AST.PropertySignature> = []
   const toPropertySignatures: Array<AST.PropertySignature> = []
-  const propertySignatureTransformations: Array<AST.PropertySignatureTransformation> = []
+  const propertySignatureTransformations: Array<TransformAST.PropertySignatureTransformation> = []
   for (let i = 0; i < ownKeys.length; i++) {
     const key = ownKeys[i]
     const field = fields[key] as any
@@ -453,12 +458,14 @@ export const struct = <
                 field._annotations
               )
             )
-            propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
-              key,
-              key,
-              O.orElse(() => O.some(optional.value())),
-              identity
-            ))
+            propertySignatureTransformations.push(
+              TransformAST.createPropertySignatureTransformation(
+                key,
+                key,
+                O.orElse(() => O.some(optional.value())),
+                identity
+              )
+            )
             break
           }
           case "Option": {
@@ -472,12 +479,14 @@ export const struct = <
                 field._annotations
               )
             )
-            propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
-              key,
-              key,
-              O.some,
-              O.flatten
-            ))
+            propertySignatureTransformations.push(
+              TransformAST.createPropertySignatureTransformation(
+                key,
+                key,
+                O.some,
+                O.flatten
+              )
+            )
             break
           }
         }
@@ -496,12 +505,12 @@ export const struct = <
       toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
     }
   }
-  if (propertySignatureTransformations.length > 0) {
+  if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
     return make(
-      AST.createTransformByPropertySignatureTransformations(
+      AST.createTransform(
         AST.createTypeLiteral(fromPropertySignatures, []),
         AST.createTypeLiteral(toPropertySignatures, []),
-        propertySignatureTransformations
+        TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
       )
     )
   } else {
@@ -518,16 +527,23 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
     self: Transform<I, A>
   ): Transform<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>> => {
     const ast = self.ast
-    if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
-      return make(
-        AST.createTransformByPropertySignatureTransformations(
-          AST.pick(ast.from, keys),
-          AST.pick(ast.to, keys),
-          ast.propertySignatureTransformations.filter((t) =>
-            (keys as ReadonlyArray<PropertyKey>).includes(t.to)
+    if (AST.isTransform(ast)) {
+      if (TransformAST.isTypeLiteralTransformation(ast.transformAST)) {
+        const propertySignatureTransformations = ast.transformAST.propertySignatureTransformations
+          .filter((t) => (keys as ReadonlyArray<PropertyKey>).includes(t.to))
+        if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
+          return make(
+            AST.createTransform(
+              AST.pick(ast.from, keys),
+              AST.pick(ast.to, keys),
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
+            )
           )
-        )
-      )
+        } else {
+          return make(AST.pick(ast.from, keys))
+        }
+      }
+      throw new Error(`pick: cannot handle this kind of transformation`)
     }
     return make(AST.pick(ast, keys))
   }
@@ -541,16 +557,23 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
     self: Transform<I, A>
   ): Transform<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>> => {
     const ast = self.ast
-    if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
-      return make(
-        AST.createTransformByPropertySignatureTransformations(
-          AST.omit(ast.from, keys),
-          AST.omit(ast.to, keys),
-          ast.propertySignatureTransformations.filter((t) =>
-            !(keys as ReadonlyArray<PropertyKey>).includes(t.to)
+    if (AST.isTransform(ast)) {
+      if (TransformAST.isTypeLiteralTransformation(ast.transformAST)) {
+        const propertySignatureTransformations = ast.transformAST.propertySignatureTransformations
+          .filter((t) => !(keys as ReadonlyArray<PropertyKey>).includes(t.to))
+        if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
+          return make(
+            AST.createTransform(
+              AST.omit(ast.from, keys),
+              AST.omit(ast.to, keys),
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
+            )
           )
-        )
-      )
+        } else {
+          return make(AST.omit(ast.from, keys))
+        }
+      }
+      throw new Error(`omit: cannot handle this kind of transformation`)
     }
     return make(AST.omit(ast, keys))
   }
@@ -614,7 +637,13 @@ export const filter = <A, B extends A>(
     if (AST.isRefinement(schema.ast)) {
       return make(AST.createRefinement(transform.ast, schema.ast.decode, schema.ast.annotations))
     }
-    return make(AST.createTransform(transform.ast, schema.ast, PR.success, PR.success))
+    return make(
+      AST.createTransform(
+        transform.ast,
+        schema.ast,
+        TransformAST.createFinalTransformation(PR.success, PR.success)
+      )
+    )
   }
 
 /**
@@ -653,15 +682,17 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   <I, A extends object>(
     transform: Transform<I, A>
   ): Transform<I, S.Spread<A & { readonly [k in K]: V }>> =>
-    make(AST.createTransformByPropertySignatureTransformations(
+    make(AST.createTransform(
       transform.ast,
       pipe(to(transform), extend(struct({ [key]: S.literal(value) }))).ast,
-      [AST.createPropertySignatureTransformation(
-        key,
-        key,
-        () => O.some(value),
-        () => O.none()
-      )]
+      TransformAST.createTypeLiteralTransformation([
+        TransformAST.createPropertySignatureTransformation(
+          key,
+          key,
+          () => O.some(value),
+          () => O.none()
+        )
+      ])
     ))
 
 // ---------------------------------------------

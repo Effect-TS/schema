@@ -13,6 +13,7 @@ import * as Order from "@effect/data/typeclass/Order"
 import { memoizeThunk } from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
+import type * as TransformAST from "@effect/schema/TransformAST"
 
 // -------------------------------------------------------------------------------------
 // model
@@ -887,38 +888,6 @@ export interface ParseOptions {
 }
 
 /**
- * Represents a `PropertySignature -> PropertySignature` transformation
- *
- * The semantic of `decode` is:
- * - `none()` represents the absence of the key/value pair
- * - `some(value)` represents the presence of the key/value pair
- *
- * The semantic of `encode` is:
- * - `none()` you don't want to output the key/value pair
- * - `some(value)` you want to output the key/value pair
- *
- * @category model
- * @since 1.0.0
- */
-export interface PropertySignatureTransformation {
-  readonly from: PropertyKey
-  readonly to: PropertyKey
-  readonly decode: (o: Option<any>) => Option<any>
-  readonly encode: (o: Option<any>) => Option<any>
-}
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const createPropertySignatureTransformation = (
-  from: PropertyKey,
-  to: PropertyKey,
-  decode: (o: Option<any>) => Option<any>,
-  encode: (o: Option<any>) => Option<any>
-): PropertySignatureTransformation => ({ from, to, decode, encode })
-
-/**
  * If `propertySignatureTransformations.length > 0` then `decode` / `encode` are derived.
  *
  * @category model
@@ -930,26 +899,8 @@ export interface Transform extends Annotated {
   readonly to: AST
   readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
   readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
+  readonly transformAST: TransformAST.TransformAST
 }
-
-/** @internal */
-export const _createTransform = (
-  from: AST,
-  to: AST,
-  decode: Transform["decode"],
-  encode: Transform["encode"],
-  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>,
-  annotations: Annotated["annotations"] = {}
-): Transform => ({
-  _tag: "Transform",
-  from,
-  to,
-  decode,
-  encode,
-  propertySignatureTransformations,
-  annotations
-})
 
 /**
  * @category constructors
@@ -958,57 +909,67 @@ export const _createTransform = (
 export const createTransform = (
   from: AST,
   to: AST,
-  decode: Transform["decode"],
-  encode: Transform["encode"],
+  transformAST: TransformAST.TransformAST,
   annotations: Annotated["annotations"] = {}
-): Transform => _createTransform(from, to, decode, encode, [], annotations)
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const createTransformByPropertySignatureTransformations = (
-  from: AST,
-  to: AST,
-  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>,
-  annotations: Annotated["annotations"] = {}
-): Transform =>
-  _createTransform(
+): Transform => {
+  const { decode, encode } = fromTransformAST(transformAST)
+  return {
+    _tag: "Transform",
     from,
     to,
-    (input: any) => {
-      for (let i = 0; i < propertySignatureTransformations.length; i++) {
-        const t = propertySignatureTransformations[i]
-        const name = t.from
-        const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          O.some(input[name]) :
-          O.none()
-        delete input[name]
-        const to = t.decode(from)
-        if (O.isSome(to)) {
-          input[t.to] = to.value
-        }
-      }
-      return PR.success(input)
-    },
-    (input: any) => {
-      for (let i = 0; i < propertySignatureTransformations.length; i++) {
-        const t = propertySignatureTransformations[i]
-        const name = t.to
-        const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          O.some(input[name]) :
-          O.none()
-        delete input[name]
-        const to = t.encode(from)
-        if (O.isSome(to)) {
-          input[t.from] = to.value
-        }
-      }
-      return PR.success(input)
-    },
-    propertySignatureTransformations,
+    decode,
+    encode,
+    transformAST,
     annotations
-  )
+  }
+}
+
+const fromTransformAST = (
+  ast: TransformAST.TransformAST
+): { decode: Transform["decode"]; encode: Transform["encode"] } => {
+  switch (ast._tag) {
+    case "FinalTransformation":
+      return {
+        decode: ast.decode,
+        encode: ast.encode
+      }
+    case "TypeLiteralTransformation": {
+      const propertySignatureTransformations = ast.propertySignatureTransformations
+      return {
+        decode: (input: any) => {
+          for (let i = 0; i < propertySignatureTransformations.length; i++) {
+            const t = propertySignatureTransformations[i]
+            const name = t.from
+            const from = Object.prototype.hasOwnProperty.call(input, name) ?
+              O.some(input[name]) :
+              O.none()
+            delete input[name]
+            const to = t.decode(from)
+            if (O.isSome(to)) {
+              input[t.to] = to.value
+            }
+          }
+          return PR.success(input)
+        },
+        encode: (input: any) => {
+          for (let i = 0; i < propertySignatureTransformations.length; i++) {
+            const t = propertySignatureTransformations[i]
+            const name = t.to
+            const from = Object.prototype.hasOwnProperty.call(input, name) ?
+              O.some(input[name]) :
+              O.none()
+            delete input[name]
+            const to = t.encode(from)
+            if (O.isSome(to)) {
+              input[t.from] = to.value
+            }
+          }
+          return PR.success(input)
+        }
+      }
+    }
+  }
+}
 
 /**
  * @category guards
