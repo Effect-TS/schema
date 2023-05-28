@@ -10,7 +10,7 @@ import type { Transform } from "@effect/schema/AST"
  * @category model
  * @since 1.0.0
  */
-export type TransformAST = FinalTransformation | TypeLiteralTransformation
+export type TransformAST = FinalTransformation | AndThenTransformation | TypeLiteralTransformation
 
 /**
  * @category model
@@ -30,6 +30,25 @@ export const createFinalTransformation = (
   decode: Transform["decode"],
   encode: Transform["encode"]
 ): FinalTransformation => ({ _tag: "FinalTransformation", decode, encode })
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface AndThenTransformation {
+  readonly _tag: "AndThenTransformation"
+  readonly from: TransformAST
+  readonly to: TransformAST
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createAndThenTransformation = (
+  from: TransformAST,
+  to: TransformAST
+): AndThenTransformation => ({ _tag: "AndThenTransformation", from, to })
 
 /**
  * Represents a `PropertySignature -> PropertySignature` transformation

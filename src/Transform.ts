@@ -185,10 +185,48 @@ export const transformResult: {
   to: Transform<I2, A2>,
   decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
   encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-): Transform<I1, A2> =>
-  make(
-    AST.createTransform(from.ast, to.ast, TransformAST.createFinalTransformation(decode, encode))
-  ))
+): Transform<I1, A2> => {
+  const final = TransformAST.createFinalTransformation(decode, encode)
+  if (AST.isTransform(from.ast)) {
+    if (AST.isTransform(to.ast)) {
+      return make(
+        AST.createTransform(
+          from.ast.from,
+          to.ast,
+          TransformAST.createAndThenTransformation(
+            TransformAST.createAndThenTransformation(from.ast.transformAST, final),
+            to.ast.transformAST
+          )
+        )
+      )
+    } else {
+      return make(
+        AST.createTransform(
+          from.ast.from,
+          to.ast,
+          TransformAST.createAndThenTransformation(from.ast.transformAST, final)
+        )
+      )
+    }
+  } else {
+    if (AST.isTransform(to.ast)) {
+      return make(
+        AST.createTransform(
+          from.ast,
+          to.ast.to,
+          TransformAST.createAndThenTransformation(
+            final,
+            to.ast.transformAST
+          )
+        )
+      )
+    } else {
+      return make(
+        AST.createTransform(from.ast, to.ast, final)
+      )
+    }
+  }
+})
 
 /**
     Create a new `Transform` by transforming the input and output of an existing `Schema`
@@ -654,6 +692,15 @@ export const filter = <A, B extends A>(
   f: (schema: S.Schema<A>) => S.Schema<B>
 ) =>
   <I>(transform: Transform<I, A>): Transform<I, B> => {
+    if (AST.isTransform(transform.ast)) {
+      return make(
+        AST.createTransform(
+          transform.ast.from,
+          f(to(transform)).ast,
+          transform.ast.transformAST
+        )
+      )
+    }
     const schema = f(to(transform))
     if (AST.isRefinement(schema.ast)) {
       return make(AST.createRefinement(transform.ast, schema.ast.decode, schema.ast.annotations))

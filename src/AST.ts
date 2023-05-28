@@ -928,6 +928,12 @@ const getDecode = (transform: TransformAST.TransformAST): Transform["decode"] =>
   switch (transform._tag) {
     case "FinalTransformation":
       return transform.decode
+    case "AndThenTransformation": {
+      const from = getDecode(transform.from)
+      const to = getDecode(transform.to)
+      return (input, options, ast) =>
+        ParseResult.flatMap(from(input, options, ast), (input) => to(input, options, ast))
+    }
     case "TypeLiteralTransformation":
       return (input, options, ast) => {
         let out: ParseResult.ParseResult<any> = E.right(input)
@@ -972,6 +978,12 @@ const getEncode = (transform: TransformAST.TransformAST): Transform["encode"] =>
   switch (transform._tag) {
     case "FinalTransformation":
       return transform.encode
+    case "AndThenTransformation": {
+      const from = getEncode(transform.to)
+      const to = getEncode(transform.from)
+      return (input, options, ast) =>
+        ParseResult.flatMap(from(input, options, ast), (input) => to(input, options, ast))
+    }
     case "TypeLiteralTransformation":
       return (input, options, ast) => {
         let out: ParseResult.ParseResult<any> = E.right(input)
