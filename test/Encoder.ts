@@ -275,25 +275,6 @@ describe.concurrent("Encoder", () => {
     )
   })
 
-  it("extend/record/ record(string, NumberFromString)", async () => {
-    const transform = pipe(
-      S.struct({ a: S.number }),
-      T.extend(T.record(S.string, NumberFromChar))
-    )
-    await Util.expectEncodeSuccess(transform, { a: 1 }, { a: 1 })
-    await Util.expectEncodeSuccess(transform, { a: 1, b: 1 }, { a: 1, b: "1" })
-  })
-
-  it("extend/record/ record(symbol, NumberFromString)", async () => {
-    const b = Symbol.for("@effect/schema/test/b")
-    const schema = pipe(
-      S.struct({ a: S.number }),
-      T.extend(T.record(S.symbol, NumberFromChar))
-    )
-    await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
-    await Util.expectEncodeSuccess(schema, { a: 1, [b]: 1 }, { a: 1, [b]: "1" })
-  })
-
   it("union", async () => {
     const schema = T.union(S.string, NumberFromChar)
     await Util.expectEncodeSuccess(schema, "a", "a")

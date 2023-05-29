@@ -3,16 +3,14 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
 
-const NumberFromChar = pipe(S.string, S.maxLength(1), T.numberFromString)
-
 describe.concurrent("dev", () => {
-  it("dev", async () => {
+  it.skip("dev", async () => {
     const transform = pipe(
-      S.struct({ a: S.number }),
-      T.extend(T.record(S.string, NumberFromChar))
+      S.struct({ a: S.string }),
+      T.extend(T.record(S.string, S.string))
     )
     // console.log("%o", transform.ast)
-    await Util.expectEncodeSuccess(transform, { a: 1 }, { a: 1 })
-    await Util.expectEncodeSuccess(transform, { a: 1, b: 1 }, { a: 1, b: "1" })
+    await Util.expectEncodeSuccess(transform, { a: "a" }, { a: "a" })
+    await Util.expectEncodeSuccess(transform, { a: "a", b: "b" }, { a: "a", b: "b" })
   })
 })
