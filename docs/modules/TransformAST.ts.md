@@ -16,6 +16,7 @@ Added in v1.0.0
   - [createAndThenTransformation](#createandthentransformation)
   - [createFinalPropertySignatureTransformation](#createfinalpropertysignaturetransformation)
   - [createFinalTransformation](#createfinaltransformation)
+  - [createIndexSignatureTransformation](#createindexsignaturetransformation)
   - [createPropertySignatureTransformation](#createpropertysignaturetransformation)
   - [createTupleTransformation](#createtupletransformation)
   - [createTypeLiteralTransformation](#createtypeliteraltransformation)
@@ -25,6 +26,7 @@ Added in v1.0.0
   - [AndThenTransformation (interface)](#andthentransformation-interface)
   - [FinalPropertySignatureTransformation (interface)](#finalpropertysignaturetransformation-interface)
   - [FinalTransformation (interface)](#finaltransformation-interface)
+  - [IndexSignatureTransformation (interface)](#indexsignaturetransformation-interface)
   - [PropertySignatureTransformation (interface)](#propertysignaturetransformation-interface)
   - [TransformAST (type alias)](#transformast-type-alias)
   - [TupleTransformation (interface)](#tupletransformation-interface)
@@ -63,9 +65,22 @@ Added in v1.0.0
 
 ```ts
 export declare const createFinalTransformation: (
-  decode: Transform['decode'],
-  encode: Transform['encode']
+  decode: FinalTransformation['decode'],
+  encode: FinalTransformation['encode']
 ) => FinalTransformation
+```
+
+Added in v1.0.0
+
+## createIndexSignatureTransformation
+
+**Signature**
+
+```ts
+export declare const createIndexSignatureTransformation: (
+  parameter: AST.StringKeyword | AST.SymbolKeyword,
+  transformation: IndexSignatureTransformation['transformation']
+) => IndexSignatureTransformation
 ```
 
 Added in v1.0.0
@@ -101,7 +116,8 @@ Added in v1.0.0
 ```ts
 export declare const createTypeLiteralTransformation: (
   propertySignatureTransformations: TypeLiteralTransformation['propertySignatureTransformations'],
-  indexSignatureTransformations: ReadonlyArray<TransformAST>
+  indexSignatureTransformations: TypeLiteralTransformation['indexSignatureTransformations'],
+  exclude: TypeLiteralTransformation['exclude']
 ) => TypeLiteralTransformation
 ```
 
@@ -168,8 +184,21 @@ Added in v1.0.0
 ```ts
 export interface FinalTransformation {
   readonly _tag: 'FinalTransformation'
-  readonly decode: Transform['decode']
-  readonly encode: Transform['encode']
+  readonly decode: AST.Transform['decode']
+  readonly encode: AST.Transform['encode']
+}
+```
+
+Added in v1.0.0
+
+## IndexSignatureTransformation (interface)
+
+**Signature**
+
+```ts
+export interface IndexSignatureTransformation {
+  readonly parameter: AST.StringKeyword | AST.SymbolKeyword
+  readonly transformation: TransformAST
 }
 ```
 
@@ -207,7 +236,6 @@ Added in v1.0.0
 export interface TupleTransformation {
   readonly _tag: 'TupleTransformation'
   readonly elements: ReadonlyArray.NonEmptyReadonlyArray<TransformAST>
-  // TODO: handle rest
 }
 ```
 
@@ -221,7 +249,8 @@ Added in v1.0.0
 export interface TypeLiteralTransformation {
   readonly _tag: 'TypeLiteralTransformation'
   readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
-  readonly indexSignatureTransformations: ReadonlyArray<TransformAST>
+  readonly indexSignatureTransformations: ReadonlyArray<IndexSignatureTransformation>
+  readonly exclude: ReadonlyArray<PropertyKey>
 }
 ```
 

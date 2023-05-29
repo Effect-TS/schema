@@ -1404,6 +1404,8 @@ export declare const mergeAnnotations: (
       encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
       transformAST: TransformAST.TransformAST
     }
+  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Declaration'
@@ -1420,11 +1422,9 @@ export declare const mergeAnnotations: (
   | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
   | {
@@ -1527,6 +1527,8 @@ export declare const setAnnotation: (
       encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
       transformAST: TransformAST.TransformAST
     }
+  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
   | {
       annotations: { [x: string]: unknown }
       _tag: 'Declaration'
@@ -1543,11 +1545,9 @@ export declare const setAnnotation: (
   | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
   | {

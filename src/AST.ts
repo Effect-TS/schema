@@ -4,13 +4,12 @@
 
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
-import { isNumber } from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
-import { isString, isSymbol } from "@effect/data/Predicate"
+import { isNumber, isString, isSymbol } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
-import { memoizeThunk } from "@effect/schema/internal/common"
+import * as I from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as TransformAST from "@effect/schema/TransformAST"
 
@@ -417,7 +416,7 @@ export const stringKeyword: StringKeyword = {
  * @category guards
  * @since 1.0.0
  */
-export const isStringKeyword = (ast: AST): ast is StringKeyword => ast._tag === "StringKeyword"
+export const isStringKeyword: (ast: AST) => ast is StringKeyword = I.isStringKeyword
 
 /**
  * @category model
@@ -517,7 +516,7 @@ export const symbolKeyword: SymbolKeyword = {
  * @category guards
  * @since 1.0.0
  */
-export const isSymbolKeyword = (ast: AST): ast is SymbolKeyword => ast._tag === "SymbolKeyword"
+export const isSymbolKeyword: (ast: AST) => ast is SymbolKeyword = I.isSymbolKeyword
 
 /**
  * @category model
@@ -744,7 +743,7 @@ export const createTypeLiteral = (
   const keys: Record<PropertyKey, null> = {}
   for (let i = 0; i < propertySignatures.length; i++) {
     const name = propertySignatures[i].name
-    if (name in keys) {
+    if (Object.prototype.hasOwnProperty.call(keys, name)) {
       throw new Error(`Duplicate property signature ${String(name)}`)
     }
     keys[name] = null
@@ -839,7 +838,7 @@ export const createLazy = (
   annotations: Annotated["annotations"] = {}
 ): Lazy => ({
   _tag: "Lazy",
-  f: memoizeThunk(f),
+  f: I.memoizeThunk(f),
   annotations
 })
 
@@ -1048,7 +1047,7 @@ export const createRecord = (key: AST, value: AST, isReadonly: boolean): TypeLit
         key.types.forEach(go)
         break
       default:
-        throw new Error(`createRecord: unsupported key ${key._tag}`)
+        throw new Error(`createRecord: unsupported key schema`)
     }
   }
   go(key)

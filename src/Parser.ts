@@ -622,7 +622,7 @@ const go = untracedMethod(() =>
           isBoundary,
           isDecoding
         )
-        const expectedKeys: any = {}
+        const expectedKeys: Record<PropertyKey, null> = {}
         for (let i = 0; i < propertySignatures.length; i++) {
           expectedKeys[ast.propertySignatures[i].name] = null
         }

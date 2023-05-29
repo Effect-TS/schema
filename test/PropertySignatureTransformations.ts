@@ -12,16 +12,20 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         T.struct({ a: T.optional(T.NumberFromString) }).ast,
         S.struct({ a: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation([
-          TransformAST.createPropertySignatureTransformation(
-            "a",
-            "a",
-            TransformAST.createFinalPropertySignatureTransformation(
-              O.orElse(() => O.some(0)),
-              identity
+        TransformAST.createTypeLiteralTransformation(
+          [
+            TransformAST.createPropertySignatureTransformation(
+              "a",
+              "a",
+              TransformAST.createFinalPropertySignatureTransformation(
+                O.orElse(() => O.some(0)),
+                identity
+              )
             )
-          )
-        ], [])
+          ],
+          [],
+          []
+        )
       )
     )
     await Util.expectParseSuccess(transform, {}, { a: 0 })
@@ -37,16 +41,20 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         T.struct({ a: T.optional(T.NumberFromString) }).ast,
         S.struct({ a: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation([
-          TransformAST.createPropertySignatureTransformation(
-            "a",
-            "a",
-            TransformAST.createFinalPropertySignatureTransformation(
-              O.orElse(() => O.some(0)),
-              (o) => O.flatMap(o, O.liftPredicate((v) => v !== 0))
+        TransformAST.createTypeLiteralTransformation(
+          [
+            TransformAST.createPropertySignatureTransformation(
+              "a",
+              "a",
+              TransformAST.createFinalPropertySignatureTransformation(
+                O.orElse(() => O.some(0)),
+                (o) => O.flatMap(o, O.liftPredicate((v) => v !== 0))
+              )
             )
-          )
-        ], [])
+          ],
+          [],
+          []
+        )
       )
     )
     await Util.expectParseSuccess(transform, {}, { a: 0 })
@@ -63,16 +71,20 @@ describe.concurrent("PropertySignatureTransformations", () => {
         AST.createTransform(
           T.struct({ a: T.optional(T.NumberFromString) }).ast,
           T.struct({ a: T.optionFromSelf(S.number) }).ast,
-          TransformAST.createTypeLiteralTransformation([
-            TransformAST.createPropertySignatureTransformation(
-              "a",
-              "a",
-              TransformAST.createFinalPropertySignatureTransformation(
-                O.some,
-                O.flatten
+          TransformAST.createTypeLiteralTransformation(
+            [
+              TransformAST.createPropertySignatureTransformation(
+                "a",
+                "a",
+                TransformAST.createFinalPropertySignatureTransformation(
+                  O.some,
+                  O.flatten
+                )
               )
-            )
-          ], [])
+            ],
+            [],
+            []
+          )
         )
       )
     await Util.expectParseSuccess(transform, {}, { a: O.none() })
@@ -88,16 +100,20 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.string }).ast,
         S.struct({ a: S.optional(S.string) }).ast,
-        TransformAST.createTypeLiteralTransformation([
-          TransformAST.createPropertySignatureTransformation(
-            "a",
-            "a",
-            TransformAST.createFinalPropertySignatureTransformation(
-              O.flatMap(O.liftPredicate((v) => v !== "")),
-              identity
+        TransformAST.createTypeLiteralTransformation(
+          [
+            TransformAST.createPropertySignatureTransformation(
+              "a",
+              "a",
+              TransformAST.createFinalPropertySignatureTransformation(
+                O.flatMap(O.liftPredicate((v) => v !== "")),
+                identity
+              )
             )
-          )
-        ], [])
+          ],
+          [],
+          []
+        )
       )
     )
     await Util.expectParseSuccess(transform, { a: "" }, {})
@@ -111,16 +127,20 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.number }).ast,
         S.struct({ b: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation([
-          TransformAST.createPropertySignatureTransformation(
-            "a",
-            "b",
-            TransformAST.createFinalPropertySignatureTransformation(
-              identity,
-              identity
+        TransformAST.createTypeLiteralTransformation(
+          [
+            TransformAST.createPropertySignatureTransformation(
+              "a",
+              "b",
+              TransformAST.createFinalPropertySignatureTransformation(
+                identity,
+                identity
+              )
             )
-          )
-        ], [])
+          ],
+          [],
+          []
+        )
       )
     )
     await Util.expectParseSuccess(transform, { a: 1 }, { b: 1 })
@@ -133,16 +153,20 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.number }).ast,
         S.struct({ a: S.optional(S.number) }).ast,
-        TransformAST.createTypeLiteralTransformation([
-          TransformAST.createPropertySignatureTransformation(
-            "a",
-            "a",
-            TransformAST.createFinalPropertySignatureTransformation(
-              identity,
-              O.orElse(() => O.some(0))
+        TransformAST.createTypeLiteralTransformation(
+          [
+            TransformAST.createPropertySignatureTransformation(
+              "a",
+              "a",
+              TransformAST.createFinalPropertySignatureTransformation(
+                identity,
+                O.orElse(() => O.some(0))
+              )
             )
-          )
-        ], [])
+          ],
+          [],
+          []
+        )
       )
     )
     await Util.expectParseSuccess(transform, { a: 1 }, { a: 1 })
@@ -158,16 +182,20 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.string }).ast,
         S.struct({ a: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation([
-          TransformAST.createPropertySignatureTransformation(
-            "a",
-            "a",
-            TransformAST.createFinalTransformation(
-              ast.decode,
-              ast.encode
+        TransformAST.createTypeLiteralTransformation(
+          [
+            TransformAST.createPropertySignatureTransformation(
+              "a",
+              "a",
+              TransformAST.createFinalTransformation(
+                ast.decode,
+                ast.encode
+              )
             )
-          )
-        ], [])
+          ],
+          [],
+          []
+        )
       )
     )
     await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
@@ -184,22 +212,30 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.struct({ b: S.string }) }).ast,
         S.struct({ a: S.struct({ b: S.number }) }).ast,
-        TransformAST.createTypeLiteralTransformation([
-          TransformAST.createPropertySignatureTransformation(
-            "a",
-            "a",
-            TransformAST.createTypeLiteralTransformation([
-              TransformAST.createPropertySignatureTransformation(
-                "b",
-                "b",
-                TransformAST.createFinalTransformation(
-                  ast.decode,
-                  ast.encode
-                )
+        TransformAST.createTypeLiteralTransformation(
+          [
+            TransformAST.createPropertySignatureTransformation(
+              "a",
+              "a",
+              TransformAST.createTypeLiteralTransformation(
+                [
+                  TransformAST.createPropertySignatureTransformation(
+                    "b",
+                    "b",
+                    TransformAST.createFinalTransformation(
+                      ast.decode,
+                      ast.encode
+                    )
+                  )
+                ],
+                [],
+                []
               )
-            ], [])
-          )
-        ], [])
+            )
+          ],
+          [],
+          []
+        )
       )
     )
     await Util.expectParseSuccess(transform, { a: { b: "1" } }, { a: { b: 1 } })

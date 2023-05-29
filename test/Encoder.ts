@@ -215,7 +215,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("struct/ required property signature with undefined", async () => {
-    const schema = T.struct({ a: T.union(S.number, S.undefined) })
+    const schema = S.struct({ a: S.union(S.number, S.undefined) })
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeSuccess(schema, { a: undefined }, { a: undefined })
     await Util.expectEncodeFailure(
@@ -227,7 +227,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("struct/ optional property signature", async () => {
-    const schema = T.struct({ a: S.optional(S.number) })
+    const schema = S.struct({ a: S.optional(S.number) })
     await Util.expectEncodeSuccess(schema, {}, {})
     await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
     await Util.expectEncodeFailure(
@@ -267,7 +267,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("record/ value error", async () => {
-    const schema = T.record(S.string, Char)
+    const schema = S.record(S.string, Char)
     await Util.expectEncodeFailure(
       schema,
       { a: "aa" },
@@ -276,12 +276,12 @@ describe.concurrent("Encoder", () => {
   })
 
   it("extend/record/ record(string, NumberFromString)", async () => {
-    const schema = pipe(
-      T.struct({ a: S.number }),
+    const transform = pipe(
+      S.struct({ a: S.number }),
       T.extend(T.record(S.string, NumberFromChar))
     )
-    await Util.expectEncodeSuccess(schema, { a: 1 }, { a: 1 })
-    await Util.expectEncodeSuccess(schema, { a: 1, b: 1 }, { a: 1, b: "1" })
+    await Util.expectEncodeSuccess(transform, { a: 1 }, { a: 1 })
+    await Util.expectEncodeSuccess(transform, { a: 1, b: 1 }, { a: 1, b: "1" })
   })
 
   it("extend/record/ record(symbol, NumberFromString)", async () => {

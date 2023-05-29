@@ -6,7 +6,8 @@ import * as E from "@effect/data/Either"
 import * as O from "@effect/data/Option"
 import type { Option } from "@effect/data/Option"
 import type * as ReadonlyArray from "@effect/data/ReadonlyArray"
-import type { Transform } from "@effect/schema/AST"
+import type * as AST from "@effect/schema/AST"
+import * as I from "@effect/schema/internal/common"
 import * as ParseResult from "@effect/schema/ParseResult"
 
 /**
@@ -25,8 +26,8 @@ export type TransformAST =
  */
 export interface FinalTransformation {
   readonly _tag: "FinalTransformation"
-  readonly decode: Transform["decode"]
-  readonly encode: Transform["encode"]
+  readonly decode: AST.Transform["decode"]
+  readonly encode: AST.Transform["encode"]
 }
 
 /**
@@ -34,8 +35,8 @@ export interface FinalTransformation {
  * @since 1.0.0
  */
 export const createFinalTransformation = (
-  decode: Transform["decode"],
-  encode: Transform["encode"]
+  decode: FinalTransformation["decode"],
+  encode: FinalTransformation["encode"]
 ): FinalTransformation => ({ _tag: "FinalTransformation", decode, encode })
 
 /**
@@ -114,12 +115,31 @@ export const createPropertySignatureTransformation = (
  * @category model
  * @since 1.0.0
  */
+export interface IndexSignatureTransformation {
+  readonly parameter: AST.StringKeyword | AST.SymbolKeyword
+  readonly transformation: TransformAST
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createIndexSignatureTransformation = (
+  parameter: AST.StringKeyword | AST.SymbolKeyword,
+  transformation: IndexSignatureTransformation["transformation"]
+): IndexSignatureTransformation => ({ parameter, transformation })
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
 export interface TypeLiteralTransformation {
   readonly _tag: "TypeLiteralTransformation"
   readonly propertySignatureTransformations: ReadonlyArray<
     PropertySignatureTransformation
   >
-  readonly indexSignatureTransformations: ReadonlyArray<TransformAST>
+  readonly indexSignatureTransformations: ReadonlyArray<IndexSignatureTransformation>
+  readonly exclude: ReadonlyArray<PropertyKey>
 }
 
 /**
@@ -128,12 +148,45 @@ export interface TypeLiteralTransformation {
  */
 export const createTypeLiteralTransformation = (
   propertySignatureTransformations: TypeLiteralTransformation["propertySignatureTransformations"],
-  indexSignatureTransformations: ReadonlyArray<TransformAST>
-): TypeLiteralTransformation => ({
-  _tag: "TypeLiteralTransformation",
-  propertySignatureTransformations,
-  indexSignatureTransformations
-})
+  indexSignatureTransformations: TypeLiteralTransformation["indexSignatureTransformations"],
+  exclude: TypeLiteralTransformation["exclude"]
+): TypeLiteralTransformation => {
+  // check for duplicate property signature transformations
+  const keys: Record<PropertyKey, true> = {}
+  for (const pst of propertySignatureTransformations) {
+    const key = pst.from
+    if (keys[key]) {
+      throw new Error(`Duplicate property signature transformation ${String(key)}`)
+    }
+    keys[key] = true
+  }
+
+  // check for duplicate index signature transformations
+  const parameters = {
+    string: false,
+    symbol: false
+  }
+  for (const ist of indexSignatureTransformations) {
+    if (I.isStringKeyword(ist.parameter)) {
+      if (parameters.string) {
+        throw new Error("Duplicate index signature transformation for type `string`")
+      }
+      parameters.string = true
+    } else if (I.isSymbolKeyword(ist.parameter)) {
+      if (parameters.symbol) {
+        throw new Error("Duplicate index signature transformation for type `symbol`")
+      }
+      parameters.symbol = true
+    }
+  }
+
+  return {
+    _tag: "TypeLiteralTransformation",
+    propertySignatureTransformations,
+    indexSignatureTransformations,
+    exclude
+  }
+}
 
 /**
  * @category guard
@@ -149,7 +202,6 @@ export const isTypeLiteralTransformation = (ast: TransformAST): ast is TypeLiter
 export interface TupleTransformation {
   readonly _tag: "TupleTransformation"
   readonly elements: ReadonlyArray.NonEmptyReadonlyArray<TransformAST>
-  // TODO: handle rest
 }
 
 /**
@@ -166,7 +218,7 @@ const isFinalPropertySignatureTransformation = (
   ast._tag === "FinalPropertySignatureTransformation"
 
 /** @internal */
-export const go = (transform: TransformAST, isDecoding: boolean): Transform["decode"] => {
+export const go = (transform: TransformAST, isDecoding: boolean): AST.Transform["decode"] => {
   switch (transform._tag) {
     case "FinalTransformation":
       return isDecoding ? transform.decode : transform.encode
@@ -183,17 +235,13 @@ export const go = (transform: TransformAST, isDecoding: boolean): Transform["dec
         // ---------------------------------------------
         // handle property signature transformations
         // ---------------------------------------------
-        for (let i = 0; i < transform.propertySignatureTransformations.length; i++) {
-          const propertySignatureTransformation = transform.propertySignatureTransformations[i]
-          const from = isDecoding ?
-            propertySignatureTransformation.from :
-            propertySignatureTransformation.to
-          const to = isDecoding ?
-            propertySignatureTransformation.to :
-            propertySignatureTransformation.from
-          const transformation = propertySignatureTransformation.transformation
-          if (isFinalPropertySignatureTransformation(transformation)) {
-            const parse = isDecoding ? transformation.decode : transformation.encode
+        for (const pst of transform.propertySignatureTransformations) {
+          const [from, to] = isDecoding ?
+            [pst.from, pst.to] :
+            [pst.to, pst.from]
+          const t = pst.transformation
+          if (isFinalPropertySignatureTransformation(t)) {
+            const parse = isDecoding ? t.decode : t.encode
             const f = (input: any) => {
               const o = parse(
                 Object.prototype.hasOwnProperty.call(input, from) ?
@@ -209,7 +257,7 @@ export const go = (transform: TransformAST, isDecoding: boolean): Transform["dec
             }
             out = ParseResult.map(out, f)
           } else {
-            const parse = go(transformation, isDecoding)
+            const parse = go(t, isDecoding)
             out = ParseResult.flatMap(
               out,
               (input) =>
@@ -224,13 +272,38 @@ export const go = (transform: TransformAST, isDecoding: boolean): Transform["dec
             )
           }
         }
+        // ---------------------------------------------
+        // handle index signature transformations
+        // ---------------------------------------------
+        const exclude = transform.exclude
+        for (const ist of transform.indexSignatureTransformations) {
+          const parameter = ist.parameter
+          const keys = I.getKeysForIndexSignature(input, parameter)
+          const parse = go(ist.transformation, isDecoding)
+          for (const key of keys) {
+            if (!exclude.includes(key)) {
+              out = ParseResult.flatMap(
+                out,
+                (input) =>
+                  ParseResult.bimap(
+                    parse(input[key], options, ast),
+                    (e) => ParseResult.parseError([ParseResult.key(key, e.errors)]),
+                    (value) => {
+                      input[key] = value
+                      return input
+                    }
+                  )
+              )
+            }
+          }
+        }
         return out
       }
     case "TupleTransformation":
       return (input, options, ast) => {
         let out: ParseResult.ParseResult<any> = E.right(input)
-        for (let i = 0; i < transform.elements.length; i++) {
-          const parse = go(transform.elements[i], isDecoding)
+        for (const [i, element] of transform.elements.entries()) {
+          const parse = go(element, isDecoding)
           out = ParseResult.flatMap(
             out,
             (input) =>

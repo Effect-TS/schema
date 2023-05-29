@@ -13,6 +13,7 @@ import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import { isNumber, isString } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -567,9 +568,6 @@ export const struct = <
         )
       }
     } else {
-      // propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-      // fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-      // toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
       if (AST.isTransform(field.ast)) {
         fromPropertySignatures.push(
           AST.createPropertySignature(key, AST.from(field.ast), false, true)
@@ -594,7 +592,11 @@ export const struct = <
       AST.createTransform(
         AST.createTypeLiteral(fromPropertySignatures, []),
         AST.createTypeLiteral(toPropertySignatures, []),
-        TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [])
+        TransformAST.createTypeLiteralTransformation(
+          propertySignatureTransformations,
+          [],
+          []
+        )
       )
     )
   } else {
@@ -620,7 +622,7 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
             AST.createTransform(
               AST.pick(ast.from, keys),
               AST.pick(ast.to, keys),
-              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [])
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [], [])
             )
           )
         } else {
@@ -650,7 +652,7 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
             AST.createTransform(
               AST.omit(ast.from, keys),
               AST.omit(ast.to, keys),
-              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [])
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [], [])
             )
           )
         } else {
@@ -670,17 +672,65 @@ export const record = <K extends string | symbol, I, A>(
   key: S.Schema<K>,
   value: Transform<I, A>
 ): Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }> => {
-  // if (AST.isTransform(value.ast)) {
-  //   const from = AST.createRecord(key.ast, AST.from(value.ast), true)
-  //   const to = AST.createRecord(key.ast, AST.to(value.ast), true)
-  //   return make(
-  //     AST.createTransform(
-  //       from,
-  //       to,
-  //       TransformAST.createTypeLiteralTransformation([], [value.ast.transformAST])
-  //     )
-  //   )
-  // }
+  if (AST.isTransform(value.ast)) {
+    const transformAST = value.ast.transformAST
+    const propertySignatures: Array<TransformAST.PropertySignatureTransformation> = []
+    const indexSignatures: Array<TransformAST.IndexSignatureTransformation> = []
+    const from = AST.createRecord(key.ast, AST.from(value.ast), true)
+    const to = AST.createRecord(key.ast, AST.to(value.ast), true)
+    const go = (key: AST.AST): void => {
+      switch (key._tag) {
+        case "NeverKeyword":
+          break
+        case "StringKeyword":
+        case "SymbolKeyword":
+          indexSignatures.push(TransformAST.createIndexSignatureTransformation(key, transformAST))
+          break
+        case "TemplateLiteral":
+          indexSignatures.push(
+            TransformAST.createIndexSignatureTransformation(AST.stringKeyword, transformAST)
+          )
+          break
+        case "Refinement":
+          go(key.from)
+          break
+        case "Literal":
+          if (isString(key.literal) || isNumber(key.literal)) {
+            propertySignatures.push(
+              TransformAST.createPropertySignatureTransformation(
+                key.literal,
+                key.literal,
+                transformAST
+              )
+            )
+          } else {
+            throw new Error(`createRecord: unsupported literal ${String(key.literal)}`)
+          }
+          break
+        case "UniqueSymbol":
+          propertySignatures.push(TransformAST.createPropertySignatureTransformation(
+            key.symbol,
+            key.symbol,
+            transformAST
+          ))
+          break
+        case "Union":
+          key.types.forEach(go)
+          break
+        default:
+          throw new Error(`createRecord: unsupported key transformation`)
+      }
+    }
+    go(key.ast)
+    const exclude = indexSignatures.length > 0 ? propertySignatures.map((p) => p.to) : []
+    return make(
+      AST.createTransform(
+        from,
+        to,
+        TransformAST.createTypeLiteralTransformation(propertySignatures, indexSignatures, exclude)
+      )
+    )
+  }
   return make(AST.createRecord(key.ast, value.ast, true))
 }
 
@@ -790,16 +840,20 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
     make(AST.createTransform(
       transform.ast,
       pipe(to(transform), extend(struct({ [key]: S.literal(value) }))).ast,
-      TransformAST.createTypeLiteralTransformation([
-        TransformAST.createPropertySignatureTransformation(
-          key,
-          key,
-          TransformAST.createFinalPropertySignatureTransformation(
-            () => O.some(value),
-            () => O.none()
+      TransformAST.createTypeLiteralTransformation(
+        [
+          TransformAST.createPropertySignatureTransformation(
+            key,
+            key,
+            TransformAST.createFinalPropertySignatureTransformation(
+              () => O.some(value),
+              () => O.none()
+            )
           )
-        )
-      ], [])
+        ],
+        [],
+        []
+      )
     ))
 
 // ---------------------------------------------
