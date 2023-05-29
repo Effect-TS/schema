@@ -1,7 +1,7 @@
 import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 
-describe.concurrent("AST.getCardinality", () => {
+describe.concurrent("getCardinality", () => {
   it("order", () => {
     const struct = S.struct({ a: S.string })
     const actual = [
