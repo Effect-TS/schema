@@ -127,4 +127,12 @@ describe.concurrent("extend", () => {
       [c]: "c"
     })
   })
+
+  it("should fail on illegal types", async () => {
+    const transform = pipe(
+      S.struct({ a: S.number }), // <= this is illegal
+      T.extend(T.record(S.string, T.NumberFromString))
+    )
+    await Util.expectParseFailure(transform, { a: 1 }, "/a Expected string, actual 1")
+  })
 })

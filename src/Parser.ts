@@ -737,9 +737,6 @@ const go = untracedMethod(() =>
             const type = indexSignatures[i][1]
             const keys = I.getKeysForIndexSignature(input, ast.indexSignatures[i].parameter)
             for (const key of keys) {
-              if (Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
-                continue
-              }
               // ---------------------------------------------
               // handle keys
               // ---------------------------------------------
@@ -772,7 +769,9 @@ const go = untracedMethod(() =>
                     return PR.failures(mutableAppend(sortByIndex(es), e))
                   }
                 } else {
-                  output[key] = veu.right
+                  if (!Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
+                    output[key] = veu.right
+                  }
                 }
               } else {
                 const nk = stepKey++
