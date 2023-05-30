@@ -1,8 +1,8 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as P from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Pretty", () => {
   it("exports", () => {
@@ -11,14 +11,14 @@ describe.concurrent("Pretty", () => {
   })
 
   it("to", () => {
-    const transform = T.NumberFromString
-    const pretty = P.build(T.to(transform))
+    const transform = C.NumberFromString
+    const pretty = P.build(C.to(transform))
     expect(pretty(1)).toEqual(`1`)
   })
 
   it("from", () => {
-    const transform = T.NumberFromString
-    const pretty = P.build(T.from(transform))
+    const transform = C.NumberFromString
+    const pretty = P.build(C.from(transform))
     expect(pretty("a")).toEqual(`"a"`)
   })
 
@@ -386,7 +386,7 @@ describe.concurrent("Pretty", () => {
   })
 
   it("Transform", () => {
-    expect(() => P.build(pipe(S.string, T.trim) as any)).toThrowError(
+    expect(() => P.build(pipe(S.string, C.trim) as any)).toThrowError(
       new Error("cannot build a Pretty for transformations")
     )
   })
@@ -407,7 +407,7 @@ describe.concurrent("Pretty", () => {
       "BooleanKeyword": () => (b: boolean) => b ? "True" : "False"
     }
     const go = AST.getCompiler(match)
-    const pretty = <A>(schema: T.Transform<A, A>) => (a: A): string => go(schema.ast)(a)
+    const pretty = <A>(schema: C.Codec<A, A>) => (a: A): string => go(schema.ast)(a)
     expect(pretty(S.boolean)(true)).toEqual(`True`)
     const schema = S.tuple(S.string, S.boolean)
     expect(pretty(schema)(["a", true])).toEqual(`["a", True]`)

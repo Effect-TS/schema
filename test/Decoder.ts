@@ -1,18 +1,18 @@
 import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Decoder", () => {
   it("from", async () => {
-    const schema = T.from(T.NumberFromString)
+    const schema = C.from(C.NumberFromString)
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseFailure(schema, null, "Expected string, actual null")
     await Util.expectParseFailure(schema, 1, "Expected string, actual 1")
   })
 
   it("to", async () => {
-    const schema = T.to(T.NumberFromString)
+    const schema = C.to(C.NumberFromString)
     await Util.expectParseSuccess(schema, 1)
     await Util.expectParseFailure(schema, null, "Expected number, actual null")
     await Util.expectParseFailure(schema, "a", `Expected number, actual "a"`)
@@ -222,7 +222,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. empty", async () => {
-    const schema = T.tuple()
+    const schema = C.tuple()
     await Util.expectParseSuccess(schema, [])
 
     await Util.expectParseFailure(
@@ -240,7 +240,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. required element", async () => {
-    const schema = T.tuple(S.number)
+    const schema = C.tuple(S.number)
     await Util.expectParseSuccess(schema, [1])
 
     await Util.expectParseFailure(
@@ -259,7 +259,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. required element with undefined", async () => {
-    const schema = T.tuple(S.union(S.number, S.undefined))
+    const schema = C.tuple(S.union(S.number, S.undefined))
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [undefined])
 
@@ -278,7 +278,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. optional element", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(S.number))
+    const schema = pipe(C.tuple(), C.optionalElement(S.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
 
@@ -296,7 +296,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. optional element with undefined", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(S.union(S.number, S.undefined)))
+    const schema = pipe(C.tuple(), C.optionalElement(S.union(S.number, S.undefined)))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [undefined])
@@ -315,7 +315,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e e?", async () => {
-    const schema = pipe(T.tuple(S.string), T.optionalElement(S.number))
+    const schema = pipe(C.tuple(S.string), C.optionalElement(S.number))
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
 
@@ -324,7 +324,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e r", async () => {
-    const schema = pipe(T.tuple(S.string), T.rest(S.number))
+    const schema = pipe(C.tuple(S.string), C.rest(S.number))
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
     await Util.expectParseSuccess(schema, ["a", 1, 2])
@@ -333,7 +333,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e? r", async () => {
-    const schema = pipe(T.tuple(), T.optionalElement(S.string), T.rest(S.number))
+    const schema = pipe(C.tuple(), C.optionalElement(S.string), C.rest(S.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
@@ -343,7 +343,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. r", async () => {
-    const schema = T.array(S.number)
+    const schema = C.array(S.number)
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [1, 2])
@@ -353,7 +353,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. r e", async () => {
-    const schema = pipe(T.array(S.string), T.element(S.number))
+    const schema = pipe(C.array(S.string), C.element(S.number))
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, ["a", 1])
     await Util.expectParseSuccess(schema, ["a", "b", 1])
@@ -364,7 +364,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e r e", async () => {
-    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(S.boolean))
+    const schema = pipe(C.tuple(S.string), C.rest(S.number), C.element(S.boolean))
     await Util.expectParseSuccess(schema, ["a", true])
     await Util.expectParseSuccess(schema, ["a", 1, true])
     await Util.expectParseSuccess(schema, ["a", 1, 2, true])
@@ -928,7 +928,7 @@ describe.concurrent("Decoder", () => {
   // ---------------------------------------------
 
   it("allErrors/tuple. e r e", async () => {
-    const schema = pipe(T.tuple(S.string), T.rest(S.number), T.element(S.boolean))
+    const schema = pipe(C.tuple(S.string), C.rest(S.number), C.element(S.boolean))
     await Util.expectParseFailure(
       schema,
       [true],
@@ -938,12 +938,12 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple: missing element", async () => {
-    const schema = T.tuple(S.string, S.number)
+    const schema = C.tuple(S.string, S.number)
     await Util.expectParseFailure(schema, [], `/0 is missing, /1 is missing`, Util.allErrors)
   })
 
   it("allErrors/tuple: wrong type for values", async () => {
-    const schema = T.tuple(S.string, S.number)
+    const schema = C.tuple(S.string, S.number)
     await Util.expectParseFailure(
       schema,
       [1, "b"],
@@ -953,7 +953,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple: unexpected indexes", async () => {
-    const schema = T.tuple()
+    const schema = C.tuple()
     await Util.expectParseFailure(
       schema,
       ["a", "b"],
@@ -963,7 +963,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple/rest: wrong type for values", async () => {
-    const schema = pipe(T.tuple(S.string), T.rest(S.number))
+    const schema = pipe(C.tuple(S.string), C.rest(S.number))
     await Util.expectParseFailure(
       schema,
       ["a", "b", "c"],
@@ -973,7 +973,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple/post rest elements: wrong type for values", async () => {
-    const schema = pipe(T.array(S.boolean), T.element(S.number), T.element(S.number))
+    const schema = pipe(C.array(S.boolean), C.element(S.number), C.element(S.number))
     await Util.expectParseFailure(
       schema,
       ["a", "b"],

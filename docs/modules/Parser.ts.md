@@ -1,6 +1,6 @@
 ---
 title: Parser.ts
-nav_order: 3
+nav_order: 4
 parent: Modules
 ---
 
@@ -55,7 +55,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <I, A>(schema: Transform<I, A>) => (i: I, options?: ParseOptions | undefined) => A
+export declare const decode: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -66,7 +66,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeEffect: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
@@ -78,7 +78,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeEither: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => E.Either<PR.ParseError, A>
 ```
 
@@ -90,7 +90,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeOption: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Option<A>
 ```
 
@@ -102,7 +102,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodePromise: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Promise<A>
 ```
 
@@ -114,7 +114,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeResult: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
@@ -127,7 +127,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encode: <I, A>(schema: Transform<I, A>) => (a: A, options?: ParseOptions | undefined) => I
+export declare const encode: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions | undefined) => I
 ```
 
 Added in v1.0.0
@@ -138,7 +138,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeEffect: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, I>
 ```
 
@@ -150,7 +150,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeEither: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => E.Either<PR.ParseError, I>
 ```
 
@@ -162,7 +162,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeOption: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (input: A, options?: ParseOptions | undefined) => Option<I>
 ```
 
@@ -174,7 +174,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodePromise: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => Promise<I>
 ```
 
@@ -186,7 +186,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeResult: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I>
 ```
 
@@ -199,7 +199,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parse: <I, A>(schema: Transform<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
+export declare const parse: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -210,7 +210,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseEffect: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
 ```
 
@@ -222,7 +222,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseEither: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => E.Either<PR.ParseError, A>
 ```
 
@@ -234,7 +234,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseOption: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Option<A>
 ```
 
@@ -246,7 +246,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parsePromise: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Promise<A>
 ```
 
@@ -258,7 +258,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseResult: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
@@ -271,10 +271,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type ToAsserts<S extends Transform<any, any>> = (
-  input: unknown,
-  options?: ParseOptions
-) => asserts input is To<S>
+export type ToAsserts<S extends Codec<any, any>> = (input: unknown, options?: ParseOptions) => asserts input is To<S>
 ```
 
 Added in v1.0.0

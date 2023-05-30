@@ -1,23 +1,23 @@
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 const expectMessage = <I, A>(
-  schema: T.Transform<I, A>,
+  schema: C.Codec<I, A>,
   u: unknown,
   message: string
 ) => {
-  expect(E.mapLeft(T.parseEither(schema)(u), (e) => Util.formatAll(e.errors))).toEqual(
+  expect(E.mapLeft(C.parseEither(schema)(u), (e) => Util.formatAll(e.errors))).toEqual(
     E.left(message)
   )
 }
 
 export const expectForbidden = <I, A>(
-  schema: T.Transform<I, A>,
+  schema: C.Codec<I, A>,
   u: unknown,
   message: string
 ) => {
@@ -53,8 +53,8 @@ describe.concurrent("Forbidden", () => {
     const transform = S.declare(
       [],
       S.number,
-      () => T.parseEffect(Util.effectify(S.number, "all")),
-      () => T.encodeEffect(Util.effectify(S.number, "all"))
+      () => C.parseEffect(Util.effectify(S.number, "all")),
+      () => C.encodeEffect(Util.effectify(S.number, "all"))
     )
     expectMessage(
       transform,
@@ -65,9 +65,9 @@ describe.concurrent("Forbidden", () => {
 
   it("transform", () => {
     const transform = pipe(
-      T.transformResult(
+      C.transformResult(
         S.string,
-        T.transformResult(
+        C.transformResult(
           S.string,
           S.string,
           (s) => PR.flatMap(Util.sleep, () => PR.success(s)),
@@ -89,7 +89,7 @@ describe.concurrent("Forbidden", () => {
       S.string.ast,
       (input) => PR.flatMap(Util.sleep, () => PR.success(input))
     )
-    const transform: T.Transform<string, string> = T.make(ast)
+    const transform: C.Codec<string, string> = C.make(ast)
     expectMessage(
       transform,
       "a",

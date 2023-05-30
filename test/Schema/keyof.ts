@@ -1,8 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
-import * as P from "@effect/schema/Parser"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("keyof", () => {
   it("struct/ string keys", () => {
@@ -11,7 +10,7 @@ describe.concurrent("keyof", () => {
       b: S.number
     })
     const keyOf = S.keyof(schema)
-    const is = P.is(keyOf)
+    const is = S.is(keyOf)
     expect(is("a")).toEqual(true)
     expect(is("b")).toEqual(true)
     expect(is("c")).toEqual(false)
@@ -25,7 +24,7 @@ describe.concurrent("keyof", () => {
       [b]: S.number
     })
     const keyOf = S.keyof(schema)
-    const is = P.is(keyOf)
+    const is = S.is(keyOf)
     expect(is(a)).toEqual(true)
     expect(is(b)).toEqual(true)
     expect(is("a")).toEqual(false)
@@ -58,7 +57,7 @@ describe.concurrent("keyof", () => {
   })
 
   it("should throw on unsupported schemas", () => {
-    expect(() => AST.keyof(T.NumberFromString.ast)).toThrowError(
+    expect(() => AST.keyof(C.NumberFromString.ast)).toThrowError(
       new Error("keyof: unsupported schema (Transform)")
     )
   })

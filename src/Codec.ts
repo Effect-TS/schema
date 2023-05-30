@@ -26,7 +26,7 @@ import * as S from "@effect/schema/Schema"
  * @category model
  * @since 1.0.0
  */
-export interface Transform<From, To> {
+export interface Codec<From, To> {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ast: AST.AST
@@ -47,13 +47,12 @@ export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To
 /**
  * @since 1.0.0
  */
-export const from = <I, A>(transform: Transform<I, A>): S.Schema<I> =>
-  S.make(AST.from(transform.ast))
+export const from = <I, A>(transform: Codec<I, A>): S.Schema<I> => S.make(AST.from(transform.ast))
 
 /**
  * @since 1.0.0
  */
-export const to = <I, A>(transform: Transform<I, A>): S.Schema<A> => S.make(AST.to(transform.ast))
+export const to = <I, A>(transform: Codec<I, A>): S.Schema<A> => S.make(AST.to(transform.ast))
 
 /* c8 ignore start */
 export {
@@ -158,10 +157,10 @@ export {
  * @category constructors
  * @since 1.0.0
  */
-export const make = <I, A>(ast: AST.AST): Transform<I, A> => ({ ast }) as any
+export const make = <I, A>(ast: AST.AST): Codec<I, A> => ({ ast }) as any
 
 /**
-  Create a new `Transform` by transforming the input and output of an existing `Schema`
+  Create a new `Codec` by transforming the input and output of an existing `Schema`
   using the provided decoding functions.
 
   @category constructors
@@ -169,28 +168,28 @@ export const make = <I, A>(ast: AST.AST): Transform<I, A> => ({ ast }) as any
  */
 export const transformResult: {
   <I2, A2, A1>(
-    to: Transform<I2, A2>,
+    to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
     encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
+  ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
   <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
+    from: Codec<I1, A1>,
+    to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
     encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-  ): Transform<I1, A2>
+  ): Codec<I1, A2>
 } = dual(4, <I1, A1, I2, A2>(
-  from: Transform<I1, A1>,
-  to: Transform<I2, A2>,
+  from: Codec<I1, A1>,
+  to: Codec<I2, A2>,
   decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
   encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-): Transform<I1, A2> =>
+): Codec<I1, A2> =>
   make(
     AST.createTransform(from.ast, to.ast, AST.createFinalTransformation(decode, encode))
   ))
 
 /**
-    Create a new `Transform` by transforming the input and output of an existing `Schema`
+    Create a new `Codec` by transforming the input and output of an existing `Schema`
     using the provided mapping functions.
 
     @category constructors
@@ -198,24 +197,24 @@ export const transformResult: {
   */
 export const transform: {
   <I2, A2, A1>(
-    to: Transform<I2, A2>,
+    to: Codec<I2, A2>,
     decode: (a1: A1) => I2,
     encode: (i2: I2) => A1
-  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
+  ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
   <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
+    from: Codec<I1, A1>,
+    to: Codec<I2, A2>,
     decode: (a1: A1) => I2,
     encode: (i2: I2) => A1
-  ): Transform<I1, A2>
+  ): Codec<I1, A2>
 } = dual(
   4,
   <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
+    from: Codec<I1, A1>,
+    to: Codec<I2, A2>,
     decode: (a1: A1) => I2,
     encode: (i2: I2) => A1
-  ): Transform<I1, A2> =>
+  ): Codec<I1, A2> =>
     transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)))
 )
 
@@ -227,9 +226,9 @@ export const transform: {
  * @category combinators
  * @since 1.0.0
  */
-export const union = <Members extends ReadonlyArray<Transform<any, any>>>(
+export const union = <Members extends ReadonlyArray<Codec<any, any>>>(
   ...members: Members
-): Transform<From<Members[number]>, To<Members[number]>> =>
+): Codec<From<Members[number]>, To<Members[number]>> =>
   make(AST.createUnion(members.map((m) => m.ast)))
 
 /**
@@ -237,8 +236,8 @@ export const union = <Members extends ReadonlyArray<Transform<any, any>>>(
  * @since 1.0.0
  */
 export const nullable = <From, To>(
-  self: Transform<From, To>
-): Transform<From | null, To | null> => {
+  self: Codec<From, To>
+): Codec<From | null, To | null> => {
   const parseResult = P.parseResult(self)
   const encodeResult = P.encodeResult(self)
   return transformResult(
@@ -253,9 +252,9 @@ export const nullable = <From, To>(
  * @category combinators
  * @since 1.0.0
  */
-export const tuple = <Elements extends ReadonlyArray<Transform<any, any>>>(
+export const tuple = <Elements extends ReadonlyArray<Codec<any, any>>>(
   ...elements: Elements
-): Transform<
+): Codec<
   { readonly [K in keyof Elements]: From<Elements[K]> },
   { readonly [K in keyof Elements]: To<Elements[K]> }
 > =>
@@ -267,10 +266,10 @@ export const tuple = <Elements extends ReadonlyArray<Transform<any, any>>>(
  * @category combinators
  * @since 1.0.0
  */
-export const rest = <IR, R>(rest: Transform<IR, R>) =>
+export const rest = <IR, R>(rest: Codec<IR, R>) =>
   <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
-    self: Transform<I, A>
-  ): Transform<readonly [...I, ...Array<IR>], readonly [...A, ...Array<R>]> => {
+    self: Codec<I, A>
+  ): Codec<readonly [...I, ...Array<IR>], readonly [...A, ...Array<R>]> => {
     if (AST.isTuple(self.ast)) {
       return make(AST.appendRestElement(self.ast, rest.ast))
     }
@@ -281,10 +280,10 @@ export const rest = <IR, R>(rest: Transform<IR, R>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const element = <IE, E>(element: Transform<IE, E>) =>
+export const element = <IE, E>(element: Codec<IE, E>) =>
   <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
-    self: Transform<I, A>
-  ): Transform<readonly [...I, IE], readonly [...A, E]> => {
+    self: Codec<I, A>
+  ): Codec<readonly [...I, IE], readonly [...A, E]> => {
     if (AST.isTuple(self.ast)) {
       return make(AST.appendElement(self.ast, AST.createElement(element.ast, false)))
     }
@@ -295,10 +294,10 @@ export const element = <IE, E>(element: Transform<IE, E>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const optionalElement = <IE, E>(element: Transform<IE, E>) =>
+export const optionalElement = <IE, E>(element: Codec<IE, E>) =>
   <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
-    self: Transform<I, A>
-  ): Transform<readonly [...I, IE?], readonly [...A, E?]> => {
+    self: Codec<I, A>
+  ): Codec<readonly [...I, IE?], readonly [...A, E?]> => {
     if (AST.isTuple(self.ast)) {
       return make(AST.appendElement(self.ast, AST.createElement(element.ast, true)))
     }
@@ -309,7 +308,7 @@ export const optionalElement = <IE, E>(element: Transform<IE, E>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const array = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, ReadonlyArray<A>> =>
+export const array = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, ReadonlyArray<A>> =>
   make(AST.createTuple([], O.some([item.ast]), true))
 
 /**
@@ -317,8 +316,8 @@ export const array = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, 
  * @since 1.0.0
  */
 export const nonEmptyArray = <I, A>(
-  item: Transform<I, A>
-): Transform<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => pipe(tuple(item), rest(item))
+  item: Codec<I, A>
+): Codec<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => pipe(tuple(item), rest(item))
 
 /**
  * @since 1.0.0
@@ -380,7 +379,7 @@ class TransformPropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
  * @since 1.0.0
  */
 export const propertySignature = <I, A>(
-  transform: Transform<I, A>,
+  transform: Codec<I, A>,
   annotations?: AST.Annotated["annotations"]
 ): TransformPropertySignature<I, false, A, false> =>
   new TransformPropertySignatureImpl(transform.ast, annotations)
@@ -389,7 +388,7 @@ export const propertySignature = <I, A>(
  * @since 1.0.0
  */
 export const optional = <I, A>(
-  transform: Transform<I, A>,
+  transform: Codec<I, A>,
   annotations?: AST.Annotated["annotations"]
 ): TransformPropertySignature<I, true, A, true> =>
   propertySignature(transform, annotations).optional()
@@ -411,14 +410,14 @@ export type FromOptionalKeys<Fields> = {
 export const struct = <
   Fields extends Record<
     PropertyKey,
-    | Transform<any, any>
-    | Transform<never, never>
+    | Codec<any, any>
+    | Codec<never, never>
     | S.PropertySignature<any, boolean, any, boolean>
     | S.PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
-): Transform<
+): Codec<
   S.Spread<
     & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
     & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
@@ -538,8 +537,8 @@ export const struct = <
  */
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
-    self: Transform<I, A>
-  ): Transform<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>> => {
+    self: Codec<I, A>
+  ): Codec<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
       if (AST.isTypeLiteralTransformation(ast.transformAST)) {
@@ -568,8 +567,8 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  */
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
-    self: Transform<I, A>
-  ): Transform<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>> => {
+    self: Codec<I, A>
+  ): Codec<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
       if (AST.isTypeLiteralTransformation(ast.transformAST)) {
@@ -598,8 +597,8 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  */
 export const record = <K extends string | symbol, I, A>(
   key: S.Schema<K>,
-  value: Transform<I, A>
-): Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
+  value: Codec<I, A>
+): Codec<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
   make(AST.createRecord(key.ast, value.ast, true))
 
 /**
@@ -608,18 +607,18 @@ export const record = <K extends string | symbol, I, A>(
  */
 export const extend: {
   <IB, B>(
-    that: Transform<IB, B>
-  ): <I, A>(self: Transform<I, A>) => Transform<S.Spread<I & IB>, S.Spread<A & B>>
+    that: Codec<IB, B>
+  ): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
   <I, A, IB, B>(
-    self: Transform<I, A>,
-    that: Transform<IB, B>
-  ): Transform<S.Spread<I & IB>, S.Spread<A & B>>
+    self: Codec<I, A>,
+    that: Codec<IB, B>
+  ): Codec<S.Spread<I & IB>, S.Spread<A & B>>
 } = dual(
   2,
   <I, A, IB, B>(
-    self: Transform<I, A>,
-    that: Transform<IB, B>
-  ): Transform<S.Spread<I & IB>, S.Spread<A & B>> =>
+    self: Codec<I, A>,
+    that: Codec<IB, B>
+  ): Codec<S.Spread<I & IB>, S.Spread<A & B>> =>
     make(
       S.intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -633,9 +632,9 @@ export const extend: {
  * @since 1.0.0
  */
 export const lazy = <I, A>(
-  f: () => Transform<I, A>,
+  f: () => Codec<I, A>,
   annotations?: AST.Annotated["annotations"]
-): Transform<I, A> => make(AST.createLazy(() => f().ast, annotations))
+): Codec<I, A> => make(AST.createLazy(() => f().ast, annotations))
 
 /**
  * Applies a `Schema` transformation.
@@ -646,7 +645,7 @@ export const lazy = <I, A>(
 export const filter = <A, B extends A>(
   f: (schema: S.Schema<A>) => S.Schema<B>
 ) =>
-  <I>(transform: Transform<I, A>): Transform<I, B> => {
+  <I>(transform: Codec<I, A>): Codec<I, B> => {
     if (AST.isTransform(transform.ast)) {
       return make(
         AST.createTransform(
@@ -680,17 +679,17 @@ export const filter = <A, B extends A>(
  *
  * @example
  * import * as S from "@effect/schema/Schema"
- * import * as T from "@effect/schema/Transform"
+ * import * as C from "@effect/schema/Codec"
  * import { pipe } from "@effect/data/Function"
  *
  * const Circle = S.struct({ radius: S.number })
  * const Square = S.struct({ sideLength: S.number })
- * const Shape = T.union(
- *   pipe(Circle, T.attachPropertySignature("kind", "circle")),
- *   pipe(Square, T.attachPropertySignature("kind", "square"))
+ * const Shape = C.union(
+ *   pipe(Circle, C.attachPropertySignature("kind", "circle")),
+ *   pipe(Square, C.attachPropertySignature("kind", "square"))
  * )
  *
- * assert.deepStrictEqual(T.decode(Shape)({ radius: 10 }), {
+ * assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
  *   kind: "circle",
  *   radius: 10
  * })
@@ -703,8 +702,8 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   value: V
 ) =>
   <I, A extends object>(
-    transform: Transform<I, A>
-  ): Transform<I, S.Spread<A & { readonly [k in K]: V }>> =>
+    transform: Codec<I, A>
+  ): Codec<I, S.Spread<A & { readonly [k in K]: V }>> =>
     make(AST.createTransform(
       transform.ast,
       pipe(to(transform), extend(struct({ [key]: S.literal(value) }))).ast,
@@ -732,7 +731,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
  * @category string
  * @since 1.0.0
  */
-export const trim = <I>(self: Transform<I, string>): Transform<I, string> =>
+export const trim = <I>(self: Codec<I, string>): Codec<I, string> =>
   transform(
     self,
     pipe(to(self), S.trimmed()),
@@ -746,7 +745,7 @@ export const trim = <I>(self: Transform<I, string>): Transform<I, string> =>
  * @category string
  * @since 1.0.0
  */
-export const Trim: Transform<string, string> = trim(S.string)
+export const Trim: Codec<string, string> = trim(S.string)
 
 // ---------------------------------------------
 // number
@@ -759,7 +758,7 @@ export const Trim: Transform<string, string> = trim(S.string)
  * @since 1.0.0
  */
 export const clamp = (min: number, max: number) =>
-  <I>(self: Transform<I, number>): Transform<I, number> =>
+  <I>(self: Codec<I, number>): Codec<I, number> =>
     transform(
       self,
       pipe(to(self), S.between(min, max)),
@@ -775,7 +774,7 @@ export const clamp = (min: number, max: number) =>
   @category number
   @since 1.0.0
 */
-export const numberFromString = <I>(self: Transform<I, string>): Transform<I, number> =>
+export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
   transformResult(
     self,
     S.number,
@@ -803,7 +802,7 @@ export const numberFromString = <I>(self: Transform<I, string>): Transform<I, nu
  * @category number
  * @since 1.0.0
  */
-export const NumberFromString: Transform<string, number> = numberFromString(S.string)
+export const NumberFromString: Codec<string, number> = numberFromString(S.string)
 
 // ---------------------------------------------
 // boolean
@@ -815,7 +814,7 @@ export const NumberFromString: Transform<string, number> = numberFromString(S.st
  * @category boolean
  * @since 1.0.0
  */
-export const not = <I>(self: Transform<I, boolean>): Transform<I, boolean> =>
+export const not = <I>(self: Codec<I, boolean>): Codec<I, boolean> =>
   transform(
     self,
     to(self),
@@ -834,7 +833,7 @@ export const not = <I>(self: Transform<I, boolean>): Transform<I, boolean> =>
  * @since 1.0.0
  */
 export const clampBigint = (min: bigint, max: bigint) =>
-  <I>(self: Transform<I, bigint>): Transform<I, bigint> =>
+  <I>(self: Codec<I, bigint>): Codec<I, bigint> =>
     transform(
       self,
       pipe(to(self), S.betweenBigint(min, max)),
@@ -852,7 +851,7 @@ export const clampBigint = (min: bigint, max: bigint) =>
   @category Date
   @since 1.0.0
 */
-export const dateFromString = <I>(self: Transform<I, string>): Transform<I, Date> =>
+export const dateFromString = <I>(self: Codec<I, string>): Codec<I, Date> =>
   transformResult(
     self,
     S.ValidDate,
@@ -860,7 +859,7 @@ export const dateFromString = <I>(self: Transform<I, string>): Transform<I, Date
     (date) => PR.success(date.toISOString())
   )
 
-const _Date: Transform<string, Date> = dateFromString(S.string)
+const _Date: Codec<string, Date> = dateFromString(S.string)
 
 export {
   /**
@@ -880,7 +879,7 @@ export {
  * @category Option
  * @since 1.0.0
  */
-export const optionFromSelf = <I, A>(value: Transform<I, A>): Transform<Option<I>, Option<A>> => {
+export const optionFromSelf = <I, A>(value: Codec<I, A>): Codec<Option<I>, Option<A>> => {
   const parseResult = P.parseResult(value)
   const encodeResult = P.encodeResult(value)
   return transformResult(
@@ -905,8 +904,8 @@ const optionAsJson = <A>(value: S.Schema<A>) =>
  * @since 1.0.0
  */
 export const option = <I, A>(
-  value: Transform<I, A>
-): Transform<
+  value: Codec<I, A>
+): Codec<
   { readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I },
   Option<A>
 > => {
@@ -931,8 +930,8 @@ export const option = <I, A>(
  * @since 1.0.0
  */
 export const optionFromNullable = <I, A>(
-  value: Transform<I, A>
-): Transform<I | null, Option<A>> => {
+  value: Codec<I, A>
+): Codec<I | null, Option<A>> => {
   const parseResult = P.parseResult(value)
   const encodeResult = P.encodeResult(value)
   return transformResult(
@@ -953,9 +952,9 @@ export const optionFromNullable = <I, A>(
  * @since 1.0.0
  */
 export const eitherFromSelf = <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-): Transform<Either<IE, IA>, Either<E, A>> => {
+  left: Codec<IE, E>,
+  right: Codec<IA, A>
+): Codec<Either<IE, IA>, Either<E, A>> => {
   const parseResultLeft = P.parseResult(left)
   const parseResultRight = P.parseResult(right)
   const encodeResultLeft = P.encodeResult(left)
@@ -985,9 +984,9 @@ const eitherAsJson = <E, A>(left: S.Schema<E>, right: S.Schema<A>) =>
  * @since 1.0.0
  */
 export const either = <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-): Transform<
+  left: Codec<IE, E>,
+  right: Codec<IA, A>
+): Codec<
   { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
   Either<E, A>
 > => {
@@ -1024,9 +1023,9 @@ export const either = <IE, E, IA, A>(
  * @since 1.0.0
  */
 export const readonlyMapFromSelf = <IK, K, IV, V>(
-  key: Transform<IK, K>,
-  value: Transform<IV, V>
-): Transform<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> => {
+  key: Codec<IK, K>,
+  value: Codec<IV, V>
+): Codec<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> => {
   const entries = array(tuple(key, value))
   const parseResult = P.parseResult(entries)
   const encodeResult = P.encodeResult(entries)
@@ -1043,9 +1042,9 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
  * @since 1.0.0
  */
 export const readonlyMap = <IK, K, IV, V>(
-  key: Transform<IK, K>,
-  value: Transform<IV, V>
-): Transform<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
+  key: Codec<IK, K>,
+  value: Codec<IV, V>
+): Codec<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
   transform(
     array(tuple(key, value)),
     S.readonlyMap(to(key), to(value)),
@@ -1062,8 +1061,8 @@ export const readonlyMap = <IK, K, IV, V>(
  * @since 1.0.0
  */
 export const readonlySetFromSelf = <I, A>(
-  item: Transform<I, A>
-): Transform<ReadonlySet<I>, ReadonlySet<A>> => {
+  item: Codec<I, A>
+): Codec<ReadonlySet<I>, ReadonlySet<A>> => {
   const parseResult = P.parseResult(array(item))
   const encodeResult = P.encodeResult(array(item))
   return transformResult(
@@ -1079,8 +1078,8 @@ export const readonlySetFromSelf = <I, A>(
  * @since 1.0.0
  */
 export const readonlySet = <I, A>(
-  item: Transform<I, A>
-): Transform<ReadonlyArray<I>, ReadonlySet<A>> =>
+  item: Codec<I, A>
+): Codec<ReadonlyArray<I>, ReadonlySet<A>> =>
   transform(
     array(item),
     S.readonlySet(to(item)),
@@ -1096,7 +1095,7 @@ export const readonlySet = <I, A>(
  * @category Chunk
  * @since 1.0.0
  */
-export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, Chunk<A>> => {
+export const chunkFromSelf = <I, A>(item: Codec<I, A>): Codec<Chunk<I>, Chunk<A>> => {
   const parseResult = P.parseResult(array(item))
   const encodeResult = P.encodeResult(array(item))
   return transformResult(
@@ -1111,7 +1110,7 @@ export const chunkFromSelf = <I, A>(item: Transform<I, A>): Transform<Chunk<I>, 
  * @category Chunk
  * @since 1.0.0
  */
-export const chunk = <I, A>(item: Transform<I, A>): Transform<ReadonlyArray<I>, Chunk<A>> =>
+export const chunk = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, Chunk<A>> =>
   transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray)
 
 // ---------------------------------------------
@@ -1130,8 +1129,8 @@ export const dataFromSelf = <
   I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
   A extends Readonly<Record<string, any>> | ReadonlyArray<any>
 >(
-  item: Transform<I, A>
-): Transform<D.Data<I>, D.Data<A>> => {
+  item: Codec<I, A>
+): Codec<D.Data<I>, D.Data<A>> => {
   const parseResult = P.parseResult(item)
   const encodeResult = P.encodeResult(item)
   return transformResult(
@@ -1150,8 +1149,8 @@ export const data = <
   I extends Readonly<Record<string, any>> | ReadonlyArray<any>,
   A extends Readonly<Record<string, any>> | ReadonlyArray<any>
 >(
-  item: Transform<I, A>
-): Transform<I, D.Data<A>> =>
+  item: Codec<I, A>
+): Codec<I, D.Data<A>> =>
   transform(
     item,
     S.data(to(item)),

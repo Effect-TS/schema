@@ -1,4 +1,3 @@
-import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -8,14 +7,14 @@ describe.concurrent("lessThanOrEqualTo", () => {
     Util.roundtrip(S.lessThanOrEqualTo(0)(S.number))
   })
 
-  it("Guard", () => {
-    const is = P.is(S.lessThanOrEqualTo(0)(S.number))
+  it("is", () => {
+    const is = S.is(S.lessThanOrEqualTo(0)(S.number))
     expect(is(0)).toEqual(true)
     expect(is(1)).toEqual(false)
     expect(is(-1)).toEqual(true)
   })
 
-  it("Decoder", async () => {
+  it("decode", async () => {
     const schema = S.lessThanOrEqualTo(0)(S.number)
     await Util.expectParseSuccess(schema, 0)
     await Util.expectParseSuccess(schema, -1)
@@ -26,7 +25,7 @@ describe.concurrent("lessThanOrEqualTo", () => {
     )
   })
 
-  it("Pretty", () => {
+  it("pretty", () => {
     const pretty = Pretty.build(S.lessThanOrEqualTo(0)(S.number))
     expect(pretty(1)).toEqual("1")
   })

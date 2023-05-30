@@ -1,28 +1,28 @@
 import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("to", () => {
   it("transform", () => {
     const schema = pipe(
       S.string,
-      T.transform(
-        T.tuple(T.NumberFromString, T.NumberFromString),
+      C.transform(
+        C.tuple(C.NumberFromString, C.NumberFromString),
         (s) => [s, s] as const,
         ([s]) => s
       ),
-      T.to
+      C.to
     )
-    expect(T.parse(schema)([1, 2])).toEqual([1, 2])
+    expect(C.parse(schema)([1, 2])).toEqual([1, 2])
   })
 
   it("refinement", () => {
     const schema = pipe(
-      T.NumberFromString,
-      T.filter(S.greaterThanOrEqualTo(1)),
-      T.filter(S.lessThanOrEqualTo(2)),
-      T.to
+      C.NumberFromString,
+      C.filter(S.greaterThanOrEqualTo(1)),
+      C.filter(S.lessThanOrEqualTo(2)),
+      C.to
     )
     expect(S.is(schema)(0)).toEqual(false)
     expect(S.is(schema)(1)).toEqual(true)
@@ -37,12 +37,12 @@ describe.concurrent("to", () => {
     interface A {
       prop: A | number
     }
-    const schema: T.Transform<I, A> = T.lazy(() =>
-      T.struct({
-        prop: T.union(T.NumberFromString, schema)
+    const schema: C.Codec<I, A> = C.lazy(() =>
+      C.struct({
+        prop: C.union(C.NumberFromString, schema)
       })
     )
-    const to = T.to(schema)
+    const to = C.to(schema)
     await Util.expectParseSuccess(to, { prop: 1 })
     await Util.expectParseSuccess(to, { prop: { prop: 1 } })
   })

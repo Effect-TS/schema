@@ -1,14 +1,14 @@
 import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("omit", () => {
   it("struct", async () => {
     const a = Symbol.for("@effect/schema/test/a")
     const schema = pipe(
-      T.struct({ [a]: S.string, b: T.NumberFromString, c: S.boolean }),
-      T.omit("c")
+      C.struct({ [a]: S.string, b: C.NumberFromString, c: S.boolean }),
+      C.omit("c")
     )
     await Util.expectParseSuccess(schema, { [a]: "a", b: "1" }, { [a]: "a", b: 1 })
 
@@ -27,8 +27,8 @@ describe.concurrent("omit", () => {
 
   it("struct with optionals", async () => {
     const schema = pipe(
-      T.struct({ a: S.optional(S.string), b: T.NumberFromString, c: S.boolean }),
-      T.omit("c")
+      C.struct({ a: S.optional(S.string), b: C.NumberFromString, c: S.boolean }),
+      C.omit("c")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
     await Util.expectParseSuccess(schema, { b: "1" }, { b: 1 })
@@ -42,13 +42,13 @@ describe.concurrent("omit", () => {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const A: T.Transform<A, A> = T.lazy(() =>
-      T.struct({
+    const A: C.Codec<A, A> = C.lazy(() =>
+      C.struct({
         a: S.string,
-        as: T.array(A)
+        as: C.array(A)
       })
     )
-    const schema = pipe(A, T.omit("a"))
+    const schema = pipe(A, C.omit("a"))
     await Util.expectParseSuccess(schema, { as: [] })
     await Util.expectParseSuccess(schema, { as: [{ a: "a", as: [] }] })
 
@@ -57,12 +57,12 @@ describe.concurrent("omit", () => {
 
   it("struct with property signature transformations", async () => {
     const schema = pipe(
-      T.struct({
-        a: T.optional(S.string).withDefault(() => ""),
-        b: T.NumberFromString,
+      C.struct({
+        a: C.optional(S.string).withDefault(() => ""),
+        b: C.NumberFromString,
         c: S.boolean
       }),
-      T.omit("c")
+      C.omit("c")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
     await Util.expectParseSuccess(schema, { b: "1" }, { a: "", b: 1 })

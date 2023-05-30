@@ -1,16 +1,16 @@
 import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
-const X2 = T.transform(
+const X2 = C.transform(
   S.string,
   S.string,
   (s) => s + s,
   (s) => s.substring(0, 1)
 )
 
-const X3 = T.transform(
+const X3 = C.transform(
   S.string,
   S.string,
   (s) => s + s + s,
@@ -20,8 +20,8 @@ const X3 = T.transform(
 describe.concurrent("extend", () => {
   it(`struct with defaults extend struct`, async () => {
     const schema = pipe(
-      T.struct({ a: T.optional(S.string).withDefault(() => ""), b: S.string }),
-      T.extend(S.struct({ c: S.number }))
+      C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }),
+      C.extend(S.struct({ c: S.number }))
     )
     await Util.expectParseSuccess(schema, { b: "b", c: 1 }, { a: "", b: "b", c: 1 })
   })
@@ -29,8 +29,8 @@ describe.concurrent("extend", () => {
   it(`struct extend struct with defaults`, async () => {
     const schema = pipe(
       S.struct({ a: S.number }),
-      T.extend(
-        T.struct({ b: S.string, c: T.optional(S.string).withDefault(() => "") })
+      C.extend(
+        C.struct({ b: S.string, c: C.optional(S.string).withDefault(() => "") })
       )
     )
     await Util.expectParseSuccess(schema, { a: 1, b: "b" }, { a: 1, b: "b", c: "" })
@@ -38,9 +38,9 @@ describe.concurrent("extend", () => {
 
   it(`struct with defaults extend struct with defaults `, async () => {
     const schema = pipe(
-      T.struct({ a: T.optional(S.string).withDefault(() => ""), b: S.string }),
-      T.extend(
-        T.struct({ c: T.optional(S.number).withDefault(() => 0), d: S.boolean })
+      C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }),
+      C.extend(
+        C.struct({ c: C.optional(S.number).withDefault(() => 0), d: S.boolean })
       )
     )
     await Util.expectParseSuccess(schema, { b: "b", d: true }, { a: "", b: "b", c: 0, d: true })
@@ -48,24 +48,24 @@ describe.concurrent("extend", () => {
 
   it(`union with defaults extend union with defaults `, async () => {
     const schema = pipe(
-      T.union(
-        T.struct({
-          a: T.optional(S.string).withDefault(() => "a"),
+      C.union(
+        C.struct({
+          a: C.optional(S.string).withDefault(() => "a"),
           b: S.string
         }),
-        T.struct({
-          c: T.optional(S.string).withDefault(() => "c"),
+        C.struct({
+          c: C.optional(S.string).withDefault(() => "c"),
           d: S.string
         })
       ),
-      T.extend(
-        T.union(
-          T.struct({
-            e: T.optional(S.string).withDefault(() => "e"),
+      C.extend(
+        C.union(
+          C.struct({
+            e: C.optional(S.string).withDefault(() => "e"),
             f: S.string
           }),
-          T.struct({
-            g: T.optional(S.string).withDefault(() => "g"),
+          C.struct({
+            g: C.optional(S.string).withDefault(() => "g"),
             h: S.string
           })
         )
@@ -88,8 +88,8 @@ describe.concurrent("extend", () => {
   it("record(string, X3)", async () => {
     const transform = pipe(
       S.struct({ a: S.string }),
-      T.extend(T.struct({ b: X2 })),
-      T.extend(T.record(S.string, X3))
+      C.extend(C.struct({ b: X2 })),
+      C.extend(C.record(S.string, X3))
     )
     await Util.expectParseSuccess(transform, { a: "a", b: "b" }, { a: "a", b: "bb" })
     await Util.expectParseSuccess(transform, { a: "a", b: "b", c: "c" }, {
@@ -109,8 +109,8 @@ describe.concurrent("extend", () => {
   it("record(symbol, X3)", async () => {
     const transform = pipe(
       S.struct({ a: S.string }),
-      T.extend(T.struct({ b: X2 })),
-      T.extend(T.record(S.symbol, X3))
+      C.extend(C.struct({ b: X2 })),
+      C.extend(C.record(S.symbol, X3))
     )
     const c = Symbol.for("@effect/schema/test/c")
     await Util.expectParseSuccess(transform, { a: "a", b: "b" }, { a: "a", b: "bb" })
@@ -131,7 +131,7 @@ describe.concurrent("extend", () => {
   it("should fail on illegal types", async () => {
     const transform = pipe(
       S.struct({ a: S.number }), // <= this is illegal
-      T.extend(T.record(S.string, T.NumberFromString))
+      C.extend(C.record(S.string, C.NumberFromString))
     )
     await Util.expectParseFailure(transform, { a: 1 }, "/a Expected string, actual 1")
   })

@@ -1,5 +1,4 @@
 import { pipe } from "@effect/data/Function"
-import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
@@ -8,9 +7,9 @@ describe.concurrent("multipleOf", () => {
     Util.roundtrip(S.multipleOf(2)(S.number))
   })
 
-  it("Guard", () => {
+  it("is", () => {
     const schema = pipe(S.number, S.multipleOf(-.2))
-    const is = P.is(schema)
+    const is = S.is(schema)
     expect(is(-2.8)).toEqual(true)
     expect(is(-2)).toEqual(true)
     expect(is(-1.5)).toEqual(false)
@@ -20,7 +19,7 @@ describe.concurrent("multipleOf", () => {
     expect(is(3.1)).toEqual(false)
   })
 
-  it("Decoder", async () => {
+  it("decode", async () => {
     const schema = S.multipleOf(2)(S.number)
     await Util.expectParseSuccess(schema, -4)
     await Util.expectParseFailure(

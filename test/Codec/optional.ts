@@ -1,12 +1,12 @@
 import * as O from "@effect/data/Option"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("optional", () => {
   it("default", async () => {
-    const transform = T.struct({
-      a: T.optional(T.NumberFromString).withDefault(() => 0)
+    const transform = C.struct({
+      a: C.optional(C.NumberFromString).withDefault(() => 0)
     })
     await Util.expectParseSuccess(transform, {}, { a: 0 })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
@@ -17,7 +17,7 @@ describe.concurrent("optional", () => {
   })
 
   it("Option", async () => {
-    const transform = T.struct({ a: T.optional(T.NumberFromString).toOption() })
+    const transform = C.struct({ a: C.optional(C.NumberFromString).toOption() })
     await Util.expectParseSuccess(transform, {}, { a: O.none() })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: O.some(1) })
     await Util.expectParseFailure(transform, { a: "a" }, `/a Expected string -> number, actual "a"`)
@@ -33,11 +33,11 @@ describe.concurrent("optional", () => {
   })
 
   it("all", async () => {
-    const transform = T.struct({
+    const transform = C.struct({
       a: S.boolean,
-      b: T.optional(T.NumberFromString),
-      c: T.optional(T.Trim).withDefault(() => "-"),
-      d: T.optional(T.Date).toOption()
+      b: C.optional(C.NumberFromString),
+      c: C.optional(C.Trim).withDefault(() => "-"),
+      d: C.optional(C.Date).toOption()
     })
     await Util.expectParseSuccess(transform, { a: true }, { a: true, c: "-", d: O.none() })
     await Util.expectParseSuccess(transform, { a: true, b: "1" }, {

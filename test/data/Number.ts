@@ -1,7 +1,7 @@
 import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Number", () => {
   describe.concurrent("Schema", () => {
@@ -49,7 +49,7 @@ describe.concurrent("Number", () => {
 
   describe.concurrent("Transform", () => {
     it("clamp", async () => {
-      const transform = pipe(S.number, T.clamp(-1, 1))
+      const transform = pipe(S.number, C.clamp(-1, 1))
 
       await Util.expectParseSuccess(transform, 3, 1)
       await Util.expectParseSuccess(transform, 0, 0)
@@ -57,7 +57,7 @@ describe.concurrent("Number", () => {
     })
 
     describe.concurrent("NumberFromString", () => {
-      const transform = T.NumberFromString
+      const transform = C.NumberFromString
 
       it("property tests", () => {
         Util.roundtrip(transform)

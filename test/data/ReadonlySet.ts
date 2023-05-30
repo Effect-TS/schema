@@ -1,8 +1,7 @@
-import * as P from "@effect/schema/Parser"
+import * as C from "@effect/schema/Codec"
 import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("ReadonlySet", () => {
   describe.concurrent("Schema", () => {
@@ -12,7 +11,7 @@ describe.concurrent("ReadonlySet", () => {
 
     it("is", () => {
       const schema = S.readonlySet(S.string)
-      const is = P.is(schema)
+      const is = S.is(schema)
       expect(is(new Set())).toEqual(true)
       expect(is(new Set(["a", "b", "c"]))).toEqual(true)
 
@@ -34,11 +33,11 @@ describe.concurrent("ReadonlySet", () => {
   describe.concurrent("Transform", () => {
     describe.concurrent("readonlySetFromSelf", () => {
       it("property tests", () => {
-        Util.roundtrip(T.readonlySetFromSelf(S.number))
+        Util.roundtrip(C.readonlySetFromSelf(S.number))
       })
 
       it("parse", async () => {
-        const transform = T.readonlySetFromSelf(T.NumberFromString)
+        const transform = C.readonlySetFromSelf(C.NumberFromString)
         await Util.expectParseSuccess(transform, new Set(), new Set())
         await Util.expectParseSuccess(transform, new Set(["1", "2", "3"]), new Set([1, 2, 3]))
 
@@ -55,7 +54,7 @@ describe.concurrent("ReadonlySet", () => {
       })
 
       it("encode", async () => {
-        const transform = T.readonlySetFromSelf(T.NumberFromString)
+        const transform = C.readonlySetFromSelf(C.NumberFromString)
         await Util.expectEncodeSuccess(transform, new Set(), new Set())
         await Util.expectEncodeSuccess(transform, new Set([1, 2, 3]), new Set(["1", "2", "3"]))
       })
@@ -63,11 +62,11 @@ describe.concurrent("ReadonlySet", () => {
 
     describe.concurrent("readonlySet", () => {
       it("property tests", () => {
-        Util.roundtrip(T.readonlySet(S.number))
+        Util.roundtrip(C.readonlySet(S.number))
       })
 
       it("parse", async () => {
-        const transform = T.readonlySet(S.number)
+        const transform = C.readonlySet(S.number)
         await Util.expectParseSuccess(transform, [], new Set([]))
         await Util.expectParseSuccess(transform, [1, 2, 3], new Set([1, 2, 3]))
 
@@ -80,7 +79,7 @@ describe.concurrent("ReadonlySet", () => {
       })
 
       it("encode", async () => {
-        const transform = T.readonlySet(S.number)
+        const transform = C.readonlySet(S.number)
         await Util.expectEncodeSuccess(transform, new Set(), [])
         await Util.expectEncodeSuccess(transform, new Set([1, 2, 3]), [1, 2, 3])
       })

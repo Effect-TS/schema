@@ -1,8 +1,7 @@
-import * as P from "@effect/schema/Parser"
+import * as C from "@effect/schema/Codec"
 import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("ReadonlyMap", () => {
   describe.concurrent("Schema", () => {
@@ -12,7 +11,7 @@ describe.concurrent("ReadonlyMap", () => {
 
     it("is", () => {
       const schema = S.readonlyMap(S.number, S.string)
-      const is = P.is(schema)
+      const is = S.is(schema)
       expect(is(new Map())).toEqual(true)
       expect(is(new Map([[1, "a"], [2, "b"], [3, "c"]]))).toEqual(true)
 
@@ -38,11 +37,11 @@ describe.concurrent("ReadonlyMap", () => {
   describe.concurrent("Transform", () => {
     describe.concurrent("readonlyMapFromSelf", () => {
       it("property tests", () => {
-        Util.roundtrip(T.readonlyMapFromSelf(S.number, S.string))
+        Util.roundtrip(C.readonlyMapFromSelf(S.number, S.string))
       })
 
       it("parse", async () => {
-        const transform = T.readonlyMapFromSelf(T.NumberFromString, S.string)
+        const transform = C.readonlyMapFromSelf(C.NumberFromString, S.string)
         await Util.expectParseSuccess(transform, new Map(), new Map())
         await Util.expectParseSuccess(
           transform,
@@ -63,7 +62,7 @@ describe.concurrent("ReadonlyMap", () => {
       })
 
       it("encode", async () => {
-        const transform = T.readonlyMapFromSelf(T.NumberFromString, S.string)
+        const transform = C.readonlyMapFromSelf(C.NumberFromString, S.string)
         await Util.expectEncodeSuccess(transform, new Map(), new Map())
         await Util.expectEncodeSuccess(
           transform,
@@ -75,11 +74,11 @@ describe.concurrent("ReadonlyMap", () => {
 
     describe.concurrent("readonlyMap", () => {
       it("property tests", () => {
-        Util.roundtrip(T.readonlyMap(S.number, S.string))
+        Util.roundtrip(C.readonlyMap(S.number, S.string))
       })
 
       it("parse", async () => {
-        const transform = T.readonlyMap(S.number, S.string)
+        const transform = C.readonlyMap(S.number, S.string)
         await Util.expectParseSuccess(transform, [], new Map())
         await Util.expectParseSuccess(
           transform,
@@ -100,7 +99,7 @@ describe.concurrent("ReadonlyMap", () => {
       })
 
       it("encode", async () => {
-        const transform = T.readonlyMap(S.number, S.string)
+        const transform = C.readonlyMap(S.number, S.string)
         await Util.expectEncodeSuccess(transform, new Map(), [])
         await Util.expectEncodeSuccess(transform, new Map([[1, "a"], [2, "b"], [3, "c"]]), [[
           1,

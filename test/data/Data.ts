@@ -1,9 +1,8 @@
 import * as Data from "@effect/data/Data"
-import * as P from "@effect/schema/Parser"
+import * as C from "@effect/schema/Codec"
 import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Data", () => {
   describe.concurrent("Schema", () => {
@@ -14,7 +13,7 @@ describe.concurrent("Data", () => {
 
     it("is", () => {
       const schema = S.data(S.struct({ a: S.string, b: S.number }))
-      const is = P.is(schema)
+      const is = S.is(schema)
       expect(is(Data.struct({ a: "ok", b: 0 }))).toEqual(true)
       expect(is({ a: "ok", b: 0 })).toEqual(false)
       expect(is(Data.struct({ a: "ok", b: "no" }))).toEqual(false)
@@ -30,12 +29,12 @@ describe.concurrent("Data", () => {
   describe.concurrent("Transform", () => {
     describe.concurrent("dataFromSelf", () => {
       it("property tests", () => {
-        Util.roundtrip(T.dataFromSelf(S.struct({ a: S.string, b: S.number })))
-        Util.roundtrip(T.dataFromSelf(T.array(S.number)))
+        Util.roundtrip(C.dataFromSelf(S.struct({ a: S.string, b: S.number })))
+        Util.roundtrip(C.dataFromSelf(C.array(S.number)))
       })
 
       it("parse", async () => {
-        const transform = T.dataFromSelf(S.struct({ a: S.string, b: S.number }))
+        const transform = C.dataFromSelf(S.struct({ a: S.string, b: S.number }))
         await Util.expectParseSuccess(
           transform,
           Data.struct({ a: "ok", b: 0 }),
@@ -54,7 +53,7 @@ describe.concurrent("Data", () => {
       })
 
       it("encode", async () => {
-        const transform = T.dataFromSelf(S.struct({ a: S.string, b: S.number }))
+        const transform = C.dataFromSelf(S.struct({ a: S.string, b: S.number }))
         await Util.expectEncodeSuccess(
           transform,
           Data.struct({ a: "ok", b: 0 }),
@@ -65,12 +64,12 @@ describe.concurrent("Data", () => {
 
     describe.concurrent("data", () => {
       it("property tests", () => {
-        Util.roundtrip(T.data(S.struct({ a: S.string, b: S.number })))
-        Util.roundtrip(T.data(T.array(S.number)))
+        Util.roundtrip(C.data(S.struct({ a: S.string, b: S.number })))
+        Util.roundtrip(C.data(C.array(S.number)))
       })
 
       it("parse", async () => {
-        const transform = T.data(S.struct({ a: S.string, b: S.number }))
+        const transform = C.data(S.struct({ a: S.string, b: S.number }))
         await Util.expectParseSuccess(
           transform,
           { a: "ok", b: 0 },
@@ -84,7 +83,7 @@ describe.concurrent("Data", () => {
       })
 
       it("encode", async () => {
-        const transform = T.data(S.struct({ a: S.string, b: S.number }))
+        const transform = C.data(S.struct({ a: S.string, b: S.number }))
         await Util.expectEncodeSuccess(transform, Data.struct({ a: "ok", b: 0 }), { a: "ok", b: 0 })
       })
     })

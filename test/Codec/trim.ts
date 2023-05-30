@@ -1,16 +1,16 @@
 import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("trim", () => {
   it("property tests", () => {
-    const transform = T.Trim
+    const transform = C.Trim
     Util.roundtrip(transform)
   })
 
   it("parse", async () => {
-    const transform = pipe(S.string, S.minLength(1), T.trim)
+    const transform = pipe(S.string, S.minLength(1), C.trim)
     await Util.expectParseSuccess(transform, "a", "a")
     await Util.expectParseSuccess(transform, "a ", "a")
     await Util.expectParseSuccess(transform, " a ", "a")
@@ -28,7 +28,7 @@ describe.concurrent("trim", () => {
   })
 
   it("encode", async () => {
-    const transform = pipe(S.string, S.minLength(1), T.trim)
+    const transform = pipe(S.string, S.minLength(1), C.trim)
     await Util.expectEncodeSuccess(transform, "a", "a")
 
     await Util.expectEncodeFailure(

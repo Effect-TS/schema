@@ -1,5 +1,5 @@
+import * as C from "@effect/schema/Codec"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("from", () => {
   it("lazy", async () => {
@@ -9,12 +9,12 @@ describe.concurrent("from", () => {
     interface A {
       prop: A | number
     }
-    const schema: T.Transform<I, A> = T.lazy(() =>
-      T.struct({
-        prop: T.union(T.NumberFromString, schema)
+    const schema: C.Codec<I, A> = C.lazy(() =>
+      C.struct({
+        prop: C.union(C.NumberFromString, schema)
       })
     )
-    const from = T.from(schema)
+    const from = C.from(schema)
     await Util.expectParseSuccess(from, { prop: "a" })
     await Util.expectParseSuccess(from, { prop: { prop: "a" } })
   })

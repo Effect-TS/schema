@@ -1,10 +1,10 @@
 import { pipe } from "@effect/data/Function"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 import * as fc from "fast-check"
 
 const doProperty = true
@@ -24,7 +24,7 @@ describe.concurrent("Arbitrary", () => {
   })
 
   it("should throw on transformations", () => {
-    const schema = T.NumberFromString
+    const schema = C.NumberFromString
     expect(() => A.go(schema.ast)).toThrowError(
       new Error("cannot build an Arbitrary for transformations")
     )
@@ -43,36 +43,36 @@ describe.concurrent("Arbitrary", () => {
   })
 
   it("to", () => {
-    const schema = T.NumberFromString
-    property(T.to(schema))
+    const schema = C.NumberFromString
+    property(C.to(schema))
   })
 
   it("from", () => {
-    const NumberFromString = T.NumberFromString
-    const schema = T.struct({
+    const NumberFromString = C.NumberFromString
+    const schema = C.struct({
       a: NumberFromString,
-      b: T.tuple(NumberFromString),
-      c: T.union(NumberFromString, S.boolean),
-      d: pipe(NumberFromString, T.filter(S.positive())),
-      e: T.optionFromSelf(NumberFromString)
+      b: C.tuple(NumberFromString),
+      c: C.union(NumberFromString, S.boolean),
+      d: pipe(NumberFromString, C.filter(S.positive())),
+      e: C.optionFromSelf(NumberFromString)
     })
-    property(T.from(schema))
+    property(C.from(schema))
   })
 
   it("from/ lazy", () => {
-    const NumberFromString = T.NumberFromString
+    const NumberFromString = C.NumberFromString
     interface I {
       readonly a: string | I
     }
     interface A {
       readonly a: number | A
     }
-    const schema: T.Transform<I, A> = T.lazy(() =>
-      T.struct({
-        a: T.union(NumberFromString, schema)
+    const schema: C.Codec<I, A> = C.lazy(() =>
+      C.struct({
+        a: C.union(NumberFromString, schema)
       })
     )
-    property(T.from(schema))
+    property(C.from(schema))
   })
 
   it("templateLiteral. a", () => {

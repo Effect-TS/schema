@@ -1,7 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("AST.guards", () => {
   it("isDeclaration", () => {
@@ -20,7 +20,7 @@ describe.concurrent("AST.guards", () => {
   })
 
   it("isTransform", () => {
-    expect(AST.isTransform(pipe(S.string, T.trim).ast)).toEqual(true)
+    expect(AST.isTransform(pipe(S.string, C.trim).ast)).toEqual(true)
     expect(AST.isTransform(S.number.ast)).toEqual(false)
   })
 
@@ -92,8 +92,8 @@ describe.concurrent("AST.guards", () => {
       .toEqual(true)
     expect(AST.isParameter(pipe(S.string, S.minLength(2)).ast)).toEqual(true)
     expect(AST.isParameter(pipe(S.number, S.int()).ast)).toEqual(false)
-    expect(AST.isParameter(T.NumberFromString.ast)).toEqual(false)
-    expect(AST.isParameter(pipe(T.NumberFromString, T.filter(S.int())).ast))
+    expect(AST.isParameter(C.NumberFromString.ast)).toEqual(false)
+    expect(AST.isParameter(pipe(C.NumberFromString, C.filter(S.int())).ast))
     expect(AST.isParameter(S.templateLiteral(S.literal("a", "b"), S.literal("c")).ast)).toEqual(
       false
     )

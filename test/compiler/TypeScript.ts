@@ -5,8 +5,8 @@ import * as RA from "@effect/data/ReadonlyArray"
 import type * as applicative from "@effect/data/typeclass/Applicative"
 import * as covariant from "@effect/data/typeclass/Covariant"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
-import * as T from "@effect/schema/Transform"
 import ts from "typescript"
 
 const printNode = (node: ts.Node, printerOptions?: ts.PrinterOptions): string => {
@@ -528,7 +528,7 @@ describe.concurrent.skip("TypeScript", () => {
       Banana
     }
     const transform = pipe(S.enums(Fruits), S.identifier("Fruits"))
-    const ts = typeScriptFor(T.to(transform))
+    const ts = typeScriptFor(C.to(transform))
     expect(printNodes(ts.nodes)).toEqual([
       `enum Fruits {
     Apple = 0,
@@ -810,8 +810,8 @@ describe.concurrent.skip("TypeScript", () => {
   })
 
   it("optionFromOption", () => {
-    const transform = T.optionFromSelf(S.struct({ a: S.string }))
-    const ts = typeScriptFor(T.to(transform))
+    const transform = C.optionFromSelf(S.struct({ a: S.string }))
+    const ts = typeScriptFor(C.to(transform))
     expect(printNodes(ts.nodes)).toEqual([`Option<{
     readonly a: string;
 }>`])

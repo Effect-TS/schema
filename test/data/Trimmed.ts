@@ -1,4 +1,3 @@
-import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -11,7 +10,7 @@ describe.concurrent("trimmed", () => {
   })
 
   it("is", () => {
-    const is = P.is(schema)
+    const is = S.is(schema)
     expect(is("a")).toEqual(true)
     expect(is("")).toEqual(true)
     expect(is("a ")).toEqual(false)

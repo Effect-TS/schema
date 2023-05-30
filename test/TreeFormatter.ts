@@ -1,8 +1,8 @@
 import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 import * as _ from "@effect/schema/TreeFormatter"
 
 describe.concurrent("formatExpected", () => {
@@ -34,7 +34,7 @@ describe.concurrent("formatErrors", () => {
 
   it("forbidden", async () => {
     const schema = Util.effectify(S.struct({ a: S.string }), "all")
-    expect(() => T.parse(schema)({ a: "a" })).toThrowError(
+    expect(() => C.parse(schema)({ a: "a" })).toThrowError(
       new Error(`error(s) found
 └─ ["a"]
    └─ is forbidden`)

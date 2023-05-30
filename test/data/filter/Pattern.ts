@@ -2,7 +2,7 @@ import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("pattern", () => {
-  it("Guard", () => {
+  it("is", () => {
     const schema = pipe(S.string, S.pattern(/^abb+$/))
     const is = S.is(schema)
     expect(is("abb")).toEqual(true)

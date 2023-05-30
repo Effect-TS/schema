@@ -1,10 +1,10 @@
 ---
-title: Transform.ts
-nav_order: 7
+title: Codec.ts
+nav_order: 3
 parent: Modules
 ---
 
-## Transform overview
+## Codec overview
 
 Added in v1.0.0
 
@@ -73,9 +73,9 @@ Added in v1.0.0
   - [encodePromise](#encodepromise)
   - [encodeResult](#encoderesult)
 - [model](#model)
+  - [Codec (interface)](#codec-interface)
   - [From (type alias)](#from-type-alias)
   - [To (type alias)](#to-type-alias)
-  - [Transform (interface)](#transform-interface)
 - [number](#number)
   - [NumberFromString](#numberfromstring)
   - [clamp](#clamp)
@@ -109,7 +109,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunk: <I, A>(item: Transform<I, A>) => Transform<readonly I[], Chunk<A>>
+export declare const chunk: <I, A>(item: Codec<I, A>) => Codec<readonly I[], Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -119,7 +119,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunkFromSelf: <I, A>(item: Transform<I, A>) => Transform<Chunk<I>, Chunk<A>>
+export declare const chunkFromSelf: <I, A>(item: Codec<I, A>) => Codec<Chunk<I>, Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -135,8 +135,8 @@ export declare const data: <
   I extends readonly any[] | Readonly<Record<string, any>>,
   A extends readonly any[] | Readonly<Record<string, any>>
 >(
-  item: Transform<I, A>
-) => Transform<I, D.Data<A>>
+  item: Codec<I, A>
+) => Codec<I, D.Data<A>>
 ```
 
 Added in v1.0.0
@@ -150,8 +150,8 @@ export declare const dataFromSelf: <
   I extends readonly any[] | Readonly<Record<string, any>>,
   A extends readonly any[] | Readonly<Record<string, any>>
 >(
-  item: Transform<I, A>
-) => Transform<D.Data<I>, D.Data<A>>
+  item: Codec<I, A>
+) => Codec<D.Data<I>, D.Data<A>>
 ```
 
 Added in v1.0.0
@@ -165,7 +165,7 @@ A schema that transforms a `string` into a `Date`.
 **Signature**
 
 ```ts
-export declare const Date: Transform<string, Date>
+export declare const Date: Codec<string, Date>
 ```
 
 Added in v1.0.0
@@ -177,7 +177,7 @@ A combinator that transforms a `string` into a valid `Date`.
 **Signature**
 
 ```ts
-export declare const dateFromString: <I>(self: Transform<I, string>) => Transform<I, Date>
+export declare const dateFromString: <I>(self: Codec<I, string>) => Codec<I, Date>
 ```
 
 Added in v1.0.0
@@ -190,12 +190,9 @@ Added in v1.0.0
 
 ```ts
 export declare const either: <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-) => Transform<
-  { readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA },
-  Either<E, A>
->
+  left: Codec<IE, E>,
+  right: Codec<IA, A>
+) => Codec<{ readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA }, Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -206,9 +203,9 @@ Added in v1.0.0
 
 ```ts
 export declare const eitherFromSelf: <IE, E, IA, A>(
-  left: Transform<IE, E>,
-  right: Transform<IA, A>
-) => Transform<Either<IE, IA>, Either<E, A>>
+  left: Codec<IE, E>,
+  right: Codec<IA, A>
+) => Codec<Either<IE, IA>, Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -221,8 +218,8 @@ Added in v1.0.0
 
 ```ts
 export declare const option: <I, A>(
-  value: Transform<I, A>
-) => Transform<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
+  value: Codec<I, A>
+) => Codec<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
 ```
 
 Added in v1.0.0
@@ -232,7 +229,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionFromSelf: <I, A>(value: Transform<I, A>) => Transform<Option<I>, Option<A>>
+export declare const optionFromSelf: <I, A>(value: Codec<I, A>) => Codec<Option<I>, Option<A>>
 ```
 
 Added in v1.0.0
@@ -245,9 +242,9 @@ Added in v1.0.0
 
 ```ts
 export declare const readonlyMap: <IK, K, IV, V>(
-  key: Transform<IK, K>,
-  value: Transform<IV, V>
-) => Transform<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
+  key: Codec<IK, K>,
+  value: Codec<IV, V>
+) => Codec<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
@@ -258,9 +255,9 @@ Added in v1.0.0
 
 ```ts
 export declare const readonlyMapFromSelf: <IK, K, IV, V>(
-  key: Transform<IK, K>,
-  value: Transform<IV, V>
-) => Transform<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
+  key: Codec<IK, K>,
+  value: Codec<IV, V>
+) => Codec<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
@@ -272,7 +269,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const readonlySet: <I, A>(item: Transform<I, A>) => Transform<readonly I[], ReadonlySet<A>>
+export declare const readonlySet: <I, A>(item: Codec<I, A>) => Codec<readonly I[], ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -282,7 +279,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const readonlySetFromSelf: <I, A>(item: Transform<I, A>) => Transform<ReadonlySet<I>, ReadonlySet<A>>
+export declare const readonlySetFromSelf: <I, A>(item: Codec<I, A>) => Codec<ReadonlySet<I>, ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -296,7 +293,7 @@ Clamps a bigint between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clampBigint: (min: bigint, max: bigint) => <I>(self: Transform<I, bigint>) => Transform<I, bigint>
+export declare const clampBigint: (min: bigint, max: bigint) => <I>(self: Codec<I, bigint>) => Codec<I, bigint>
 ```
 
 Added in v1.0.0
@@ -310,7 +307,7 @@ Negates a boolean value
 **Signature**
 
 ```ts
-export declare const not: <I>(self: Transform<I, boolean>) => Transform<I, boolean>
+export declare const not: <I>(self: Codec<I, boolean>) => Codec<I, boolean>
 ```
 
 Added in v1.0.0
@@ -322,7 +319,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const array: <I, A>(item: Transform<I, A>) => Transform<readonly I[], readonly A[]>
+export declare const array: <I, A>(item: Codec<I, A>) => Codec<readonly I[], readonly A[]>
 ```
 
 Added in v1.0.0
@@ -339,24 +336,24 @@ but rather maps to another schema, for example when you want to add a discrimina
 export declare const attachPropertySignature: <K extends string | number | symbol, V extends AST.LiteralValue>(
   key: K,
   value: V
-) => <I, A extends object>(transform: Transform<I, A>) => Transform<I, S.Spread<A & { readonly [k in K]: V }>>
+) => <I, A extends object>(transform: Codec<I, A>) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
 ```
 
 **Example**
 
 ```ts
 import * as S from '@effect/schema/Schema'
-import * as T from '@effect/schema/Transform'
+import * as C from '@effect/schema/Codec'
 import { pipe } from '@effect/data/Function'
 
 const Circle = S.struct({ radius: S.number })
 const Square = S.struct({ sideLength: S.number })
-const Shape = T.union(
-  pipe(Circle, T.attachPropertySignature('kind', 'circle')),
-  pipe(Square, T.attachPropertySignature('kind', 'square'))
+const Shape = C.union(
+  pipe(Circle, C.attachPropertySignature('kind', 'circle')),
+  pipe(Square, C.attachPropertySignature('kind', 'square'))
 )
 
-assert.deepStrictEqual(T.decode(Shape)({ radius: 10 }), {
+assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
   kind: 'circle',
   radius: 10,
 })
@@ -370,10 +367,10 @@ Added in v1.0.0
 
 ```ts
 export declare const element: <IE, E>(
-  element: Transform<IE, E>
+  element: Codec<IE, E>
 ) => <I extends readonly any[], A extends readonly any[]>(
-  self: Transform<I, A>
-) => Transform<readonly [...I, IE], readonly [...A, E]>
+  self: Codec<I, A>
+) => Codec<readonly [...I, IE], readonly [...A, E]>
 ```
 
 Added in v1.0.0
@@ -384,8 +381,8 @@ Added in v1.0.0
 
 ```ts
 export declare const extend: {
-  <IB, B>(that: Transform<IB, B>): <I, A>(self: Transform<I, A>) => Transform<S.Spread<I & IB>, S.Spread<A & B>>
-  <I, A, IB, B>(self: Transform<I, A>, that: Transform<IB, B>): Transform<S.Spread<I & IB>, S.Spread<A & B>>
+  <IB, B>(that: Codec<IB, B>): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
+  <I, A, IB, B>(self: Codec<I, A>, that: Codec<IB, B>): Codec<S.Spread<I & IB>, S.Spread<A & B>>
 }
 ```
 
@@ -400,7 +397,7 @@ Applies a `Schema` transformation.
 ```ts
 export declare const filter: <A, B extends A>(
   f: (schema: S.Schema<A>) => S.Schema<B>
-) => <I>(transform: Transform<I, A>) => Transform<I, B>
+) => <I>(transform: Codec<I, A>) => Codec<I, B>
 ```
 
 Added in v1.0.0
@@ -410,10 +407,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <I, A>(
-  f: () => Transform<I, A>,
-  annotations?: AST.Annotations | undefined
-) => Transform<I, A>
+export declare const lazy: <I, A>(f: () => Codec<I, A>, annotations?: AST.Annotations | undefined) => Codec<I, A>
 ```
 
 Added in v1.0.0
@@ -423,9 +417,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nonEmptyArray: <I, A>(
-  item: Transform<I, A>
-) => Transform<readonly [I, ...I[]], readonly [A, ...A[]]>
+export declare const nonEmptyArray: <I, A>(item: Codec<I, A>) => Codec<readonly [I, ...I[]], readonly [A, ...A[]]>
 ```
 
 Added in v1.0.0
@@ -435,7 +427,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const nullable: <From, To>(self: Transform<From, To>) => Transform<From | null, To | null>
+export declare const nullable: <From, To>(self: Codec<From, To>) => Codec<From | null, To | null>
 ```
 
 Added in v1.0.0
@@ -448,8 +440,8 @@ Added in v1.0.0
 export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
-  self: Transform<I, A>
-) => Transform<S.Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, S.Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
+  self: Codec<I, A>
+) => Codec<S.Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, S.Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
 ```
 
 Added in v1.0.0
@@ -460,10 +452,10 @@ Added in v1.0.0
 
 ```ts
 export declare const optionalElement: <IE, E>(
-  element: Transform<IE, E>
+  element: Codec<IE, E>
 ) => <I extends readonly any[], A extends readonly any[]>(
-  self: Transform<I, A>
-) => Transform<readonly [...I, (IE | undefined)?], readonly [...A, (E | undefined)?]>
+  self: Codec<I, A>
+) => Codec<readonly [...I, (IE | undefined)?], readonly [...A, (E | undefined)?]>
 ```
 
 Added in v1.0.0
@@ -476,8 +468,8 @@ Added in v1.0.0
 export declare const pick: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
-  self: Transform<I, A>
-) => Transform<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>>
+  self: Codec<I, A>
+) => Codec<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -489,8 +481,8 @@ Added in v1.0.0
 ```ts
 export declare const record: <K extends string | symbol, I, A>(
   key: S.Schema<K>,
-  value: Transform<I, A>
-) => Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }>
+  value: Codec<I, A>
+) => Codec<{ readonly [k in K]: I }, { readonly [k in K]: A }>
 ```
 
 Added in v1.0.0
@@ -501,10 +493,10 @@ Added in v1.0.0
 
 ```ts
 export declare const rest: <IR, R>(
-  rest: Transform<IR, R>
+  rest: Codec<IR, R>
 ) => <I extends readonly any[], A extends readonly any[]>(
-  self: Transform<I, A>
-) => Transform<readonly [...I, ...IR[]], readonly [...A, ...R[]]>
+  self: Codec<I, A>
+) => Codec<readonly [...I, ...IR[]], readonly [...A, ...R[]]>
 ```
 
 Added in v1.0.0
@@ -517,14 +509,14 @@ Added in v1.0.0
 export declare const struct: <
   Fields extends Record<
     string | number | symbol,
-    | Transform<any, any>
-    | Transform<never, never>
     | S.PropertySignature<any, boolean, any, boolean>
     | S.PropertySignature<never, boolean, never, boolean>
+    | Codec<any, any>
+    | Codec<never, never>
   >
 >(
   fields: Fields
-) => Transform<
+) => Codec<
   S.Spread<
     { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
       readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
@@ -545,12 +537,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: <Elements extends readonly Transform<any, any>[]>(
+export declare const tuple: <Elements extends readonly Codec<any, any>[]>(
   ...elements: Elements
-) => Transform<
-  { readonly [K in keyof Elements]: From<Elements[K]> },
-  { readonly [K in keyof Elements]: To<Elements[K]> }
->
+) => Codec<{ readonly [K in keyof Elements]: From<Elements[K]> }, { readonly [K in keyof Elements]: To<Elements[K]> }>
 ```
 
 Added in v1.0.0
@@ -560,9 +549,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const union: <Members extends readonly Transform<any, any>[]>(
+export declare const union: <Members extends readonly Codec<any, any>[]>(
   ...members: Members
-) => Transform<From<Members[number]>, To<Members[number]>>
+) => Codec<From<Members[number]>, To<Members[number]>>
 ```
 
 Added in v1.0.0
@@ -574,29 +563,27 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const make: <I, A>(ast: AST.AST) => Transform<I, A>
+export declare const make: <I, A>(ast: AST.AST) => Codec<I, A>
 ```
 
 Added in v1.0.0
 
 ## transform
 
-Create a new `Transform` by transforming the input and output of an existing `Schema`
+Create a new `Codec` by transforming the input and output of an existing `Schema`
 using the provided mapping functions.
 
 **Signature**
 
 ```ts
 export declare const transform: {
-  <I2, A2, A1>(to: Transform<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): <I1>(
-    self: Transform<I1, A1>
-  ) => Transform<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
-    decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
-  ): Transform<I1, A2>
+  <I2, A2, A1>(to: Codec<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): <I1>(
+    self: Codec<I1, A1>
+  ) => Codec<I1, A2>
+  <I1, A1, I2, A2>(from: Codec<I1, A1>, to: Codec<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Codec<
+    I1,
+    A2
+  >
 }
 ```
 
@@ -604,7 +591,7 @@ Added in v1.0.0
 
 ## transformResult
 
-Create a new `Transform` by transforming the input and output of an existing `Schema`
+Create a new `Codec` by transforming the input and output of an existing `Schema`
 using the provided decoding functions.
 
 **Signature**
@@ -612,16 +599,16 @@ using the provided decoding functions.
 ```ts
 export declare const transformResult: {
   <I2, A2, A1>(
-    to: Transform<I2, A2>,
+    to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
     encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
-  ): <I1>(self: Transform<I1, A1>) => Transform<I1, A2>
+  ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
   <I1, A1, I2, A2>(
-    from: Transform<I1, A1>,
-    to: Transform<I2, A2>,
+    from: Codec<I1, A1>,
+    to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
     encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
-  ): Transform<I1, A2>
+  ): Codec<I1, A2>
 }
 ```
 
@@ -634,7 +621,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <I, A>(schema: Transform<I, A>) => (i: I, options?: ParseOptions | undefined) => A
+export declare const decode: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -645,7 +632,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeEffect: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
 
@@ -657,7 +644,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeEither: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
 ```
 
@@ -669,7 +656,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeOption: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Option<A>
 ```
 
@@ -681,7 +668,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodePromise: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Promise<A>
 ```
 
@@ -693,7 +680,7 @@ Added in v1.0.0
 
 ```ts
 export declare const decodeResult: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
@@ -706,7 +693,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encode: <I, A>(schema: Transform<I, A>) => (a: A, options?: ParseOptions | undefined) => I
+export declare const encode: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions | undefined) => I
 ```
 
 Added in v1.0.0
@@ -717,7 +704,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeEffect: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, I>
 ```
 
@@ -729,7 +716,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeEither: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => Either<PR.ParseError, I>
 ```
 
@@ -741,7 +728,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeOption: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (input: A, options?: ParseOptions | undefined) => Option<I>
 ```
 
@@ -753,7 +740,7 @@ Added in v1.0.0
 
 ```ts
 export declare const encodePromise: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => Promise<I>
 ```
 
@@ -765,13 +752,27 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeResult: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I>
 ```
 
 Added in v1.0.0
 
 # model
+
+## Codec (interface)
+
+**Signature**
+
+```ts
+export interface Codec<From, To> {
+  readonly From: (_: From) => From
+  readonly To: (_: To) => To
+  readonly ast: AST.AST
+}
+```
+
+Added in v1.0.0
 
 ## From (type alias)
 
@@ -793,20 +794,6 @@ export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To
 
 Added in v1.0.0
 
-## Transform (interface)
-
-**Signature**
-
-```ts
-export interface Transform<From, To> {
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
-  readonly ast: AST.AST
-}
-```
-
-Added in v1.0.0
-
 # number
 
 ## NumberFromString
@@ -818,7 +805,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 **Signature**
 
 ```ts
-export declare const NumberFromString: Transform<string, number>
+export declare const NumberFromString: Codec<string, number>
 ```
 
 Added in v1.0.0
@@ -830,7 +817,7 @@ Clamps a number between a minimum and a maximum value.
 **Signature**
 
 ```ts
-export declare const clamp: (min: number, max: number) => <I>(self: Transform<I, number>) => Transform<I, number>
+export declare const clamp: (min: number, max: number) => <I>(self: Codec<I, number>) => Codec<I, number>
 ```
 
 Added in v1.0.0
@@ -844,7 +831,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 **Signature**
 
 ```ts
-export declare const numberFromString: <I>(self: Transform<I, string>) => Transform<I, number>
+export declare const numberFromString: <I>(self: Codec<I, string>) => Codec<I, number>
 ```
 
 Added in v1.0.0
@@ -856,7 +843,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionFromNullable: <I, A>(value: Transform<I, A>) => Transform<I | null, Option<A>>
+export declare const optionFromNullable: <I, A>(value: Codec<I, A>) => Codec<I | null, Option<A>>
 ```
 
 Added in v1.0.0
@@ -868,7 +855,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parse: <I, A>(schema: Transform<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
+export declare const parse: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0
@@ -879,7 +866,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseEffect: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
 
@@ -891,7 +878,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseEither: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
 ```
 
@@ -903,7 +890,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseOption: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Option<A>
 ```
 
@@ -915,7 +902,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parsePromise: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Promise<A>
 ```
 
@@ -927,7 +914,7 @@ Added in v1.0.0
 
 ```ts
 export declare const parseResult: <I, A>(
-  schema: Transform<I, A>
+  schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
 ```
 
@@ -942,7 +929,7 @@ This transformation allows removing whitespaces from the beginning and end of a 
 **Signature**
 
 ```ts
-export declare const Trim: Transform<string, string>
+export declare const Trim: Codec<string, string>
 ```
 
 Added in v1.0.0
@@ -954,7 +941,7 @@ This combinator allows removing whitespaces from the beginning and end of a stri
 **Signature**
 
 ```ts
-export declare const trim: <I>(self: Transform<I, string>) => Transform<I, string>
+export declare const trim: <I>(self: Codec<I, string>) => Codec<I, string>
 ```
 
 Added in v1.0.0
@@ -997,7 +984,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(transform: Transform<I, A>) => S.Schema<I>
+export declare const from: <I, A>(transform: Codec<I, A>) => S.Schema<I>
 ```
 
 Added in v1.0.0
@@ -1008,7 +995,7 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: <I, A>(
-  transform: Transform<I, A>,
+  transform: Codec<I, A>,
   annotations?: AST.Annotations | undefined
 ) => TransformPropertySignature<I, true, A, true>
 ```
@@ -1021,7 +1008,7 @@ Added in v1.0.0
 
 ```ts
 export declare const propertySignature: <I, A>(
-  transform: Transform<I, A>,
+  transform: Codec<I, A>,
   annotations?: AST.Annotations | undefined
 ) => TransformPropertySignature<I, false, A, false>
 ```
@@ -1033,7 +1020,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(transform: Transform<I, A>) => S.Schema<A>
+export declare const to: <I, A>(transform: Codec<I, A>) => S.Schema<A>
 ```
 
 Added in v1.0.0

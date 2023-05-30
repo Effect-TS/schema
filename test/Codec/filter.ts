@@ -1,26 +1,26 @@
 import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Refinement", () => {
   it("filter int", async () => {
-    const transform = pipe(T.NumberFromString, T.filter(S.int()))
+    const transform = pipe(C.NumberFromString, C.filter(S.int()))
 
     await Util.expectParseSuccess(transform, "1", 1)
     await Util.expectParseFailure(transform, "1.2", "Expected integer, actual 1.2")
 
     // should work with `Schema`s too
-    const schema = pipe(S.number, T.filter(S.int()))
+    const schema = pipe(S.number, C.filter(S.int()))
     await Util.expectParseSuccess(schema, 1)
     await Util.expectParseFailure(schema, 1.2, "Expected integer, actual 1.2")
   })
 
   it("filter greaterThanOrEqualTo + lessThanOrEqualTo", async () => {
     const schema = pipe(
-      T.NumberFromString,
-      T.filter(S.greaterThanOrEqualTo(1)),
-      T.filter(S.lessThanOrEqualTo(2))
+      C.NumberFromString,
+      C.filter(S.greaterThanOrEqualTo(1)),
+      C.filter(S.lessThanOrEqualTo(2))
     )
     await Util.expectParseSuccess(schema, "1", 1)
     await Util.expectParseFailure(

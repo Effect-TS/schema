@@ -4,7 +4,6 @@ import { isRecord } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as A from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
-import * as P from "@effect/schema/Parser"
 import * as S from "@effect/schema/Schema"
 import Ajv from "ajv"
 import * as fc from "fast-check"
@@ -246,7 +245,7 @@ const jsonSchemaFor = <A>(schema: S.Schema<A>): JsonSchema7Type => {
 
 const property = <A>(schema: S.Schema<A>) => {
   const arbitrary = A.build(schema)
-  const is = P.is(schema)
+  const is = S.is(schema)
   const validate = new Ajv({ strict: false }).compile(jsonSchemaFor(schema))
   const arb = arbitrary(fc).filter(isJson)
   fc.assert(fc.property(arb, (a) => {
@@ -257,7 +256,7 @@ const property = <A>(schema: S.Schema<A>) => {
 const ajv = new Ajv({ strict: false })
 
 export const assertTrue = <A>(schema: S.Schema<A>, input: unknown) => {
-  const is = P.is(schema)
+  const is = S.is(schema)
   const jsonschema = jsonSchemaFor(schema)
   const validate = ajv.compile(jsonschema)
   expect(is(input)).toEqual(validate(input))
@@ -265,7 +264,7 @@ export const assertTrue = <A>(schema: S.Schema<A>, input: unknown) => {
 }
 
 export const assertFalse = <A>(schema: S.Schema<A>, input: unknown) => {
-  const is = P.is(schema)
+  const is = S.is(schema)
   const jsonschema = jsonSchemaFor(schema)
   const validate = ajv.compile(jsonschema)
   expect(is(input)).toEqual(validate(input))

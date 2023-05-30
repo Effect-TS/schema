@@ -3,99 +3,99 @@ import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as Effect from "@effect/io/Effect"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("Parser", () => {
   it("asserts", () => {
     const schema = S.string
-    expect(P.asserts(schema)("a")).toEqual(undefined)
-    expect(() => P.asserts(schema)(1)).toThrowError(
+    expect(S.asserts(schema)("a")).toEqual(undefined)
+    expect(() => S.asserts(schema)(1)).toThrowError(
       new Error(`error(s) found
 └─ Expected string, actual 1`)
     )
   })
 
   it("parse", () => {
-    const transform = T.NumberFromString
-    expect(P.parse(transform)("1")).toEqual(1)
-    expect(() => P.parse(transform)("a")).toThrowError(
+    const transform = C.NumberFromString
+    expect(C.parse(transform)("1")).toEqual(1)
+    expect(() => C.parse(transform)("a")).toThrowError(
       new Error(`error(s) found
 └─ Expected string -> number, actual "a"`)
     )
   })
 
   it("parseOption", () => {
-    const transform = T.NumberFromString
-    expect(P.parseOption(transform)("1")).toEqual(O.some(1))
-    expect(P.parseOption(transform)("a")).toEqual(O.none())
+    const transform = C.NumberFromString
+    expect(C.parseOption(transform)("1")).toEqual(O.some(1))
+    expect(C.parseOption(transform)("a")).toEqual(O.none())
   })
 
   it("parseEither", () => {
-    const transform = T.NumberFromString
-    expect(P.parseEither(transform)("1")).toEqual(E.right(1))
-    expect(P.parseEither(transform)("a")).toEqual(
+    const transform = C.NumberFromString
+    expect(C.parseEither(transform)("1")).toEqual(E.right(1))
+    expect(C.parseEither(transform)("a")).toEqual(
       E.left(PR.parseError([PR.type(transform.ast, "a")]))
     )
   })
 
   it("parsePromise", async () => {
-    const transform = T.NumberFromString
-    await expect(P.parsePromise(transform)("1")).resolves.toEqual(1)
-    await expect(P.parsePromise(transform)("a")).rejects.toThrow()
+    const transform = C.NumberFromString
+    await expect(C.parsePromise(transform)("1")).resolves.toEqual(1)
+    await expect(C.parsePromise(transform)("a")).rejects.toThrow()
   })
 
   it("parseEffect", async () => {
-    const transform = T.NumberFromString
-    expect(await Effect.runPromiseEither(P.parseEffect(transform)("1"))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.parseEffect(transform)("a"))).toEqual(
+    const transform = C.NumberFromString
+    expect(await Effect.runPromiseEither(C.parseEffect(transform)("1"))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(C.parseEffect(transform)("a"))).toEqual(
       E.left(PR.parseError([PR.type(transform.ast, "a")]))
     )
   })
 
   it("decode", () => {
-    const transform = T.NumberFromString
-    expect(P.decode(transform)("1")).toEqual(1)
-    expect(() => P.decode(transform)("a")).toThrowError(
+    const transform = C.NumberFromString
+    expect(C.decode(transform)("1")).toEqual(1)
+    expect(() => C.decode(transform)("a")).toThrowError(
       new Error(`error(s) found
 └─ Expected string -> number, actual "a"`)
     )
   })
 
   it("decodeOption", () => {
-    const transform = T.NumberFromString
-    expect(P.decodeOption(transform)("1")).toEqual(O.some(1))
-    expect(P.decodeOption(transform)("a")).toEqual(O.none())
+    const transform = C.NumberFromString
+    expect(C.decodeOption(transform)("1")).toEqual(O.some(1))
+    expect(C.decodeOption(transform)("a")).toEqual(O.none())
   })
 
   it("decodeEither", () => {
-    const transform = T.NumberFromString
-    expect(P.decodeEither(transform)("1")).toEqual(E.right(1))
-    expect(P.decodeEither(transform)("a")).toEqual(
+    const transform = C.NumberFromString
+    expect(C.decodeEither(transform)("1")).toEqual(E.right(1))
+    expect(C.decodeEither(transform)("a")).toEqual(
       E.left(PR.parseError([PR.type(transform.ast, "a")]))
     )
   })
 
   it("decodePromise", async () => {
-    const transform = T.NumberFromString
-    await expect(P.decodePromise(transform)("1")).resolves.toEqual(1)
-    await expect(P.decodePromise(transform)("a")).rejects.toThrow()
+    const transform = C.NumberFromString
+    await expect(C.decodePromise(transform)("1")).resolves.toEqual(1)
+    await expect(C.decodePromise(transform)("a")).rejects.toThrow()
   })
 
   it("decodeEffect", async () => {
-    const transform = T.NumberFromString
-    expect(await Effect.runPromiseEither(P.decodeEffect(transform)("1"))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.decodeEffect(transform)("a"))).toEqual(
+    const transform = C.NumberFromString
+    expect(await Effect.runPromiseEither(C.decodeEffect(transform)("1"))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(C.decodeEffect(transform)("a"))).toEqual(
       E.left(PR.parseError([PR.type(transform.ast, "a")]))
     )
   })
 
   it("validate", () => {
     const schema = S.number
-    expect(P.validate(schema)(1)).toEqual(1)
-    expect(() => P.validate(schema)("1")).toThrowError(
+    expect(S.validate(schema)(1)).toEqual(1)
+    expect(() => S.validate(schema)("1")).toThrowError(
       new Error(`error(s) found
 └─ Expected number, actual "1"`)
     )
@@ -103,49 +103,49 @@ describe.concurrent("Parser", () => {
 
   it("validateOption", () => {
     const schema = S.number
-    expect(P.validateOption(schema)(1)).toEqual(O.some(1))
-    expect(P.validateOption(schema)("1")).toEqual(O.none())
+    expect(S.validateOption(schema)(1)).toEqual(O.some(1))
+    expect(S.validateOption(schema)("1")).toEqual(O.none())
   })
 
   it("validateEither", () => {
     const schema = S.number
-    expect(P.validateEither(schema)(1)).toEqual(E.right(1))
-    expect(P.validateEither(schema)("1")).toEqual(
+    expect(S.validateEither(schema)(1)).toEqual(E.right(1))
+    expect(S.validateEither(schema)("1")).toEqual(
       E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })
 
   it("validateResult", () => {
     const schema = S.number
-    expect(P.validateResult(schema)(1)).toEqual(E.right(1))
-    expect(P.validateResult(schema)("1")).toEqual(
+    expect(S.validateResult(schema)(1)).toEqual(E.right(1))
+    expect(S.validateResult(schema)("1")).toEqual(
       E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })
 
   it("validatePromise", async () => {
     const schema = S.number
-    await expect(P.validatePromise(schema)(1)).resolves.toEqual(1)
-    await expect(P.validatePromise(schema)("1")).rejects.toThrow()
-    await expect(P.validatePromise(schema)("a")).rejects.toThrow()
+    await expect(S.validatePromise(schema)(1)).resolves.toEqual(1)
+    await expect(S.validatePromise(schema)("1")).rejects.toThrow()
+    await expect(S.validatePromise(schema)("a")).rejects.toThrow()
   })
 
   it("validateEffect", async () => {
     const schema = S.number
-    expect(await Effect.runPromiseEither(P.validateEffect(schema)(1))).toEqual(E.right(1))
-    expect(await Effect.runPromiseEither(P.validateEffect(schema)("1"))).toEqual(
+    expect(await Effect.runPromiseEither(S.validateEffect(schema)(1))).toEqual(E.right(1))
+    expect(await Effect.runPromiseEither(S.validateEffect(schema)("1"))).toEqual(
       E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })
 
   it("encodeResult", () => {
-    const transform = T.NumberFromString
-    expect(P.encodeResult(transform)(1)).toEqual(E.right("1"))
+    const transform = C.NumberFromString
+    expect(C.encodeResult(transform)(1)).toEqual(E.right("1"))
   })
 
   it("encodePromise", async () => {
-    const transform = T.NumberFromString
-    await expect(P.encodePromise(transform)(1)).resolves.toEqual("1")
+    const transform = C.NumberFromString
+    await expect(C.encodePromise(transform)(1)).resolves.toEqual("1")
   })
 
   it("_getLiterals", () => {
@@ -168,8 +168,8 @@ describe.concurrent("Parser", () => {
         S.declare(
           [],
           S.struct({ _tag: S.literal("a") }),
-          () => P.parseResult(S.struct({ _tag: S.literal("a") })),
-          () => P.encodeResult(S.struct({ _tag: S.literal("a") }))
+          () => C.parseResult(S.struct({ _tag: S.literal("a") })),
+          () => C.encodeResult(S.struct({ _tag: S.literal("a") }))
         ).ast
       )
     ).toEqual([["_tag", AST.createLiteral("a")]])
@@ -177,7 +177,7 @@ describe.concurrent("Parser", () => {
     // Transform
     expect(
       P._getLiterals(
-        pipe(S.struct({ radius: S.number }), T.attachPropertySignature("kind", "circle")).ast
+        pipe(S.struct({ radius: S.number }), C.attachPropertySignature("kind", "circle")).ast
       )
     ).toEqual([])
   })

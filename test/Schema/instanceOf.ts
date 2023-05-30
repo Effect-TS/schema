@@ -1,4 +1,3 @@
-import * as P from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -6,7 +5,7 @@ import * as Util from "@effect/schema/test/util"
 describe.concurrent("instanceOf", () => {
   it("is", () => {
     const schema = S.instanceOf(Set)
-    const is = P.is(schema)
+    const is = S.is(schema)
     expect(is(new Set())).toEqual(true)
     expect(is(1)).toEqual(false)
     expect(is({})).toEqual(false)

@@ -1,15 +1,15 @@
 import { identity } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as AST from "@effect/schema/AST"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("PropertySignatureTransformations", () => {
   it("default", async () => {
-    const transform: T.Transform<{ readonly a?: string }, { readonly a: number }> = T.make(
+    const transform: C.Codec<{ readonly a?: string }, { readonly a: number }> = C.make(
       AST.createTransform(
-        T.struct({ a: T.optional(T.NumberFromString) }).ast,
+        C.struct({ a: C.optional(C.NumberFromString) }).ast,
         S.struct({ a: S.number }).ast,
         AST.createTypeLiteralTransformation(
           [
@@ -34,9 +34,9 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("bidirectional default", async () => {
-    const transform: T.Transform<{ readonly a?: string }, { readonly a: number }> = T.make(
+    const transform: C.Codec<{ readonly a?: string }, { readonly a: number }> = C.make(
       AST.createTransform(
-        T.struct({ a: T.optional(T.NumberFromString) }).ast,
+        C.struct({ a: C.optional(C.NumberFromString) }).ast,
         S.struct({ a: S.number }).ast,
         AST.createTypeLiteralTransformation(
           [
@@ -61,11 +61,11 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("optional -> Option", async () => {
-    const transform: T.Transform<{ readonly a?: string }, { readonly a: O.Option<number> }> = T
+    const transform: C.Codec<{ readonly a?: string }, { readonly a: O.Option<number> }> = C
       .make(
         AST.createTransform(
-          T.struct({ a: T.optional(T.NumberFromString) }).ast,
-          T.struct({ a: T.optionFromSelf(S.number) }).ast,
+          C.struct({ a: C.optional(C.NumberFromString) }).ast,
+          C.struct({ a: C.optionFromSelf(S.number) }).ast,
           AST.createTypeLiteralTransformation(
             [
               AST.createPropertySignatureTransformation(
@@ -89,7 +89,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("empty string as optional", async () => {
-    const transform: T.Transform<{ readonly a: string }, { readonly a?: string }> = T.make(
+    const transform: C.Codec<{ readonly a: string }, { readonly a?: string }> = C.make(
       AST.createTransform(
         S.struct({ a: S.string }).ast,
         S.struct({ a: S.optional(S.string) }).ast,
@@ -114,7 +114,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("rename", async () => {
-    const transform: T.Transform<{ readonly a: number }, { readonly b: number }> = T.make(
+    const transform: C.Codec<{ readonly a: number }, { readonly b: number }> = C.make(
       AST.createTransform(
         S.struct({ a: S.number }).ast,
         S.struct({ b: S.number }).ast,
@@ -138,7 +138,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("reversed default", async () => {
-    const transform: T.Transform<{ readonly a: string }, { readonly a?: number }> = T.make(
+    const transform: C.Codec<{ readonly a: string }, { readonly a?: number }> = C.make(
       AST.createTransform(
         S.struct({ a: S.number }).ast,
         S.struct({ a: S.optional(S.number) }).ast,
@@ -164,8 +164,8 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("string -> number", async () => {
-    const ast = T.NumberFromString.ast as any
-    const transform: T.Transform<{ readonly a: string }, { readonly a: number }> = T.make(
+    const ast = C.NumberFromString.ast as any
+    const transform: C.Codec<{ readonly a: string }, { readonly a: number }> = C.make(
       AST.createTransform(
         S.struct({ a: S.string }).ast,
         S.struct({ a: S.number }).ast,
@@ -186,11 +186,11 @@ describe.concurrent("PropertySignatureTransformations", () => {
   })
 
   it("string -> number (nested)", async () => {
-    const ast = T.NumberFromString.ast as any
-    const transform: T.Transform<
+    const ast = C.NumberFromString.ast as any
+    const transform: C.Codec<
       { readonly a: { readonly b: string } },
       { readonly a: { readonly b: number } }
-    > = T.make(
+    > = C.make(
       AST.createTransform(
         S.struct({ a: S.struct({ b: S.string }) }).ast,
         S.struct({ a: S.struct({ b: S.number }) }).ast,

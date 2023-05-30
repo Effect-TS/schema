@@ -1,7 +1,7 @@
 import { identity, pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import * as T from "@effect/schema/Transform"
 
 describe.concurrent("required", () => {
   it("string", () => {
@@ -121,7 +121,7 @@ describe.concurrent("required", () => {
   })
 
   it("transformations should throw", async () => {
-    expect(() => S.required(T.transform(S.string, S.string, identity, identity) as any))
+    expect(() => S.required(C.transform(S.string, S.string, identity, identity) as any))
       .toThrowError(
         new Error("`required` cannot handle transformations")
       )

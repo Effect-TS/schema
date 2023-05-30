@@ -1,5 +1,4 @@
 import { pipe } from "@effect/data/Function"
-import * as p from "@effect/schema/Parser"
 import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -11,14 +10,14 @@ describe.concurrent("finite", () => {
     Util.roundtrip(schema)
   })
 
-  it("Guard", () => {
-    const is = p.is(schema)
+  it("is", () => {
+    const is = S.is(schema)
     expect(is(1)).toEqual(true)
     expect(is(Infinity)).toEqual(false)
     expect(is(-Infinity)).toEqual(false)
   })
 
-  it("Decoder", async () => {
+  it("decode", async () => {
     await Util.expectParseSuccess(schema, 1)
     await Util.expectParseFailure(
       schema,
@@ -32,7 +31,7 @@ describe.concurrent("finite", () => {
     )
   })
 
-  it("Pretty", () => {
+  it("pretty", () => {
     const pretty = Pretty.build(schema)
     expect(pretty(1)).toEqual("1")
     expect(pretty(NaN)).toEqual("NaN")

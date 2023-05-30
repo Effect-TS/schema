@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 6
+nav_order: 7
 parent: Modules
 ---
 
@@ -825,10 +825,10 @@ Added in v1.0.0
 export declare const struct: <
   Fields extends Record<
     string | number | symbol,
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
     | Schema<any>
     | Schema<never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields

@@ -8,7 +8,7 @@ describe.concurrent("UUID", () => {
     Util.roundtrip(schema)
   })
 
-  it("Decoder", async () => {
+  it("decode", async () => {
     await Util.expectParseSuccess(schema, "123e4567-e89b-12d3-a456-426614174000")
     await Util.expectParseFailure(
       schema,
