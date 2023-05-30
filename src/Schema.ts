@@ -186,9 +186,6 @@ export const declare = (
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
   ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  encode: (
-    ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
   annotations?: AST.Annotated["annotations"]
 ): Schema<any> =>
   make(
@@ -330,7 +327,6 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
     () =>
       (input, _, self) =>
         input instanceof constructor ? PR.success(input) : PR.failure(PR.type(self, input)),
-    () => PR.success,
     {
       [AST.TypeAnnotationId]: InstanceOfTypeId,
       [InstanceOfTypeId]: { constructor },
@@ -1746,7 +1742,6 @@ export const Date: Schema<Date> = declare(
   [],
   struct({}),
   () => (u: unknown, _, self) => !isDate(u) ? PR.failure(PR.type(self, u)) : PR.success(u),
-  () => PR.success,
   {
     [AST.IdentifierAnnotationId]: "Date",
     [I.PrettyHookId]: datePretty,
@@ -1853,7 +1848,6 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
             C.fromIterable
           )
     },
-    () => PR.success,
     {
       [AST.IdentifierAnnotationId]: "Chunk",
       [I.PrettyHookId]: chunkPretty,
@@ -1897,7 +1891,6 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
           PR.failure(PR.type(self, u)) :
           PR.map(parseResult(u, options), toData)
     },
-    () => PR.success,
     {
       [AST.IdentifierAnnotationId]: "Data",
       [I.PrettyHookId]: dataPretty,
@@ -1956,7 +1949,6 @@ export const either = <E, A>(
           PR.map(parseResultLeft(u.left, options), E.left) :
           PR.map(parseResultRight(u.right, options), E.right)
     },
-    () => PR.success,
     {
       [AST.IdentifierAnnotationId]: "Either",
       [I.PrettyHookId]: eitherPretty,
@@ -2086,7 +2078,6 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> => {
           PR.success(O.none()) :
           PR.map(parseResult(u.value, options), O.some)
     },
-    () => PR.success,
     {
       [AST.IdentifierAnnotationId]: "Option",
       [I.PrettyHookId]: optionPretty,
@@ -2220,7 +2211,6 @@ export const readonlyMap = <K, V>(
           PR.failure(PR.type(self, u)) :
           PR.map(parseResult(Array.from(u.entries()), options), (as) => new Map(as))
     },
-    () => PR.success,
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
       [I.PrettyHookId]: readonlyMapPretty,
@@ -2262,7 +2252,6 @@ export const readonlySet = <A>(
           PR.failure(PR.type(self, u)) :
           PR.map(parseResult(Array.from(u.values()), options), (as) => new Set(as))
       },
-    () => PR.success,
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
       [I.PrettyHookId]: readonlySetPretty,

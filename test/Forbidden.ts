@@ -53,8 +53,7 @@ describe.concurrent("Forbidden", () => {
     const transform = S.declare(
       [],
       S.number,
-      () => C.parseEffect(Util.effectify(S.number, "all")),
-      () => C.encodeEffect(Util.effectify(S.number, "all"))
+      () => C.parseEffect(Util.effectify(S.number, "all"))
     )
     expectMessage(
       transform,

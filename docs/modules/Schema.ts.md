@@ -898,9 +898,6 @@ export declare const declare: (
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
   ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  encode: (
-    ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
   annotations?: AST.Annotations | undefined
 ) => Schema<any>
 ```
