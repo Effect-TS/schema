@@ -209,7 +209,7 @@ pipe(T.struct({ a: T.optional(S.string).withDefault(() => ''),  b: T.NumberFromS
 T.record(S.string, T.NumberFromString)
 
 // ---------------------------------------------
-// Extend
+// extend
 // ---------------------------------------------
 
 // $ExpectType Transform<{ readonly a: string; readonly b: string; readonly c: string; }, { readonly a: string; readonly b: string; readonly c: string; }>

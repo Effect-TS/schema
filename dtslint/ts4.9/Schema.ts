@@ -288,21 +288,21 @@ pipe(S.struct({ a: S.optional(S.string),  b: S.number, c: S.boolean }), S.omit('
 pipe(S.number, S.int(), S.brand('Int'))
 
 // ---------------------------------------------
-// Partial
+// partial
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a?: string; readonly b?: number; }>
 S.partial(S.struct({ a: S.string,  b: S.number }));
 
 // ---------------------------------------------
-// Required
+// required
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }>
 S.required(S.struct({ a: S.optional(S.string),  b: S.optional(S.number) }));
 
 // ---------------------------------------------
-// Extend
+// extend
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: string; readonly c: string; }>
