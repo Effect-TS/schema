@@ -332,7 +332,7 @@ but rather maps to another schema, for example when you want to add a discrimina
 **Signature**
 
 ```ts
-export declare const attachPropertySignature: <K extends string | number | symbol, V extends AST.LiteralValue>(
+export declare const attachPropertySignature: <K extends PropertyKey, V extends AST.LiteralValue>(
   key: K,
   value: V
 ) => <I, A extends object>(transform: Codec<I, A>) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
@@ -406,7 +406,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <I, A>(f: () => Codec<I, A>, annotations?: AST.Annotations | undefined) => Codec<I, A>
+export declare const lazy: <I, A>(f: () => Codec<I, A>, annotations?: AST.Annotated['annotations']) => Codec<I, A>
 ```
 
 Added in v1.0.0
@@ -440,7 +440,7 @@ export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Codec<I, A>
-) => Codec<S.Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, S.Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
+) => Codec<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -507,7 +507,7 @@ Added in v1.0.0
 ```ts
 export declare const struct: <
   Fields extends Record<
-    string | number | symbol,
+    PropertyKey,
     | Codec<any, any>
     | Codec<never, never>
     | S.PropertySignature<any, boolean, any, boolean>
@@ -599,14 +599,14 @@ using the provided decoding functions.
 export declare const transformResult: {
   <I2, A2, A1>(
     to: Codec<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
   ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
   <I1, A1, I2, A2>(
     from: Codec<I1, A1>,
     to: Codec<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => PR.IO<PR.ParseError, A1>
+    decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
   ): Codec<I1, A2>
 }
 ```
@@ -680,7 +680,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeResult: <I, A>(
   schema: Codec<I, A>
-) => (i: I, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+) => (i: I, options?: ParseOptions | undefined) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -752,7 +752,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeResult: <I, A>(
   schema: Codec<I, A>
-) => (a: A, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I>
+) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
 ```
 
 Added in v1.0.0
@@ -914,7 +914,7 @@ Added in v1.0.0
 ```ts
 export declare const parseResult: <I, A>(
   schema: Codec<I, A>
-) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -980,7 +980,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <I, A>(
   transform: Codec<I, A>,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => S.OptionalPropertySignature<I, true, A, true>
 ```
 
@@ -993,7 +993,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <I, A>(
   transform: Codec<I, A>,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => S.PropertySignature<I, false, A, false>
 ```
 

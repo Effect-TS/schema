@@ -235,7 +235,7 @@ A filter excluding invalid dates (e.g. `new Date("fail")`).
 **Signature**
 
 ```ts
-export declare const validDate: (options?: AnnotationOptions<Date> | undefined) => (self: Schema<Date>) => Schema<Date>
+export declare const validDate: (options?: AnnotationOptions<Date>) => (self: Schema<Date>) => Schema<Date>
 ```
 
 Added in v1.0.0
@@ -604,7 +604,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 export declare const brand: <B extends string | symbol, A>(
   brand: B,
   options?: AnnotationOptions<A> | undefined
-) => (self: Schema<A>) => BrandSchema<any>
+) => (self: Schema<A>) => BrandSchema<A & Brand<B>>
 ```
 
 **Example**
@@ -688,10 +688,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const fromBrand: <C extends any>(
-  constructor: any,
-  options?: AnnotationOptions<any> | undefined
-) => <A extends any>(self: Schema<A>) => Schema<A & C>
+export declare const fromBrand: <C extends Brand<string | symbol>>(
+  constructor: Brand.Constructor<C>,
+  options?: AnnotationOptions<Brand.Unbranded<C>> | undefined
+) => <A extends Brand.Unbranded<C>>(self: Schema<A>) => Schema<A & C>
 ```
 
 Added in v1.0.0
@@ -711,7 +711,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <A>(f: () => Schema<A>, annotations?: AST.Annotations | undefined) => Schema<A>
+export declare const lazy: <A>(f: () => Schema<A>, annotations?: AST.Annotated['annotations']) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -743,7 +743,7 @@ Added in v1.0.0
 ```ts
 export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
-) => (self: Schema<A>) => Schema<Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
+) => (self: Schema<A>) => Schema<Spread<Omit<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -834,7 +834,7 @@ Added in v1.0.0
 ```ts
 export declare const struct: <
   Fields extends Record<
-    string | number | symbol,
+    PropertyKey,
     | Schema<any>
     | Schema<never>
     | SchemaPropertySignature<any, boolean, any, boolean>
@@ -908,7 +908,7 @@ export declare const declare: (
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
   ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => Schema<any>
 ```
 
@@ -929,7 +929,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const instanceOf: new (...args: any) => any
+export declare const instanceOf: <A extends abstract new (...args: any) => any>(
+  constructor: A,
+  options?: AnnotationOptions<object>
+) => Schema<InstanceType<A>>
 ```
 
 Added in v1.0.0
@@ -963,7 +966,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <A>(
   schema: Schema<A>,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => SchemaPropertySignature<A, false, A, false>
 ```
 
@@ -1006,7 +1009,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const uniqueSymbol: <S extends symbol>(symbol: S, annotations?: AST.Annotations | undefined) => Schema<S>
+export declare const uniqueSymbol: <S extends symbol>(
+  symbol: S,
+  annotations?: AST.Annotated['annotations']
+) => Schema<S>
 ```
 
 Added in v1.0.0
@@ -2139,7 +2145,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <A>(
   schema: Schema<A>,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => OptionalSchemaPropertySignature<A, true, A, true>
 ```
 
@@ -2234,7 +2240,7 @@ Added in v1.0.0
 ```ts
 export declare const validateResult: <A>(
   schema: Schema<A>
-) => (a: unknown, options?: AST.ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+) => (a: unknown, options?: AST.ParseOptions | undefined) => PR.ParseResult<A>
 ```
 
 Added in v1.0.0
