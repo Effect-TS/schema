@@ -26,7 +26,6 @@ import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
-import * as TransformAST from "@effect/schema/TransformAST"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 /**
@@ -660,7 +659,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.indexSignatures.concat(y.indexSignatures)
             )
           } else if (
-            AST.isTransform(y) && TransformAST.isTypeLiteralTransformation(y.transformAST) &&
+            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             const from = AST.createTypeLiteral(
@@ -674,13 +673,13 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
             return AST.createTransform(
               from,
               to,
-              TransformAST.createTypeLiteralTransformation(
+              AST.createTypeLiteralTransformation(
                 y.transformAST.propertySignatureTransformations
               )
             )
           }
         } else if (
-          AST.isTransform(x) && TransformAST.isTypeLiteralTransformation(x.transformAST) &&
+          AST.isTransform(x) && AST.isTypeLiteralTransformation(x.transformAST) &&
           AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
         ) {
           if (AST.isTypeLiteral(y)) {
@@ -695,12 +694,12 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
             return AST.createTransform(
               from,
               to,
-              TransformAST.createTypeLiteralTransformation(
+              AST.createTypeLiteralTransformation(
                 x.transformAST.propertySignatureTransformations
               )
             )
           } else if (
-            AST.isTransform(y) && TransformAST.isTypeLiteralTransformation(y.transformAST) &&
+            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             const from = AST.createTypeLiteral(
@@ -714,7 +713,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
             return AST.createTransform(
               from,
               to,
-              TransformAST.createTypeLiteralTransformation(
+              AST.createTypeLiteralTransformation(
                 x.transformAST.propertySignatureTransformations.concat(
                   y.transformAST.propertySignatureTransformations
                 )

@@ -37,13 +37,17 @@ Added in v1.0.0
   - [booleanKeyword](#booleankeyword)
   - [createDeclaration](#createdeclaration)
   - [createEnums](#createenums)
+  - [createFinalPropertySignatureTransformation](#createfinalpropertysignaturetransformation)
+  - [createFinalTransformation](#createfinaltransformation)
   - [createLazy](#createlazy)
   - [createLiteral](#createliteral)
+  - [createPropertySignatureTransformation](#createpropertysignaturetransformation)
   - [createRefinement](#createrefinement)
   - [createTemplateLiteral](#createtemplateliteral)
   - [createTransform](#createtransform)
   - [createTuple](#createtuple)
   - [createTypeLiteral](#createtypeliteral)
+  - [createTypeLiteralTransformation](#createtypeliteraltransformation)
   - [createUnion](#createunion)
   - [createUniqueSymbol](#createuniquesymbol)
   - [neverKeyword](#neverkeyword)
@@ -54,6 +58,8 @@ Added in v1.0.0
   - [undefinedKeyword](#undefinedkeyword)
   - [unknownKeyword](#unknownkeyword)
   - [voidKeyword](#voidkeyword)
+- [guard](#guard)
+  - [isTypeLiteralTransformation](#istypeliteraltransformation)
 - [guards](#guards)
   - [isAnyKeyword](#isanykeyword)
   - [isBigIntKeyword](#isbigintkeyword)
@@ -86,6 +92,8 @@ Added in v1.0.0
   - [BooleanKeyword (interface)](#booleankeyword-interface)
   - [Declaration (interface)](#declaration-interface)
   - [Enums (interface)](#enums-interface)
+  - [FinalPropertySignatureTransformation (interface)](#finalpropertysignaturetransformation-interface)
+  - [FinalTransformation (interface)](#finaltransformation-interface)
   - [Lazy (interface)](#lazy-interface)
   - [Literal (interface)](#literal-interface)
   - [LiteralValue (type alias)](#literalvalue-type-alias)
@@ -93,13 +101,16 @@ Added in v1.0.0
   - [NumberKeyword (interface)](#numberkeyword-interface)
   - [ObjectKeyword (interface)](#objectkeyword-interface)
   - [ParseOptions (interface)](#parseoptions-interface)
+  - [PropertySignatureTransformation (interface)](#propertysignaturetransformation-interface)
   - [Refinement (interface)](#refinement-interface)
   - [StringKeyword (interface)](#stringkeyword-interface)
   - [SymbolKeyword (interface)](#symbolkeyword-interface)
   - [TemplateLiteral (interface)](#templateliteral-interface)
   - [Transform (interface)](#transform-interface)
+  - [TransformAST (type alias)](#transformast-type-alias)
   - [Tuple (interface)](#tuple-interface)
   - [TypeLiteral (interface)](#typeliteral-interface)
+  - [TypeLiteralTransformation (interface)](#typeliteraltransformation-interface)
   - [UndefinedKeyword (interface)](#undefinedkeyword-interface)
   - [Union (interface)](#union-interface)
   - [UniqueSymbol (interface)](#uniquesymbol-interface)
@@ -375,6 +386,32 @@ export declare const createEnums: (enums: ReadonlyArray<readonly [string, string
 
 Added in v1.0.0
 
+## createFinalPropertySignatureTransformation
+
+**Signature**
+
+```ts
+export declare const createFinalPropertySignatureTransformation: (
+  decode: FinalPropertySignatureTransformation['decode'],
+  encode: FinalPropertySignatureTransformation['encode']
+) => FinalPropertySignatureTransformation
+```
+
+Added in v1.0.0
+
+## createFinalTransformation
+
+**Signature**
+
+```ts
+export declare const createFinalTransformation: (
+  decode: FinalTransformation['decode'],
+  encode: FinalTransformation['encode']
+) => FinalTransformation
+```
+
+Added in v1.0.0
+
 ## createLazy
 
 **Signature**
@@ -391,6 +428,20 @@ Added in v1.0.0
 
 ```ts
 export declare const createLiteral: (literal: LiteralValue) => Literal
+```
+
+Added in v1.0.0
+
+## createPropertySignatureTransformation
+
+**Signature**
+
+```ts
+export declare const createPropertySignatureTransformation: (
+  from: PropertyKey,
+  to: PropertyKey,
+  transformation: PropertySignatureTransformation['transformation']
+) => PropertySignatureTransformation
 ```
 
 Added in v1.0.0
@@ -430,7 +481,7 @@ Added in v1.0.0
 export declare const createTransform: (
   from: AST,
   to: AST,
-  transformAST: TransformAST.TransformAST,
+  transformAST: TransformAST,
   annotations?: Annotated['annotations']
 ) => Transform
 ```
@@ -462,6 +513,18 @@ export declare const createTypeLiteral: (
   indexSignatures: ReadonlyArray<IndexSignature>,
   annotations?: Annotated['annotations']
 ) => TypeLiteral
+```
+
+Added in v1.0.0
+
+## createTypeLiteralTransformation
+
+**Signature**
+
+```ts
+export declare const createTypeLiteralTransformation: (
+  propertySignatureTransformations: TypeLiteralTransformation['propertySignatureTransformations']
+) => TypeLiteralTransformation
 ```
 
 Added in v1.0.0
@@ -562,6 +625,18 @@ Added in v1.0.0
 
 ```ts
 export declare const voidKeyword: VoidKeyword
+```
+
+Added in v1.0.0
+
+# guard
+
+## isTypeLiteralTransformation
+
+**Signature**
+
+```ts
+export declare const isTypeLiteralTransformation: (ast: TransformAST) => ast is TypeLiteralTransformation
 ```
 
 Added in v1.0.0
@@ -910,6 +985,46 @@ export interface Enums extends Annotated {
 
 Added in v1.0.0
 
+## FinalPropertySignatureTransformation (interface)
+
+Represents a `PropertySignature -> PropertySignature` transformation
+
+The semantic of `decode` is:
+
+- `none()` represents the absence of the key/value pair
+- `some(value)` represents the presence of the key/value pair
+
+The semantic of `encode` is:
+
+- `none()` you don't want to output the key/value pair
+- `some(value)` you want to output the key/value pair
+
+**Signature**
+
+```ts
+export interface FinalPropertySignatureTransformation {
+  readonly _tag: 'FinalPropertySignatureTransformation'
+  readonly decode: (o: Option<any>) => Option<any>
+  readonly encode: (o: Option<any>) => Option<any>
+}
+```
+
+Added in v1.0.0
+
+## FinalTransformation (interface)
+
+**Signature**
+
+```ts
+export interface FinalTransformation {
+  readonly _tag: 'FinalTransformation'
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+}
+```
+
+Added in v1.0.0
+
 ## Lazy (interface)
 
 **Signature**
@@ -997,6 +1112,20 @@ export interface ParseOptions {
 
 Added in v1.0.0
 
+## PropertySignatureTransformation (interface)
+
+**Signature**
+
+```ts
+export interface PropertySignatureTransformation {
+  readonly from: PropertyKey
+  readonly to: PropertyKey
+  readonly transformation: FinalPropertySignatureTransformation | TransformAST
+}
+```
+
+Added in v1.0.0
+
 ## Refinement (interface)
 
 **Signature**
@@ -1060,8 +1189,18 @@ export interface Transform extends Annotated {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
-  readonly transformAST: TransformAST.TransformAST
+  readonly transformAST: TransformAST
 }
+```
+
+Added in v1.0.0
+
+## TransformAST (type alias)
+
+**Signature**
+
+```ts
+export type TransformAST = FinalTransformation | TypeLiteralTransformation
 ```
 
 Added in v1.0.0
@@ -1090,6 +1229,19 @@ export interface TypeLiteral extends Annotated {
   readonly _tag: 'TypeLiteral'
   readonly propertySignatures: ReadonlyArray<PropertySignature>
   readonly indexSignatures: ReadonlyArray<IndexSignature>
+}
+```
+
+Added in v1.0.0
+
+## TypeLiteralTransformation (interface)
+
+**Signature**
+
+```ts
+export interface TypeLiteralTransformation {
+  readonly _tag: 'TypeLiteralTransformation'
+  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
 }
 ```
 
@@ -1454,13 +1606,7 @@ export declare const mergeAnnotations: (
       from: AST
       decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      transformAST: TransformAST.TransformAST
-    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Transform'; from: AST; to: AST; transformAST: TransformAST }
 ```
 
 Added in v1.0.0
@@ -1575,13 +1721,7 @@ export declare const setAnnotation: (
       from: AST
       decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
     }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      transformAST: TransformAST.TransformAST
-    }
+  | { annotations: { [x: string]: unknown }; _tag: 'Transform'; from: AST; to: AST; transformAST: TransformAST }
 ```
 
 Added in v1.0.0

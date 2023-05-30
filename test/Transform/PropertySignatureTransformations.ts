@@ -4,7 +4,6 @@ import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as T from "@effect/schema/Transform"
-import * as TransformAST from "@effect/schema/TransformAST"
 
 describe.concurrent("PropertySignatureTransformations", () => {
   it("default", async () => {
@@ -12,12 +11,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         T.struct({ a: T.optional(T.NumberFromString) }).ast,
         S.struct({ a: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation(
+        AST.createTypeLiteralTransformation(
           [
-            TransformAST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransformation(
               "a",
               "a",
-              TransformAST.createFinalPropertySignatureTransformation(
+              AST.createFinalPropertySignatureTransformation(
                 O.orElse(() => O.some(0)),
                 identity
               )
@@ -39,12 +38,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         T.struct({ a: T.optional(T.NumberFromString) }).ast,
         S.struct({ a: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation(
+        AST.createTypeLiteralTransformation(
           [
-            TransformAST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransformation(
               "a",
               "a",
-              TransformAST.createFinalPropertySignatureTransformation(
+              AST.createFinalPropertySignatureTransformation(
                 O.orElse(() => O.some(0)),
                 (o) => O.flatMap(o, O.liftPredicate((v) => v !== 0))
               )
@@ -67,12 +66,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
         AST.createTransform(
           T.struct({ a: T.optional(T.NumberFromString) }).ast,
           T.struct({ a: T.optionFromSelf(S.number) }).ast,
-          TransformAST.createTypeLiteralTransformation(
+          AST.createTypeLiteralTransformation(
             [
-              TransformAST.createPropertySignatureTransformation(
+              AST.createPropertySignatureTransformation(
                 "a",
                 "a",
-                TransformAST.createFinalPropertySignatureTransformation(
+                AST.createFinalPropertySignatureTransformation(
                   O.some,
                   O.flatten
                 )
@@ -94,12 +93,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.string }).ast,
         S.struct({ a: S.optional(S.string) }).ast,
-        TransformAST.createTypeLiteralTransformation(
+        AST.createTypeLiteralTransformation(
           [
-            TransformAST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransformation(
               "a",
               "a",
-              TransformAST.createFinalPropertySignatureTransformation(
+              AST.createFinalPropertySignatureTransformation(
                 O.flatMap(O.liftPredicate((v) => v !== "")),
                 identity
               )
@@ -119,12 +118,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.number }).ast,
         S.struct({ b: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation(
+        AST.createTypeLiteralTransformation(
           [
-            TransformAST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransformation(
               "a",
               "b",
-              TransformAST.createFinalPropertySignatureTransformation(
+              AST.createFinalPropertySignatureTransformation(
                 identity,
                 identity
               )
@@ -143,12 +142,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.number }).ast,
         S.struct({ a: S.optional(S.number) }).ast,
-        TransformAST.createTypeLiteralTransformation(
+        AST.createTypeLiteralTransformation(
           [
-            TransformAST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransformation(
               "a",
               "a",
-              TransformAST.createFinalPropertySignatureTransformation(
+              AST.createFinalPropertySignatureTransformation(
                 identity,
                 O.orElse(() => O.some(0))
               )
@@ -170,9 +169,9 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.string }).ast,
         S.struct({ a: S.number }).ast,
-        TransformAST.createTypeLiteralTransformation(
+        AST.createTypeLiteralTransformation(
           [
-            TransformAST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransformation(
               "a",
               "a",
               ast.transformAST
@@ -195,14 +194,14 @@ describe.concurrent("PropertySignatureTransformations", () => {
       AST.createTransform(
         S.struct({ a: S.struct({ b: S.string }) }).ast,
         S.struct({ a: S.struct({ b: S.number }) }).ast,
-        TransformAST.createTypeLiteralTransformation(
+        AST.createTypeLiteralTransformation(
           [
-            TransformAST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransformation(
               "a",
               "a",
-              TransformAST.createTypeLiteralTransformation(
+              AST.createTypeLiteralTransformation(
                 [
-                  TransformAST.createPropertySignatureTransformation(
+                  AST.createPropertySignatureTransformation(
                     "b",
                     "b",
                     ast.transformAST

@@ -18,7 +18,6 @@ import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
 import type { To, Transform } from "@effect/schema/Transform"
-import type * as TransformAST from "@effect/schema/TransformAST"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 const get = (ast: AST.AST, isDecoding: boolean) => {
@@ -1102,13 +1101,13 @@ function sortByIndex(es: Array<[number, any]>): any {
 // -------------------------------------------------------------------------------------
 
 const isFinalPropertySignatureTransformation = (
-  ast: TransformAST.FinalPropertySignatureTransformation | TransformAST.TransformAST
-): ast is TransformAST.FinalPropertySignatureTransformation =>
+  ast: AST.FinalPropertySignatureTransformation | AST.TransformAST
+): ast is AST.FinalPropertySignatureTransformation =>
   ast._tag === "FinalPropertySignatureTransformation"
 
 /** @internal */
 export const getDecode = (
-  transform: TransformAST.TransformAST,
+  transform: AST.TransformAST,
   isDecoding: boolean
 ): (input: any, options: ParseOptions, self: AST.AST) => ParseResult<any> => {
   switch (transform._tag) {

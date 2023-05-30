@@ -13,7 +13,6 @@ import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import type { Transform } from "@effect/schema/Transform"
 import * as T from "@effect/schema/Transform"
-import * as TransformAST from "@effect/schema/TransformAST"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
 import * as fc from "fast-check"
 
@@ -78,7 +77,7 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
       return AST.createTransform(
         effectifyAST(ast.from, mode),
         effectifyAST(ast.to, mode),
-        TransformAST.createFinalTransformation(
+        AST.createFinalTransformation(
           // I need to override with the original ast here in order to not change the error message
           // ------------------------------------------------v
           effectifyDecode(getDecode(ast.transformAST, true), ast),
@@ -93,7 +92,7 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
   return AST.createTransform(
     ast,
     ast,
-    TransformAST.createFinalTransformation(
+    AST.createFinalTransformation(
       (a, options) => Effect.flatMap(sleep, () => decode(a, options)),
       (a, options) => Effect.flatMap(sleep, () => decode(a, options))
     )
