@@ -129,6 +129,13 @@ export type MyModelFrom = C.From<typeof MyModel>
 export type MyModelTo = C.To<typeof MyModel>
 
 // ---------------------------------------------
+// propertySignature
+// ---------------------------------------------
+
+// $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
+C.struct({ a: S.string, b: S.number, c: C.propertySignature(C.NumberFromString) });
+
+// ---------------------------------------------
 // optional
 // ---------------------------------------------
 
@@ -138,6 +145,9 @@ C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString) });
 // piping
 // $ExpectType Codec<{ readonly a?: string; }, { readonly a?: number; }>
 C.struct({ a: pipe(C.NumberFromString, C.optional) })
+
+// $ExpectType Codec<{ readonly a?: never; }, { readonly a?: never; }>
+C.struct({ a: C.optional(S.never) })
 
 // ---------------------------------------------
 // optional().withDefault()

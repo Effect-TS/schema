@@ -4,6 +4,22 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("optional", () => {
+  it("should add annotations to optional().withDefault()", () => {
+    const schema = C.struct({
+      a: C.optional(S.string, { a: "a" }).withDefault(() => "")
+    })
+    const ast: any = schema.ast
+    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
+  })
+
+  it("should add annotations to optional().toOption()", () => {
+    const schema = C.struct({
+      a: C.optional(S.string, { a: "a" }).toOption()
+    })
+    const ast: any = schema.ast
+    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
+  })
+
   it("default", async () => {
     const transform = C.struct({
       a: C.optional(C.NumberFromString).withDefault(() => 0)

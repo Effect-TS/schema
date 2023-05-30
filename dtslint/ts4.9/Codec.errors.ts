@@ -7,3 +7,6 @@ pipe(S.boolean, S.optional, S.nullable)
 
 // $ExpectError
 pipe(S.boolean, T.optional, T.nullable)
+
+// $ExpectError
+S.struct({ a: S.string, b: S.number, c: T.optional(S.boolean).withDefault(() => true) });

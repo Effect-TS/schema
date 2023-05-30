@@ -11,6 +11,7 @@ import { untracedMethod } from "@effect/data/Debug"
 import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
+import type { LazyArg } from "@effect/data/Function"
 import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
@@ -535,32 +536,70 @@ export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
 /**
  * @since 1.0.0
  */
+export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
+{
+  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
+  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
+}
+
+/**
+ * @since 1.0.0
+ */
 export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
   extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
 {
-  readonly optional: () => SchemaPropertySignature<From, true, To, true>
+  readonly [SchemaTypeId]: (_: From) => From
 }
 
-class SchemaPropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
-  implements SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
+/**
+ * @since 1.0.0
+ */
+export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
 {
+  readonly [SchemaTypeId]: (_: From) => From
+}
+
+/**
+ * @internal
+ * @since -
+ */
+export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
+  /** @since - */
   readonly [SchemaTypeId]!: (_: From) => From
+  /** @since - */
   readonly From!: (_: From) => From
+  /** @since - */
   readonly FromIsOptional!: FromIsOptional
+  /** @since - */
   readonly To!: (_: To) => To
+  /** @since - */
   readonly ToIsOptional!: ToIsOptional
 
   constructor(
     readonly _from: AST.AST,
     readonly _annotations?: AST.Annotated["annotations"],
-    readonly _optional?: { readonly to: "optional" }
+    readonly _optional?:
+      | { readonly to: "optional" }
+      | { readonly to: "Option" }
+      | {
+        readonly to: "default"
+        readonly value: LazyArg<To>
+      }
   ) {}
 
-  optional(): SchemaPropertySignature<From, true, To, true> {
-    if (this._optional) {
-      throw new Error(`duplicate optional configuration`)
-    }
-    return new SchemaPropertySignatureImpl(this._from, this._annotations, { to: "optional" })
+  /** @since - */
+  withDefault(value: () => To): SchemaPropertySignature<From, true, To, false> {
+    return new PropertySignatureImpl(this._from, this._annotations, {
+      to: "default",
+      value
+    })
+  }
+
+  /** @since - */
+  toOption(): SchemaPropertySignature<From, true, Option<To>, false> {
+    return new PropertySignatureImpl(this._from, this._annotations, { to: "Option" })
   }
 }
 
@@ -571,8 +610,7 @@ class SchemaPropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
 export const propertySignature = <A>(
   schema: Schema<A>,
   annotations?: AST.Annotated["annotations"]
-): SchemaPropertySignature<A, false, A, false> =>
-  new SchemaPropertySignatureImpl(schema.ast, annotations)
+): SchemaPropertySignature<A, false, A, false> => new PropertySignatureImpl(schema.ast, annotations)
 
 /**
  * @since 1.0.0
@@ -580,7 +618,8 @@ export const propertySignature = <A>(
 export const optional = <A>(
   schema: Schema<A>,
   annotations?: AST.Annotated["annotations"]
-): SchemaPropertySignature<A, true, A, true> => propertySignature(schema, annotations).optional()
+): OptionalSchemaPropertySignature<A, true, A, true> =>
+  new PropertySignatureImpl(schema.ast, annotations, { to: "optional" })
 
 /**
  * @since 1.0.0
@@ -608,8 +647,8 @@ export const struct = <
     PropertyKey,
     | Schema<any>
     | Schema<never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
+    | SchemaPropertySignature<any, boolean, any, boolean>
+    | SchemaPropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
@@ -623,10 +662,11 @@ export const struct = <
     AST.createTypeLiteral(
       I.ownKeys(fields).map((key) => {
         const field = fields[key] as any
+        const isOptional = "_from" in field
         return AST.createPropertySignature(
           key,
-          "_from" in field ? field._from : field.ast,
-          "_from" in field,
+          isOptional ? field._from : field.ast,
+          isOptional,
           true
         )
       }),

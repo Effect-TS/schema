@@ -176,7 +176,17 @@ Added in v1.0.0
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [Join (type alias)](#join-type-alias)
+  - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
+  - [OptionalSchemaPropertySignature (interface)](#optionalschemapropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
+  - [PropertySignatureImpl (class)](#propertysignatureimpl-class)
+    - [withDefault (method)](#withdefault-method)
+    - [toOption (method)](#tooption-method)
+    - [[SchemaTypeId] (property)](#schematypeid-property)
+    - [From (property)](#from-property)
+    - [FromIsOptional (property)](#fromisoptional-property)
+    - [To (property)](#to-property)
+    - [ToIsOptional (property)](#toisoptional-property)
   - [SchemaPropertySignature (interface)](#schemapropertysignature-interface)
   - [Spread (type alias)](#spread-type-alias)
   - [ToAsserts](#toasserts)
@@ -827,8 +837,8 @@ export declare const struct: <
     string | number | symbol,
     | Schema<any>
     | Schema<never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
+    | SchemaPropertySignature<any, boolean, any, boolean>
+    | SchemaPropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
@@ -1935,6 +1945,33 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
+## OptionalPropertySignature (interface)
+
+**Signature**
+
+```ts
+export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
+  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
+  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
+}
+```
+
+Added in v1.0.0
+
+## OptionalSchemaPropertySignature (interface)
+
+**Signature**
+
+```ts
+export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional> {
+  readonly [SchemaTypeId]: (_: From) => From
+}
+```
+
+Added in v1.0.0
+
 ## PropertySignature (interface)
 
 **Signature**
@@ -1950,6 +1987,98 @@ export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
 
 Added in v1.0.0
 
+## PropertySignatureImpl (class)
+
+**Signature**
+
+```ts
+export declare class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
+  constructor(
+    readonly _from: AST.AST,
+    readonly _annotations?: AST.Annotated['annotations'],
+    readonly _optional?:
+      | { readonly to: 'optional' }
+      | { readonly to: 'Option' }
+      | {
+          readonly to: 'default'
+          readonly value: LazyArg<To>
+        }
+  )
+}
+```
+
+Added in v-
+
+### withDefault (method)
+
+**Signature**
+
+```ts
+withDefault(value: () => To): SchemaPropertySignature<From, true, To, false>
+```
+
+Added in v-
+
+### toOption (method)
+
+**Signature**
+
+```ts
+toOption(): SchemaPropertySignature<From, true, Option<To>, false>
+```
+
+Added in v-
+
+### [SchemaTypeId] (property)
+
+**Signature**
+
+```ts
+readonly [SchemaTypeId]: (_: From) => From
+```
+
+Added in v-
+
+### From (property)
+
+**Signature**
+
+```ts
+readonly From: (_: From) => From
+```
+
+Added in v-
+
+### FromIsOptional (property)
+
+**Signature**
+
+```ts
+readonly FromIsOptional: FromIsOptional
+```
+
+Added in v-
+
+### To (property)
+
+**Signature**
+
+```ts
+readonly To: (_: To) => To
+```
+
+Added in v-
+
+### ToIsOptional (property)
+
+**Signature**
+
+```ts
+readonly ToIsOptional: ToIsOptional
+```
+
+Added in v-
+
 ## SchemaPropertySignature (interface)
 
 **Signature**
@@ -1957,7 +2086,7 @@ Added in v1.0.0
 ```ts
 export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
   extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly optional: () => SchemaPropertySignature<From, true, To, true>
+  readonly [SchemaTypeId]: (_: From) => From
 }
 ```
 
@@ -2011,7 +2140,7 @@ Added in v1.0.0
 export declare const optional: <A>(
   schema: Schema<A>,
   annotations?: AST.Annotations | undefined
-) => SchemaPropertySignature<A, true, A, true>
+) => OptionalSchemaPropertySignature<A, true, A, true>
 ```
 
 Added in v1.0.0

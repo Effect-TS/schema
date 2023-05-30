@@ -94,7 +94,6 @@ Added in v1.0.0
   - [trim](#trim)
 - [utils](#utils)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
-  - [TransformPropertySignature (interface)](#transformpropertysignature-interface)
   - [from](#from)
   - [optional](#optional)
   - [propertySignature](#propertysignature)
@@ -509,10 +508,10 @@ Added in v1.0.0
 export declare const struct: <
   Fields extends Record<
     string | number | symbol,
-    | S.PropertySignature<any, boolean, any, boolean>
-    | S.PropertySignature<never, boolean, never, boolean>
     | Codec<any, any>
     | Codec<never, never>
+    | S.PropertySignature<any, boolean, any, boolean>
+    | S.PropertySignature<never, boolean, never, boolean>
   >
 >(
   fields: Fields
@@ -964,21 +963,6 @@ export type FromOptionalKeys<Fields> = {
 
 Added in v1.0.0
 
-## TransformPropertySignature (interface)
-
-**Signature**
-
-```ts
-export interface TransformPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends S.PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly optional: () => TransformPropertySignature<From, true, To, true>
-  readonly withDefault: (value: () => To) => TransformPropertySignature<From, true, To, false>
-  readonly toOption: () => TransformPropertySignature<From, true, Option<To>, false>
-}
-```
-
-Added in v1.0.0
-
 ## from
 
 **Signature**
@@ -997,7 +981,7 @@ Added in v1.0.0
 export declare const optional: <I, A>(
   transform: Codec<I, A>,
   annotations?: AST.Annotations | undefined
-) => TransformPropertySignature<I, true, A, true>
+) => S.OptionalPropertySignature<I, true, A, true>
 ```
 
 Added in v1.0.0
@@ -1010,7 +994,7 @@ Added in v1.0.0
 export declare const propertySignature: <I, A>(
   transform: Codec<I, A>,
   annotations?: AST.Annotations | undefined
-) => TransformPropertySignature<I, false, A, false>
+) => S.PropertySignature<I, false, A, false>
 ```
 
 Added in v1.0.0

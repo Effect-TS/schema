@@ -1,5 +1,6 @@
 import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
+import * as C from "@effect/schema/Codec";
 
 // ---------------------------------------------
 // To
@@ -239,6 +240,13 @@ S.struct({ a: S.string,  b: S.number });
 S.struct({ a: S.never })
 
 // ---------------------------------------------
+// propertySignature
+// ---------------------------------------------
+
+// $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c: boolean; }>
+S.struct({ a: S.string, b: S.number, c: S.propertySignature(S.boolean) });
+
+// ---------------------------------------------
 // optional
 // ---------------------------------------------
 
@@ -251,6 +259,31 @@ S.struct({ a: pipe(S.string, S.optional) })
 
 // $ExpectType Schema<{ readonly a?: never; }>
 S.struct({ a: S.optional(S.never) })
+
+// ---------------------------------------------
+// optional().withDefault()
+// ---------------------------------------------
+
+// $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: boolean; }>
+C.struct({ a: S.string, b: S.number, c: S.optional(S.boolean).withDefault(() => false) });
+
+// piping
+// $ExpectType Codec<{ readonly a?: string; }, { readonly a: string; }>
+C.struct({ a: pipe(S.string, S.optional).withDefault(() => '') })
+
+// ---------------------------------------------
+// optional().toOption()
+// ---------------------------------------------
+
+// $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: Option<boolean>; }>
+C.struct({ a: S.string, b: S.number, c: C.optional(S.boolean).toOption() });
+
+// $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: Option<number>; }>
+C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString).toOption() });
+
+// piping
+// $ExpectType Codec<{ readonly a?: string; }, { readonly a: Option<string>; }>
+C.struct({ a: pipe(S.string, C.optional).toOption() })
 
 // ---------------------------------------------
 // pick
