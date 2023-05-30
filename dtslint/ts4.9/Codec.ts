@@ -222,7 +222,7 @@ pipe(
 // $ExpectType Codec<{ readonly a: string; readonly b: string; readonly c: string; }, { readonly a: string; readonly b: string; readonly c: string; }>
 C.extend(C.struct({ a: S.string, b: S.string }), C.struct({ c: S.string }));
 
-// $ExpectType Codec<{ [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }, { [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
+// $ExpectType Codec<{ readonly [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }, { readonly [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
 pipe(
   C.struct({ a: S.string, b: S.string }),
   C.extend(C.struct({ c: S.string })),

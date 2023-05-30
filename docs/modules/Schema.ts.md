@@ -1972,7 +1972,7 @@ Added in v1.0.0
 
 ```ts
 export type Spread<A> = {
-  [K in keyof A]: A[K]
+  readonly [K in keyof A]: A[K]
 } extends infer B
   ? B
   : never

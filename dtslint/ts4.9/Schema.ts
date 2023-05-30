@@ -315,7 +315,7 @@ pipe(
 // $ExpectType Schema<{ readonly a: string; readonly b: string; readonly c: string; }>
 S.extend(S.struct({ a: S.string, b: S.string }), S.struct({ c: S.string }));
 
-// $ExpectType Schema<{ [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
+// $ExpectType Schema<{ readonly [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
 pipe(
   S.struct({ a: S.string, b: S.string }),
   S.extend(S.struct({ c: S.string })),
