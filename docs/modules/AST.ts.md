@@ -110,6 +110,7 @@ Added in v1.0.0
   - [Element (interface)](#element-interface)
   - [IndexSignature (interface)](#indexsignature-interface)
   - [Match (type alias)](#match-type-alias)
+  - [Members (type alias)](#members-type-alias)
   - [Parameter (type alias)](#parameter-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [TemplateLiteralSpan (interface)](#templateliteralspan-interface)
@@ -1059,8 +1060,6 @@ export interface Transform extends Annotated {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
   readonly transformAST: TransformAST.TransformAST
 }
 ```
@@ -1115,7 +1114,7 @@ Added in v1.0.0
 ```ts
 export interface Union extends Annotated {
   readonly _tag: 'Union'
-  readonly types: readonly [AST, AST, ...Array<AST>]
+  readonly types: Members<AST>
 }
 ```
 
@@ -1205,6 +1204,16 @@ Added in v1.0.0
 export type Match<A> = {
   [K in AST['_tag']]: (ast: Extract<AST, { _tag: K }>, compile: Compiler<A>) => A
 }
+```
+
+Added in v1.0.0
+
+## Members (type alias)
+
+**Signature**
+
+```ts
+export type Members<A> = readonly [A, A, ...Array<A>]
 ```
 
 Added in v1.0.0
@@ -1397,17 +1406,6 @@ export declare const mergeAnnotations: (
 ) =>
   | {
       annotations: { [x: string]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
-      encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
-      transformAST: TransformAST.TransformAST
-    }
-  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
-  | {
-      annotations: { [x: string]: unknown }
       _tag: 'Declaration'
       typeParameters: readonly AST[]
       type: AST
@@ -1422,9 +1420,11 @@ export declare const mergeAnnotations: (
   | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
   | {
@@ -1453,6 +1453,13 @@ export declare const mergeAnnotations: (
       _tag: 'Refinement'
       from: AST
       decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
+    }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Transform'
+      from: AST
+      to: AST
+      transformAST: TransformAST.TransformAST
     }
 ```
 
@@ -1520,17 +1527,6 @@ export declare const setAnnotation: (
 ) =>
   | {
       annotations: { [x: string]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
-      encode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
-      transformAST: TransformAST.TransformAST
-    }
-  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
-  | {
-      annotations: { [x: string]: unknown }
       _tag: 'Declaration'
       typeParameters: readonly AST[]
       type: AST
@@ -1545,9 +1541,11 @@ export declare const setAnnotation: (
   | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
+  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
   | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
   | {
@@ -1576,6 +1574,13 @@ export declare const setAnnotation: (
       _tag: 'Refinement'
       from: AST
       decode: (input: any, options: ParseOptions, self: AST) => IO<ParseError, any>
+    }
+  | {
+      annotations: { [x: string]: unknown }
+      _tag: 'Transform'
+      from: AST
+      to: AST
+      transformAST: TransformAST.TransformAST
     }
 ```
 

@@ -13,7 +13,6 @@ import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
-import { isNumber, isString } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -186,48 +185,10 @@ export const transformResult: {
   to: Transform<I2, A2>,
   decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
   encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
-): Transform<I1, A2> => {
-  const final = TransformAST.createFinalTransformation(decode, encode)
-  if (AST.isTransform(from.ast)) {
-    if (AST.isTransform(to.ast)) {
-      return make(
-        AST.createTransform(
-          from.ast.from,
-          to.ast,
-          TransformAST.createAndThenTransformation(
-            TransformAST.createAndThenTransformation(from.ast.transformAST, final),
-            to.ast.transformAST
-          )
-        )
-      )
-    } else {
-      return make(
-        AST.createTransform(
-          from.ast.from,
-          to.ast,
-          TransformAST.createAndThenTransformation(from.ast.transformAST, final)
-        )
-      )
-    }
-  } else {
-    if (AST.isTransform(to.ast)) {
-      return make(
-        AST.createTransform(
-          from.ast,
-          to.ast.to,
-          TransformAST.createAndThenTransformation(
-            final,
-            to.ast.transformAST
-          )
-        )
-      )
-    } else {
-      return make(
-        AST.createTransform(from.ast, to.ast, final)
-      )
-    }
-  }
-})
+): Transform<I1, A2> =>
+  make(
+    AST.createTransform(from.ast, to.ast, TransformAST.createFinalTransformation(decode, encode))
+  ))
 
 /**
     Create a new `Transform` by transforming the input and output of an existing `Schema`
@@ -276,8 +237,18 @@ export const union = <Members extends ReadonlyArray<Transform<any, any>>>(
  * @category combinators
  * @since 1.0.0
  */
-export const nullable = <From, To>(self: Transform<From, To>): Transform<From | null, To | null> =>
-  union(S.null, self)
+export const nullable = <From, To>(
+  self: Transform<From, To>
+): Transform<From | null, To | null> => {
+  const parseResult = P.parseResult(self)
+  const encodeResult = P.encodeResult(self)
+  return transformResult(
+    S.nullable(from(self)),
+    S.nullable(to(self)),
+    (nullable, options) => nullable === null ? PR.success(null) : parseResult(nullable, options),
+    (nullable, options) => nullable === null ? PR.success(null) : encodeResult(nullable, options)
+  )
+}
 
 /**
  * @category combinators
@@ -288,35 +259,10 @@ export const tuple = <Elements extends ReadonlyArray<Transform<any, any>>>(
 ): Transform<
   { readonly [K in keyof Elements]: From<Elements[K]> },
   { readonly [K in keyof Elements]: To<Elements[K]> }
-> => {
-  const fromElements: Array<AST.Element> = []
-  const toElements: Array<AST.Element> = []
-  const tansformations: Array<TransformAST.TransformAST> = []
-  for (let i = 0; i < elements.length; i++) {
-    const element = elements[i]
-    if (AST.isTransform(element.ast)) {
-      fromElements.push(AST.createElement(element.ast.from, false))
-      toElements.push(AST.createElement(element.ast.to, false))
-      tansformations.push(element.ast.transformAST)
-    } else {
-      fromElements.push(AST.createElement(element.ast, false))
-      toElements.push(AST.createElement(element.ast, false))
-    }
-  }
-
-  if (RA.isNonEmptyReadonlyArray(tansformations)) {
-    return make(
-      AST.createTransform(
-        AST.createTuple(fromElements, O.none(), true),
-        AST.createTuple(toElements, O.none(), true),
-        TransformAST.createTupleTransformation(tansformations)
-      )
-    )
-  }
-  return make(
+> =>
+  make(
     AST.createTuple(elements.map((schema) => AST.createElement(schema.ast, false)), O.none(), true)
   )
-}
 
 /**
  * @category combinators
@@ -539,7 +485,7 @@ export const struct = <
             toPropertySignatures.push(
               AST.createPropertySignature(
                 key,
-                S.option(S.make(AST.to(field._from))).ast,
+                optionFromSelf(make(AST.to(field._from))).ast,
                 false,
                 true,
                 field._annotations
@@ -568,23 +514,9 @@ export const struct = <
         )
       }
     } else {
-      if (AST.isTransform(field.ast)) {
-        fromPropertySignatures.push(
-          AST.createPropertySignature(key, AST.from(field.ast), false, true)
-        )
-        toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
-        propertySignatureTransformations.push(
-          TransformAST.createPropertySignatureTransformation(
-            key,
-            key,
-            field.ast.transformAST
-          )
-        )
-      } else {
-        propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-        fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-        toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
-      }
+      propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+      fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
+      toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
     }
   }
   if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
@@ -593,15 +525,12 @@ export const struct = <
         AST.createTypeLiteral(fromPropertySignatures, []),
         AST.createTypeLiteral(toPropertySignatures, []),
         TransformAST.createTypeLiteralTransformation(
-          propertySignatureTransformations,
-          [],
-          []
+          propertySignatureTransformations
         )
       )
     )
-  } else {
-    return make(AST.createTypeLiteral(propertySignatures, []))
   }
+  return make(AST.createTypeLiteral(propertySignatures, []))
 }
 
 /**
@@ -622,7 +551,7 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
             AST.createTransform(
               AST.pick(ast.from, keys),
               AST.pick(ast.to, keys),
-              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [], [])
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
             )
           )
         } else {
@@ -652,7 +581,7 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
             AST.createTransform(
               AST.omit(ast.from, keys),
               AST.omit(ast.to, keys),
-              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations, [], [])
+              TransformAST.createTypeLiteralTransformation(propertySignatureTransformations)
             )
           )
         } else {
@@ -671,68 +600,8 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
 export const record = <K extends string | symbol, I, A>(
   key: S.Schema<K>,
   value: Transform<I, A>
-): Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }> => {
-  if (AST.isTransform(value.ast)) {
-    const transformAST = value.ast.transformAST
-    const propertySignatures: Array<TransformAST.PropertySignatureTransformation> = []
-    const indexSignatures: Array<TransformAST.IndexSignatureTransformation> = []
-    const from = AST.createRecord(key.ast, AST.from(value.ast), true)
-    const to = AST.createRecord(key.ast, AST.to(value.ast), true)
-    const go = (key: AST.AST): void => {
-      switch (key._tag) {
-        case "NeverKeyword":
-          break
-        case "StringKeyword":
-        case "SymbolKeyword":
-          indexSignatures.push(TransformAST.createIndexSignatureTransformation(key, transformAST))
-          break
-        case "TemplateLiteral":
-          indexSignatures.push(
-            TransformAST.createIndexSignatureTransformation(AST.stringKeyword, transformAST)
-          )
-          break
-        case "Refinement":
-          go(key.from)
-          break
-        case "Literal":
-          if (isString(key.literal) || isNumber(key.literal)) {
-            propertySignatures.push(
-              TransformAST.createPropertySignatureTransformation(
-                key.literal,
-                key.literal,
-                transformAST
-              )
-            )
-          } else {
-            throw new Error(`createRecord: unsupported literal ${String(key.literal)}`)
-          }
-          break
-        case "UniqueSymbol":
-          propertySignatures.push(TransformAST.createPropertySignatureTransformation(
-            key.symbol,
-            key.symbol,
-            transformAST
-          ))
-          break
-        case "Union":
-          key.types.forEach(go)
-          break
-        default:
-          throw new Error(`createRecord: unsupported key transformation`)
-      }
-    }
-    go(key.ast)
-    const exclude = indexSignatures.length > 0 ? propertySignatures.map((p) => p.to) : []
-    return make(
-      AST.createTransform(
-        from,
-        to,
-        TransformAST.createTypeLiteralTransformation(propertySignatures, indexSignatures, exclude)
-      )
-    )
-  }
-  return make(AST.createRecord(key.ast, value.ast, true))
-}
+): Transform<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
+  make(AST.createRecord(key.ast, value.ast, true))
 
 /**
  * @category combinators
@@ -850,9 +719,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
               () => O.none()
             )
           )
-        ],
-        [],
-        []
+        ]
       )
     ))
 
@@ -1010,17 +877,6 @@ export {
 // Option
 // ---------------------------------------------
 
-const optionInline = <I, A>(value: Transform<I, A>) =>
-  union(
-    struct({
-      _tag: S.literal("None")
-    }),
-    struct({
-      _tag: S.literal("Some"),
-      value
-    })
-  )
-
 /**
  * @category Option
  * @since 1.0.0
@@ -1042,19 +898,34 @@ export const optionFromSelf = <I, A>(value: Transform<I, A>): Transform<Option<I
   )
 }
 
+const optionAsJson = <A>(value: S.Schema<A>) =>
+  S.union(S.struct({ _tag: S.literal("None") }), S.struct({ _tag: S.literal("Some"), value }))
+
 /**
  * @category Option
  * @since 1.0.0
  */
 export const option = <I, A>(
   value: Transform<I, A>
-): Transform<{ readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I }, Option<A>> =>
-  transform(
-    optionInline(value),
+): Transform<
+  { readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I },
+  Option<A>
+> => {
+  const parseResult = P.parseResult(value)
+  const encodeResult = P.encodeResult(value)
+  return transformResult(
+    optionAsJson(from(value)),
     S.option(to(value)),
-    (o) => o._tag === "None" ? O.none() : O.some(o.value),
-    O.match(() => ({ _tag: "None" as const }), (value) => ({ _tag: "Some" as const, value }))
+    (optionAsJson, options) =>
+      optionAsJson._tag === "None" ?
+        PR.success(O.none()) :
+        PR.map(parseResult(optionAsJson.value, options), O.some),
+    (o, options) =>
+      O.isNone(o) ?
+        PR.success({ _tag: "None" as const }) :
+        PR.map(encodeResult(o.value, options), (value) => ({ _tag: "Some" as const, value }))
   )
+}
 
 /**
  * @category option
@@ -1062,24 +933,21 @@ export const option = <I, A>(
  */
 export const optionFromNullable = <I, A>(
   value: Transform<I, A>
-): Transform<I | null, Option<A>> =>
-  transform(nullable(value), S.option(to(value)), O.fromNullable, O.getOrNull)
+): Transform<I | null, Option<A>> => {
+  const parseResult = P.parseResult(value)
+  const encodeResult = P.encodeResult(value)
+  return transformResult(
+    S.nullable(from(value)),
+    S.option(to(value)),
+    (nullable, options) =>
+      nullable === null ? PR.success(O.none()) : PR.map(parseResult(nullable, options), O.some),
+    (o, options) => O.isNone(o) ? PR.success(null) : encodeResult(o.value, options)
+  )
+}
 
 // ---------------------------------------------
 // Either
 // ---------------------------------------------
-
-const eitherInline = <IE, E, IA, A>(left: Transform<IE, E>, right: Transform<IA, A>) =>
-  union(
-    struct({
-      _tag: S.literal("Left"),
-      left
-    }),
-    struct({
-      _tag: S.literal("Right"),
-      right
-    })
-  )
 
 /**
  * @category Either
@@ -1107,6 +975,12 @@ export const eitherFromSelf = <IE, E, IA, A>(
   )
 }
 
+const eitherAsJson = <E, A>(left: S.Schema<E>, right: S.Schema<A>) =>
+  S.union(
+    S.struct({ _tag: S.literal("Left"), left }),
+    S.struct({ _tag: S.literal("Right"), right })
+  )
+
 /**
  * @category Either
  * @since 1.0.0
@@ -1117,16 +991,30 @@ export const either = <IE, E, IA, A>(
 ): Transform<
   { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
   Either<E, A>
-> =>
-  transform(
-    eitherInline(left, right),
+> => {
+  const parseResultLeft = P.parseResult(left)
+  const parseResultRight = P.parseResult(right)
+  const encodeResultLeft = P.encodeResult(left)
+  const encodeResultRight = P.encodeResult(right)
+  return transformResult(
+    eitherAsJson(from(left), from(right)),
     S.either(to(left), to(right)),
-    (a) => a._tag === "Left" ? E.left(a.left) : E.right(a.right),
-    E.match(
-      (left) => ({ _tag: "Left" as const, left }),
-      (right) => ({ _tag: "Right" as const, right })
-    )
+    (eitherAsJson, options) =>
+      eitherAsJson._tag === "Left" ?
+        PR.map(parseResultLeft(eitherAsJson.left, options), E.left) :
+        PR.map(parseResultRight(eitherAsJson.right, options), E.right),
+    (either, options) =>
+      E.isLeft(either) ?
+        PR.map(
+          encodeResultLeft(either.left, options),
+          (left) => ({ _tag: "Left" as const, left })
+        ) :
+        PR.map(
+          encodeResultRight(either.right, options),
+          (right) => ({ _tag: "Right" as const, right })
+        )
   )
+}
 
 // ---------------------------------------------
 // ReadonlyMap

@@ -13,38 +13,22 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [constructors](#constructors)
-  - [createAndThenTransformation](#createandthentransformation)
   - [createFinalPropertySignatureTransformation](#createfinalpropertysignaturetransformation)
   - [createFinalTransformation](#createfinaltransformation)
-  - [createIndexSignatureTransformation](#createindexsignaturetransformation)
   - [createPropertySignatureTransformation](#createpropertysignaturetransformation)
-  - [createTupleTransformation](#createtupletransformation)
   - [createTypeLiteralTransformation](#createtypeliteraltransformation)
 - [guard](#guard)
   - [isTypeLiteralTransformation](#istypeliteraltransformation)
 - [model](#model)
-  - [AndThenTransformation (interface)](#andthentransformation-interface)
   - [FinalPropertySignatureTransformation (interface)](#finalpropertysignaturetransformation-interface)
   - [FinalTransformation (interface)](#finaltransformation-interface)
-  - [IndexSignatureTransformation (interface)](#indexsignaturetransformation-interface)
   - [PropertySignatureTransformation (interface)](#propertysignaturetransformation-interface)
   - [TransformAST (type alias)](#transformast-type-alias)
-  - [TupleTransformation (interface)](#tupletransformation-interface)
   - [TypeLiteralTransformation (interface)](#typeliteraltransformation-interface)
 
 ---
 
 # constructors
-
-## createAndThenTransformation
-
-**Signature**
-
-```ts
-export declare const createAndThenTransformation: (from: TransformAST, to: TransformAST) => AndThenTransformation
-```
-
-Added in v1.0.0
 
 ## createFinalPropertySignatureTransformation
 
@@ -72,19 +56,6 @@ export declare const createFinalTransformation: (
 
 Added in v1.0.0
 
-## createIndexSignatureTransformation
-
-**Signature**
-
-```ts
-export declare const createIndexSignatureTransformation: (
-  parameter: AST.StringKeyword | AST.SymbolKeyword,
-  transformation: IndexSignatureTransformation['transformation']
-) => IndexSignatureTransformation
-```
-
-Added in v1.0.0
-
 ## createPropertySignatureTransformation
 
 **Signature**
@@ -99,25 +70,13 @@ export declare const createPropertySignatureTransformation: (
 
 Added in v1.0.0
 
-## createTupleTransformation
-
-**Signature**
-
-```ts
-export declare const createTupleTransformation: (elements: TupleTransformation['elements']) => TupleTransformation
-```
-
-Added in v1.0.0
-
 ## createTypeLiteralTransformation
 
 **Signature**
 
 ```ts
 export declare const createTypeLiteralTransformation: (
-  propertySignatureTransformations: TypeLiteralTransformation['propertySignatureTransformations'],
-  indexSignatureTransformations: TypeLiteralTransformation['indexSignatureTransformations'],
-  exclude: TypeLiteralTransformation['exclude']
+  propertySignatureTransformations: TypeLiteralTransformation['propertySignatureTransformations']
 ) => TypeLiteralTransformation
 ```
 
@@ -136,20 +95,6 @@ export declare const isTypeLiteralTransformation: (ast: TransformAST) => ast is 
 Added in v1.0.0
 
 # model
-
-## AndThenTransformation (interface)
-
-**Signature**
-
-```ts
-export interface AndThenTransformation {
-  readonly _tag: 'AndThenTransformation'
-  readonly from: TransformAST
-  readonly to: TransformAST
-}
-```
-
-Added in v1.0.0
 
 ## FinalPropertySignatureTransformation (interface)
 
@@ -184,21 +129,8 @@ Added in v1.0.0
 ```ts
 export interface FinalTransformation {
   readonly _tag: 'FinalTransformation'
-  readonly decode: AST.Transform['decode']
-  readonly encode: AST.Transform['encode']
-}
-```
-
-Added in v1.0.0
-
-## IndexSignatureTransformation (interface)
-
-**Signature**
-
-```ts
-export interface IndexSignatureTransformation {
-  readonly parameter: AST.StringKeyword | AST.SymbolKeyword
-  readonly transformation: TransformAST
+  readonly decode: (input: any, options: AST.ParseOptions, self: AST.AST) => ParseResult<any>
+  readonly encode: (input: any, options: AST.ParseOptions, self: AST.AST) => ParseResult<any>
 }
 ```
 
@@ -223,20 +155,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type TransformAST = FinalTransformation | AndThenTransformation | TypeLiteralTransformation | TupleTransformation
-```
-
-Added in v1.0.0
-
-## TupleTransformation (interface)
-
-**Signature**
-
-```ts
-export interface TupleTransformation {
-  readonly _tag: 'TupleTransformation'
-  readonly elements: ReadonlyArray.NonEmptyReadonlyArray<TransformAST>
-}
+export type TransformAST = FinalTransformation | TypeLiteralTransformation
 ```
 
 Added in v1.0.0
@@ -249,8 +168,6 @@ Added in v1.0.0
 export interface TypeLiteralTransformation {
   readonly _tag: 'TypeLiteralTransformation'
   readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
-  readonly indexSignatureTransformations: ReadonlyArray<IndexSignatureTransformation>
-  readonly exclude: ReadonlyArray<PropertyKey>
 }
 ```
 

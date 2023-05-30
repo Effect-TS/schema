@@ -18,6 +18,7 @@ import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
 import type { Schema } from "@effect/schema/Schema"
 import type { To, Transform } from "@effect/schema/Transform"
+import type * as TransformAST from "@effect/schema/TransformAST"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 const get = (ast: AST.AST, isDecoding: boolean) => {
@@ -310,7 +311,7 @@ const go = untracedMethod(() =>
       }
       case "Transform": {
         const to = isDecoding ? go(ast.to, false, true) : go(ast.from, false, false)
-        const decode = isDecoding ? ast.decode : ast.encode
+        const decode = getDecode(ast.transformAST, isDecoding)
         if (isBoundary) {
           const from = isDecoding ? go(ast.from, true, true) : go(ast.to, true, false)
           return (i1, options) =>
@@ -737,6 +738,9 @@ const go = untracedMethod(() =>
             const type = indexSignatures[i][1]
             const keys = I.getKeysForIndexSignature(input, ast.indexSignatures[i].parameter)
             for (const key of keys) {
+              if (Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
+                continue
+              }
               // ---------------------------------------------
               // handle keys
               // ---------------------------------------------
@@ -1091,4 +1095,70 @@ function sortByIndex<T>(es: RA.NonEmptyArray<[number, T]>): RA.NonEmptyArray<T>
 function sortByIndex<T>(es: Array<[number, T]>): Array<T>
 function sortByIndex(es: Array<[number, any]>): any {
   return es.sort(([a], [b]) => a > b ? 1 : a < b ? -1 : 0).map(([_, a]) => a)
+}
+
+// -------------------------------------------------------------------------------------
+// transformations interpreter
+// -------------------------------------------------------------------------------------
+
+const isFinalPropertySignatureTransformation = (
+  ast: TransformAST.FinalPropertySignatureTransformation | TransformAST.TransformAST
+): ast is TransformAST.FinalPropertySignatureTransformation =>
+  ast._tag === "FinalPropertySignatureTransformation"
+
+/** @internal */
+export const getDecode = (
+  transform: TransformAST.TransformAST,
+  isDecoding: boolean
+): (input: any, options: ParseOptions, self: AST.AST) => ParseResult<any> => {
+  switch (transform._tag) {
+    case "FinalTransformation":
+      return isDecoding ? transform.decode : transform.encode
+    case "TypeLiteralTransformation":
+      return (input, options, ast) => {
+        let out: PR.ParseResult<any> = E.right(input)
+
+        // ---------------------------------------------
+        // handle property signature transformations
+        // ---------------------------------------------
+        for (const pst of transform.propertySignatureTransformations) {
+          const [from, to] = isDecoding ?
+            [pst.from, pst.to] :
+            [pst.to, pst.from]
+          const t = pst.transformation
+          if (isFinalPropertySignatureTransformation(t)) {
+            const parse = isDecoding ? t.decode : t.encode
+            const f = (input: any) => {
+              const o = parse(
+                Object.prototype.hasOwnProperty.call(input, from) ?
+                  O.some(input[from]) :
+                  O.none()
+              )
+              if (O.isSome(o)) {
+                input[to] = o.value
+              } else {
+                delete input[from]
+              }
+              return input
+            }
+            out = PR.map(out, f)
+          } else {
+            const parse = getDecode(t, isDecoding)
+            out = PR.flatMap(
+              out,
+              (input) =>
+                PR.bimap(
+                  parse(input[from], options, ast),
+                  (e) => PR.parseError([PR.key(from, e.errors)]),
+                  (value) => {
+                    input[to] = value
+                    return input
+                  }
+                )
+            )
+          }
+        }
+        return out
+      }
+  }
 }

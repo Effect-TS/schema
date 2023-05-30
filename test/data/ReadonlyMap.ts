@@ -58,7 +58,7 @@ describe.concurrent("ReadonlyMap", () => {
         await Util.expectParseFailure(
           transform,
           new Map([["1", "a"], ["a", "b"]]),
-          `/1 /0 Expected <anonymous tuple or array schema> -> <anonymous tuple or array schema>, actual "a"`
+          `/1 /0 Expected string -> number, actual "a"`
         )
       })
 

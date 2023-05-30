@@ -11,7 +11,7 @@ import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
 import * as I from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
-import * as TransformAST from "@effect/schema/TransformAST"
+import type * as TransformAST from "@effect/schema/TransformAST"
 
 // -------------------------------------------------------------------------------------
 // model
@@ -782,13 +782,20 @@ export const createTypeLiteral = (
 export const isTypeLiteral = (ast: AST): ast is TypeLiteral => ast._tag === "TypeLiteral"
 
 /**
+ * @since 1.0.0
+ */
+export type Members<A> = readonly [A, A, ...Array<A>]
+
+/**
  * @category model
  * @since 1.0.0
  */
 export interface Union extends Annotated {
   readonly _tag: "Union"
-  readonly types: readonly [AST, AST, ...Array<AST>]
+  readonly types: Members<AST>
 }
+
+const isMembers = <A>(as: ReadonlyArray<A>): as is readonly [A, A, ...Array<A>] => as.length > 1
 
 /**
  * @category constructors
@@ -799,19 +806,17 @@ export const createUnion = (
   annotations: Annotated["annotations"] = {}
 ): AST => {
   const types = unify(candidates)
-  switch (types.length) {
-    case 0:
-      return neverKeyword
-    case 1:
-      return types[0]
-    default: {
-      return {
-        _tag: "Union",
-        types: sortUnionMembers(types) as any,
-        annotations
-      }
+  if (isMembers(types)) {
+    return {
+      _tag: "Union",
+      types: sortUnionMembers(types),
+      annotations
     }
   }
+  if (ReadonlyArray.isNonEmptyReadonlyArray(types)) {
+    return types[0]
+  }
+  return neverKeyword
 }
 
 /**
@@ -895,8 +900,6 @@ export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
   readonly transformAST: TransformAST.TransformAST
 }
 
@@ -909,15 +912,7 @@ export const createTransform = (
   to: AST,
   transformAST: TransformAST.TransformAST,
   annotations: Annotated["annotations"] = {}
-): Transform => ({
-  _tag: "Transform",
-  from,
-  to,
-  decode: TransformAST.go(transformAST, true),
-  encode: TransformAST.go(transformAST, false),
-  transformAST,
-  annotations
-})
+): Transform => ({ _tag: "Transform", from, to, transformAST, annotations })
 
 /**
  * @category guards
@@ -1312,7 +1307,9 @@ export const getWeight = (ast: AST): number => {
   }
 }
 
-const sortUnionMembers = ReadonlyArray.sort(Order.reverse(Order.contramap(Number.Order, getWeight)))
+const sortUnionMembers: (self: Members<AST>) => Members<AST> = ReadonlyArray.sort(
+  Order.reverse(Order.contramap(Number.Order, getWeight))
+) as any
 
 const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   let out = pipe(

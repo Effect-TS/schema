@@ -282,9 +282,9 @@ describe.concurrent("Encoder", () => {
   })
 
   it("union/ more required property signatures", async () => {
-    const a = T.struct({ a: S.string })
-    const ab = T.struct({ a: S.string, b: S.number })
-    const schema = T.union(a, ab)
+    const a = S.struct({ a: S.string })
+    const ab = S.struct({ a: S.string, b: S.number })
+    const schema = S.union(a, ab)
     await Util.expectEncodeSuccess(schema, { a: "a", b: 1 }, { a: "a", b: 1 })
   })
 

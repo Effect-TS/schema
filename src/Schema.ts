@@ -671,17 +671,11 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.propertySignatures.concat(y.to.propertySignatures),
               x.indexSignatures.concat(y.to.indexSignatures)
             )
-            const indexSignatureTransformations = y.transformAST.indexSignatureTransformations
-            const exclude = indexSignatureTransformations.length > 0 ?
-              x.propertySignatures.concat(y.from.propertySignatures).map((p) => p.name) :
-              []
             return AST.createTransform(
               from,
               to,
               TransformAST.createTypeLiteralTransformation(
-                y.transformAST.propertySignatureTransformations,
-                indexSignatureTransformations,
-                exclude
+                y.transformAST.propertySignatureTransformations
               )
             )
           }
@@ -698,17 +692,11 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.to.propertySignatures.concat(y.propertySignatures),
               x.to.indexSignatures.concat(y.indexSignatures)
             )
-            const indexSignatureTransformations = x.transformAST.indexSignatureTransformations
-            const exclude = indexSignatureTransformations.length > 0 ?
-              y.propertySignatures.concat(x.from.propertySignatures).map((p) => p.name) :
-              []
             return AST.createTransform(
               from,
               to,
               TransformAST.createTypeLiteralTransformation(
-                x.transformAST.propertySignatureTransformations,
-                indexSignatureTransformations,
-                exclude
+                x.transformAST.propertySignatureTransformations
               )
             )
           } else if (
@@ -723,22 +711,13 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.to.propertySignatures.concat(y.to.propertySignatures),
               x.to.indexSignatures.concat(y.to.indexSignatures)
             )
-            const indexSignatureTransformations = ReadonlyArray.appendAll(
-              x.transformAST.indexSignatureTransformations,
-              y.transformAST.indexSignatureTransformations
-            )
-            const exclude = indexSignatureTransformations.length > 0 ?
-              y.to.propertySignatures.concat(x.to.propertySignatures).map((p) => p.name) :
-              []
             return AST.createTransform(
               from,
               to,
               TransformAST.createTypeLiteralTransformation(
                 x.transformAST.propertySignatureTransformations.concat(
                   y.transformAST.propertySignatureTransformations
-                ),
-                indexSignatureTransformations,
-                exclude
+                )
               )
             )
           }

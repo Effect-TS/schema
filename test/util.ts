@@ -8,6 +8,7 @@ import * as Effect from "@effect/io/Effect"
 import * as A from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
+import { getDecode } from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import type { Transform } from "@effect/schema/Transform"
@@ -77,12 +78,13 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
       return AST.createTransform(
         effectifyAST(ast.from, mode),
         effectifyAST(ast.to, mode),
-        TransformAST.createFinalTransformation( // I need to override with the original ast here in order to not change the error message
-          // -------------------------v
-          effectifyDecode(ast.decode, ast),
+        TransformAST.createFinalTransformation(
           // I need to override with the original ast here in order to not change the error message
-          // -------------------------v
-          effectifyDecode(ast.encode, ast)
+          // ------------------------------------------------v
+          effectifyDecode(getDecode(ast.transformAST, true), ast),
+          // I need to override with the original ast here in order to not change the error message
+          // ------------------------------------------------v
+          effectifyDecode(getDecode(ast.transformAST, false), ast)
         ),
         ast.annotations
       )

@@ -22,9 +22,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
                 identity
               )
             )
-          ],
-          [],
-          []
+          ]
         )
       )
     )
@@ -51,9 +49,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
                 (o) => O.flatMap(o, O.liftPredicate((v) => v !== 0))
               )
             )
-          ],
-          [],
-          []
+          ]
         )
       )
     )
@@ -81,9 +77,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
                   O.flatten
                 )
               )
-            ],
-            [],
-            []
+            ]
           )
         )
       )
@@ -110,9 +104,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
                 identity
               )
             )
-          ],
-          [],
-          []
+          ]
         )
       )
     )
@@ -137,9 +129,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
                 identity
               )
             )
-          ],
-          [],
-          []
+          ]
         )
       )
     )
@@ -163,9 +153,7 @@ describe.concurrent("PropertySignatureTransformations", () => {
                 O.orElse(() => O.some(0))
               )
             )
-          ],
-          [],
-          []
+          ]
         )
       )
     )
@@ -187,14 +175,9 @@ describe.concurrent("PropertySignatureTransformations", () => {
             TransformAST.createPropertySignatureTransformation(
               "a",
               "a",
-              TransformAST.createFinalTransformation(
-                ast.decode,
-                ast.encode
-              )
+              ast.transformAST
             )
-          ],
-          [],
-          []
+          ]
         )
       )
     )
@@ -222,19 +205,12 @@ describe.concurrent("PropertySignatureTransformations", () => {
                   TransformAST.createPropertySignatureTransformation(
                     "b",
                     "b",
-                    TransformAST.createFinalTransformation(
-                      ast.decode,
-                      ast.encode
-                    )
+                    ast.transformAST
                   )
-                ],
-                [],
-                []
+                ]
               )
             )
-          ],
-          [],
-          []
+          ]
         )
       )
     )
