@@ -567,7 +567,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const annotations: (annotations: AST.Annotated['annotations']) => <A>(self: Schema<A>) => Schema<A>
+export declare const annotations: <A>(options: AnnotationOptions<A>) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -958,7 +958,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <A>(
   schema: Schema<A>,
-  annotations: AST.Annotated['annotations']
+  options: AnnotationOptions<A>
 ) => SchemaPropertySignature<A, false, A, false>
 ```
 

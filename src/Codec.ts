@@ -323,12 +323,12 @@ export const nonEmptyArray = <I, A>(
  */
 export const propertySignature = <I, A>(
   transform: Codec<I, A>,
-  annotations: AST.Annotated["annotations"]
+  options: S.AnnotationOptions<A>
 ): S.PropertySignature<I, false, A, false> =>
   new S.PropertySignatureImpl({
     _tag: "PropertySignature",
     ast: transform.ast,
-    annotations
+    annotations: S.toAnnotations(options)
   })
 
 /**

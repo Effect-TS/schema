@@ -117,8 +117,8 @@ export type {
  * @category combinators
  * @since 1.0.0
  */
-export const annotations = (annotations: AST.Annotated["annotations"]) =>
-  <A>(self: Schema<A>): Schema<A> => make(AST.mergeAnnotations(self.ast, annotations))
+export const annotations = <A>(options: AnnotationOptions<A>) =>
+  (self: Schema<A>): Schema<A> => make(AST.mergeAnnotations(self.ast, toAnnotations(options)))
 
 /**
  * @category annotations
@@ -623,12 +623,12 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
  */
 export const propertySignature = <A>(
   schema: Schema<A>,
-  annotations: AST.Annotated["annotations"]
+  options: AnnotationOptions<A>
 ): SchemaPropertySignature<A, false, A, false> =>
   new PropertySignatureImpl({
     _tag: "PropertySignature",
     ast: schema.ast,
-    annotations
+    annotations: toAnnotations(options)
   })
 
 /**
