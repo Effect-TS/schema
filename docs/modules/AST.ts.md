@@ -163,7 +163,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BrandAnnotationId: '@effect/schema/BrandAnnotationId'
+export declare const BrandAnnotationId: typeof BrandAnnotationId
 ```
 
 Added in v1.0.0
@@ -183,7 +183,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const DescriptionAnnotationId: '@effect/schema/DescriptionAnnotationId'
+export declare const DescriptionAnnotationId: typeof DescriptionAnnotationId
 ```
 
 Added in v1.0.0
@@ -203,7 +203,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const DocumentationAnnotationId: '@effect/schema/DocumentationAnnotationId'
+export declare const DocumentationAnnotationId: typeof DocumentationAnnotationId
 ```
 
 Added in v1.0.0
@@ -223,7 +223,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ExamplesAnnotationId: '@effect/schema/ExamplesAnnotationId'
+export declare const ExamplesAnnotationId: typeof ExamplesAnnotationId
 ```
 
 Added in v1.0.0
@@ -243,7 +243,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const IdentifierAnnotationId: '@effect/schema/IdentifierAnnotationId'
+export declare const IdentifierAnnotationId: typeof IdentifierAnnotationId
 ```
 
 Added in v1.0.0
@@ -263,7 +263,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const JSONSchemaAnnotationId: '@effect/schema/JSONSchemaAnnotationId'
+export declare const JSONSchemaAnnotationId: typeof JSONSchemaAnnotationId
 ```
 
 Added in v1.0.0
@@ -283,7 +283,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MessageAnnotationId: '@effect/schema/MessageAnnotationId'
+export declare const MessageAnnotationId: typeof MessageAnnotationId
 ```
 
 Added in v1.0.0
@@ -303,7 +303,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const TitleAnnotationId: '@effect/schema/TitleAnnotationId'
+export declare const TitleAnnotationId: typeof TitleAnnotationId
 ```
 
 Added in v1.0.0
@@ -313,7 +313,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type TypeAnnotation = string | symbol
+export type TypeAnnotation = symbol
 ```
 
 Added in v1.0.0
@@ -323,7 +323,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const TypeAnnotationId: '@effect/schema/TypeAnnotationId'
+export declare const TypeAnnotationId: typeof TypeAnnotationId
 ```
 
 Added in v1.0.0
@@ -913,7 +913,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Annotations extends Record<string | symbol, unknown> {}
+export interface Annotations {
+  [_: symbol]: unknown
+}
 ```
 
 Added in v1.0.0
@@ -1497,7 +1499,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const getAnnotation: <A>(key: PropertyKey) => (annotated: Annotated) => Option<A>
+export declare const getAnnotation: <A>(key: symbol) => (annotated: Annotated) => Option<A>
 ```
 
 Added in v1.0.0
@@ -1556,64 +1558,54 @@ export declare const mergeAnnotations: (
   annotations: Annotated['annotations']
 ) =>
   | {
-      annotations: { [x: string]: unknown; [x: symbol]: unknown }
+      annotations: { [x: symbol]: unknown }
       _tag: 'Declaration'
       typeParameters: readonly AST[]
       type: AST
       decode: (...typeParameters: readonly AST[]) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
     }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'Literal'; literal: LiteralValue }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'UndefinedKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'VoidKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'NeverKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'UnknownKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'AnyKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'StringKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'NumberKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'BooleanKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'BigIntKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'SymbolKeyword' }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'ObjectKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'Literal'; literal: LiteralValue }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'UndefinedKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'VoidKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'NeverKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'UnknownKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'AnyKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'StringKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'NumberKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'BooleanKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'BigIntKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'SymbolKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'ObjectKeyword' }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
   | {
-      annotations: { [x: string]: unknown; [x: symbol]: unknown }
-      _tag: 'Enums'
-      enums: readonly (readonly [string, string | number])[]
-    }
-  | {
-      annotations: { [x: string]: unknown; [x: symbol]: unknown }
+      annotations: { [x: symbol]: unknown }
       _tag: 'TemplateLiteral'
       head: string
       spans: readonly [TemplateLiteralSpan, ...TemplateLiteralSpan[]]
     }
   | {
-      annotations: { [x: string]: unknown; [x: symbol]: unknown }
+      annotations: { [x: symbol]: unknown }
       _tag: 'Tuple'
       elements: readonly Element[]
       rest: Option<readonly [AST, ...AST[]]>
       isReadonly: boolean
     }
   | {
-      annotations: { [x: string]: unknown; [x: symbol]: unknown }
+      annotations: { [x: symbol]: unknown }
       _tag: 'TypeLiteral'
       propertySignatures: readonly PropertySignature[]
       indexSignatures: readonly IndexSignature[]
     }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
-  | { annotations: { [x: string]: unknown; [x: symbol]: unknown }; _tag: 'Lazy'; f: () => AST }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'Lazy'; f: () => AST }
   | {
-      annotations: { [x: string]: unknown; [x: symbol]: unknown }
+      annotations: { [x: symbol]: unknown }
       _tag: 'Refinement'
       from: AST
       decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
     }
-  | {
-      annotations: { [x: string]: unknown; [x: symbol]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      transformAST: TransformAST
-    }
+  | { annotations: { [x: symbol]: unknown }; _tag: 'Transform'; from: AST; to: AST; transformAST: TransformAST }
 ```
 
 Added in v1.0.0

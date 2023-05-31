@@ -17,7 +17,7 @@ describe.concurrent("brand", () => {
     )
 
     expect(Branded.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "@effect/schema/IntTypeId",
+      [AST.TypeAnnotationId]: S.IntTypeId,
       [AST.BrandAnnotationId]: ["A", "B"],
       [AST.DescriptionAnnotationId]: "a B brand",
       [AST.JSONSchemaAnnotationId]: { type: "integer" }
@@ -36,7 +36,7 @@ describe.concurrent("brand", () => {
       })
     )
     expect(Branded.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "@effect/schema/IntTypeId",
+      [AST.TypeAnnotationId]: S.IntTypeId,
       [AST.BrandAnnotationId]: [A, B],
       [AST.DescriptionAnnotationId]: "a B brand",
       [AST.JSONSchemaAnnotationId]: { type: "integer" }

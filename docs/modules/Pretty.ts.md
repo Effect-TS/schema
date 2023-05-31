@@ -30,7 +30,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PrettyHookId: '@effect/schema/PrettyHookId'
+export declare const PrettyHookId: symbol
 ```
 
 Added in v1.0.0

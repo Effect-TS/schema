@@ -86,7 +86,7 @@ Added in v1.0.0
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [model](#model)
-  - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
+  - [AnnotationOptions (interface)](#annotationoptions-interface)
   - [BrandSchema (interface)](#brandschema-interface)
   - [Schema (interface)](#schema-interface)
   - [To (type alias)](#to-type-alias)
@@ -1011,12 +1011,12 @@ Added in v1.0.0
 
 # model
 
-## AnnotationOptions (type alias)
+## AnnotationOptions (interface)
 
 **Signature**
 
 ```ts
-export type AnnotationOptions<A> = {
+export interface AnnotationOptions<A> extends AST.Annotations {
   readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
   readonly message?: AST.MessageAnnotation<A>
   readonly identifier?: AST.IdentifierAnnotation
@@ -1026,7 +1026,6 @@ export type AnnotationOptions<A> = {
   readonly documentation?: AST.DocumentationAnnotation
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-  readonly [_: string]: unknown
 }
 ```
 
@@ -1565,7 +1564,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BetweenBigintTypeId: '@effect/schema/BetweenBigintTypeId'
+export declare const BetweenBigintTypeId: typeof BetweenBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1575,7 +1574,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BetweenTypeId: '@effect/schema/BetweenTypeId'
+export declare const BetweenTypeId: typeof BetweenTypeId
 ```
 
 Added in v1.0.0
@@ -1585,7 +1584,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BrandTypeId: '@effect/schema/BrandTypeId'
+export declare const BrandTypeId: typeof BrandTypeId
 ```
 
 Added in v1.0.0
@@ -1595,7 +1594,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const EndsWithTypeId: '@effect/schema/EndsWithTypeId'
+export declare const EndsWithTypeId: typeof EndsWithTypeId
 ```
 
 Added in v1.0.0
@@ -1605,7 +1604,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const FiniteTypeId: '@effect/schema/FiniteTypeId'
+export declare const FiniteTypeId: typeof FiniteTypeId
 ```
 
 Added in v1.0.0
@@ -1615,7 +1614,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanBigintTypeId: '@effect/schema/GreaterThanBigintTypeId'
+export declare const GreaterThanBigintTypeId: typeof GreaterThanBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1625,7 +1624,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanOrEqualToBigintTypeId: '@effect/schema/GreaterThanOrEqualToBigintTypeId'
+export declare const GreaterThanOrEqualToBigintTypeId: typeof GreaterThanOrEqualToBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1635,7 +1634,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanOrEqualToTypeId: '@effect/schema/GreaterThanOrEqualToTypeId'
+export declare const GreaterThanOrEqualToTypeId: typeof GreaterThanOrEqualToTypeId
 ```
 
 Added in v1.0.0
@@ -1645,7 +1644,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanTypeId: '@effect/schema/GreaterThanTypeId'
+export declare const GreaterThanTypeId: typeof GreaterThanTypeId
 ```
 
 Added in v1.0.0
@@ -1655,7 +1654,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const IncludesTypeId: '@effect/schema/IncludesTypeId'
+export declare const IncludesTypeId: typeof IncludesTypeId
 ```
 
 Added in v1.0.0
@@ -1665,7 +1664,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const InstanceOfTypeId: '@effect/schema/InstanceOfTypeId'
+export declare const InstanceOfTypeId: typeof InstanceOfTypeId
 ```
 
 Added in v1.0.0
@@ -1675,7 +1674,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const IntTypeId: '@effect/schema/IntTypeId'
+export declare const IntTypeId: typeof IntTypeId
 ```
 
 Added in v1.0.0
@@ -1685,7 +1684,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ItemsCountTypeId: '@effect/schema/ItemsCountTypeId'
+export declare const ItemsCountTypeId: typeof ItemsCountTypeId
 ```
 
 Added in v1.0.0
@@ -1695,7 +1694,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const JsonNumberTypeId: '@effect/schema/JsonNumberTypeId'
+export declare const JsonNumberTypeId: typeof JsonNumberTypeId
 ```
 
 Added in v1.0.0
@@ -1705,7 +1704,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanBigintTypeId: '@effect/schema/LessThanBigintTypeId'
+export declare const LessThanBigintTypeId: typeof LessThanBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1715,7 +1714,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanOrEqualToBigintTypeId: '@effect/schema/LessThanOrEqualToBigintTypeId'
+export declare const LessThanOrEqualToBigintTypeId: typeof LessThanOrEqualToBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1725,7 +1724,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanOrEqualToTypeId: '@effect/schema/LessThanOrEqualToTypeId'
+export declare const LessThanOrEqualToTypeId: typeof LessThanOrEqualToTypeId
 ```
 
 Added in v1.0.0
@@ -1735,7 +1734,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanTypeId: '@effect/schema/LessThanTypeId'
+export declare const LessThanTypeId: typeof LessThanTypeId
 ```
 
 Added in v1.0.0
@@ -1745,7 +1744,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MaxItemsTypeId: '@effect/schema/MaxItemsTypeId'
+export declare const MaxItemsTypeId: typeof MaxItemsTypeId
 ```
 
 Added in v1.0.0
@@ -1755,7 +1754,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MaxLengthTypeId: '@effect/schema/MaxLengthTypeId'
+export declare const MaxLengthTypeId: typeof MaxLengthTypeId
 ```
 
 Added in v1.0.0
@@ -1765,7 +1764,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MinItemsTypeId: '@effect/schema/MinItemsTypeId'
+export declare const MinItemsTypeId: typeof MinItemsTypeId
 ```
 
 Added in v1.0.0
@@ -1775,7 +1774,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MinLengthTypeId: '@effect/schema/MinLengthTypeId'
+export declare const MinLengthTypeId: typeof MinLengthTypeId
 ```
 
 Added in v1.0.0
@@ -1785,7 +1784,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MultipleOfTypeId: '@effect/schema/MultipleOfTypeId'
+export declare const MultipleOfTypeId: typeof MultipleOfTypeId
 ```
 
 Added in v1.0.0
@@ -1795,7 +1794,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NegativeBigintTypeId: '@effect/schema/NegativeBigintTypeId'
+export declare const NegativeBigintTypeId: typeof NegativeBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1805,7 +1804,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NegativeTypeId: '@effect/schema/NegativeTypeId'
+export declare const NegativeTypeId: typeof NegativeTypeId
 ```
 
 Added in v1.0.0
@@ -1815,7 +1814,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonNaNTypeId: '@effect/schema/NonNaNTypeId'
+export declare const NonNaNTypeId: typeof NonNaNTypeId
 ```
 
 Added in v1.0.0
@@ -1825,7 +1824,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonNegativeBigintTypeId: '@effect/schema/NonNegativeBigintTypeId'
+export declare const NonNegativeBigintTypeId: typeof NonNegativeBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1835,7 +1834,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonNegativeTypeId: '@effect/schema/NonNegativeTypeId'
+export declare const NonNegativeTypeId: typeof NonNegativeTypeId
 ```
 
 Added in v1.0.0
@@ -1845,7 +1844,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonPositiveBigintTypeId: '@effect/schema/NonPositiveBigintTypeId'
+export declare const NonPositiveBigintTypeId: typeof NonPositiveBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1855,7 +1854,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonPositiveTypeId: '@effect/schema/NonPositiveTypeId'
+export declare const NonPositiveTypeId: typeof NonPositiveTypeId
 ```
 
 Added in v1.0.0
@@ -1865,7 +1864,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PatternTypeId: '@effect/schema/PatternTypeId'
+export declare const PatternTypeId: typeof PatternTypeId
 ```
 
 Added in v1.0.0
@@ -1875,7 +1874,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PositiveBigintTypeId: '@effect/schema/PositiveBigintTypeId'
+export declare const PositiveBigintTypeId: typeof PositiveBigintTypeId
 ```
 
 Added in v1.0.0
@@ -1885,7 +1884,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PositiveTypeId: '@effect/schema/PositiveTypeId'
+export declare const PositiveTypeId: typeof PositiveTypeId
 ```
 
 Added in v1.0.0
@@ -1895,7 +1894,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const StartsWithTypeId: '@effect/schema/StartsWithTypeId'
+export declare const StartsWithTypeId: typeof StartsWithTypeId
 ```
 
 Added in v1.0.0
@@ -1905,7 +1904,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const TrimmedTypeId: '@effect/schema/TrimmedTypeId'
+export declare const TrimmedTypeId: typeof TrimmedTypeId
 ```
 
 Added in v1.0.0
@@ -1915,7 +1914,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const UUIDTypeId: '@effect/schema/UUIDTypeId'
+export declare const UUIDTypeId: typeof UUIDTypeId
 ```
 
 Added in v1.0.0
@@ -1925,7 +1924,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ValidDateTypeId: '@effect/schema/ValidDateTypeId'
+export declare const ValidDateTypeId: typeof ValidDateTypeId
 ```
 
 Added in v1.0.0

@@ -35,7 +35,7 @@ describe.concurrent("annotations", () => {
     const schema = pipe(
       S.string,
       S.filter((s): s is string => s.length === 1, {
-        typeId: "Char",
+        typeId: Symbol.for("Char"),
         description: "description",
         documentation: "documentation",
         examples: ["examples"],
@@ -46,7 +46,7 @@ describe.concurrent("annotations", () => {
       })
     )
     expect(schema.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "Char",
+      [AST.TypeAnnotationId]: Symbol.for("Char"),
       [AST.DescriptionAnnotationId]: "description",
       [AST.DocumentationAnnotationId]: "documentation",
       [AST.ExamplesAnnotationId]: [

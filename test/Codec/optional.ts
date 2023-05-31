@@ -6,26 +6,34 @@ import * as Util from "@effect/schema/test/util"
 describe.concurrent("optional", () => {
   it("should add annotations (optional)", () => {
     const schema = C.struct({
-      a: C.optional(S.string, { a: "a" })
+      a: C.optional(S.string, { [Symbol.for("custom-annotation")]: "custom-annotation-value" })
     })
     const ast: any = schema.ast
-    expect(ast.propertySignatures[0].annotations).toEqual({ a: "a" })
+    expect(ast.propertySignatures[0].annotations).toEqual({
+      [Symbol.for("custom-annotation")]: "custom-annotation-value"
+    })
   })
 
   it("should add annotations (optional + withDefault)", () => {
     const schema = C.struct({
-      a: C.optional(S.string, { a: "a" }).withDefault(() => "")
+      a: C.optional(S.string, { [Symbol.for("custom-annotation")]: "custom-annotation-value" })
+        .withDefault(() => "")
     })
     const ast: any = schema.ast
-    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
+    expect(ast.to.propertySignatures[0].annotations).toEqual({
+      [Symbol.for("custom-annotation")]: "custom-annotation-value"
+    })
   })
 
   it.only("should add annotations (optional + toOption)", () => {
     const schema = C.struct({
-      a: C.optional(S.string, { a: "a" }).toOption()
+      a: C.optional(S.string, { [Symbol.for("custom-annotation")]: "custom-annotation-value" })
+        .toOption()
     })
     const ast: any = schema.ast
-    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
+    expect(ast.to.propertySignatures[0].annotations).toEqual({
+      [Symbol.for("custom-annotation")]: "custom-annotation-value"
+    })
   })
 
   it("case Default", async () => {
@@ -34,7 +42,9 @@ describe.concurrent("optional", () => {
     })
     await Util.expectParseSuccess(transform, {}, { a: 0 })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
-    await Util.expectParseFailure(transform, { a: "a" }, `/a Expected string -> number, actual "a"`)
+    await Util.expectParseFailure(transform, {
+      [Symbol.for("custom-annotation")]: "custom-annotation-value"
+    }, `/a Expected string -> number, actual "a"`)
 
     await Util.expectEncodeSuccess(transform, { a: 1 }, { a: "1" })
     await Util.expectEncodeSuccess(transform, { a: 0 }, { a: "0" })
@@ -44,7 +54,9 @@ describe.concurrent("optional", () => {
     const transform = C.struct({ a: C.optional(C.NumberFromString).toOption() })
     await Util.expectParseSuccess(transform, {}, { a: O.none() })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: O.some(1) })
-    await Util.expectParseFailure(transform, { a: "a" }, `/a Expected string -> number, actual "a"`)
+    await Util.expectParseFailure(transform, {
+      [Symbol.for("custom-annotation")]: "custom-annotation-value"
+    }, `/a Expected string -> number, actual "a"`)
 
     await Util.expectEncodeSuccess(transform, { a: O.some(1) }, { a: "1" })
     await Util.expectEncodeSuccess(transform, { a: O.none() }, {})

@@ -244,7 +244,7 @@ S.struct({ a: S.never })
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c: boolean; }>
-S.struct({ a: S.string, b: S.number, c: S.propertySignature(S.boolean) });
+S.struct({ a: S.string, b: S.number, c: S.propertySignature(S.boolean, {}) });
 
 // ---------------------------------------------
 // optional

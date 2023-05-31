@@ -58,19 +58,19 @@ export type BrandAnnotation = ReadonlyArray<string>
  * @category annotations
  * @since 1.0.0
  */
-export const BrandAnnotationId = "@effect/schema/BrandAnnotationId"
+export const BrandAnnotationId = Symbol.for("@effect/schema/BrandAnnotationId")
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export type TypeAnnotation = string | symbol
+export type TypeAnnotation = symbol
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export const TypeAnnotationId = "@effect/schema/TypeAnnotationId"
+export const TypeAnnotationId = Symbol.for("@effect/schema/TypeAnnotationId")
 
 /**
  * @category annotations
@@ -82,7 +82,7 @@ export type MessageAnnotation<A> = (a: A) => string
  * @category annotations
  * @since 1.0.0
  */
-export const MessageAnnotationId = "@effect/schema/MessageAnnotationId"
+export const MessageAnnotationId = Symbol.for("@effect/schema/MessageAnnotationId")
 
 /**
  * @category annotations
@@ -94,7 +94,7 @@ export type IdentifierAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const IdentifierAnnotationId = "@effect/schema/IdentifierAnnotationId"
+export const IdentifierAnnotationId = Symbol.for("@effect/schema/IdentifierAnnotationId")
 
 /**
  * @category annotations
@@ -106,7 +106,7 @@ export type TitleAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const TitleAnnotationId = "@effect/schema/TitleAnnotationId"
+export const TitleAnnotationId = Symbol.for("@effect/schema/TitleAnnotationId")
 
 /**
  * @category annotations
@@ -118,7 +118,7 @@ export type DescriptionAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const DescriptionAnnotationId = "@effect/schema/DescriptionAnnotationId"
+export const DescriptionAnnotationId = Symbol.for("@effect/schema/DescriptionAnnotationId")
 
 /**
  * @category annotations
@@ -130,7 +130,7 @@ export type ExamplesAnnotation = ReadonlyArray<unknown>
  * @category annotations
  * @since 1.0.0
  */
-export const ExamplesAnnotationId = "@effect/schema/ExamplesAnnotationId"
+export const ExamplesAnnotationId = Symbol.for("@effect/schema/ExamplesAnnotationId")
 
 /**
  * @category annotations
@@ -142,7 +142,7 @@ export type JSONSchemaAnnotation = object
  * @category annotations
  * @since 1.0.0
  */
-export const JSONSchemaAnnotationId = "@effect/schema/JSONSchemaAnnotationId"
+export const JSONSchemaAnnotationId = Symbol.for("@effect/schema/JSONSchemaAnnotationId")
 
 /**
  * @category annotations
@@ -154,7 +154,7 @@ export type DocumentationAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const DocumentationAnnotationId = "@effect/schema/DocumentationAnnotationId"
+export const DocumentationAnnotationId = Symbol.for("@effect/schema/DocumentationAnnotationId")
 
 // ---------------------------------------------
 // models
@@ -164,7 +164,9 @@ export const DocumentationAnnotationId = "@effect/schema/DocumentationAnnotation
  * @category model
  * @since 1.0.0
  */
-export interface Annotations extends Record<string | symbol, unknown> {}
+export interface Annotations {
+  [_: symbol]: unknown
+}
 
 /**
  * @category model
@@ -177,7 +179,7 @@ export interface Annotated {
 /**
  * @since 1.0.0
  */
-export const getAnnotation = <A>(key: PropertyKey) =>
+export const getAnnotation = <A>(key: symbol) =>
   (annotated: Annotated): O.Option<A> =>
     Object.prototype.hasOwnProperty.call(annotated.annotations, key) ?
       O.some(annotated.annotations[key] as any) :

@@ -133,7 +133,7 @@ export type MyModelTo = C.To<typeof MyModel>
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
-C.struct({ a: S.string, b: S.number, c: C.propertySignature(C.NumberFromString) });
+C.struct({ a: S.string, b: S.number, c: C.propertySignature(C.NumberFromString, {}) });
 
 // ---------------------------------------------
 // optional
