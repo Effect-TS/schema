@@ -1,4 +1,5 @@
 import { pipe } from "@effect/data/Function"
+import { ArbitraryHookId } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 
@@ -40,7 +41,8 @@ describe.concurrent("annotations", () => {
         examples: ["examples"],
         identifier: "identifier",
         jsonSchema: { minLength: 1, maxLength: 1 },
-        title: "title"
+        title: "title",
+        extra: "custom"
       })
     )
     expect(schema.ast.annotations).toEqual({
@@ -55,7 +57,18 @@ describe.concurrent("annotations", () => {
         "maxLength": 1,
         "minLength": 1
       },
-      [AST.TitleAnnotationId]: "title"
+      [AST.TitleAnnotationId]: "title",
+      extra: "custom"
     })
+  })
+
+  it("toAnnotation (arbitrary)", () => {
+    const schema = pipe(
+      S.string,
+      S.filter((s): s is string => s.length === 1, {
+        arbitrary: () => (fc) => fc.string({ minLength: 1, maxLength: 1 })
+      })
+    )
+    expect(schema.ast.annotations[ArbitraryHookId]).exist
   })
 })

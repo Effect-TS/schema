@@ -906,41 +906,36 @@ export const required = <A>(
 export const toAnnotations = <A>(
   options?: AnnotationOptions<A>
 ): AST.Annotated["annotations"] => {
-  const annotations: AST.Annotated["annotations"] = {}
-  if (options?.typeId !== undefined) {
-    const typeId = options?.typeId
+  if (!options) {
+    return {}
+  }
+  const out: AST.Annotated["annotations"] = { ...options }
+  if (options.typeId !== undefined) {
+    delete out["typeId"]
+    const typeId = options.typeId
     if (typeof typeId === "object") {
-      annotations[AST.TypeAnnotationId] = typeId.id
-      annotations[typeId.id] = typeId.params
+      out[AST.TypeAnnotationId] = typeId.id
+      out[typeId.id] = typeId.params
     } else {
-      annotations[AST.TypeAnnotationId] = typeId
+      out[AST.TypeAnnotationId] = typeId
     }
   }
-  if (options?.message !== undefined) {
-    annotations[AST.MessageAnnotationId] = options?.message
+  const move = (from: string, to: string) => {
+    if (options[from] !== undefined) {
+      delete out[from]
+      out[to] = options[from]
+    }
   }
-  if (options?.identifier !== undefined) {
-    annotations[AST.IdentifierAnnotationId] = options?.identifier
-  }
-  if (options?.title !== undefined) {
-    annotations[AST.TitleAnnotationId] = options?.title
-  }
-  if (options?.description !== undefined) {
-    annotations[AST.DescriptionAnnotationId] = options?.description
-  }
-  if (options?.examples !== undefined) {
-    annotations[AST.ExamplesAnnotationId] = options?.examples
-  }
-  if (options?.documentation !== undefined) {
-    annotations[AST.DocumentationAnnotationId] = options?.documentation
-  }
-  if (options?.jsonSchema !== undefined) {
-    annotations[AST.JSONSchemaAnnotationId] = options?.jsonSchema
-  }
-  if (options?.arbitrary !== undefined) {
-    annotations[I.ArbitraryHookId] = options?.arbitrary
-  }
-  return annotations
+  move("message", AST.MessageAnnotationId)
+  move("identifier", AST.IdentifierAnnotationId)
+  move("title", AST.TitleAnnotationId)
+  move("description", AST.DescriptionAnnotationId)
+  move("examples", AST.ExamplesAnnotationId)
+  move("documentation", AST.DocumentationAnnotationId)
+  move("jsonSchema", AST.JSONSchemaAnnotationId)
+  move("arbitrary", I.ArbitraryHookId)
+
+  return out
 }
 
 /**
@@ -976,15 +971,16 @@ export function filter<A>(
  * @since 1.0.0
  */
 export type AnnotationOptions<A> = {
-  typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
-  message?: AST.MessageAnnotation<A>
-  identifier?: AST.IdentifierAnnotation
-  title?: AST.TitleAnnotation
-  description?: AST.DescriptionAnnotation
-  examples?: AST.ExamplesAnnotation
-  documentation?: AST.DocumentationAnnotation
-  jsonSchema?: AST.JSONSchemaAnnotation
-  arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+  readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  readonly message?: AST.MessageAnnotation<A>
+  readonly identifier?: AST.IdentifierAnnotation
+  readonly title?: AST.TitleAnnotation
+  readonly description?: AST.DescriptionAnnotation
+  readonly examples?: AST.ExamplesAnnotation
+  readonly documentation?: AST.DocumentationAnnotation
+  readonly jsonSchema?: AST.JSONSchemaAnnotation
+  readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+  readonly [_: string]: unknown
 }
 
 // ---------------------------------------------

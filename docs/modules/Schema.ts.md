@@ -1017,15 +1017,16 @@ Added in v1.0.0
 
 ```ts
 export type AnnotationOptions<A> = {
-  typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
-  message?: AST.MessageAnnotation<A>
-  identifier?: AST.IdentifierAnnotation
-  title?: AST.TitleAnnotation
-  description?: AST.DescriptionAnnotation
-  examples?: AST.ExamplesAnnotation
-  documentation?: AST.DocumentationAnnotation
-  jsonSchema?: AST.JSONSchemaAnnotation
-  arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+  readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  readonly message?: AST.MessageAnnotation<A>
+  readonly identifier?: AST.IdentifierAnnotation
+  readonly title?: AST.TitleAnnotation
+  readonly description?: AST.DescriptionAnnotation
+  readonly examples?: AST.ExamplesAnnotation
+  readonly documentation?: AST.DocumentationAnnotation
+  readonly jsonSchema?: AST.JSONSchemaAnnotation
+  readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+  readonly [_: string]: unknown
 }
 ```
 
