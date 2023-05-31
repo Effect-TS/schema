@@ -1,5 +1,4 @@
 import { pipe } from "@effect/data/Function"
-import * as AST from "@effect/schema/AST"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -19,8 +18,7 @@ describe.concurrent("formatErrors", () => {
   it("refinement", () => {
     const schema = pipe(
       S.number,
-      S.filter((n) => n > 0),
-      S.annotations({ [AST.MessageAnnotationId]: () => "mymessage" })
+      S.filter((n) => n > 0, { message: () => "mymessage" })
     )
     expect(() => S.validate(schema)("a")).toThrowError(
       new Error(`error(s) found

@@ -17,7 +17,7 @@ describe.concurrent("to", () => {
     expect(C.parse(schema)([1, 2])).toEqual([1, 2])
   })
 
-  it("refinement", () => {
+  it("filter", () => {
     const schema = pipe(
       C.NumberFromString,
       C.filter(S.greaterThanOrEqualTo(1)),

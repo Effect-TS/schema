@@ -46,12 +46,12 @@ export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To
 /**
  * @since 1.0.0
  */
-export const from = <I, A>(transform: Codec<I, A>): S.Schema<I> => S.make(AST.from(transform.ast))
+export const from = <I, A>(codec: Codec<I, A>): S.Schema<I> => S.make(AST.from(codec.ast))
 
 /**
  * @since 1.0.0
  */
-export const to = <I, A>(transform: Codec<I, A>): S.Schema<A> => S.make(AST.to(transform.ast))
+export const to = <I, A>(codec: Codec<I, A>): S.Schema<A> => S.make(AST.to(codec.ast))
 
 /* c8 ignore start */
 export {
@@ -322,12 +322,12 @@ export const nonEmptyArray = <I, A>(
  * @since 1.0.0
  */
 export const propertySignature = <I, A>(
-  transform: Codec<I, A>,
+  codec: Codec<I, A>,
   options: S.AnnotationOptions<A>
 ): S.PropertySignature<I, false, A, false> =>
   new S.PropertySignatureImpl({
     _tag: "PropertySignature",
-    ast: transform.ast,
+    ast: codec.ast,
     annotations: S.toAnnotations(options)
   })
 
@@ -335,12 +335,12 @@ export const propertySignature = <I, A>(
  * @since 1.0.0
  */
 export const optional = <I, A>(
-  transform: Codec<I, A>,
+  codec: Codec<I, A>,
   annotations?: AST.Annotated["annotations"]
 ): S.OptionalPropertySignature<I, true, A, true> =>
   new S.PropertySignatureImpl({
     _tag: "Optional",
-    ast: transform.ast,
+    ast: codec.ast,
     annotations
   })
 
@@ -556,7 +556,7 @@ export const lazy = <I, A>(
 ): Codec<I, A> => make(AST.createLazy(() => f().ast, annotations))
 
 /**
- * Applies a `Schema` transformation.
+ * Append a `Schema` transformation.
  *
  * @category combinators
  * @since 1.0.0
@@ -564,23 +564,25 @@ export const lazy = <I, A>(
 export const filter = <A, B extends A>(
   f: (schema: S.Schema<A>) => S.Schema<B>
 ) =>
-  <I>(transform: Codec<I, A>): Codec<I, B> => {
-    if (AST.isTransform(transform.ast)) {
+  <I>(codec: Codec<I, A>): Codec<I, B> => {
+    if (AST.isTransform(codec.ast)) {
       return make(
         AST.createTransform(
-          transform.ast.from,
-          f(to(transform)).ast,
-          transform.ast.transformAST
+          codec.ast.from,
+          pipe(make<unknown, A>(codec.ast.to), filter(f)).ast,
+          codec.ast.transformAST,
+          codec.ast.annotations
         )
       )
     }
-    const schema = f(to(transform))
+
+    const schema = f(to(codec))
     if (AST.isRefinement(schema.ast)) {
-      return make(AST.createRefinement(transform.ast, schema.ast.decode, schema.ast.annotations))
+      return make(AST.createRefinement(codec.ast, schema.ast.decode, schema.ast.annotations))
     }
     return make(
       AST.createTransform(
-        transform.ast,
+        codec.ast,
         schema.ast,
         AST.createFinalTransformation(PR.success, PR.success)
       )
@@ -621,11 +623,11 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   value: V
 ) =>
   <I, A extends object>(
-    transform: Codec<I, A>
+    codec: Codec<I, A>
   ): Codec<I, S.Spread<A & { readonly [k in K]: V }>> =>
     make(AST.createTransform(
-      transform.ast,
-      pipe(to(transform), extend(struct({ [key]: S.literal(value) }))).ast,
+      codec.ast,
+      pipe(to(codec), extend(struct({ [key]: S.literal(value) }))).ast,
       AST.createTypeLiteralTransformation(
         [
           AST.createPropertySignatureTransformation(

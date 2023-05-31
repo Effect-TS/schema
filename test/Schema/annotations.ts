@@ -42,7 +42,7 @@ describe.concurrent("annotations", () => {
         identifier: "identifier",
         jsonSchema: { minLength: 1, maxLength: 1 },
         title: "title",
-        extra: "custom"
+        [Symbol.for("custom-annotation")]: "custom-annotation-value"
       })
     )
     expect(schema.ast.annotations).toEqual({
@@ -58,8 +58,20 @@ describe.concurrent("annotations", () => {
         "minLength": 1
       },
       [AST.TitleAnnotationId]: "title",
-      extra: "custom"
+      [Symbol.for("custom-annotation")]: "custom-annotation-value"
     })
+  })
+
+  it("toAnnotation (message)", () => {
+    const schema = pipe(
+      S.string,
+      S.filter((s): s is string => s.length === 1, {
+        message: () => "message"
+      })
+    )
+    const annotation: any = schema.ast.annotations[AST.MessageAnnotationId]
+    expect(annotation).toBeTypeOf("function")
+    expect(annotation()).toEqual("message")
   })
 
   it("toAnnotation (arbitrary)", () => {

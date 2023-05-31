@@ -348,7 +348,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const message: (message: AST.MessageAnnotation<unknown>) => <A>(self: Schema<A>) => Schema<A>
+export declare const message: <A>(message: AST.MessageAnnotation<A>) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0

@@ -93,7 +93,6 @@ describe.concurrent("AST.guards", () => {
     expect(AST.isParameter(pipe(S.string, S.minLength(2)).ast)).toEqual(true)
     expect(AST.isParameter(pipe(S.number, S.int()).ast)).toEqual(false)
     expect(AST.isParameter(C.NumberFromString.ast)).toEqual(false)
-    expect(AST.isParameter(pipe(C.NumberFromString, C.filter(S.int())).ast))
     expect(AST.isParameter(S.templateLiteral(S.literal("a", "b"), S.literal("c")).ast)).toEqual(
       false
     )

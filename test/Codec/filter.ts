@@ -3,8 +3,8 @@ import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
-describe.concurrent("Refinement", () => {
-  it("filter int", async () => {
+describe.concurrent("filter", () => {
+  it("int", async () => {
     const transform = pipe(C.NumberFromString, C.filter(S.int()))
 
     await Util.expectParseSuccess(transform, "1", 1)
@@ -16,7 +16,7 @@ describe.concurrent("Refinement", () => {
     await Util.expectParseFailure(schema, 1.2, "Expected integer, actual 1.2")
   })
 
-  it("filter greaterThanOrEqualTo + lessThanOrEqualTo", async () => {
+  it("greaterThanOrEqualTo + lessThanOrEqualTo", async () => {
     const schema = pipe(
       C.NumberFromString,
       C.filter(S.greaterThanOrEqualTo(1)),

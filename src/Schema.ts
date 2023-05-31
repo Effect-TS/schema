@@ -124,48 +124,46 @@ export const annotations = <A>(options: AnnotationOptions<A>) =>
  * @category annotations
  * @since 1.0.0
  */
-export const message = (message: AST.MessageAnnotation<unknown>) =>
-  <A>(self: Schema<A>): Schema<A> =>
-    make(AST.setAnnotation(self.ast, AST.MessageAnnotationId, message))
+export const message = <A>(message: AST.MessageAnnotation<A>): (self: Schema<A>) => Schema<A> =>
+  annotations({ message })
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export const identifier = (identifier: AST.IdentifierAnnotation) =>
-  <A>(self: Schema<A>): Schema<A> =>
-    make(AST.setAnnotation(self.ast, AST.IdentifierAnnotationId, identifier))
+export const identifier = (
+  identifier: AST.IdentifierAnnotation
+): <A>(self: Schema<A>) => Schema<A> => annotations({ identifier })
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export const title = (title: AST.TitleAnnotation) =>
-  <A>(self: Schema<A>): Schema<A> => make(AST.setAnnotation(self.ast, AST.TitleAnnotationId, title))
+export const title = (title: AST.TitleAnnotation): <A>(self: Schema<A>) => Schema<A> =>
+  annotations({ title })
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export const description = (description: AST.DescriptionAnnotation) =>
-  <A>(self: Schema<A>): Schema<A> =>
-    make(AST.setAnnotation(self.ast, AST.DescriptionAnnotationId, description))
+export const description = (
+  description: AST.DescriptionAnnotation
+): <A>(self: Schema<A>) => Schema<A> => annotations({ description })
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export const examples = (examples: AST.ExamplesAnnotation) =>
-  <A>(self: Schema<A>): Schema<A> =>
-    make(AST.setAnnotation(self.ast, AST.ExamplesAnnotationId, examples))
+export const examples = (examples: AST.ExamplesAnnotation): <A>(self: Schema<A>) => Schema<A> =>
+  annotations({ examples })
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export const documentation = (documentation: AST.DocumentationAnnotation) =>
-  <A>(self: Schema<A>): Schema<A> =>
-    make(AST.setAnnotation(self.ast, AST.DocumentationAnnotationId, documentation))
+export const documentation = (
+  documentation: AST.DocumentationAnnotation
+): <A>(self: Schema<A>) => Schema<A> => annotations({ documentation })
 
 // ---------------------------------------------
 // constructors
@@ -920,7 +918,7 @@ export const toAnnotations = <A>(
       out[AST.TypeAnnotationId] = typeId
     }
   }
-  const move = (from: string, to: string) => {
+  const move = (from: keyof AnnotationOptions<A>, to: string) => {
     if (options[from] !== undefined) {
       delete out[from]
       out[to] = options[from]
@@ -980,7 +978,7 @@ export type AnnotationOptions<A> = {
   readonly documentation?: AST.DocumentationAnnotation
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-  readonly [_: string]: unknown
+  readonly [_: symbol]: unknown
 }
 
 // ---------------------------------------------

@@ -934,16 +934,6 @@ export const mergeAnnotations = (ast: AST, annotations: Annotated["annotations"]
 })
 
 /**
- * Adds an annotation, potentially overwriting the existing annotation with the specified id.
- *
- * @since 1.0.0
- */
-export const setAnnotation = (ast: AST, id: PropertyKey, value: unknown) => ({
-  ...ast,
-  annotations: { ...ast.annotations, [id]: value }
-})
-
-/**
  * Adds a rest element to the end of a tuple, or throws an exception if the rest element is already present.
  *
  * @since 1.0.0

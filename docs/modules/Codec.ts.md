@@ -335,7 +335,7 @@ but rather maps to another schema, for example when you want to add a discrimina
 export declare const attachPropertySignature: <K extends PropertyKey, V extends AST.LiteralValue>(
   key: K,
   value: V
-) => <I, A extends object>(transform: Codec<I, A>) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+) => <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
 ```
 
 **Example**
@@ -389,14 +389,14 @@ Added in v1.0.0
 
 ## filter
 
-Applies a `Schema` transformation.
+Append a `Schema` transformation.
 
 **Signature**
 
 ```ts
 export declare const filter: <A, B extends A>(
   f: (schema: S.Schema<A>) => S.Schema<B>
-) => <I>(transform: Codec<I, A>) => Codec<I, B>
+) => <I>(codec: Codec<I, A>) => Codec<I, B>
 ```
 
 Added in v1.0.0
@@ -968,7 +968,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(transform: Codec<I, A>) => S.Schema<I>
+export declare const from: <I, A>(codec: Codec<I, A>) => S.Schema<I>
 ```
 
 Added in v1.0.0
@@ -979,7 +979,7 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: <I, A>(
-  transform: Codec<I, A>,
+  codec: Codec<I, A>,
   annotations?: AST.Annotated['annotations']
 ) => S.OptionalPropertySignature<I, true, A, true>
 ```
@@ -992,7 +992,7 @@ Added in v1.0.0
 
 ```ts
 export declare const propertySignature: <I, A>(
-  transform: Codec<I, A>,
+  codec: Codec<I, A>,
   options: S.AnnotationOptions<A>
 ) => S.PropertySignature<I, false, A, false>
 ```
@@ -1004,7 +1004,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(transform: Codec<I, A>) => S.Schema<A>
+export declare const to: <I, A>(codec: Codec<I, A>) => S.Schema<A>
 ```
 
 Added in v1.0.0
