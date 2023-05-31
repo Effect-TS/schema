@@ -585,27 +585,18 @@ export type PropertySignatureConfig =
     readonly annotations: AST.Annotated["annotations"] | undefined
   }
 
-/**
- * @internal
- * @since -
- */
+/** @internal */
 export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
-  /** @since - */
   readonly [SchemaTypeId]!: (_: From) => From
-  /** @since - */
   readonly From!: (_: From) => From
-  /** @since - */
   readonly FromIsOptional!: FromIsOptional
-  /** @since - */
   readonly To!: (_: To) => To
-  /** @since - */
   readonly ToIsOptional!: ToIsOptional
 
   constructor(
     readonly config: PropertySignatureConfig
   ) {}
 
-  /** @since - */
   withDefault(value: () => To): SchemaPropertySignature<From, true, To, false> {
     return new PropertySignatureImpl(
       {
@@ -617,7 +608,6 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
     )
   }
 
-  /** @since - */
   toOption(): SchemaPropertySignature<From, true, Option<To>, false> {
     return new PropertySignatureImpl({
       _tag: "Option",

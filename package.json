@@ -66,7 +66,7 @@
     "@changesets/cli": "^2.26.1",
     "@effect-ts/build-utils": "^0.40.7",
     "@effect-ts/core": "^0.60.5",
-    "@effect/docgen": "^0.0.2",
+    "@effect/docgen": "^0.0.3",
     "@effect/language-service": "^0.0.19",
     "@repo-tooling/eslint-plugin-dprint": "^0.0.4",
     "@types/benchmark": "^2.1.2",
