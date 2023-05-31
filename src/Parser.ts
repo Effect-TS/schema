@@ -610,23 +610,32 @@ const go = untracedMethod(() =>
         if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
           return fromRefinement(ast, P.isNotNullable)
         }
-        const propertySignatures = ast.propertySignatures.map((ps) =>
-          go(ps.type, isBoundary, isDecoding)
-        )
-        const indexSignatures = ast.indexSignatures.map((is) =>
-          [go(is.parameter, isBoundary, isDecoding), go(is.type, isBoundary, isDecoding)] as const
-        )
-        const parameter = go(
-          AST.createUnion(
-            ast.indexSignatures.map((is) => AST.getParameterBase(is.parameter))
-          ),
-          isBoundary,
-          isDecoding
-        )
+
+        const propertySignatures: Array<Parser<any, any>> = []
         const expectedKeys: Record<PropertyKey, null> = {}
-        for (let i = 0; i < propertySignatures.length; i++) {
-          expectedKeys[ast.propertySignatures[i].name] = null
+        for (const ps of ast.propertySignatures) {
+          propertySignatures.push(go(ps.type, isBoundary, isDecoding))
+          expectedKeys[ps.name] = null
         }
+
+        const indexSignatures: Array<readonly [Parser<any, any>, Parser<any, any>]> = []
+        const expectedKeyTypes: {
+          string?: true
+          symbol?: true
+        } = {}
+        for (const is of ast.indexSignatures) {
+          indexSignatures.push([
+            go(is.parameter, isBoundary, isDecoding),
+            go(is.type, isBoundary, isDecoding)
+          ])
+          const base = AST.getParameterBase(is.parameter)
+          if (AST.isSymbolKeyword(base)) {
+            expectedKeyTypes.symbol = true
+          } else {
+            expectedKeyTypes.string = true
+          }
+        }
+
         return (input: unknown, options) => {
           if (!P.isRecord(input)) {
             return PR.failure(PR.type(unknownRecord, input))
@@ -642,9 +651,7 @@ const go = untracedMethod(() =>
           if (onExcessPropertyError) {
             for (const key of I.ownKeys(input)) {
               if (!(Object.prototype.hasOwnProperty.call(expectedKeys, key))) {
-                const te = parameter(key)
-                const eu = PR.eitherOrUndefined(te)
-                if (eu && E.isLeft(eu)) {
+                if (!(typeof key in expectedKeyTypes)) {
                   const e = PR.key(key, [PR.unexpected(input[key])])
                   if (allErrors) {
                     es.push([stepKey++, e])
