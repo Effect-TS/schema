@@ -1453,7 +1453,7 @@ export const createFinalPropertySignatureTransformation = (
 export interface PropertySignatureTransformation {
   readonly from: PropertyKey
   readonly to: PropertyKey
-  readonly transformation: FinalPropertySignatureTransformation | TransformAST
+  readonly transformation: FinalPropertySignatureTransformation
 }
 
 /**

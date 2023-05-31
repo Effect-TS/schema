@@ -966,7 +966,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <A>(
   schema: Schema<A>,
-  annotations?: AST.Annotated['annotations']
+  annotations: AST.Annotated['annotations']
 ) => SchemaPropertySignature<A, false, A, false>
 ```
 
@@ -1999,17 +1999,7 @@ Added in v1.0.0
 
 ```ts
 export declare class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
-  constructor(
-    readonly _from: AST.AST,
-    readonly _annotations?: AST.Annotated['annotations'],
-    readonly _optional?:
-      | { readonly to: 'optional' }
-      | { readonly to: 'Option' }
-      | {
-          readonly to: 'default'
-          readonly value: LazyArg<To>
-        }
-  )
+  constructor(readonly config: PropertySignatureConfig)
 }
 ```
 

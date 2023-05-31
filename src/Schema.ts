@@ -561,6 +561,30 @@ export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsO
   readonly [SchemaTypeId]: (_: From) => From
 }
 
+/** @internal */
+export type PropertySignatureConfig =
+  | {
+    readonly _tag: "PropertySignature"
+    readonly ast: AST.AST
+    readonly annotations: AST.Annotated["annotations"]
+  }
+  | {
+    readonly _tag: "Optional"
+    readonly ast: AST.AST
+    readonly annotations: AST.Annotated["annotations"] | undefined
+  }
+  | {
+    readonly _tag: "Default"
+    readonly ast: AST.AST
+    readonly value: LazyArg<any>
+    readonly annotations: AST.Annotated["annotations"] | undefined
+  }
+  | {
+    readonly _tag: "Option"
+    readonly ast: AST.AST
+    readonly annotations: AST.Annotated["annotations"] | undefined
+  }
+
 /**
  * @internal
  * @since -
@@ -578,28 +602,28 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
   readonly ToIsOptional!: ToIsOptional
 
   constructor(
-    readonly _from: AST.AST,
-    readonly _annotations?: AST.Annotated["annotations"],
-    readonly _optional?:
-      | { readonly to: "optional" }
-      | { readonly to: "Option" }
-      | {
-        readonly to: "default"
-        readonly value: LazyArg<To>
-      }
+    readonly config: PropertySignatureConfig
   ) {}
 
   /** @since - */
   withDefault(value: () => To): SchemaPropertySignature<From, true, To, false> {
-    return new PropertySignatureImpl(this._from, this._annotations, {
-      to: "default",
-      value
-    })
+    return new PropertySignatureImpl(
+      {
+        _tag: "Default",
+        ast: this.config.ast,
+        value,
+        annotations: this.config.annotations
+      }
+    )
   }
 
   /** @since - */
   toOption(): SchemaPropertySignature<From, true, Option<To>, false> {
-    return new PropertySignatureImpl(this._from, this._annotations, { to: "Option" })
+    return new PropertySignatureImpl({
+      _tag: "Option",
+      ast: this.config.ast,
+      annotations: this.config.annotations
+    })
   }
 }
 
@@ -609,8 +633,13 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
  */
 export const propertySignature = <A>(
   schema: Schema<A>,
-  annotations?: AST.Annotated["annotations"]
-): SchemaPropertySignature<A, false, A, false> => new PropertySignatureImpl(schema.ast, annotations)
+  annotations: AST.Annotated["annotations"]
+): SchemaPropertySignature<A, false, A, false> =>
+  new PropertySignatureImpl({
+    _tag: "PropertySignature",
+    ast: schema.ast,
+    annotations
+  })
 
 /**
  * @since 1.0.0
@@ -619,7 +648,11 @@ export const optional = <A>(
   schema: Schema<A>,
   annotations?: AST.Annotated["annotations"]
 ): OptionalSchemaPropertySignature<A, true, A, true> =>
-  new PropertySignatureImpl(schema.ast, annotations, { to: "optional" })
+  new PropertySignatureImpl({
+    _tag: "Optional",
+    ast: schema.ast,
+    annotations
+  })
 
 /**
  * @since 1.0.0
@@ -662,12 +695,15 @@ export const struct = <
     AST.createTypeLiteral(
       I.ownKeys(fields).map((key) => {
         const field = fields[key] as any
-        const isOptional = "_from" in field
+        const isOptional = "config" in field
+        const ast = isOptional ? field.config.ast : field.ast
+        const annotations = isOptional ? field.config.annotations : undefined
         return AST.createPropertySignature(
           key,
-          isOptional ? field._from : field.ast,
+          ast,
           isOptional,
-          true
+          true,
+          annotations
         )
       }),
       []

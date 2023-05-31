@@ -993,7 +993,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <I, A>(
   transform: Codec<I, A>,
-  annotations?: AST.Annotated['annotations']
+  annotations: AST.Annotated['annotations']
 ) => S.PropertySignature<I, false, A, false>
 ```
 

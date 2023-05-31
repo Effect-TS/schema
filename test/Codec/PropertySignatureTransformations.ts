@@ -184,37 +184,4 @@ describe.concurrent("PropertySignatureTransformations", () => {
 
     await Util.expectEncodeSuccess(transform, { a: 1 }, { a: "1" })
   })
-
-  it("string -> number (nested)", async () => {
-    const ast = C.NumberFromString.ast as any
-    const transform: C.Codec<
-      { readonly a: { readonly b: string } },
-      { readonly a: { readonly b: number } }
-    > = C.make(
-      AST.createTransform(
-        S.struct({ a: S.struct({ b: S.string }) }).ast,
-        S.struct({ a: S.struct({ b: S.number }) }).ast,
-        AST.createTypeLiteralTransformation(
-          [
-            AST.createPropertySignatureTransformation(
-              "a",
-              "a",
-              AST.createTypeLiteralTransformation(
-                [
-                  AST.createPropertySignatureTransformation(
-                    "b",
-                    "b",
-                    ast.transformAST
-                  )
-                ]
-              )
-            )
-          ]
-        )
-      )
-    )
-    await Util.expectParseSuccess(transform, { a: { b: "1" } }, { a: { b: 1 } })
-
-    await Util.expectEncodeSuccess(transform, { a: { b: 1 } }, { a: { b: "1" } })
-  })
 })

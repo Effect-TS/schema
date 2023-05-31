@@ -1120,7 +1120,7 @@ Added in v1.0.0
 export interface PropertySignatureTransformation {
   readonly from: PropertyKey
   readonly to: PropertyKey
-  readonly transformation: FinalPropertySignatureTransformation | TransformAST
+  readonly transformation: FinalPropertySignatureTransformation
 }
 ```
 

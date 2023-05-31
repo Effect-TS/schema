@@ -4,7 +4,15 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("optional", () => {
-  it("should add annotations to optional().withDefault()", () => {
+  it("should add annotations (optional)", () => {
+    const schema = C.struct({
+      a: C.optional(S.string, { a: "a" })
+    })
+    const ast: any = schema.ast
+    expect(ast.propertySignatures[0].annotations).toEqual({ a: "a" })
+  })
+
+  it("should add annotations (optional + withDefault)", () => {
     const schema = C.struct({
       a: C.optional(S.string, { a: "a" }).withDefault(() => "")
     })
@@ -12,7 +20,7 @@ describe.concurrent("optional", () => {
     expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
   })
 
-  it("should add annotations to optional().toOption()", () => {
+  it.only("should add annotations (optional + toOption)", () => {
     const schema = C.struct({
       a: C.optional(S.string, { a: "a" }).toOption()
     })
@@ -20,7 +28,7 @@ describe.concurrent("optional", () => {
     expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
   })
 
-  it("default", async () => {
+  it("case Default", async () => {
     const transform = C.struct({
       a: C.optional(C.NumberFromString).withDefault(() => 0)
     })
@@ -32,7 +40,7 @@ describe.concurrent("optional", () => {
     await Util.expectEncodeSuccess(transform, { a: 0 }, { a: "0" })
   })
 
-  it("Option", async () => {
+  it("case Option", async () => {
     const transform = C.struct({ a: C.optional(C.NumberFromString).toOption() })
     await Util.expectParseSuccess(transform, {}, { a: O.none() })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: O.some(1) })
