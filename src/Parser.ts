@@ -309,10 +309,10 @@ const go = untracedMethod(() =>
         }
       }
       case "Transform": {
-        const to = isDecoding ? go(ast.to, false, true) : go(ast.from, false, false)
         const decode = getDecode(ast.transformAST, isDecoding)
         if (isBoundary) {
           const from = isDecoding ? go(ast.from, true, true) : go(ast.to, true, false)
+          const to = isDecoding ? go(ast.to, false, true) : go(ast.from, false, false)
           return (i1, options) =>
             handleForbidden(
               PR.flatMap(
@@ -326,6 +326,7 @@ const go = untracedMethod(() =>
               options
             )
         } else {
+          const to = isDecoding ? go(ast.to, true, true) : go(ast.from, true, false)
           return (a, options) =>
             handleForbidden(
               PR.flatMap(
