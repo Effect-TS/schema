@@ -805,7 +805,9 @@ const go = untracedMethod(() =>
                               return PR.failures(mutableAppend(sortByIndex(es), e))
                             }
                           } else {
-                            output[key] = tv.right
+                            if (!Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
+                              output[key] = tv.right
+                            }
                             return Effect.unit()
                           }
                         }
