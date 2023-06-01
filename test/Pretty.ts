@@ -407,7 +407,7 @@ describe.concurrent("Pretty", () => {
       "BooleanKeyword": () => (b: boolean) => b ? "True" : "False"
     }
     const go = AST.getCompiler(match)
-    const pretty = <A>(schema: C.Codec<A, A>) => (a: A): string => go(schema.ast)(a)
+    const pretty = <A>(codec: C.Codec<A, A>) => (a: A): string => go(codec.ast)(a)
     expect(pretty(S.boolean)(true)).toEqual(`True`)
     const schema = S.tuple(S.string, S.boolean)
     expect(pretty(schema)(["a", true])).toEqual(`["a", True]`)

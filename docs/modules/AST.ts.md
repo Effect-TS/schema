@@ -454,7 +454,7 @@ export declare const createRefinement: <From extends AST = AST>(
   from: From,
   decode: Refinement['decode'],
   annotations?: Annotated['annotations']
-) => Refinement<From>
+) => Transform | Refinement<From>
 ```
 
 Added in v1.0.0

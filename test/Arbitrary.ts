@@ -67,12 +67,12 @@ describe.concurrent("Arbitrary", () => {
     interface A {
       readonly a: number | A
     }
-    const schema: C.Codec<I, A> = C.lazy(() =>
+    const codec: C.Codec<I, A> = C.lazy(() =>
       C.struct({
-        a: C.union(NumberFromString, schema)
+        a: C.union(NumberFromString, codec)
       })
     )
-    property(C.from(schema))
+    property(C.from(codec))
   })
 
   it("templateLiteral. a", () => {

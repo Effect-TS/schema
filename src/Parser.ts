@@ -21,7 +21,7 @@ import type { Schema } from "@effect/schema/Schema"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
 const get = (ast: AST.AST, isDecoding: boolean) => {
-  const parser = go(ast, false, isDecoding)
+  const parser = go(ast, isDecoding)
   return (input: unknown, options?: ParseOptions) => {
     const result = parser(input, options)
     // @ts-expect-error
@@ -34,24 +34,24 @@ const get = (ast: AST.AST, isDecoding: boolean) => {
 }
 
 const getOption = (ast: AST.AST, isDecoding: boolean) => {
-  const parser = go(ast, false, isDecoding)
+  const parser = go(ast, isDecoding)
   return (input: unknown, options?: ParseOptions) =>
     O.fromEither<any, any>(parser(input, options) as any)
 }
 
 const getEither = (ast: AST.AST, isDecoding: boolean) => {
-  const parser = go(ast, false, isDecoding)
+  const parser = go(ast, isDecoding)
   return (input: unknown, options?: ParseOptions) => parser(input, options) as any
 }
 
 const getPromise = (ast: AST.AST, isDecoding: boolean) => {
-  const parser = go(ast, false, isDecoding)
+  const parser = go(ast, isDecoding)
   return (input: unknown, options?: ParseOptions) =>
     Effect.runPromise(parser(input, { ...options, isEffectAllowed: true }))
 }
 
 const getEffect = (ast: AST.AST, isDecoding: boolean) => {
-  const parser = go(ast, false, isDecoding)
+  const parser = go(ast, isDecoding)
   return (input: unknown, options?: ParseOptions) =>
     parser(input, { ...options, isEffectAllowed: true })
 }
@@ -85,7 +85,7 @@ export const parseEither = <I, A>(
  */
 export const parseResult = <I, A>(
   schema: Codec<I, A>
-): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, false, true)
+): (i: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true)
 
 /**
  * @category parsing
@@ -179,7 +179,7 @@ export const validateEither = <A>(
  */
 export const validateResult = <A>(
   schema: Schema<A>
-): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, false, true)
+): (a: unknown, options?: ParseOptions) => PR.ParseResult<A> => go(schema.ast, true)
 
 /**
  * @category validation
@@ -255,7 +255,7 @@ export const encodeEither = <I, A>(
  */
 export const encodeResult = <I, A>(
   schema: Codec<I, A>
-): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(schema.ast, false, false)
+): (a: A, options?: ParseOptions) => PR.ParseResult<I> => go(schema.ast, false)
 
 /**
  * @category encoding
@@ -288,11 +288,11 @@ interface Parser<I, A> {
 export const defaultParseOption: ParseOptions = {}
 
 const go = untracedMethod(() =>
-  (ast: AST.AST, isTrusted: boolean, isDecoding: boolean): Parser<any, any> => {
+  (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
     switch (ast._tag) {
       case "Refinement": {
         if (isDecoding) {
-          const from = go(ast.from, isTrusted, true)
+          const from = go(ast.from, true)
           return (i, options) =>
             handleForbidden(
               PR.flatMap(
@@ -302,40 +302,30 @@ const go = untracedMethod(() =>
               options
             )
         } else {
-          const from = go(AST.to(ast), isTrusted, true)
-          const to = go(dropRightRefinement(ast.from), true, false)
-          return (i, options) =>
-            handleForbidden(PR.flatMap(from(i, options), (a) => to(a, options)), options)
+          const from = go(AST.to(ast), true)
+          const to = go(dropRightRefinement(ast.from), false)
+          return (
+            i,
+            options
+          ) => handleForbidden(PR.flatMap(from(i, options), (a) => to(a, options)), options)
         }
       }
       case "Transform": {
         const decode = getDecode(ast.transformAST, isDecoding)
-        if (isTrusted) {
-          const to = isDecoding ? go(ast.to, false, true) : go(ast.from, false, false)
-          return (a, options) =>
-            handleForbidden(
-              PR.flatMap(
-                decode(a, options ?? defaultParseOption, ast),
-                (i2) => to(i2, options)
-              ),
-              options
-            )
-        } else {
-          const from = isDecoding ? go(ast.from, false, true) : go(ast.to, false, false)
-          const to = isDecoding ? go(ast.to, true, true) : go(ast.from, true, false)
-          return (i1, options) =>
-            handleForbidden(
-              PR.flatMap(
-                from(i1, options),
-                (a) =>
-                  PR.flatMap(
-                    decode(a, options ?? defaultParseOption, ast),
-                    (i2) => to(i2, options)
-                  )
-              ),
-              options
-            )
-        }
+        const from = isDecoding ? go(ast.from, true) : go(ast.to, false)
+        const to = isDecoding ? go(ast.to, true) : go(ast.from, false)
+        return (i1, options) =>
+          handleForbidden(
+            PR.flatMap(
+              from(i1, options),
+              (a) =>
+                PR.flatMap(
+                  decode(a, options ?? defaultParseOption, ast),
+                  (i2) => to(i2, options)
+                )
+            ),
+            options
+          )
       }
       case "Declaration": {
         if (isDecoding) {
@@ -377,10 +367,10 @@ const go = untracedMethod(() =>
         return fromRefinement(ast, (u): u is any => P.isString(u) && regex.test(u))
       }
       case "Tuple": {
-        const elements = ast.elements.map((e) => go(e.type, isTrusted, isDecoding))
+        const elements = ast.elements.map((e) => go(e.type, isDecoding))
         const rest = pipe(
           ast.rest,
-          O.map(RA.mapNonEmpty((ast) => go(ast, isTrusted, isDecoding)))
+          O.map(RA.mapNonEmpty((ast) => go(ast, isDecoding)))
         )
         let requiredLen = ast.elements.filter((e) => !e.isOptional).length
         if (O.isSome(ast.rest)) {
@@ -617,7 +607,7 @@ const go = untracedMethod(() =>
         const propertySignatures: Array<Parser<any, any>> = []
         const expectedKeys: Record<PropertyKey, null> = {}
         for (const ps of ast.propertySignatures) {
-          propertySignatures.push(go(ps.type, isTrusted, isDecoding))
+          propertySignatures.push(go(ps.type, isDecoding))
           expectedKeys[ps.name] = null
         }
 
@@ -628,8 +618,8 @@ const go = untracedMethod(() =>
         } = {}
         for (const is of ast.indexSignatures) {
           indexSignatures.push([
-            go(is.parameter, isTrusted, isDecoding),
-            go(is.type, isTrusted, isDecoding)
+            go(is.parameter, isDecoding),
+            go(is.type, isDecoding)
           ])
           const base = AST.getParameterBase(is.parameter)
           if (AST.isSymbolKeyword(base)) {
@@ -848,7 +838,7 @@ const go = untracedMethod(() =>
         const len = ownKeys.length
         const map = new Map<any, Parser<any, any>>()
         for (let i = 0; i < ast.types.length; i++) {
-          map.set(ast.types[i], go(ast.types[i], isTrusted, isDecoding))
+          map.set(ast.types[i], go(ast.types[i], isDecoding))
         }
         return (input, options) => {
           const es: Array<[number, PR.ParseErrors]> = []
@@ -966,7 +956,7 @@ const go = untracedMethod(() =>
         }
       }
       case "Lazy": {
-        const get = I.memoizeThunk(() => go(ast.f(), isTrusted, isDecoding))
+        const get = I.memoizeThunk(() => go(ast.f(), isDecoding))
         return (a, options) => get()(a, options)
       }
     }

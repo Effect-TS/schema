@@ -874,7 +874,17 @@ export const createRefinement = <From extends AST = AST>(
   from: From,
   decode: Refinement["decode"],
   annotations: Annotated["annotations"] = {}
-): Refinement<From> => ({ _tag: "Refinement", from, decode, annotations })
+): Refinement<From> | Transform => {
+  if (isTransform(from)) {
+    return createTransform(
+      from.from,
+      createRefinement(from.to, decode, annotations),
+      from.transformAST,
+      from.annotations
+    )
+  }
+  return { _tag: "Refinement", from, decode, annotations }
+}
 
 /**
  * @category guards

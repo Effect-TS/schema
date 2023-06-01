@@ -12,6 +12,7 @@ import { dual, identity, pipe } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -554,6 +555,30 @@ export const lazy = <I, A>(
   f: () => Codec<I, A>,
   annotations?: AST.Annotated["annotations"]
 ): Codec<I, A> => make(AST.createLazy(() => f().ast, annotations))
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export function filter<C extends A, B extends A, A = C>(
+  refinement: Refinement<A, B>,
+  options?: S.AnnotationOptions<A>
+): <I>(self: Codec<I, C>) => Codec<I, C & B>
+export function filter<B extends A, A = B>(
+  predicate: Predicate<A>,
+  options?: S.AnnotationOptions<A>
+): <I>(self: Codec<I, B>) => Codec<I, B>
+export function filter<A>(
+  predicate: Predicate<A>,
+  options?: S.AnnotationOptions<A>
+): <I>(self: Codec<I, A>) => Codec<I, A> {
+  return <I>(self: Codec<I, A>) =>
+    make(AST.createRefinement(
+      self.ast,
+      (a: A, _, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
+      S.toAnnotations(options)
+    ))
+}
 
 /**
  * Append a transformation.

@@ -12,18 +12,18 @@ const Char = pipe(S.string, S.maxLength(1))
 
 describe.concurrent("Encoder", () => {
   it("encode", () => {
-    const schema = NumberFromChar
-    expect(C.encode(schema)(1)).toEqual("1")
-    expect(() => C.encode(schema)(10)).toThrowError(
+    const codec = NumberFromChar
+    expect(C.encode(codec)(1)).toEqual("1")
+    expect(() => C.encode(codec)(10)).toThrowError(
       new Error(`error(s) found
 └─ Expected a string at most 1 character(s) long, actual "10"`)
     )
   })
 
   it("encodeOption", () => {
-    const schema = pipe(S.string, S.maxLength(1), C.numberFromString)
-    expect(C.encodeOption(schema)(1)).toEqual(O.some("1"))
-    expect(C.encodeOption(schema)(10)).toEqual(O.none())
+    const codec = pipe(S.string, S.maxLength(1), C.numberFromString)
+    expect(C.encodeOption(codec)(1)).toEqual(O.some("1"))
+    expect(C.encodeOption(codec)(10)).toEqual(O.none())
   })
 
   it("never", async () => {
@@ -309,18 +309,18 @@ describe.concurrent("Encoder", () => {
       readonly a: number
       readonly as: ReadonlyArray<A>
     }
-    interface FromA {
+    interface I {
       readonly a: string
-      readonly as: ReadonlyArray<FromA>
+      readonly as: ReadonlyArray<I>
     }
-    const schema: C.Codec<FromA, A> = C.lazy<FromA, A>(() =>
+    const codec: C.Codec<I, A> = C.lazy<I, A>(() =>
       C.struct({
         a: NumberFromChar,
-        as: C.array(schema)
+        as: C.array(codec)
       })
     )
-    await Util.expectEncodeSuccess(schema, { a: 1, as: [] }, { a: "1", as: [] })
-    await Util.expectEncodeSuccess(schema, { a: 1, as: [{ a: 2, as: [] }] }, {
+    await Util.expectEncodeSuccess(codec, { a: 1, as: [] }, { a: "1", as: [] })
+    await Util.expectEncodeSuccess(codec, { a: 1, as: [{ a: 2, as: [] }] }, {
       a: "1",
       as: [{ a: "2", as: [] }]
     })

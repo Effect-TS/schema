@@ -9,12 +9,12 @@ describe.concurrent("from", () => {
     interface A {
       prop: A | number
     }
-    const schema: C.Codec<I, A> = C.lazy(() =>
+    const codec: C.Codec<I, A> = C.lazy(() =>
       C.struct({
-        prop: C.union(C.NumberFromString, schema)
+        prop: C.union(C.NumberFromString, codec)
       })
     )
-    const from = C.from(schema)
+    const from = C.from(codec)
     await Util.expectParseSuccess(from, { prop: "a" })
     await Util.expectParseSuccess(from, { prop: { prop: "a" } })
   })

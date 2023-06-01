@@ -7,21 +7,21 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 const expectMessage = <I, A>(
-  schema: C.Codec<I, A>,
+  codec: C.Codec<I, A>,
   u: unknown,
   message: string
 ) => {
-  expect(E.mapLeft(C.parseEither(schema)(u), (e) => Util.formatAll(e.errors))).toEqual(
+  expect(E.mapLeft(C.parseEither(codec)(u), (e) => Util.formatAll(e.errors))).toEqual(
     E.left(message)
   )
 }
 
 export const expectForbidden = <I, A>(
-  schema: C.Codec<I, A>,
+  codec: C.Codec<I, A>,
   u: unknown,
   message: string
 ) => {
-  expectMessage(Util.effectify(schema, "all"), u, message)
+  expectMessage(Util.effectify(codec, "all"), u, message)
 }
 
 describe.concurrent("Forbidden", () => {

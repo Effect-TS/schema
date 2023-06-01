@@ -43,6 +43,7 @@ Added in v1.0.0
   - [attachPropertySignature](#attachpropertysignature)
   - [element](#element)
   - [extend](#extend)
+  - [filter](#filter)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
@@ -320,9 +321,7 @@ Append a transformation.
 **Signature**
 
 ```ts
-export declare const andThen: <A, B extends A, C>(
-  f: (to: S.Schema<A>) => Codec<B, C>
-) => <I>(self: Codec<I, A>) => Codec<I, C>
+export declare const andThen: <A, C>(f: (to: S.Schema<A>) => Codec<A, C>) => <I>(self: Codec<I, A>) => Codec<I, C>
 ```
 
 Added in v1.0.0
@@ -397,6 +396,23 @@ export declare const extend: {
   <IB, B>(that: Codec<IB, B>): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
   <I, A, IB, B>(self: Codec<I, A>, that: Codec<IB, B>): Codec<S.Spread<I & IB>, S.Spread<A & B>>
 }
+```
+
+Added in v1.0.0
+
+## filter
+
+**Signature**
+
+```ts
+export declare function filter<C extends A, B extends A, A = C>(
+  refinement: Refinement<A, B>,
+  options?: S.AnnotationOptions<A>
+): <I>(self: Codec<I, C>) => Codec<I, C & B>
+export declare function filter<B extends A, A = B>(
+  predicate: Predicate<A>,
+  options?: S.AnnotationOptions<A>
+): <I>(self: Codec<I, B>) => Codec<I, B>
 ```
 
 Added in v1.0.0

@@ -16,9 +16,10 @@ import * as S from "@effect/schema/Schema"
 import { formatActual, formatErrors, formatExpected } from "@effect/schema/TreeFormatter"
 import * as fc from "fast-check"
 
+// const doEffectify = true
+// const doRoundtrip = true
 // TODO
 const doEffectify = false
-// TODO
 const doRoundtrip = false
 
 export const sleep = Effect.sleep(Duration.millis(10))
