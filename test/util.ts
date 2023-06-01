@@ -39,13 +39,6 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
     }
   }
   switch (ast._tag) {
-    case "Declaration":
-      return AST.createDeclaration(
-        ast.typeParameters.map((ast) => effectifyAST(ast, mode)),
-        ast.type,
-        ast.decode,
-        ast.annotations
-      )
     case "Tuple":
       return AST.createTuple(
         ast.elements.map((e) => AST.createElement(effectifyAST(e.type, mode), e.isOptional)),
@@ -290,4 +283,8 @@ const formatDecodeError = (e: PR.ParseErrors): string => {
     case "UnionMember":
       return `union member: ${pipe(e.errors, RA.map(formatDecodeError), RA.join(", "))}`
   }
+}
+
+export const printAST = <I, A>(codec: Codec<I, A>) => {
+  console.log("%o", codec.ast)
 }

@@ -7,18 +7,18 @@ const X2 = C.transform(
   S.string,
   S.string,
   (s) => s + s,
-  (s) => s.substring(0, 1)
+  (s) => s.substring(0, s.length / 2)
 )
 
 const X3 = C.transform(
   S.string,
   S.string,
   (s) => s + s + s,
-  (s) => s.substring(0, 1)
+  (s) => s.substring(0, s.length / 3)
 )
 
 describe.concurrent("extend", () => {
-  it(`struct with defaults extend struct`, async () => {
+  it(`struct with defaults + struct`, async () => {
     const schema = pipe(
       C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }),
       C.extend(S.struct({ c: S.number }))
@@ -26,7 +26,7 @@ describe.concurrent("extend", () => {
     await Util.expectParseSuccess(schema, { b: "b", c: 1 }, { a: "", b: "b", c: 1 })
   })
 
-  it(`struct extend struct with defaults`, async () => {
+  it(`struct + struct with defaults`, async () => {
     const schema = pipe(
       S.struct({ a: S.number }),
       C.extend(
@@ -36,7 +36,7 @@ describe.concurrent("extend", () => {
     await Util.expectParseSuccess(schema, { a: 1, b: "b" }, { a: 1, b: "b", c: "" })
   })
 
-  it(`struct with defaults extend struct with defaults `, async () => {
+  it(`struct with defaults + struct with defaults `, async () => {
     const schema = pipe(
       C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }),
       C.extend(
@@ -46,7 +46,7 @@ describe.concurrent("extend", () => {
     await Util.expectParseSuccess(schema, { b: "b", d: true }, { a: "", b: "b", c: 0, d: true })
   })
 
-  it(`union with defaults extend union with defaults `, async () => {
+  it(`union with defaults + union with defaults `, async () => {
     const schema = pipe(
       C.union(
         C.struct({
@@ -85,7 +85,7 @@ describe.concurrent("extend", () => {
     })
   })
 
-  it("record(string, X3)", async () => {
+  it("struct + struct + record(string, X3)", async () => {
     const transform = pipe(
       S.struct({ a: S.string }),
       C.extend(C.struct({ b: X2 })),
@@ -106,7 +106,7 @@ describe.concurrent("extend", () => {
     })
   })
 
-  it("record(symbol, X3)", async () => {
+  it("struct + struct + record(symbol, X3)", async () => {
     const transform = pipe(
       S.struct({ a: S.string }),
       C.extend(C.struct({ b: X2 })),

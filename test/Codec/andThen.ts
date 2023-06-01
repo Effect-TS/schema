@@ -11,11 +11,11 @@ const StringFromNumber = C.transformResult(
 )
 
 describe.concurrent("andThen", () => {
-  it("int", async () => {
-    const transform = pipe(C.NumberFromString, C.andThen(S.int()))
+  it("codec + schema filter", async () => {
+    const codec = pipe(C.NumberFromString, C.andThen(S.int()))
 
-    await Util.expectParseSuccess(transform, "1", 1)
-    await Util.expectParseFailure(transform, "1.2", "Expected integer, actual 1.2")
+    await Util.expectParseSuccess(codec, "1", 1)
+    await Util.expectParseFailure(codec, "1.2", "Expected integer, actual 1.2")
 
     // should work with `Schema`s too
     const schema = pipe(S.number, C.andThen(S.int()))
@@ -23,41 +23,73 @@ describe.concurrent("andThen", () => {
     await Util.expectParseFailure(schema, 1.2, "Expected integer, actual 1.2")
   })
 
-  it("greaterThanOrEqualTo + lessThanOrEqualTo", async () => {
-    const schema = pipe(
+  it("codec + 2 schema filters as 2 andThen applications", async () => {
+    const codec = pipe(
       C.NumberFromString,
       C.andThen(S.greaterThanOrEqualTo(1)),
       C.andThen(S.lessThanOrEqualTo(2))
     )
-    await Util.expectParseSuccess(schema, "1", 1)
+
+    await Util.expectParseSuccess(codec, "1", 1)
     await Util.expectParseFailure(
-      schema,
+      codec,
       "0",
       `Expected a number greater than or equal to 1, actual 0`
     )
     await Util.expectParseFailure(
-      schema,
+      codec,
       "3",
       `Expected a number less than or equal to 2, actual 3`
     )
 
-    await Util.expectEncodeSuccess(schema, 1, "1")
+    await Util.expectEncodeSuccess(codec, 1, "1")
     await Util.expectEncodeFailure(
-      schema,
+      codec,
       0,
       `Expected a number greater than or equal to 1, actual 0`
     )
     await Util.expectEncodeFailure(
-      schema,
+      codec,
       3,
       `Expected a number less than or equal to 2, actual 3`
     )
   })
 
-  it("NumberFromString + StringFromNumber", async () => {
-    const transform = pipe(C.NumberFromString, C.andThen(() => StringFromNumber))
+  it("codec + 2 schema filters as 1 andThen application", async () => {
+    const codec = pipe(
+      C.NumberFromString,
+      C.andThen((schema) => pipe(schema, S.greaterThanOrEqualTo(1), S.lessThanOrEqualTo(2)))
+    )
 
-    await Util.expectParseSuccess(transform, "1", "1")
-    await Util.expectParseFailure(transform, "a", `Expected string -> number -> string, actual "a"`)
+    await Util.expectParseSuccess(codec, "1", 1)
+    await Util.expectParseFailure(
+      codec,
+      "0",
+      `Expected a number greater than or equal to 1, actual 0`
+    )
+    await Util.expectParseFailure(
+      codec,
+      "3",
+      `Expected a number less than or equal to 2, actual 3`
+    )
+
+    await Util.expectEncodeSuccess(codec, 1, "1")
+    await Util.expectEncodeFailure(
+      codec,
+      0,
+      `Expected a number greater than or equal to 1, actual 0`
+    )
+    await Util.expectEncodeFailure(
+      codec,
+      3,
+      `Expected a number less than or equal to 2, actual 3`
+    )
+  })
+
+  it("codec + codec", async () => {
+    const codec = pipe(C.NumberFromString, C.andThen(() => StringFromNumber))
+
+    await Util.expectParseSuccess(codec, "1", "1")
+    await Util.expectParseFailure(codec, "a", `Expected string -> number -> string, actual "a"`)
   })
 })

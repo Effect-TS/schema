@@ -1166,13 +1166,6 @@ export const getCompiler = <A>(match: Match<A>): Compiler<A> => {
  */
 export const to = (ast: AST): AST => {
   switch (ast._tag) {
-    case "Declaration":
-      return createDeclaration(
-        ast.typeParameters.map(to),
-        to(ast.type),
-        ast.decode,
-        ast.annotations
-      )
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(to(e.type), e.isOptional)),
@@ -1207,13 +1200,6 @@ export const to = (ast: AST): AST => {
  */
 export const from = (ast: AST): AST => {
   switch (ast._tag) {
-    case "Declaration":
-      return createDeclaration(
-        ast.typeParameters.map(from),
-        from(ast.type),
-        ast.decode,
-        ast.annotations
-      )
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(from(e.type), e.isOptional)),

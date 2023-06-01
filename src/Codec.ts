@@ -561,11 +561,10 @@ export const lazy = <I, A>(
  * @category combinators
  * @since 1.0.0
  */
-export const andThen = <A, B extends A, C>(
-  f: (to: S.Schema<A>) => Codec<B, C>
+export const andThen = <A, C>(
+  f: (to: S.Schema<A>) => Codec<A, C>
 ) =>
   <I>(self: Codec<I, A>): Codec<I, C> => {
-    // right-associative
     if (AST.isTransform(self.ast)) {
       return make(
         AST.createTransform(
@@ -578,9 +577,6 @@ export const andThen = <A, B extends A, C>(
     }
 
     const codec = f(to(self))
-    if (AST.isRefinement(codec.ast)) {
-      return make(AST.createRefinement(self.ast, codec.ast.decode, codec.ast.annotations))
-    }
     if (AST.isTransform(codec.ast)) {
       return make(
         AST.createTransform(
@@ -591,13 +587,11 @@ export const andThen = <A, B extends A, C>(
         )
       )
     }
-    // self is Tuple, TypeLiteral, Union, Lazy with transformations inside
     return make(
       AST.createTransform(
         self.ast,
         codec.ast,
-        AST.createFinalTransformation(PR.success, PR.success),
-        self.ast.annotations
+        AST.createFinalTransformation(PR.success, PR.success)
       )
     )
   }
