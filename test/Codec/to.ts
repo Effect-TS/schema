@@ -20,8 +20,8 @@ describe.concurrent("to", () => {
   it("filter", () => {
     const schema = pipe(
       C.NumberFromString,
-      C.filter(S.greaterThanOrEqualTo(1)),
-      C.filter(S.lessThanOrEqualTo(2)),
+      C.andThen(S.greaterThanOrEqualTo(1)),
+      C.andThen(S.lessThanOrEqualTo(2)),
       C.to
     )
     expect(S.is(schema)(0)).toEqual(false)

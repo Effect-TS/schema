@@ -53,7 +53,7 @@ describe.concurrent("Arbitrary", () => {
       a: NumberFromString,
       b: C.tuple(NumberFromString),
       c: C.union(NumberFromString, S.boolean),
-      d: pipe(NumberFromString, C.filter(S.positive())),
+      d: pipe(NumberFromString, C.andThen(S.positive())),
       e: C.optionFromSelf(NumberFromString)
     })
     property(C.from(schema))

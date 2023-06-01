@@ -37,11 +37,13 @@ export type AST =
   | ObjectKeyword
   | Enums
   | TemplateLiteral
+  | Refinement
+  // possible transformations
   | Tuple
   | TypeLiteral
   | Union
   | Lazy
-  | Refinement
+  // transformations
   | Transform
 
 // ---------------------------------------------

@@ -38,11 +38,11 @@ Added in v1.0.0
 - [boolean](#boolean)
   - [not](#not)
 - [combinators](#combinators)
+  - [andThen](#andthen)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
   - [element](#element)
   - [extend](#extend)
-  - [filter](#filter)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
@@ -313,6 +313,20 @@ Added in v1.0.0
 
 # combinators
 
+## andThen
+
+Append a transformation.
+
+**Signature**
+
+```ts
+export declare const andThen: <A, B extends A, C>(
+  f: (to: S.Schema<A>) => Codec<B, C>
+) => <I>(self: Codec<I, A>) => Codec<I, C>
+```
+
+Added in v1.0.0
+
 ## array
 
 **Signature**
@@ -383,20 +397,6 @@ export declare const extend: {
   <IB, B>(that: Codec<IB, B>): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
   <I, A, IB, B>(self: Codec<I, A>, that: Codec<IB, B>): Codec<S.Spread<I & IB>, S.Spread<A & B>>
 }
-```
-
-Added in v1.0.0
-
-## filter
-
-Append a `Schema` transformation.
-
-**Signature**
-
-```ts
-export declare const filter: <A, B extends A>(
-  f: (schema: S.Schema<A>) => S.Schema<B>
-) => <I>(codec: Codec<I, A>) => Codec<I, B>
 ```
 
 Added in v1.0.0

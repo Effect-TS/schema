@@ -3,15 +3,22 @@ import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
-describe.concurrent("filter", () => {
+const StringFromNumber = C.transformResult(
+  S.number,
+  S.string,
+  C.encodeResult(C.NumberFromString),
+  C.decodeResult(C.NumberFromString)
+)
+
+describe.concurrent("andThen", () => {
   it("int", async () => {
-    const transform = pipe(C.NumberFromString, C.filter(S.int()))
+    const transform = pipe(C.NumberFromString, C.andThen(S.int()))
 
     await Util.expectParseSuccess(transform, "1", 1)
     await Util.expectParseFailure(transform, "1.2", "Expected integer, actual 1.2")
 
     // should work with `Schema`s too
-    const schema = pipe(S.number, C.filter(S.int()))
+    const schema = pipe(S.number, C.andThen(S.int()))
     await Util.expectParseSuccess(schema, 1)
     await Util.expectParseFailure(schema, 1.2, "Expected integer, actual 1.2")
   })
@@ -19,8 +26,8 @@ describe.concurrent("filter", () => {
   it("greaterThanOrEqualTo + lessThanOrEqualTo", async () => {
     const schema = pipe(
       C.NumberFromString,
-      C.filter(S.greaterThanOrEqualTo(1)),
-      C.filter(S.lessThanOrEqualTo(2))
+      C.andThen(S.greaterThanOrEqualTo(1)),
+      C.andThen(S.lessThanOrEqualTo(2))
     )
     await Util.expectParseSuccess(schema, "1", 1)
     await Util.expectParseFailure(
@@ -45,5 +52,12 @@ describe.concurrent("filter", () => {
       3,
       `Expected a number less than or equal to 2, actual 3`
     )
+  })
+
+  it("NumberFromString + StringFromNumber", async () => {
+    const transform = pipe(C.NumberFromString, C.andThen(() => StringFromNumber))
+
+    await Util.expectParseSuccess(transform, "1", "1")
+    await Util.expectParseFailure(transform, "a", `Expected string -> number -> string, actual "a"`)
   })
 })

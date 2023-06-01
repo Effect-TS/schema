@@ -556,35 +556,48 @@ export const lazy = <I, A>(
 ): Codec<I, A> => make(AST.createLazy(() => f().ast, annotations))
 
 /**
- * Append a `Schema` transformation.
+ * Append a transformation.
  *
  * @category combinators
  * @since 1.0.0
  */
-export const filter = <A, B extends A>(
-  f: (schema: S.Schema<A>) => S.Schema<B>
+export const andThen = <A, B extends A, C>(
+  f: (to: S.Schema<A>) => Codec<B, C>
 ) =>
-  <I>(codec: Codec<I, A>): Codec<I, B> => {
+  <I>(self: Codec<I, A>): Codec<I, C> => {
+    // right-associative
+    if (AST.isTransform(self.ast)) {
+      return make(
+        AST.createTransform(
+          self.ast.from,
+          pipe(make<unknown, A>(self.ast.to), andThen(f)).ast,
+          self.ast.transformAST,
+          self.ast.annotations
+        )
+      )
+    }
+
+    const codec = f(to(self))
+    if (AST.isRefinement(codec.ast)) {
+      return make(AST.createRefinement(self.ast, codec.ast.decode, codec.ast.annotations))
+    }
     if (AST.isTransform(codec.ast)) {
       return make(
         AST.createTransform(
-          codec.ast.from,
-          pipe(make<unknown, A>(codec.ast.to), filter(f)).ast,
+          self.ast,
+          codec.ast.to,
           codec.ast.transformAST,
           codec.ast.annotations
         )
       )
     }
-
-    const schema = f(to(codec))
-    if (AST.isRefinement(schema.ast)) {
-      return make(AST.createRefinement(codec.ast, schema.ast.decode, schema.ast.annotations))
-    }
+    // self is Tuple, TypeLiteral, Union, Lazy with transformations inside
     return make(
       AST.createTransform(
+        self.ast,
         codec.ast,
-        schema.ast,
-        AST.createFinalTransformation(PR.success, PR.success)
+        AST.createFinalTransformation(PR.success, PR.success),
+        self.ast.annotations
       )
     )
   }

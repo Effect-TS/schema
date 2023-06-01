@@ -886,11 +886,13 @@ export type AST =
   | ObjectKeyword
   | Enums
   | TemplateLiteral
+  | Refinement
+  // possible transformations
   | Tuple
   | TypeLiteral
   | Union
   | Lazy
-  | Refinement
+  // transformations
   | Transform
 ```
 
@@ -1586,6 +1588,12 @@ export declare const mergeAnnotations: (
     }
   | {
       annotations: { [x: symbol]: unknown }
+      _tag: 'Refinement'
+      from: AST
+      decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+    }
+  | {
+      annotations: { [x: symbol]: unknown }
       _tag: 'Tuple'
       elements: readonly Element[]
       rest: Option<readonly [AST, ...AST[]]>
@@ -1599,12 +1607,6 @@ export declare const mergeAnnotations: (
     }
   | { annotations: { [x: symbol]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
   | { annotations: { [x: symbol]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | {
-      annotations: { [x: symbol]: unknown }
-      _tag: 'Refinement'
-      from: AST
-      decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-    }
   | { annotations: { [x: symbol]: unknown }; _tag: 'Transform'; from: AST; to: AST; transformAST: TransformAST }
 ```
 
