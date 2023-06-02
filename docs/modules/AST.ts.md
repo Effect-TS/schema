@@ -462,7 +462,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createRefinement: <From extends AST = AST>(
+export declare const createRefinement: <From extends AST>(
   from: From,
   filter: Refinement['filter'],
   annotations?: Annotated['annotations']

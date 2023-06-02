@@ -41,6 +41,7 @@ Added in v1.0.0
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
+  - [brand](#brand)
   - [compose](#compose)
   - [element](#element)
   - [extend](#extend)
@@ -369,6 +370,19 @@ assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
   kind: 'circle',
   radius: 10,
 })
+```
+
+Added in v1.0.0
+
+## brand
+
+**Signature**
+
+```ts
+export declare const brand: <B extends string | symbol, A>(
+  brand: B,
+  options?: S.DocAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A & Brand<B>>
 ```
 
 Added in v1.0.0

@@ -3,6 +3,7 @@
  */
 
 import * as B from "@effect/data/Bigint"
+import type { Brand } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
 import type * as D from "@effect/data/Data"
@@ -170,8 +171,6 @@ export {
  * @since 1.0.0
  */
 export const make = <I, A>(ast: AST.AST): Codec<I, A> => ({ ast }) as any
-
-// TODO: fromBrand?
 
 // ---------------------------------------------
 // combinators
@@ -570,7 +569,26 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
     return make(AST.omit(ast, keys))
   }
 
-// TODO: brand?
+const recurseRight = <A extends ReadonlyArray<any>>(
+  f: (ast: AST.AST, ...a: A) => AST.AST
+) =>
+  (ast: AST.AST, ...a: A): AST.AST => {
+    if (AST.isTransform(ast)) {
+      return AST.createTransform(ast.from, f(ast.to, ...a), ast.transformAST, ast.annotations)
+    }
+    return f(ast, ...a)
+  }
+
+const addBrand = recurseRight(S.addBrand)
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const brand = <B extends string | symbol, A>(
+  brand: B,
+  options?: S.DocAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A & Brand<B>> => make(addBrand(self.ast, brand, options))
 
 /**
  * @category combinators

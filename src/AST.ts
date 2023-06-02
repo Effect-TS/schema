@@ -870,12 +870,13 @@ export interface Refinement<From = AST> extends Annotated {
  * @category constructors
  * @since 1.0.0
  */
-export const createRefinement = <From extends AST = AST>(
+export const createRefinement = <From extends AST>(
   from: From,
   filter: Refinement["filter"],
   annotations: Annotated["annotations"] = {}
 ): Refinement<From> | Transform => {
   if (isTransform(from)) {
+    // recurse right
     return createTransform(
       from.from,
       createRefinement(from.to, filter, annotations),

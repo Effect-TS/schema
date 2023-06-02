@@ -824,7 +824,18 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
 /**
  * @since 1.0.0
  */
-export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Constructor<To> {}
+export interface BrandSchema<A extends Brand<any>> extends Schema<A>, Brand.Constructor<A> {}
+
+/** @internal */
+export const addBrand = <B extends string | symbol, A>(
+  ast: AST.AST,
+  brand: B,
+  options?: DocAnnotations<A>
+): AST.AST => {
+  const annotations = toAnnotations(options)
+  annotations[AST.BrandAnnotationId] = [...getBrands(ast), brand]
+  return AST.mergeAnnotations(ast, annotations)
+}
 
 /**
  * Returns a nominal branded schema by applying a brand to a given schema.
@@ -851,9 +862,7 @@ export const brand = <B extends string | symbol, A>(
   options?: DocAnnotations<A>
 ) =>
   (self: Schema<A>): BrandSchema<A & Brand<B>> => {
-    const annotations = toAnnotations(options)
-    annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
-    const ast = AST.mergeAnnotations(self.ast, annotations)
+    const ast = addBrand(self.ast, brand, options)
     const schema = make(ast)
     const validate = P.validate(schema)
     const validateOption = P.validateOption(schema)

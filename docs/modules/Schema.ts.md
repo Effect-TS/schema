@@ -1907,7 +1907,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Constructor<To> {}
+export interface BrandSchema<A extends Brand<any>> extends Schema<A>, Brand.Constructor<A> {}
 ```
 
 Added in v1.0.0
