@@ -360,9 +360,7 @@ Added in v1.0.0
 export declare const createDeclaration: (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
-  decode: (
-    ...typeParameters: ReadonlyArray<AST>
-  ) => (input: unknown, options?: ParseOptions | undefined) => ParseResult<any>,
+  decode: (...typeParameters: ReadonlyArray<AST>) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
   annotations?: Annotated['annotations']
 ) => Declaration
 ```
@@ -1454,70 +1452,7 @@ Adds a group of annotations, potentially overwriting existing annotations.
 **Signature**
 
 ```ts
-export declare const mergeAnnotations: (
-  ast: AST,
-  annotations: Annotated['annotations']
-) =>
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Declaration'
-      typeParameters: readonly AST[]
-      type: AST
-      decode: (
-        ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-    }
-  | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
-  | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
-  | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'VoidKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'TemplateLiteral'
-      head: string
-      spans: readonly [TemplateLiteralSpan, ...TemplateLiteralSpan[]]
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Tuple'
-      elements: readonly Element[]
-      rest: Option<readonly [AST, ...AST[]]>
-      isReadonly: boolean
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'TypeLiteral'
-      propertySignatures: readonly PropertySignature[]
-      indexSignatures: readonly IndexSignature[]
-    }
-  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
-  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Refinement'
-      from: AST
-      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-      isReversed: boolean
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-      encode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-      propertySignatureTransformations: readonly PropertySignatureTransformation[]
-    }
+export declare const mergeAnnotations: (ast: AST, annotations: Annotated['annotations']) => AST
 ```
 
 Added in v1.0.0
@@ -1577,71 +1512,7 @@ Adds an annotation, potentially overwriting the existing annotation with the spe
 **Signature**
 
 ```ts
-export declare const setAnnotation: (
-  ast: AST,
-  id: PropertyKey,
-  value: unknown
-) =>
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Declaration'
-      typeParameters: readonly AST[]
-      type: AST
-      decode: (
-        ...typeParameters: readonly AST[]
-      ) => (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-    }
-  | { annotations: { [x: string]: unknown }; _tag: 'Literal'; literal: LiteralValue }
-  | { annotations: { [x: string]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
-  | { annotations: { [x: string]: unknown }; _tag: 'UndefinedKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'VoidKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'NeverKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'UnknownKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'AnyKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'StringKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'NumberKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'BooleanKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'BigIntKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'SymbolKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'ObjectKeyword' }
-  | { annotations: { [x: string]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'TemplateLiteral'
-      head: string
-      spans: readonly [TemplateLiteralSpan, ...TemplateLiteralSpan[]]
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Tuple'
-      elements: readonly Element[]
-      rest: Option<readonly [AST, ...AST[]]>
-      isReadonly: boolean
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'TypeLiteral'
-      propertySignatures: readonly PropertySignature[]
-      indexSignatures: readonly IndexSignature[]
-    }
-  | { annotations: { [x: string]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
-  | { annotations: { [x: string]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Refinement'
-      from: AST
-      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-      isReversed: boolean
-    }
-  | {
-      annotations: { [x: string]: unknown }
-      _tag: 'Transform'
-      from: AST
-      to: AST
-      decode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-      encode: (input: any, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, any>
-      propertySignatureTransformations: readonly PropertySignatureTransformation[]
-    }
+export declare const setAnnotation: (ast: AST, id: PropertyKey, value: unknown) => AST
 ```
 
 Added in v1.0.0

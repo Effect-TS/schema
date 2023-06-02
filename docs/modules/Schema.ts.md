@@ -280,9 +280,7 @@ A filter excluding invalid dates (e.g. `new Date("fail")`).
 **Signature**
 
 ```ts
-export declare const validDate: (
-  options?: AnnotationOptions<Date> | undefined
-) => <I>(self: Schema<I, Date>) => Schema<I, Date>
+export declare const validDate: (options?: AnnotationOptions<Date>) => <I>(self: Schema<I, Date>) => Schema<I, Date>
 ```
 
 Added in v1.0.0
@@ -570,7 +568,7 @@ but rather maps to another schema, for example when you want to add a discrimina
 **Signature**
 
 ```ts
-export declare const attachPropertySignature: <K extends string | number | symbol, V extends AST.LiteralValue>(
+export declare const attachPropertySignature: <K extends PropertyKey, V extends AST.LiteralValue>(
   key: K,
   value: V
 ) => <I, A extends object>(schema: Schema<I, A>) => Schema<I, Spread<A & { readonly [k in K]: V }>>
@@ -611,7 +609,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 export declare const brand: <B extends string | symbol, A>(
   brand: B,
   options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => BrandSchema<I, any>
+) => <I>(self: Schema<I, A>) => BrandSchema<I, A & Brand<B>>
 ```
 
 **Example**
@@ -676,8 +674,8 @@ export declare const declare: (
   type: Schema<any>,
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: unknown, options?: ParseOptions | undefined) => ParseResult<any>,
-  annotations?: AST.Annotations | undefined
+  ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
+  annotations?: AST.Annotated['annotations']
 ) => Schema<any>
 ```
 
@@ -758,10 +756,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const fromBrand: <C extends any>(
-  constructor: any,
-  options?: AnnotationOptions<any> | undefined
-) => <I, A extends any>(self: Schema<I, A>) => Schema<I, A & C>
+export declare const fromBrand: <C extends Brand<string | symbol>>(
+  constructor: Brand.Constructor<C>,
+  options?: AnnotationOptions<Brand.Unbranded<C>> | undefined
+) => <I, A extends Brand.Unbranded<C>>(self: Schema<I, A>) => Schema<I, A & C>
 ```
 
 Added in v1.0.0
@@ -781,7 +779,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotations | undefined) => Schema<I, A>
+export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotated['annotations']) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -815,7 +813,7 @@ export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Schema<I, A>
-) => Schema<Spread<Pick<I, Exclude<keyof I, Keys[number]>>>, Spread<Pick<A, Exclude<keyof A, Keys[number]>>>>
+) => Schema<Spread<Omit<I, Keys[number]>>, Spread<Omit<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -947,7 +945,7 @@ Added in v1.0.0
 ```ts
 export declare const struct: <
   Fields extends Record<
-    string | number | symbol,
+    PropertyKey,
     | Schema<any, any>
     | Schema<never, never>
     | PropertySignature<any, boolean, any, boolean>
@@ -1003,14 +1001,14 @@ using the provided decoding functions.
 export declare const transformResult: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A1>
+    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
+    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I2>,
-    encode: (i2: I2, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A1>
+    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
+    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
   ): Schema<I1, A2>
 }
 ```
@@ -1105,7 +1103,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const instanceOf: new (...args: any) => any
+export declare const instanceOf: <A extends abstract new (...args: any) => any>(
+  constructor: A,
+  options?: AnnotationOptions<object>
+) => Schema<InstanceType<A>, InstanceType<A>>
 ```
 
 Added in v1.0.0
@@ -1149,7 +1150,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <I, A>(
   schema: Schema<I, A>,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => PropertySignature<I, false, A, false>
 ```
 
@@ -1197,7 +1198,7 @@ Added in v1.0.0
 ```ts
 export declare const uniqueSymbol: <S extends symbol>(
   symbol: S,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => Schema<S, S>
 ```
 
@@ -1270,7 +1271,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeResult: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+) => (i: I, options?: ParseOptions | undefined) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -1342,7 +1343,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeResult: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, I>
+) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
 ```
 
 Added in v1.0.0
@@ -1727,7 +1728,7 @@ Added in v1.0.0
 ```ts
 export declare const parseResult: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -2477,7 +2478,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <I, A>(
   schema: Schema<I, A>,
-  annotations?: AST.Annotations | undefined
+  annotations?: AST.Annotated['annotations']
 ) => PropertySignature<I, true, A, true>
 ```
 
@@ -2582,7 +2583,7 @@ Added in v1.0.0
 ```ts
 export declare const validateResult: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => PR.IO<PR.ParseError, A>
+) => (a: unknown, options?: ParseOptions | undefined) => ParseResult<A>
 ```
 
 Added in v1.0.0
