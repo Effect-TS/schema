@@ -111,7 +111,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const success: <A>(a: A) => IO<ParseError, A>
+export declare const success: <A>(a: A) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -121,7 +121,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const type: (expected: AST.AST, actual: unknown, message?: string | undefined) => Type
+export declare const type: (expected: AST.AST, actual: unknown, message?: string) => Type
 ```
 
 Added in v1.0.0
@@ -285,7 +285,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const eitherOrUndefined: <E, A>(self: IO<E, A>) => E.Left<E, A> | E.Right<E, A> | undefined
+export declare const eitherOrUndefined: <E, A>(self: IO<E, A>) => E.Either<E, A> | undefined
 ```
 
 Added in v1.0.0
