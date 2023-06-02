@@ -62,9 +62,7 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
     case "Refinement":
       return AST.createRefinement(
         effectifyAST(ast.from, mode),
-        // I need to override with the original ast here in order to not change the error message
-        // -------------------------v
-        effectifyDecode(ast.decode, ast),
+        ast.filter,
         ast.annotations
       )
     case "Transform":

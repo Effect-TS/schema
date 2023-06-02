@@ -2,7 +2,6 @@
  * @since 1.0.0
  */
 
-import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import { isNumber } from "@effect/data/Predicate"
@@ -10,7 +9,6 @@ import * as RA from "@effect/data/ReadonlyArray"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
 import { defaultParseOption } from "@effect/schema/Parser"
-import { eitherOrUndefined } from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import type * as FastCheck from "fast-check"
 
@@ -219,15 +217,7 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
       return pipe(
         getHook(ast),
         O.match(
-          () =>
-            (fc) =>
-              from(fc).filter((a) => {
-                const eu = eitherOrUndefined(ast.decode(a, defaultParseOption, ast))
-                if (eu) {
-                  return E.isRight(eu)
-                }
-                throw new Error("cannot build an Arbitrary for effectful refinements")
-              }),
+          () => (fc) => from(fc).filter((a) => O.isNone(ast.filter(a, defaultParseOption, ast))),
           (handler) => handler(from)
         )
       )

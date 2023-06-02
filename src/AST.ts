@@ -10,7 +10,7 @@ import { isNumber, isString, isSymbol } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import * as Order from "@effect/data/typeclass/Order"
 import * as I from "@effect/schema/internal/common"
-import type { ParseResult } from "@effect/schema/ParseResult"
+import type { ParseError, ParseResult } from "@effect/schema/ParseResult"
 
 // -------------------------------------------------------------------------------------
 // model
@@ -863,7 +863,7 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
 export interface Refinement<From = AST> extends Annotated {
   readonly _tag: "Refinement"
   readonly from: From
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly filter: (input: any, options: ParseOptions, self: AST) => Option<ParseError>
 }
 
 /**
@@ -872,18 +872,18 @@ export interface Refinement<From = AST> extends Annotated {
  */
 export const createRefinement = <From extends AST = AST>(
   from: From,
-  decode: Refinement["decode"],
+  filter: Refinement["filter"],
   annotations: Annotated["annotations"] = {}
 ): Refinement<From> | Transform => {
   if (isTransform(from)) {
     return createTransform(
       from.from,
-      createRefinement(from.to, decode, annotations),
+      createRefinement(from.to, filter, annotations),
       from.transformAST,
       from.annotations
     )
   }
-  return { _tag: "Refinement", from, decode, annotations }
+  return { _tag: "Refinement", from, filter, annotations }
 }
 
 /**
@@ -942,7 +942,7 @@ export const isTransform = (ast: AST): ast is Transform => ast._tag === "Transfo
  *
  * @since 1.0.0
  */
-export const mergeAnnotations = (ast: AST, annotations: Annotated["annotations"]) => ({
+export const mergeAnnotations = (ast: AST, annotations: Annotated["annotations"]): AST => ({
   ...ast,
   annotations: { ...ast.annotations, ...annotations }
 })
@@ -1198,7 +1198,7 @@ export const to = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => to(ast.f()), ast.annotations)
     case "Refinement":
-      return createRefinement(to(ast.from), ast.decode, ast.annotations)
+      return createRefinement(to(ast.from), ast.filter, ast.annotations)
     case "Transform":
       return to(ast.to)
   }

@@ -452,7 +452,7 @@ Added in v1.0.0
 ```ts
 export declare const createRefinement: <From extends AST = AST>(
   from: From,
-  decode: Refinement['decode'],
+  filter: Refinement['filter'],
   annotations?: Annotated['annotations']
 ) => Transform | Refinement<From>
 ```
@@ -1137,7 +1137,7 @@ Added in v1.0.0
 export interface Refinement<From = AST> extends Annotated {
   readonly _tag: 'Refinement'
   readonly from: From
-  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
+  readonly filter: (input: any, options: ParseOptions, self: AST) => Option<ParseError>
 }
 ```
 
@@ -1555,59 +1555,7 @@ Adds a group of annotations, potentially overwriting existing annotations.
 **Signature**
 
 ```ts
-export declare const mergeAnnotations: (
-  ast: AST,
-  annotations: Annotated['annotations']
-) =>
-  | {
-      annotations: { [x: symbol]: unknown }
-      _tag: 'Declaration'
-      typeParameters: readonly AST[]
-      type: AST
-      decode: (...typeParameters: readonly AST[]) => (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-    }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'Literal'; literal: LiteralValue }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'UniqueSymbol'; symbol: symbol }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'UndefinedKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'VoidKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'NeverKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'UnknownKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'AnyKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'StringKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'NumberKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'BooleanKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'BigIntKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'SymbolKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'ObjectKeyword' }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'Enums'; enums: readonly (readonly [string, string | number])[] }
-  | {
-      annotations: { [x: symbol]: unknown }
-      _tag: 'TemplateLiteral'
-      head: string
-      spans: readonly [TemplateLiteralSpan, ...TemplateLiteralSpan[]]
-    }
-  | {
-      annotations: { [x: symbol]: unknown }
-      _tag: 'Refinement'
-      from: AST
-      decode: (input: any, options: ParseOptions, self: AST) => ParseResult<any>
-    }
-  | {
-      annotations: { [x: symbol]: unknown }
-      _tag: 'Tuple'
-      elements: readonly Element[]
-      rest: Option<readonly [AST, ...AST[]]>
-      isReadonly: boolean
-    }
-  | {
-      annotations: { [x: symbol]: unknown }
-      _tag: 'TypeLiteral'
-      propertySignatures: readonly PropertySignature[]
-      indexSignatures: readonly IndexSignature[]
-    }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'Union'; types: readonly [AST, AST, ...AST[]] }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'Lazy'; f: () => AST }
-  | { annotations: { [x: symbol]: unknown }; _tag: 'Transform'; from: AST; to: AST; transformAST: TransformAST }
+export declare const mergeAnnotations: (ast: AST, annotations: Annotated['annotations']) => AST
 ```
 
 Added in v1.0.0

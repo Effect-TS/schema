@@ -1,6 +1,5 @@
 import * as E from "@effect/data/Either"
 import { pipe } from "@effect/data/Function"
-import * as AST from "@effect/schema/AST"
 import * as C from "@effect/schema/Codec"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
@@ -76,19 +75,6 @@ describe.concurrent("Forbidden", () => {
         E.right
       )
     )
-    expectMessage(
-      transform,
-      "a",
-      "is forbidden"
-    )
-  })
-
-  it("refinement", () => {
-    const ast = AST.createRefinement(
-      S.string.ast,
-      (input) => PR.flatMap(Util.sleep, () => PR.success(input))
-    )
-    const transform: C.Codec<string, string> = C.make(ast)
     expectMessage(
       transform,
       "a",

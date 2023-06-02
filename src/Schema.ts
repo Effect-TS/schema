@@ -961,7 +961,7 @@ export function filter<A>(
   return (self) =>
     make(AST.createRefinement(
       self.ast,
-      (a: A, _, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
+      (a: A, _, ast: AST.AST) => predicate(a) ? O.none() : O.some(PR.parseError([PR.type(ast, a)])),
       toAnnotations(options)
     ))
 }
@@ -1868,17 +1868,17 @@ export const fromBrand = <C extends Brand<string | symbol>>(
   options?: AnnotationOptions<Brand.Unbranded<C>>
 ) =>
   <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
-    const decode = untracedMethod(() =>
-      (a: A, _, self: AST.AST): ParseResult<C> =>
-        E.mapLeft(
-          constructor.either(a),
-          (brandErrors) =>
-            PR.parseError([PR.type(self, a, brandErrors.map((v) => v.message).join(", "))])
-        )
+    const filter = untracedMethod(() =>
+      (a: A, _, self: AST.AST): Option<PR.ParseError> => {
+        const e = constructor.either(a)
+        return E.isLeft(e) ?
+          O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
+          O.none()
+      }
     )
     const ast = AST.createRefinement(
       self.ast,
-      decode,
+      filter,
       toAnnotations({ typeId: BrandTypeId, ...options })
     )
     return make(ast)

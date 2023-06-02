@@ -575,7 +575,7 @@ export function filter<A>(
   return <I>(self: Codec<I, A>) =>
     make(AST.createRefinement(
       self.ast,
-      (a: A, _, ast: AST.AST) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a)),
+      (a: A, _, ast: AST.AST) => predicate(a) ? O.none() : O.some(PR.parseError([PR.type(ast, a)])),
       S.toAnnotations(options)
     ))
 }

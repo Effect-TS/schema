@@ -297,7 +297,12 @@ const go = untracedMethod(() =>
             handleForbidden(
               PR.flatMap(
                 from(i, options),
-                (a) => ast.decode(a, options ?? defaultParseOption, ast)
+                (a) =>
+                  O.match(
+                    ast.filter(a, options ?? defaultParseOption, ast),
+                    () => PR.success(a),
+                    PR.fail
+                  )
               ),
               options
             )

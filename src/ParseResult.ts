@@ -223,7 +223,13 @@ export const success: <A>(a: A) => ParseResult<A> = E.right
  * @category constructors
  * @since 1.0.0
  */
-export const failure = (e: ParseErrors): ParseResult<never> => E.left(parseError([e]))
+export const fail: (error: ParseError) => ParseResult<never> = E.left
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const failure = (e: ParseErrors): ParseResult<never> => fail(parseError([e]))
 
 /**
  * @category constructors

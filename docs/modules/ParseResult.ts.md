@@ -13,6 +13,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [constructors](#constructors)
+  - [fail](#fail)
   - [failure](#failure)
   - [failures](#failures)
   - [forbidden](#forbidden)
@@ -47,6 +48,16 @@ Added in v1.0.0
 ---
 
 # constructors
+
+## fail
+
+**Signature**
+
+```ts
+export declare const fail: (error: ParseError) => ParseResult<never>
+```
+
+Added in v1.0.0
 
 ## failure
 

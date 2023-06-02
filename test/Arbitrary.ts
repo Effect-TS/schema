@@ -1,10 +1,7 @@
 import { pipe } from "@effect/data/Function"
 import * as A from "@effect/schema/Arbitrary"
-import * as AST from "@effect/schema/AST"
 import * as C from "@effect/schema/Codec"
-import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
-import * as Util from "@effect/schema/test/util"
 import * as fc from "fast-check"
 
 const doProperty = true
@@ -27,18 +24,6 @@ describe.concurrent("Arbitrary", () => {
     const schema = C.NumberFromString
     expect(() => A.go(schema.ast)).toThrowError(
       new Error("cannot build an Arbitrary for transformations")
-    )
-  })
-
-  it("should throw on effectful refinements", () => {
-    const ast = AST.createRefinement(
-      S.number.ast,
-      // I need to override with the original ast here in order to not change the error message
-      // ------------------------------v
-      Util.effectifyDecode(PR.success, S.number.ast)
-    )
-    expect(() => fc.sample(A.go(ast)(fc), 1)).toThrowError(
-      new Error("cannot build an Arbitrary for effectful refinements")
     )
   })
 
