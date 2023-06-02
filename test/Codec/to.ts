@@ -20,8 +20,7 @@ describe.concurrent("to", async () => {
   it("Refinement", async () => {
     const schema = pipe(
       C.NumberFromString,
-      C.andThen(S.greaterThanOrEqualTo(1)),
-      C.andThen(S.lessThanOrEqualTo(2)),
+      C.compose(pipe(S.number, S.greaterThanOrEqualTo(1), S.lessThanOrEqualTo(2))),
       C.to
     )
     await Util.expectParseFailure(
@@ -37,7 +36,7 @@ describe.concurrent("to", async () => {
   it("Refinement (struct)", async () => {
     const schema = pipe(
       C.struct({
-        a: pipe(C.NumberFromString, C.andThen(S.greaterThanOrEqualTo(1)))
+        a: pipe(C.NumberFromString, C.compose(pipe(S.number, S.greaterThanOrEqualTo(1))))
       }),
       C.filter(({ a }) => a > 0),
       C.to

@@ -38,9 +38,9 @@ Added in v1.0.0
 - [boolean](#boolean)
   - [not](#not)
 - [combinators](#combinators)
-  - [andThen](#andthen)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
+  - [compose](#compose)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
@@ -314,18 +314,6 @@ Added in v1.0.0
 
 # combinators
 
-## andThen
-
-Append a transformation.
-
-**Signature**
-
-```ts
-export declare const andThen: <A, C>(f: (to: S.Schema<A>) => Codec<A, C>) => <I>(self: Codec<I, A>) => Codec<I, C>
-```
-
-Added in v1.0.0
-
 ## array
 
 **Signature**
@@ -369,6 +357,19 @@ assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
   kind: 'circle',
   radius: 10,
 })
+```
+
+Added in v1.0.0
+
+## compose
+
+**Signature**
+
+```ts
+export declare const compose: {
+  <A, B>(that: Codec<A, B>): <I>(self: Codec<I, A>) => Codec<I, B>
+  <I, A, B>(self: Codec<I, A>, that: Codec<A, B>): Codec<I, B>
+}
 ```
 
 Added in v1.0.0

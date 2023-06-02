@@ -4,12 +4,6 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("dev", () => {
-  it.skip("dev", async () => {
-    const codec = pipe(C.NumberFromString, C.filter((n) => n > 0))
-    await Util.expectParseSuccess(codec, "1", 1)
-    await Util.expectParseFailure(codec, "0", "Expected <anonymous refinement schema>, actual 0")
-  })
-
   it.skip("tuple/e", async () => {
     const NumberFromChar = pipe(S.string, S.maxLength(1), C.numberFromString)
     const codec = C.array(NumberFromChar)
@@ -18,5 +12,13 @@ describe.concurrent("dev", () => {
       [10],
       `/0 Expected a string at most 1 character(s) long, actual "10"`
     )
+  })
+
+  it.skip("codec + schema", async () => {
+    const codec = C.NumberFromString
+    const schema = pipe(S.number, S.int())
+
+    const composition = pipe(codec, C.filter((n) => n > 0), C.compose(schema))
+    Util.printAST(composition)
   })
 })

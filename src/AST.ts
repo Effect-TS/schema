@@ -1382,6 +1382,7 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
  */
 export type TransformAST =
   | FinalTransformation
+  | ComposeTransformation
   | TypeLiteralTransformation
 
 /**
@@ -1402,6 +1403,20 @@ export const createFinalTransformation = (
   decode: FinalTransformation["decode"],
   encode: FinalTransformation["encode"]
 ): FinalTransformation => ({ _tag: "FinalTransformation", decode, encode })
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface ComposeTransformation {
+  readonly _tag: "ComposeTransformation"
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const composeTransformation: ComposeTransformation = { _tag: "ComposeTransformation" }
 
 /**
  * Represents a `PropertySignature -> PropertySignature` transformation

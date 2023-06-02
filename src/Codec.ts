@@ -581,45 +581,17 @@ export function filter<A>(
 }
 
 /**
- * Append a transformation.
- *
  * @category combinators
  * @since 1.0.0
  */
-export const andThen = <A, C>(
-  f: (to: S.Schema<A>) => Codec<A, C>
-) =>
-  <I>(self: Codec<I, A>): Codec<I, C> => {
-    if (AST.isTransform(self.ast)) {
-      return make(
-        AST.createTransform(
-          self.ast.from,
-          pipe(make<unknown, A>(self.ast.to), andThen(f)).ast,
-          self.ast.transformAST,
-          self.ast.annotations
-        )
-      )
-    }
-
-    const codec = f(to(self))
-    if (AST.isTransform(codec.ast)) {
-      return make(
-        AST.createTransform(
-          self.ast,
-          codec.ast.to,
-          codec.ast.transformAST,
-          codec.ast.annotations
-        )
-      )
-    }
-    return make(
-      AST.createTransform(
-        self.ast,
-        codec.ast,
-        AST.createFinalTransformation(PR.success, PR.success)
-      )
-    )
-  }
+export const compose: {
+  <A, B>(that: Codec<A, B>): <I>(self: Codec<I, A>) => Codec<I, B>
+  <I, A, B>(self: Codec<I, A>, that: Codec<A, B>): Codec<I, B>
+} = dual(
+  2,
+  <I, A, B>(self: Codec<I, A>, that: Codec<A, B>): Codec<I, B> =>
+    make(AST.createTransform(self.ast, that.ast, AST.composeTransformation))
+)
 
 /**
  * Attaches a property signature with the specified key and value to the schema.

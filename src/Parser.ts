@@ -1120,6 +1120,8 @@ export const getDecode = (
   switch (transform._tag) {
     case "FinalTransformation":
       return isDecoding ? transform.decode : transform.encode
+    case "ComposeTransformation":
+      return PR.success
     case "TypeLiteralTransformation":
       return (input, options, ast) => {
         let out: PR.ParseResult<any> = E.right(input)

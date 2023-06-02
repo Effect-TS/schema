@@ -868,6 +868,7 @@ export const brand = <B extends string | symbol, A>(
     const is = P.is(schema)
     const out: any = Object.assign((input: unknown) => validate(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
+      [SchemaTypeId]: identity,
       ast,
       option: (input: unknown) => validateOption(input),
       either: (input: unknown) =>
@@ -1879,7 +1880,7 @@ export const fromBrand = <C extends Brand<string | symbol>>(
     const ast = AST.createRefinement(
       self.ast,
       filter,
-      toAnnotations({ typeId: BrandTypeId, ...options })
+      toAnnotations({ typeId: { id: BrandTypeId, params: { constructor } }, ...options })
     )
     return make(ast)
   }

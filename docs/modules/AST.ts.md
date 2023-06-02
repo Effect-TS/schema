@@ -35,6 +35,7 @@ Added in v1.0.0
   - [anyKeyword](#anykeyword)
   - [bigIntKeyword](#bigintkeyword)
   - [booleanKeyword](#booleankeyword)
+  - [composeTransformation](#composetransformation)
   - [createDeclaration](#createdeclaration)
   - [createEnums](#createenums)
   - [createFinalPropertySignatureTransformation](#createfinalpropertysignaturetransformation)
@@ -90,6 +91,7 @@ Added in v1.0.0
   - [AnyKeyword (interface)](#anykeyword-interface)
   - [BigIntKeyword (interface)](#bigintkeyword-interface)
   - [BooleanKeyword (interface)](#booleankeyword-interface)
+  - [ComposeTransformation (interface)](#composetransformation-interface)
   - [Declaration (interface)](#declaration-interface)
   - [Enums (interface)](#enums-interface)
   - [FinalPropertySignatureTransformation (interface)](#finalpropertysignaturetransformation-interface)
@@ -356,6 +358,16 @@ Added in v1.0.0
 
 ```ts
 export declare const booleanKeyword: BooleanKeyword
+```
+
+Added in v1.0.0
+
+## composeTransformation
+
+**Signature**
+
+```ts
+export declare const composeTransformation: ComposeTransformation
 ```
 
 Added in v1.0.0
@@ -958,6 +970,18 @@ export interface BooleanKeyword extends Annotated {
 
 Added in v1.0.0
 
+## ComposeTransformation (interface)
+
+**Signature**
+
+```ts
+export interface ComposeTransformation {
+  readonly _tag: 'ComposeTransformation'
+}
+```
+
+Added in v1.0.0
+
 ## Declaration (interface)
 
 **Signature**
@@ -1203,7 +1227,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type TransformAST = FinalTransformation | TypeLiteralTransformation
+export type TransformAST = FinalTransformation | ComposeTransformation | TypeLiteralTransformation
 ```
 
 Added in v1.0.0
