@@ -26,6 +26,7 @@ Added in v1.0.0
   - [eitherFromSelf](#eitherfromself)
 - [Option](#option)
   - [option](#option)
+  - [optionFromNullable](#optionfromnullable)
   - [optionFromSelf](#optionfromself)
 - [ReadonlyMap](#readonlymap)
   - [readonlyMap](#readonlymap)
@@ -82,8 +83,6 @@ Added in v1.0.0
   - [NumberFromString](#numberfromstring)
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring)
-- [option](#option-1)
-  - [optionFromNullable](#optionfromnullable)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEffect](#parseeffect)
@@ -221,6 +220,16 @@ Added in v1.0.0
 export declare const option: <I, A>(
   value: Codec<I, A>
 ) => Codec<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
+```
+
+Added in v1.0.0
+
+## optionFromNullable
+
+**Signature**
+
+```ts
+export declare const optionFromNullable: <I, A>(value: Codec<I, A>) => Codec<I | null, Option<A>>
 ```
 
 Added in v1.0.0
@@ -851,18 +860,6 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 
 ```ts
 export declare const numberFromString: <I>(self: Codec<I, string>) => Codec<I, number>
-```
-
-Added in v1.0.0
-
-# option
-
-## optionFromNullable
-
-**Signature**
-
-```ts
-export declare const optionFromNullable: <I, A>(value: Codec<I, A>) => Codec<I | null, Option<A>>
 ```
 
 Added in v1.0.0

@@ -297,6 +297,37 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
     }
   )
 
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const BrandTypeId = Symbol.for("@effect/schema/BrandTypeId")
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const fromBrand = <C extends Brand<string | symbol>>(
+  constructor: Brand.Constructor<C>,
+  options?: AnnotationOptions<Brand.Unbranded<C>>
+) =>
+  <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
+    const filter = untracedMethod(() =>
+      (a: A, _, self: AST.AST): Option<PR.ParseError> => {
+        const e = constructor.either(a)
+        return E.isLeft(e) ?
+          O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
+          O.none()
+      }
+    )
+    const ast = AST.createRefinement(
+      self.ast,
+      filter,
+      toAnnotations({ typeId: { id: BrandTypeId, params: { constructor } }, ...options })
+    )
+    return make(ast)
+  }
+
 // ---------------------------------------------
 // primitives
 // ---------------------------------------------
@@ -791,7 +822,6 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   (self: Schema<A>): Schema<Spread<Omit<A, Keys[number]>>> => make(AST.omit(self.ast, keys))
 
 /**
- * @category model
  * @since 1.0.0
  */
 export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Constructor<To> {}
@@ -907,6 +937,22 @@ export const toAnnotations = <A>(
 }
 
 /**
+ * @category model
+ * @since 1.0.0
+ */
+export interface AnnotationOptions<A> extends AST.Annotations {
+  readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  readonly message?: AST.MessageAnnotation<A>
+  readonly identifier?: AST.IdentifierAnnotation
+  readonly title?: AST.TitleAnnotation
+  readonly description?: AST.DescriptionAnnotation
+  readonly examples?: AST.ExamplesAnnotation
+  readonly documentation?: AST.DocumentationAnnotation
+  readonly jsonSchema?: AST.JSONSchemaAnnotation
+  readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+}
+
+/**
  * @category combinators
  * @since 1.0.0
  */
@@ -931,27 +977,7 @@ export function filter<A>(
 }
 
 // ---------------------------------------------
-// filters
-// ---------------------------------------------
-
-/**
- * @category model
- * @since 1.0.0
- */
-export interface AnnotationOptions<A> extends AST.Annotations {
-  readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
-  readonly message?: AST.MessageAnnotation<A>
-  readonly identifier?: AST.IdentifierAnnotation
-  readonly title?: AST.TitleAnnotation
-  readonly description?: AST.DescriptionAnnotation
-  readonly examples?: AST.ExamplesAnnotation
-  readonly documentation?: AST.DocumentationAnnotation
-  readonly jsonSchema?: AST.JSONSchemaAnnotation
-  readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-}
-
-// ---------------------------------------------
-// string
+// string filters
 // ---------------------------------------------
 
 /**
@@ -961,7 +987,7 @@ export interface AnnotationOptions<A> extends AST.Annotations {
 export const MinLengthTypeId = Symbol.for("@effect/schema/MinLengthTypeId")
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const minLength = <A extends string>(
@@ -983,7 +1009,7 @@ export const minLength = <A extends string>(
     )
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const nonEmpty = <A extends string>(
@@ -997,7 +1023,7 @@ export const nonEmpty = <A extends string>(
 export const MaxLengthTypeId = Symbol.for("@effect/schema/MaxLengthTypeId")
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const maxLength = <A extends string>(
@@ -1019,7 +1045,7 @@ export const maxLength = <A extends string>(
     )
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const length = <A extends string>(
@@ -1034,7 +1060,7 @@ export const length = <A extends string>(
 export const PatternTypeId = Symbol.for("@effect/schema/PatternTypeId")
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const pattern = <A extends string>(
@@ -1065,30 +1091,10 @@ export const pattern = <A extends string>(
  * @category type id
  * @since 1.0.0
  */
-export const UUIDTypeId = Symbol.for("@effect/schema/UUIDTypeId")
-
-const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const UUID: Schema<string> = pipe(
-  string,
-  pattern(uuidRegex, {
-    typeId: UUIDTypeId,
-    arbitrary: (): Arbitrary<string> => (fc) => fc.uuid()
-  })
-)
-
-/**
- * @category type id
- * @since 1.0.0
- */
 export const StartsWithTypeId = Symbol.for("@effect/schema/StartsWithTypeId")
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const startsWith = <A extends string>(
@@ -1116,7 +1122,7 @@ export const startsWith = <A extends string>(
 export const EndsWithTypeId = Symbol.for("@effect/schema/EndsWithTypeId")
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const endsWith = <A extends string>(
@@ -1144,7 +1150,7 @@ export const endsWith = <A extends string>(
 export const IncludesTypeId = Symbol.for("@effect/schema/IncludesTypeId")
 
 /**
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const includes = <A extends string>(
@@ -1179,7 +1185,7 @@ const trimmedRegex = /^\S.*\S$|^\S$|^$/
  * Note. This combinator does not make any transformations, it only validates.
  * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
  *
- * @category string
+ * @category string filters
  * @since 1.0.0
  */
 export const trimmed = <A extends string>(options?: AnnotationOptions<A>) =>
@@ -1197,14 +1203,8 @@ export const trimmed = <A extends string>(options?: AnnotationOptions<A>) =>
       })
     )
 
-/**
- * @category string
- * @since 1.0.0
- */
-export const Trimmed: Schema<string> = pipe(string, trimmed())
-
 // ---------------------------------------------
-// number
+// number filters
 // ---------------------------------------------
 
 /**
@@ -1214,7 +1214,7 @@ export const Trimmed: Schema<string> = pipe(string, trimmed())
 export const GreaterThanTypeId = Symbol.for("@effect/schema/GreaterThanTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const greaterThan = <A extends number>(
@@ -1239,7 +1239,7 @@ export const greaterThan = <A extends number>(
 export const GreaterThanOrEqualToTypeId = Symbol.for("@effect/schema/GreaterThanOrEqualToTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const greaterThanOrEqualTo = <A extends number>(
@@ -1264,7 +1264,7 @@ export const greaterThanOrEqualTo = <A extends number>(
 export const LessThanTypeId = Symbol.for("@effect/schema/LessThanTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const lessThan = <A extends number>(max: number, options?: AnnotationOptions<A>) =>
@@ -1286,7 +1286,7 @@ export const lessThan = <A extends number>(max: number, options?: AnnotationOpti
 export const LessThanOrEqualToTypeId = Symbol.for("@effect/schema/LessThanOrEqualToTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const lessThanOrEqualTo = <A extends number>(
@@ -1311,7 +1311,7 @@ export const lessThanOrEqualTo = <A extends number>(
 export const IntTypeId = Symbol.for("@effect/schema/IntTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const int = <A extends number>(options?: AnnotationOptions<A>) =>
@@ -1333,7 +1333,7 @@ export const int = <A extends number>(options?: AnnotationOptions<A>) =>
 export const FiniteTypeId = Symbol.for("@effect/schema/FiniteTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const finite = <A extends number>(options?: AnnotationOptions<A>) =>
@@ -1354,7 +1354,7 @@ export const finite = <A extends number>(options?: AnnotationOptions<A>) =>
 export const BetweenTypeId = Symbol.for("@effect/schema/BetweenTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const between = <A extends number>(
@@ -1380,7 +1380,7 @@ export const between = <A extends number>(
 export const NonNaNTypeId = Symbol.for("@effect/schema/NonNaNTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const nonNaN = <A extends number>(options?: AnnotationOptions<A>) =>
@@ -1395,19 +1395,13 @@ export const nonNaN = <A extends number>(options?: AnnotationOptions<A>) =>
     )
 
 /**
- * @category number
- * @since 1.0.0
- */
-export const NonNaN = pipe(number, nonNaN())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const PositiveTypeId = Symbol.for("@effect/schema/PositiveTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const positive = <A extends number>(
@@ -1420,19 +1414,13 @@ export const positive = <A extends number>(
   })
 
 /**
- * @category number
- * @since 1.0.0
- */
-export const Positive = pipe(number, positive())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const NegativeTypeId = Symbol.for("@effect/schema/NegativeTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const negative = <A extends number>(
@@ -1445,19 +1433,13 @@ export const negative = <A extends number>(
   })
 
 /**
- * @category number
- * @since 1.0.0
- */
-export const Negative = pipe(number, negative())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const NonNegativeTypeId = Symbol.for("@effect/schema/NonNegativeTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const nonNegative = <A extends number>(
@@ -1470,19 +1452,13 @@ export const nonNegative = <A extends number>(
   })
 
 /**
- * @category number
- * @since 1.0.0
- */
-export const NonNegative = pipe(number, nonNegative())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const NonPositiveTypeId = Symbol.for("@effect/schema/NonPositiveTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const nonPositive = <A extends number>(
@@ -1495,19 +1471,13 @@ export const nonPositive = <A extends number>(
   })
 
 /**
- * @category number
- * @since 1.0.0
- */
-export const NonPositive = pipe(number, nonPositive())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const MultipleOfTypeId = Symbol.for("@effect/schema/MultipleOfTypeId")
 
 /**
- * @category number
+ * @category number filters
  * @since 1.0.0
  */
 export const multipleOf = <A extends number>(
@@ -1526,7 +1496,7 @@ export const multipleOf = <A extends number>(
     )
 
 // ---------------------------------------------
-// bigint
+// bigint filters
 // ---------------------------------------------
 
 /**
@@ -1536,7 +1506,7 @@ export const multipleOf = <A extends number>(
 export const GreaterThanBigintTypeId = Symbol.for("@effect/schema/GreaterThanBigintTypeId")
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const greaterThanBigint = <A extends bigint>(
@@ -1563,7 +1533,7 @@ export const GreaterThanOrEqualToBigintTypeId = Symbol.for(
 )
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const greaterThanOrEqualToBigint = <A extends bigint>(
@@ -1588,7 +1558,7 @@ export const greaterThanOrEqualToBigint = <A extends bigint>(
 export const LessThanBigintTypeId = Symbol.for("@effect/schema/LessThanBigintTypeId")
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const lessThanBigint = <A extends bigint>(
@@ -1615,7 +1585,7 @@ export const LessThanOrEqualToBigintTypeId = Symbol.for(
 )
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const lessThanOrEqualToBigint = <A extends bigint>(
@@ -1640,7 +1610,7 @@ export const lessThanOrEqualToBigint = <A extends bigint>(
 export const BetweenBigintTypeId = Symbol.for("@effect/schema/BetweenBigintTypeId")
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const betweenBigint = <A extends bigint>(
@@ -1666,7 +1636,7 @@ export const betweenBigint = <A extends bigint>(
 export const PositiveBigintTypeId = Symbol.for("@effect/schema/PositiveBigintTypeId")
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const positiveBigint = <A extends bigint>(
@@ -1679,19 +1649,13 @@ export const positiveBigint = <A extends bigint>(
   })
 
 /**
- * @category bigint
- * @since 1.0.0
- */
-export const PositiveBigint = pipe(bigint, positiveBigint())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const NegativeBigintTypeId = Symbol.for("@effect/schema/NegativeBigintTypeId")
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const negativeBigint = <A extends bigint>(
@@ -1704,19 +1668,13 @@ export const negativeBigint = <A extends bigint>(
   })
 
 /**
- * @category bigint
- * @since 1.0.0
- */
-export const NegativeBigint = pipe(bigint, negativeBigint())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const NonPositiveBigintTypeId = Symbol.for("@effect/schema/NonPositiveBigintTypeId")
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const nonPositiveBigint = <A extends bigint>(
@@ -1729,19 +1687,13 @@ export const nonPositiveBigint = <A extends bigint>(
   })
 
 /**
- * @category bigint
- * @since 1.0.0
- */
-export const NonPositiveBigint = pipe(bigint, nonPositiveBigint())
-
-/**
  * @category type id
  * @since 1.0.0
  */
 export const NonNegativeBigintTypeId = Symbol.for("@effect/schema/NonNegativeBigintTypeId")
 
 /**
- * @category bigint
+ * @category bigint filters
  * @since 1.0.0
  */
 export const nonNegativeBigint = <A extends bigint>(
@@ -1753,11 +1705,186 @@ export const nonNegativeBigint = <A extends bigint>(
     ...options
   })
 
+// ---------------------------------------------
+// ReadonlyArray filters
+// ---------------------------------------------
+
 /**
- * @category bigint
+ * @category type id
  * @since 1.0.0
  */
-export const NonNegativeBigint = pipe(bigint, nonNegativeBigint())
+export const MinItemsTypeId = Symbol.for("@effect/schema/MinItemsTypeId")
+
+/**
+ * @category ReadonlyArray filters
+ * @since 1.0.0
+ */
+export const minItems = <A>(
+  n: number,
+  options?: AnnotationOptions<ReadonlyArray<A>>
+) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    pipe(
+      self,
+      filter((a): a is ReadonlyArray<A> => a.length >= n, {
+        typeId: MinItemsTypeId,
+        description: `an array of at least ${n} items`,
+        jsonSchema: { minItems: n },
+        ...options
+      })
+    )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const MaxItemsTypeId = Symbol.for("@effect/schema/MaxItemsTypeId")
+
+/**
+ * @category ReadonlyArray filters
+ * @since 1.0.0
+ */
+export const maxItems = <A>(
+  n: number,
+  options?: AnnotationOptions<ReadonlyArray<A>>
+) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    pipe(
+      self,
+      filter((a): a is ReadonlyArray<A> => a.length <= n, {
+        typeId: MaxItemsTypeId,
+        description: `an array of at most ${n} items`,
+        jsonSchema: { maxItems: n },
+        ...options
+      })
+    )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const ItemsCountTypeId = Symbol.for("@effect/schema/ItemsCountTypeId")
+
+/**
+ * @category ReadonlyArray filters
+ * @since 1.0.0
+ */
+export const itemsCount = <A>(
+  n: number,
+  options?: AnnotationOptions<ReadonlyArray<A>>
+) =>
+  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+    pipe(
+      self,
+      filter((a): a is ReadonlyArray<A> => a.length === n, {
+        typeId: ItemsCountTypeId,
+        description: `an array of exactly ${n} items`,
+        jsonSchema: { minItems: n, maxItems: n },
+        ...options
+      })
+    )
+
+// ---------------------------------------------
+// data types
+// ---------------------------------------------
+
+// ---------------------------------------------
+// string constructors
+// ---------------------------------------------
+
+/**
+ * @category string constructors
+ * @since 1.0.0
+ */
+export const Trimmed: Schema<string> = pipe(string, trimmed())
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const UUIDTypeId = Symbol.for("@effect/schema/UUIDTypeId")
+
+const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/i
+
+/**
+ * @category string constructors
+ * @since 1.0.0
+ */
+export const UUID: Schema<string> = pipe(
+  string,
+  pattern(uuidRegex, {
+    typeId: UUIDTypeId,
+    arbitrary: (): Arbitrary<string> => (fc) => fc.uuid()
+  })
+)
+
+// ---------------------------------------------
+// number constructors
+// ---------------------------------------------
+
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const NonNaN: Schema<number> = pipe(number, nonNaN())
+
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const Int: Schema<number> = pipe(number, int())
+
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const Positive: Schema<number> = pipe(number, positive())
+
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const Negative: Schema<number> = pipe(number, negative())
+
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const NonNegative: Schema<number> = pipe(number, nonNegative())
+
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const NonPositive: Schema<number> = pipe(number, nonPositive())
+
+// ---------------------------------------------
+// bigint constructors
+// ---------------------------------------------
+
+/**
+ * @category bigint constructors
+ * @since 1.0.0
+ */
+export const PositiveBigint: Schema<bigint> = pipe(bigint, positiveBigint())
+
+/**
+ * @category bigint constructors
+ * @since 1.0.0
+ */
+export const NegativeBigint: Schema<bigint> = pipe(bigint, negativeBigint())
+
+/**
+ * @category bigint constructors
+ * @since 1.0.0
+ */
+export const NonNegativeBigint: Schema<bigint> = pipe(bigint, nonNegativeBigint())
+
+/**
+ * @category bigint constructors
+ * @since 1.0.0
+ */
+export const NonPositiveBigint: Schema<bigint> = pipe(bigint, nonPositiveBigint())
 
 // ---------------------------------------------
 // Date
@@ -1768,7 +1895,7 @@ const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date()
 const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
 
 /**
- * @category Date
+ * @category Date constructors
  * @since 1.0.0
  */
 export const Date: Schema<Date> = declare(
@@ -1791,7 +1918,7 @@ export const ValidDateTypeId = Symbol.for("@effect/schema/ValidDateTypeId")
 /**
  * A filter excluding invalid dates (e.g. `new Date("fail")`).
  *
- * @category Date
+ * @category Date combinators
  * @since 1.0.0
  */
 export const validDate = (options?: AnnotationOptions<Date>) =>
@@ -1808,45 +1935,10 @@ export const validDate = (options?: AnnotationOptions<Date>) =>
 /**
  * A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
  *
- * @category Date
+ * @category Date constructors
  * @since 1.0.0
  */
 export const ValidDate: Schema<Date> = pipe(Date, validDate())
-
-// ---------------------------------------------
-// Brand
-// ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const BrandTypeId = Symbol.for("@effect/schema/BrandTypeId")
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const fromBrand = <C extends Brand<string | symbol>>(
-  constructor: Brand.Constructor<C>,
-  options?: AnnotationOptions<Brand.Unbranded<C>>
-) =>
-  <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
-    const filter = untracedMethod(() =>
-      (a: A, _, self: AST.AST): Option<PR.ParseError> => {
-        const e = constructor.either(a)
-        return E.isLeft(e) ?
-          O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
-          O.none()
-      }
-    )
-    const ast = AST.createRefinement(
-      self.ast,
-      filter,
-      toAnnotations({ typeId: { id: BrandTypeId, params: { constructor } }, ...options })
-    )
-    return make(ast)
-  }
 
 // ---------------------------------------------
 // Chunk
@@ -1861,7 +1953,7 @@ export const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
   (c) => `Chunk(${C.toReadonlyArray(c).map(item).join(", ")})`
 
 /**
- * @category constructors
+ * @category Chunk constructors
  * @since 1.0.0
  */
 export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
@@ -1908,13 +2000,13 @@ export const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArr
 ): Pretty<D.Data<A>> => (d) => `Data(${item(d)})`
 
 /**
- * @category combinators
+ * @category Data constructors
  * @since 1.0.0
  */
 export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Schema<A>
-): Schema<D.Data<A>> => {
-  return declare(
+): Schema<D.Data<A>> =>
+  declare(
     [item],
     item,
     <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(item: Schema<A>) => {
@@ -1930,7 +2022,6 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
       [I.ArbitraryHookId]: dataArbitrary
     }
   )
-}
 
 // ---------------------------------------------
 // Either
@@ -1962,7 +2053,7 @@ const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
   )
 
 /**
- * @category combinators
+ * @category Either constructors
  * @since 1.0.0
  */
 export const either = <E, A>(
@@ -2041,7 +2132,7 @@ export const JsonNumberTypeId = Symbol.for("@effect/schema/JsonNumberTypeId")
  * assert.deepStrictEqual(is(Number.POSITIVE_INFINITY), false)
  * assert.deepStrictEqual(is(Number.NEGATIVE_INFINITY), false)
  *
- * @category Json
+ * @category Json constructors
  * @since 1.0.0
  */
 export const JsonNumber = pipe(
@@ -2053,7 +2144,7 @@ export const JsonNumber = pipe(
 )
 
 /**
- * @category Json
+ * @category Json constructors
  * @since 1.0.0
  */
 export const json: Schema<Json> = lazy(() =>
@@ -2095,7 +2186,7 @@ const optionInline = <A>(value: Schema<A>) =>
   )
 
 /**
- * @category combinators
+ * @category Option constructors
  * @since 1.0.0
  */
 export const option = <A>(value: Schema<A>): Schema<Option<A>> => {
@@ -2118,85 +2209,6 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> => {
     }
   )
 }
-
-// ---------------------------------------------
-// ReadonlyArray
-// ---------------------------------------------
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const MinItemsTypeId = Symbol.for("@effect/schema/MinItemsTypeId")
-
-/**
- * @category array
- * @since 1.0.0
- */
-export const minItems = <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) =>
-  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length >= n, {
-        typeId: MinItemsTypeId,
-        description: `an array of at least ${n} items`,
-        jsonSchema: { minItems: n },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const MaxItemsTypeId = Symbol.for("@effect/schema/MaxItemsTypeId")
-
-/**
- * @category array
- * @since 1.0.0
- */
-export const maxItems = <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) =>
-  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length <= n, {
-        typeId: MaxItemsTypeId,
-        description: `an array of at most ${n} items`,
-        jsonSchema: { maxItems: n },
-        ...options
-      })
-    )
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const ItemsCountTypeId = Symbol.for("@effect/schema/ItemsCountTypeId")
-
-/**
- * @category array
- * @since 1.0.0
- */
-export const itemsCount = <A>(
-  n: number,
-  options?: AnnotationOptions<ReadonlyArray<A>>
-) =>
-  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length === n, {
-        typeId: ItemsCountTypeId,
-        description: `an array of exactly ${n} items`,
-        jsonSchema: { minItems: n, maxItems: n },
-        ...options
-      })
-    )
 
 // ---------------------------------------------
 // ReadonlyMap
@@ -2225,7 +2237,7 @@ export const readonlyMapPretty = <K, V>(
     }])`
 
 /**
- * @category constructors
+ * @category ReadonlyMap constructors
  * @since 1.0.0
  */
 export const readonlyMap = <K, V>(
@@ -2252,7 +2264,7 @@ export const readonlyMap = <K, V>(
   )
 
 // ---------------------------------------------
-// data/ReadonlySet
+// ReadonlySet
 // ---------------------------------------------
 
 /** @internal */
@@ -2267,7 +2279,7 @@ export const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
   (set) => `new Set([${Array.from(set.values()).map((a) => item(a)).join(", ")}])`
 
 /**
- * @category constructors
+ * @category ReadonlySet constructors
  * @since 1.0.0
  */
 export const readonlySet = <A>(

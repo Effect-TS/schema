@@ -171,12 +171,18 @@ export {
  */
 export const make = <I, A>(ast: AST.AST): Codec<I, A> => ({ ast }) as any
 
-/**
-  Create a new `Codec` by transforming the input and output of an existing `Schema`
-  using the provided decoding functions.
+// TODO: fromBrand?
 
-  @category constructors
-  @since 1.0.0
+// ---------------------------------------------
+// combinators
+// ---------------------------------------------
+
+/**
+ * Create a new `Codec` by transforming the input and output of an existing `Schema`
+ * using the provided decoding functions.
+ *
+ * @category constructors
+ * @since 1.0.0
  */
 export const transformResult: {
   <I2, A2, A1>(
@@ -201,12 +207,12 @@ export const transformResult: {
   ))
 
 /**
-    Create a new `Codec` by transforming the input and output of an existing `Schema`
-    using the provided mapping functions.
-
-    @category constructors
-    @since 1.0.0
-  */
+ * Create a new `Codec` by transforming the input and output of an existing `Schema`
+ * using the provided mapping functions.
+ *
+ * @category constructors
+ * @since 1.0.0
+ */
 export const transform: {
   <I2, A2, A1>(
     to: Codec<I2, A2>,
@@ -229,10 +235,6 @@ export const transform: {
   ): Codec<I1, A2> =>
     transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)))
 )
-
-// ---------------------------------------------
-// combinators
-// ---------------------------------------------
 
 /**
  * @category combinators
@@ -278,6 +280,20 @@ export const tuple = <Elements extends ReadonlyArray<Codec<any, any>>>(
  * @category combinators
  * @since 1.0.0
  */
+export const optionalElement = <IE, E>(element: Codec<IE, E>) =>
+  <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
+    self: Codec<I, A>
+  ): Codec<readonly [...I, IE?], readonly [...A, E?]> => {
+    if (AST.isTuple(self.ast)) {
+      return make(AST.appendElement(self.ast, AST.createElement(element.ast, true)))
+    }
+    throw new Error("`optionalElement` is not supported on this transformation")
+  }
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
 export const rest = <IR, R>(rest: Codec<IR, R>) =>
   <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
     self: Codec<I, A>
@@ -306,20 +322,6 @@ export const element = <IE, E>(element: Codec<IE, E>) =>
  * @category combinators
  * @since 1.0.0
  */
-export const optionalElement = <IE, E>(element: Codec<IE, E>) =>
-  <I extends ReadonlyArray<any>, A extends ReadonlyArray<any>>(
-    self: Codec<I, A>
-  ): Codec<readonly [...I, IE?], readonly [...A, E?]> => {
-    if (AST.isTuple(self.ast)) {
-      return make(AST.appendElement(self.ast, AST.createElement(element.ast, true)))
-    }
-    throw new Error("`optionalElement` is not supported on this transformation")
-  }
-
-/**
- * @category combinators
- * @since 1.0.0
- */
 export const array = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, ReadonlyArray<A>> =>
   make(AST.createTuple([], O.some([item.ast]), true))
 
@@ -330,6 +332,15 @@ export const array = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, Readonly
 export const nonEmptyArray = <I, A>(
   item: Codec<I, A>
 ): Codec<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => pipe(tuple(item), rest(item))
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const lazy = <I, A>(
+  f: () => Codec<I, A>,
+  annotations?: AST.Annotated["annotations"]
+): Codec<I, A> => make(AST.createLazy(() => f().ast, annotations))
 
 /**
  * @since 1.0.0
@@ -467,6 +478,42 @@ export const struct = <
  * @category combinators
  * @since 1.0.0
  */
+export const record = <K extends string | symbol, I, A>(
+  key: S.Schema<K>,
+  value: Codec<I, A>
+): Codec<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
+  make(AST.createRecord(key.ast, value.ast, true))
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
+export const extend: {
+  <IB, B>(
+    that: Codec<IB, B>
+  ): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
+  <I, A, IB, B>(
+    self: Codec<I, A>,
+    that: Codec<IB, B>
+  ): Codec<S.Spread<I & IB>, S.Spread<A & B>>
+} = dual(
+  2,
+  <I, A, IB, B>(
+    self: Codec<I, A>,
+    that: Codec<IB, B>
+  ): Codec<S.Spread<I & IB>, S.Spread<A & B>> =>
+    make(
+      S.intersectUnionMembers(
+        AST.isUnion(self.ast) ? self.ast.types : [self.ast],
+        AST.isUnion(that.ast) ? that.ast.types : [that.ast]
+      )
+    )
+)
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Codec<I, A>
@@ -523,50 +570,7 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
     return make(AST.omit(ast, keys))
   }
 
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const record = <K extends string | symbol, I, A>(
-  key: S.Schema<K>,
-  value: Codec<I, A>
-): Codec<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
-  make(AST.createRecord(key.ast, value.ast, true))
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const extend: {
-  <IB, B>(
-    that: Codec<IB, B>
-  ): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
-  <I, A, IB, B>(
-    self: Codec<I, A>,
-    that: Codec<IB, B>
-  ): Codec<S.Spread<I & IB>, S.Spread<A & B>>
-} = dual(
-  2,
-  <I, A, IB, B>(
-    self: Codec<I, A>,
-    that: Codec<IB, B>
-  ): Codec<S.Spread<I & IB>, S.Spread<A & B>> =>
-    make(
-      S.intersectUnionMembers(
-        AST.isUnion(self.ast) ? self.ast.types : [self.ast],
-        AST.isUnion(that.ast) ? that.ast.types : [that.ast]
-      )
-    )
-)
-
-/**
- * @category combinators
- * @since 1.0.0
- */
-export const lazy = <I, A>(
-  f: () => Codec<I, A>,
-  annotations?: AST.Annotated["annotations"]
-): Codec<I, A> => make(AST.createLazy(() => f().ast, annotations))
+// TODO: brand?
 
 /**
  * @category combinators
@@ -783,11 +787,11 @@ export const clampBigint = (min: bigint, max: bigint) =>
 // ---------------------------------------------
 
 /**
-  A combinator that transforms a `string` into a valid `Date`.
-
-  @category Date
-  @since 1.0.0
-*/
+ * A combinator that transforms a `string` into a valid `Date`.
+ *
+ * @category Date
+ * @since 1.0.0
+ */
 export const dateFromString = <I>(self: Codec<I, string>): Codec<I, Date> =>
   transformResult(
     self,
@@ -863,7 +867,7 @@ export const option = <I, A>(
 }
 
 /**
- * @category option
+ * @category Option
  * @since 1.0.0
  */
 export const optionFromNullable = <I, A>(

@@ -12,28 +12,43 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [Date](#date)
-  - [Date](#date-1)
-  - [ValidDate](#validdate)
+- [Chunk constructors](#chunk-constructors)
+  - [chunk](#chunk)
+- [Data constructors](#data-constructors)
+  - [data](#data)
+- [Date combinators](#date-combinators)
   - [validDate](#validdate)
+- [Date constructors](#date-constructors)
+  - [Date](#date)
+  - [ValidDate](#validdate)
+- [Either constructors](#either-constructors)
+  - [either](#either)
 - [Json](#json)
   - [Json (type alias)](#json-type-alias)
   - [JsonArray (type alias)](#jsonarray-type-alias)
-  - [JsonNumber](#jsonnumber)
   - [JsonObject (type alias)](#jsonobject-type-alias)
+- [Json constructors](#json-constructors)
+  - [JsonNumber](#jsonnumber)
   - [json](#json)
-- [array](#array)
+- [Option constructors](#option-constructors)
+  - [option](#option)
+- [ReadonlyArray filters](#readonlyarray-filters)
   - [itemsCount](#itemscount)
   - [maxItems](#maxitems)
   - [minItems](#minitems)
+- [ReadonlyMap constructors](#readonlymap-constructors)
+  - [readonlyMap](#readonlymap)
+- [ReadonlySet constructors](#readonlyset-constructors)
+  - [readonlySet](#readonlyset)
 - [asserts](#asserts)
   - [ToAsserts](#toasserts)
   - [asserts](#asserts-1)
-- [bigint](#bigint)
+- [bigint constructors](#bigint-constructors)
   - [NegativeBigint](#negativebigint)
   - [NonNegativeBigint](#nonnegativebigint)
   - [NonPositiveBigint](#nonpositivebigint)
   - [PositiveBigint](#positivebigint)
+- [bigint filters](#bigint-filters)
   - [betweenBigint](#betweenbigint)
   - [greaterThanBigint](#greaterthanbigint)
   - [greaterThanOrEqualToBigint](#greaterthanorequaltobigint)
@@ -45,20 +60,16 @@ Added in v1.0.0
   - [positiveBigint](#positivebigint)
 - [combinators](#combinators)
   - [annotations](#annotations)
-  - [array](#array-1)
+  - [array](#array)
   - [brand](#brand)
-  - [data](#data)
-  - [either](#either)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
-  - [fromBrand](#frombrand)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
   - [omit](#omit)
-  - [option](#option)
   - [optionalElement](#optionalelement)
   - [partial](#partial)
   - [pick](#pick)
@@ -69,32 +80,30 @@ Added in v1.0.0
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
-  - [UUID](#uuid)
-  - [chunk](#chunk)
   - [declare](#declare)
   - [enums](#enums)
+  - [fromBrand](#frombrand)
   - [instanceOf](#instanceof)
   - [literal](#literal)
   - [make](#make)
   - [propertySignature](#propertysignature)
-  - [readonlyMap](#readonlymap)
-  - [readonlySet](#readonlyset)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [guards](#guards)
   - [is](#is)
 - [model](#model)
   - [AnnotationOptions (interface)](#annotationoptions-interface)
-  - [BrandSchema (interface)](#brandschema-interface)
   - [Schema (interface)](#schema-interface)
   - [SchemaTypeId](#schematypeid)
   - [SchemaTypeId (type alias)](#schematypeid-type-alias)
-- [number](#number)
+- [number constructors](#number-constructors)
+  - [Int](#int)
   - [Negative](#negative)
   - [NonNaN](#nonnan)
   - [NonNegative](#nonnegative)
   - [NonPositive](#nonpositive)
   - [Positive](#positive)
+- [number filters](#number-filters)
   - [between](#between)
   - [finite](#finite)
   - [greaterThan](#greaterthan)
@@ -110,19 +119,21 @@ Added in v1.0.0
   - [positive](#positive)
 - [primitives](#primitives)
   - [any](#any)
-  - [bigint](#bigint-1)
+  - [bigint](#bigint)
   - [boolean](#boolean)
   - [never](#never)
   - [null](#null)
-  - [number](#number-1)
+  - [number](#number)
   - [object](#object)
   - [string](#string)
   - [symbol](#symbol)
   - [undefined](#undefined)
   - [unknown](#unknown)
   - [void](#void)
-- [string](#string-1)
+- [string constructors](#string-constructors)
   - [Trimmed](#trimmed)
+  - [UUID](#uuid)
+- [string filters](#string-filters)
   - [endsWith](#endswith)
   - [includes](#includes)
   - [length](#length)
@@ -171,6 +182,7 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
+  - [BrandSchema (interface)](#brandschema-interface)
   - [Join (type alias)](#join-type-alias)
   - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
   - [OptionalSchemaPropertySignature (interface)](#optionalschemapropertysignature-interface)
@@ -190,7 +202,47 @@ Added in v1.0.0
 
 ---
 
-# Date
+# Chunk constructors
+
+## chunk
+
+**Signature**
+
+```ts
+export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
+```
+
+Added in v1.0.0
+
+# Data constructors
+
+## data
+
+**Signature**
+
+```ts
+export declare const data: <A extends readonly any[] | Readonly<Record<string, any>>>(
+  item: Schema<A>
+) => Schema<D.Data<A>>
+```
+
+Added in v1.0.0
+
+# Date combinators
+
+## validDate
+
+A filter excluding invalid dates (e.g. `new Date("fail")`).
+
+**Signature**
+
+```ts
+export declare const validDate: (options?: AnnotationOptions<Date>) => (self: Schema<Date>) => Schema<Date>
+```
+
+Added in v1.0.0
+
+# Date constructors
 
 ## Date
 
@@ -214,14 +266,14 @@ export declare const ValidDate: Schema<Date>
 
 Added in v1.0.0
 
-## validDate
+# Either constructors
 
-A filter excluding invalid dates (e.g. `new Date("fail")`).
+## either
 
 **Signature**
 
 ```ts
-export declare const validDate: (options?: AnnotationOptions<Date>) => (self: Schema<Date>) => Schema<Date>
+export declare const either: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -247,6 +299,18 @@ export type JsonArray = ReadonlyArray<Json>
 ```
 
 Added in v1.0.0
+
+## JsonObject (type alias)
+
+**Signature**
+
+```ts
+export type JsonObject = { readonly [key: string]: Json }
+```
+
+Added in v1.0.0
+
+# Json constructors
 
 ## JsonNumber
 
@@ -275,16 +339,6 @@ assert.deepStrictEqual(is(Number.NEGATIVE_INFINITY), false)
 
 Added in v1.0.0
 
-## JsonObject (type alias)
-
-**Signature**
-
-```ts
-export type JsonObject = { readonly [key: string]: Json }
-```
-
-Added in v1.0.0
-
 ## json
 
 **Signature**
@@ -295,7 +349,19 @@ export declare const json: Schema<Json>
 
 Added in v1.0.0
 
-# array
+# Option constructors
+
+## option
+
+**Signature**
+
+```ts
+export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
+```
+
+Added in v1.0.0
+
+# ReadonlyArray filters
 
 ## itemsCount
 
@@ -336,6 +402,30 @@ export declare const minItems: <A>(
 
 Added in v1.0.0
 
+# ReadonlyMap constructors
+
+## readonlyMap
+
+**Signature**
+
+```ts
+export declare const readonlyMap: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
+```
+
+Added in v1.0.0
+
+# ReadonlySet constructors
+
+## readonlySet
+
+**Signature**
+
+```ts
+export declare const readonlySet: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
+```
+
+Added in v1.0.0
+
 # asserts
 
 ## ToAsserts
@@ -360,7 +450,7 @@ export declare const asserts: <A>(
 
 Added in v1.0.0
 
-# bigint
+# bigint constructors
 
 ## NegativeBigint
 
@@ -401,6 +491,8 @@ export declare const PositiveBigint: Schema<bigint>
 ```
 
 Added in v1.0.0
+
+# bigint filters
 
 ## betweenBigint
 
@@ -567,28 +659,6 @@ type Int = S.To<typeof Int> // number & Brand<"Int">
 
 Added in v1.0.0
 
-## data
-
-**Signature**
-
-```ts
-export declare const data: <A extends readonly any[] | Readonly<Record<string, any>>>(
-  item: Schema<A>
-) => Schema<D.Data<A>>
-```
-
-Added in v1.0.0
-
-## either
-
-**Signature**
-
-```ts
-export declare const either: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>
-```
-
-Added in v1.0.0
-
 ## element
 
 **Signature**
@@ -627,19 +697,6 @@ export declare function filter<B extends A, A = B>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
 ): (self: Schema<B>) => Schema<B>
-```
-
-Added in v1.0.0
-
-## fromBrand
-
-**Signature**
-
-```ts
-export declare const fromBrand: <C extends Brand<string | symbol>>(
-  constructor: Brand.Constructor<C>,
-  options?: AnnotationOptions<Brand.Unbranded<C>> | undefined
-) => <A extends Brand.Unbranded<C>>(self: Schema<A>) => Schema<A & C>
 ```
 
 Added in v1.0.0
@@ -692,16 +749,6 @@ Added in v1.0.0
 export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => (self: Schema<A>) => Schema<Spread<Omit<A, Keys[number]>>>
-```
-
-Added in v1.0.0
-
-## option
-
-**Signature**
-
-```ts
-export declare const option: <A>(value: Schema<A>) => Schema<Option<A>>
 ```
 
 Added in v1.0.0
@@ -825,26 +872,6 @@ Added in v1.0.0
 
 # constructors
 
-## UUID
-
-**Signature**
-
-```ts
-export declare const UUID: Schema<string>
-```
-
-Added in v1.0.0
-
-## chunk
-
-**Signature**
-
-```ts
-export declare const chunk: <A>(item: Schema<A>) => Schema<Chunk<A>>
-```
-
-Added in v1.0.0
-
 ## declare
 
 **Signature**
@@ -868,6 +895,19 @@ Added in v1.0.0
 
 ```ts
 export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Schema<A[keyof A]>
+```
+
+Added in v1.0.0
+
+## fromBrand
+
+**Signature**
+
+```ts
+export declare const fromBrand: <C extends Brand<string | symbol>>(
+  constructor: Brand.Constructor<C>,
+  options?: AnnotationOptions<Brand.Unbranded<C>> | undefined
+) => <A extends Brand.Unbranded<C>>(self: Schema<A>) => Schema<A & C>
 ```
 
 Added in v1.0.0
@@ -916,26 +956,6 @@ export declare const propertySignature: <A>(
   schema: Schema<A>,
   options: AnnotationOptions<A>
 ) => SchemaPropertySignature<A, false, A, false>
-```
-
-Added in v1.0.0
-
-## readonlyMap
-
-**Signature**
-
-```ts
-export declare const readonlyMap: <K, V>(key: Schema<K>, value: Schema<V>) => Schema<ReadonlyMap<K, V>>
-```
-
-Added in v1.0.0
-
-## readonlySet
-
-**Signature**
-
-```ts
-export declare const readonlySet: <A>(item: Schema<A>) => Schema<ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -999,16 +1019,6 @@ export interface AnnotationOptions<A> extends AST.Annotations {
 
 Added in v1.0.0
 
-## BrandSchema (interface)
-
-**Signature**
-
-```ts
-export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Constructor<To> {}
-```
-
-Added in v1.0.0
-
 ## Schema (interface)
 
 **Signature**
@@ -1044,7 +1054,17 @@ export type SchemaTypeId = typeof SchemaTypeId
 
 Added in v1.0.0
 
-# number
+# number constructors
+
+## Int
+
+**Signature**
+
+```ts
+export declare const Int: Schema<number>
+```
+
+Added in v1.0.0
 
 ## Negative
 
@@ -1095,6 +1115,8 @@ export declare const Positive: Schema<number>
 ```
 
 Added in v1.0.0
+
+# number filters
 
 ## between
 
@@ -1381,7 +1403,7 @@ export declare const void: Schema<void>
 
 Added in v1.0.0
 
-# string
+# string constructors
 
 ## Trimmed
 
@@ -1392,6 +1414,18 @@ export declare const Trimmed: Schema<string>
 ```
 
 Added in v1.0.0
+
+## UUID
+
+**Signature**
+
+```ts
+export declare const UUID: Schema<string>
+```
+
+Added in v1.0.0
+
+# string filters
 
 ## endsWith
 
@@ -1886,6 +1920,16 @@ export declare const ValidDateTypeId: typeof ValidDateTypeId
 Added in v1.0.0
 
 # utils
+
+## BrandSchema (interface)
+
+**Signature**
+
+```ts
+export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Constructor<To> {}
+```
+
+Added in v1.0.0
 
 ## Join (type alias)
 
