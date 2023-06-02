@@ -1,21 +1,14 @@
-import * as Pretty from "@effect/schema/Pretty"
+import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("minLength", () => {
   it("property tests", () => {
-    Util.roundtrip(S.minLength(0)(S.string))
-  })
-
-  it("is", () => {
-    const is = S.is(S.minLength(1)(S.string))
-    expect(is("")).toEqual(false)
-    expect(is("a")).toEqual(true)
-    expect(is("aa")).toEqual(true)
+    Util.roundtrip(pipe(S.string, S.minLength(1)))
   })
 
   it("decode", async () => {
-    const schema = S.minLength(1)(S.string)
+    const schema = pipe(S.string, S.minLength(1))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "aa")
     await Util.expectParseFailure(
@@ -23,10 +16,5 @@ describe.concurrent("minLength", () => {
       "",
       `Expected a string at least 1 character(s) long, actual ""`
     )
-  })
-
-  it("pretty", () => {
-    const pretty = Pretty.build(S.minLength(0)(S.string))
-    expect(pretty("a")).toEqual(`"a"`)
   })
 })

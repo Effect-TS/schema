@@ -588,12 +588,7 @@ export function filter<A>(
   predicate: Predicate<A>,
   options?: S.AnnotationOptions<A>
 ): <I>(self: Codec<I, A>) => Codec<I, A> {
-  return <I>(self: Codec<I, A>) =>
-    make(AST.createRefinement(
-      self.ast,
-      (a: A, _, ast: AST.AST) => predicate(a) ? O.none() : O.some(PR.parseError([PR.type(ast, a)])),
-      S.toAnnotations(options)
-    ))
+  return <I>(self: Codec<I, A>) => make(S._filter(self.ast, predicate, options))
 }
 
 /**
@@ -661,6 +656,19 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
         ]
       )
     ))
+
+// ---------------------------------------------
+// string filters
+// ---------------------------------------------
+
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const minLength = <A extends string>(
+  minLength: number,
+  options?: S.AnnotationOptions<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._minLength(self.ast, minLength, options))
 
 // ---------------------------------------------
 // string

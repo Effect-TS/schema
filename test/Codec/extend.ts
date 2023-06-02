@@ -3,20 +3,6 @@ import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
-const X2 = C.transform(
-  S.string,
-  S.string,
-  (s) => s + s,
-  (s) => s.substring(0, s.length / 2)
-)
-
-const X3 = C.transform(
-  S.string,
-  S.string,
-  (s) => s + s + s,
-  (s) => s.substring(0, s.length / 3)
-)
-
 describe.concurrent("extend", () => {
   it(`struct with defaults + struct`, async () => {
     const schema = pipe(
@@ -88,8 +74,8 @@ describe.concurrent("extend", () => {
   it("struct + struct + record(string, X3)", async () => {
     const transform = pipe(
       S.struct({ a: S.string }),
-      C.extend(C.struct({ b: X2 })),
-      C.extend(C.record(S.string, X3))
+      C.extend(C.struct({ b: Util.X2 })),
+      C.extend(C.record(S.string, Util.X3))
     )
     await Util.expectParseSuccess(transform, { a: "a", b: "b" }, { a: "a", b: "bb" })
     await Util.expectParseSuccess(transform, { a: "a", b: "b", c: "c" }, {
@@ -109,8 +95,8 @@ describe.concurrent("extend", () => {
   it("struct + struct + record(symbol, X3)", async () => {
     const transform = pipe(
       S.struct({ a: S.string }),
-      C.extend(C.struct({ b: X2 })),
-      C.extend(C.record(S.symbol, X3))
+      C.extend(C.struct({ b: Util.X2 })),
+      C.extend(C.record(S.symbol, Util.X3))
     )
     const c = Symbol.for("@effect/schema/test/c")
     await Util.expectParseSuccess(transform, { a: "a", b: "b" }, { a: "a", b: "bb" })

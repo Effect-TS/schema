@@ -93,6 +93,8 @@ Added in v1.0.0
 - [string](#string)
   - [Trim](#trim)
   - [trim](#trim)
+- [string filters](#string-filters)
+  - [minLength](#minlength)
 - [utils](#utils)
   - [From (type alias)](#from-type-alias)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
@@ -958,6 +960,21 @@ This combinator allows removing whitespaces from the beginning and end of a stri
 
 ```ts
 export declare const trim: <I>(self: Codec<I, string>) => Codec<I, string>
+```
+
+Added in v1.0.0
+
+# string filters
+
+## minLength
+
+**Signature**
+
+```ts
+export declare const minLength: <A extends string>(
+  minLength: number,
+  options?: S.AnnotationOptions<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
 ```
 
 Added in v1.0.0

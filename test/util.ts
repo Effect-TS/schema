@@ -287,3 +287,17 @@ const formatDecodeError = (e: PR.ParseErrors): string => {
 export const printAST = <I, A>(codec: Codec<I, A>) => {
   console.log("%o", codec.ast)
 }
+
+export const X2 = C.transform(
+  S.string,
+  S.string,
+  (s) => s + s,
+  (s) => s.substring(0, s.length / 2)
+)
+
+export const X3 = C.transform(
+  S.string,
+  S.string,
+  (s) => s + s + s,
+  (s) => s.substring(0, s.length / 3)
+)

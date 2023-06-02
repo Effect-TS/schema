@@ -952,6 +952,18 @@ export interface AnnotationOptions<A> extends AST.Annotations {
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
 }
 
+/** @internal */
+export const _filter = <From extends AST.AST, A>(
+  from: From,
+  predicate: Predicate<A>,
+  options?: AnnotationOptions<A>
+): AST.Transform | AST.Refinement<From> =>
+  AST.createRefinement(
+    from,
+    (a: A, _, ast: AST.AST) => predicate(a) ? O.none() : O.some(PR.parseError([PR.type(ast, a)])),
+    toAnnotations(options)
+  )
+
 /**
  * @category combinators
  * @since 1.0.0
@@ -968,12 +980,7 @@ export function filter<A>(
   predicate: Predicate<A>,
   options?: AnnotationOptions<A>
 ): (self: Schema<A>) => Schema<A> {
-  return (self) =>
-    make(AST.createRefinement(
-      self.ast,
-      (a: A, _, ast: AST.AST) => predicate(a) ? O.none() : O.some(PR.parseError([PR.type(ast, a)])),
-      toAnnotations(options)
-    ))
+  return (self) => make(_filter(self.ast, predicate, options))
 }
 
 // ---------------------------------------------
@@ -986,6 +993,19 @@ export function filter<A>(
  */
 export const MinLengthTypeId = Symbol.for("@effect/schema/MinLengthTypeId")
 
+/** @internal */
+export const _minLength = <A extends string>(
+  ast: AST.AST,
+  minLength: number,
+  options?: AnnotationOptions<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a.length >= minLength, {
+    typeId: MinLengthTypeId,
+    description: `a string at least ${minLength} character(s) long`,
+    jsonSchema: { minLength },
+    ...options
+  })
+
 /**
  * @category string filters
  * @since 1.0.0
@@ -993,20 +1013,7 @@ export const MinLengthTypeId = Symbol.for("@effect/schema/MinLengthTypeId")
 export const minLength = <A extends string>(
   minLength: number,
   options?: AnnotationOptions<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.length >= minLength,
-        {
-          typeId: MinLengthTypeId,
-          description: `a string at least ${minLength} character(s) long`,
-          jsonSchema: { minLength },
-          ...options
-        }
-      )
-    )
+) => (self: Schema<A>): Schema<A> => make(_minLength(self.ast, minLength, options))
 
 /**
  * @category string filters
