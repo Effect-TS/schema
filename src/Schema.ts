@@ -29,14 +29,18 @@ import type { ParseResult } from "@effect/schema/ParseResult"
 import type { Pretty } from "@effect/schema/Pretty"
 import { formatErrors } from "@effect/schema/TreeFormatter"
 
+// ---------------------------------------------
+// model
+// ---------------------------------------------
+
 /**
- * @category symbols
+ * @category model
  * @since 1.0.0
  */
 export const SchemaTypeId = Symbol.for("@effect/schema/Schema")
 
 /**
- * @category symbols
+ * @category model
  * @since 1.0.0
  */
 export type SchemaTypeId = typeof SchemaTypeId
@@ -53,50 +57,53 @@ export interface Schema<A> {
 }
 
 /**
- * @category model
  * @since 1.0.0
  */
 export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To"]>[0]
 
+// ---------------------------------------------
+// validating / asserts / guards
+// ---------------------------------------------
+
 /* c8 ignore start */
 export {
   /**
-   * @category validation
+   * @category asserts
    * @since 1.0.0
    */
   asserts,
   /**
-   * @category validation
+   * @category guards
    * @since 1.0.0
    */
   is,
   /**
-   * @category validation
+   * @category validating
    * @since 1.0.0
    */
   validate,
   /**
-   * @category validation
+   * @category validating
    * @since 1.0.0
    */
   validateEffect,
   /**
-   * @category validation
+   * @category validating
    * @since 1.0.0
    */
   validateEither,
   /**
-   * @category validation
+   * @category validating
    * @since 1.0.0
    */
   validateOption,
   /**
-   * @category validation
+   * @category validating
    * @since 1.0.0
    */
   validatePromise,
   /**
-   * @category validation
+   * @category validating
    * @since 1.0.0
    */
   validateResult
@@ -104,6 +111,7 @@ export {
 
 export type {
   /**
+   * @category asserts
    * @since 1.0.0
    */
   ToAsserts
@@ -119,51 +127,6 @@ export type {
  */
 export const annotations = <A>(options: AnnotationOptions<A>) =>
   (self: Schema<A>): Schema<A> => make(AST.mergeAnnotations(self.ast, toAnnotations(options)))
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const message = <A>(message: AST.MessageAnnotation<A>): (self: Schema<A>) => Schema<A> =>
-  annotations({ message })
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const identifier = (
-  identifier: AST.IdentifierAnnotation
-): <A>(self: Schema<A>) => Schema<A> => annotations({ identifier })
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const title = (title: AST.TitleAnnotation): <A>(self: Schema<A>) => Schema<A> =>
-  annotations({ title })
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const description = (
-  description: AST.DescriptionAnnotation
-): <A>(self: Schema<A>) => Schema<A> => annotations({ description })
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const examples = (examples: AST.ExamplesAnnotation): <A>(self: Schema<A>) => Schema<A> =>
-  annotations({ examples })
-
-/**
- * @category annotations
- * @since 1.0.0
- */
-export const documentation = (
-  documentation: AST.DocumentationAnnotation
-): <A>(self: Schema<A>) => Schema<A> => annotations({ documentation })
 
 // ---------------------------------------------
 // constructors

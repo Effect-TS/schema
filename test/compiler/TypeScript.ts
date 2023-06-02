@@ -527,7 +527,7 @@ describe.concurrent.skip("TypeScript", () => {
       Apple,
       Banana
     }
-    const transform = pipe(S.enums(Fruits), S.identifier("Fruits"))
+    const transform = pipe(S.enums(Fruits), S.annotations({ identifier: "Fruits" }))
     const ts = typeScriptFor(C.to(transform))
     expect(printNodes(ts.nodes)).toEqual([
       `enum Fruits {

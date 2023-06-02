@@ -22,17 +22,13 @@ Added in v1.0.0
   - [JsonNumber](#jsonnumber)
   - [JsonObject (type alias)](#jsonobject-type-alias)
   - [json](#json)
-- [annotations](#annotations)
-  - [description](#description)
-  - [documentation](#documentation)
-  - [examples](#examples)
-  - [identifier](#identifier)
-  - [message](#message)
-  - [title](#title)
 - [array](#array)
   - [itemsCount](#itemscount)
   - [maxItems](#maxitems)
   - [minItems](#minitems)
+- [asserts](#asserts)
+  - [ToAsserts](#toasserts)
+  - [asserts](#asserts-1)
 - [bigint](#bigint)
   - [NegativeBigint](#negativebigint)
   - [NonNegativeBigint](#nonnegativebigint)
@@ -48,7 +44,7 @@ Added in v1.0.0
   - [nonPositiveBigint](#nonpositivebigint)
   - [positiveBigint](#positivebigint)
 - [combinators](#combinators)
-  - [annotations](#annotations-1)
+  - [annotations](#annotations)
   - [array](#array-1)
   - [brand](#brand)
   - [data](#data)
@@ -85,11 +81,14 @@ Added in v1.0.0
   - [readonlySet](#readonlyset)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
+- [guards](#guards)
+  - [is](#is)
 - [model](#model)
   - [AnnotationOptions (interface)](#annotationoptions-interface)
   - [BrandSchema (interface)](#brandschema-interface)
   - [Schema (interface)](#schema-interface)
-  - [To (type alias)](#to-type-alias)
+  - [SchemaTypeId](#schematypeid)
+  - [SchemaTypeId (type alias)](#schematypeid-type-alias)
 - [number](#number)
   - [Negative](#negative)
   - [NonNaN](#nonnan)
@@ -133,9 +132,6 @@ Added in v1.0.0
   - [pattern](#pattern)
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
-- [symbols](#symbols)
-  - [SchemaTypeId](#schematypeid)
-  - [SchemaTypeId (type alias)](#schematypeid-type-alias)
 - [type id](#type-id)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
   - [BetweenTypeId](#betweentypeid)
@@ -181,12 +177,10 @@ Added in v1.0.0
   - [PropertySignature (interface)](#propertysignature-interface)
   - [SchemaPropertySignature (interface)](#schemapropertysignature-interface)
   - [Spread (type alias)](#spread-type-alias)
-  - [ToAsserts](#toasserts)
+  - [To (type alias)](#to-type-alias)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [optional](#optional)
-- [validation](#validation)
-  - [asserts](#asserts)
-  - [is](#is)
+- [validating](#validating)
   - [validate](#validate)
   - [validateEffect](#validateeffect)
   - [validateEither](#validateeither)
@@ -301,68 +295,6 @@ export declare const json: Schema<Json>
 
 Added in v1.0.0
 
-# annotations
-
-## description
-
-**Signature**
-
-```ts
-export declare const description: (description: AST.DescriptionAnnotation) => <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## documentation
-
-**Signature**
-
-```ts
-export declare const documentation: (documentation: AST.DocumentationAnnotation) => <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## examples
-
-**Signature**
-
-```ts
-export declare const examples: (examples: AST.ExamplesAnnotation) => <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## identifier
-
-**Signature**
-
-```ts
-export declare const identifier: (identifier: AST.IdentifierAnnotation) => <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## message
-
-**Signature**
-
-```ts
-export declare const message: <A>(message: AST.MessageAnnotation<A>) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## title
-
-**Signature**
-
-```ts
-export declare const title: (title: AST.TitleAnnotation) => <A>(self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
 # array
 
 ## itemsCount
@@ -400,6 +332,30 @@ export declare const minItems: <A>(
   n: number,
   options?: AnnotationOptions<readonly A[]> | undefined
 ) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
+```
+
+Added in v1.0.0
+
+# asserts
+
+## ToAsserts
+
+**Signature**
+
+```ts
+export declare const ToAsserts: P.ToAsserts<S>
+```
+
+Added in v1.0.0
+
+## asserts
+
+**Signature**
+
+```ts
+export declare const asserts: <A>(
+  schema: Schema<A>
+) => (a: unknown, options?: AST.ParseOptions | undefined) => asserts a is A
 ```
 
 Added in v1.0.0
@@ -1009,6 +965,18 @@ export declare const uniqueSymbol: <S extends symbol>(
 
 Added in v1.0.0
 
+# guards
+
+## is
+
+**Signature**
+
+```ts
+export declare const is: <A>(schema: Schema<A>) => (a: unknown) => a is A
+```
+
+Added in v1.0.0
+
 # model
 
 ## AnnotationOptions (interface)
@@ -1056,12 +1024,22 @@ export interface Schema<A> {
 
 Added in v1.0.0
 
-## To (type alias)
+## SchemaTypeId
 
 **Signature**
 
 ```ts
-export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
+export declare const SchemaTypeId: typeof SchemaTypeId
+```
+
+Added in v1.0.0
+
+## SchemaTypeId (type alias)
+
+**Signature**
+
+```ts
+export type SchemaTypeId = typeof SchemaTypeId
 ```
 
 Added in v1.0.0
@@ -1535,28 +1513,6 @@ export declare const trimmed: <A extends string>(
 
 Added in v1.0.0
 
-# symbols
-
-## SchemaTypeId
-
-**Signature**
-
-```ts
-export declare const SchemaTypeId: typeof SchemaTypeId
-```
-
-Added in v1.0.0
-
-## SchemaTypeId (type alias)
-
-**Signature**
-
-```ts
-export type SchemaTypeId = typeof SchemaTypeId
-```
-
-Added in v1.0.0
-
 # type id
 
 ## BetweenBigintTypeId
@@ -2012,12 +1968,12 @@ export type Spread<A> = {
 
 Added in v1.0.0
 
-## ToAsserts
+## To (type alias)
 
 **Signature**
 
 ```ts
-export declare const ToAsserts: P.ToAsserts<S>
+export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
 ```
 
 Added in v1.0.0
@@ -2051,29 +2007,7 @@ export declare const optional: <A>(
 
 Added in v1.0.0
 
-# validation
-
-## asserts
-
-**Signature**
-
-```ts
-export declare const asserts: <A>(
-  schema: Schema<A>
-) => (a: unknown, options?: AST.ParseOptions | undefined) => asserts a is A
-```
-
-Added in v1.0.0
-
-## is
-
-**Signature**
-
-```ts
-export declare const is: <A>(schema: Schema<A>) => (a: unknown) => a is A
-```
-
-Added in v1.0.0
+# validating
 
 ## validate
 

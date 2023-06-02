@@ -22,6 +22,10 @@ import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 
+// ---------------------------------------------
+// model
+// ---------------------------------------------
+
 /**
  * @category model
  * @since 1.0.0
@@ -33,26 +37,34 @@ export interface Codec<From, To> {
 }
 
 /**
- * @category model
  * @since 1.0.0
  */
 export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S["From"]>[0]
 
 /**
- * @category model
  * @since 1.0.0
  */
 export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To"]>[0]
 
+// ---------------------------------------------
+// converters
+// ---------------------------------------------
+
 /**
+ * @category converters
  * @since 1.0.0
  */
 export const from = <I, A>(codec: Codec<I, A>): S.Schema<I> => S.make(AST.from(codec.ast))
 
 /**
+ * @category converters
  * @since 1.0.0
  */
 export const to = <I, A>(codec: Codec<I, A>): S.Schema<A> => S.make(AST.to(codec.ast))
+
+// ---------------------------------------------
+// decoding / encoding / parsing
+// ---------------------------------------------
 
 /* c8 ignore start */
 export {

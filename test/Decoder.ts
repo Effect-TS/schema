@@ -23,7 +23,7 @@ describe.concurrent("Decoder", () => {
       // initial schema, a string
       S.string,
       // add an error message for non-string values
-      S.message(() => "not a string"),
+      S.annotations({ message: () => "not a string" }),
       // add a constraint to the schema, only non-empty strings are valid
       S.nonEmpty({ message: () => "required" }),
       // add a constraint to the schema, only strings with a length less or equal than 10 are valid

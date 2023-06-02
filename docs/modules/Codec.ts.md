@@ -59,6 +59,9 @@ Added in v1.0.0
   - [make](#make)
   - [transform](#transform)
   - [transformResult](#transformresult)
+- [converters](#converters)
+  - [from](#from)
+  - [to](#to)
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeEffect](#decodeeffect)
@@ -75,8 +78,6 @@ Added in v1.0.0
   - [encodeResult](#encoderesult)
 - [model](#model)
   - [Codec (interface)](#codec-interface)
-  - [From (type alias)](#from-type-alias)
-  - [To (type alias)](#to-type-alias)
 - [number](#number)
   - [NumberFromString](#numberfromstring)
   - [clamp](#clamp)
@@ -94,11 +95,11 @@ Added in v1.0.0
   - [Trim](#trim)
   - [trim](#trim)
 - [utils](#utils)
+  - [From (type alias)](#from-type-alias)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
-  - [from](#from)
+  - [To (type alias)](#to-type-alias)
   - [optional](#optional)
   - [propertySignature](#propertysignature)
-  - [to](#to)
 
 ---
 
@@ -630,6 +631,28 @@ export declare const transformResult: {
 
 Added in v1.0.0
 
+# converters
+
+## from
+
+**Signature**
+
+```ts
+export declare const from: <I, A>(codec: Codec<I, A>) => S.Schema<I>
+```
+
+Added in v1.0.0
+
+## to
+
+**Signature**
+
+```ts
+export declare const to: <I, A>(codec: Codec<I, A>) => S.Schema<A>
+```
+
+Added in v1.0.0
+
 # decoding
 
 ## decode
@@ -790,26 +813,6 @@ export interface Codec<From, To> {
 
 Added in v1.0.0
 
-## From (type alias)
-
-**Signature**
-
-```ts
-export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S['From']>[0]
-```
-
-Added in v1.0.0
-
-## To (type alias)
-
-**Signature**
-
-```ts
-export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
-```
-
-Added in v1.0.0
-
 # number
 
 ## NumberFromString
@@ -964,6 +967,16 @@ Added in v1.0.0
 
 # utils
 
+## From (type alias)
+
+**Signature**
+
+```ts
+export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S['From']>[0]
+```
+
+Added in v1.0.0
+
 ## FromOptionalKeys (type alias)
 
 **Signature**
@@ -980,12 +993,12 @@ export type FromOptionalKeys<Fields> = {
 
 Added in v1.0.0
 
-## from
+## To (type alias)
 
 **Signature**
 
 ```ts
-export declare const from: <I, A>(codec: Codec<I, A>) => S.Schema<I>
+export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
 ```
 
 Added in v1.0.0
@@ -1012,16 +1025,6 @@ export declare const propertySignature: <I, A>(
   codec: Codec<I, A>,
   options: S.AnnotationOptions<A>
 ) => S.PropertySignature<I, false, A, false>
-```
-
-Added in v1.0.0
-
-## to
-
-**Signature**
-
-```ts
-export declare const to: <I, A>(codec: Codec<I, A>) => S.Schema<A>
 ```
 
 Added in v1.0.0
