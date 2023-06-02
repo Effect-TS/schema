@@ -347,7 +347,7 @@ export const lazy = <I, A>(
  */
 export const propertySignature = <I, A>(
   codec: Codec<I, A>,
-  options: S.AnnotationOptions<A>
+  options: S.DocAnnotations<A>
 ): S.PropertySignature<I, false, A, false> =>
   new S.PropertySignatureImpl({
     _tag: "PropertySignature",
@@ -360,12 +360,12 @@ export const propertySignature = <I, A>(
  */
 export const optional = <I, A>(
   codec: Codec<I, A>,
-  annotations?: AST.Annotated["annotations"]
+  options?: S.DocAnnotations<A>
 ): S.OptionalPropertySignature<I, true, A, true> =>
   new S.PropertySignatureImpl({
     _tag: "Optional",
     ast: codec.ast,
-    annotations
+    annotations: S.toAnnotations(options)
   })
 
 /**
@@ -578,15 +578,15 @@ export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
  */
 export function filter<C extends A, B extends A, A = C>(
   refinement: Refinement<A, B>,
-  options?: S.AnnotationOptions<A>
+  options?: S.FilterAnnotations<A>
 ): <I>(self: Codec<I, C>) => Codec<I, C & B>
 export function filter<B extends A, A = B>(
   predicate: Predicate<A>,
-  options?: S.AnnotationOptions<A>
+  options?: S.FilterAnnotations<A>
 ): <I>(self: Codec<I, B>) => Codec<I, B>
 export function filter<A>(
   predicate: Predicate<A>,
-  options?: S.AnnotationOptions<A>
+  options?: S.FilterAnnotations<A>
 ): <I>(self: Codec<I, A>) => Codec<I, A> {
   return <I>(self: Codec<I, A>) => make(S._filter(self.ast, predicate, options))
 }
@@ -667,7 +667,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
  */
 export const minLength = <A extends string>(
   minLength: number,
-  options?: S.AnnotationOptions<A>
+  options?: S.FilterAnnotations<A>
 ) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._minLength(self.ast, minLength, options))
 
 // ---------------------------------------------

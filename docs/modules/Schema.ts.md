@@ -92,7 +92,6 @@ Added in v1.0.0
 - [guards](#guards)
   - [is](#is)
 - [model](#model)
-  - [AnnotationOptions (interface)](#annotationoptions-interface)
   - [Schema (interface)](#schema-interface)
   - [SchemaTypeId](#schematypeid)
   - [SchemaTypeId (type alias)](#schematypeid-type-alias)
@@ -183,6 +182,8 @@ Added in v1.0.0
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [BrandSchema (interface)](#brandschema-interface)
+  - [DocAnnotations (interface)](#docannotations-interface)
+  - [FilterAnnotations (interface)](#filterannotations-interface)
   - [Join (type alias)](#join-type-alias)
   - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
   - [OptionalSchemaPropertySignature (interface)](#optionalschemapropertysignature-interface)
@@ -237,7 +238,7 @@ A filter excluding invalid dates (e.g. `new Date("fail")`).
 **Signature**
 
 ```ts
-export declare const validDate: (options?: AnnotationOptions<Date>) => (self: Schema<Date>) => Schema<Date>
+export declare const validDate: (options?: FilterAnnotations<Date>) => (self: Schema<Date>) => Schema<Date>
 ```
 
 Added in v1.0.0
@@ -370,7 +371,7 @@ Added in v1.0.0
 ```ts
 export declare const itemsCount: <A>(
   n: number,
-  options?: AnnotationOptions<readonly A[]> | undefined
+  options?: FilterAnnotations<readonly A[]> | undefined
 ) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
 ```
 
@@ -383,7 +384,7 @@ Added in v1.0.0
 ```ts
 export declare const maxItems: <A>(
   n: number,
-  options?: AnnotationOptions<readonly A[]> | undefined
+  options?: FilterAnnotations<readonly A[]> | undefined
 ) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
 ```
 
@@ -396,7 +397,7 @@ Added in v1.0.0
 ```ts
 export declare const minItems: <A>(
   n: number,
-  options?: AnnotationOptions<readonly A[]> | undefined
+  options?: FilterAnnotations<readonly A[]> | undefined
 ) => (self: Schema<readonly A[]>) => Schema<readonly A[]>
 ```
 
@@ -502,7 +503,7 @@ Added in v1.0.0
 export declare const betweenBigint: <A extends bigint>(
   min: bigint,
   max: bigint,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -515,7 +516,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThanBigint: <A extends bigint>(
   min: bigint,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -528,7 +529,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThanOrEqualToBigint: <A extends bigint>(
   min: bigint,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -541,7 +542,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThanBigint: <A extends bigint>(
   max: bigint,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -554,7 +555,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThanOrEqualToBigint: <A extends bigint>(
   max: bigint,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -566,7 +567,7 @@ Added in v1.0.0
 
 ```ts
 export declare const negativeBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -578,7 +579,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNegativeBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -590,7 +591,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonPositiveBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -602,7 +603,7 @@ Added in v1.0.0
 
 ```ts
 export declare const positiveBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -615,7 +616,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const annotations: <A>(options: AnnotationOptions<A>) => (self: Schema<A>) => Schema<A>
+export declare const annotations: <A>(options: DocAnnotations<A>) => (self: Schema<A>) => Schema<A>
 ```
 
 Added in v1.0.0
@@ -643,7 +644,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 ```ts
 export declare const brand: <B extends string | symbol, A>(
   brand: B,
-  options?: AnnotationOptions<A> | undefined
+  options?: DocAnnotations<A> | undefined
 ) => (self: Schema<A>) => BrandSchema<A & Brand<B>>
 ```
 
@@ -691,11 +692,11 @@ Added in v1.0.0
 ```ts
 export declare function filter<C extends A, B extends A, A = C>(
   refinement: Refinement<A, B>,
-  options?: AnnotationOptions<A>
+  options?: FilterAnnotations<A>
 ): (self: Schema<C>) => Schema<C & B>
 export declare function filter<B extends A, A = B>(
   predicate: Predicate<A>,
-  options?: AnnotationOptions<A>
+  options?: FilterAnnotations<A>
 ): (self: Schema<B>) => Schema<B>
 ```
 
@@ -906,7 +907,7 @@ Added in v1.0.0
 ```ts
 export declare const fromBrand: <C extends Brand<string | symbol>>(
   constructor: Brand.Constructor<C>,
-  options?: AnnotationOptions<Brand.Unbranded<C>> | undefined
+  options?: FilterAnnotations<Brand.Unbranded<C>> | undefined
 ) => <A extends Brand.Unbranded<C>>(self: Schema<A>) => Schema<A & C>
 ```
 
@@ -919,7 +920,7 @@ Added in v1.0.0
 ```ts
 export declare const instanceOf: <A extends abstract new (...args: any) => any>(
   constructor: A,
-  options?: AnnotationOptions<object>
+  options?: FilterAnnotations<unknown>
 ) => Schema<InstanceType<A>>
 ```
 
@@ -954,7 +955,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <A>(
   schema: Schema<A>,
-  options: AnnotationOptions<A>
+  options: DocAnnotations<A>
 ) => SchemaPropertySignature<A, false, A, false>
 ```
 
@@ -998,26 +999,6 @@ export declare const is: <A>(schema: Schema<A>) => (a: unknown) => a is A
 Added in v1.0.0
 
 # model
-
-## AnnotationOptions (interface)
-
-**Signature**
-
-```ts
-export interface AnnotationOptions<A> extends AST.Annotations {
-  readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
-  readonly message?: AST.MessageAnnotation<A>
-  readonly identifier?: AST.IdentifierAnnotation
-  readonly title?: AST.TitleAnnotation
-  readonly description?: AST.DescriptionAnnotation
-  readonly examples?: AST.ExamplesAnnotation
-  readonly documentation?: AST.DocumentationAnnotation
-  readonly jsonSchema?: AST.JSONSchemaAnnotation
-  readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-}
-```
-
-Added in v1.0.0
 
 ## Schema (interface)
 
@@ -1126,7 +1107,7 @@ Added in v1.0.0
 export declare const between: <A extends number>(
   min: number,
   max: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1138,7 +1119,7 @@ Added in v1.0.0
 
 ```ts
 export declare const finite: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1151,7 +1132,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThan: <A extends number>(
   min: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1164,7 +1145,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThanOrEqualTo: <A extends number>(
   min: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1176,7 +1157,7 @@ Added in v1.0.0
 
 ```ts
 export declare const int: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1189,7 +1170,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThan: <A extends number>(
   max: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1202,7 +1183,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThanOrEqualTo: <A extends number>(
   max: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1215,7 +1196,7 @@ Added in v1.0.0
 ```ts
 export declare const multipleOf: <A extends number>(
   divisor: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1227,7 +1208,7 @@ Added in v1.0.0
 
 ```ts
 export declare const negative: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1239,7 +1220,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNaN: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1251,7 +1232,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNegative: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1263,7 +1244,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonPositive: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1275,7 +1256,7 @@ Added in v1.0.0
 
 ```ts
 export declare const positive: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1434,7 +1415,7 @@ Added in v1.0.0
 ```ts
 export declare const endsWith: <A extends string>(
   endsWith: string,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1447,7 +1428,7 @@ Added in v1.0.0
 ```ts
 export declare const includes: <A extends string>(
   searchString: string,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1460,7 +1441,7 @@ Added in v1.0.0
 ```ts
 export declare const length: <A extends string>(
   length: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1473,7 +1454,7 @@ Added in v1.0.0
 ```ts
 export declare const maxLength: <A extends string>(
   maxLength: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1486,7 +1467,7 @@ Added in v1.0.0
 ```ts
 export declare const minLength: <A extends string>(
   minLength: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1498,7 +1479,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonEmpty: <A extends string>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1511,7 +1492,7 @@ Added in v1.0.0
 ```ts
 export declare const pattern: <A extends string>(
   regex: RegExp,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1524,7 +1505,7 @@ Added in v1.0.0
 ```ts
 export declare const startsWith: <A extends string>(
   startsWith: string,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1541,7 +1522,7 @@ If what you were looking for was a combinator to trim strings, then check out th
 
 ```ts
 export declare const trimmed: <A extends string>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
 ```
 
@@ -1931,6 +1912,37 @@ export interface BrandSchema<To extends Brand<any>> extends Schema<To>, Brand.Co
 
 Added in v1.0.0
 
+## DocAnnotations (interface)
+
+**Signature**
+
+```ts
+export interface DocAnnotations<A> extends AST.Annotations {
+  readonly identifier?: AST.IdentifierAnnotation
+  readonly title?: AST.TitleAnnotation
+  readonly description?: AST.DescriptionAnnotation
+  readonly examples?: AST.ExamplesAnnotation
+  readonly documentation?: AST.DocumentationAnnotation
+  readonly message?: AST.MessageAnnotation<A>
+}
+```
+
+Added in v1.0.0
+
+## FilterAnnotations (interface)
+
+**Signature**
+
+```ts
+export interface FilterAnnotations<A> extends DocAnnotations<A> {
+  readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  readonly jsonSchema?: AST.JSONSchemaAnnotation
+  readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+}
+```
+
+Added in v1.0.0
+
 ## Join (type alias)
 
 **Signature**
@@ -2045,7 +2057,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <A>(
   schema: Schema<A>,
-  annotations?: AST.Annotated['annotations']
+  options?: DocAnnotations<A> | undefined
 ) => OptionalSchemaPropertySignature<A, true, A, true>
 ```
 

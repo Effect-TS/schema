@@ -420,11 +420,11 @@ Added in v1.0.0
 ```ts
 export declare function filter<C extends A, B extends A, A = C>(
   refinement: Refinement<A, B>,
-  options?: S.AnnotationOptions<A>
+  options?: S.FilterAnnotations<A>
 ): <I>(self: Codec<I, C>) => Codec<I, C & B>
 export declare function filter<B extends A, A = B>(
   predicate: Predicate<A>,
-  options?: S.AnnotationOptions<A>
+  options?: S.FilterAnnotations<A>
 ): <I>(self: Codec<I, B>) => Codec<I, B>
 ```
 
@@ -973,7 +973,7 @@ Added in v1.0.0
 ```ts
 export declare const minLength: <A extends string>(
   minLength: number,
-  options?: S.AnnotationOptions<A> | undefined
+  options?: S.FilterAnnotations<A> | undefined
 ) => <I>(self: Codec<I, A>) => Codec<I, A>
 ```
 
@@ -1024,7 +1024,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <I, A>(
   codec: Codec<I, A>,
-  annotations?: AST.Annotated['annotations']
+  options?: S.DocAnnotations<A> | undefined
 ) => S.OptionalPropertySignature<I, true, A, true>
 ```
 
@@ -1037,7 +1037,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <I, A>(
   codec: Codec<I, A>,
-  options: S.AnnotationOptions<A>
+  options: S.DocAnnotations<A>
 ) => S.PropertySignature<I, false, A, false>
 ```
 
