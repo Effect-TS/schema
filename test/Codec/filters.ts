@@ -119,45 +119,45 @@ describe.concurrent("string filters", () => {
 describe.concurrent("number filters", () => {
   describe.concurrent("greaterThan", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.number), C.greaterThan(0))
-      await Util.expectParseSuccess(codec, 1)
-      await Util.expectParseFailure(codec, 0, `Expected a number greater than 0, actual 0`)
-      await Util.expectParseFailure(codec, -1, `Expected a number greater than 0, actual -1`)
+      const codec = pipe(Util.identityTransform(S.number), C.greaterThan(1))
+      await Util.expectParseSuccess(codec, 2)
+      await Util.expectParseFailure(codec, 1, `Expected a number greater than 1, actual 1`)
+      await Util.expectParseFailure(codec, 0, `Expected a number greater than 1, actual 0`)
     })
   })
 
   describe.concurrent("greaterThanOrEqualTo", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.number), C.greaterThanOrEqualTo(0))
+      const codec = pipe(Util.identityTransform(S.number), C.greaterThanOrEqualTo(1))
 
-      await Util.expectParseSuccess(codec, 0)
       await Util.expectParseSuccess(codec, 1)
+      await Util.expectParseSuccess(codec, 2)
       await Util.expectParseFailure(
         codec,
-        -1,
-        `Expected a number greater than or equal to 0, actual -1`
+        0,
+        `Expected a number greater than or equal to 1, actual 0`
       )
     })
   })
 
   describe.concurrent("lessThan", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.number), C.lessThan(0))
-      await Util.expectParseSuccess(codec, -1)
-      await Util.expectParseFailure(codec, 0, `Expected a number less than 0, actual 0`)
-      await Util.expectParseFailure(codec, 1, `Expected a number less than 0, actual 1`)
+      const codec = pipe(Util.identityTransform(S.number), C.lessThan(1))
+      await Util.expectParseSuccess(codec, 0)
+      await Util.expectParseFailure(codec, 1, `Expected a number less than 1, actual 1`)
+      await Util.expectParseFailure(codec, 2, `Expected a number less than 1, actual 2`)
     })
   })
 
   describe.concurrent("lessThanOrEqualTo", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.number), C.lessThanOrEqualTo(0))
+      const codec = pipe(Util.identityTransform(S.number), C.lessThanOrEqualTo(1))
+      await Util.expectParseSuccess(codec, 1)
       await Util.expectParseSuccess(codec, 0)
-      await Util.expectParseSuccess(codec, -1)
       await Util.expectParseFailure(
         codec,
-        1,
-        `Expected a number less than or equal to 0, actual 1`
+        2,
+        `Expected a number less than or equal to 1, actual 2`
       )
     })
   })
@@ -270,48 +270,48 @@ describe.concurrent("number filters", () => {
 describe.concurrent("bigint filters", () => {
   describe.concurrent("greaterThanBigint", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.bigint), C.greaterThanBigint(0n))
+      const codec = pipe(Util.identityTransform(S.bigint), C.greaterThanBigint(1n))
 
-      await Util.expectParseFailure(codec, -1n, "Expected a bigint greater than 0n, actual -1n")
-      await Util.expectParseFailure(codec, 0n, "Expected a bigint greater than 0n, actual 0n")
-      await Util.expectEncodeSuccess(codec, 1n, 1n)
+      await Util.expectParseFailure(codec, 0n, "Expected a bigint greater than 1n, actual 0n")
+      await Util.expectParseFailure(codec, 1n, "Expected a bigint greater than 1n, actual 1n")
+      await Util.expectEncodeSuccess(codec, 2n, 2n)
     })
   })
 
   describe.concurrent("greaterThanOrEqualToBigint", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.bigint), C.greaterThanOrEqualToBigint(0n))
+      const codec = pipe(Util.identityTransform(S.bigint), C.greaterThanOrEqualToBigint(1n))
 
       await Util.expectParseFailure(
         codec,
-        -1n,
-        "Expected a bigint greater than or equal to 0n, actual -1n"
+        0n,
+        "Expected a bigint greater than or equal to 1n, actual 0n"
       )
-      await Util.expectParseSuccess(codec, 0n, 0n)
-      await Util.expectEncodeSuccess(codec, 1n, 1n)
+      await Util.expectParseSuccess(codec, 1n, 1n)
+      await Util.expectEncodeSuccess(codec, 2n, 2n)
     })
   })
 
   describe.concurrent("lessThanBigint", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.bigint), C.lessThanBigint(0n))
+      const codec = pipe(Util.identityTransform(S.bigint), C.lessThanBigint(1n))
 
-      await Util.expectEncodeSuccess(codec, -1n, -1n)
-      await Util.expectParseFailure(codec, 0n, "Expected a bigint less than 0n, actual 0n")
-      await Util.expectParseFailure(codec, 1n, "Expected a bigint less than 0n, actual 1n")
+      await Util.expectEncodeSuccess(codec, 0n, 0n)
+      await Util.expectParseFailure(codec, 1n, "Expected a bigint less than 1n, actual 1n")
+      await Util.expectParseFailure(codec, 2n, "Expected a bigint less than 1n, actual 2n")
     })
   })
 
   describe.concurrent("lessThanOrEqualToBigint", () => {
     it("decode / encode", async () => {
-      const codec = pipe(Util.identityTransform(S.bigint), C.lessThanOrEqualToBigint(0n))
+      const codec = pipe(Util.identityTransform(S.bigint), C.lessThanOrEqualToBigint(1n))
 
-      await Util.expectEncodeSuccess(codec, -1n, -1n)
-      await Util.expectParseSuccess(codec, 0n, 0n)
+      await Util.expectEncodeSuccess(codec, 0n, 0n)
+      await Util.expectParseSuccess(codec, 1n, 1n)
       await Util.expectParseFailure(
         codec,
-        1n,
-        "Expected a bigint less than or equal to 0n, actual 1n"
+        2n,
+        "Expected a bigint less than or equal to 1n, actual 2n"
       )
     })
   })

@@ -1243,7 +1243,7 @@ export const _greaterThan = <A extends number>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a > min, {
     typeId: GreaterThanTypeId,
-    description: `a number greater than ${min}`,
+    description: min === 0 ? "a positive number" : `a number greater than ${min}`,
     jsonSchema: { exclusiveMinimum: min },
     ...options
   })
@@ -1271,7 +1271,7 @@ export const _greaterThanOrEqualTo = <A extends number>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a >= min, {
     typeId: GreaterThanOrEqualToTypeId,
-    description: `a number greater than or equal to ${min}`,
+    description: min === 0 ? "a non-negative number" : `a number greater than or equal to ${min}`,
     jsonSchema: { minimum: min },
     ...options
   })
@@ -1299,7 +1299,7 @@ export const _lessThan = <A extends number>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a < max, {
     typeId: LessThanTypeId,
-    description: `a number less than ${max}`,
+    description: max === 0 ? "a negative number" : `a number less than ${max}`,
     jsonSchema: { exclusiveMaximum: max },
     ...options
   })
@@ -1325,7 +1325,7 @@ export const _lessThanOrEqualTo = <A extends number>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a <= max, {
     typeId: LessThanOrEqualToTypeId,
-    description: `a number less than or equal to ${max}`,
+    description: max === 0 ? "a non-positive number" : `a number less than or equal to ${max}`,
     jsonSchema: { maximum: max },
     ...options
   })
@@ -1440,11 +1440,7 @@ export const nonNaN = <A extends number>(options?: FilterAnnotations<A>) =>
 export const _positive = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _greaterThan(ast, 0, {
-    description: "a positive number",
-    ...options
-  })
+): AST.AST => _greaterThan(ast, 0, options)
 
 /**
  * @category number filters
@@ -1458,11 +1454,7 @@ export const positive = <A extends number>(
 export const _negative = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _lessThan(ast, 0, {
-    description: "a negative number",
-    ...options
-  })
+): AST.AST => _lessThan(ast, 0, options)
 
 /**
  * @category number filters
@@ -1476,11 +1468,7 @@ export const negative = <A extends number>(
 export const _nonNegative = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _greaterThanOrEqualTo(ast, 0, {
-    description: "a non-negative number",
-    ...options
-  })
+): AST.AST => _greaterThanOrEqualTo(ast, 0, options)
 
 /**
  * @category number filters
@@ -1494,11 +1482,7 @@ export const nonNegative = <A extends number>(
 export const _nonPositive = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _lessThanOrEqualTo(ast, 0, {
-    description: "a non-positive number",
-    ...options
-  })
+): AST.AST => _lessThanOrEqualTo(ast, 0, options)
 
 /**
  * @category number filters
@@ -1554,7 +1538,7 @@ export const _greaterThanBigint = <A extends bigint>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a > min, {
     typeId: GreaterThanBigintTypeId,
-    description: `a bigint greater than ${min}n`,
+    description: min === 0n ? "a positive bigint" : `a bigint greater than ${min}n`,
     jsonSchema: { exclusiveMinimum: min },
     ...options
   })
@@ -1584,7 +1568,7 @@ export const _greaterThanOrEqualToBigint = <A extends bigint>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a >= min, {
     typeId: GreaterThanOrEqualToBigintTypeId,
-    description: `a bigint greater than or equal to ${min}n`,
+    description: min === 0n ? "a non-negative bigint" : `a bigint greater than or equal to ${min}n`,
     jsonSchema: { minimum: min },
     ...options
   })
@@ -1612,7 +1596,7 @@ export const _lessThanBigint = <A extends bigint>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a < max, {
     typeId: LessThanBigintTypeId,
-    description: `a bigint less than ${max}n`,
+    description: max === 0n ? "a negative bigint" : `a bigint less than ${max}n`,
     jsonSchema: { exclusiveMaximum: max },
     ...options
   })
@@ -1642,7 +1626,7 @@ export const _lessThanOrEqualToBigint = <A extends bigint>(
 ): AST.AST =>
   _filter(ast, (a): a is A => a <= max, {
     typeId: LessThanOrEqualToBigintTypeId,
-    description: `a bigint less than or equal to ${max}n`,
+    description: max === 0n ? "a non-positive bigint" : `a bigint less than or equal to ${max}n`,
     jsonSchema: { maximum: max },
     ...options
   })
@@ -1684,11 +1668,7 @@ export const betweenBigint = <A extends bigint>(
 export const _positiveBigint = <A extends bigint>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _greaterThanBigint(ast, 0n, {
-    description: "a positive bigint",
-    ...options
-  })
+): AST.AST => _greaterThanBigint(ast, 0n, options)
 
 /**
  * @category bigint filters
@@ -1702,11 +1682,7 @@ export const positiveBigint = <A extends bigint>(
 export const _negativeBigint = <A extends bigint>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _lessThanBigint(ast, 0n, {
-    description: "a negative bigint",
-    ...options
-  })
+): AST.AST => _lessThanBigint(ast, 0n, options)
 
 /**
  * @category bigint filters
@@ -1720,11 +1696,7 @@ export const negativeBigint = <A extends bigint>(
 export const _nonPositiveBigint = <A extends bigint>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _lessThanOrEqualToBigint(ast, 0n, {
-    description: "a non-positive bigint",
-    ...options
-  })
+): AST.AST => _lessThanOrEqualToBigint(ast, 0n, options)
 
 /**
  * @category bigint filters
@@ -1738,11 +1710,7 @@ export const nonPositiveBigint = <A extends bigint>(
 export const _nonNegativeBigint = <A extends bigint>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
-): AST.AST =>
-  _greaterThanOrEqualToBigint(ast, 0n, {
-    description: "a non-negative bigint",
-    ...options
-  })
+): AST.AST => _greaterThanOrEqualToBigint(ast, 0n, options)
 
 /**
  * @category bigint filters

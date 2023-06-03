@@ -139,65 +139,65 @@ describe.concurrent("string filters", () => {
 describe.concurrent("number filters", () => {
   describe.concurrent("greaterThan", () => {
     it("property tests", () => {
-      const schema = pipe(S.number, S.greaterThan(0))
+      const schema = pipe(S.number, S.greaterThan(1))
       Util.roundtrip(schema)
     })
 
     it("decode / encode", async () => {
-      const schema = pipe(S.number, S.greaterThan(0))
-      await Util.expectParseSuccess(schema, 1)
-      await Util.expectParseFailure(schema, 0, `Expected a number greater than 0, actual 0`)
-      await Util.expectParseFailure(schema, -1, `Expected a number greater than 0, actual -1`)
+      const schema = pipe(S.number, S.greaterThan(1))
+      await Util.expectParseSuccess(schema, 2)
+      await Util.expectParseFailure(schema, 1, `Expected a number greater than 1, actual 1`)
+      await Util.expectParseFailure(schema, 0, `Expected a number greater than 1, actual 0`)
     })
   })
 
   describe.concurrent("greaterThanOrEqualTo", () => {
     it("property tests", () => {
-      const schema = pipe(S.number, S.greaterThanOrEqualTo(0))
+      const schema = pipe(S.number, S.greaterThanOrEqualTo(1))
       Util.roundtrip(schema)
     })
 
     it("decode / encode", async () => {
-      const schema = pipe(S.number, S.greaterThanOrEqualTo(0))
+      const schema = pipe(S.number, S.greaterThanOrEqualTo(1))
 
-      await Util.expectParseSuccess(schema, 0)
       await Util.expectParseSuccess(schema, 1)
+      await Util.expectParseSuccess(schema, 2)
       await Util.expectParseFailure(
         schema,
-        -1,
-        `Expected a number greater than or equal to 0, actual -1`
+        0,
+        `Expected a number greater than or equal to 1, actual 0`
       )
     })
   })
 
   describe.concurrent("lessThan", () => {
     it("property tests", () => {
-      const schema = pipe(S.number, S.lessThan(0))
+      const schema = pipe(S.number, S.lessThan(1))
       Util.roundtrip(schema)
     })
 
     it("decode / encode", async () => {
-      const schema = pipe(S.number, S.lessThan(0))
-      await Util.expectParseSuccess(schema, -1)
-      await Util.expectParseFailure(schema, 0, `Expected a number less than 0, actual 0`)
-      await Util.expectParseFailure(schema, 1, `Expected a number less than 0, actual 1`)
+      const schema = pipe(S.number, S.lessThan(1))
+      await Util.expectParseSuccess(schema, 0)
+      await Util.expectParseFailure(schema, 1, `Expected a number less than 1, actual 1`)
+      await Util.expectParseFailure(schema, 2, `Expected a number less than 1, actual 2`)
     })
   })
 
   describe.concurrent("lessThanOrEqualTo", () => {
     it("property tests", () => {
-      const schema = pipe(S.number, S.lessThanOrEqualTo(0))
+      const schema = pipe(S.number, S.lessThanOrEqualTo(1))
       Util.roundtrip(schema)
     })
 
     it("decode / encode", async () => {
-      const schema = pipe(S.number, S.lessThanOrEqualTo(0))
+      const schema = pipe(S.number, S.lessThanOrEqualTo(1))
+      await Util.expectParseSuccess(schema, 1)
       await Util.expectParseSuccess(schema, 0)
-      await Util.expectParseSuccess(schema, -1)
       await Util.expectParseFailure(
         schema,
-        1,
-        `Expected a number less than or equal to 0, actual 1`
+        2,
+        `Expected a number less than or equal to 1, actual 2`
       )
     })
   })
@@ -338,48 +338,48 @@ describe.concurrent("number filters", () => {
 describe.concurrent("bigint filters", () => {
   describe.concurrent("greaterThanBigint", () => {
     it("decode / encode", async () => {
-      const schema = pipe(S.bigint, S.greaterThanBigint(0n))
+      const schema = pipe(S.bigint, S.greaterThanBigint(1n))
 
-      await Util.expectParseFailure(schema, -1n, "Expected a bigint greater than 0n, actual -1n")
-      await Util.expectParseFailure(schema, 0n, "Expected a bigint greater than 0n, actual 0n")
-      await Util.expectEncodeSuccess(schema, 1n, 1n)
+      await Util.expectParseFailure(schema, 0n, "Expected a bigint greater than 1n, actual 0n")
+      await Util.expectParseFailure(schema, 1n, "Expected a bigint greater than 1n, actual 1n")
+      await Util.expectEncodeSuccess(schema, 2n, 2n)
     })
   })
 
   describe.concurrent("greaterThanOrEqualToBigint", () => {
     it("decode / encode", async () => {
-      const schema = pipe(S.bigint, S.greaterThanOrEqualToBigint(0n))
+      const schema = pipe(S.bigint, S.greaterThanOrEqualToBigint(1n))
 
       await Util.expectParseFailure(
         schema,
-        -1n,
-        "Expected a bigint greater than or equal to 0n, actual -1n"
+        0n,
+        "Expected a bigint greater than or equal to 1n, actual 0n"
       )
-      await Util.expectParseSuccess(schema, 0n, 0n)
-      await Util.expectEncodeSuccess(schema, 1n, 1n)
+      await Util.expectParseSuccess(schema, 1n, 1n)
+      await Util.expectEncodeSuccess(schema, 2n, 2n)
     })
   })
 
   describe.concurrent("lessThanBigint", () => {
     it("decode / encode", async () => {
-      const schema = pipe(S.bigint, S.lessThanBigint(0n))
+      const schema = pipe(S.bigint, S.lessThanBigint(1n))
 
-      await Util.expectEncodeSuccess(schema, -1n, -1n)
-      await Util.expectParseFailure(schema, 0n, "Expected a bigint less than 0n, actual 0n")
-      await Util.expectParseFailure(schema, 1n, "Expected a bigint less than 0n, actual 1n")
+      await Util.expectEncodeSuccess(schema, 0n, 0n)
+      await Util.expectParseFailure(schema, 1n, "Expected a bigint less than 1n, actual 1n")
+      await Util.expectParseFailure(schema, 2n, "Expected a bigint less than 1n, actual 2n")
     })
   })
 
   describe.concurrent("lessThanOrEqualToBigint", () => {
     it("decode / encode", async () => {
-      const schema = pipe(S.bigint, S.lessThanOrEqualToBigint(0n))
+      const schema = pipe(S.bigint, S.lessThanOrEqualToBigint(1n))
 
-      await Util.expectEncodeSuccess(schema, -1n, -1n)
-      await Util.expectParseSuccess(schema, 0n, 0n)
+      await Util.expectEncodeSuccess(schema, 0n, 0n)
+      await Util.expectParseSuccess(schema, 1n, 1n)
       await Util.expectParseFailure(
         schema,
-        1n,
-        "Expected a bigint less than or equal to 0n, actual 1n"
+        2n,
+        "Expected a bigint less than or equal to 1n, actual 2n"
       )
     })
   })

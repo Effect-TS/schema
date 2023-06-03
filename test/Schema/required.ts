@@ -18,7 +18,7 @@ describe.concurrent("required", () => {
     await Util.expectParseFailure(
       transform,
       { a: -1 },
-      "/a Expected a number greater than 0, actual -1"
+      "/a Expected a positive number, actual -1"
     )
   })
 
