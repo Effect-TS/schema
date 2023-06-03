@@ -303,8 +303,14 @@ C.optionFromNullable(C.NumberFromString)
 // $ExpectType Codec<{ readonly radius: number; }, { readonly radius: number; readonly kind: "circle"; }>
 pipe(C.struct({ radius: S.number }), C.attachPropertySignature("kind", "circle"))
 
+// $ExpectType Codec<{ readonly radius: number; }, { readonly radius: number; readonly kind: "circle"; }>
+C.attachPropertySignature(C.struct({ radius: S.number }), "kind", "circle")
+
 // $ExpectType Codec<{ readonly radius: string; }, { readonly radius: number; readonly kind: "circle"; }>
 pipe(C.struct({ radius: C.NumberFromString }), C.attachPropertySignature("kind", "circle"))
+
+// $ExpectType Codec<{ readonly radius: string; }, { readonly radius: number; readonly kind: "circle"; }>
+C.attachPropertySignature(C.struct({ radius: C.NumberFromString }), "kind", "circle")
 
 // ---------------------------------------------
 // filter

@@ -541,10 +541,15 @@ but rather maps to another schema, for example when you want to add a discrimina
 **Signature**
 
 ```ts
-export declare const attachPropertySignature: <K extends PropertyKey, V extends AST.LiteralValue>(
-  key: K,
-  value: V
-) => <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+export declare const attachPropertySignature: {
+  <K extends PropertyKey, V extends AST.LiteralValue>(key: K, value: V): <I, A extends object>(
+    codec: Codec<I, A>
+  ) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+  <I, A, K extends PropertyKey, V extends AST.LiteralValue>(codec: Codec<I, A>, key: K, value: V): Codec<
+    I,
+    S.Spread<A & { readonly [k in K]: V }>
+  >
+}
 ```
 
 **Example**
@@ -557,8 +562,8 @@ import { pipe } from '@effect/data/Function'
 const Circle = S.struct({ radius: S.number })
 const Square = S.struct({ sideLength: S.number })
 const Shape = C.union(
-  pipe(Circle, C.attachPropertySignature('kind', 'circle')),
-  pipe(Square, C.attachPropertySignature('kind', 'square'))
+  C.attachPropertySignature(Circle, 'kind', 'circle'),
+  C.attachPropertySignature(Square, 'kind', 'square')
 )
 
 assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {

@@ -709,6 +709,7 @@ To achieve this, you can add a special property to each member of the union, whi
 
 ```ts
 import * as S from "@effect/schema/Schema";
+import * as C from "@effect/schema/Codec";
 import { pipe } from "@effect/data/Function";
 
 const Circle = S.struct({
@@ -719,31 +720,27 @@ const Square = S.struct({
   sideLength: S.number,
 });
 
-const DiscriminatedShape = S.union(
-  pipe(
+const DiscriminatedShape = C.union(
+  C.transform(
     Circle,
-    S.transform(
-      pipe(Circle, S.extend(S.struct({ kind: S.literal("circle") }))), // Add a "kind" property with the literal value "circle" to Circle
-      (circle) => ({ ...circle, kind: "circle" as const }), // Add the discriminant property to Circle
-      ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
-    )
+    pipe(Circle, S.extend(S.struct({ kind: S.literal("circle") }))), // Add a "kind" property with the literal value "circle" to Circle
+    (circle) => ({ ...circle, kind: "circle" as const }), // Add the discriminant property to Circle
+    ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
   ),
-  pipe(
+  C.transform(
     Square,
-    S.transform(
-      pipe(Square, S.extend(S.struct({ kind: S.literal("square") }))), // Add a "kind" property with the literal value "square" to Square
-      (square) => ({ ...square, kind: "square" as const }), // Add the discriminant property to Square
-      ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
-    )
+    pipe(Square, S.extend(S.struct({ kind: S.literal("square") }))), // Add a "kind" property with the literal value "square" to Square
+    (square) => ({ ...square, kind: "square" as const }), // Add the discriminant property to Square
+    ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
   )
 );
 
-expect(S.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(C.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
-expect(S.parse(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+expect(C.parse(DiscriminatedShape)({ sideLength: 10 })).toEqual({
   kind: "square",
   sideLength: 10,
 });
@@ -758,20 +755,20 @@ The previous solution works perfectly and shows how we can add and remove proper
 ```ts
 const Circle = S.struct({ radius: S.number });
 const Square = S.struct({ sideLength: S.number });
-const DiscriminatedShape = S.union(
-  pipe(Circle, S.attachPropertySignature("kind", "circle")),
-  pipe(Square, S.attachPropertySignature("kind", "square"))
+const DiscriminatedShape = C.union(
+  C.attachPropertySignature(Circle, "kind", "circle"),
+  C.attachPropertySignature(Square, "kind", "square")
 );
 
 // parsing
-expect(S.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(C.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
 // encoding
 expect(
-  S.encode(DiscriminatedShape)({
+  C.encode(DiscriminatedShape)({
     kind: "circle",
     radius: 10,
   })

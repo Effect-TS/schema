@@ -9,8 +9,8 @@ describe.concurrent("attachPropertySignature", () => {
     const Circle = S.struct({ radius: S.number })
     const Square = S.struct({ sideLength: S.number })
     const DiscriminatedShape = C.union(
-      pipe(Circle, C.attachPropertySignature("kind", "circle")),
-      pipe(Square, C.attachPropertySignature("kind", "square"))
+      C.attachPropertySignature(Circle, "kind", "circle"),
+      C.attachPropertySignature(Square, "kind", "square")
     )
 
     expect(C.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
