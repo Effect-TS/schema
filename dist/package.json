@@ -1,0 +1,30 @@
+{
+  "name": "@effect/schema",
+  "version": "0.21.0-dev.20230603",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/effect-ts/schema.git"
+  },
+  "dependencies": {
+    "@effect/data": "^0.12.2",
+    "@effect/io": "^0.26.0",
+    "fast-check": "^3.8.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "sideEffects": [],
+  "exports": {
+    "./*": {
+      "import": {
+        "types": "./*.d.ts",
+        "default": "./mjs/*.mjs"
+      },
+      "require": {
+        "types": "./*.d.ts",
+        "default": "./*.js"
+      }
+    }
+  }
+}
