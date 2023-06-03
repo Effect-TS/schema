@@ -288,6 +288,9 @@ export const printAST = <I, A>(codec: Codec<I, A>) => {
   console.log("%o", codec.ast)
 }
 
+export const identityTransform = <A>(schema: S.Schema<A>): C.Codec<A, A> =>
+  pipe(schema, C.compose(schema))
+
 export const X2 = C.transform(
   S.string,
   S.string,

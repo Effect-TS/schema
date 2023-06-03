@@ -261,26 +261,8 @@ export const getConstraints = (ast: AST.Refinement): Constraints | undefined => 
         _tag: "NumberConstraints",
         constraints: { max: jsonSchema.exclusiveMaximum ?? jsonSchema.maximum }
       }
-    case S.PositiveTypeId:
-    case S.NonNegativeTypeId:
-      return { _tag: "NumberConstraints", constraints: { min: 0 } }
-    case S.NegativeTypeId:
-    case S.NonPositiveTypeId:
-      return { _tag: "NumberConstraints", constraints: { max: 0 } }
     case S.IntTypeId:
       return { _tag: "IntegerConstraints", constraints: {} }
-    case S.BetweenTypeId: {
-      const min = jsonSchema.minimum
-      const max = jsonSchema.maximum
-      const constraints: NumberConstraints["constraints"] = {}
-      if (isNumber(min)) {
-        constraints.min = min
-      }
-      if (isNumber(max)) {
-        constraints.max = max
-      }
-      return { _tag: "NumberConstraints", constraints }
-    }
     case S.MinLengthTypeId:
       return { _tag: "StringConstraints", constraints: { minLength: jsonSchema.minLength } }
     case S.MaxLengthTypeId:

@@ -143,8 +143,6 @@ Added in v1.0.0
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
 - [type id](#type-id)
-  - [BetweenBigintTypeId](#betweenbiginttypeid)
-  - [BetweenTypeId](#betweentypeid)
   - [BrandTypeId](#brandtypeid)
   - [EndsWithTypeId](#endswithtypeid)
   - [FiniteTypeId](#finitetypeid)
@@ -155,7 +153,6 @@ Added in v1.0.0
   - [IncludesTypeId](#includestypeid)
   - [InstanceOfTypeId](#instanceoftypeid)
   - [IntTypeId](#inttypeid)
-  - [ItemsCountTypeId](#itemscounttypeid)
   - [JsonNumberTypeId](#jsonnumbertypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
@@ -166,16 +163,8 @@ Added in v1.0.0
   - [MinItemsTypeId](#minitemstypeid)
   - [MinLengthTypeId](#minlengthtypeid)
   - [MultipleOfTypeId](#multipleoftypeid)
-  - [NegativeBigintTypeId](#negativebiginttypeid)
-  - [NegativeTypeId](#negativetypeid)
   - [NonNaNTypeId](#nonnantypeid)
-  - [NonNegativeBigintTypeId](#nonnegativebiginttypeid)
-  - [NonNegativeTypeId](#nonnegativetypeid)
-  - [NonPositiveBigintTypeId](#nonpositivebiginttypeid)
-  - [NonPositiveTypeId](#nonpositivetypeid)
   - [PatternTypeId](#patterntypeid)
-  - [PositiveBigintTypeId](#positivebiginttypeid)
-  - [PositiveTypeId](#positivetypeid)
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
   - [UUIDTypeId](#uuidtypeid)
@@ -496,6 +485,8 @@ Added in v1.0.0
 # bigint filters
 
 ## betweenBigint
+
+Tests if a `bigint` is between a minimum and a maximum value (included).
 
 **Signature**
 
@@ -1101,6 +1092,8 @@ Added in v1.0.0
 
 ## between
 
+Tests if a `number` is between a minimum and a maximum value (included).
+
 **Signature**
 
 ```ts
@@ -1516,7 +1509,7 @@ Added in v1.0.0
 Verifies that a string contains no leading or trailing whitespaces.
 
 Note. This combinator does not make any transformations, it only validates.
-If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+If what you were looking for was a combinator to trim strings, then check out the `Codec.trim` combinator.
 
 **Signature**
 
@@ -1529,26 +1522,6 @@ export declare const trimmed: <A extends string>(
 Added in v1.0.0
 
 # type id
-
-## BetweenBigintTypeId
-
-**Signature**
-
-```ts
-export declare const BetweenBigintTypeId: typeof BetweenBigintTypeId
-```
-
-Added in v1.0.0
-
-## BetweenTypeId
-
-**Signature**
-
-```ts
-export declare const BetweenTypeId: typeof BetweenTypeId
-```
-
-Added in v1.0.0
 
 ## BrandTypeId
 
@@ -1646,16 +1619,6 @@ Added in v1.0.0
 
 ```ts
 export declare const IntTypeId: typeof IntTypeId
-```
-
-Added in v1.0.0
-
-## ItemsCountTypeId
-
-**Signature**
-
-```ts
-export declare const ItemsCountTypeId: typeof ItemsCountTypeId
 ```
 
 Added in v1.0.0
@@ -1760,26 +1723,6 @@ export declare const MultipleOfTypeId: typeof MultipleOfTypeId
 
 Added in v1.0.0
 
-## NegativeBigintTypeId
-
-**Signature**
-
-```ts
-export declare const NegativeBigintTypeId: typeof NegativeBigintTypeId
-```
-
-Added in v1.0.0
-
-## NegativeTypeId
-
-**Signature**
-
-```ts
-export declare const NegativeTypeId: typeof NegativeTypeId
-```
-
-Added in v1.0.0
-
 ## NonNaNTypeId
 
 **Signature**
@@ -1790,72 +1733,12 @@ export declare const NonNaNTypeId: typeof NonNaNTypeId
 
 Added in v1.0.0
 
-## NonNegativeBigintTypeId
-
-**Signature**
-
-```ts
-export declare const NonNegativeBigintTypeId: typeof NonNegativeBigintTypeId
-```
-
-Added in v1.0.0
-
-## NonNegativeTypeId
-
-**Signature**
-
-```ts
-export declare const NonNegativeTypeId: typeof NonNegativeTypeId
-```
-
-Added in v1.0.0
-
-## NonPositiveBigintTypeId
-
-**Signature**
-
-```ts
-export declare const NonPositiveBigintTypeId: typeof NonPositiveBigintTypeId
-```
-
-Added in v1.0.0
-
-## NonPositiveTypeId
-
-**Signature**
-
-```ts
-export declare const NonPositiveTypeId: typeof NonPositiveTypeId
-```
-
-Added in v1.0.0
-
 ## PatternTypeId
 
 **Signature**
 
 ```ts
 export declare const PatternTypeId: typeof PatternTypeId
-```
-
-Added in v1.0.0
-
-## PositiveBigintTypeId
-
-**Signature**
-
-```ts
-export declare const PositiveBigintTypeId: typeof PositiveBigintTypeId
-```
-
-Added in v1.0.0
-
-## PositiveTypeId
-
-**Signature**
-
-```ts
-export declare const PositiveTypeId: typeof PositiveTypeId
 ```
 
 Added in v1.0.0

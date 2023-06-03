@@ -1043,6 +1043,19 @@ export const nonEmpty = <A extends string>(
  */
 export const MaxLengthTypeId = Symbol.for("@effect/schema/MaxLengthTypeId")
 
+/** @internal */
+export const _maxLength = <A extends string>(
+  ast: AST.AST,
+  maxLength: number,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a.length <= maxLength, {
+    typeId: MaxLengthTypeId,
+    description: `a string at most ${maxLength} character(s) long`,
+    jsonSchema: { maxLength },
+    ...options
+  })
+
 /**
  * @category string filters
  * @since 1.0.0
@@ -1050,20 +1063,7 @@ export const MaxLengthTypeId = Symbol.for("@effect/schema/MaxLengthTypeId")
 export const maxLength = <A extends string>(
   maxLength: number,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.length <= maxLength,
-        {
-          typeId: MaxLengthTypeId,
-          description: `a string at most ${maxLength} character(s) long`,
-          jsonSchema: { maxLength },
-          ...options
-        }
-      )
-    )
+) => (self: Schema<A>): Schema<A> => make(_maxLength(self.ast, maxLength, options))
 
 /**
  * @category string filters
@@ -1072,13 +1072,30 @@ export const maxLength = <A extends string>(
 export const length = <A extends string>(
   length: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => minLength(length, options)(maxLength<A>(length)(self))
+) => (self: Schema<A>): Schema<A> => pipe(self, minLength(length), maxLength(length, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const PatternTypeId = Symbol.for("@effect/schema/PatternTypeId")
+
+/** @internal */
+export const _pattern = <A extends string>(
+  ast: AST.AST,
+  regex: RegExp,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => {
+    // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
+    regex.lastIndex = 0
+    return regex.test(a)
+  }, {
+    typeId: { id: PatternTypeId, params: { regex } },
+    description: `a string matching the pattern ${regex.source}`,
+    jsonSchema: { pattern },
+    ...options
+  })
 
 /**
  * @category string filters
@@ -1087,32 +1104,26 @@ export const PatternTypeId = Symbol.for("@effect/schema/PatternTypeId")
 export const pattern = <A extends string>(
   regex: RegExp,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> => {
-    const pattern = regex.source
-    return pipe(
-      self,
-      filter(
-        (a): a is A => {
-          // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
-          regex.lastIndex = 0
-          return regex.test(a)
-        },
-        {
-          typeId: { id: PatternTypeId, params: { regex } },
-          description: `a string matching the pattern ${pattern}`,
-          jsonSchema: { pattern },
-          ...options
-        }
-      )
-    )
-  }
+) => (self: Schema<A>): Schema<A> => make(_pattern(self.ast, regex, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const StartsWithTypeId = Symbol.for("@effect/schema/StartsWithTypeId")
+
+/** @internal */
+export const _startsWith = <A extends string>(
+  ast: AST.AST,
+  startsWith: string,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a.startsWith(startsWith), {
+    typeId: { id: StartsWithTypeId, params: { startsWith } },
+    description: `a string starting with ${JSON.stringify(startsWith)}`,
+    jsonSchema: { pattern: `^${startsWith}` },
+    ...options
+  })
 
 /**
  * @category string filters
@@ -1121,26 +1132,26 @@ export const StartsWithTypeId = Symbol.for("@effect/schema/StartsWithTypeId")
 export const startsWith = <A extends string>(
   startsWith: string,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.startsWith(startsWith),
-        {
-          typeId: { id: StartsWithTypeId, params: { startsWith } },
-          description: `a string starting with ${JSON.stringify(startsWith)}`,
-          jsonSchema: { pattern: `^${startsWith}` },
-          ...options
-        }
-      )
-    )
+) => (self: Schema<A>): Schema<A> => make(_startsWith(self.ast, startsWith, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const EndsWithTypeId = Symbol.for("@effect/schema/EndsWithTypeId")
+
+/** @internal */
+export const _endsWith = <A extends string>(
+  ast: AST.AST,
+  endsWith: string,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a.endsWith(endsWith), {
+    typeId: { id: EndsWithTypeId, params: { endsWith } },
+    description: `a string ending with ${JSON.stringify(endsWith)}`,
+    jsonSchema: { pattern: `^.*${endsWith}$` },
+    ...options
+  })
 
 /**
  * @category string filters
@@ -1149,26 +1160,26 @@ export const EndsWithTypeId = Symbol.for("@effect/schema/EndsWithTypeId")
 export const endsWith = <A extends string>(
   endsWith: string,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.endsWith(endsWith),
-        {
-          typeId: { id: EndsWithTypeId, params: { endsWith } },
-          description: `a string ending with ${JSON.stringify(endsWith)}`,
-          jsonSchema: { pattern: `^.*${endsWith}$` },
-          ...options
-        }
-      )
-    )
+) => (self: Schema<A>): Schema<A> => make(_endsWith(self.ast, endsWith, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const IncludesTypeId = Symbol.for("@effect/schema/IncludesTypeId")
+
+/** @internal */
+export const _includes = <A extends string>(
+  ast: AST.AST,
+  searchString: string,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a.includes(searchString), {
+    typeId: { id: IncludesTypeId, params: { includes: searchString } },
+    description: `a string including ${JSON.stringify(searchString)}`,
+    jsonSchema: { pattern: `.*${searchString}.*` },
+    ...options
+  })
 
 /**
  * @category string filters
@@ -1177,20 +1188,7 @@ export const IncludesTypeId = Symbol.for("@effect/schema/IncludesTypeId")
 export const includes = <A extends string>(
   searchString: string,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter(
-        (a): a is A => a.includes(searchString),
-        {
-          typeId: { id: IncludesTypeId, params: { includes: searchString } },
-          description: `a string including ${JSON.stringify(searchString)}`,
-          jsonSchema: { pattern: `.*${searchString}.*` },
-          ...options
-        }
-      )
-    )
+) => (self: Schema<A>): Schema<A> => make(_includes(self.ast, searchString, options))
 
 /**
  * @category type id
@@ -1200,29 +1198,32 @@ export const TrimmedTypeId = Symbol.for("@effect/schema/TrimmedTypeId")
 
 const trimmedRegex = /^\S.*\S$|^\S$|^$/
 
+/** @internal */
+export const _trimmed = <A extends string>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => trimmedRegex.test(a), {
+    typeId: TrimmedTypeId,
+    description: "a string with no leading or trailing whitespace",
+    jsonSchema: {
+      type: "string",
+      pattern: trimmedRegex.source
+    },
+    ...options
+  })
+
 /**
  * Verifies that a string contains no leading or trailing whitespaces.
  *
  * Note. This combinator does not make any transformations, it only validates.
- * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+ * If what you were looking for was a combinator to trim strings, then check out the `Codec.trim` combinator.
  *
  * @category string filters
  * @since 1.0.0
  */
 export const trimmed = <A extends string>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => trimmedRegex.test(a), {
-        typeId: TrimmedTypeId,
-        description: "a string with no leading or trailing whitespace",
-        jsonSchema: {
-          type: "string",
-          pattern: trimmedRegex.source
-        },
-        ...options
-      })
-    )
+  (self: Schema<A>): Schema<A> => make(_trimmed(self.ast, options))
 
 // ---------------------------------------------
 // number filters
@@ -1234,6 +1235,19 @@ export const trimmed = <A extends string>(options?: FilterAnnotations<A>) =>
  */
 export const GreaterThanTypeId = Symbol.for("@effect/schema/GreaterThanTypeId")
 
+/** @internal */
+export const _greaterThan = <A extends number>(
+  ast: AST.AST,
+  min: number,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a > min, {
+    typeId: GreaterThanTypeId,
+    description: `a number greater than ${min}`,
+    jsonSchema: { exclusiveMinimum: min },
+    ...options
+  })
+
 /**
  * @category number filters
  * @since 1.0.0
@@ -1241,23 +1255,26 @@ export const GreaterThanTypeId = Symbol.for("@effect/schema/GreaterThanTypeId")
 export const greaterThan = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a > min, {
-        typeId: GreaterThanTypeId,
-        description: `a number greater than ${min}`,
-        jsonSchema: { exclusiveMinimum: min },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_greaterThan(self.ast, min, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const GreaterThanOrEqualToTypeId = Symbol.for("@effect/schema/GreaterThanOrEqualToTypeId")
+
+/** @internal */
+export const _greaterThanOrEqualTo = <A extends number>(
+  ast: AST.AST,
+  min: number,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a >= min, {
+    typeId: GreaterThanOrEqualToTypeId,
+    description: `a number greater than or equal to ${min}`,
+    jsonSchema: { minimum: min },
+    ...options
+  })
 
 /**
  * @category number filters
@@ -1266,17 +1283,7 @@ export const GreaterThanOrEqualToTypeId = Symbol.for("@effect/schema/GreaterThan
 export const greaterThanOrEqualTo = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min, {
-        typeId: GreaterThanOrEqualToTypeId,
-        description: `a number greater than or equal to ${min}`,
-        jsonSchema: { minimum: min },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_greaterThanOrEqualTo(self.ast, min, options))
 
 /**
  * @category type id
@@ -1284,27 +1291,44 @@ export const greaterThanOrEqualTo = <A extends number>(
  */
 export const LessThanTypeId = Symbol.for("@effect/schema/LessThanTypeId")
 
+/** @internal */
+export const _lessThan = <A extends number>(
+  ast: AST.AST,
+  max: number,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a < max, {
+    typeId: LessThanTypeId,
+    description: `a number less than ${max}`,
+    jsonSchema: { exclusiveMaximum: max },
+    ...options
+  })
+
 /**
  * @category number filters
  * @since 1.0.0
  */
 export const lessThan = <A extends number>(max: number, options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a < max, {
-        typeId: LessThanTypeId,
-        description: `a number less than ${max}`,
-        jsonSchema: { exclusiveMaximum: max },
-        ...options
-      })
-    )
+  (self: Schema<A>): Schema<A> => make(_lessThan(self.ast, max, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const LessThanOrEqualToTypeId = Symbol.for("@effect/schema/LessThanOrEqualToTypeId")
+
+/** @internal */
+export const _lessThanOrEqualTo = <A extends number>(
+  ast: AST.AST,
+  max: number,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a <= max, {
+    typeId: LessThanOrEqualToTypeId,
+    description: `a number less than or equal to ${max}`,
+    jsonSchema: { maximum: max },
+    ...options
+  })
 
 /**
  * @category number filters
@@ -1313,17 +1337,7 @@ export const LessThanOrEqualToTypeId = Symbol.for("@effect/schema/LessThanOrEqua
 export const lessThanOrEqualTo = <A extends number>(
   max: number,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a <= max, {
-        typeId: LessThanOrEqualToTypeId,
-        description: `a number less than or equal to ${max}`,
-        jsonSchema: { maximum: max },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_lessThanOrEqualTo(self.ast, max, options))
 
 /**
  * @category type id
@@ -1331,21 +1345,24 @@ export const lessThanOrEqualTo = <A extends number>(
  */
 export const IntTypeId = Symbol.for("@effect/schema/IntTypeId")
 
+/** @internal */
+export const _int = <A extends number>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => Number.isInteger(a), {
+    typeId: IntTypeId,
+    description: "integer",
+    jsonSchema: { type: "integer" },
+    ...options
+  })
+
 /**
  * @category number filters
  * @since 1.0.0
  */
 export const int = <A extends number>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => Number.isInteger(a), {
-        typeId: IntTypeId,
-        description: "integer",
-        jsonSchema: { type: "integer" },
-        ...options
-      })
-    )
+  (self: Schema<A>): Schema<A> => make(_int(self.ast, options))
 
 /**
  * @category type id
@@ -1353,28 +1370,39 @@ export const int = <A extends number>(options?: FilterAnnotations<A>) =>
  */
 export const FiniteTypeId = Symbol.for("@effect/schema/FiniteTypeId")
 
+/** @internal */
+export const _finite = <A extends number>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => Number.isFinite(a), {
+    typeId: FiniteTypeId,
+    description: "a finite number",
+    ...options
+  })
+
 /**
  * @category number filters
  * @since 1.0.0
  */
 export const finite = <A extends number>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => Number.isFinite(a), {
-        typeId: FiniteTypeId,
-        description: "a finite number",
-        ...options
-      })
-    )
+  (self: Schema<A>): Schema<A> => make(_finite(self.ast, options))
+
+/** @internal */
+export const _between = <A extends number>(
+  ast: AST.AST,
+  min: number,
+  max: number,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _lessThanOrEqualTo(_greaterThanOrEqualTo(ast, min), max, {
+    description: `a number between ${min} and ${max}`,
+    ...options
+  })
 
 /**
- * @category type id
- * @since 1.0.0
- */
-export const BetweenTypeId = Symbol.for("@effect/schema/BetweenTypeId")
-
-/**
+ * Tests if a `number` is between a minimum and a maximum value (included).
+ *
  * @category number filters
  * @since 1.0.0
  */
@@ -1382,17 +1410,7 @@ export const between = <A extends number>(
   min: number,
   max: number,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min && a <= max, {
-        typeId: BetweenTypeId,
-        description: `a number between ${min} and ${max}`,
-        jsonSchema: { maximum: max, minimum: min },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_between(self.ast, min, max, options))
 
 /**
  * @category type id
@@ -1400,26 +1418,33 @@ export const between = <A extends number>(
  */
 export const NonNaNTypeId = Symbol.for("@effect/schema/NonNaNTypeId")
 
+/** @internal */
+export const _nonNaN = <A extends number>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => !Number.isNaN(a), {
+    typeId: NonNaNTypeId,
+    description: "a number NaN excluded",
+    ...options
+  })
+
 /**
  * @category number filters
  * @since 1.0.0
  */
 export const nonNaN = <A extends number>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => !Number.isNaN(a), {
-        typeId: NonNaNTypeId,
-        description: "a number NaN excluded",
-        ...options
-      })
-    )
+  (self: Schema<A>): Schema<A> => make(_nonNaN(self.ast, options))
 
-/**
- * @category type id
- * @since 1.0.0
- */
-export const PositiveTypeId = Symbol.for("@effect/schema/PositiveTypeId")
+/** @internal */
+export const _positive = <A extends number>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _greaterThan(ast, 0, {
+    description: "a positive number",
+    ...options
+  })
 
 /**
  * @category number filters
@@ -1427,18 +1452,17 @@ export const PositiveTypeId = Symbol.for("@effect/schema/PositiveTypeId")
  */
 export const positive = <A extends number>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThan(0, {
-    typeId: PositiveTypeId,
-    description: "a positive number",
+) => (self: Schema<A>): Schema<A> => make(_positive(self.ast, options))
+
+/** @internal */
+export const _negative = <A extends number>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _lessThan(ast, 0, {
+    description: "a negative number",
     ...options
   })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NegativeTypeId = Symbol.for("@effect/schema/NegativeTypeId")
 
 /**
  * @category number filters
@@ -1446,18 +1470,17 @@ export const NegativeTypeId = Symbol.for("@effect/schema/NegativeTypeId")
  */
 export const negative = <A extends number>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThan(0, {
-    typeId: NegativeTypeId,
-    description: "a negative number",
+) => (self: Schema<A>): Schema<A> => make(_negative(self.ast, options))
+
+/** @internal */
+export const _nonNegative = <A extends number>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _greaterThanOrEqualTo(ast, 0, {
+    description: "a non-negative number",
     ...options
   })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonNegativeTypeId = Symbol.for("@effect/schema/NonNegativeTypeId")
 
 /**
  * @category number filters
@@ -1465,18 +1488,17 @@ export const NonNegativeTypeId = Symbol.for("@effect/schema/NonNegativeTypeId")
  */
 export const nonNegative = <A extends number>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThanOrEqualTo(0, {
-    typeId: NonNegativeTypeId,
-    description: "a non-negative number",
+) => (self: Schema<A>): Schema<A> => make(_nonNegative(self.ast, options))
+
+/** @internal */
+export const _nonPositive = <A extends number>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _lessThanOrEqualTo(ast, 0, {
+    description: "a non-positive number",
     ...options
   })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonPositiveTypeId = Symbol.for("@effect/schema/NonPositiveTypeId")
 
 /**
  * @category number filters
@@ -1484,18 +1506,26 @@ export const NonPositiveTypeId = Symbol.for("@effect/schema/NonPositiveTypeId")
  */
 export const nonPositive = <A extends number>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThanOrEqualTo(0, {
-    typeId: NonPositiveTypeId,
-    description: "a non-positive number",
-    ...options
-  })
+) => (self: Schema<A>): Schema<A> => make(_nonPositive(self.ast, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const MultipleOfTypeId = Symbol.for("@effect/schema/MultipleOfTypeId")
+
+/** @internal */
+export const _multipleOf = <A extends number>(
+  ast: AST.AST,
+  divisor: number,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => N.remainder(a, divisor) === 0, {
+    typeId: MultipleOfTypeId,
+    description: `a number divisible by ${divisor}`,
+    jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
+    ...options
+  })
 
 /**
  * @category number filters
@@ -1504,17 +1534,7 @@ export const MultipleOfTypeId = Symbol.for("@effect/schema/MultipleOfTypeId")
 export const multipleOf = <A extends number>(
   divisor: number,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => N.remainder(a, divisor) === 0, {
-        typeId: MultipleOfTypeId,
-        description: `a number divisible by ${divisor}`,
-        jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_multipleOf(self.ast, divisor, options))
 
 // ---------------------------------------------
 // bigint filters
@@ -1526,6 +1546,19 @@ export const multipleOf = <A extends number>(
  */
 export const GreaterThanBigintTypeId = Symbol.for("@effect/schema/GreaterThanBigintTypeId")
 
+/** @internal */
+export const _greaterThanBigint = <A extends bigint>(
+  ast: AST.AST,
+  min: bigint,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a > min, {
+    typeId: GreaterThanBigintTypeId,
+    description: `a bigint greater than ${min}n`,
+    jsonSchema: { exclusiveMinimum: min },
+    ...options
+  })
+
 /**
  * @category bigint filters
  * @since 1.0.0
@@ -1533,17 +1566,7 @@ export const GreaterThanBigintTypeId = Symbol.for("@effect/schema/GreaterThanBig
 export const greaterThanBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a > min, {
-        typeId: GreaterThanBigintTypeId,
-        description: `a bigint greater than ${min}n`,
-        jsonSchema: { exclusiveMinimum: min },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_greaterThanBigint(self.ast, min, options))
 
 /**
  * @category type id
@@ -1553,6 +1576,19 @@ export const GreaterThanOrEqualToBigintTypeId = Symbol.for(
   "@effect/schema/GreaterThanOrEqualToBigintTypeId"
 )
 
+/** @internal */
+export const _greaterThanOrEqualToBigint = <A extends bigint>(
+  ast: AST.AST,
+  min: bigint,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a >= min, {
+    typeId: GreaterThanOrEqualToBigintTypeId,
+    description: `a bigint greater than or equal to ${min}n`,
+    jsonSchema: { minimum: min },
+    ...options
+  })
+
 /**
  * @category bigint filters
  * @since 1.0.0
@@ -1560,23 +1596,26 @@ export const GreaterThanOrEqualToBigintTypeId = Symbol.for(
 export const greaterThanOrEqualToBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min, {
-        typeId: GreaterThanOrEqualToBigintTypeId,
-        description: `a bigint greater than or equal to ${min}n`,
-        jsonSchema: { minimum: min },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_greaterThanOrEqualToBigint(self.ast, min, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const LessThanBigintTypeId = Symbol.for("@effect/schema/LessThanBigintTypeId")
+
+/** @internal */
+export const _lessThanBigint = <A extends bigint>(
+  ast: AST.AST,
+  max: bigint,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a < max, {
+    typeId: LessThanBigintTypeId,
+    description: `a bigint less than ${max}n`,
+    jsonSchema: { exclusiveMaximum: max },
+    ...options
+  })
 
 /**
  * @category bigint filters
@@ -1585,17 +1624,7 @@ export const LessThanBigintTypeId = Symbol.for("@effect/schema/LessThanBigintTyp
 export const lessThanBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a < max, {
-        typeId: LessThanBigintTypeId,
-        description: `a bigint less than ${max}n`,
-        jsonSchema: { exclusiveMaximum: max },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_lessThanBigint(self.ast, max, options))
 
 /**
  * @category type id
@@ -1605,6 +1634,19 @@ export const LessThanOrEqualToBigintTypeId = Symbol.for(
   "@effect/schema/LessThanOrEqualToBigintTypeId"
 )
 
+/** @internal */
+export const _lessThanOrEqualToBigint = <A extends bigint>(
+  ast: AST.AST,
+  max: bigint,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _filter(ast, (a): a is A => a <= max, {
+    typeId: LessThanOrEqualToBigintTypeId,
+    description: `a bigint less than or equal to ${max}n`,
+    jsonSchema: { maximum: max },
+    ...options
+  })
+
 /**
  * @category bigint filters
  * @since 1.0.0
@@ -1612,25 +1654,23 @@ export const LessThanOrEqualToBigintTypeId = Symbol.for(
 export const lessThanOrEqualToBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a <= max, {
-        typeId: LessThanOrEqualToBigintTypeId,
-        description: `a bigint less than or equal to ${max}n`,
-        jsonSchema: { maximum: max },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_lessThanOrEqualToBigint(self.ast, max, options))
+
+/** @internal */
+export const _betweenBigint = <A extends bigint>(
+  ast: AST.AST,
+  min: bigint,
+  max: bigint,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _lessThanOrEqualToBigint(_greaterThanOrEqualToBigint(ast, min), max, {
+    description: `a bigint between ${min}n and ${max}n`,
+    ...options
+  })
 
 /**
- * @category type id
- * @since 1.0.0
- */
-export const BetweenBigintTypeId = Symbol.for("@effect/schema/BetweenBigintTypeId")
-
-/**
+ * Tests if a `bigint` is between a minimum and a maximum value (included).
+ *
  * @category bigint filters
  * @since 1.0.0
  */
@@ -1638,23 +1678,17 @@ export const betweenBigint = <A extends bigint>(
   min: bigint,
   max: bigint,
   options?: FilterAnnotations<A>
-) =>
-  (self: Schema<A>): Schema<A> =>
-    pipe(
-      self,
-      filter((a): a is A => a >= min && a <= max, {
-        typeId: BetweenBigintTypeId,
-        description: `a bigint between ${min}n and ${max}n`,
-        jsonSchema: { maximum: max, minimum: min },
-        ...options
-      })
-    )
+) => (self: Schema<A>): Schema<A> => make(_betweenBigint(self.ast, min, max, options))
 
-/**
- * @category type id
- * @since 1.0.0
- */
-export const PositiveBigintTypeId = Symbol.for("@effect/schema/PositiveBigintTypeId")
+/** @internal */
+export const _positiveBigint = <A extends bigint>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _greaterThanBigint(ast, 0n, {
+    description: "a positive bigint",
+    ...options
+  })
 
 /**
  * @category bigint filters
@@ -1662,18 +1696,17 @@ export const PositiveBigintTypeId = Symbol.for("@effect/schema/PositiveBigintTyp
  */
 export const positiveBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThanBigint(0n, {
-    typeId: PositiveBigintTypeId,
-    description: "a positive bigint",
+) => (self: Schema<A>): Schema<A> => make(_positiveBigint(self.ast, options))
+
+/** @internal */
+export const _negativeBigint = <A extends bigint>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _lessThanBigint(ast, 0n, {
+    description: "a negative bigint",
     ...options
   })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NegativeBigintTypeId = Symbol.for("@effect/schema/NegativeBigintTypeId")
 
 /**
  * @category bigint filters
@@ -1681,18 +1714,17 @@ export const NegativeBigintTypeId = Symbol.for("@effect/schema/NegativeBigintTyp
  */
 export const negativeBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThanBigint(0n, {
-    typeId: NegativeBigintTypeId,
-    description: "a negative bigint",
+) => (self: Schema<A>): Schema<A> => make(_negativeBigint(self.ast, options))
+
+/** @internal */
+export const _nonPositiveBigint = <A extends bigint>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _lessThanOrEqualToBigint(ast, 0n, {
+    description: "a non-positive bigint",
     ...options
   })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonPositiveBigintTypeId = Symbol.for("@effect/schema/NonPositiveBigintTypeId")
 
 /**
  * @category bigint filters
@@ -1700,18 +1732,17 @@ export const NonPositiveBigintTypeId = Symbol.for("@effect/schema/NonPositiveBig
  */
 export const nonPositiveBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  lessThanOrEqualToBigint(0n, {
-    typeId: NonPositiveBigintTypeId,
-    description: "a non-positive bigint",
+) => (self: Schema<A>): Schema<A> => make(_nonPositiveBigint(self.ast, options))
+
+/** @internal */
+export const _nonNegativeBigint = <A extends bigint>(
+  ast: AST.AST,
+  options?: FilterAnnotations<A>
+): AST.AST =>
+  _greaterThanOrEqualToBigint(ast, 0n, {
+    description: "a non-negative bigint",
     ...options
   })
-
-/**
- * @category type id
- * @since 1.0.0
- */
-export const NonNegativeBigintTypeId = Symbol.for("@effect/schema/NonNegativeBigintTypeId")
 
 /**
  * @category bigint filters
@@ -1719,12 +1750,7 @@ export const NonNegativeBigintTypeId = Symbol.for("@effect/schema/NonNegativeBig
  */
 export const nonNegativeBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-): (self: Schema<A>) => Schema<A> =>
-  greaterThanOrEqualToBigint(0n, {
-    typeId: NonNegativeBigintTypeId,
-    description: "a non-negative bigint",
-    ...options
-  })
+) => (self: Schema<A>): Schema<A> => make(_nonNegativeBigint(self.ast, options))
 
 // ---------------------------------------------
 // ReadonlyArray filters
@@ -1736,6 +1762,19 @@ export const nonNegativeBigint = <A extends bigint>(
  */
 export const MinItemsTypeId = Symbol.for("@effect/schema/MinItemsTypeId")
 
+/** @internal */
+export const _minItems = <A>(
+  ast: AST.AST,
+  n: number,
+  options?: FilterAnnotations<ReadonlyArray<A>>
+): AST.AST =>
+  _filter(ast, (a): a is ReadonlyArray<A> => a.length >= n, {
+    typeId: MinItemsTypeId,
+    description: `an array of at least ${n} items`,
+    jsonSchema: { minItems: n },
+    ...options
+  })
+
 /**
  * @category ReadonlyArray filters
  * @since 1.0.0
@@ -1745,21 +1784,26 @@ export const minItems = <A>(
   options?: FilterAnnotations<ReadonlyArray<A>>
 ) =>
   (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length >= n, {
-        typeId: MinItemsTypeId,
-        description: `an array of at least ${n} items`,
-        jsonSchema: { minItems: n },
-        ...options
-      })
-    )
+    make(_minItems(self.ast, n, options))
 
 /**
  * @category type id
  * @since 1.0.0
  */
 export const MaxItemsTypeId = Symbol.for("@effect/schema/MaxItemsTypeId")
+
+/** @internal */
+export const _maxItems = <A>(
+  ast: AST.AST,
+  n: number,
+  options?: FilterAnnotations<ReadonlyArray<A>>
+): AST.AST =>
+  _filter(ast, (a): a is ReadonlyArray<A> => a.length <= n, {
+    typeId: MaxItemsTypeId,
+    description: `an array of at most ${n} items`,
+    jsonSchema: { maxItems: n },
+    ...options
+  })
 
 /**
  * @category ReadonlyArray filters
@@ -1770,21 +1814,18 @@ export const maxItems = <A>(
   options?: FilterAnnotations<ReadonlyArray<A>>
 ) =>
   (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length <= n, {
-        typeId: MaxItemsTypeId,
-        description: `an array of at most ${n} items`,
-        jsonSchema: { maxItems: n },
-        ...options
-      })
-    )
+    make(_maxItems(self.ast, n, options))
 
-/**
- * @category type id
- * @since 1.0.0
- */
-export const ItemsCountTypeId = Symbol.for("@effect/schema/ItemsCountTypeId")
+/** @internal */
+export const _itemsCount = <A>(
+  ast: AST.AST,
+  n: number,
+  options?: FilterAnnotations<ReadonlyArray<A>>
+): AST.AST =>
+  _maxItems(_minItems(ast, n), n, {
+    description: `an array of exactly ${n} items`,
+    ...options
+  })
 
 /**
  * @category ReadonlyArray filters
@@ -1795,15 +1836,7 @@ export const itemsCount = <A>(
   options?: FilterAnnotations<ReadonlyArray<A>>
 ) =>
   (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    pipe(
-      self,
-      filter((a): a is ReadonlyArray<A> => a.length === n, {
-        typeId: ItemsCountTypeId,
-        description: `an array of exactly ${n} items`,
-        jsonSchema: { minItems: n, maxItems: n },
-        ...options
-      })
-    )
+    make(_itemsCount(self.ast, n, options))
 
 // ---------------------------------------------
 // data types

@@ -12,31 +12,45 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [Chunk](#chunk)
+- [Chunk transformations](#chunk-transformations)
   - [chunk](#chunk)
   - [chunkFromSelf](#chunkfromself)
-- [Data](#data)
+- [Data transformations](#data-transformations)
   - [data](#data)
   - [dataFromSelf](#datafromself)
-- [Date](#date)
-  - [Date](#date-1)
+- [Date transformations](#date-transformations)
+  - [Date](#date)
   - [dateFromString](#datefromstring)
-- [Either](#either)
+- [Either transformations](#either-transformations)
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
-- [Option](#option)
+- [Option transformations](#option-transformations)
   - [option](#option)
   - [optionFromNullable](#optionfromnullable)
   - [optionFromSelf](#optionfromself)
-- [ReadonlyMap](#readonlymap)
+- [ReadonlyArray filters](#readonlyarray-filters)
+  - [itemsCount](#itemscount)
+  - [maxItems](#maxitems)
+  - [minItems](#minitems)
+- [ReadonlyMap transformations](#readonlymap-transformations)
   - [readonlyMap](#readonlymap)
   - [readonlyMapFromSelf](#readonlymapfromself)
-- [ReadonlySet](#readonlyset)
+- [ReadonlySet transformations](#readonlyset-transformations)
   - [readonlySet](#readonlyset)
   - [readonlySetFromSelf](#readonlysetfromself)
-- [bigint](#bigint)
+- [bigint filters](#bigint-filters)
+  - [betweenBigint](#betweenbigint)
+  - [greaterThanBigint](#greaterthanbigint)
+  - [greaterThanOrEqualToBigint](#greaterthanorequaltobigint)
+  - [lessThanBigint](#lessthanbigint)
+  - [lessThanOrEqualToBigint](#lessthanorequaltobigint)
+  - [negativeBigint](#negativebigint)
+  - [nonNegativeBigint](#nonnegativebigint)
+  - [nonPositiveBigint](#nonpositivebigint)
+  - [positiveBigint](#positivebigint)
+- [bigint transformations](#bigint-transformations)
   - [clampBigint](#clampbigint)
-- [boolean](#boolean)
+- [boolean transformations](#boolean-transformations)
   - [not](#not)
 - [combinators](#combinators)
   - [array](#array)
@@ -80,7 +94,21 @@ Added in v1.0.0
   - [encodeResult](#encoderesult)
 - [model](#model)
   - [Codec (interface)](#codec-interface)
-- [number](#number)
+- [number filters](#number-filters)
+  - [between](#between)
+  - [finite](#finite)
+  - [greaterThan](#greaterthan)
+  - [greaterThanOrEqualTo](#greaterthanorequalto)
+  - [int](#int)
+  - [lessThan](#lessthan)
+  - [lessThanOrEqualTo](#lessthanorequalto)
+  - [multipleOf](#multipleof)
+  - [negative](#negative)
+  - [nonNaN](#nonnan)
+  - [nonNegative](#nonnegative)
+  - [nonPositive](#nonpositive)
+  - [positive](#positive)
+- [number transformations](#number-transformations)
   - [NumberFromString](#numberfromstring)
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring)
@@ -91,11 +119,19 @@ Added in v1.0.0
   - [parseOption](#parseoption)
   - [parsePromise](#parsepromise)
   - [parseResult](#parseresult)
-- [string](#string)
+- [string filters](#string-filters)
+  - [endsWith](#endswith)
+  - [includes](#includes)
+  - [length](#length)
+  - [maxLength](#maxlength)
+  - [minLength](#minlength)
+  - [nonEmpty](#nonempty)
+  - [pattern](#pattern)
+  - [startsWith](#startswith)
+  - [trimmed](#trimmed)
+- [string transformations](#string-transformations)
   - [Trim](#trim)
   - [trim](#trim)
-- [string filters](#string-filters)
-  - [minLength](#minlength)
 - [utils](#utils)
   - [From (type alias)](#from-type-alias)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
@@ -105,7 +141,7 @@ Added in v1.0.0
 
 ---
 
-# Chunk
+# Chunk transformations
 
 ## chunk
 
@@ -127,7 +163,7 @@ export declare const chunkFromSelf: <I, A>(item: Codec<I, A>) => Codec<Chunk<I>,
 
 Added in v1.0.0
 
-# Data
+# Data transformations
 
 ## data
 
@@ -159,7 +195,7 @@ export declare const dataFromSelf: <
 
 Added in v1.0.0
 
-# Date
+# Date transformations
 
 ## Date
 
@@ -185,7 +221,7 @@ export declare const dateFromString: <I>(self: Codec<I, string>) => Codec<I, Dat
 
 Added in v1.0.0
 
-# Either
+# Either transformations
 
 ## either
 
@@ -213,7 +249,7 @@ export declare const eitherFromSelf: <IE, E, IA, A>(
 
 Added in v1.0.0
 
-# Option
+# Option transformations
 
 ## option
 
@@ -247,7 +283,48 @@ export declare const optionFromSelf: <I, A>(value: Codec<I, A>) => Codec<Option<
 
 Added in v1.0.0
 
-# ReadonlyMap
+# ReadonlyArray filters
+
+## itemsCount
+
+**Signature**
+
+```ts
+export declare const itemsCount: <A>(
+  n: number,
+  options?: S.FilterAnnotations<readonly A[]> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## maxItems
+
+**Signature**
+
+```ts
+export declare const maxItems: <A>(
+  n: number,
+  options?: S.FilterAnnotations<readonly A[]> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## minItems
+
+**Signature**
+
+```ts
+export declare const minItems: <A>(
+  n: number,
+  options?: S.FilterAnnotations<readonly A[]> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+# ReadonlyMap transformations
 
 ## readonlyMap
 
@@ -275,7 +352,7 @@ export declare const readonlyMapFromSelf: <IK, K, IV, V>(
 
 Added in v1.0.0
 
-# ReadonlySet
+# ReadonlySet transformations
 
 ## readonlySet
 
@@ -297,7 +374,125 @@ export declare const readonlySetFromSelf: <I, A>(item: Codec<I, A>) => Codec<Rea
 
 Added in v1.0.0
 
-# bigint
+# bigint filters
+
+## betweenBigint
+
+Tests if a `bigint` is between a minimum and a maximum value (included).
+
+**Signature**
+
+```ts
+export declare const betweenBigint: <A extends bigint>(
+  min: bigint,
+  max: bigint,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanBigint
+
+**Signature**
+
+```ts
+export declare const greaterThanBigint: <A extends bigint>(
+  min: bigint,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanOrEqualToBigint
+
+**Signature**
+
+```ts
+export declare const greaterThanOrEqualToBigint: <A extends bigint>(
+  min: bigint,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanBigint
+
+**Signature**
+
+```ts
+export declare const lessThanBigint: <A extends bigint>(
+  max: bigint,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanOrEqualToBigint
+
+**Signature**
+
+```ts
+export declare const lessThanOrEqualToBigint: <A extends bigint>(
+  max: bigint,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## negativeBigint
+
+**Signature**
+
+```ts
+export declare const negativeBigint: <A extends bigint>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## nonNegativeBigint
+
+**Signature**
+
+```ts
+export declare const nonNegativeBigint: <A extends bigint>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## nonPositiveBigint
+
+**Signature**
+
+```ts
+export declare const nonPositiveBigint: <A extends bigint>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## positiveBigint
+
+**Signature**
+
+```ts
+export declare const positiveBigint: <A extends bigint>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+# bigint transformations
 
 ## clampBigint
 
@@ -311,7 +506,7 @@ export declare const clampBigint: (min: bigint, max: bigint) => <I>(self: Codec<
 
 Added in v1.0.0
 
-# boolean
+# boolean transformations
 
 ## not
 
@@ -838,7 +1033,174 @@ export interface Codec<From, To> {
 
 Added in v1.0.0
 
-# number
+# number filters
+
+## between
+
+Tests if a `number` is between a minimum and a maximum value (included).
+
+**Signature**
+
+```ts
+export declare const between: <A extends number>(
+  min: number,
+  max: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## finite
+
+**Signature**
+
+```ts
+export declare const finite: <A extends number>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThan
+
+**Signature**
+
+```ts
+export declare const greaterThan: <A extends number>(
+  min: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanOrEqualTo
+
+**Signature**
+
+```ts
+export declare const greaterThanOrEqualTo: <A extends number>(
+  min: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## int
+
+**Signature**
+
+```ts
+export declare const int: <A extends number>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## lessThan
+
+**Signature**
+
+```ts
+export declare const lessThan: <A extends number>(
+  max: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanOrEqualTo
+
+**Signature**
+
+```ts
+export declare const lessThanOrEqualTo: <A extends number>(
+  max: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## multipleOf
+
+**Signature**
+
+```ts
+export declare const multipleOf: <A extends number>(
+  divisor: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## negative
+
+**Signature**
+
+```ts
+export declare const negative: <A extends number>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## nonNaN
+
+**Signature**
+
+```ts
+export declare const nonNaN: <A extends number>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## nonNegative
+
+**Signature**
+
+```ts
+export declare const nonNegative: <A extends number>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## nonPositive
+
+**Signature**
+
+```ts
+export declare const nonPositive: <A extends number>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## positive
+
+**Signature**
+
+```ts
+export declare const positive: <A extends number>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+# number transformations
 
 ## NumberFromString
 
@@ -952,7 +1314,129 @@ export declare const parseResult: <I, A>(
 
 Added in v1.0.0
 
-# string
+# string filters
+
+## endsWith
+
+**Signature**
+
+```ts
+export declare const endsWith: <A extends string>(
+  endsWith: string,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## includes
+
+**Signature**
+
+```ts
+export declare const includes: <A extends string>(
+  searchString: string,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## length
+
+**Signature**
+
+```ts
+export declare const length: <A extends string>(
+  length: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## maxLength
+
+**Signature**
+
+```ts
+export declare const maxLength: <A extends string>(
+  maxLength: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## minLength
+
+**Signature**
+
+```ts
+export declare const minLength: <A extends string>(
+  minLength: number,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## nonEmpty
+
+**Signature**
+
+```ts
+export declare const nonEmpty: <A extends string>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## pattern
+
+**Signature**
+
+```ts
+export declare const pattern: <A extends string>(
+  regex: RegExp,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## startsWith
+
+**Signature**
+
+```ts
+export declare const startsWith: <A extends string>(
+  startsWith: string,
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+## trimmed
+
+Verifies that a string contains no leading or trailing whitespaces.
+
+Note. This combinator does not make any transformations, it only validates.
+If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+
+**Signature**
+
+```ts
+export declare const trimmed: <A extends string>(
+  options?: S.FilterAnnotations<A> | undefined
+) => <I>(self: Codec<I, A>) => Codec<I, A>
+```
+
+Added in v1.0.0
+
+# string transformations
 
 ## Trim
 
@@ -974,21 +1458,6 @@ This combinator allows removing whitespaces from the beginning and end of a stri
 
 ```ts
 export declare const trim: <I>(self: Codec<I, string>) => Codec<I, string>
-```
-
-Added in v1.0.0
-
-# string filters
-
-## minLength
-
-**Signature**
-
-```ts
-export declare const minLength: <A extends string>(
-  minLength: number,
-  options?: S.FilterAnnotations<A> | undefined
-) => <I>(self: Codec<I, A>) => Codec<I, A>
 ```
 
 Added in v1.0.0

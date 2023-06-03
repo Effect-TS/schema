@@ -4,7 +4,7 @@ import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("annotations", () => {
-  it("filter/ annotation options", () => {
+  it("on filter", () => {
     const schema = pipe(
       S.string,
       S.filter((s): s is string => s.length === 1, {

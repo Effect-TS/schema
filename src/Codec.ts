@@ -688,14 +688,316 @@ export const minLength = <A extends string>(
   options?: S.FilterAnnotations<A>
 ) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._minLength(self.ast, minLength, options))
 
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const nonEmpty = <A extends string>(
+  options?: S.FilterAnnotations<A>
+): <I>(self: Codec<I, A>) => Codec<I, A> => minLength(1, options)
+
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const maxLength = <A extends string>(
+  maxLength: number,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._maxLength(self.ast, maxLength, options))
+
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const length = <A extends string>(
+  length: number,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => minLength(length, options)(maxLength<A>(length)(self))
+
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const pattern = <A extends string>(
+  regex: RegExp,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._pattern(self.ast, regex, options))
+
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const startsWith = <A extends string>(
+  startsWith: string,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._startsWith(self.ast, startsWith, options))
+
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const endsWith = <A extends string>(
+  endsWith: string,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._endsWith(self.ast, endsWith, options))
+
+/**
+ * @category string filters
+ * @since 1.0.0
+ */
+export const includes = <A extends string>(
+  searchString: string,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._includes(self.ast, searchString, options))
+
+/**
+ * Verifies that a string contains no leading or trailing whitespaces.
+ *
+ * Note. This combinator does not make any transformations, it only validates.
+ * If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+ *
+ * @category string filters
+ * @since 1.0.0
+ */
+export const trimmed = <A extends string>(options?: S.FilterAnnotations<A>) =>
+  <I>(self: Codec<I, A>): Codec<I, A> => make(S._trimmed(self.ast, options))
+
 // ---------------------------------------------
-// string
+// number filters
+// ---------------------------------------------
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const greaterThan = <A extends number>(
+  min: number,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._greaterThan(self.ast, min, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const greaterThanOrEqualTo = <A extends number>(
+  min: number,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._greaterThanOrEqualTo(self.ast, min, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const lessThan = <A extends number>(max: number, options?: S.FilterAnnotations<A>) =>
+  <I>(self: Codec<I, A>): Codec<I, A> => make(S._lessThan(self.ast, max, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const lessThanOrEqualTo = <A extends number>(
+  max: number,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._lessThanOrEqualTo(self.ast, max, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const int = <A extends number>(options?: S.FilterAnnotations<A>) =>
+  <I>(self: Codec<I, A>): Codec<I, A> => make(S._int(self.ast, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const finite = <A extends number>(options?: S.FilterAnnotations<A>) =>
+  <I>(self: Codec<I, A>): Codec<I, A> => make(S._finite(self.ast, options))
+
+/**
+ * Tests if a `number` is between a minimum and a maximum value (included).
+ *
+ * @category number filters
+ * @since 1.0.0
+ */
+export const between = <A extends number>(
+  min: number,
+  max: number,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._between(self.ast, min, max, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const nonNaN = <A extends number>(options?: S.FilterAnnotations<A>) =>
+  <I>(self: Codec<I, A>): Codec<I, A> => make(S._nonNaN(self.ast, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const positive = <A extends number>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._positive(self.ast, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const negative = <A extends number>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._negative(self.ast, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const nonNegative = <A extends number>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._nonNegative(self.ast, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const nonPositive = <A extends number>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._nonPositive(self.ast, options))
+
+/**
+ * @category number filters
+ * @since 1.0.0
+ */
+export const multipleOf = <A extends number>(
+  divisor: number,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._multipleOf(self.ast, divisor, options))
+
+// ---------------------------------------------
+// bigint filters
+// ---------------------------------------------
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const greaterThanBigint = <A extends bigint>(
+  min: bigint,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._greaterThanBigint(self.ast, min, options))
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const greaterThanOrEqualToBigint = <A extends bigint>(
+  min: bigint,
+  options?: S.FilterAnnotations<A>
+) =>
+  <I>(self: Codec<I, A>): Codec<I, A> => make(S._greaterThanOrEqualToBigint(self.ast, min, options))
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const lessThanBigint = <A extends bigint>(
+  max: bigint,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._lessThanBigint(self.ast, max, options))
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const lessThanOrEqualToBigint = <A extends bigint>(
+  max: bigint,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._lessThanOrEqualToBigint(self.ast, max, options))
+
+/**
+ * Tests if a `bigint` is between a minimum and a maximum value (included).
+ *
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const betweenBigint = <A extends bigint>(
+  min: bigint,
+  max: bigint,
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._betweenBigint(self.ast, min, max, options))
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const positiveBigint = <A extends bigint>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._positiveBigint(self.ast, options))
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const negativeBigint = <A extends bigint>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._negativeBigint(self.ast, options))
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const nonPositiveBigint = <A extends bigint>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._nonPositiveBigint(self.ast, options))
+
+/**
+ * @category bigint filters
+ * @since 1.0.0
+ */
+export const nonNegativeBigint = <A extends bigint>(
+  options?: S.FilterAnnotations<A>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._nonNegativeBigint(self.ast, options))
+
+// ---------------------------------------------
+// ReadonlyArray filters
+// ---------------------------------------------
+
+/**
+ * @category ReadonlyArray filters
+ * @since 1.0.0
+ */
+export const minItems = <A>(
+  n: number,
+  options?: S.FilterAnnotations<ReadonlyArray<A>>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._minItems(self.ast, n, options))
+
+/**
+ * @category ReadonlyArray filters
+ * @since 1.0.0
+ */
+export const maxItems = <A>(
+  n: number,
+  options?: S.FilterAnnotations<ReadonlyArray<A>>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._maxItems(self.ast, n, options))
+
+/**
+ * @category ReadonlyArray filters
+ * @since 1.0.0
+ */
+export const itemsCount = <A>(
+  n: number,
+  options?: S.FilterAnnotations<ReadonlyArray<A>>
+) => <I>(self: Codec<I, A>): Codec<I, A> => make(S._itemsCount(self.ast, n, options))
+
+// ---------------------------------------------
+// string transformations
 // ---------------------------------------------
 
 /**
  * This combinator allows removing whitespaces from the beginning and end of a string.
  *
- * @category string
+ * @category string transformations
  * @since 1.0.0
  */
 export const trim = <I>(self: Codec<I, string>): Codec<I, string> =>
@@ -709,19 +1011,19 @@ export const trim = <I>(self: Codec<I, string>): Codec<I, string> =>
 /**
  * This transformation allows removing whitespaces from the beginning and end of a string.
  *
- * @category string
+ * @category string transformations
  * @since 1.0.0
  */
 export const Trim: Codec<string, string> = trim(S.string)
 
 // ---------------------------------------------
-// number
+// number transformations
 // ---------------------------------------------
 
 /**
  * Clamps a number between a minimum and a maximum value.
  *
- * @category number
+ * @category number transformations
  * @since 1.0.0
  */
 export const clamp = (min: number, max: number) =>
@@ -738,7 +1040,7 @@ export const clamp = (min: number, max: number) =>
 
   The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
-  @category number
+  @category number transformations
   @since 1.0.0
 */
 export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
@@ -766,19 +1068,19 @@ export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
  *
  * The following special string values are supported: "NaN", "Infinity", "-Infinity".
  *
- * @category number
+ * @category number transformations
  * @since 1.0.0
  */
 export const NumberFromString: Codec<string, number> = numberFromString(S.string)
 
 // ---------------------------------------------
-// boolean
+// boolean transformations
 // ---------------------------------------------
 
 /**
  * Negates a boolean value
  *
- * @category boolean
+ * @category boolean transformations
  * @since 1.0.0
  */
 export const not = <I>(self: Codec<I, boolean>): Codec<I, boolean> =>
@@ -790,13 +1092,13 @@ export const not = <I>(self: Codec<I, boolean>): Codec<I, boolean> =>
   )
 
 // ---------------------------------------------
-// bigint
+// bigint transformations
 // ---------------------------------------------
 
 /**
  * Clamps a bigint between a minimum and a maximum value.
  *
- * @category bigint
+ * @category bigint transformations
  * @since 1.0.0
  */
 export const clampBigint = (min: bigint, max: bigint) =>
@@ -809,13 +1111,13 @@ export const clampBigint = (min: bigint, max: bigint) =>
     )
 
 // ---------------------------------------------
-// Date
+// Date transformations
 // ---------------------------------------------
 
 /**
  * A combinator that transforms a `string` into a valid `Date`.
  *
- * @category Date
+ * @category Date transformations
  * @since 1.0.0
  */
 export const dateFromString = <I>(self: Codec<I, string>): Codec<I, Date> =>
@@ -832,18 +1134,18 @@ export {
   /**
    * A schema that transforms a `string` into a `Date`.
    *
-   * @category Date
+   * @category Date transformations
    * @since 1.0.0
    */
   _Date as Date
 }
 
 // ---------------------------------------------
-// Option
+// Option transformations
 // ---------------------------------------------
 
 /**
- * @category Option
+ * @category Option transformations
  * @since 1.0.0
  */
 export const optionFromSelf = <I, A>(value: Codec<I, A>): Codec<Option<I>, Option<A>> => {
@@ -867,7 +1169,7 @@ const optionAsJson = <A>(value: S.Schema<A>) =>
   S.union(S.struct({ _tag: S.literal("None") }), S.struct({ _tag: S.literal("Some"), value }))
 
 /**
- * @category Option
+ * @category Option transformations
  * @since 1.0.0
  */
 export const option = <I, A>(
@@ -893,7 +1195,7 @@ export const option = <I, A>(
 }
 
 /**
- * @category Option
+ * @category Option transformations
  * @since 1.0.0
  */
 export const optionFromNullable = <I, A>(
@@ -911,11 +1213,11 @@ export const optionFromNullable = <I, A>(
 }
 
 // ---------------------------------------------
-// Either
+// Either transformations
 // ---------------------------------------------
 
 /**
- * @category Either
+ * @category Either transformations
  * @since 1.0.0
  */
 export const eitherFromSelf = <IE, E, IA, A>(
@@ -947,7 +1249,7 @@ const eitherAsJson = <E, A>(left: S.Schema<E>, right: S.Schema<A>) =>
   )
 
 /**
- * @category Either
+ * @category Either transformations
  * @since 1.0.0
  */
 export const either = <IE, E, IA, A>(
@@ -982,11 +1284,11 @@ export const either = <IE, E, IA, A>(
 }
 
 // ---------------------------------------------
-// ReadonlyMap
+// ReadonlyMap transformations
 // ---------------------------------------------
 
 /**
- * @category ReadonlyMap
+ * @category ReadonlyMap transformations
  * @since 1.0.0
  */
 export const readonlyMapFromSelf = <IK, K, IV, V>(
@@ -1005,7 +1307,7 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
 }
 
 /**
- * @category ReadonlyMap
+ * @category ReadonlyMap transformations
  * @since 1.0.0
  */
 export const readonlyMap = <IK, K, IV, V>(
@@ -1020,11 +1322,11 @@ export const readonlyMap = <IK, K, IV, V>(
   )
 
 // ---------------------------------------------
-// ReadonlySet
+// ReadonlySet transformations
 // ---------------------------------------------
 
 /**
- * @category ReadonlySet
+ * @category ReadonlySet transformations
  * @since 1.0.0
  */
 export const readonlySetFromSelf = <I, A>(
@@ -1041,7 +1343,7 @@ export const readonlySetFromSelf = <I, A>(
 }
 
 /**
- * @category ReadonlySet
+ * @category ReadonlySet transformations
  * @since 1.0.0
  */
 export const readonlySet = <I, A>(
@@ -1055,11 +1357,11 @@ export const readonlySet = <I, A>(
   )
 
 // ---------------------------------------------
-// Chunk
+// Chunk transformations
 // ---------------------------------------------
 
 /**
- * @category Chunk
+ * @category Chunk transformations
  * @since 1.0.0
  */
 export const chunkFromSelf = <I, A>(item: Codec<I, A>): Codec<Chunk<I>, Chunk<A>> => {
@@ -1074,14 +1376,14 @@ export const chunkFromSelf = <I, A>(item: Codec<I, A>): Codec<Chunk<I>, Chunk<A>
 }
 
 /**
- * @category Chunk
+ * @category Chunk transformations
  * @since 1.0.0
  */
 export const chunk = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, Chunk<A>> =>
   transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray)
 
 // ---------------------------------------------
-// Data
+// Data transformations
 // ---------------------------------------------
 
 const fromData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
@@ -1089,7 +1391,7 @@ const fromData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
 ): A => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
 
 /**
- * @category Data
+ * @category Data transformations
  * @since 1.0.0
  */
 export const dataFromSelf = <
@@ -1109,7 +1411,7 @@ export const dataFromSelf = <
 }
 
 /**
- * @category Data
+ * @category Data transformations
  * @since 1.0.0
  */
 export const data = <
