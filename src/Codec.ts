@@ -187,22 +187,30 @@ export const transformResult: {
   <I2, A2, A1>(
     to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>,
+    annotations?: AST.Annotated["annotations"]
   ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
   <I1, A1, I2, A2>(
     from: Codec<I1, A1>,
     to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>,
+    annotations?: AST.Annotated["annotations"]
   ): Codec<I1, A2>
 } = dual(4, <I1, A1, I2, A2>(
   from: Codec<I1, A1>,
   to: Codec<I2, A2>,
   decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-  encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+  encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>,
+  annotations?: AST.Annotated["annotations"]
 ): Codec<I1, A2> =>
   make(
-    AST.createTransform(from.ast, to.ast, AST.createFinalTransformation(decode, encode))
+    AST.createTransform(
+      from.ast,
+      to.ast,
+      AST.createFinalTransformation(decode, encode),
+      annotations
+    )
   ))
 
 /**
@@ -216,13 +224,15 @@ export const transform: {
   <I2, A2, A1>(
     to: Codec<I2, A2>,
     decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
+    encode: (i2: I2) => A1,
+    annotations?: AST.Annotated["annotations"]
   ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
   <I1, A1, I2, A2>(
     from: Codec<I1, A1>,
     to: Codec<I2, A2>,
     decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
+    encode: (i2: I2) => A1,
+    annotations?: AST.Annotated["annotations"]
   ): Codec<I1, A2>
 } = dual(
   4,
@@ -230,9 +240,10 @@ export const transform: {
     from: Codec<I1, A1>,
     to: Codec<I2, A2>,
     decode: (a1: A1) => I2,
-    encode: (i2: I2) => A1
+    encode: (i2: I2) => A1,
+    annotations?: AST.Annotated["annotations"]
   ): Codec<I1, A2> =>
-    transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)))
+    transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)), annotations)
 )
 
 /**
@@ -257,7 +268,8 @@ export const nullable = <From, To>(
     S.nullable(from(self)),
     S.nullable(to(self)),
     (nullable, options) => nullable === null ? PR.success(null) : parseResult(nullable, options),
-    (nullable, options) => nullable === null ? PR.success(null) : encodeResult(nullable, options)
+    (nullable, options) => nullable === null ? PR.success(null) : encodeResult(nullable, options),
+    { [AST.DocumentationAnnotationId]: "nullable" }
   )
 }
 
@@ -1013,7 +1025,8 @@ export const trim = <I>(self: Codec<I, string>): Codec<I, string> =>
     self,
     pipe(to(self), S.trimmed()),
     (s) => s.trim(),
-    identity
+    identity,
+    { [AST.DocumentationAnnotationId]: "trim" }
   )
 
 /**
@@ -1040,7 +1053,8 @@ export const clamp = (min: number, max: number) =>
       self,
       pipe(to(self), S.between(min, max)),
       (n) => N.clamp(n, min, max),
-      identity
+      identity,
+      { [AST.DocumentationAnnotationId]: "clamp" }
     )
 
 /**
@@ -1068,7 +1082,8 @@ export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
       const n = parseFloat(s)
       return isNaN(n) ? PR.failure(PR.type(ast, s)) : PR.success(n)
     },
-    (n) => PR.success(String(n))
+    (n) => PR.success(String(n)),
+    { [AST.DocumentationAnnotationId]: "numberFromString" }
   )
 
 /**
@@ -1096,7 +1111,8 @@ export const not = <I>(self: Codec<I, boolean>): Codec<I, boolean> =>
     self,
     to(self),
     (b) => !b,
-    (b) => !b
+    (b) => !b,
+    { [AST.DocumentationAnnotationId]: "not" }
   )
 
 // ---------------------------------------------
@@ -1115,7 +1131,8 @@ export const clampBigint = (min: bigint, max: bigint) =>
       self,
       pipe(to(self), S.betweenBigint(min, max)),
       (input) => B.clamp(input, min, max),
-      identity
+      identity,
+      { [AST.DocumentationAnnotationId]: "clampBigint" }
     )
 
 // ---------------------------------------------
@@ -1133,7 +1150,8 @@ export const dateFromString = <I>(self: Codec<I, string>): Codec<I, Date> =>
     self,
     S.ValidDate,
     (input) => PR.success(new Date(input)),
-    (date) => PR.success(date.toISOString())
+    (date) => PR.success(date.toISOString()),
+    { [AST.DocumentationAnnotationId]: "dateFromString" }
   )
 
 const _Date: Codec<string, Date> = dateFromString(S.string)
@@ -1169,7 +1187,8 @@ export const optionFromSelf = <I, A>(value: Codec<I, A>): Codec<Option<I>, Optio
     (option, options) =>
       O.isNone(option) ?
         PR.success(O.none()) :
-        PR.map(encodeResult(option.value, options), O.some)
+        PR.map(encodeResult(option.value, options), O.some),
+    { [AST.DocumentationAnnotationId]: "optionFromSelf" }
   )
 }
 
@@ -1198,7 +1217,8 @@ export const option = <I, A>(
     (o, options) =>
       O.isNone(o) ?
         PR.success({ _tag: "None" as const }) :
-        PR.map(encodeResult(o.value, options), (value) => ({ _tag: "Some" as const, value }))
+        PR.map(encodeResult(o.value, options), (value) => ({ _tag: "Some" as const, value })),
+    { [AST.DocumentationAnnotationId]: "option" }
   )
 }
 
@@ -1216,7 +1236,8 @@ export const optionFromNullable = <I, A>(
     S.option(to(value)),
     (nullable, options) =>
       nullable === null ? PR.success(O.none()) : PR.map(parseResult(nullable, options), O.some),
-    (o, options) => O.isNone(o) ? PR.success(null) : encodeResult(o.value, options)
+    (o, options) => O.isNone(o) ? PR.success(null) : encodeResult(o.value, options),
+    { [AST.DocumentationAnnotationId]: "optionFromNullable" }
   )
 }
 
@@ -1246,7 +1267,8 @@ export const eitherFromSelf = <IE, E, IA, A>(
     (either, options) =>
       E.isLeft(either) ?
         PR.map(encodeResultLeft(either.left, options), E.left) :
-        PR.map(encodeResultRight(either.right, options), E.right)
+        PR.map(encodeResultRight(either.right, options), E.right),
+    { [AST.DocumentationAnnotationId]: "eitherFromSelf" }
   )
 }
 
@@ -1287,7 +1309,8 @@ export const either = <IE, E, IA, A>(
         PR.map(
           encodeResultRight(either.right, options),
           (right) => ({ _tag: "Right" as const, right })
-        )
+        ),
+    { [AST.DocumentationAnnotationId]: "either" }
   )
 }
 
@@ -1310,7 +1333,8 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
     S.readonlyMap(from(key), from(value)),
     S.readonlyMap(to(key), to(value)),
     (map, options) => PR.map(parseResult(Array.from(map.entries()), options), (as) => new Map(as)),
-    (map, options) => PR.map(encodeResult(Array.from(map.entries()), options), (as) => new Map(as))
+    (map, options) => PR.map(encodeResult(Array.from(map.entries()), options), (as) => new Map(as)),
+    { [AST.DocumentationAnnotationId]: "readonlyMapFromSelf" }
   )
 }
 
@@ -1326,7 +1350,8 @@ export const readonlyMap = <IK, K, IV, V>(
     array(tuple(key, value)),
     S.readonlyMap(to(key), to(value)),
     (entries) => new Map(entries),
-    (map) => Array.from(map.entries())
+    (map) => Array.from(map.entries()),
+    { [AST.DocumentationAnnotationId]: "readonlyMap" }
   )
 
 // ---------------------------------------------
@@ -1346,7 +1371,8 @@ export const readonlySetFromSelf = <I, A>(
     S.readonlySet(from(item)),
     S.readonlySet(to(item)),
     (set, options) => PR.map(parseResult(Array.from(set.values()), options), (as) => new Set(as)),
-    (set, options) => PR.map(encodeResult(Array.from(set.values()), options), (as) => new Set(as))
+    (set, options) => PR.map(encodeResult(Array.from(set.values()), options), (as) => new Set(as)),
+    { [AST.DocumentationAnnotationId]: "readonlySetFromSelf" }
   )
 }
 
@@ -1361,7 +1387,8 @@ export const readonlySet = <I, A>(
     array(item),
     S.readonlySet(to(item)),
     (as) => new Set(as),
-    (set) => Array.from(set)
+    (set) => Array.from(set),
+    { [AST.DocumentationAnnotationId]: "readonlySet" }
   )
 
 // ---------------------------------------------
@@ -1379,7 +1406,8 @@ export const chunkFromSelf = <I, A>(item: Codec<I, A>): Codec<Chunk<I>, Chunk<A>
     S.chunk(from(item)),
     S.chunk(to(item)),
     (chunk, options) => PR.map(parseResult(C.toReadonlyArray(chunk), options), C.fromIterable),
-    (chunk, options) => PR.map(encodeResult(C.toReadonlyArray(chunk), options), C.fromIterable)
+    (chunk, options) => PR.map(encodeResult(C.toReadonlyArray(chunk), options), C.fromIterable),
+    { [AST.DocumentationAnnotationId]: "chunkFromSelf" }
   )
 }
 
@@ -1388,7 +1416,9 @@ export const chunkFromSelf = <I, A>(item: Codec<I, A>): Codec<Chunk<I>, Chunk<A>
  * @since 1.0.0
  */
 export const chunk = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, Chunk<A>> =>
-  transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray)
+  transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray, {
+    [AST.DocumentationAnnotationId]: "chunk"
+  })
 
 // ---------------------------------------------
 // Data transformations
@@ -1414,7 +1444,8 @@ export const dataFromSelf = <
     S.data(from(item)),
     S.data(to(item)),
     (data, options) => PR.map(parseResult(fromData(data), options), S.toData),
-    (data, options) => PR.map(encodeResult(fromData(data), options), S.toData)
+    (data, options) => PR.map(encodeResult(fromData(data), options), S.toData),
+    { [AST.DocumentationAnnotationId]: "dataFromSelf" }
   )
 }
 
@@ -1432,5 +1463,6 @@ export const data = <
     item,
     S.data(to(item)),
     S.toData,
-    (data) => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any
+    (data) => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any,
+    { [AST.DocumentationAnnotationId]: "data" }
   )

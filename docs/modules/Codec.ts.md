@@ -819,13 +819,19 @@ using the provided mapping functions.
 
 ```ts
 export declare const transform: {
-  <I2, A2, A1>(to: Codec<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): <I1>(
-    self: Codec<I1, A1>
-  ) => Codec<I1, A2>
-  <I1, A1, I2, A2>(from: Codec<I1, A1>, to: Codec<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Codec<
-    I1,
-    A2
-  >
+  <I2, A2, A1>(
+    to: Codec<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1,
+    annotations?: AST.Annotated['annotations']
+  ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
+  <I1, A1, I2, A2>(
+    from: Codec<I1, A1>,
+    to: Codec<I2, A2>,
+    decode: (a1: A1) => I2,
+    encode: (i2: I2) => A1,
+    annotations?: AST.Annotated['annotations']
+  ): Codec<I1, A2>
 }
 ```
 
@@ -843,13 +849,15 @@ export declare const transformResult: {
   <I2, A2, A1>(
     to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>,
+    annotations?: AST.Annotated['annotations']
   ): <I1>(self: Codec<I1, A1>) => Codec<I1, A2>
   <I1, A1, I2, A2>(
     from: Codec<I1, A1>,
     to: Codec<I2, A2>,
     decode: (a1: A1, options: ParseOptions, self: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>
+    encode: (i2: I2, options: ParseOptions, self: AST.AST) => ParseResult<A1>,
+    annotations?: AST.Annotated['annotations']
   ): Codec<I1, A2>
 }
 ```
