@@ -22,46 +22,46 @@ export type ToNever = C.To<typeof S.never>
 // ---------------------------------------------
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.filter(S.maxLength(5)));
+pipe(S.string, C.maxLength(5));
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.filter(S.minLength(5)));
+pipe(S.string, C.minLength(5));
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.filter(S.length(5)));
+pipe(S.string, C.length(5));
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.filter(S.pattern(/a/)));
+pipe(S.string, C.pattern(/a/));
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.filter(S.startsWith('a')));
+pipe(S.string, C.startsWith('a'));
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.filter(S.endsWith('a')));
+pipe(S.string, C.endsWith('a'));
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.filter(S.includes('a')));
+pipe(S.string, C.includes('a'));
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.filter(S.greaterThan(5)));
+pipe(S.number, C.greaterThan(5));
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.filter(S.greaterThanOrEqualTo(5)));
+pipe(S.number, C.greaterThanOrEqualTo(5));
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.filter(S.lessThan(5)));
+pipe(S.number, C.lessThan(5));
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.filter(S.lessThanOrEqualTo(5)));
+pipe(S.number, C.lessThanOrEqualTo(5));
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.filter(S.int()));
+pipe(S.number, C.int());
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.filter(S.nonNaN())); // not NaN
+pipe(S.number, C.nonNaN()); // not NaN
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.filter(S.finite())); // value must be finite, not Infinity or -Infinity
+pipe(S.number, C.finite()); // value must be finite, not Infinity or -Infinity
 
 // ---------------------------------------------
 // nullable
@@ -212,6 +212,13 @@ pipe(C.struct({ a: C.optional(S.string),  b: C.NumberFromString, c: S.boolean })
 pipe(C.struct({ a: C.optional(S.string).withDefault(() => ''),  b: C.NumberFromString, c: S.boolean }), C.omit('c'));
 
 // ---------------------------------------------
+// brand
+// ---------------------------------------------
+
+// $ExpectType Codec<string, number & Brand<"Int">>
+pipe(C.NumberFromString, C.int(), C.brand('Int'))
+
+// ---------------------------------------------
 // Records
 // ---------------------------------------------
 
@@ -307,29 +314,29 @@ const predicateFilter1 = (u: unknown) => typeof u === 'string'
 const FromFilter = S.union(S.string, S.number)
 
 // $ExpectType Codec<string | number, string | number>
-pipe(FromFilter, C.filter(S.filter(predicateFilter1)))
+pipe(FromFilter, C.filter(predicateFilter1))
 
 const FromRefinement = S.struct({ a: S.optional(S.string), b: S.optional(S.number) })
 
 // $ExpectType Codec<{ readonly a?: string; readonly b?: number; }, { readonly a?: string; readonly b?: number; } & { readonly b: number; }>
-pipe(FromRefinement, C.filter(S.filter(S.is(S.struct({ b: S.number })))))
+pipe(FromRefinement, C.filter(S.is(S.struct({ b: S.number }))))
 
 const LiteralFilter = S.literal('a', 'b')
 const predicateFilter2 = (u: unknown): u is 'a' => typeof u === 'string' && u === 'a'
 
 // $ExpectType Codec<"a" | "b", "a">
-pipe(LiteralFilter, C.filter(S.filter(predicateFilter2)))
+pipe(LiteralFilter, C.filter(predicateFilter2))
 
 // $ExpectType Codec<"a" | "b", "a">
-pipe(LiteralFilter, C.filter(S.filter(S.is(S.literal('a')))))
+pipe(LiteralFilter, C.filter(S.is(S.literal('a'))))
 
 // $ExpectType Codec<"a" | "b", never>
-pipe(LiteralFilter, C.filter(S.filter(S.is(S.literal('c')))))
+pipe(LiteralFilter, C.filter(S.is(S.literal('c'))))
 
 declare const UnionFilter: C.Codec<{ readonly a: string } | { readonly b: string }, { readonly a: string } | { readonly b: string }>
 
 // $ExpectType Codec<{ readonly a: string; } | { readonly b: string; }, ({ readonly a: string; } | { readonly b: string; }) & { readonly b: string; }>
-pipe(UnionFilter, C.filter(S.filter(S.is(S.struct({ b: S.string })))))
+pipe(UnionFilter, C.filter(S.is(S.struct({ b: S.string }))))
 
 // $ExpectType Codec<number, number & Brand<"MyNumber">>
-pipe(S.number, C.filter(S.filter((n): n is number & Brand<"MyNumber"> => n > 0)))
+pipe(S.number, C.filter((n): n is number & Brand<"MyNumber"> => n > 0))
