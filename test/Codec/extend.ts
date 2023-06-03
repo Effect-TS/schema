@@ -119,6 +119,6 @@ describe.concurrent("extend", () => {
       S.struct({ a: S.number }), // <= this is illegal
       C.extend(C.record(S.string, C.NumberFromString))
     )
-    await Util.expectParseFailure(transform, { a: 1 }, "/a Expected string, actual 1")
+    await Util.expectParseFailure(transform, { a: 1 }, "/a Expected a string, actual 1")
   })
 })

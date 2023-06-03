@@ -57,7 +57,7 @@ describe.concurrent("ReadonlyMap", () => {
         await Util.expectParseFailure(
           transform,
           new Map([["1", "a"], ["a", "b"]]),
-          `/1 /0 Expected string -> number, actual "a"`
+          `/1 /0 Expected (a string -> a number), actual "a"`
         )
       })
 
@@ -94,7 +94,7 @@ describe.concurrent("ReadonlyMap", () => {
         await Util.expectParseFailure(
           transform,
           [[1, "a"], [2, 1]],
-          `/1 /1 Expected string, actual 1`
+          `/1 /1 Expected a string, actual 1`
         )
       })
 

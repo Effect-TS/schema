@@ -90,8 +90,8 @@ const getDescription = AST.getAnnotation<AST.DescriptionAnnotation>(
 const getExpected = (ast: AST.AST): O.Option<string> =>
   pipe(
     getIdentifier(ast),
-    O.orElse(() => getTitle(ast)),
-    O.orElse(() => getDescription(ast))
+    O.orElse(() => getDescription(ast)),
+    O.orElse(() => getTitle(ast))
   )
 
 /** @internal */
@@ -135,7 +135,7 @@ export const formatExpected = (ast: AST.AST): string => {
     case "Transform":
       return O.getOrElse(
         getExpected(ast),
-        () => `${formatExpected(ast.from)} -> ${formatExpected(ast.to)}`
+        () => `(${formatExpected(ast.from)} -> ${formatExpected(ast.to)})`
       )
   }
 }

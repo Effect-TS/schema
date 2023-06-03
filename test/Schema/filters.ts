@@ -212,7 +212,7 @@ describe.concurrent("number filters", () => {
       const schema = pipe(S.number, S.int())
       await Util.expectParseSuccess(schema, 0)
       await Util.expectParseSuccess(schema, 1)
-      await Util.expectParseFailure(schema, 0.5, `Expected integer, actual 0.5`)
+      await Util.expectParseFailure(schema, 0.5, `Expected an integer, actual 0.5`)
     })
   })
 
@@ -274,7 +274,7 @@ describe.concurrent("number filters", () => {
       await Util.expectParseFailure(
         schema,
         "",
-        `Expected number, actual ""`
+        `Expected a number, actual ""`
       )
     })
   })

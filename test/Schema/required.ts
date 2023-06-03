@@ -71,7 +71,7 @@ describe.concurrent("required", () => {
     await Util.expectParseFailure(
       schema,
       ["", 0, "a"],
-      `/2 union member: Expected number, actual "a", union member: Expected boolean, actual "a"`
+      `/2 union member: Expected a number, actual "a", union member: Expected a boolean, actual "a"`
     )
   })
 

@@ -167,7 +167,7 @@ describe.concurrent("number filters", () => {
       const codec = pipe(Util.identityTransform(S.number), C.int())
       await Util.expectParseSuccess(codec, 0)
       await Util.expectParseSuccess(codec, 1)
-      await Util.expectParseFailure(codec, 0.5, `Expected integer, actual 0.5`)
+      await Util.expectParseFailure(codec, 0.5, `Expected an integer, actual 0.5`)
     })
   })
   describe.concurrent("finite", () => {
@@ -206,7 +206,7 @@ describe.concurrent("number filters", () => {
       await Util.expectParseFailure(
         codec,
         "",
-        `Expected number, actual ""`
+        `Expected a number, actual ""`
       )
     })
   })

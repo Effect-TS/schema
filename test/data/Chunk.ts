@@ -55,7 +55,7 @@ describe.concurrent("Chunk", () => {
         await Util.expectParseFailure(
           transform,
           Chunk.fromIterable(["1", "a", "3"]),
-          `/1 Expected string -> number, actual "a"`
+          `/1 Expected (a string -> a number), actual "a"`
         )
       })
 
@@ -85,7 +85,7 @@ describe.concurrent("Chunk", () => {
           null,
           `Expected a generic array, actual null`
         )
-        await Util.expectParseFailure(transform, ["1", 1], `/1 Expected string, actual 1`)
+        await Util.expectParseFailure(transform, ["1", 1], `/1 Expected a string, actual 1`)
       })
 
       it("encode", async () => {

@@ -48,7 +48,7 @@ describe.concurrent("brand", () => {
     expect(Int(1)).toEqual(1)
     expect(() => Int(1.2)).toThrowError(
       new Error(`error(s) found
-└─ Expected integer, actual 1.2`)
+└─ Expected an integer, actual 1.2`)
     )
   })
 
@@ -64,7 +64,7 @@ describe.concurrent("brand", () => {
     expect(Int.either(1.2)).toEqual(E.left([{
       meta: 1.2,
       message: `error(s) found
-└─ Expected integer, actual 1.2`
+└─ Expected an integer, actual 1.2`
     }]))
   })
 

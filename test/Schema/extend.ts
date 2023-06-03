@@ -135,11 +135,11 @@ describe.concurrent("extend", () => {
 
     await Util.expectParseFailure(schema, {}, "/a is missing")
     await Util.expectParseFailure(schema, { b: "b" }, "/a is missing")
-    await Util.expectParseFailure(schema, { a: 1 }, "/a Expected string, actual 1")
+    await Util.expectParseFailure(schema, { a: 1 }, "/a Expected a string, actual 1")
     await Util.expectParseFailure(
       schema,
       { a: "a", b: 1 },
-      "/b Expected string, actual 1"
+      "/b Expected a string, actual 1"
     )
   })
 })

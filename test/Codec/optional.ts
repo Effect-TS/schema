@@ -44,7 +44,7 @@ describe.concurrent("optional", () => {
     await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
     await Util.expectParseFailure(transform, {
       [Symbol.for("custom-annotation")]: "custom-annotation-value"
-    }, `/a Expected string -> number, actual "a"`)
+    }, `/a Expected (a string -> a number), actual "a"`)
 
     await Util.expectEncodeSuccess(transform, { a: 1 }, { a: "1" })
     await Util.expectEncodeSuccess(transform, { a: 0 }, { a: "0" })
@@ -56,7 +56,7 @@ describe.concurrent("optional", () => {
     await Util.expectParseSuccess(transform, { a: "1" }, { a: O.some(1) })
     await Util.expectParseFailure(transform, {
       [Symbol.for("custom-annotation")]: "custom-annotation-value"
-    }, `/a Expected string -> number, actual "a"`)
+    }, `/a Expected (a string -> a number), actual "a"`)
 
     await Util.expectEncodeSuccess(transform, { a: O.some(1) }, { a: "1" })
     await Util.expectEncodeSuccess(transform, { a: O.none() }, {})

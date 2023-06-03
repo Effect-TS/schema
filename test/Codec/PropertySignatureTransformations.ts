@@ -27,7 +27,11 @@ describe.concurrent("PropertySignatureTransformations", () => {
     )
     await Util.expectParseSuccess(transform, {}, { a: 0 })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
-    await Util.expectParseFailure(transform, { a: "a" }, `/a Expected string -> number, actual "a"`)
+    await Util.expectParseFailure(
+      transform,
+      { a: "a" },
+      `/a Expected (a string -> a number), actual "a"`
+    )
 
     await Util.expectEncodeSuccess(transform, { a: 1 }, { a: "1" })
     await Util.expectEncodeSuccess(transform, { a: 0 }, { a: "0" })
@@ -54,7 +58,11 @@ describe.concurrent("PropertySignatureTransformations", () => {
     )
     await Util.expectParseSuccess(transform, {}, { a: 0 })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
-    await Util.expectParseFailure(transform, { a: "a" }, `/a Expected string -> number, actual "a"`)
+    await Util.expectParseFailure(
+      transform,
+      { a: "a" },
+      `/a Expected (a string -> a number), actual "a"`
+    )
 
     await Util.expectEncodeSuccess(transform, { a: 1 }, { a: "1" })
     await Util.expectEncodeSuccess(transform, { a: 0 }, {})
@@ -82,7 +90,11 @@ describe.concurrent("PropertySignatureTransformations", () => {
       )
     await Util.expectParseSuccess(transform, {}, { a: O.none() })
     await Util.expectParseSuccess(transform, { a: "1" }, { a: O.some(1) })
-    await Util.expectParseFailure(transform, { a: "a" }, `/a Expected string -> number, actual "a"`)
+    await Util.expectParseFailure(
+      transform,
+      { a: "a" },
+      `/a Expected (a string -> a number), actual "a"`
+    )
 
     await Util.expectEncodeSuccess(transform, { a: O.some(1) }, { a: "1" })
     await Util.expectEncodeSuccess(transform, { a: O.none() }, {})

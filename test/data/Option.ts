@@ -73,12 +73,12 @@ describe.concurrent("Option", () => {
         await Util.expectParseFailure(
           schema,
           undefined,
-          `union member: Expected null, actual undefined, union member: Expected string, actual undefined`
+          `union member: Expected null, actual undefined, union member: Expected a string, actual undefined`
         )
         await Util.expectParseFailure(
           schema,
           {},
-          `union member: Expected null, actual {}, union member: Expected string, actual {}`
+          `union member: Expected null, actual {}, union member: Expected a string, actual {}`
         )
       })
 

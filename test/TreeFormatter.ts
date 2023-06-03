@@ -22,7 +22,7 @@ describe.concurrent("formatErrors", () => {
     )
     expect(() => S.validate(schema)("a")).toThrowError(
       new Error(`error(s) found
-└─ Expected number, actual "a"`)
+└─ Expected a number, actual "a"`)
     )
     expect(() => S.validate(schema)(-1)).toThrowError(
       new Error(`error(s) found
@@ -71,14 +71,14 @@ describe.concurrent("formatErrors", () => {
       { a: { b: { c: [{ d: null }] } } },
       `error(s) found
 └─ ["a"]["b"]["c"][0]["d"]
-   └─ Expected string, actual null`
+   └─ Expected a string, actual null`
     )
     Util.expectParseFailureTree(
       schema,
       { a: { b: { c: [{ d: null }, { d: 1 }] } } },
       `error(s) found
 └─ ["a"]["b"]["c"][0]["d"]
-   └─ Expected string, actual null`
+   └─ Expected a string, actual null`
     )
     Util.expectParseFailureTree(
       schema,
@@ -86,9 +86,9 @@ describe.concurrent("formatErrors", () => {
       `error(s) found
 └─ ["a"]["b"]["c"]
    ├─ [0]["d"]
-   │  └─ Expected string, actual null
+   │  └─ Expected a string, actual null
    └─ [1]["d"]
-      └─ Expected string, actual 1`,
+      └─ Expected a string, actual 1`,
       Util.allErrors
     )
   })

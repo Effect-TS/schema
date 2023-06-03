@@ -60,7 +60,7 @@ export type BrandAnnotation = ReadonlyArray<string>
  * @category annotations
  * @since 1.0.0
  */
-export const BrandAnnotationId = Symbol.for("@effect/schema/BrandAnnotationId")
+export const BrandAnnotationId = Symbol.for("@effect/schema/annotation/Brand")
 
 /**
  * @category annotations
@@ -72,7 +72,7 @@ export type TypeAnnotation = symbol
  * @category annotations
  * @since 1.0.0
  */
-export const TypeAnnotationId = Symbol.for("@effect/schema/TypeAnnotationId")
+export const TypeAnnotationId = Symbol.for("@effect/schema/annotation/Type")
 
 /**
  * @category annotations
@@ -84,7 +84,7 @@ export type MessageAnnotation<A> = (a: A) => string
  * @category annotations
  * @since 1.0.0
  */
-export const MessageAnnotationId = Symbol.for("@effect/schema/MessageAnnotationId")
+export const MessageAnnotationId = Symbol.for("@effect/schema/annotation/Message")
 
 /**
  * @category annotations
@@ -96,7 +96,7 @@ export type IdentifierAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const IdentifierAnnotationId = Symbol.for("@effect/schema/IdentifierAnnotationId")
+export const IdentifierAnnotationId = Symbol.for("@effect/schema/annotation/Identifier")
 
 /**
  * @category annotations
@@ -108,7 +108,7 @@ export type TitleAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const TitleAnnotationId = Symbol.for("@effect/schema/TitleAnnotationId")
+export const TitleAnnotationId = Symbol.for("@effect/schema/annotation/Title")
 
 /**
  * @category annotations
@@ -120,7 +120,7 @@ export type DescriptionAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const DescriptionAnnotationId = Symbol.for("@effect/schema/DescriptionAnnotationId")
+export const DescriptionAnnotationId = Symbol.for("@effect/schema/annotation/Description")
 
 /**
  * @category annotations
@@ -132,7 +132,7 @@ export type ExamplesAnnotation = ReadonlyArray<unknown>
  * @category annotations
  * @since 1.0.0
  */
-export const ExamplesAnnotationId = Symbol.for("@effect/schema/ExamplesAnnotationId")
+export const ExamplesAnnotationId = Symbol.for("@effect/schema/annotation/Examples")
 
 /**
  * @category annotations
@@ -144,7 +144,7 @@ export type JSONSchemaAnnotation = object
  * @category annotations
  * @since 1.0.0
  */
-export const JSONSchemaAnnotationId = Symbol.for("@effect/schema/JSONSchemaAnnotationId")
+export const JSONSchemaAnnotationId = Symbol.for("@effect/schema/annotation/JSONSchema")
 
 /**
  * @category annotations
@@ -156,7 +156,7 @@ export type DocumentationAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const DocumentationAnnotationId = Symbol.for("@effect/schema/DocumentationAnnotationId")
+export const DocumentationAnnotationId = Symbol.for("@effect/schema/annotation/Documentation")
 
 // ---------------------------------------------
 // models
@@ -411,7 +411,8 @@ export interface StringKeyword extends Annotated {
 export const stringKeyword: StringKeyword = {
   _tag: "StringKeyword",
   annotations: {
-    [TitleAnnotationId]: "string"
+    [TitleAnnotationId]: "string",
+    [DescriptionAnnotationId]: "a string"
   }
 }
 
@@ -436,7 +437,8 @@ export interface NumberKeyword extends Annotated {
 export const numberKeyword: NumberKeyword = {
   _tag: "NumberKeyword",
   annotations: {
-    [TitleAnnotationId]: "number"
+    [TitleAnnotationId]: "number",
+    [DescriptionAnnotationId]: "a number"
   }
 }
 
@@ -461,7 +463,8 @@ export interface BooleanKeyword extends Annotated {
 export const booleanKeyword: BooleanKeyword = {
   _tag: "BooleanKeyword",
   annotations: {
-    [TitleAnnotationId]: "boolean"
+    [TitleAnnotationId]: "boolean",
+    [DescriptionAnnotationId]: "a boolean"
   }
 }
 
@@ -486,7 +489,8 @@ export interface BigIntKeyword extends Annotated {
 export const bigIntKeyword: BigIntKeyword = {
   _tag: "BigIntKeyword",
   annotations: {
-    [TitleAnnotationId]: "bigint"
+    [TitleAnnotationId]: "bigint",
+    [DescriptionAnnotationId]: "a bigint"
   }
 }
 
@@ -511,7 +515,8 @@ export interface SymbolKeyword extends Annotated {
 export const symbolKeyword: SymbolKeyword = {
   _tag: "SymbolKeyword",
   annotations: {
-    [TitleAnnotationId]: "symbol"
+    [TitleAnnotationId]: "symbol",
+    [DescriptionAnnotationId]: "a symbol"
   }
 }
 
@@ -536,7 +541,8 @@ export interface ObjectKeyword extends Annotated {
 export const objectKeyword: ObjectKeyword = {
   _tag: "ObjectKeyword",
   annotations: {
-    [TitleAnnotationId]: "object"
+    [TitleAnnotationId]: "object",
+    [DescriptionAnnotationId]: "an object"
   }
 }
 

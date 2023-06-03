@@ -14,7 +14,7 @@ describe.concurrent("Parser", () => {
     expect(S.asserts(schema)("a")).toEqual(undefined)
     expect(() => S.asserts(schema)(1)).toThrowError(
       new Error(`error(s) found
-└─ Expected string, actual 1`)
+└─ Expected a string, actual 1`)
     )
   })
 
@@ -23,7 +23,7 @@ describe.concurrent("Parser", () => {
     expect(C.parse(transform)("1")).toEqual(1)
     expect(() => C.parse(transform)("a")).toThrowError(
       new Error(`error(s) found
-└─ Expected string -> number, actual "a"`)
+└─ Expected (a string -> a number), actual "a"`)
     )
   })
 
@@ -60,7 +60,7 @@ describe.concurrent("Parser", () => {
     expect(C.decode(transform)("1")).toEqual(1)
     expect(() => C.decode(transform)("a")).toThrowError(
       new Error(`error(s) found
-└─ Expected string -> number, actual "a"`)
+└─ Expected (a string -> a number), actual "a"`)
     )
   })
 
@@ -97,7 +97,7 @@ describe.concurrent("Parser", () => {
     expect(S.validate(schema)(1)).toEqual(1)
     expect(() => S.validate(schema)("1")).toThrowError(
       new Error(`error(s) found
-└─ Expected number, actual "1"`)
+└─ Expected a number, actual "1"`)
     )
   })
 

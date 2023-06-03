@@ -7,15 +7,15 @@ describe.concurrent("Decoder", () => {
   it("from", async () => {
     const schema = C.from(C.NumberFromString)
     await Util.expectParseSuccess(schema, "a")
-    await Util.expectParseFailure(schema, null, "Expected string, actual null")
-    await Util.expectParseFailure(schema, 1, "Expected string, actual 1")
+    await Util.expectParseFailure(schema, null, "Expected a string, actual null")
+    await Util.expectParseFailure(schema, 1, "Expected a string, actual 1")
   })
 
   it("to", async () => {
     const schema = C.to(C.NumberFromString)
     await Util.expectParseSuccess(schema, 1)
-    await Util.expectParseFailure(schema, null, "Expected number, actual null")
-    await Util.expectParseFailure(schema, "a", `Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, null, "Expected a number, actual null")
+    await Util.expectParseFailure(schema, "a", `Expected a number, actual "a"`)
   })
 
   it("annotations/message refinement", async () => {
@@ -72,7 +72,7 @@ describe.concurrent("Decoder", () => {
   it("string", async () => {
     const schema = S.string
     await Util.expectParseSuccess(schema, "a", "a")
-    await Util.expectParseFailure(schema, 1, "Expected string, actual 1")
+    await Util.expectParseFailure(schema, 1, "Expected a string, actual 1")
   })
 
   it("number", async () => {
@@ -81,14 +81,14 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(schema, NaN, NaN)
     await Util.expectParseSuccess(schema, Infinity, Infinity)
     await Util.expectParseSuccess(schema, -Infinity, -Infinity)
-    await Util.expectParseFailure(schema, "a", `Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, "a", `Expected a number, actual "a"`)
   })
 
   it("boolean", async () => {
     const schema = S.boolean
     await Util.expectParseSuccess(schema, true, true)
     await Util.expectParseSuccess(schema, false, false)
-    await Util.expectParseFailure(schema, 1, `Expected boolean, actual 1`)
+    await Util.expectParseFailure(schema, 1, `Expected a boolean, actual 1`)
   })
 
   it("bigint", async () => {
@@ -99,12 +99,12 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       null,
-      "Expected bigint, actual null"
+      "Expected a bigint, actual null"
     )
     await Util.expectParseFailure(
       schema,
       1.2,
-      `Expected bigint, actual 1.2`
+      `Expected a bigint, actual 1.2`
     )
   })
 
@@ -115,7 +115,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       "@effect/schema/test/a",
-      `Expected symbol, actual "@effect/schema/test/a"`
+      `Expected a symbol, actual "@effect/schema/test/a"`
     )
   })
 
@@ -123,10 +123,10 @@ describe.concurrent("Decoder", () => {
     const schema = S.object
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, [])
-    await Util.expectParseFailure(schema, null, `Expected object, actual null`)
-    await Util.expectParseFailure(schema, "a", `Expected object, actual "a"`)
-    await Util.expectParseFailure(schema, 1, `Expected object, actual 1`)
-    await Util.expectParseFailure(schema, true, `Expected object, actual true`)
+    await Util.expectParseFailure(schema, null, `Expected an object, actual null`)
+    await Util.expectParseFailure(schema, "a", `Expected an object, actual "a"`)
+    await Util.expectParseFailure(schema, 1, `Expected an object, actual 1`)
+    await Util.expectParseFailure(schema, true, `Expected an object, actual true`)
   })
 
   it("literal 1 member", async () => {
@@ -252,9 +252,9 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       [undefined],
-      `/0 Expected number, actual undefined`
+      `/0 Expected a number, actual undefined`
     )
-    await Util.expectParseFailure(schema, ["a"], `/0 Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, ["a"], `/0 Expected a number, actual "a"`)
     await Util.expectParseFailure(schema, [1, "b"], `/1 is unexpected`)
   })
 
@@ -272,7 +272,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       ["a"],
-      `/0 union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
+      `/0 union member: Expected a number, actual "a", union member: Expected undefined, actual "a"`
     )
     await Util.expectParseFailure(schema, [1, "b"], `/1 is unexpected`)
   })
@@ -290,7 +290,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       ["a"],
-      `/0 Expected number, actual "a"`
+      `/0 Expected a number, actual "a"`
     )
     await Util.expectParseFailure(schema, [1, "b"], `/1 is unexpected`)
   })
@@ -309,7 +309,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       ["a"],
-      `/0 union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
+      `/0 union member: Expected a number, actual "a", union member: Expected undefined, actual "a"`
     )
     await Util.expectParseFailure(schema, [1, "b"], `/1 is unexpected`)
   })
@@ -319,8 +319,8 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
 
-    await Util.expectParseFailure(schema, [1], `/0 Expected string, actual 1`)
-    await Util.expectParseFailure(schema, ["a", "b"], `/1 Expected number, actual "b"`)
+    await Util.expectParseFailure(schema, [1], `/0 Expected a string, actual 1`)
+    await Util.expectParseFailure(schema, ["a", "b"], `/1 Expected a number, actual "b"`)
   })
 
   it("tuple. e r", async () => {
@@ -339,7 +339,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(schema, ["a", 1])
     await Util.expectParseSuccess(schema, ["a", 1, 2])
 
-    await Util.expectParseFailure(schema, [1], `/0 Expected string, actual 1`)
+    await Util.expectParseFailure(schema, [1], `/0 Expected a string, actual 1`)
   })
 
   it("tuple. r", async () => {
@@ -348,8 +348,8 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [1, 2])
 
-    await Util.expectParseFailure(schema, ["a"], `/0 Expected number, actual "a"`)
-    await Util.expectParseFailure(schema, [1, "a"], `/1 Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, ["a"], `/0 Expected a number, actual "a"`)
+    await Util.expectParseFailure(schema, [1, "a"], `/1 Expected a number, actual "a"`)
   })
 
   it("tuple. r e", async () => {
@@ -359,8 +359,8 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(schema, ["a", "b", 1])
 
     await Util.expectParseFailure(schema, [], `/0 is missing`)
-    await Util.expectParseFailure(schema, ["a"], `/0 Expected number, actual "a"`)
-    await Util.expectParseFailure(schema, [1, 2], `/0 Expected string, actual 1`)
+    await Util.expectParseFailure(schema, ["a"], `/0 Expected a number, actual "a"`)
+    await Util.expectParseFailure(schema, [1, 2], `/0 Expected a string, actual 1`)
   })
 
   it("tuple. e r e", async () => {
@@ -371,8 +371,8 @@ describe.concurrent("Decoder", () => {
 
     await Util.expectParseFailure(schema, [], `/0 is missing`)
     await Util.expectParseFailure(schema, ["a"], `/1 is missing`)
-    await Util.expectParseFailure(schema, ["a", 1], `/1 Expected boolean, actual 1`)
-    await Util.expectParseFailure(schema, [1, true], `/0 Expected string, actual 1`)
+    await Util.expectParseFailure(schema, ["a", 1], `/1 Expected a boolean, actual 1`)
+    await Util.expectParseFailure(schema, [1, true], `/0 Expected a string, actual 1`)
     await Util.expectParseFailure(schema, [true], `/1 is missing`)
   })
 
@@ -402,7 +402,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: undefined },
-      "/a Expected number, actual undefined"
+      "/a Expected a number, actual undefined"
     )
     await Util.expectParseFailure(
       schema,
@@ -426,7 +426,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: "a" },
-      `/a union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
+      `/a union member: Expected a number, actual "a", union member: Expected undefined, actual "a"`
     )
     await Util.expectParseFailure(
       schema,
@@ -449,12 +449,12 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: "a" },
-      `/a Expected number, actual "a"`
+      `/a Expected a number, actual "a"`
     )
     await Util.expectParseFailure(
       schema,
       { a: undefined },
-      `/a Expected number, actual undefined`
+      `/a Expected a number, actual undefined`
     )
     await Util.expectParseFailure(
       schema,
@@ -478,7 +478,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: "a" },
-      `/a union member: Expected number, actual "a", union member: Expected undefined, actual "a"`
+      `/a union member: Expected a number, actual "a", union member: Expected undefined, actual "a"`
     )
     await Util.expectParseFailure(
       schema,
@@ -512,7 +512,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: "a" },
-      `/a Expected number, actual "a"`
+      `/a Expected a number, actual "a"`
     )
     const b = Symbol.for("@effect/schema/test/b")
     await Util.expectParseFailure(
@@ -542,7 +542,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { [a]: "a" },
-      `/Symbol(@effect/schema/test/a) Expected number, actual "a"`
+      `/Symbol(@effect/schema/test/a) Expected a number, actual "a"`
     )
     await Util.expectParseFailure(
       schema,
@@ -579,7 +579,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(schema, {}, `/a is missing`)
     await Util.expectParseFailure(schema, { a: 1 }, `/b is missing`)
     await Util.expectParseFailure(schema, { b: 2 }, `/a is missing`)
-    await Util.expectParseFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, { a: "a" }, `/a Expected a number, actual "a"`)
   })
 
   it("struct/ record(keyof struct({ a, b } & Record<string, string>), number)", async () => {
@@ -592,7 +592,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseSuccess(schema, { a: 1 })
     await Util.expectParseSuccess(schema, { b: 2 })
 
-    await Util.expectParseFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, { a: "a" }, `/a Expected a number, actual "a"`)
   })
 
   it("struct/ record(keyof struct({ a, b } & Record<symbol, string>), number)", async () => {
@@ -610,9 +610,9 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: 1, b: 2, [c]: "c" },
-      `/Symbol(@effect/schema/test/c) Expected number, actual "c"`
+      `/Symbol(@effect/schema/test/c) Expected a number, actual "c"`
     )
-    await Util.expectParseFailure(schema, { a: "a" }, `/a Expected number, actual "a"`)
+    await Util.expectParseFailure(schema, { a: "a" }, `/a Expected a number, actual "a"`)
   })
 
   it("struct/ record(Symbol('a') | Symbol('b'), number)", async () => {
@@ -650,7 +650,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { "-": "a" },
-      `/- Expected number, actual "a"`
+      `/- Expected a number, actual "a"`
     )
   })
 
@@ -932,7 +932,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       [true],
-      `/1 is missing, /0 Expected string, actual true`,
+      `/1 is missing, /0 Expected a string, actual true`,
       Util.allErrors
     )
   })
@@ -947,7 +947,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       [1, "b"],
-      `/0 Expected string, actual 1, /1 Expected number, actual "b"`,
+      `/0 Expected a string, actual 1, /1 Expected a number, actual "b"`,
       Util.allErrors
     )
   })
@@ -967,7 +967,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       ["a", "b", "c"],
-      `/1 Expected number, actual "b", /2 Expected number, actual "c"`,
+      `/1 Expected a number, actual "b", /2 Expected a number, actual "c"`,
       Util.allErrors
     )
   })
@@ -977,7 +977,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       ["a", "b"],
-      `/0 Expected number, actual "a", /1 Expected number, actual "b"`,
+      `/0 Expected a number, actual "a", /1 Expected a number, actual "b"`,
       Util.allErrors
     )
   })
@@ -992,7 +992,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: 1, b: "b" },
-      `/a Expected string, actual 1, /b Expected number, actual "b"`,
+      `/a Expected a string, actual 1, /b Expected a number, actual "b"`,
       Util.allErrors
     )
   })
@@ -1022,7 +1022,7 @@ describe.concurrent("Decoder", () => {
     await Util.expectParseFailure(
       schema,
       { a: "a", b: "b" },
-      `/a Expected number, actual "a", /b Expected number, actual "b"`,
+      `/a Expected a number, actual "a", /b Expected a number, actual "b"`,
       Util.allErrors
     )
   })

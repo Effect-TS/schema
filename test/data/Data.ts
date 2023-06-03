@@ -48,7 +48,7 @@ describe.concurrent("Data", () => {
         await Util.expectParseFailure(
           transform,
           Data.struct({ a: "ok", b: "0" }),
-          "/b Expected number, actual \"0\""
+          "/b Expected a number, actual \"0\""
         )
       })
 
@@ -78,7 +78,7 @@ describe.concurrent("Data", () => {
         await Util.expectParseFailure(
           transform,
           { a: "ok", b: "0" },
-          "/b Expected number, actual \"0\""
+          "/b Expected a number, actual \"0\""
         )
       })
 

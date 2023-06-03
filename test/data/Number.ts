@@ -26,12 +26,12 @@ describe.concurrent("Number", () => {
         await Util.expectParseFailure(
           transform,
           "a",
-          `Expected string -> number, actual "a"`
+          `Expected (a string -> a number), actual "a"`
         )
         await Util.expectParseFailure(
           transform,
           "a1",
-          `Expected string -> number, actual "a1"`
+          `Expected (a string -> a number), actual "a1"`
         )
       })
 
@@ -52,7 +52,7 @@ describe.concurrent("Number", () => {
         await Util.expectParseFailure(
           transform,
           "a",
-          `Expected string -> number, actual "a"`
+          `Expected (a string -> a number), actual "a"`
         )
       })
     })

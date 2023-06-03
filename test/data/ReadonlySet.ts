@@ -49,7 +49,7 @@ describe.concurrent("ReadonlySet", () => {
         await Util.expectParseFailure(
           transform,
           new Set(["1", "a", "3"]),
-          `/1 Expected string -> number, actual "a"`
+          `/1 Expected (a string -> a number), actual "a"`
         )
       })
 
@@ -75,7 +75,7 @@ describe.concurrent("ReadonlySet", () => {
           null,
           `Expected a generic array, actual null`
         )
-        await Util.expectParseFailure(transform, [1, "a"], `/1 Expected number, actual "a"`)
+        await Util.expectParseFailure(transform, [1, "a"], `/1 Expected a number, actual "a"`)
       })
 
       it("encode", async () => {

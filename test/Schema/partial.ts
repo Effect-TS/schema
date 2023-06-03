@@ -12,7 +12,7 @@ describe.concurrent("partial", () => {
     await Util.expectParseFailure(
       schema,
       { a: undefined },
-      `/a Expected number, actual undefined`
+      `/a Expected a number, actual undefined`
     )
   })
 
@@ -35,7 +35,7 @@ describe.concurrent("partial", () => {
       `error(s) found
 └─ [0]
    ├─ union member
-   │  └─ Expected number, actual "a"
+   │  └─ Expected a number, actual "a"
    └─ union member
       └─ Expected undefined, actual "a"`
     )
@@ -55,11 +55,11 @@ describe.concurrent("partial", () => {
 ├─ union member
 │  └─ [0]
 │     ├─ union member
-│     │  └─ Expected number, actual "a"
+│     │  └─ Expected a number, actual "a"
 │     └─ union member
 │        └─ Expected undefined, actual "a"
 └─ union member
-   └─ Expected string, actual ["a"]`
+   └─ Expected a string, actual ["a"]`
     )
   })
 
