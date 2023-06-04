@@ -579,7 +579,7 @@ export type PropertySignatureConfig =
 
 /** @internal */
 export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
-  readonly [SchemaTypeId]!: (_: From) => From
+  readonly [SchemaTypeId]: (_: From) => From = identity
   readonly From!: (_: From) => From
   readonly FromIsOptional!: FromIsOptional
   readonly To!: (_: To) => To
@@ -1388,6 +1388,12 @@ export const _finite = <A extends number>(
 export const finite = <A extends number>(options?: FilterAnnotations<A>) =>
   (self: Schema<A>): Schema<A> => make(_finite(self.ast, options))
 
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const Finite: Schema<number> = pipe(number, finite())
+
 /** @internal */
 export const _between = <A extends number>(
   ast: AST.AST,
@@ -1996,7 +2002,8 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
           )
     },
     {
-      [AST.IdentifierAnnotationId]: "Chunk",
+      [AST.TitleAnnotationId]: "Chunk",
+      [AST.DescriptionAnnotationId]: "a Chunk",
       [I.PrettyHookId]: chunkPretty,
       [I.ArbitraryHookId]: chunkArbitrary
     }
@@ -2039,7 +2046,8 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
           PR.map(parseResult(u, options), toData)
     },
     {
-      [AST.IdentifierAnnotationId]: "Data",
+      [AST.TitleAnnotationId]: "Data",
+      [AST.DescriptionAnnotationId]: "a Data",
       [I.PrettyHookId]: dataPretty,
       [I.ArbitraryHookId]: dataArbitrary
     }
@@ -2096,7 +2104,8 @@ export const either = <E, A>(
           PR.map(parseResultRight(u.right, options), E.right)
     },
     {
-      [AST.IdentifierAnnotationId]: "Either",
+      [AST.TitleAnnotationId]: "Either",
+      [AST.DescriptionAnnotationId]: "an Either",
       [I.PrettyHookId]: eitherPretty,
       [I.ArbitraryHookId]: eitherArbitrary
     }
@@ -2161,6 +2170,7 @@ export const JsonNumber = pipe(
   number,
   filter((n) => !isNaN(n) && isFinite(n), {
     typeId: JsonNumberTypeId,
+    title: "JSONNumber",
     description: "a JSON number"
   })
 )
@@ -2225,7 +2235,8 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> => {
           PR.map(parseResult(u.value, options), O.some)
     },
     {
-      [AST.IdentifierAnnotationId]: "Option",
+      [AST.TitleAnnotationId]: "Option",
+      [AST.DescriptionAnnotationId]: "an Option",
       [I.PrettyHookId]: optionPretty,
       [I.ArbitraryHookId]: optionArbitrary
     }
@@ -2279,7 +2290,8 @@ export const readonlyMap = <K, V>(
           PR.map(parseResult(Array.from(u.entries()), options), (as) => new Map(as))
     },
     {
-      [AST.IdentifierAnnotationId]: "ReadonlyMap",
+      [AST.TitleAnnotationId]: "ReadonlyMap",
+      [AST.DescriptionAnnotationId]: "a ReadonlyMap",
       [I.PrettyHookId]: readonlyMapPretty,
       [I.ArbitraryHookId]: readonlyMapArbitrary
     }
@@ -2320,7 +2332,8 @@ export const readonlySet = <A>(
           PR.map(parseResult(Array.from(u.values()), options), (as) => new Set(as))
       },
     {
-      [AST.IdentifierAnnotationId]: "ReadonlySet",
+      [AST.TitleAnnotationId]: "ReadonlySet",
+      [AST.DescriptionAnnotationId]: "a ReadonlySet",
       [I.PrettyHookId]: readonlySetPretty,
       [I.ArbitraryHookId]: readonlySetArbitrary
     }

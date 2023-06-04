@@ -3,14 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.array = exports.any = exports.annotations = exports.addBrand = exports._trimmed = exports._startsWith = exports._positiveBigint = exports._positive = exports._pattern = exports._nonPositiveBigint = exports._nonPositive = exports._nonNegativeBigint = exports._nonNegative = exports._nonNaN = exports._negativeBigint = exports._negative = exports._multipleOf = exports._minLength = exports._minItems = exports._maxLength = exports._maxItems = exports._lessThanOrEqualToBigint = exports._lessThanOrEqualTo = exports._lessThanBigint = exports._lessThan = exports._itemsCount = exports._int = exports._includes = exports._greaterThanOrEqualToBigint = exports._greaterThanOrEqualTo = exports._greaterThanBigint = exports._greaterThan = exports._finite = exports._filter = exports._endsWith = exports._betweenBigint = exports._between = exports.ValidDateTypeId = exports.ValidDate = exports.UUIDTypeId = exports.UUID = exports.TrimmedTypeId = exports.Trimmed = exports.StartsWithTypeId = exports.SchemaTypeId = exports.PropertySignatureImpl = exports.PositiveBigint = exports.Positive = exports.PatternTypeId = exports.NonPositiveBigint = exports.NonPositive = exports.NonNegativeBigint = exports.NonNegative = exports.NonNaNTypeId = exports.NonNaN = exports.NegativeBigint = exports.Negative = exports.MultipleOfTypeId = exports.MinLengthTypeId = exports.MinItemsTypeId = exports.MaxLengthTypeId = exports.MaxItemsTypeId = exports.LessThanTypeId = exports.LessThanOrEqualToTypeId = exports.LessThanOrEqualToBigintTypeId = exports.LessThanBigintTypeId = exports.JsonNumberTypeId = exports.JsonNumber = exports.IntTypeId = exports.Int = exports.InstanceOfTypeId = exports.IncludesTypeId = exports.GreaterThanTypeId = exports.GreaterThanOrEqualToTypeId = exports.GreaterThanOrEqualToBigintTypeId = exports.GreaterThanBigintTypeId = exports.FiniteTypeId = exports.EndsWithTypeId = exports.Date = exports.BrandTypeId = void 0;
+exports.array = exports.any = exports.annotations = exports.addBrand = exports._trimmed = exports._startsWith = exports._positiveBigint = exports._positive = exports._pattern = exports._nonPositiveBigint = exports._nonPositive = exports._nonNegativeBigint = exports._nonNegative = exports._nonNaN = exports._negativeBigint = exports._negative = exports._multipleOf = exports._minLength = exports._minItems = exports._maxLength = exports._maxItems = exports._lessThanOrEqualToBigint = exports._lessThanOrEqualTo = exports._lessThanBigint = exports._lessThan = exports._itemsCount = exports._int = exports._includes = exports._greaterThanOrEqualToBigint = exports._greaterThanOrEqualTo = exports._greaterThanBigint = exports._greaterThan = exports._finite = exports._filter = exports._endsWith = exports._betweenBigint = exports._between = exports.ValidDateTypeId = exports.ValidDate = exports.UUIDTypeId = exports.UUID = exports.TrimmedTypeId = exports.Trimmed = exports.StartsWithTypeId = exports.SchemaTypeId = exports.PropertySignatureImpl = exports.PositiveBigint = exports.Positive = exports.PatternTypeId = exports.NonPositiveBigint = exports.NonPositive = exports.NonNegativeBigint = exports.NonNegative = exports.NonNaNTypeId = exports.NonNaN = exports.NegativeBigint = exports.Negative = exports.MultipleOfTypeId = exports.MinLengthTypeId = exports.MinItemsTypeId = exports.MaxLengthTypeId = exports.MaxItemsTypeId = exports.LessThanTypeId = exports.LessThanOrEqualToTypeId = exports.LessThanOrEqualToBigintTypeId = exports.LessThanBigintTypeId = exports.JsonNumberTypeId = exports.JsonNumber = exports.IntTypeId = exports.Int = exports.InstanceOfTypeId = exports.IncludesTypeId = exports.GreaterThanTypeId = exports.GreaterThanOrEqualToTypeId = exports.GreaterThanOrEqualToBigintTypeId = exports.GreaterThanBigintTypeId = exports.FiniteTypeId = exports.Finite = exports.EndsWithTypeId = exports.Date = exports.BrandTypeId = void 0;
 Object.defineProperty(exports, "asserts", {
   enumerable: true,
   get: function () {
     return P.asserts;
   }
 });
-exports.extend = exports.enums = exports.endsWith = exports.element = exports.eitherPretty = exports.eitherArbitrary = exports.either = exports.declare = exports.dataPretty = exports.dataArbitrary = exports.data = exports.chunkPretty = exports.chunkArbitrary = exports.chunk = exports.brand = exports.boolean = exports.bigint = exports.betweenBigint = exports.between = void 0;
+exports.enums = exports.endsWith = exports.element = exports.eitherPretty = exports.eitherArbitrary = exports.either = exports.declare = exports.dataPretty = exports.dataArbitrary = exports.data = exports.chunkPretty = exports.chunkArbitrary = exports.chunk = exports.brand = exports.boolean = exports.bigint = exports.betweenBigint = exports.between = void 0;
+exports.extend = void 0;
 exports.filter = filter;
 exports.intersectUnionMembers = exports.int = exports.instanceOf = exports.includes = exports.greaterThanOrEqualToBigint = exports.greaterThanOrEqualTo = exports.greaterThanBigint = exports.greaterThan = exports.getBrands = exports.fromBrand = exports.finite = void 0;
 Object.defineProperty(exports, "is", {
@@ -370,7 +371,7 @@ const lazy = (f, annotations) => make(AST.createLazy(() => f().ast, annotations)
 exports.lazy = lazy;
 class PropertySignatureImpl {
   config;
-  [SchemaTypeId];
+  [SchemaTypeId] = _Function.identity;
   From;
   FromIsOptional;
   To;
@@ -915,8 +916,14 @@ const _finite = (ast, options) => _filter(ast, a => Number.isFinite(a), {
  */
 exports._finite = _finite;
 const finite = options => self => make(_finite(self.ast, options));
-/** @internal */
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
 exports.finite = finite;
+const Finite = /*#__PURE__*/(0, _Function.pipe)(number, /*#__PURE__*/finite());
+/** @internal */
+exports.Finite = Finite;
 const _between = (ast, min, max, options) => _lessThanOrEqualTo(_greaterThanOrEqualTo(ast, min), max, {
   description: `a number between ${min} and ${max}`,
   ...options
@@ -1362,7 +1369,8 @@ const chunk = item => declare([item], struct({
   const parseResult = P.parseResult(array(item));
   return (u, options, self) => !C.isChunk(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(C.toReadonlyArray(u), options), C.fromIterable);
 }, {
-  [AST.IdentifierAnnotationId]: "Chunk",
+  [AST.TitleAnnotationId]: "Chunk",
+  [AST.DescriptionAnnotationId]: "a Chunk",
   [I.PrettyHookId]: chunkPretty,
   [I.ArbitraryHookId]: chunkArbitrary
 });
@@ -1387,7 +1395,8 @@ const data = item => declare([item], item, item => {
   const parseResult = P.parseResult(item);
   return (u, options, self) => !Equal.isEqual(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(u, options), toData);
 }, {
-  [AST.IdentifierAnnotationId]: "Data",
+  [AST.TitleAnnotationId]: "Data",
+  [AST.DescriptionAnnotationId]: "a Data",
   [I.PrettyHookId]: dataPretty,
   [I.ArbitraryHookId]: dataArbitrary
 });
@@ -1418,7 +1427,8 @@ const either = (left, right) => {
     const parseResultRight = P.parseResult(right);
     return (u, options, self) => !E.isEither(u) ? PR.failure(PR.type(self, u)) : E.isLeft(u) ? PR.map(parseResultLeft(u.left, options), E.left) : PR.map(parseResultRight(u.right, options), E.right);
   }, {
-    [AST.IdentifierAnnotationId]: "Either",
+    [AST.TitleAnnotationId]: "Either",
+    [AST.DescriptionAnnotationId]: "an Either",
     [I.PrettyHookId]: eitherPretty,
     [I.ArbitraryHookId]: eitherArbitrary
   });
@@ -1451,6 +1461,7 @@ const JsonNumberTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/JsonNumb
 exports.JsonNumberTypeId = JsonNumberTypeId;
 const JsonNumber = /*#__PURE__*/(0, _Function.pipe)(number, /*#__PURE__*/filter(n => !isNaN(n) && isFinite(n), {
   typeId: JsonNumberTypeId,
+  title: "JSONNumber",
   description: "a JSON number"
 }));
 /**
@@ -1486,7 +1497,8 @@ const option = value => {
     const parseResult = P.parseResult(value);
     return (u, options, self) => !O.isOption(u) ? PR.failure(PR.type(self, u)) : O.isNone(u) ? PR.success(O.none()) : PR.map(parseResult(u.value, options), O.some);
   }, {
-    [AST.IdentifierAnnotationId]: "Option",
+    [AST.TitleAnnotationId]: "Option",
+    [AST.DescriptionAnnotationId]: "an Option",
     [I.PrettyHookId]: optionPretty,
     [I.ArbitraryHookId]: optionArbitrary
   });
@@ -1514,7 +1526,8 @@ const readonlyMap = (key, value) => declare([key, value], struct({
   const parseResult = P.parseResult(array(tuple(key, value)));
   return (u, options, self) => !isMap(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.entries()), options), as => new Map(as));
 }, {
-  [AST.IdentifierAnnotationId]: "ReadonlyMap",
+  [AST.TitleAnnotationId]: "ReadonlyMap",
+  [AST.DescriptionAnnotationId]: "a ReadonlyMap",
   [I.PrettyHookId]: readonlyMapPretty,
   [I.ArbitraryHookId]: readonlyMapArbitrary
 });
@@ -1541,7 +1554,8 @@ const readonlySet = item => declare([item], struct({
   const parseResult = P.parseResult(array(item));
   return !isSet(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.values()), options), as => new Set(as));
 }, {
-  [AST.IdentifierAnnotationId]: "ReadonlySet",
+  [AST.TitleAnnotationId]: "ReadonlySet",
+  [AST.DescriptionAnnotationId]: "a ReadonlySet",
   [I.PrettyHookId]: readonlySetPretty,
   [I.ArbitraryHookId]: readonlySetArbitrary
 });

@@ -548,6 +548,11 @@ export declare const FiniteTypeId: unique symbol;
  */
 export declare const finite: <A extends number>(options?: FilterAnnotations<A> | undefined) => (self: Schema<A>) => Schema<A>;
 /**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export declare const Finite: Schema<number>;
+/**
  * Tests if a `number` is between a minimum and a maximum value (included).
  *
  * @category number filters

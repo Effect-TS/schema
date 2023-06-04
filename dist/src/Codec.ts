@@ -1058,13 +1058,17 @@ export const clamp = (min: number, max: number) =>
     )
 
 /**
-  This combinator transforms a `string` into a `number` by parsing the string using `parseFloat`.
-
-  The following special string values are supported: "NaN", "Infinity", "-Infinity".
-
-  @category number transformations
-  @since 1.0.0
-*/
+ * This combinator converts a string into a number by parsing the string using the `Number` function.
+ *
+ * It returns an error when non-numeric characters are provided at the end of the string.
+ *
+ * This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
+ *
+ * @param self - The codec representing the input string
+ *
+ * @category number transformations
+ * @since 1.0.0
+ */
 export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
   transformResult(
     self,
@@ -1079,7 +1083,10 @@ export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
       if (s === "-Infinity") {
         return PR.success(-Infinity)
       }
-      const n = parseFloat(s)
+      if (s.trim() === "") {
+        return PR.failure(PR.type(ast, s))
+      }
+      const n = Number(s)
       return isNaN(n) ? PR.failure(PR.type(ast, s)) : PR.success(n)
     },
     (n) => PR.success(String(n)),
@@ -1087,9 +1094,11 @@ export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
   )
 
 /**
- * This transformation converts a `string` into a `number` by parsing the string using `parseFloat`.
+ * This `Codec` converts a string into a number by parsing the string using the `Number` function.
  *
- * The following special string values are supported: "NaN", "Infinity", "-Infinity".
+ * It returns an error when non-numeric characters are provided at the end of the string.
+ *
+ * This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
  *
  * @category number transformations
  * @since 1.0.0

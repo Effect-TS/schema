@@ -331,7 +331,7 @@ export const lazy = (f, annotations) => make(AST.createLazy(() => f().ast, annot
 /** @internal */
 export class PropertySignatureImpl {
   config;
-  [SchemaTypeId];
+  [SchemaTypeId] = identity;
   From;
   FromIsOptional;
   To;
@@ -820,6 +820,11 @@ export const _finite = (ast, options) => _filter(ast, a => Number.isFinite(a), {
  * @since 1.0.0
  */
 export const finite = options => self => make(_finite(self.ast, options));
+/**
+ * @category number constructors
+ * @since 1.0.0
+ */
+export const Finite = /*#__PURE__*/pipe(number, /*#__PURE__*/finite());
 /** @internal */
 export const _between = (ast, min, max, options) => _lessThanOrEqualTo(_greaterThanOrEqualTo(ast, min), max, {
   description: `a number between ${min} and ${max}`,
@@ -1201,7 +1206,8 @@ export const chunk = item => declare([item], struct({
   const parseResult = P.parseResult(array(item));
   return (u, options, self) => !C.isChunk(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(C.toReadonlyArray(u), options), C.fromIterable);
 }, {
-  [AST.IdentifierAnnotationId]: "Chunk",
+  [AST.TitleAnnotationId]: "Chunk",
+  [AST.DescriptionAnnotationId]: "a Chunk",
   [I.PrettyHookId]: chunkPretty,
   [I.ArbitraryHookId]: chunkArbitrary
 });
@@ -1222,7 +1228,8 @@ export const data = item => declare([item], item, item => {
   const parseResult = P.parseResult(item);
   return (u, options, self) => !Equal.isEqual(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(u, options), toData);
 }, {
-  [AST.IdentifierAnnotationId]: "Data",
+  [AST.TitleAnnotationId]: "Data",
+  [AST.DescriptionAnnotationId]: "a Data",
   [I.PrettyHookId]: dataPretty,
   [I.ArbitraryHookId]: dataArbitrary
 });
@@ -1250,7 +1257,8 @@ export const either = (left, right) => {
     const parseResultRight = P.parseResult(right);
     return (u, options, self) => !E.isEither(u) ? PR.failure(PR.type(self, u)) : E.isLeft(u) ? PR.map(parseResultLeft(u.left, options), E.left) : PR.map(parseResultRight(u.right, options), E.right);
   }, {
-    [AST.IdentifierAnnotationId]: "Either",
+    [AST.TitleAnnotationId]: "Either",
+    [AST.DescriptionAnnotationId]: "an Either",
     [I.PrettyHookId]: eitherPretty,
     [I.ArbitraryHookId]: eitherArbitrary
   });
@@ -1281,6 +1289,7 @@ export const JsonNumberTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/J
  */
 export const JsonNumber = /*#__PURE__*/pipe(number, /*#__PURE__*/filter(n => !isNaN(n) && isFinite(n), {
   typeId: JsonNumberTypeId,
+  title: "JSONNumber",
   description: "a JSON number"
 }));
 /**
@@ -1312,7 +1321,8 @@ export const option = value => {
     const parseResult = P.parseResult(value);
     return (u, options, self) => !O.isOption(u) ? PR.failure(PR.type(self, u)) : O.isNone(u) ? PR.success(O.none()) : PR.map(parseResult(u.value, options), O.some);
   }, {
-    [AST.IdentifierAnnotationId]: "Option",
+    [AST.TitleAnnotationId]: "Option",
+    [AST.DescriptionAnnotationId]: "an Option",
     [I.PrettyHookId]: optionPretty,
     [I.ArbitraryHookId]: optionArbitrary
   });
@@ -1336,7 +1346,8 @@ export const readonlyMap = (key, value) => declare([key, value], struct({
   const parseResult = P.parseResult(array(tuple(key, value)));
   return (u, options, self) => !isMap(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.entries()), options), as => new Map(as));
 }, {
-  [AST.IdentifierAnnotationId]: "ReadonlyMap",
+  [AST.TitleAnnotationId]: "ReadonlyMap",
+  [AST.DescriptionAnnotationId]: "a ReadonlyMap",
   [I.PrettyHookId]: readonlyMapPretty,
   [I.ArbitraryHookId]: readonlyMapArbitrary
 });
@@ -1359,7 +1370,8 @@ export const readonlySet = item => declare([item], struct({
   const parseResult = P.parseResult(array(item));
   return !isSet(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.values()), options), as => new Set(as));
 }, {
-  [AST.IdentifierAnnotationId]: "ReadonlySet",
+  [AST.TitleAnnotationId]: "ReadonlySet",
+  [AST.DescriptionAnnotationId]: "a ReadonlySet",
   [I.PrettyHookId]: readonlySetPretty,
   [I.ArbitraryHookId]: readonlySetArbitrary
 });
