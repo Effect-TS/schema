@@ -579,7 +579,7 @@ export type PropertySignatureConfig =
 
 /** @internal */
 export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
-  readonly [SchemaTypeId]!: (_: From) => From
+  readonly [SchemaTypeId]: (_: From) => From = identity
   readonly From!: (_: From) => From
   readonly FromIsOptional!: FromIsOptional
   readonly To!: (_: To) => To

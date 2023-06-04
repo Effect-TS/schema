@@ -1217,9 +1217,11 @@ Added in v1.0.0
 
 ## NumberFromString
 
-This transformation converts a `string` into a `number` by parsing the string using `parseFloat`.
+This `Codec` converts a string into a number by parsing the string using the `Number` function.
 
-The following special string values are supported: "NaN", "Infinity", "-Infinity".
+It returns an error when non-numeric characters are provided at the end of the string.
+
+This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
 
 **Signature**
 
@@ -1243,9 +1245,11 @@ Added in v1.0.0
 
 ## numberFromString
 
-This combinator transforms a `string` into a `number` by parsing the string using `parseFloat`.
+This combinator converts a string into a number by parsing the string using the `Number` function.
 
-The following special string values are supported: "NaN", "Infinity", "-Infinity".
+It returns an error when non-numeric characters are provided at the end of the string.
+
+This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
 
 **Signature**
 
