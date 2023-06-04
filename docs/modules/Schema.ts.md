@@ -96,6 +96,7 @@ Added in v1.0.0
   - [SchemaTypeId](#schematypeid)
   - [SchemaTypeId (type alias)](#schematypeid-type-alias)
 - [number constructors](#number-constructors)
+  - [Finite](#finite)
   - [Int](#int)
   - [Negative](#negative)
   - [NonNaN](#nonnan)
@@ -1027,6 +1028,16 @@ export type SchemaTypeId = typeof SchemaTypeId
 Added in v1.0.0
 
 # number constructors
+
+## Finite
+
+**Signature**
+
+```ts
+export declare const Finite: Schema<number>
+```
+
+Added in v1.0.0
 
 ## Int
 

@@ -21,7 +21,7 @@ const PositiveInt = B.all(Int, Positive)
 type Eur = number & B.Brand<"Eur">
 const Eur = B.nominal<Eur>()
 
-describe.concurrent("Brand", () => {
+describe.concurrent("fromBrand", () => {
   it("property tests", () => {
     Util.roundtrip(S.fromBrand(Int)(S.number)) // refined
     Util.roundtrip(S.fromBrand(Eur)(S.number)) // nominal

@@ -134,6 +134,52 @@ describe.concurrent("string filters", () => {
       )
     })
   })
+
+  describe.concurrent("trimmed", () => {
+    const schema = S.Trimmed
+
+    it("property tests", () => {
+      Util.roundtrip(schema)
+    })
+
+    it("decode / encode", async () => {
+      await Util.expectParseSuccess(schema, "a")
+      await Util.expectParseSuccess(schema, "")
+      await Util.expectParseFailure(
+        schema,
+        "a ",
+        `Expected a string with no leading or trailing whitespace, actual "a "`
+      )
+      await Util.expectParseFailure(
+        schema,
+        " a",
+        `Expected a string with no leading or trailing whitespace, actual " a"`
+      )
+      await Util.expectParseFailure(
+        schema,
+        " a ",
+        `Expected a string with no leading or trailing whitespace, actual " a "`
+      )
+
+      await Util.expectEncodeSuccess(schema, "a", "a")
+      await Util.expectEncodeSuccess(schema, "", "")
+      await Util.expectEncodeFailure(
+        schema,
+        "a ",
+        `Expected a string with no leading or trailing whitespace, actual "a "`
+      )
+      await Util.expectEncodeFailure(
+        schema,
+        " a",
+        `Expected a string with no leading or trailing whitespace, actual " a"`
+      )
+      await Util.expectEncodeFailure(
+        schema,
+        " a ",
+        `Expected a string with no leading or trailing whitespace, actual " a "`
+      )
+    })
+  })
 })
 
 describe.concurrent("number filters", () => {
@@ -216,14 +262,27 @@ describe.concurrent("number filters", () => {
     })
   })
 
-  describe.concurrent("finite", () => {
+  describe.concurrent("nonNaN", () => {
+    const schema = S.NonNaN
+
     it("property tests", () => {
-      const schema = pipe(S.number, S.finite())
       Util.roundtrip(schema)
     })
 
     it("decode / encode", async () => {
-      const schema = pipe(S.number, S.finite())
+      await Util.expectParseSuccess(schema, 1)
+      await Util.expectParseFailure(schema, NaN, `Expected a number NaN excluded, actual NaN`)
+    })
+  })
+
+  describe.concurrent("finite", () => {
+    const schema = S.Finite
+
+    it("property tests", () => {
+      Util.roundtrip(schema)
+    })
+
+    it("decode / encode", async () => {
       await Util.expectParseSuccess(schema, 1)
       await Util.expectParseFailure(
         schema,
