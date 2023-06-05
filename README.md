@@ -500,6 +500,8 @@ pipe(S.number, S.positive()); // > 0
 pipe(S.number, S.nonNegative()); // >= 0
 pipe(S.number, S.negative()); // < 0
 pipe(S.number, S.nonPositive()); // <= 0
+
+pipe(S.number, S.multipleOf(5)); // evenly divisible by 5
 ```
 
 ### Bigint filters
@@ -854,17 +856,17 @@ Optional fields can be configured to accept a default value, making the field op
 
 ```ts
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
-const schema = S.struct({ a. S.optional(S.number).withDefault(() => 0) });
+const schema = S.struct({ a: S.optional(S.number).withDefault(() => 0) });
 
-const parse = S.parse(schema)
+const parse = S.parse(schema);
 
-parse({}) // { a: 0 }
-parse({ a: 1 }) // { a: 1 }
+parse({}); // { a: 0 }
+parse({ a: 1 }); // { a: 1 }
 
-const encode = S.encode(schema)
+const encode = S.encode(schema);
 
-encode({ a: 0 }) // { a: 0 }
-encode({ a: 1 }) // { a: 1 }
+encode({ a: 0 }); // { a: 0 }
+encode({ a: 1 }); // { a: 1 }
 ```
 
 #### Optional fields as `Option`s
