@@ -500,6 +500,8 @@ pipe(S.number, S.positive()); // > 0
 pipe(S.number, S.nonNegative()); // >= 0
 pipe(S.number, S.negative()); // < 0
 pipe(S.number, S.nonPositive()); // <= 0
+
+pipe(S.number, S.multipleOf(5)); // evenly divisible by 5
 ```
 
 ### Bigint filters
