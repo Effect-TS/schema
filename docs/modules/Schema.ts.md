@@ -1448,7 +1448,9 @@ Added in v1.0.0
 
 ## NumberFromString
 
-This schema transforms a `string` into a `number` by parsing the string using `parseFloat`.
+This schema transforms a `string` into a `number` by parsing the string using the `Number` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
 
 The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
@@ -1625,7 +1627,9 @@ Added in v1.0.0
 
 ## numberFromString
 
-This combinator transforms a `string` into a `number` by parsing the string using `parseFloat`.
+This combinator transforms a `string` into a `number` by parsing the string using the `Number` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
 
 The following special string values are supported: "NaN", "Infinity", "-Infinity".
 
