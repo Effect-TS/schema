@@ -1058,11 +1058,11 @@ export const clamp = (min: number, max: number) =>
     )
 
 /**
- * This combinator converts a string into a number by parsing the string using the `Number` function.
+ * This combinator transforms a `string` into a `number` by parsing the string using the `Number` function.
  *
- * It returns an error when non-numeric characters are provided at the end of the string.
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
  *
- * This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
+ * The following special string values are supported: "NaN", "Infinity", "-Infinity".
  *
  * @param self - The codec representing the input string
  *
@@ -1094,11 +1094,11 @@ export const numberFromString = <I>(self: Codec<I, string>): Codec<I, number> =>
   )
 
 /**
- * This `Codec` converts a string into a number by parsing the string using the `Number` function.
+ * This codec transforms a `string` into a `number` by parsing the string using the `Number` function.
  *
- * It returns an error when non-numeric characters are provided at the end of the string.
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
  *
- * This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
+ * The following special string values are supported: "NaN", "Infinity", "-Infinity".
  *
  * @category number transformations
  * @since 1.0.0

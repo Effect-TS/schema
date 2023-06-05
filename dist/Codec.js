@@ -698,11 +698,11 @@ const clamp = (min, max) => self => transform(self, (0, _Function.pipe)(to(self)
   [AST.DocumentationAnnotationId]: "clamp"
 });
 /**
- * This combinator converts a string into a number by parsing the string using the `Number` function.
+ * This combinator transforms a `string` into a `number` by parsing the string using the `Number` function.
  *
- * It returns an error when non-numeric characters are provided at the end of the string.
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
  *
- * This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
+ * The following special string values are supported: "NaN", "Infinity", "-Infinity".
  *
  * @param self - The codec representing the input string
  *
@@ -729,11 +729,11 @@ const numberFromString = self => transformResult(self, S.number, (s, _, ast) => 
   [AST.DocumentationAnnotationId]: "numberFromString"
 });
 /**
- * This `Codec` converts a string into a number by parsing the string using the `Number` function.
+ * This codec transforms a `string` into a `number` by parsing the string using the `Number` function.
  *
- * It returns an error when non-numeric characters are provided at the end of the string.
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
  *
- * This combinator supports the following special string values: "NaN", "Infinity", "-Infinity".
+ * The following special string values are supported: "NaN", "Infinity", "-Infinity".
  *
  * @category number transformations
  * @since 1.0.0
