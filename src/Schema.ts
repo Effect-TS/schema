@@ -2,6 +2,7 @@
  * @since 1.0.0
  */
 
+import * as BI from "@effect/data/Bigint"
 import type { Brand } from "@effect/data/Brand"
 import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
@@ -17,8 +18,9 @@ import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
-import { isDate } from "@effect/data/Predicate"
+import { isDate, not } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
+import * as Str from "@effect/data/String"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -1013,7 +1015,7 @@ export const _minLength = <A extends string>(
   minLength: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.length >= minLength, {
+  _filter(ast, (a) => a.length >= minLength, {
     typeId: MinLengthTypeId,
     description: `a string at least ${minLength} character(s) long`,
     jsonSchema: { minLength },
@@ -1049,7 +1051,7 @@ export const _maxLength = <A extends string>(
   maxLength: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.length <= maxLength, {
+  _filter(ast, (a) => a.length <= maxLength, {
     typeId: MaxLengthTypeId,
     description: `a string at most ${maxLength} character(s) long`,
     jsonSchema: { maxLength },
@@ -1086,7 +1088,7 @@ export const _pattern = <A extends string>(
   regex: RegExp,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => {
+  _filter(ast, (a) => {
     // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
     regex.lastIndex = 0
     return regex.test(a)
@@ -1118,7 +1120,7 @@ export const _startsWith = <A extends string>(
   startsWith: string,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.startsWith(startsWith), {
+  _filter(ast, Str.startsWith(startsWith), {
     typeId: { id: StartsWithTypeId, params: { startsWith } },
     description: `a string starting with ${JSON.stringify(startsWith)}`,
     jsonSchema: { pattern: `^${startsWith}` },
@@ -1146,7 +1148,7 @@ export const _endsWith = <A extends string>(
   endsWith: string,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.endsWith(endsWith), {
+  _filter(ast, Str.endsWith(endsWith), {
     typeId: { id: EndsWithTypeId, params: { endsWith } },
     description: `a string ending with ${JSON.stringify(endsWith)}`,
     jsonSchema: { pattern: `^.*${endsWith}$` },
@@ -1174,7 +1176,7 @@ export const _includes = <A extends string>(
   searchString: string,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.includes(searchString), {
+  _filter(ast, Str.includes(searchString), {
     typeId: { id: IncludesTypeId, params: { includes: searchString } },
     description: `a string including ${JSON.stringify(searchString)}`,
     jsonSchema: { pattern: `.*${searchString}.*` },
@@ -1203,7 +1205,7 @@ export const _trimmed = <A extends string>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => trimmedRegex.test(a), {
+  _filter(ast, (a) => trimmedRegex.test(a), {
     typeId: TrimmedTypeId,
     description: "a string with no leading or trailing whitespace",
     jsonSchema: {
@@ -1241,7 +1243,7 @@ export const _greaterThan = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a > min, {
+  _filter(ast, N.greaterThan(min), {
     typeId: GreaterThanTypeId,
     description: min === 0 ? "a positive number" : `a number greater than ${min}`,
     jsonSchema: { exclusiveMinimum: min },
@@ -1269,7 +1271,7 @@ export const _greaterThanOrEqualTo = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a >= min, {
+  _filter(ast, N.greaterThanOrEqualTo(min), {
     typeId: GreaterThanOrEqualToTypeId,
     description: min === 0 ? "a non-negative number" : `a number greater than or equal to ${min}`,
     jsonSchema: { minimum: min },
@@ -1297,7 +1299,7 @@ export const _lessThan = <A extends number>(
   max: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a < max, {
+  _filter(ast, N.lessThan(max), {
     typeId: LessThanTypeId,
     description: max === 0 ? "a negative number" : `a number less than ${max}`,
     jsonSchema: { exclusiveMaximum: max },
@@ -1323,7 +1325,7 @@ export const _lessThanOrEqualTo = <A extends number>(
   max: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a <= max, {
+  _filter(ast, N.lessThanOrEqualTo(max), {
     typeId: LessThanOrEqualToTypeId,
     description: max === 0 ? "a non-positive number" : `a number less than or equal to ${max}`,
     jsonSchema: { maximum: max },
@@ -1350,7 +1352,7 @@ export const _int = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => Number.isInteger(a), {
+  _filter(ast, Number.isInteger, {
     typeId: IntTypeId,
     description: "an integer",
     jsonSchema: { type: "integer" },
@@ -1375,7 +1377,7 @@ export const _finite = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => Number.isFinite(a), {
+  _filter(ast, Number.isFinite, {
     typeId: FiniteTypeId,
     description: "a finite number",
     ...options
@@ -1429,7 +1431,7 @@ export const _nonNaN = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => !Number.isNaN(a), {
+  _filter(ast, not(Number.isNaN), {
     typeId: NonNaNTypeId,
     description: "a number NaN excluded",
     ...options
@@ -1510,7 +1512,7 @@ export const _multipleOf = <A extends number>(
   divisor: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => N.remainder(a, divisor) === 0, {
+  _filter(ast, (a) => N.remainder(a, divisor) === 0, {
     typeId: MultipleOfTypeId,
     description: `a number divisible by ${divisor}`,
     jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
@@ -1542,7 +1544,7 @@ export const _greaterThanBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a > min, {
+  _filter(ast, BI.greaterThan(min), {
     typeId: GreaterThanBigintTypeId,
     description: min === 0n ? "a positive bigint" : `a bigint greater than ${min}n`,
     jsonSchema: { exclusiveMinimum: min },
@@ -1572,7 +1574,7 @@ export const _greaterThanOrEqualToBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a >= min, {
+  _filter(ast, BI.greaterThanOrEqualTo(min), {
     typeId: GreaterThanOrEqualToBigintTypeId,
     description: min === 0n ? "a non-negative bigint" : `a bigint greater than or equal to ${min}n`,
     jsonSchema: { minimum: min },
@@ -1600,7 +1602,7 @@ export const _lessThanBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a < max, {
+  _filter(ast, BI.lessThan(max), {
     typeId: LessThanBigintTypeId,
     description: max === 0n ? "a negative bigint" : `a bigint less than ${max}n`,
     jsonSchema: { exclusiveMaximum: max },
@@ -1630,7 +1632,7 @@ export const _lessThanOrEqualToBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a <= max, {
+  _filter(ast, BI.lessThanOrEqualTo(max), {
     typeId: LessThanOrEqualToBigintTypeId,
     description: max === 0n ? "a non-positive bigint" : `a bigint less than or equal to ${max}n`,
     jsonSchema: { maximum: max },
