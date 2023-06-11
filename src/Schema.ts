@@ -1994,12 +1994,12 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
       length: number
     }),
     <A>(item: Schema<A>) => {
-      const parseResult = P.parseResult(array(item))
+      const validateResult = P.validateResult(array(item))
       return (u: unknown, options, self) =>
         !C.isChunk(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(
-            parseResult(C.toReadonlyArray(u), options),
+            validateResult(C.toReadonlyArray(u), options),
             C.fromIterable
           )
     },
@@ -2041,11 +2041,11 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
     [item],
     item,
     <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(item: Schema<A>) => {
-      const parseResult = P.parseResult(item)
+      const validateResult = P.validateResult(item)
       return (u: unknown, options, self) =>
         !Equal.isEqual(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(u, options), toData)
+          PR.map(validateResult(u, options), toData)
     },
     {
       [AST.TitleAnnotationId]: "Data",
@@ -2096,14 +2096,14 @@ export const either = <E, A>(
     [left, right],
     eitherInline(left, right),
     <E, A>(left: Schema<E>, right: Schema<A>) => {
-      const parseResultLeft = P.parseResult(left)
-      const parseResultRight = P.parseResult(right)
+      const validateResultLeft = P.validateResult(left)
+      const validateResultRight = P.validateResult(right)
       return (u: unknown, options, self) =>
         !E.isEither(u) ?
           PR.failure(PR.type(self, u)) :
           E.isLeft(u) ?
-          PR.map(parseResultLeft(u.left, options), E.left) :
-          PR.map(parseResultRight(u.right, options), E.right)
+          PR.map(validateResultLeft(u.left, options), E.left) :
+          PR.map(validateResultRight(u.right, options), E.right)
     },
     {
       [AST.TitleAnnotationId]: "Either",
@@ -2228,13 +2228,13 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> => {
     [value],
     optionInline(value),
     <A>(value: Schema<A>) => {
-      const parseResult = P.parseResult(value)
+      const validateResult = P.validateResult(value)
       return (u: unknown, options, self) =>
         !O.isOption(u) ?
           PR.failure(PR.type(self, u)) :
           O.isNone(u) ?
           PR.success(O.none()) :
-          PR.map(parseResult(u.value, options), O.some)
+          PR.map(validateResult(u.value, options), O.some)
     },
     {
       [AST.TitleAnnotationId]: "Option",
@@ -2285,11 +2285,11 @@ export const readonlyMap = <K, V>(
       size: number
     }),
     <K, V>(key: Schema<K>, value: Schema<V>) => {
-      const parseResult = P.parseResult(array(tuple(key, value)))
+      const validateResult = P.validateResult(array(tuple(key, value)))
       return (u: unknown, options, self) =>
         !isMap(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(Array.from(u.entries()), options), (as) => new Map(as))
+          PR.map(validateResult(Array.from(u.entries()), options), (as) => new Map(as))
     },
     {
       [AST.TitleAnnotationId]: "ReadonlyMap",
@@ -2328,10 +2328,10 @@ export const readonlySet = <A>(
     }),
     <A>(item: Schema<A>) =>
       (u: unknown, options, self) => {
-        const parseResult = P.parseResult(array(item))
+        const validateResult = P.validateResult(array(item))
         return !isSet(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(Array.from(u.values()), options), (as) => new Set(as))
+          PR.map(validateResult(Array.from(u.values()), options), (as) => new Set(as))
       },
     {
       [AST.TitleAnnotationId]: "ReadonlySet",
