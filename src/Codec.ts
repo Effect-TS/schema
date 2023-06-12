@@ -404,11 +404,11 @@ export const struct = <
 >(
   fields: Fields
 ): Codec<
-  S.Spread<
+  S.Simplify<
     & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
     & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
-  S.Spread<
+  S.Simplify<
     & { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
@@ -502,17 +502,17 @@ export const record = <K extends string | symbol, I, A>(
 export const extend: {
   <IB, B>(
     that: Codec<IB, B>
-  ): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
+  ): <I, A>(self: Codec<I, A>) => Codec<S.Simplify<I & IB>, S.Simplify<A & B>>
   <I, A, IB, B>(
     self: Codec<I, A>,
     that: Codec<IB, B>
-  ): Codec<S.Spread<I & IB>, S.Spread<A & B>>
+  ): Codec<S.Simplify<I & IB>, S.Simplify<A & B>>
 } = dual(
   2,
   <I, A, IB, B>(
     self: Codec<I, A>,
     that: Codec<IB, B>
-  ): Codec<S.Spread<I & IB>, S.Spread<A & B>> =>
+  ): Codec<S.Simplify<I & IB>, S.Simplify<A & B>> =>
     make(
       S.intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -528,7 +528,7 @@ export const extend: {
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Codec<I, A>
-  ): Codec<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>> => {
+  ): Codec<S.Simplify<Pick<I, Keys[number]>>, S.Simplify<Pick<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
       if (AST.isTypeLiteralTransformation(ast.transformAST)) {
@@ -558,7 +558,7 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Codec<I, A>
-  ): Codec<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>> => {
+  ): Codec<S.Simplify<Omit<I, Keys[number]>>, S.Simplify<Omit<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
       if (AST.isTypeLiteralTransformation(ast.transformAST)) {
@@ -667,17 +667,17 @@ export const attachPropertySignature: {
   <K extends PropertyKey, V extends AST.LiteralValue>(
     key: K,
     value: V
-  ): <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+  ): <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Simplify<A & { readonly [k in K]: V }>>
   <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
     codec: Codec<I, A>,
     key: K,
     value: V
-  ): Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+  ): Codec<I, S.Simplify<A & { readonly [k in K]: V }>>
 } = dual(3, <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
   codec: Codec<I, A>,
   key: K,
   value: V
-): Codec<I, S.Spread<A & { readonly [k in K]: V }>> =>
+): Codec<I, S.Simplify<A & { readonly [k in K]: V }>> =>
   make(AST.createTransform(
     codec.ast,
     pipe(to(codec), extend(struct({ [key]: S.literal(value) }))).ast,

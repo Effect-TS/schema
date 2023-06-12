@@ -544,10 +544,10 @@ but rather maps to another schema, for example when you want to add a discrimina
 export declare const attachPropertySignature: {
   <K extends PropertyKey, V extends AST.LiteralValue>(key: K, value: V): <I, A extends object>(
     codec: Codec<I, A>
-  ) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+  ) => Codec<I, S.Simplify<A & { readonly [k in K]: V }>>
   <I, A, K extends PropertyKey, V extends AST.LiteralValue>(codec: Codec<I, A>, key: K, value: V): Codec<
     I,
-    S.Spread<A & { readonly [k in K]: V }>
+    S.Simplify<A & { readonly [k in K]: V }>
   >
 }
 ```
@@ -620,8 +620,8 @@ Added in v1.0.0
 
 ```ts
 export declare const extend: {
-  <IB, B>(that: Codec<IB, B>): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
-  <I, A, IB, B>(self: Codec<I, A>, that: Codec<IB, B>): Codec<S.Spread<I & IB>, S.Spread<A & B>>
+  <IB, B>(that: Codec<IB, B>): <I, A>(self: Codec<I, A>) => Codec<S.Simplify<I & IB>, S.Simplify<A & B>>
+  <I, A, IB, B>(self: Codec<I, A>, that: Codec<IB, B>): Codec<S.Simplify<I & IB>, S.Simplify<A & B>>
 }
 ```
 
@@ -683,7 +683,7 @@ export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Codec<I, A>
-) => Codec<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>>
+) => Codec<S.Simplify<Omit<I, Keys[number]>>, S.Simplify<Omit<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -711,7 +711,7 @@ export declare const pick: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Codec<I, A>
-) => Codec<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>>
+) => Codec<S.Simplify<Pick<I, Keys[number]>>, S.Simplify<Pick<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -759,12 +759,12 @@ export declare const struct: <
 >(
   fields: Fields
 ) => Codec<
-  S.Spread<
+  S.Simplify<
     { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
       readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
     }
   >,
-  S.Spread<
+  S.Simplify<
     { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
       readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
     }

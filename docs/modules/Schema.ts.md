@@ -179,7 +179,7 @@ Added in v1.0.0
   - [OptionalSchemaPropertySignature (interface)](#optionalschemapropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [SchemaPropertySignature (interface)](#schemapropertysignature-interface)
-  - [Spread (type alias)](#spread-type-alias)
+  - [Simplify (type alias)](#simplify-type-alias)
   - [To (type alias)](#to-type-alias)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [optional](#optional)
@@ -670,8 +670,8 @@ Added in v1.0.0
 
 ```ts
 export declare const extend: {
-  <B>(that: Schema<B>): <A>(self: Schema<A>) => Schema<Spread<A & B>>
-  <A, B>(self: Schema<A>, that: Schema<B>): Schema<Spread<A & B>>
+  <B>(that: Schema<B>): <A>(self: Schema<A>) => Schema<Simplify<A & B>>
+  <A, B>(self: Schema<A>, that: Schema<B>): Schema<Simplify<A & B>>
 }
 ```
 
@@ -741,7 +741,7 @@ Added in v1.0.0
 ```ts
 export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
-) => (self: Schema<A>) => Schema<Spread<Omit<A, Keys[number]>>>
+) => (self: Schema<A>) => Schema<Simplify<Omit<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -763,7 +763,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: <A>(self: Schema<A>) => Schema<Spread<Partial<A>>>
+export declare const partial: <A>(self: Schema<A>) => Schema<Simplify<Partial<A>>>
 ```
 
 Added in v1.0.0
@@ -775,7 +775,7 @@ Added in v1.0.0
 ```ts
 export declare const pick: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
-) => (self: Schema<A>) => Schema<Spread<Pick<A, Keys[number]>>>
+) => (self: Schema<A>) => Schema<Simplify<Pick<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -798,7 +798,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const required: <A>(self: Schema<A>) => Schema<Spread<Required<A>>>
+export declare const required: <A>(self: Schema<A>) => Schema<Simplify<Required<A>>>
 ```
 
 Added in v1.0.0
@@ -831,7 +831,7 @@ export declare const struct: <
 >(
   fields: Fields
 ) => Schema<
-  Spread<
+  Simplify<
     { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
       readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
     }
@@ -1904,12 +1904,12 @@ export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
 
 Added in v1.0.0
 
-## Spread (type alias)
+## Simplify (type alias)
 
 **Signature**
 
 ```ts
-export type Spread<A> = {
+export type Simplify<A> = {
   readonly [K in keyof A]: A[K]
 } extends infer B
   ? B

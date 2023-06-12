@@ -641,7 +641,7 @@ export const optional = <A>(
 /**
  * @since 1.0.0
  */
-export type Spread<A> = {
+export type Simplify<A> = {
   readonly [K in keyof A]: A[K]
 } extends infer B ? B : never
 
@@ -670,7 +670,7 @@ export const struct = <
 >(
   fields: Fields
 ): Schema<
-  Spread<
+  Simplify<
     & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
@@ -790,17 +790,17 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
 export const extend: {
   <B>(
     that: Schema<B>
-  ): <A>(self: Schema<A>) => Schema<Spread<A & B>>
+  ): <A>(self: Schema<A>) => Schema<Simplify<A & B>>
   <A, B>(
     self: Schema<A>,
     that: Schema<B>
-  ): Schema<Spread<A & B>>
+  ): Schema<Simplify<A & B>>
 } = dual(
   2,
   <A, B>(
     self: Schema<A>,
     that: Schema<B>
-  ): Schema<Spread<A & B>> =>
+  ): Schema<Simplify<A & B>> =>
     make(
       intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -814,14 +814,14 @@ export const extend: {
  * @since 1.0.0
  */
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (self: Schema<A>): Schema<Spread<Pick<A, Keys[number]>>> => make(AST.pick(self.ast, keys))
+  (self: Schema<A>): Schema<Simplify<Pick<A, Keys[number]>>> => make(AST.pick(self.ast, keys))
 
 /**
  * @category combinators
  * @since 1.0.0
  */
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (self: Schema<A>): Schema<Spread<Omit<A, Keys[number]>>> => make(AST.omit(self.ast, keys))
+  (self: Schema<A>): Schema<Simplify<Omit<A, Keys[number]>>> => make(AST.omit(self.ast, keys))
 
 /**
  * @since 1.0.0
@@ -895,7 +895,7 @@ export const getBrands = (ast: AST.AST): Array<string> =>
  */
 export const partial = <A>(
   self: Schema<A>
-): Schema<Spread<Partial<A>>> => make(AST.partial(self.ast))
+): Schema<Simplify<Partial<A>>> => make(AST.partial(self.ast))
 
 /**
  * @category combinators
@@ -903,7 +903,7 @@ export const partial = <A>(
  */
 export const required = <A>(
   self: Schema<A>
-): Schema<Spread<Required<A>>> => make(AST.required(self.ast))
+): Schema<Simplify<Required<A>>> => make(AST.required(self.ast))
 
 /** @internal */
 export const toAnnotations = <A>(
