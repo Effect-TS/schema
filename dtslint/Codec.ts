@@ -1,7 +1,7 @@
-import { Brand } from "@effect/data/Brand";
-import { pipe } from "@effect/data/Function";
-import * as C from "@effect/schema/Codec";
-import * as S from "@effect/schema/Schema";
+import type { Brand } from "@effect/data/Brand"
+import { pipe } from "@effect/data/Function"
+import * as C from "@effect/schema/Codec"
+import * as S from "@effect/schema/Schema"
 
 // ---------------------------------------------
 // From
@@ -22,46 +22,46 @@ export type ToNever = C.To<typeof S.never>
 // ---------------------------------------------
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.maxLength(5));
+pipe(S.string, C.maxLength(5))
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.minLength(5));
+pipe(S.string, C.minLength(5))
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.length(5));
+pipe(S.string, C.length(5))
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.pattern(/a/));
+pipe(S.string, C.pattern(/a/))
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.startsWith('a'));
+pipe(S.string, C.startsWith("a"))
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.endsWith('a'));
+pipe(S.string, C.endsWith("a"))
 
 // $ExpectType Codec<string, string>
-pipe(S.string, C.includes('a'));
+pipe(S.string, C.includes("a"))
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.greaterThan(5));
+pipe(S.number, C.greaterThan(5))
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.greaterThanOrEqualTo(5));
+pipe(S.number, C.greaterThanOrEqualTo(5))
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.lessThan(5));
+pipe(S.number, C.lessThan(5))
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.lessThanOrEqualTo(5));
+pipe(S.number, C.lessThanOrEqualTo(5))
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.int());
+pipe(S.number, C.int())
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.nonNaN()); // not NaN
+pipe(S.number, C.nonNaN()) // not NaN
 
 // $ExpectType Codec<number, number>
-pipe(S.number, C.finite()); // value must be finite, not Infinity or -Infinity
+pipe(S.number, C.finite()) // value must be finite, not Infinity or -Infinity
 
 // ---------------------------------------------
 // nullable
@@ -75,14 +75,14 @@ C.nullable(C.NumberFromString)
 // ---------------------------------------------
 
 // $ExpectType Codec<string | boolean, number | boolean>
-C.union(S.boolean, C.NumberFromString);
+C.union(S.boolean, C.NumberFromString)
 
 // ---------------------------------------------
 // Tuples
 // ---------------------------------------------
 
 // $ExpectType Codec<readonly [string, string], readonly [string, number]>
-C.tuple(S.string, C.NumberFromString);
+C.tuple(S.string, C.NumberFromString)
 
 // ---------------------------------------------
 // rest
@@ -110,17 +110,17 @@ pipe(C.tuple(S.string, C.NumberFromString), C.optionalElement(C.NumberFromString
 // ---------------------------------------------
 
 // $ExpectType Codec<readonly string[], readonly number[]>
-C.array(C.NumberFromString);
+C.array(C.NumberFromString)
 
 // $ExpectType Codec<readonly [string, ...string[]], readonly [number, ...number[]]>
-C.nonEmptyArray(C.NumberFromString);
+C.nonEmptyArray(C.NumberFromString)
 
 // ---------------------------------------------
 // Structs
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-const MyModel = C.struct({ a: S.string,  b: C.NumberFromString });
+const MyModel = C.struct({ a: S.string, b: C.NumberFromString })
 
 // $ExpectType { readonly a: string; readonly b: string; }
 export type MyModelFrom = C.From<typeof MyModel>
@@ -133,14 +133,14 @@ export type MyModelTo = C.To<typeof MyModel>
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
-C.struct({ a: S.string, b: S.number, c: C.propertySignature(C.NumberFromString, {}) });
+C.struct({ a: S.string, b: S.number, c: C.propertySignature(C.NumberFromString, {}) })
 
 // ---------------------------------------------
 // optional
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c?: number; }>
-C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString) });
+C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString) })
 
 // piping
 // $ExpectType Codec<{ readonly a?: string; }, { readonly a?: number; }>
@@ -154,24 +154,24 @@ C.struct({ a: C.optional(S.never) })
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: boolean; }>
-C.struct({ a: S.string, b: S.number, c: C.optional(S.boolean).withDefault(() => false) });
+C.struct({ a: S.string, b: S.number, c: C.optional(S.boolean).withDefault(() => false) })
 
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
-C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString).withDefault(() => 0) });
+C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString).withDefault(() => 0) })
 
 // piping
 // $ExpectType Codec<{ readonly a?: string; }, { readonly a: string; }>
-C.struct({ a: pipe(S.string, C.optional).withDefault(() => '') })
+C.struct({ a: pipe(S.string, C.optional).withDefault(() => "") })
 
 // ---------------------------------------------
 // optional().toOption()
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: Option<boolean>; }>
-C.struct({ a: S.string, b: S.number, c: C.optional(S.boolean).toOption() });
+C.struct({ a: S.string, b: S.number, c: C.optional(S.boolean).toOption() })
 
 // $ExpectType Codec<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: Option<number>; }>
-C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString).toOption() });
+C.struct({ a: S.string, b: S.number, c: C.optional(C.NumberFromString).toOption() })
 
 // piping
 // $ExpectType Codec<{ readonly a?: string; }, { readonly a: Option<string>; }>
@@ -182,41 +182,47 @@ C.struct({ a: pipe(S.string, C.optional).toOption() })
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(C.struct({ a: S.string,  b: C.NumberFromString, c: S.boolean }), C.pick('a', 'b'));
+pipe(C.struct({ a: S.string, b: C.NumberFromString, c: S.boolean }), C.pick("a", "b"))
 
 // ---------------------------------------------
 // pick - optional
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a?: string; readonly b: string; }, { readonly a?: string; readonly b: number; }>
-pipe(C.struct({ a: C.optional(S.string),  b: C.NumberFromString, c: S.boolean }), C.pick('a', 'b'));
+pipe(C.struct({ a: C.optional(S.string), b: C.NumberFromString, c: S.boolean }), C.pick("a", "b"))
 
 // $ExpectType Codec<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(C.struct({ a: C.optional(S.string).withDefault(() => ''),  b: C.NumberFromString, c: S.boolean }), C.pick('a', 'b'));
+pipe(
+  C.struct({ a: C.optional(S.string).withDefault(() => ""), b: C.NumberFromString, c: S.boolean }),
+  C.pick("a", "b")
+)
 
 // ---------------------------------------------
 // omit
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(C.struct({ a: S.string,  b: C.NumberFromString, c: S.boolean }), C.omit('c'));
+pipe(C.struct({ a: S.string, b: C.NumberFromString, c: S.boolean }), C.omit("c"))
 
 // ---------------------------------------------
 // omit - optional
 // ---------------------------------------------
 
 // $ExpectType Codec<{ readonly a?: string; readonly b: string; }, { readonly a?: string; readonly b: number; }>
-pipe(C.struct({ a: C.optional(S.string),  b: C.NumberFromString, c: S.boolean }), C.omit('c'));
+pipe(C.struct({ a: C.optional(S.string), b: C.NumberFromString, c: S.boolean }), C.omit("c"))
 
 // $ExpectType Codec<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
-pipe(C.struct({ a: C.optional(S.string).withDefault(() => ''),  b: C.NumberFromString, c: S.boolean }), C.omit('c'));
+pipe(
+  C.struct({ a: C.optional(S.string).withDefault(() => ""), b: C.NumberFromString, c: S.boolean }),
+  C.omit("c")
+)
 
 // ---------------------------------------------
 // brand
 // ---------------------------------------------
 
 // $ExpectType Codec<string, number & Brand<"Int">>
-pipe(C.NumberFromString, C.int(), C.brand('Int'))
+pipe(C.NumberFromString, C.int(), C.brand("Int"))
 
 // ---------------------------------------------
 // Records
@@ -232,19 +238,19 @@ C.record(S.string, C.NumberFromString)
 // $ExpectType Codec<{ readonly a: string; readonly b: string; readonly c: string; }, { readonly a: string; readonly b: string; readonly c: string; }>
 pipe(
   C.struct({ a: S.string, b: S.string }),
-  C.extend(C.struct({ c: S.string })),
-);
+  C.extend(C.struct({ c: S.string }))
+)
 
 // dual
 // $ExpectType Codec<{ readonly a: string; readonly b: string; readonly c: string; }, { readonly a: string; readonly b: string; readonly c: string; }>
-C.extend(C.struct({ a: S.string, b: S.string }), C.struct({ c: S.string }));
+C.extend(C.struct({ a: S.string, b: S.string }), C.struct({ c: S.string }))
 
 // $ExpectType Codec<{ readonly [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }, { readonly [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
 pipe(
   C.struct({ a: S.string, b: S.string }),
   C.extend(C.struct({ c: S.string })),
   C.extend(C.record(S.string, S.string))
-);
+)
 
 // ---------------------------------------------
 // lazy
@@ -316,7 +322,7 @@ C.attachPropertySignature(C.struct({ radius: C.NumberFromString }), "kind", "cir
 // filter
 // ---------------------------------------------
 
-const predicateFilter1 = (u: unknown) => typeof u === 'string'
+const predicateFilter1 = (u: unknown) => typeof u === "string"
 const FromFilter = S.union(S.string, S.number)
 
 // $ExpectType Codec<string | number, string | number>
@@ -327,19 +333,22 @@ const FromRefinement = S.struct({ a: S.optional(S.string), b: S.optional(S.numbe
 // $ExpectType Codec<{ readonly a?: string; readonly b?: number; }, { readonly a?: string; readonly b?: number; } & { readonly b: number; }>
 pipe(FromRefinement, C.filter(S.is(S.struct({ b: S.number }))))
 
-const LiteralFilter = S.literal('a', 'b')
-const predicateFilter2 = (u: unknown): u is 'a' => typeof u === 'string' && u === 'a'
+const LiteralFilter = S.literal("a", "b")
+const predicateFilter2 = (u: unknown): u is "a" => typeof u === "string" && u === "a"
 
 // $ExpectType Codec<"a" | "b", "a">
 pipe(LiteralFilter, C.filter(predicateFilter2))
 
 // $ExpectType Codec<"a" | "b", "a">
-pipe(LiteralFilter, C.filter(S.is(S.literal('a'))))
+pipe(LiteralFilter, C.filter(S.is(S.literal("a"))))
 
 // $ExpectType Codec<"a" | "b", never>
-pipe(LiteralFilter, C.filter(S.is(S.literal('c'))))
+pipe(LiteralFilter, C.filter(S.is(S.literal("c"))))
 
-declare const UnionFilter: C.Codec<{ readonly a: string } | { readonly b: string }, { readonly a: string } | { readonly b: string }>
+declare const UnionFilter: C.Codec<
+  { readonly a: string } | { readonly b: string },
+  { readonly a: string } | { readonly b: string }
+>
 
 // $ExpectType Codec<{ readonly a: string; } | { readonly b: string; }, ({ readonly a: string; } | { readonly b: string; }) & { readonly b: string; }>
 pipe(UnionFilter, C.filter(S.is(S.struct({ b: S.string }))))

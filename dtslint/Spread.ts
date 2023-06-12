@@ -1,4 +1,4 @@
-import * as S from '@effect/schema/Schema'
+import type * as S from "@effect/schema/Schema"
 
 // $ExpectType { readonly [x: string]: string; readonly a: string; }
 export type Test1 = S.Spread<{ readonly a: string } & { readonly [_: string]: string }>

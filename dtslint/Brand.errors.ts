@@ -1,8 +1,8 @@
-import * as S from "@effect/schema/Schema";
-import { pipe } from "@effect/data/Function";
+import { pipe } from "@effect/data/Function"
+import * as S from "@effect/schema/Schema"
 
-const Int1 = Symbol.for('Int')
-const Int2 = Symbol.for('Int')
+const Int1 = Symbol.for("Int")
+const Int2 = Symbol.for("Int")
 
 const schema1 = pipe(S.number, S.int(), S.brand(Int1))
 const schema2 = pipe(S.number, S.int(), S.brand(Int2))
