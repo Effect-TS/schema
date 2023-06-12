@@ -356,6 +356,22 @@ pipe(
 )
 
 // ---------------------------------------------
+// lazy
+// ---------------------------------------------
+
+interface SchemaLazyTo {
+  readonly a: number
+  readonly as: ReadonlyArray<SchemaLazyTo>
+}
+
+const lazy1: S.Schema<SchemaLazyTo> = S.lazy(() =>
+  S.struct({
+    a: S.number,
+    as: S.array(lazy1)
+  })
+)
+
+// ---------------------------------------------
 // option
 // ---------------------------------------------
 

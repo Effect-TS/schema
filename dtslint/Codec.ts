@@ -256,29 +256,20 @@ pipe(
 // lazy
 // ---------------------------------------------
 
-interface LazyTo1 {
-  readonly a: number
-  readonly as: ReadonlyArray<LazyTo1>
-}
-const lazy1: C.Codec<LazyTo1, LazyTo1> = C.lazy(() =>
-  C.struct({
-    a: S.number,
-    as: C.array(lazy1)
-  })
-)
-
-interface LazyFrom2 {
+interface CodecLazyFrom {
   readonly a: string
-  readonly as: ReadonlyArray<LazyFrom2>
+  readonly as: ReadonlyArray<CodecLazyFrom>
 }
-interface LazyTo2 {
+
+interface CodecLazyTo {
   readonly a: number
-  readonly as: ReadonlyArray<LazyTo2>
+  readonly as: ReadonlyArray<CodecLazyTo>
 }
-const lazy2: C.Codec<LazyFrom2, LazyTo2> = C.lazy(() =>
+
+const lazy: C.Codec<CodecLazyFrom, CodecLazyTo> = C.lazy(() =>
   C.struct({
     a: C.NumberFromString,
-    as: C.array(lazy2)
+    as: C.array(lazy)
   })
 )
 

@@ -173,7 +173,7 @@ export {
 export const make = <I, A>(ast: AST.AST): Codec<I, A> => ({ ast }) as any
 
 // ---------------------------------------------
-// combinators
+// codec combinators
 // ---------------------------------------------
 
 /**
@@ -246,6 +246,10 @@ export const transform: {
     transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)), annotations)
 )
 
+// ---------------------------------------------
+// combinators
+// ---------------------------------------------
+
 /**
  * @category combinators
  * @since 1.0.0
@@ -261,17 +265,7 @@ export const union = <Members extends ReadonlyArray<Codec<any, any>>>(
  */
 export const nullable = <From, To>(
   self: Codec<From, To>
-): Codec<From | null, To | null> => {
-  const parseResult = P.parseResult(self)
-  const encodeResult = P.encodeResult(self)
-  return transformResult(
-    S.nullable(from(self)),
-    S.nullable(to(self)),
-    (nullable, options) => nullable === null ? PR.success(null) : parseResult(nullable, options),
-    (nullable, options) => nullable === null ? PR.success(null) : encodeResult(nullable, options),
-    { [AST.DocumentationAnnotationId]: "nullable" }
-  )
-}
+): Codec<From | null, To | null> => union(S.null, self)
 
 /**
  * @category combinators
