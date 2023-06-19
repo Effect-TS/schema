@@ -135,11 +135,8 @@ Added in v1.0.0
 - [utils](#utils)
   - [From (type alias)](#from-type-alias)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
-  - [JSONChunk (interface)](#jsonchunk-interface)
   - [JSONEither (type alias)](#jsoneither-type-alias)
   - [JSONOption (type alias)](#jsonoption-type-alias)
-  - [JSONReadonlyMap (interface)](#jsonreadonlymap-interface)
-  - [JSONReadonlySet (interface)](#jsonreadonlyset-interface)
   - [To (type alias)](#to-type-alias)
   - [optional](#optional)
   - [propertySignature](#propertysignature)
@@ -153,7 +150,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunk: <I, A>(item: Codec<I, A>) => Codec<JSONChunk<I>, Chunk<A>>
+export declare const chunk: <I, A>(item: Codec<I, A>) => Codec<readonly I[], Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -337,7 +334,7 @@ Added in v1.0.0
 export declare const readonlyMap: <IK, K, IV, V>(
   key: Codec<IK, K>,
   value: Codec<IV, V>
-) => Codec<JSONReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
+) => Codec<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
@@ -362,7 +359,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const readonlySet: <I, A>(item: Codec<I, A>) => Codec<JSONReadonlySet<I>, ReadonlySet<A>>
+export declare const readonlySet: <I, A>(item: Codec<I, A>) => Codec<readonly I[], ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -1510,19 +1507,6 @@ export type FromOptionalKeys<Fields> = {
 
 Added in v1.0.0
 
-## JSONChunk (interface)
-
-**Signature**
-
-```ts
-export interface JSONChunk<A> {
-  readonly _tag: 'Chunk'
-  readonly values: ReadonlyArray<A>
-}
-```
-
-Added in v1.0.0
-
 ## JSONEither (type alias)
 
 **Signature**
@@ -1544,26 +1528,6 @@ Added in v1.0.0
 
 ```ts
 export type JSONOption<A> = { readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: A }
-```
-
-Added in v1.0.0
-
-## JSONReadonlyMap (interface)
-
-**Signature**
-
-```ts
-export interface JSONReadonlyMap<K, V> extends ReadonlyArray<readonly [K, V]> {}
-```
-
-Added in v1.0.0
-
-## JSONReadonlySet (interface)
-
-**Signature**
-
-```ts
-export interface JSONReadonlySet<A> extends ReadonlyArray<A> {}
 ```
 
 Added in v1.0.0

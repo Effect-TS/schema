@@ -1209,10 +1209,7 @@ export type JSONOption<A> = { readonly _tag: "None" } | { readonly _tag: "Some";
  */
 export const option = <I, A>(
   value: Codec<I, A>
-): Codec<
-  JSONOption<I>,
-  Option<A>
-> => {
+): Codec<JSONOption<I>, Option<A>> => {
   const parseResult = P.parseResult(value)
   const encodeResult = P.encodeResult(value)
   return transformResult(
@@ -1301,10 +1298,7 @@ export type JSONEither<E, A> = { readonly _tag: "Left"; readonly left: E } | {
 export const either = <IE, E, IA, A>(
   left: Codec<IE, E>,
   right: Codec<IA, A>
-): Codec<
-  JSONEither<IE, IA>,
-  Either<E, A>
-> => {
+): Codec<JSONEither<IE, IA>, Either<E, A>> => {
   const parseResultLeft = P.parseResult(left)
   const parseResultRight = P.parseResult(right)
   const encodeResultLeft = P.encodeResult(left)
@@ -1355,18 +1349,13 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
 }
 
 /**
- * @since 1.0.0
- */
-export interface JSONReadonlyMap<K, V> extends ReadonlyArray<readonly [K, V]> {}
-
-/**
  * @category ReadonlyMap transformations
  * @since 1.0.0
  */
 export const readonlyMap = <IK, K, IV, V>(
   key: Codec<IK, K>,
   value: Codec<IV, V>
-): Codec<JSONReadonlyMap<IK, IV>, ReadonlyMap<K, V>> =>
+): Codec<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
   transform(
     array(tuple(key, value)),
     S.readonlyMap(to(key), to(value)),
@@ -1398,17 +1387,12 @@ export const readonlySetFromSelf = <I, A>(
 }
 
 /**
- * @since 1.0.0
- */
-export interface JSONReadonlySet<A> extends ReadonlyArray<A> {}
-
-/**
  * @category ReadonlySet transformations
  * @since 1.0.0
  */
 export const readonlySet = <I, A>(
   item: Codec<I, A>
-): Codec<JSONReadonlySet<I>, ReadonlySet<A>> =>
+): Codec<ReadonlyArray<I>, ReadonlySet<A>> =>
   transform(
     array(item),
     S.readonlySet(to(item)),
@@ -1438,32 +1422,15 @@ export const chunkFromSelf = <I, A>(item: Codec<I, A>): Codec<Chunk<I>, Chunk<A>
 }
 
 /**
- * @since 1.0.0
- */
-export interface JSONChunk<A> {
-  readonly _tag: "Chunk"
-  readonly values: ReadonlyArray<A>
-}
-
-/**
  * @category Chunk transformations
  * @since 1.0.0
  */
 export const chunk = <I, A>(
   item: Codec<I, A>
-): Codec<JSONChunk<I>, Chunk<A>> =>
-  transform(
-    struct({
-      _tag: S.literal("Chunk"),
-      values: array(item)
-    }),
-    S.chunk(to(item)),
-    (json) => C.fromIterable(json.values),
-    (chunk) => ({ _tag: "Chunk" as const, values: C.toReadonlyArray(chunk) }),
-    {
-      [AST.DocumentationAnnotationId]: "chunk"
-    }
-  )
+): Codec<ReadonlyArray<I>, Chunk<A>> =>
+  transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray, {
+    [AST.DocumentationAnnotationId]: "chunk"
+  })
 
 // ---------------------------------------------
 // Data transformations
