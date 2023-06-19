@@ -43,18 +43,32 @@ describe.concurrent("Chunk", () => {
     })
 
     it("decode / encode", async () => {
+      const toJSON = <A>(chunk: Chunk.Chunk<A>): unknown => JSON.parse(JSON.stringify(chunk))
+
       const codec = C.chunk(C.NumberFromString)
-      await Util.expectParseSuccess(codec, [], Chunk.empty())
-      await Util.expectParseSuccess(codec, ["1", "2", "3"], Chunk.fromIterable([1, 2, 3]))
+      await Util.expectParseSuccess(codec, toJSON(Chunk.empty()), Chunk.empty())
+      await Util.expectParseSuccess(
+        codec,
+        toJSON(Chunk.fromIterable(["1", "2", "3"])),
+        Chunk.fromIterable([1, 2, 3])
+      )
 
       await Util.expectParseFailure(
         codec,
         null,
-        `Expected a generic array, actual null`
+        `Expected a generic object, actual null`
       )
-      await Util.expectParseFailure(codec, ["1", 1], `/1 Expected a string, actual 1`)
-      await Util.expectEncodeSuccess(codec, Chunk.empty(), [])
-      await Util.expectEncodeSuccess(codec, Chunk.fromIterable([1, 2, 3]), ["1", "2", "3"])
+      await Util.expectParseFailure(
+        codec,
+        toJSON(Chunk.fromIterable(["1", 1])),
+        `/values /1 Expected a string, actual 1`
+      )
+      await Util.expectEncodeSuccess(codec, Chunk.empty(), toJSON(Chunk.empty()))
+      await Util.expectEncodeSuccess(
+        codec,
+        Chunk.fromIterable([1, 2, 3]),
+        toJSON(Chunk.fromIterable(["1", "2", "3"]))
+      )
     })
   })
 })

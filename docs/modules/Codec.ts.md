@@ -135,6 +135,11 @@ Added in v1.0.0
 - [utils](#utils)
   - [From (type alias)](#from-type-alias)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
+  - [JSONChunk (interface)](#jsonchunk-interface)
+  - [JSONEither (type alias)](#jsoneither-type-alias)
+  - [JSONOption (type alias)](#jsonoption-type-alias)
+  - [JSONReadonlyMap (interface)](#jsonreadonlymap-interface)
+  - [JSONReadonlySet (interface)](#jsonreadonlyset-interface)
   - [To (type alias)](#to-type-alias)
   - [optional](#optional)
   - [propertySignature](#propertysignature)
@@ -148,7 +153,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunk: <I, A>(item: Codec<I, A>) => Codec<readonly I[], Chunk<A>>
+export declare const chunk: <I, A>(item: Codec<I, A>) => Codec<JSONChunk<I>, Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -231,7 +236,7 @@ Added in v1.0.0
 export declare const either: <IE, E, IA, A>(
   left: Codec<IE, E>,
   right: Codec<IA, A>
-) => Codec<{ readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA }, Either<E, A>>
+) => Codec<JSONEither<IE, IA>, Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -256,9 +261,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const option: <I, A>(
-  value: Codec<I, A>
-) => Codec<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
+export declare const option: <I, A>(value: Codec<I, A>) => Codec<JSONOption<I>, Option<A>>
 ```
 
 Added in v1.0.0
@@ -334,7 +337,7 @@ Added in v1.0.0
 export declare const readonlyMap: <IK, K, IV, V>(
   key: Codec<IK, K>,
   value: Codec<IV, V>
-) => Codec<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
+) => Codec<JSONReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
@@ -359,7 +362,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const readonlySet: <I, A>(item: Codec<I, A>) => Codec<readonly I[], ReadonlySet<A>>
+export declare const readonlySet: <I, A>(item: Codec<I, A>) => Codec<JSONReadonlySet<I>, ReadonlySet<A>>
 ```
 
 Added in v1.0.0
@@ -1503,6 +1506,64 @@ export type FromOptionalKeys<Fields> = {
     ? K
     : never
 }[keyof Fields]
+```
+
+Added in v1.0.0
+
+## JSONChunk (interface)
+
+**Signature**
+
+```ts
+export interface JSONChunk<A> {
+  readonly _tag: 'Chunk'
+  readonly values: ReadonlyArray<A>
+}
+```
+
+Added in v1.0.0
+
+## JSONEither (type alias)
+
+**Signature**
+
+```ts
+export type JSONEither<E, A> =
+  | { readonly _tag: 'Left'; readonly left: E }
+  | {
+      readonly _tag: 'Right'
+      readonly right: A
+    }
+```
+
+Added in v1.0.0
+
+## JSONOption (type alias)
+
+**Signature**
+
+```ts
+export type JSONOption<A> = { readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: A }
+```
+
+Added in v1.0.0
+
+## JSONReadonlyMap (interface)
+
+**Signature**
+
+```ts
+export interface JSONReadonlyMap<K, V> extends ReadonlyArray<readonly [K, V]> {}
+```
+
+Added in v1.0.0
+
+## JSONReadonlySet (interface)
+
+**Signature**
+
+```ts
+export interface JSONReadonlySet<A> extends ReadonlyArray<A> {}
 ```
 
 Added in v1.0.0
