@@ -121,4 +121,47 @@ describe.concurrent("extend", () => {
     )
     await Util.expectParseFailure(transform, { a: 1 }, "/a Expected a string, actual 1")
   })
+
+  describe.concurrent("both operands are transformations", () => {
+    const BoolFromString = C.transform(
+      S.string,
+      S.boolean,
+      (x) => !!x,
+      (x) => "" + x
+    )
+
+    it("optional, transformation", async () => {
+      const schema = pipe(
+        C.struct({
+          a: S.optional(S.boolean).withDefault(() => true)
+        }),
+        C.extend(
+          C.struct({
+            b: C.array(BoolFromString)
+          })
+        )
+      )
+
+      await Util.expectParseSuccess(schema, {
+        b: ["a"]
+      }, { a: true, b: [true] })
+    })
+
+    it("transformation, optional", async () => {
+      const schema = pipe(
+        C.struct({
+          b: C.array(BoolFromString)
+        }),
+        C.extend(
+          C.struct({
+            a: S.optional(S.boolean).withDefault(() => true)
+          })
+        )
+      )
+
+      await Util.expectParseSuccess(schema, {
+        b: ["a"]
+      }, { a: true, b: [true] })
+    })
+  })
 })
