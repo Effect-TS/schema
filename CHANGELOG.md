@@ -1,5 +1,17 @@
 # @effect/schema
 
+## 0.20.3
+
+### Patch Changes
+
+- [#307](https://github.com/Effect-TS/schema/pull/307) [`a325816`](https://github.com/Effect-TS/schema/commit/a32581607fc3941825a8d09fb4a70a04ea37e97d) Thanks [@gcanti](https://github.com/gcanti)! - extend should support transformations as both operands
+
+## 0.20.2
+
+### Patch Changes
+
+- [#303](https://github.com/Effect-TS/schema/pull/303) [`0f70b22`](https://github.com/Effect-TS/schema/commit/0f70b22f9d0e6643a2c87a994f18ed4dd7775eda) Thanks [@sukovanej](https://github.com/sukovanej)! - Update @effect/data and fast-check.
+
 ## 0.20.1
 
 ### Patch Changes

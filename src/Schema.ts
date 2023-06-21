@@ -710,6 +710,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
       return ys.map((y) => {
         if (AST.isTypeLiteral(x)) {
           if (AST.isTypeLiteral(y)) {
+            // isTypeLiteral(x) && isTypeLiteral(y)
             return AST.createTypeLiteral(
               x.propertySignatures.concat(y.propertySignatures),
               x.indexSignatures.concat(y.indexSignatures)
@@ -718,13 +719,14 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
             AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
+            // isTypeLiteral(x) && isTransform(y)
             const from = AST.createTypeLiteral(
               x.propertySignatures.concat(y.from.propertySignatures),
               x.indexSignatures.concat(y.from.indexSignatures)
             )
             const to = AST.createTypeLiteral(
-              x.propertySignatures.concat(y.to.propertySignatures),
-              x.indexSignatures.concat(y.to.indexSignatures)
+              AST.getToPropertySignatures(x.propertySignatures).concat(y.to.propertySignatures),
+              AST.getToIndexSignatures(x.indexSignatures).concat(y.to.indexSignatures)
             )
             return AST.createTransform(
               from,
@@ -739,13 +741,14 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
           AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
         ) {
           if (AST.isTypeLiteral(y)) {
+            // isTransform(x) && isTypeLiteral(y)
             const from = AST.createTypeLiteral(
               x.from.propertySignatures.concat(y.propertySignatures),
               x.from.indexSignatures.concat(y.indexSignatures)
             )
             const to = AST.createTypeLiteral(
-              x.to.propertySignatures.concat(y.propertySignatures),
-              x.to.indexSignatures.concat(y.indexSignatures)
+              x.to.propertySignatures.concat(AST.getToPropertySignatures(y.propertySignatures)),
+              x.to.indexSignatures.concat(AST.getToIndexSignatures(y.indexSignatures))
             )
             return AST.createTransform(
               from,
@@ -758,6 +761,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
             AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
+            // isTransform(x) && isTransform(y)
             const from = AST.createTypeLiteral(
               x.from.propertySignatures.concat(y.from.propertySignatures),
               x.from.indexSignatures.concat(y.from.indexSignatures)
