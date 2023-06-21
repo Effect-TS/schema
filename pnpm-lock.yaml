@@ -41,8 +41,8 @@ devDependencies:
     specifier: ^0.60.5
     version: 0.60.5
   '@effect/docgen':
-    specifier: ^0.0.3
-    version: 0.0.3(@types/node@18.16.0)(typescript@5.0.4)
+    specifier: ^0.1.1
+    version: 0.1.1(@types/node@18.16.0)(typescript@5.0.4)
   '@effect/language-service':
     specifier: ^0.0.19
     version: 0.0.19
@@ -732,8 +732,8 @@ packages:
     resolution: {integrity: sha512-f/NRMyxOIPnxz2kRxUbSv0UFeELjruI+yqMpuoGKbmd3Ji5DP2SAQNF0LXESuZ0AucqRdxKT6odyjuAOZBXyKA==}
     dev: false
 
-  /@effect/docgen@0.0.3(@types/node@18.16.0)(typescript@5.0.4):
-    resolution: {integrity: sha512-R2PPDvSJDKhVay3Mr+RMb0tC7X7tl6Hc0T9w/WrveSnXsmxAlTflwkXQp6u3uBSkDeT14HRzFQkzrv7xLPldDA==}
+  /@effect/docgen@0.1.1(@types/node@18.16.0)(typescript@5.0.4):
+    resolution: {integrity: sha512-WymDghrzsbMpNmgTZDo6qYtOUnaSqvVicJPdESrQEterO2aw/iQVTngTIN6bzJUDQOljOYFsFtBzFJwG5hv8MA==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     peerDependencies:
