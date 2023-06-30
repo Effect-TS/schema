@@ -1,5 +1,17 @@
 # @effect/schema
 
+## 0.21.1
+
+### Patch Changes
+
+- [#312](https://github.com/Effect-TS/schema/pull/312) [`217a3ba`](https://github.com/Effect-TS/schema/commit/217a3ba9807dcdc71b5ab5a7b8bf6bac76c9a7be) Thanks [@gcanti](https://github.com/gcanti)! - struct should allow a "constructor" field name
+
+## 0.21.0
+
+### Minor Changes
+
+- [#310](https://github.com/Effect-TS/schema/pull/310) [`10f8457`](https://github.com/Effect-TS/schema/commit/10f845702fb5017ec1635214c0f995c2da4f3188) Thanks [@sukovanej](https://github.com/sukovanej)! - Update /data and /io.
+
 ## 0.20.3
 
 ### Patch Changes
