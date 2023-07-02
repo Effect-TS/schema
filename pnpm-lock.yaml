@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.12.10
     version: 0.12.10
   '@effect/io':
-    specifier: ^0.28.0
-    version: 0.28.0
+    specifier: ^0.29.0
+    version: 0.29.0
   fast-check:
     specifier: ^3.10.0
     version: 3.10.0
@@ -755,8 +755,8 @@ packages:
       - '@types/node'
     dev: true
 
-  /@effect/io@0.28.0:
-    resolution: {integrity: sha512-FzGyTAoRZMsXsji6I45/lLDqqFxV38rEhqebhLiXc995tfIvS+xAHkiTN+nrLFadTP0JL0H4ystSz4kcYgTy5Q==}
+  /@effect/io@0.29.0:
+    resolution: {integrity: sha512-kDx4ztILcA2Wcq87veQu/FwjuWVbiMrFKC70BDhvjs0OpE9u2MAg7uuu+J0yCuPFZHh9eFPLYAeTI56J2SaSrw==}
     dependencies:
       '@effect/data': 0.12.10
     dev: false
