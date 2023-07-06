@@ -12,8 +12,8 @@ dependencies:
     specifier: ^0.29.0
     version: 0.29.0
   fast-check:
-    specifier: ^3.10.0
-    version: 3.10.0
+    specifier: ^3.11.0
+    version: 3.11.0
 
 devDependencies:
   '@babel/cli':
@@ -3569,8 +3569,8 @@ packages:
     engines: {'0': node >=0.6.0}
     dev: true
 
-  /fast-check@3.10.0:
-    resolution: {integrity: sha512-I2FldZwnCbcY6iL+H0rp9m4D+O3PotuFu9FasWjMCzUedYHMP89/37JbSt6/n7Yq/IZmJDW0B2h30sPYdzrfzw==}
+  /fast-check@3.11.0:
+    resolution: {integrity: sha512-H2tctb7AGfFQfz+DEr3UWhJ3s47LXsGp5g3jeJr5tHjnf4xUvpArIqiwcDmL2EXiv+auLHIpF5MqaIpIKvpxiA==}
     engines: {node: '>=8.0.0'}
     dependencies:
       pure-rand: 6.0.1
