@@ -433,6 +433,7 @@ S.never;
 
 S.json;
 S.UUID;
+S.ULID;
 ```
 
 ## Literals

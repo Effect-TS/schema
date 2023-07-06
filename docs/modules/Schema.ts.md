@@ -80,6 +80,7 @@ Added in v1.0.0
 - [constructors](#constructors)
   - [JsonNumber](#jsonnumber)
   - [UUID](#uuid)
+  - [ULID](#ulid)
   - [chunkFromSelf](#chunkfromself)
   - [enums](#enums)
   - [instanceOf](#instanceof)
@@ -129,7 +130,7 @@ Added in v1.0.0
   - [nonNaN](#nonnan)
   - [nonNegative](#nonnegative)
   - [nonPositive](#nonpositive)
-  - [numberFromString](#numberfromstring)
+  - [numberFromString](#numberfromstring-1)
   - [positive](#positive)
 - [option](#option-1)
   - [optionFromNullable](#optionfromnullable)
@@ -163,7 +164,7 @@ Added in v1.0.0
   - [nonEmpty](#nonempty)
   - [pattern](#pattern)
   - [startsWith](#startswith)
-  - [trim](#trim)
+  - [trim](#trim-1)
   - [trimmed](#trimmed)
 - [type id](#type-id)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
@@ -202,6 +203,7 @@ Added in v1.0.0
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
   - [UUIDTypeId](#uuidtypeid)
+  - [ULIDTypeId](#ulidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
@@ -1074,6 +1076,16 @@ Added in v1.0.0
 
 ```ts
 export declare const UUID: Schema<string, string>
+```
+
+Added in v1.0.0
+
+## ULID
+
+**Signature**
+
+```ts
+export declare const ULID: Schema<string, string>
 ```
 
 Added in v1.0.0
@@ -2363,6 +2375,16 @@ Added in v1.0.0
 
 ```ts
 export declare const UUIDTypeId: '@effect/schema/UUIDTypeId'
+```
+
+Added in v1.0.0
+
+## ULIDTypeId
+
+**Signature**
+
+```ts
+export declare const ULIDTypeId: '@effect/schema/ULIDTypeId'
 ```
 
 Added in v1.0.0
