@@ -152,12 +152,12 @@ if (E.isLeft(result2)) {
 
 The `parsePerson` function returns a value of type `ParseResult<A>`, which is a type alias for `Either<NonEmptyReadonlyArray<ParseErrors>, A>`, where `NonEmptyReadonlyArray<ParseErrors>` represents a list of errors that occurred during the parsing process and `A` is the inferred type of the data described by the `Schema`. A successful parse will result in a `Right`, containing the parsed data. A `Right` value indicates that the parse was successful and no errors occurred. In the case of a failed parse, the result will be a `Left` value containing a list of `ParseError`s.
 
-The `parse` function is used to parse a value and throw an error if the parsing fails.
+The `parseSync` function is used to parse a value and throw an error if the parsing fails.
 It is useful when you want to ensure that the value being parsed is in the correct format, and want to throw an error if it is not.
 
 ```ts
 try {
-  const person = S.parse(Person)({});
+  const person = S.parseSync(Person)({});
   console.log(person);
 } catch (e) {
   console.error("Parsing failed:");
@@ -188,7 +188,7 @@ const Person = S.struct({
 });
 
 console.log(
-  S.parse(Person)({
+  S.parseSync(Person)({
     name: "Bob",
     age: 40,
     email: "bob@example.com",
@@ -198,7 +198,7 @@ console.log(
 { name: 'Bob', age: 40 }
 */
 
-S.parse(Person)(
+S.parseSync(Person)(
   {
     name: "Bob",
     age: 40,
@@ -228,7 +228,7 @@ const Person = S.struct({
   age: S.number,
 });
 
-S.parse(Person)(
+S.parseSync(Person)(
   {
     name: "Bob",
     age: "abc",
@@ -741,12 +741,12 @@ const DiscriminatedShape = S.union(
   )
 );
 
-expect(S.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(S.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
-expect(S.parse(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+expect(S.parseSync(DiscriminatedShape)({ sideLength: 10 })).toEqual({
   kind: "square",
   sideLength: 10,
 });
@@ -767,14 +767,14 @@ const DiscriminatedShape = S.union(
 );
 
 // parsing
-expect(S.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(S.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
 // encoding
 expect(
-  S.encode(DiscriminatedShape)({
+  S.encodeSync(DiscriminatedShape)({
     kind: "circle",
     radius: 10,
   })
@@ -862,12 +862,12 @@ Optional fields can be configured to accept a default value, making the field op
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
 const schema = S.struct({ a: S.optional(S.number).withDefault(() => 0) });
 
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 
 parse({}); // { a: 0 }
 parse({ a: 1 }); // { a: 1 }
 
-const encode = S.encode(schema);
+const encode = S.encodeSync(schema);
 
 encode({ a: 0 }); // { a: 0 }
 encode({ a: 1 }); // { a: 1 }
@@ -883,12 +883,12 @@ import * as O from "@effect/data/Option"
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
 const schema = S.struct({ a. S.optional(S.number).toOption() });
 
-const parse = S.parse(schema)
+const parse = S.parseSync(schema)
 
 parse({}) // { a: none() }
 parse({ a: 1 }) // { a: some(1) }
 
-const encode = S.encode(schema)
+const encode = S.encodeSync(schema)
 
 encode({ a: O.none() }) // {}
 encode({ a: O.some(1) }) // { a: 1 }
@@ -1171,7 +1171,7 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, string>
 const schema = S.Trim;
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 
 parse("a"); // "a"
 parse(" a"); // "a"
@@ -1194,7 +1194,7 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, number>
 const schema = S.NumberFromString;
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 
 // success cases
 parse("1"); // 1
@@ -1218,7 +1218,7 @@ import * as S from "@effect/schema/Schema";
 // const schema: S.Schema<number, number>
 const schema = pipe(S.number, S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 parse(-3); // -1
 parse(0); // 0
 parse(3); // 1
@@ -1236,7 +1236,7 @@ import * as S from "@effect/schema/Schema";
 // const schema: S.Schema<bigint, bigint>
 const schema = pipe(S.bigint, S.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 parse(-3n); // -1n
 parse(0n); // 0n
 parse(3n); // 1n
@@ -1254,7 +1254,7 @@ import * as S from "@effect/schema/Schema";
 // const schema: S.Schema<boolean, boolean>
 const schema = pipe(S.boolean, S.not);
 
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 parse(true); // false
 parse(false); // true
 ```
@@ -1270,13 +1270,13 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<string, Date>
 const schema = S.Date;
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 
 parse("1970-01-01T00:00:00.000Z"); // new Date(0)
 
 parse("a"); // throws
 
-const validate = S.validate(schema);
+const validate = S.validateSync(schema);
 
 validate(new Date(0)); // new Date(0)
 validate(new Date("fail")); // throws
@@ -1314,7 +1314,7 @@ const schema = S.struct({
 });
 
 // parsing
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 parse({ a: "hello", b: null }); // { a: "hello", b: none() }
 parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
@@ -1322,7 +1322,7 @@ parse({ a: "hello", b: undefined }); // throws
 parse({ a: "hello" }); // throws (key "b" is missing)
 
 // encoding
-const encodeOrThrow = S.encode(schema);
+const encodeOrThrow = S.encodeSync(schema);
 
 encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
 encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
@@ -1337,7 +1337,7 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<readonly number[], ReadonlySet<number>>
 const schema = S.readonlySet(S.number); // define a schema for ReadonlySet with number values
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 
 parse([1, 2, 3]); // new Set([1, 2, 3])
 ```
@@ -1351,7 +1351,7 @@ import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<readonly (readonly [number, string])[], ReadonlyMap<number, string>>
 const schema = S.readonlyMap(S.number, S.string); // define the schema for ReadonlyMap with number keys and string values
-const parse = S.parse(schema);
+const parse = S.parseSync(schema);
 
 parse([
   [1, "a"],
@@ -1374,7 +1374,7 @@ const LongString = pipe(
   })
 );
 
-console.log(S.parse(LongString)("a"));
+console.log(S.parseSync(LongString)("a"));
 /*
 error(s) found
 └─ Expected a string at least 10 characters long, actual "a"
