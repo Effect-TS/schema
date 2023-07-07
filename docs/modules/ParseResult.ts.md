@@ -37,7 +37,6 @@ Added in v1.0.0
   - [flatMap](#flatmap)
   - [map](#map)
 - [utils](#utils)
-  - [IO (type alias)](#io-type-alias)
   - [ParseError (interface)](#parseerror-interface)
   - [ParseResult (type alias)](#parseresult-type-alias)
   - [parseError](#parseerror)
@@ -285,7 +284,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const eitherOrUndefined: <E, A>(self: IO<E, A>) => E.Either<E, A> | undefined
+export declare const eitherOrUndefined: <A>(self: ParseResult<A>) => E.Either<ParseError, A> | undefined
 ```
 
 Added in v1.0.0
@@ -295,7 +294,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const flatMap: <E, E1, A, B>(self: IO<E, A>, f: (self: A) => IO<E1, B>) => IO<E | E1, B>
+export declare const flatMap: <A, B>(self: ParseResult<A>, f: (self: A) => ParseResult<B>) => ParseResult<B>
 ```
 
 Added in v1.0.0
@@ -305,22 +304,12 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const map: <E, A, B>(self: IO<E, A>, f: (self: A) => B) => IO<E, B>
+export declare const map: <A, B>(self: ParseResult<A>, f: (self: A) => B) => ParseResult<B>
 ```
 
 Added in v1.0.0
 
 # utils
-
-## IO (type alias)
-
-**Signature**
-
-```ts
-export type IO<E, A> = Effect.Effect<never, E, A> | E.Either<E, A>
-```
-
-Added in v1.0.0
 
 ## ParseError (interface)
 
@@ -340,7 +329,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type ParseResult<A> = IO<ParseError, A>
+export type ParseResult<A> = Effect.Effect<never, ParseError, A>
 ```
 
 Added in v1.0.0

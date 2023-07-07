@@ -1,11 +1,8 @@
-import * as D from "@effect/data/Debug"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
-
-D.runtimeDebug.tracingEnabled = true
 
 /*
 parseEither (good) x 276,758 ops/sec ±0.56% (89 runs sampled)
