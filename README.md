@@ -165,11 +165,11 @@ if (E.isLeft(result2)) {
 
 The `validatePerson` function returns a value of type `ParseResult<A>`, which is an alias for `Either<NonEmptyReadonlyArray<ParseErrors>, A>`. In this case, `A` represents the inferred type of the data described by the `Schema`. If the validation succeeds, the result will be a `Right` value containing the validated data. If the validation fails, the result will be a `Left` value containing a list of `ParseErrors`.
 
-Alternatively, you can use the `validate` function to validate a value and throw an error if the validation fails. Here's an example:
+Alternatively, you can use the `validateSync` function to validate a value and throw an error if the validation fails. Here's an example:
 
 ```ts
 try {
-  const person = S.validate(Person)({});
+  const person = S.validateSync(Person)({});
   console.log(person);
 } catch (e) {
   console.error("Validation failed:");
@@ -200,7 +200,7 @@ const Person = S.struct({
 });
 
 console.log(
-  S.validate(Person)({
+  S.validateSync(Person)({
     name: "Bob",
     age: 40,
     email: "bob@example.com",
@@ -210,7 +210,7 @@ console.log(
 { name: 'Bob', age: 40 }
 */
 
-S.validate(Person)(
+S.validateSync(Person)(
   {
     name: "Bob",
     age: 40,
@@ -240,7 +240,7 @@ const Person = S.struct({
   age: S.number,
 });
 
-S.validate(Person)(
+S.validateSync(Person)(
   {
     name: "Bob",
     age: "abc",
@@ -339,9 +339,9 @@ assertsPerson({ name: "Alice", age: 30 });
 
 When working with a `Codec<I, A>`, you have the following operations available:
 
-- `parse`: Converts from `unknown` to `A`
-- `decode`: Converts from `I` to `A`
-- `encode`: Converts from `A` to `I`
+- `parseSync`: Converts from `unknown` to `A`
+- `decodeSync`: Converts from `I` to `A`
+- `encodeSync`: Converts from `A` to `I`
 
 Here's an example:
 
@@ -353,16 +353,16 @@ const codec = C.NumberFromString; // This codec transforms a `string` into a `nu
 
 const input: unknown = "1";
 
-C.parse(codec)(input); // => 1
-C.decode(codec)(input); // error: decode expects a string
-C.decode(codec)("1"); // => 1
+C.parseSync(codec)(input); // => 1
+C.decodeSync(codec)(input); // error: decode expects a string
+C.decodeSync(codec)("1"); // => 1
 
-C.encode(codec)(1); // => "1"
+C.encodeSync(codec)(1); // => "1"
 ```
 
-By using the `parse` function, you can convert an `unknown` value to the expected type `A`. However, when using `decode`, you need to provide the correct input type `I`, which in this case is a `string`.
+By using the `parse` function, you can convert an `unknown` value to the expected type `A`. However, when using `decodeSync`, you need to provide the correct input type `I`, which in this case is a `string`.
 
-Similarly, the `encode` function converts a value of type `A` to the desired output type `I`, which in this example is a `string`.
+Similarly, the `encodeSync` function converts a value of type `A` to the desired output type `I`, which in this example is a `string`.
 
 ## [fast-check](https://github.com/dubzzz/fast-check) arbitraries
 
@@ -379,9 +379,9 @@ const Person = S.struct({
   age: pipe(S.number, S.int(), S.between(1, 100)),
 });
 
-const PersonArbitraryTo = A.build(Person)(fc);
+const PersonArbitrary = A.build(Person)(fc);
 
-console.log(fc.sample(PersonArbitraryTo, 2));
+console.log(fc.sample(PersonArbitrary, 2));
 /*
 [
   { name: '.lAR', age: 7 },
@@ -746,12 +746,12 @@ const DiscriminatedShape = C.union(
   )
 );
 
-expect(C.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(C.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
-expect(C.parse(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+expect(C.parseSync(DiscriminatedShape)({ sideLength: 10 })).toEqual({
   kind: "square",
   sideLength: 10,
 });
@@ -772,14 +772,14 @@ const DiscriminatedShape = C.union(
 );
 
 // parsing
-expect(C.parse(DiscriminatedShape)({ radius: 10 })).toEqual({
+expect(C.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
   radius: 10,
 });
 
 // encoding
 expect(
-  C.encode(DiscriminatedShape)({
+  C.encodeSync(DiscriminatedShape)({
     kind: "circle",
     radius: 10,
   })
@@ -867,15 +867,15 @@ Optional fields can be configured to accept a default value, making the field op
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
 const codec = C.struct({ a: S.optional(S.number).withDefault(() => 0) });
 
-const parse = C.parse(codec);
+const parseSync = C.parseSync(codec);
 
-parse({}); // { a: 0 }
-parse({ a: 1 }); // { a: 1 }
+parseSync({}); // { a: 0 }
+parseSync({ a: 1 }); // { a: 1 }
 
-const encode = C.encode(codec);
+const encodeSync = C.encodeSync(codec);
 
-encode({ a: 0 }); // { a: 0 }
-encode({ a: 1 }); // { a: 1 }
+encodeSync({ a: 0 }); // { a: 0 }
+encodeSync({ a: 1 }); // { a: 1 }
 ```
 
 #### Optional fields as `Option`s
@@ -888,15 +888,15 @@ import * as O from "@effect/data/Option";
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
 const schema = C.struct({ a: S.optional(S.number).toOption() });
 
-const parse = C.parse(schema);
+const parseSync = C.parseSync(schema);
 
-parse({}); // { a: none() }
-parse({ a: 1 }); // { a: some(1) }
+parseSync({}); // { a: none() }
+parseSync({ a: 1 }); // { a: some(1) }
 
-const encode = C.encode(schema);
+const encodeSync = C.encodeSync(schema);
 
-encode({ a: O.none() }); // {}
-encode({ a: O.some(1) }); // { a: 1 }
+encodeSync({ a: O.none() }); // {}
+encodeSync({ a: O.some(1) }); // { a: 1 }
 ```
 
 ## Pick
@@ -1111,16 +1111,16 @@ import { pipe } from "@effect/data/Function";
 import * as TF from "@effect/schema/TreeFormatter";
 
 const api = (url: string) =>
-  Effect.tryCatchPromise(
-    () =>
+  Effect.tryPromise({
+    catch: () =>
       fetch(url).then((res) => {
         if (res.ok) {
           return res.json() as Promise<unknown>;
         }
         throw new Error(String(res.status));
       }),
-    (e) => new Error(String(e))
-  );
+    try: (e) => new Error(String(e)),
+  });
 
 const PeopleId = pipe(S.string, S.brand("PeopleId"));
 
@@ -1128,11 +1128,10 @@ const PeopleIdFromString = C.transformResult(
   S.string,
   PeopleId,
   (s, _, self) =>
-    Effect.mapBoth(
-      api(`https://swapi.dev/api/people/${s}`),
-      (e) => PR.parseError([PR.type(self, s, e.message)]),
-      () => PeopleId(s)
-    ),
+    Effect.mapBoth(api(`https://swapi.dev/api/people/${s}`), {
+      onFailure: (e) => PR.parseError([PR.type(self, s, e.message)]),
+      onSuccess: () => PeopleId(s),
+    }),
   PR.success
 );
 
@@ -1159,12 +1158,12 @@ import * as C from "@effect/schema/Codec";
 
 // const codec: C.Codec<string, string>
 const codec = C.Trim;
-const parse = C.parse(codec);
+const parseSync = C.parseSync(codec);
 
-parse("a"); // "a"
-parse(" a"); // "a"
-parse("a "); // "a"
-parse(" a "); // "a"
+parseSync("a"); // "a"
+parseSync(" a"); // "a"
+parseSync("a "); // "a"
+parseSync(" a "); // "a"
 ```
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
@@ -1182,18 +1181,18 @@ import * as C from "@effect/schema/Codec";
 
 // const codec: C.Codec<string, number>
 const codec = C.NumberFromString;
-const parse = C.parse(codec);
+const parseSync = C.parsev(codec);
 
 // success cases
-parse("1"); // 1
-parse("-1"); // -1
-parse("1.5"); // 1.5
-parse("NaN"); // NaN
-parse("Infinity"); // Infinity
-parse("-Infinity"); // -Infinity
+parseSync("1"); // 1
+parseSync("-1"); // -1
+parseSync("1.5"); // 1.5
+parseSync("NaN"); // NaN
+parseSync("Infinity"); // Infinity
+parseSync("-Infinity"); // -Infinity
 
 // failure cases
-parse("a"); // throws
+parseSync("a"); // throws
 ```
 
 #### clamp
@@ -1207,10 +1206,10 @@ import * as C from "@effect/schema/Codec";
 // const codec: C.Codec<number, number>
 const codec = pipe(S.number, C.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
-const parse = C.parse(codec);
-parse(-3); // -1
-parse(0); // 0
-parse(3); // 1
+const parseSync = C.parseSync(codec);
+parseSync(-3); // -1
+parseSync(0); // 0
+parseSync(3); // 1
 ```
 
 ### Bigint transformations
@@ -1226,10 +1225,10 @@ import * as C from "@effect/schema/Codec";
 // const codec: C.Codec<bigint, bigint>
 const codec = pipe(S.bigint, C.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
-const parse = C.parse(codec);
-parse(-3n); // -1n
-parse(0n); // 0n
-parse(3n); // 1n
+const parseSync = C.parseSync(codec);
+parseSync(-3n); // -1n
+parseSync(0n); // 0n
+parseSync(3n); // 1n
 ```
 
 ### Boolean transformations
@@ -1245,9 +1244,9 @@ import * as C from "@effect/schema/Codec";
 // const codec: C.Codec<boolean, boolean>
 const codec = pipe(S.boolean, C.not);
 
-const parse = C.parse(codec);
-parse(true); // false
-parse(false); // true
+const parseSync = C.parseSync(codec);
+parseSync(true); // false
+parseSync(false); // true
 ```
 
 ### Date transformations
@@ -1262,16 +1261,16 @@ import * as C from "@effect/schema/Codec";
 
 // const codec: C.Codec<string, Date>
 const codec = C.Date;
-const parse = C.parse(codec);
+const parseSync = C.parseSync(codec);
 
-parse("1970-01-01T00:00:00.000Z"); // new Date(0)
+parseSync("1970-01-01T00:00:00.000Z"); // new Date(0)
 
-parse("a"); // throws
+parseSync("a"); // throws
 
-const validate = S.validate(C.to(codec));
+const validateSync = S.validateSync(C.to(codec));
 
-validate(new Date(0)); // new Date(0)
-validate(new Date("fail")); // throws
+validateSync(new Date(0)); // new Date(0)
+validateSync(new Date("fail")); // throws
 ```
 
 ## Option
@@ -1307,18 +1306,18 @@ const codec = C.struct({
 });
 
 // parsing
-const parse = C.parse(codec);
-parse({ a: "hello", b: null }); // { a: "hello", b: none() }
-parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
+const parseSync = C.parseSync(codec);
+parseSync({ a: "hello", b: null }); // { a: "hello", b: none() }
+parseSync({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
 
-parse({ a: "hello", b: undefined }); // throws
-parse({ a: "hello" }); // throws (key "b" is missing)
+parseSync({ a: "hello", b: undefined }); // throws
+parseSync({ a: "hello" }); // throws (key "b" is missing)
 
 // encoding
-const encodeOrThrow = C.encode(codec);
+const encodeSync = C.encodeSync(codec);
 
-encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
-encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
+encodeSync({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
+encodeSync({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
 ```
 
 ## ReadonlySet
@@ -1331,9 +1330,9 @@ import * as C from "@effect/schema/Codec";
 
 // const codec: C.Codec<readonly number[], ReadonlySet<number>>
 const codec = C.readonlySet(S.number); // define a schema for ReadonlySet with number values
-const parse = C.parse(codec);
+const parseSync = C.parseSync(codec);
 
-parse([1, 2, 3]); // new Set([1, 2, 3])
+parseSync([1, 2, 3]); // new Set([1, 2, 3])
 ```
 
 ## ReadonlyMap
@@ -1346,9 +1345,9 @@ import * as C from "@effect/schema/Codec";
 
 // const codec: C.Codec<readonly (readonly [number, string])[], ReadonlyMap<number, string>>
 const codec = C.readonlyMap(S.number, S.string); // define the schema for ReadonlyMap with number keys and string values
-const parse = C.parse(codec);
+const parseSync = C.parseSync(codec);
 
-parse([
+parseSync([
   [1, "a"],
   [2, "b"],
   [3, "c"],
@@ -1369,7 +1368,7 @@ const LongString = pipe(
   })
 );
 
-console.log(S.parse(LongString)("a"));
+console.log(S.parseSync(LongString)("a"));
 /*
 error(s) found
 └─ Expected a string at least 10 characters long, actual "a"
