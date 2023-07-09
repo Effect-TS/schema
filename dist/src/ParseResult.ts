@@ -215,9 +215,8 @@ export const failure = (e: ParseErrors): ParseResult<never> => fail(parseError([
  * @category constructors
  * @since 1.0.0
  */
-export const failures = (
-  es: NonEmptyReadonlyArray<ParseErrors>
-): ParseResult<never> => E.left(parseError(es))
+export const failures = (es: NonEmptyReadonlyArray<ParseErrors>): ParseResult<never> =>
+  E.left(parseError(es))
 
 /**
  * @category optimisation

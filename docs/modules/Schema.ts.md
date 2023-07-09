@@ -132,6 +132,7 @@ Added in v1.0.0
   - [void](#void)
 - [string constructors](#string-constructors)
   - [Trimmed](#trimmed)
+  - [ULID](#ulid)
   - [UUID](#uuid)
 - [string filters](#string-filters)
   - [endsWith](#endswith)
@@ -991,16 +992,6 @@ export declare const is: <A>(schema: Schema<A>) => (a: unknown) => a is A
 
 Added in v1.0.0
 
-## encodeSync
-
-**Signature**
-
-```ts
-export declare const encodeSync: <I, A>(schema: Schema<I, A>) => (a: A, options?: ParseOptions | undefined) => I
-```
-
-Added in v1.0.0
-
 # model
 
 ## Schema (interface)
@@ -1277,16 +1268,6 @@ export declare const positive: <A extends number>(
 
 Added in v1.0.0
 
-## parseSync
-
-**Signature**
-
-```ts
-export declare const parseSync: <_, A>(schema: Schema<_, A>) => (i: unknown, options?: ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
 # primitives
 
 ## any
@@ -1417,6 +1398,16 @@ Added in v1.0.0
 
 ```ts
 export declare const Trimmed: Schema<string>
+```
+
+Added in v1.0.0
+
+## ULID
+
+**Signature**
+
+```ts
+export declare const ULID: Schema<string>
 ```
 
 Added in v1.0.0
@@ -1795,6 +1786,16 @@ export declare const TrimmedTypeId: typeof TrimmedTypeId
 
 Added in v1.0.0
 
+## ULIDTypeId
+
+**Signature**
+
+```ts
+export declare const ULIDTypeId: typeof ULIDTypeId
+```
+
+Added in v1.0.0
+
 ## UUIDTypeId
 
 **Signature**
@@ -2046,16 +2047,6 @@ Added in v1.0.0
 
 ```ts
 export declare const validateSync: <A>(schema: Schema<A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
-## validateSync
-
-**Signature**
-
-```ts
-export declare const validateSync: <_, A>(schema: Schema<_, A>) => (a: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0

@@ -77,12 +77,12 @@ export {
    * @category guards
    * @since 1.0.0
    */
-  encodeSync,
+  is,
   /**
    * @category validating
    * @since 1.0.0
    */
-  parseSync,
+  validate,
   /**
    * @category validating
    * @since 1.0.0
