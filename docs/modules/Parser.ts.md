@@ -14,25 +14,25 @@ Added in v1.0.0
 
 - [decoding](#decoding)
   - [decode](#decode)
-  - [decodeEffect](#decodeeffect)
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
   - [decodePromise](#decodepromise)
   - [decodeResult](#decoderesult)
+  - [decodeSync](#decodesync)
 - [encoding](#encoding)
   - [encode](#encode)
-  - [encodeEffect](#encodeeffect)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
   - [encodePromise](#encodepromise)
   - [encodeResult](#encoderesult)
+  - [encodeSync](#encodesync)
 - [parsing](#parsing)
   - [parse](#parse)
-  - [parseEffect](#parseeffect)
   - [parseEither](#parseeither)
   - [parseOption](#parseoption)
   - [parsePromise](#parsepromise)
   - [parseResult](#parseresult)
+  - [parseSync](#parsesync)
 - [utils](#utils)
   - [ToAsserts (type alias)](#toasserts-type-alias)
   - [defaultParseOption](#defaultparseoption)
@@ -40,11 +40,11 @@ Added in v1.0.0
   - [asserts](#asserts)
   - [is](#is)
   - [validate](#validate)
-  - [validateEffect](#validateeffect)
   - [validateEither](#validateeither)
   - [validateOption](#validateoption)
   - [validatePromise](#validatepromise)
   - [validateResult](#validateresult)
+  - [validateSync](#validatesync)
 
 ---
 
@@ -55,17 +55,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions) => A
-```
-
-Added in v1.0.0
-
-## decodeEffect
-
-**Signature**
-
-```ts
-export declare const decodeEffect: <I, A>(
+export declare const decode: <I, A>(
   schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>
 ```
@@ -114,6 +104,16 @@ export declare const decodeResult: <I, A>(schema: Codec<I, A>) => (i: I, options
 
 Added in v1.0.0
 
+## decodeSync
+
+**Signature**
+
+```ts
+export declare const decodeSync: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions) => A
+```
+
+Added in v1.0.0
+
 # encoding
 
 ## encode
@@ -121,17 +121,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encode: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions) => I
-```
-
-Added in v1.0.0
-
-## encodeEffect
-
-**Signature**
-
-```ts
-export declare const encodeEffect: <I, A>(
+export declare const encode: <I, A>(
   schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, I>
 ```
@@ -180,6 +170,16 @@ export declare const encodeResult: <I, A>(schema: Codec<I, A>) => (a: A, options
 
 Added in v1.0.0
 
+## encodeSync
+
+**Signature**
+
+```ts
+export declare const encodeSync: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions) => I
+```
+
+Added in v1.0.0
+
 # parsing
 
 ## parse
@@ -187,17 +187,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parse: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions) => A
-```
-
-Added in v1.0.0
-
-## parseEffect
-
-**Signature**
-
-```ts
-export declare const parseEffect: <I, A>(
+export declare const parse: <I, A>(
   schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>
 ```
@@ -242,6 +232,16 @@ Added in v1.0.0
 
 ```ts
 export declare const parseResult: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions) => ParseResult<A>
+```
+
+Added in v1.0.0
+
+## parseSync
+
+**Signature**
+
+```ts
+export declare const parseSync: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions) => A
 ```
 
 Added in v1.0.0
@@ -295,17 +295,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validate: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => A
-```
-
-Added in v1.0.0
-
-## validateEffect
-
-**Signature**
-
-```ts
-export declare const validateEffect: <A>(
+export declare const validate: <A>(
   schema: Schema<A>
 ) => (a: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>
 ```
@@ -350,6 +340,16 @@ Added in v1.0.0
 
 ```ts
 export declare const validateResult: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => ParseResult<A>
+```
+
+Added in v1.0.0
+
+## validateSync
+
+**Signature**
+
+```ts
+export declare const validateSync: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => A
 ```
 
 Added in v1.0.0

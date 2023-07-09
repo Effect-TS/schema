@@ -4,7 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.unionMember = exports.unexpected = exports.type = exports.success = exports.parseError = exports.missing = exports.mapLeft = exports.map = exports.key = exports.index = exports.forbidden = exports.flatMap = exports.failures = exports.failure = exports.fail = exports.eitherOrUndefined = exports.bimap = void 0;
-var Debug = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Debug"));
 var E = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Either"));
 var O = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Option"));
 var Effect = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/io/Effect"));
@@ -134,7 +133,7 @@ const flatMap = (self, f) => {
   if (s["_tag"] === "Right") {
     return f(s.right);
   }
-  return Debug.bodyWithTrace((trace, restore) => Effect.flatMap(self, a => restore(f)(a)).traced(trace));
+  return Effect.flatMap(self, f);
 };
 /**
  * @category optimisation
@@ -149,7 +148,7 @@ const map = (self, f) => {
   if (s["_tag"] === "Right") {
     return E.right(f(s.right));
   }
-  return Debug.bodyWithTrace((trace, restore) => Effect.map(self, restore(f)).traced(trace));
+  return Effect.map(self, f);
 };
 /**
  * @category optimisation
@@ -164,7 +163,7 @@ const mapLeft = (self, f) => {
   if (s["_tag"] === "Right") {
     s;
   }
-  return Debug.bodyWithTrace((trace, restore) => Effect.mapError(self, restore(f)).traced(trace));
+  return Effect.mapError(self, f);
 };
 /**
  * @category optimisation
@@ -172,10 +171,17 @@ const mapLeft = (self, f) => {
  */
 exports.mapLeft = mapLeft;
 const bimap = (self, f, g) => {
-  if (E.isEither(self)) {
-    return E.bimap(self, f, g);
+  const s = self;
+  if (s["_tag"] === "Left") {
+    return E.left(f(s.left));
   }
-  return Debug.bodyWithTrace((trace, restore) => Effect.mapBoth(self, restore(f), restore(g)).traced(trace));
+  if (s["_tag"] === "Right") {
+    return E.right(g(s.right));
+  }
+  return Effect.mapBoth(self, {
+    onFailure: f,
+    onSuccess: g
+  });
 };
 exports.bimap = bimap;
 //# sourceMappingURL=ParseResult.js.map

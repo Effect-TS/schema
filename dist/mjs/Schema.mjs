@@ -1,17 +1,18 @@
 /**
  * @since 1.0.0
  */
+import * as BI from "@effect/data/Bigint";
 import { RefinedConstructorsTypeId } from "@effect/data/Brand";
 import * as C from "@effect/data/Chunk";
 import * as D from "@effect/data/Data";
-import { untracedMethod } from "@effect/data/Debug";
 import * as E from "@effect/data/Either";
 import * as Equal from "@effect/data/Equal";
 import { dual, identity, pipe } from "@effect/data/Function";
 import * as N from "@effect/data/Number";
 import * as O from "@effect/data/Option";
-import { isDate } from "@effect/data/Predicate";
+import { isDate, not } from "@effect/data/Predicate";
 import * as ReadonlyArray from "@effect/data/ReadonlyArray";
+import * as Str from "@effect/data/String";
 import * as AST from "@effect/schema/AST";
 import * as I from "@effect/schema/internal/common";
 import * as P from "@effect/schema/Parser";
@@ -49,11 +50,6 @@ validate,
  * @category validating
  * @since 1.0.0
  */
-validateEffect,
-/**
- * @category validating
- * @since 1.0.0
- */
 validateEither,
 /**
  * @category validating
@@ -69,7 +65,12 @@ validatePromise,
  * @category validating
  * @since 1.0.0
  */
-validateResult } from "@effect/schema/Parser";
+validateResult,
+/**
+ * @category validating
+ * @since 1.0.0
+ */
+validateSync } from "@effect/schema/Parser";
 // ---------------------------------------------
 // annotations
 // ---------------------------------------------
@@ -178,10 +179,10 @@ export const BrandTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Brand"
  * @since 1.0.0
  */
 export const fromBrand = (constructor, options) => self => {
-  const filter = untracedMethod(() => (a, _, self) => {
+  const filter = (a, _, self) => {
     const e = constructor.either(a);
     return E.isLeft(e) ? O.some(PR.parseError([PR.type(self, a, e.left.map(v => v.message).join(", "))])) : O.none();
-  });
+  };
   const ast = AST.createRefinement(self.ast, filter, toAnnotations({
     typeId: {
       id: BrandTypeId,
@@ -394,18 +395,22 @@ export const intersectUnionMembers = (xs, ys) => {
     return ys.map(y => {
       if (AST.isTypeLiteral(x)) {
         if (AST.isTypeLiteral(y)) {
+          // isTypeLiteral(x) && isTypeLiteral(y)
           return AST.createTypeLiteral(x.propertySignatures.concat(y.propertySignatures), x.indexSignatures.concat(y.indexSignatures));
         } else if (AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) && AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)) {
+          // isTypeLiteral(x) && isTransform(y)
           const from = AST.createTypeLiteral(x.propertySignatures.concat(y.from.propertySignatures), x.indexSignatures.concat(y.from.indexSignatures));
-          const to = AST.createTypeLiteral(x.propertySignatures.concat(y.to.propertySignatures), x.indexSignatures.concat(y.to.indexSignatures));
+          const to = AST.createTypeLiteral(AST.getToPropertySignatures(x.propertySignatures).concat(y.to.propertySignatures), AST.getToIndexSignatures(x.indexSignatures).concat(y.to.indexSignatures));
           return AST.createTransform(from, to, AST.createTypeLiteralTransformation(y.transformAST.propertySignatureTransformations));
         }
       } else if (AST.isTransform(x) && AST.isTypeLiteralTransformation(x.transformAST) && AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)) {
         if (AST.isTypeLiteral(y)) {
+          // isTransform(x) && isTypeLiteral(y)
           const from = AST.createTypeLiteral(x.from.propertySignatures.concat(y.propertySignatures), x.from.indexSignatures.concat(y.indexSignatures));
-          const to = AST.createTypeLiteral(x.to.propertySignatures.concat(y.propertySignatures), x.to.indexSignatures.concat(y.indexSignatures));
+          const to = AST.createTypeLiteral(x.to.propertySignatures.concat(AST.getToPropertySignatures(y.propertySignatures)), x.to.indexSignatures.concat(AST.getToIndexSignatures(y.indexSignatures)));
           return AST.createTransform(from, to, AST.createTypeLiteralTransformation(x.transformAST.propertySignatureTransformations));
         } else if (AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) && AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)) {
+          // isTransform(x) && isTransform(y)
           const from = AST.createTypeLiteral(x.from.propertySignatures.concat(y.from.propertySignatures), x.from.indexSignatures.concat(y.from.indexSignatures));
           const to = AST.createTypeLiteral(x.to.propertySignatures.concat(y.to.propertySignatures), x.to.indexSignatures.concat(y.to.indexSignatures));
           return AST.createTransform(from, to, AST.createTypeLiteralTransformation(x.transformAST.propertySignatureTransformations.concat(y.transformAST.propertySignatureTransformations)));
@@ -459,7 +464,7 @@ export const addBrand = (ast, brand, options) => {
 export const brand = (brand, options) => self => {
   const ast = addBrand(self.ast, brand, options);
   const schema = make(ast);
-  const validate = P.validate(schema);
+  const validate = P.validateSync(schema);
   const validateOption = P.validateOption(schema);
   const validateEither = P.validateEither(schema);
   const is = P.is(schema);
@@ -614,7 +619,7 @@ export const pattern = (regex, options) => self => make(_pattern(self.ast, regex
  */
 export const StartsWithTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/StartsWith");
 /** @internal */
-export const _startsWith = (ast, startsWith, options) => _filter(ast, a => a.startsWith(startsWith), {
+export const _startsWith = (ast, startsWith, options) => _filter(ast, Str.startsWith(startsWith), {
   typeId: {
     id: StartsWithTypeId,
     params: {
@@ -638,7 +643,7 @@ export const startsWith = (startsWith, options) => self => make(_startsWith(self
  */
 export const EndsWithTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/EndsWith");
 /** @internal */
-export const _endsWith = (ast, endsWith, options) => _filter(ast, a => a.endsWith(endsWith), {
+export const _endsWith = (ast, endsWith, options) => _filter(ast, Str.endsWith(endsWith), {
   typeId: {
     id: EndsWithTypeId,
     params: {
@@ -662,7 +667,7 @@ export const endsWith = (endsWith, options) => self => make(_endsWith(self.ast, 
  */
 export const IncludesTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Includes");
 /** @internal */
-export const _includes = (ast, searchString, options) => _filter(ast, a => a.includes(searchString), {
+export const _includes = (ast, searchString, options) => _filter(ast, Str.includes(searchString), {
   typeId: {
     id: IncludesTypeId,
     params: {
@@ -715,7 +720,7 @@ export const trimmed = options => self => make(_trimmed(self.ast, options));
  */
 export const GreaterThanTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThan");
 /** @internal */
-export const _greaterThan = (ast, min, options) => _filter(ast, a => a > min, {
+export const _greaterThan = (ast, min, options) => _filter(ast, N.greaterThan(min), {
   typeId: GreaterThanTypeId,
   description: min === 0 ? "a positive number" : `a number greater than ${min}`,
   jsonSchema: {
@@ -734,7 +739,7 @@ export const greaterThan = (min, options) => self => make(_greaterThan(self.ast,
  */
 export const GreaterThanOrEqualToTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThanOrEqualTo");
 /** @internal */
-export const _greaterThanOrEqualTo = (ast, min, options) => _filter(ast, a => a >= min, {
+export const _greaterThanOrEqualTo = (ast, min, options) => _filter(ast, N.greaterThanOrEqualTo(min), {
   typeId: GreaterThanOrEqualToTypeId,
   description: min === 0 ? "a non-negative number" : `a number greater than or equal to ${min}`,
   jsonSchema: {
@@ -753,7 +758,7 @@ export const greaterThanOrEqualTo = (min, options) => self => make(_greaterThanO
  */
 export const LessThanTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThan");
 /** @internal */
-export const _lessThan = (ast, max, options) => _filter(ast, a => a < max, {
+export const _lessThan = (ast, max, options) => _filter(ast, N.lessThan(max), {
   typeId: LessThanTypeId,
   description: max === 0 ? "a negative number" : `a number less than ${max}`,
   jsonSchema: {
@@ -772,7 +777,7 @@ export const lessThan = (max, options) => self => make(_lessThan(self.ast, max, 
  */
 export const LessThanOrEqualToTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThanOrEqualTo");
 /** @internal */
-export const _lessThanOrEqualTo = (ast, max, options) => _filter(ast, a => a <= max, {
+export const _lessThanOrEqualTo = (ast, max, options) => _filter(ast, N.lessThanOrEqualTo(max), {
   typeId: LessThanOrEqualToTypeId,
   description: max === 0 ? "a non-positive number" : `a number less than or equal to ${max}`,
   jsonSchema: {
@@ -791,7 +796,7 @@ export const lessThanOrEqualTo = (max, options) => self => make(_lessThanOrEqual
  */
 export const IntTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Int");
 /** @internal */
-export const _int = (ast, options) => _filter(ast, a => Number.isInteger(a), {
+export const _int = (ast, options) => _filter(ast, Number.isInteger, {
   typeId: IntTypeId,
   description: "an integer",
   jsonSchema: {
@@ -810,7 +815,7 @@ export const int = options => self => make(_int(self.ast, options));
  */
 export const FiniteTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Finite");
 /** @internal */
-export const _finite = (ast, options) => _filter(ast, a => Number.isFinite(a), {
+export const _finite = (ast, options) => _filter(ast, Number.isFinite, {
   typeId: FiniteTypeId,
   description: "a finite number",
   ...options
@@ -843,7 +848,7 @@ export const between = (min, max, options) => self => make(_between(self.ast, mi
  */
 export const NonNaNTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/NonNaN");
 /** @internal */
-export const _nonNaN = (ast, options) => _filter(ast, a => !Number.isNaN(a), {
+export const _nonNaN = (ast, options) => _filter(ast, not(Number.isNaN), {
   typeId: NonNaNTypeId,
   description: "a number NaN excluded",
   ...options
@@ -909,7 +914,7 @@ export const multipleOf = (divisor, options) => self => make(_multipleOf(self.as
  */
 export const GreaterThanBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThanBigint");
 /** @internal */
-export const _greaterThanBigint = (ast, min, options) => _filter(ast, a => a > min, {
+export const _greaterThanBigint = (ast, min, options) => _filter(ast, BI.greaterThan(min), {
   typeId: GreaterThanBigintTypeId,
   description: min === 0n ? "a positive bigint" : `a bigint greater than ${min}n`,
   jsonSchema: {
@@ -928,7 +933,7 @@ export const greaterThanBigint = (min, options) => self => make(_greaterThanBigi
  */
 export const GreaterThanOrEqualToBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThanOrEqualToBigint");
 /** @internal */
-export const _greaterThanOrEqualToBigint = (ast, min, options) => _filter(ast, a => a >= min, {
+export const _greaterThanOrEqualToBigint = (ast, min, options) => _filter(ast, BI.greaterThanOrEqualTo(min), {
   typeId: GreaterThanOrEqualToBigintTypeId,
   description: min === 0n ? "a non-negative bigint" : `a bigint greater than or equal to ${min}n`,
   jsonSchema: {
@@ -947,7 +952,7 @@ export const greaterThanOrEqualToBigint = (min, options) => self => make(_greate
  */
 export const LessThanBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThanBigint");
 /** @internal */
-export const _lessThanBigint = (ast, max, options) => _filter(ast, a => a < max, {
+export const _lessThanBigint = (ast, max, options) => _filter(ast, BI.lessThan(max), {
   typeId: LessThanBigintTypeId,
   description: max === 0n ? "a negative bigint" : `a bigint less than ${max}n`,
   jsonSchema: {
@@ -966,7 +971,7 @@ export const lessThanBigint = (max, options) => self => make(_lessThanBigint(sel
  */
 export const LessThanOrEqualToBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThanOrEqualToBigint");
 /** @internal */
-export const _lessThanOrEqualToBigint = (ast, max, options) => _filter(ast, a => a <= max, {
+export const _lessThanOrEqualToBigint = (ast, max, options) => _filter(ast, BI.lessThanOrEqualTo(max), {
   typeId: LessThanOrEqualToBigintTypeId,
   description: max === 0n ? "a non-positive bigint" : `a bigint less than or equal to ${max}n`,
   jsonSchema: {
@@ -1203,8 +1208,8 @@ export const chunk = item => declare([item], struct({
   _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
   length: number
 }), item => {
-  const parseResult = P.parseResult(array(item));
-  return (u, options, self) => !C.isChunk(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(C.toReadonlyArray(u), options), C.fromIterable);
+  const validateResult = P.validateResult(array(item));
+  return (u, options, self) => !C.isChunk(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(C.toReadonlyArray(u), options), C.fromIterable);
 }, {
   [AST.TitleAnnotationId]: "Chunk",
   [AST.DescriptionAnnotationId]: "a Chunk",
@@ -1225,8 +1230,8 @@ export const dataPretty = item => d => `Data(${item(d)})`;
  * @since 1.0.0
  */
 export const data = item => declare([item], item, item => {
-  const parseResult = P.parseResult(item);
-  return (u, options, self) => !Equal.isEqual(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(u, options), toData);
+  const validateResult = P.validateResult(item);
+  return (u, options, self) => !Equal.isEqual(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(u, options), toData);
 }, {
   [AST.TitleAnnotationId]: "Data",
   [AST.DescriptionAnnotationId]: "a Data",
@@ -1239,7 +1244,10 @@ export const data = item => declare([item], item, item => {
 /** @internal */
 export const eitherArbitrary = (left, right) => fc => fc.oneof(left(fc).map(E.left), right(fc).map(E.right));
 /** @internal */
-export const eitherPretty = (left, right) => E.match(e => `left(${left(e)})`, a => `right(${right(a)})`);
+export const eitherPretty = (left, right) => E.match({
+  onLeft: e => `left(${left(e)})`,
+  onRight: a => `right(${right(a)})`
+});
 const eitherInline = (left, right) => union(struct({
   _tag: literal("Left"),
   left
@@ -1253,9 +1261,9 @@ const eitherInline = (left, right) => union(struct({
  */
 export const either = (left, right) => {
   return declare([left, right], eitherInline(left, right), (left, right) => {
-    const parseResultLeft = P.parseResult(left);
-    const parseResultRight = P.parseResult(right);
-    return (u, options, self) => !E.isEither(u) ? PR.failure(PR.type(self, u)) : E.isLeft(u) ? PR.map(parseResultLeft(u.left, options), E.left) : PR.map(parseResultRight(u.right, options), E.right);
+    const validateResultLeft = P.validateResult(left);
+    const validateResultRight = P.validateResult(right);
+    return (u, options, self) => !E.isEither(u) ? PR.failure(PR.type(self, u)) : E.isLeft(u) ? PR.map(validateResultLeft(u.left, options), E.left) : PR.map(validateResultRight(u.right, options), E.right);
   }, {
     [AST.TitleAnnotationId]: "Either",
     [AST.DescriptionAnnotationId]: "an Either",
@@ -1305,7 +1313,10 @@ export const json = /*#__PURE__*/lazy(() => union(_null, string, JsonNumber, boo
 /** @internal */
 export const optionArbitrary = value => fc => fc.oneof(fc.constant(O.none()), value(fc).map(O.some));
 /** @internal */
-export const optionPretty = value => O.match(() => "none()", a => `some(${value(a)})`);
+export const optionPretty = value => O.match({
+  onNone: () => "none()",
+  onSome: a => `some(${value(a)})`
+});
 const optionInline = value => union(struct({
   _tag: literal("None")
 }), struct({
@@ -1318,8 +1329,8 @@ const optionInline = value => union(struct({
  */
 export const option = value => {
   return declare([value], optionInline(value), value => {
-    const parseResult = P.parseResult(value);
-    return (u, options, self) => !O.isOption(u) ? PR.failure(PR.type(self, u)) : O.isNone(u) ? PR.success(O.none()) : PR.map(parseResult(u.value, options), O.some);
+    const validateResult = P.validateResult(value);
+    return (u, options, self) => !O.isOption(u) ? PR.failure(PR.type(self, u)) : O.isNone(u) ? PR.success(O.none()) : PR.map(validateResult(u.value, options), O.some);
   }, {
     [AST.TitleAnnotationId]: "Option",
     [AST.DescriptionAnnotationId]: "an Option",
@@ -1343,8 +1354,8 @@ export const readonlyMapPretty = (key, value) => map => `new Map([${Array.from(m
 export const readonlyMap = (key, value) => declare([key, value], struct({
   size: number
 }), (key, value) => {
-  const parseResult = P.parseResult(array(tuple(key, value)));
-  return (u, options, self) => !isMap(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.entries()), options), as => new Map(as));
+  const validateResult = P.validateResult(array(tuple(key, value)));
+  return (u, options, self) => !isMap(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(Array.from(u.entries()), options), as => new Map(as));
 }, {
   [AST.TitleAnnotationId]: "ReadonlyMap",
   [AST.DescriptionAnnotationId]: "a ReadonlyMap",
@@ -1367,8 +1378,8 @@ export const readonlySetPretty = item => set => `new Set([${Array.from(set.value
 export const readonlySet = item => declare([item], struct({
   size: number
 }), item => (u, options, self) => {
-  const parseResult = P.parseResult(array(item));
-  return !isSet(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.values()), options), as => new Set(as));
+  const validateResult = P.validateResult(array(item));
+  return !isSet(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(Array.from(u.values()), options), as => new Set(as));
 }, {
   [AST.TitleAnnotationId]: "ReadonlySet",
   [AST.DescriptionAnnotationId]: "a ReadonlySet",

@@ -1,11 +1,8 @@
-import * as D from "@effect/data/Debug"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
-
-D.runtimeDebug.tracingEnabled = true
 
 /*
 n = 100

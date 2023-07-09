@@ -66,8 +66,8 @@ describe.concurrent("string filters", () => {
         S.string,
         S.pattern(regex)
       )
-      expect(S.validate(schema)("A")).toEqual("A")
-      expect(S.validate(schema)("A")).toEqual("A")
+      expect(S.validateSync(schema)("A")).toEqual("A")
+      expect(S.validateSync(schema)("A")).toEqual("A")
     })
   })
 

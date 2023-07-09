@@ -52,11 +52,6 @@ decode,
  * @category decoding
  * @since 1.0.0
  */
-decodeEffect, 
-/**
- * @category decoding
- * @since 1.0.0
- */
 decodeEither, 
 /**
  * @category decoding
@@ -74,15 +69,15 @@ decodePromise,
  */
 decodeResult, 
 /**
- * @category encoding
+ * @category decoding
  * @since 1.0.0
  */
-encode, 
+decodeSync, 
 /**
  * @category encoding
  * @since 1.0.0
  */
-encodeEffect, 
+encode, 
 /**
  * @category encoding
  * @since 1.0.0
@@ -104,15 +99,15 @@ encodePromise,
  */
 encodeResult, 
 /**
- * @category parsing
+ * @category encoding
  * @since 1.0.0
  */
-parse, 
+encodeSync, 
 /**
  * @category parsing
  * @since 1.0.0
  */
-parseEffect, 
+parse, 
 /**
  * @category parsing
  * @since 1.0.0
@@ -132,7 +127,12 @@ parsePromise,
  * @category parsing
  * @since 1.0.0
  */
-parseResult } from "@effect/schema/Parser";
+parseResult, 
+/**
+ * @category parsing
+ * @since 1.0.0
+ */
+parseSync } from "@effect/schema/Parser";
 /**
  * @category constructors
  * @since 1.0.0
@@ -223,7 +223,7 @@ export type FromOptionalKeys<Fields> = {
  * @category combinators
  * @since 1.0.0
  */
-export declare const struct: <Fields extends Record<PropertyKey, S.PropertySignature<any, boolean, any, boolean> | S.PropertySignature<never, boolean, never, boolean> | Codec<any, any> | Codec<never, never>>>(fields: Fields) => Codec<S.Spread<{ readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>; } & { readonly [K_1 in FromOptionalKeys<Fields>]?: From<Fields[K_1]>; }>, S.Spread<{ readonly [K_2 in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K_2]>; } & { readonly [K_3 in S.ToOptionalKeys<Fields>]?: To<Fields[K_3]>; }>>;
+export declare const struct: <Fields extends Record<PropertyKey, S.PropertySignature<any, boolean, any, boolean> | S.PropertySignature<never, boolean, never, boolean> | Codec<any, any> | Codec<never, never>>>(fields: Fields) => Codec<S.Simplify<{ readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>; } & { readonly [K_1 in FromOptionalKeys<Fields>]?: From<Fields[K_1]>; }>, S.Simplify<{ readonly [K_2 in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K_2]>; } & { readonly [K_3 in S.ToOptionalKeys<Fields>]?: To<Fields[K_3]>; }>>;
 /**
  * @category combinators
  * @since 1.0.0
@@ -234,19 +234,19 @@ export declare const record: <K extends string | symbol, I, A>(key: S.Schema<K>,
  * @since 1.0.0
  */
 export declare const extend: {
-    <IB, B>(that: Codec<IB, B>): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>;
-    <I, A, IB, B>(self: Codec<I, A>, that: Codec<IB, B>): Codec<S.Spread<I & IB>, S.Spread<A & B>>;
+    <IB, B>(that: Codec<IB, B>): <I, A>(self: Codec<I, A>) => Codec<S.Simplify<I & IB>, S.Simplify<A & B>>;
+    <I, A, IB, B>(self: Codec<I, A>, that: Codec<IB, B>): Codec<S.Simplify<I & IB>, S.Simplify<A & B>>;
 };
 /**
  * @category combinators
  * @since 1.0.0
  */
-export declare const pick: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => <I extends { [K in keyof A]?: any; }>(self: Codec<I, A>) => Codec<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>>;
+export declare const pick: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => <I extends { [K in keyof A]?: any; }>(self: Codec<I, A>) => Codec<S.Simplify<Pick<I, Keys[number]>>, S.Simplify<Pick<A, Keys[number]>>>;
 /**
  * @category combinators
  * @since 1.0.0
  */
-export declare const omit: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => <I extends { [K in keyof A]?: any; }>(self: Codec<I, A>) => Codec<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>>;
+export declare const omit: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => <I extends { [K in keyof A]?: any; }>(self: Codec<I, A>) => Codec<S.Simplify<Omit<I, Keys[number]>>, S.Simplify<Omit<A, Keys[number]>>>;
 /**
  * @category combinators
  * @since 1.0.0
@@ -296,10 +296,10 @@ export declare const compose: {
  * @since 1.0.0
  */
 export declare const attachPropertySignature: {
-    <K extends PropertyKey, V extends AST.LiteralValue>(key: K, value: V): <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Spread<A & {
+    <K extends PropertyKey, V extends AST.LiteralValue>(key: K, value: V): <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Simplify<A & {
         readonly [k in K]: V;
     }>>;
-    <I, A, K extends PropertyKey, V extends AST.LiteralValue>(codec: Codec<I, A>, key: K, value: V): Codec<I, S.Spread<A & {
+    <I, A, K extends PropertyKey, V extends AST.LiteralValue>(codec: Codec<I, A>, key: K, value: V): Codec<I, S.Simplify<A & {
         readonly [k in K]: V;
     }>>;
 };
@@ -563,15 +563,19 @@ _Date as Date };
  */
 export declare const optionFromSelf: <I, A>(value: Codec<I, A>) => Codec<Option<I>, Option<A>>;
 /**
- * @category Option transformations
  * @since 1.0.0
  */
-export declare const option: <I, A>(value: Codec<I, A>) => Codec<{
+export type JSONOption<A> = {
     readonly _tag: "None";
 } | {
     readonly _tag: "Some";
-    readonly value: I;
-}, Option<A>>;
+    readonly value: A;
+};
+/**
+ * @category Option transformations
+ * @since 1.0.0
+ */
+export declare const option: <I, A>(value: Codec<I, A>) => Codec<JSONOption<I>, Option<A>>;
 /**
  * @category Option transformations
  * @since 1.0.0
@@ -583,16 +587,20 @@ export declare const optionFromNullable: <I, A>(value: Codec<I, A>) => Codec<I |
  */
 export declare const eitherFromSelf: <IE, E, IA, A>(left: Codec<IE, E>, right: Codec<IA, A>) => Codec<Either<IE, IA>, Either<E, A>>;
 /**
+ * @since 1.0.0
+ */
+export type JSONEither<E, A> = {
+    readonly _tag: "Left";
+    readonly left: E;
+} | {
+    readonly _tag: "Right";
+    readonly right: A;
+};
+/**
  * @category Either transformations
  * @since 1.0.0
  */
-export declare const either: <IE, E, IA, A>(left: Codec<IE, E>, right: Codec<IA, A>) => Codec<{
-    readonly _tag: "Left";
-    readonly left: IE;
-} | {
-    readonly _tag: "Right";
-    readonly right: IA;
-}, Either<E, A>>;
+export declare const either: <IE, E, IA, A>(left: Codec<IE, E>, right: Codec<IA, A>) => Codec<JSONEither<IE, IA>, Either<E, A>>;
 /**
  * @category ReadonlyMap transformations
  * @since 1.0.0

@@ -78,11 +78,6 @@ export {
    * @category decoding
    * @since 1.0.0
    */
-  decodeEffect,
-  /**
-   * @category decoding
-   * @since 1.0.0
-   */
   decodeEither,
   /**
    * @category decoding
@@ -100,15 +95,15 @@ export {
    */
   decodeResult,
   /**
-   * @category encoding
+   * @category decoding
    * @since 1.0.0
    */
-  encode,
+  decodeSync,
   /**
    * @category encoding
    * @since 1.0.0
    */
-  encodeEffect,
+  encode,
   /**
    * @category encoding
    * @since 1.0.0
@@ -130,15 +125,15 @@ export {
    */
   encodeResult,
   /**
-   * @category parsing
+   * @category encoding
    * @since 1.0.0
    */
-  parse,
+  encodeSync,
   /**
    * @category parsing
    * @since 1.0.0
    */
-  parseEffect,
+  parse,
   /**
    * @category parsing
    * @since 1.0.0
@@ -158,7 +153,12 @@ export {
    * @category parsing
    * @since 1.0.0
    */
-  parseResult
+  parseResult,
+  /**
+   * @category parsing
+   * @since 1.0.0
+   */
+  parseSync
 } from "@effect/schema/Parser"
 /* c8 ignore end */
 
@@ -173,7 +173,7 @@ export {
 export const make = <I, A>(ast: AST.AST): Codec<I, A> => ({ ast }) as any
 
 // ---------------------------------------------
-// combinators
+// codec combinators
 // ---------------------------------------------
 
 /**
@@ -246,6 +246,10 @@ export const transform: {
     transformResult(from, to, (a) => E.right(decode(a)), (b) => E.right(encode(b)), annotations)
 )
 
+// ---------------------------------------------
+// combinators
+// ---------------------------------------------
+
 /**
  * @category combinators
  * @since 1.0.0
@@ -261,17 +265,7 @@ export const union = <Members extends ReadonlyArray<Codec<any, any>>>(
  */
 export const nullable = <From, To>(
   self: Codec<From, To>
-): Codec<From | null, To | null> => {
-  const parseResult = P.parseResult(self)
-  const encodeResult = P.encodeResult(self)
-  return transformResult(
-    S.nullable(from(self)),
-    S.nullable(to(self)),
-    (nullable, options) => nullable === null ? PR.success(null) : parseResult(nullable, options),
-    (nullable, options) => nullable === null ? PR.success(null) : encodeResult(nullable, options),
-    { [AST.DocumentationAnnotationId]: "nullable" }
-  )
-}
+): Codec<From | null, To | null> => union(S.null, self)
 
 /**
  * @category combinators
@@ -404,11 +398,11 @@ export const struct = <
 >(
   fields: Fields
 ): Codec<
-  S.Spread<
+  S.Simplify<
     & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
     & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
-  S.Spread<
+  S.Simplify<
     & { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
@@ -502,17 +496,17 @@ export const record = <K extends string | symbol, I, A>(
 export const extend: {
   <IB, B>(
     that: Codec<IB, B>
-  ): <I, A>(self: Codec<I, A>) => Codec<S.Spread<I & IB>, S.Spread<A & B>>
+  ): <I, A>(self: Codec<I, A>) => Codec<S.Simplify<I & IB>, S.Simplify<A & B>>
   <I, A, IB, B>(
     self: Codec<I, A>,
     that: Codec<IB, B>
-  ): Codec<S.Spread<I & IB>, S.Spread<A & B>>
+  ): Codec<S.Simplify<I & IB>, S.Simplify<A & B>>
 } = dual(
   2,
   <I, A, IB, B>(
     self: Codec<I, A>,
     that: Codec<IB, B>
-  ): Codec<S.Spread<I & IB>, S.Spread<A & B>> =>
+  ): Codec<S.Simplify<I & IB>, S.Simplify<A & B>> =>
     make(
       S.intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -528,7 +522,7 @@ export const extend: {
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Codec<I, A>
-  ): Codec<S.Spread<Pick<I, Keys[number]>>, S.Spread<Pick<A, Keys[number]>>> => {
+  ): Codec<S.Simplify<Pick<I, Keys[number]>>, S.Simplify<Pick<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
       if (AST.isTypeLiteralTransformation(ast.transformAST)) {
@@ -558,7 +552,7 @@ export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Codec<I, A>
-  ): Codec<S.Spread<Omit<I, Keys[number]>>, S.Spread<Omit<A, Keys[number]>>> => {
+  ): Codec<S.Simplify<Omit<I, Keys[number]>>, S.Simplify<Omit<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
       if (AST.isTypeLiteralTransformation(ast.transformAST)) {
@@ -667,17 +661,17 @@ export const attachPropertySignature: {
   <K extends PropertyKey, V extends AST.LiteralValue>(
     key: K,
     value: V
-  ): <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+  ): <I, A extends object>(codec: Codec<I, A>) => Codec<I, S.Simplify<A & { readonly [k in K]: V }>>
   <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
     codec: Codec<I, A>,
     key: K,
     value: V
-  ): Codec<I, S.Spread<A & { readonly [k in K]: V }>>
+  ): Codec<I, S.Simplify<A & { readonly [k in K]: V }>>
 } = dual(3, <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
   codec: Codec<I, A>,
   key: K,
   value: V
-): Codec<I, S.Spread<A & { readonly [k in K]: V }>> =>
+): Codec<I, S.Simplify<A & { readonly [k in K]: V }>> =>
   make(AST.createTransform(
     codec.ast,
     pipe(to(codec), extend(struct({ [key]: S.literal(value) }))).ast,
@@ -1205,15 +1199,17 @@ const optionAsJson = <A>(value: S.Schema<A>) =>
   S.union(S.struct({ _tag: S.literal("None") }), S.struct({ _tag: S.literal("Some"), value }))
 
 /**
+ * @since 1.0.0
+ */
+export type JSONOption<A> = { readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: A }
+
+/**
  * @category Option transformations
  * @since 1.0.0
  */
 export const option = <I, A>(
   value: Codec<I, A>
-): Codec<
-  { readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I },
-  Option<A>
-> => {
+): Codec<JSONOption<I>, Option<A>> => {
   const parseResult = P.parseResult(value)
   const encodeResult = P.encodeResult(value)
   return transformResult(
@@ -1288,16 +1284,21 @@ const eitherAsJson = <E, A>(left: S.Schema<E>, right: S.Schema<A>) =>
   )
 
 /**
+ * @since 1.0.0
+ */
+export type JSONEither<E, A> = { readonly _tag: "Left"; readonly left: E } | {
+  readonly _tag: "Right"
+  readonly right: A
+}
+
+/**
  * @category Either transformations
  * @since 1.0.0
  */
 export const either = <IE, E, IA, A>(
   left: Codec<IE, E>,
   right: Codec<IA, A>
-): Codec<
-  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
-  Either<E, A>
-> => {
+): Codec<JSONEither<IE, IA>, Either<E, A>> => {
   const parseResultLeft = P.parseResult(left)
   const parseResultRight = P.parseResult(right)
   const encodeResultLeft = P.encodeResult(left)
@@ -1424,7 +1425,9 @@ export const chunkFromSelf = <I, A>(item: Codec<I, A>): Codec<Chunk<I>, Chunk<A>
  * @category Chunk transformations
  * @since 1.0.0
  */
-export const chunk = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, Chunk<A>> =>
+export const chunk = <I, A>(
+  item: Codec<I, A>
+): Codec<ReadonlyArray<I>, Chunk<A>> =>
   transform(array(item), S.chunk(to(item)), C.fromIterable, C.toReadonlyArray, {
     [AST.DocumentationAnnotationId]: "chunk"
   })

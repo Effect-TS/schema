@@ -78,11 +78,6 @@ export {
    * @category decoding
    * @since 1.0.0
    */
-  decodeEffect,
-  /**
-   * @category decoding
-   * @since 1.0.0
-   */
   decodeEither,
   /**
    * @category decoding
@@ -100,15 +95,15 @@ export {
    */
   decodeResult,
   /**
-   * @category encoding
+   * @category decoding
    * @since 1.0.0
    */
-  encode,
+  decodeSync,
   /**
    * @category encoding
    * @since 1.0.0
    */
-  encodeEffect,
+  encode,
   /**
    * @category encoding
    * @since 1.0.0
@@ -130,15 +125,15 @@ export {
    */
   encodeResult,
   /**
-   * @category parsing
+   * @category encoding
    * @since 1.0.0
    */
-  parse,
+  encodeSync,
   /**
    * @category parsing
    * @since 1.0.0
    */
-  parseEffect,
+  parse,
   /**
    * @category parsing
    * @since 1.0.0
@@ -158,7 +153,12 @@ export {
    * @category parsing
    * @since 1.0.0
    */
-  parseResult
+  parseResult,
+  /**
+   * @category parsing
+   * @since 1.0.0
+   */
+  parseSync
 } from "@effect/schema/Parser"
 /* c8 ignore end */
 
@@ -649,7 +649,7 @@ export const compose: {
  *   C.attachPropertySignature(Square, "kind", "square")
  * )
  *
- * assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
+ * assert.deepStrictEqual(C.decodeSync(Shape)({ radius: 10 }), {
  *   kind: "circle",
  *   radius: 10
  * })

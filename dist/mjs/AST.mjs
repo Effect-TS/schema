@@ -4,9 +4,9 @@
 import { pipe } from "@effect/data/Function";
 import * as Number from "@effect/data/Number";
 import * as O from "@effect/data/Option";
+import * as Order from "@effect/data/Order";
 import { isNumber, isString, isSymbol } from "@effect/data/Predicate";
 import * as ReadonlyArray from "@effect/data/ReadonlyArray";
-import * as Order from "@effect/data/typeclass/Order";
 import * as I from "@effect/schema/internal/common";
 /**
  * @category annotations
@@ -520,11 +520,14 @@ export const appendElement = (ast, newElement) => {
   if (ast.elements.some(e => e.isOptional) && !newElement.isOptional) {
     throw new Error("A required element cannot follow an optional element. ts(1257)");
   }
-  return pipe(ast.rest, O.match(() => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly), rest => {
-    if (newElement.isOptional) {
-      throw new Error("An optional element cannot follow a rest element. ts(1266)");
+  return pipe(ast.rest, O.match({
+    onNone: () => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly),
+    onSome: rest => {
+      if (newElement.isOptional) {
+        throw new Error("An optional element cannot follow a rest element. ts(1266)");
+      }
+      return createTuple(ast.elements, O.some([...rest, newElement.type]), ast.isReadonly);
     }
-    return createTuple(ast.elements, O.some([...rest, newElement.type]), ast.isReadonly);
   }));
 };
 /**
@@ -655,6 +658,10 @@ export const getCompiler = match => {
   const compile = ast => match[ast._tag](ast, compile);
   return compile;
 };
+/** @internal */
+export const getToPropertySignatures = ps => ps.map(p => createPropertySignature(p.name, to(p.type), p.isOptional, p.isReadonly, p.annotations));
+/** @internal */
+export const getToIndexSignatures = ps => ps.map(is => createIndexSignature(is.parameter, to(is.type), is.isReadonly));
 /**
  * @since 1.0.0
  */
@@ -663,7 +670,7 @@ export const to = ast => {
     case "Tuple":
       return createTuple(ast.elements.map(e => createElement(to(e.type), e.isOptional)), O.map(ast.rest, ReadonlyArray.mapNonEmpty(to)), ast.isReadonly, ast.annotations);
     case "TypeLiteral":
-      return createTypeLiteral(ast.propertySignatures.map(p => createPropertySignature(p.name, to(p.type), p.isOptional, p.isReadonly, p.annotations)), ast.indexSignatures.map(is => createIndexSignature(is.parameter, to(is.type), is.isReadonly)), ast.annotations);
+      return createTypeLiteral(getToPropertySignatures(ast.propertySignatures), getToIndexSignatures(ast.indexSignatures), ast.annotations);
     case "Union":
       return createUnion(ast.types.map(to), ast.annotations);
     case "Lazy":

@@ -27,12 +27,6 @@ Object.defineProperty(exports, "validate", {
     return P.validate;
   }
 });
-Object.defineProperty(exports, "validateEffect", {
-  enumerable: true,
-  get: function () {
-    return P.validateEffect;
-  }
-});
 Object.defineProperty(exports, "validateEither", {
   enumerable: true,
   get: function () {
@@ -57,11 +51,17 @@ Object.defineProperty(exports, "validateResult", {
     return P.validateResult;
   }
 });
+Object.defineProperty(exports, "validateSync", {
+  enumerable: true,
+  get: function () {
+    return P.validateSync;
+  }
+});
 exports.void = void 0;
+var BI = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Bigint"));
 var _Brand = /*#__PURE__*/require("@effect/data/Brand");
 var C = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Chunk"));
 var D = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Data"));
-var _Debug = /*#__PURE__*/require("@effect/data/Debug");
 var E = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Either"));
 var Equal = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Equal"));
 var _Function = /*#__PURE__*/require("@effect/data/Function");
@@ -69,6 +69,7 @@ var N = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data
 var O = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Option"));
 var _Predicate = /*#__PURE__*/require("@effect/data/Predicate");
 var ReadonlyArray = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/ReadonlyArray"));
+var Str = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/String"));
 var AST = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/AST"));
 var I = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/internal/common"));
 var P = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/Parser"));
@@ -211,10 +212,10 @@ const BrandTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Brand");
  */
 exports.BrandTypeId = BrandTypeId;
 const fromBrand = (constructor, options) => self => {
-  const filter = (0, _Debug.untracedMethod)(() => (a, _, self) => {
+  const filter = (a, _, self) => {
     const e = constructor.either(a);
     return E.isLeft(e) ? O.some(PR.parseError([PR.type(self, a, e.left.map(v => v.message).join(", "))])) : O.none();
-  });
+  };
   const ast = AST.createRefinement(self.ast, filter, toAnnotations({
     typeId: {
       id: BrandTypeId,
@@ -439,18 +440,22 @@ const intersectUnionMembers = (xs, ys) => {
     return ys.map(y => {
       if (AST.isTypeLiteral(x)) {
         if (AST.isTypeLiteral(y)) {
+          // isTypeLiteral(x) && isTypeLiteral(y)
           return AST.createTypeLiteral(x.propertySignatures.concat(y.propertySignatures), x.indexSignatures.concat(y.indexSignatures));
         } else if (AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) && AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)) {
+          // isTypeLiteral(x) && isTransform(y)
           const from = AST.createTypeLiteral(x.propertySignatures.concat(y.from.propertySignatures), x.indexSignatures.concat(y.from.indexSignatures));
-          const to = AST.createTypeLiteral(x.propertySignatures.concat(y.to.propertySignatures), x.indexSignatures.concat(y.to.indexSignatures));
+          const to = AST.createTypeLiteral(AST.getToPropertySignatures(x.propertySignatures).concat(y.to.propertySignatures), AST.getToIndexSignatures(x.indexSignatures).concat(y.to.indexSignatures));
           return AST.createTransform(from, to, AST.createTypeLiteralTransformation(y.transformAST.propertySignatureTransformations));
         }
       } else if (AST.isTransform(x) && AST.isTypeLiteralTransformation(x.transformAST) && AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)) {
         if (AST.isTypeLiteral(y)) {
+          // isTransform(x) && isTypeLiteral(y)
           const from = AST.createTypeLiteral(x.from.propertySignatures.concat(y.propertySignatures), x.from.indexSignatures.concat(y.indexSignatures));
-          const to = AST.createTypeLiteral(x.to.propertySignatures.concat(y.propertySignatures), x.to.indexSignatures.concat(y.indexSignatures));
+          const to = AST.createTypeLiteral(x.to.propertySignatures.concat(AST.getToPropertySignatures(y.propertySignatures)), x.to.indexSignatures.concat(AST.getToIndexSignatures(y.indexSignatures)));
           return AST.createTransform(from, to, AST.createTypeLiteralTransformation(x.transformAST.propertySignatureTransformations));
         } else if (AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) && AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)) {
+          // isTransform(x) && isTransform(y)
           const from = AST.createTypeLiteral(x.from.propertySignatures.concat(y.from.propertySignatures), x.from.indexSignatures.concat(y.from.indexSignatures));
           const to = AST.createTypeLiteral(x.to.propertySignatures.concat(y.to.propertySignatures), x.to.indexSignatures.concat(y.to.indexSignatures));
           return AST.createTransform(from, to, AST.createTypeLiteralTransformation(x.transformAST.propertySignatureTransformations.concat(y.transformAST.propertySignatureTransformations)));
@@ -509,7 +514,7 @@ exports.addBrand = addBrand;
 const brand = (brand, options) => self => {
   const ast = addBrand(self.ast, brand, options);
   const schema = make(ast);
-  const validate = P.validate(schema);
+  const validate = P.validateSync(schema);
   const validateOption = P.validateOption(schema);
   const validateEither = P.validateEither(schema);
   const is = P.is(schema);
@@ -682,7 +687,7 @@ exports.pattern = pattern;
 const StartsWithTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/StartsWith");
 /** @internal */
 exports.StartsWithTypeId = StartsWithTypeId;
-const _startsWith = (ast, startsWith, options) => _filter(ast, a => a.startsWith(startsWith), {
+const _startsWith = (ast, startsWith, options) => _filter(ast, Str.startsWith(startsWith), {
   typeId: {
     id: StartsWithTypeId,
     params: {
@@ -709,7 +714,7 @@ exports.startsWith = startsWith;
 const EndsWithTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/EndsWith");
 /** @internal */
 exports.EndsWithTypeId = EndsWithTypeId;
-const _endsWith = (ast, endsWith, options) => _filter(ast, a => a.endsWith(endsWith), {
+const _endsWith = (ast, endsWith, options) => _filter(ast, Str.endsWith(endsWith), {
   typeId: {
     id: EndsWithTypeId,
     params: {
@@ -736,7 +741,7 @@ exports.endsWith = endsWith;
 const IncludesTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Includes");
 /** @internal */
 exports.IncludesTypeId = IncludesTypeId;
-const _includes = (ast, searchString, options) => _filter(ast, a => a.includes(searchString), {
+const _includes = (ast, searchString, options) => _filter(ast, Str.includes(searchString), {
   typeId: {
     id: IncludesTypeId,
     params: {
@@ -795,7 +800,7 @@ exports.trimmed = trimmed;
 const GreaterThanTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThan");
 /** @internal */
 exports.GreaterThanTypeId = GreaterThanTypeId;
-const _greaterThan = (ast, min, options) => _filter(ast, a => a > min, {
+const _greaterThan = (ast, min, options) => _filter(ast, N.greaterThan(min), {
   typeId: GreaterThanTypeId,
   description: min === 0 ? "a positive number" : `a number greater than ${min}`,
   jsonSchema: {
@@ -817,7 +822,7 @@ exports.greaterThan = greaterThan;
 const GreaterThanOrEqualToTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThanOrEqualTo");
 /** @internal */
 exports.GreaterThanOrEqualToTypeId = GreaterThanOrEqualToTypeId;
-const _greaterThanOrEqualTo = (ast, min, options) => _filter(ast, a => a >= min, {
+const _greaterThanOrEqualTo = (ast, min, options) => _filter(ast, N.greaterThanOrEqualTo(min), {
   typeId: GreaterThanOrEqualToTypeId,
   description: min === 0 ? "a non-negative number" : `a number greater than or equal to ${min}`,
   jsonSchema: {
@@ -839,7 +844,7 @@ exports.greaterThanOrEqualTo = greaterThanOrEqualTo;
 const LessThanTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThan");
 /** @internal */
 exports.LessThanTypeId = LessThanTypeId;
-const _lessThan = (ast, max, options) => _filter(ast, a => a < max, {
+const _lessThan = (ast, max, options) => _filter(ast, N.lessThan(max), {
   typeId: LessThanTypeId,
   description: max === 0 ? "a negative number" : `a number less than ${max}`,
   jsonSchema: {
@@ -861,7 +866,7 @@ exports.lessThan = lessThan;
 const LessThanOrEqualToTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThanOrEqualTo");
 /** @internal */
 exports.LessThanOrEqualToTypeId = LessThanOrEqualToTypeId;
-const _lessThanOrEqualTo = (ast, max, options) => _filter(ast, a => a <= max, {
+const _lessThanOrEqualTo = (ast, max, options) => _filter(ast, N.lessThanOrEqualTo(max), {
   typeId: LessThanOrEqualToTypeId,
   description: max === 0 ? "a non-positive number" : `a number less than or equal to ${max}`,
   jsonSchema: {
@@ -883,7 +888,7 @@ exports.lessThanOrEqualTo = lessThanOrEqualTo;
 const IntTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Int");
 /** @internal */
 exports.IntTypeId = IntTypeId;
-const _int = (ast, options) => _filter(ast, a => Number.isInteger(a), {
+const _int = (ast, options) => _filter(ast, Number.isInteger, {
   typeId: IntTypeId,
   description: "an integer",
   jsonSchema: {
@@ -905,7 +910,7 @@ exports.int = int;
 const FiniteTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Finite");
 /** @internal */
 exports.FiniteTypeId = FiniteTypeId;
-const _finite = (ast, options) => _filter(ast, a => Number.isFinite(a), {
+const _finite = (ast, options) => _filter(ast, Number.isFinite, {
   typeId: FiniteTypeId,
   description: "a finite number",
   ...options
@@ -944,7 +949,7 @@ exports.between = between;
 const NonNaNTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/NonNaN");
 /** @internal */
 exports.NonNaNTypeId = NonNaNTypeId;
-const _nonNaN = (ast, options) => _filter(ast, a => !Number.isNaN(a), {
+const _nonNaN = (ast, options) => _filter(ast, (0, _Predicate.not)(Number.isNaN), {
   typeId: NonNaNTypeId,
   description: "a number NaN excluded",
   ...options
@@ -1024,7 +1029,7 @@ exports.multipleOf = multipleOf;
 const GreaterThanBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThanBigint");
 /** @internal */
 exports.GreaterThanBigintTypeId = GreaterThanBigintTypeId;
-const _greaterThanBigint = (ast, min, options) => _filter(ast, a => a > min, {
+const _greaterThanBigint = (ast, min, options) => _filter(ast, BI.greaterThan(min), {
   typeId: GreaterThanBigintTypeId,
   description: min === 0n ? "a positive bigint" : `a bigint greater than ${min}n`,
   jsonSchema: {
@@ -1046,7 +1051,7 @@ exports.greaterThanBigint = greaterThanBigint;
 const GreaterThanOrEqualToBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/GreaterThanOrEqualToBigint");
 /** @internal */
 exports.GreaterThanOrEqualToBigintTypeId = GreaterThanOrEqualToBigintTypeId;
-const _greaterThanOrEqualToBigint = (ast, min, options) => _filter(ast, a => a >= min, {
+const _greaterThanOrEqualToBigint = (ast, min, options) => _filter(ast, BI.greaterThanOrEqualTo(min), {
   typeId: GreaterThanOrEqualToBigintTypeId,
   description: min === 0n ? "a non-negative bigint" : `a bigint greater than or equal to ${min}n`,
   jsonSchema: {
@@ -1068,7 +1073,7 @@ exports.greaterThanOrEqualToBigint = greaterThanOrEqualToBigint;
 const LessThanBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThanBigint");
 /** @internal */
 exports.LessThanBigintTypeId = LessThanBigintTypeId;
-const _lessThanBigint = (ast, max, options) => _filter(ast, a => a < max, {
+const _lessThanBigint = (ast, max, options) => _filter(ast, BI.lessThan(max), {
   typeId: LessThanBigintTypeId,
   description: max === 0n ? "a negative bigint" : `a bigint less than ${max}n`,
   jsonSchema: {
@@ -1090,7 +1095,7 @@ exports.lessThanBigint = lessThanBigint;
 const LessThanOrEqualToBigintTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/LessThanOrEqualToBigint");
 /** @internal */
 exports.LessThanOrEqualToBigintTypeId = LessThanOrEqualToBigintTypeId;
-const _lessThanOrEqualToBigint = (ast, max, options) => _filter(ast, a => a <= max, {
+const _lessThanOrEqualToBigint = (ast, max, options) => _filter(ast, BI.lessThanOrEqualTo(max), {
   typeId: LessThanOrEqualToBigintTypeId,
   description: max === 0n ? "a non-positive bigint" : `a bigint less than or equal to ${max}n`,
   jsonSchema: {
@@ -1366,8 +1371,8 @@ const chunk = item => declare([item], struct({
   _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
   length: number
 }), item => {
-  const parseResult = P.parseResult(array(item));
-  return (u, options, self) => !C.isChunk(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(C.toReadonlyArray(u), options), C.fromIterable);
+  const validateResult = P.validateResult(array(item));
+  return (u, options, self) => !C.isChunk(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(C.toReadonlyArray(u), options), C.fromIterable);
 }, {
   [AST.TitleAnnotationId]: "Chunk",
   [AST.DescriptionAnnotationId]: "a Chunk",
@@ -1392,8 +1397,8 @@ const dataPretty = item => d => `Data(${item(d)})`;
  */
 exports.dataPretty = dataPretty;
 const data = item => declare([item], item, item => {
-  const parseResult = P.parseResult(item);
-  return (u, options, self) => !Equal.isEqual(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(u, options), toData);
+  const validateResult = P.validateResult(item);
+  return (u, options, self) => !Equal.isEqual(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(u, options), toData);
 }, {
   [AST.TitleAnnotationId]: "Data",
   [AST.DescriptionAnnotationId]: "a Data",
@@ -1408,7 +1413,10 @@ exports.data = data;
 const eitherArbitrary = (left, right) => fc => fc.oneof(left(fc).map(E.left), right(fc).map(E.right));
 /** @internal */
 exports.eitherArbitrary = eitherArbitrary;
-const eitherPretty = (left, right) => E.match(e => `left(${left(e)})`, a => `right(${right(a)})`);
+const eitherPretty = (left, right) => E.match({
+  onLeft: e => `left(${left(e)})`,
+  onRight: a => `right(${right(a)})`
+});
 exports.eitherPretty = eitherPretty;
 const eitherInline = (left, right) => union(struct({
   _tag: literal("Left"),
@@ -1423,9 +1431,9 @@ const eitherInline = (left, right) => union(struct({
  */
 const either = (left, right) => {
   return declare([left, right], eitherInline(left, right), (left, right) => {
-    const parseResultLeft = P.parseResult(left);
-    const parseResultRight = P.parseResult(right);
-    return (u, options, self) => !E.isEither(u) ? PR.failure(PR.type(self, u)) : E.isLeft(u) ? PR.map(parseResultLeft(u.left, options), E.left) : PR.map(parseResultRight(u.right, options), E.right);
+    const validateResultLeft = P.validateResult(left);
+    const validateResultRight = P.validateResult(right);
+    return (u, options, self) => !E.isEither(u) ? PR.failure(PR.type(self, u)) : E.isLeft(u) ? PR.map(validateResultLeft(u.left, options), E.left) : PR.map(validateResultRight(u.right, options), E.right);
   }, {
     [AST.TitleAnnotationId]: "Either",
     [AST.DescriptionAnnotationId]: "an Either",
@@ -1480,7 +1488,10 @@ exports.json = json;
 const optionArbitrary = value => fc => fc.oneof(fc.constant(O.none()), value(fc).map(O.some));
 /** @internal */
 exports.optionArbitrary = optionArbitrary;
-const optionPretty = value => O.match(() => "none()", a => `some(${value(a)})`);
+const optionPretty = value => O.match({
+  onNone: () => "none()",
+  onSome: a => `some(${value(a)})`
+});
 exports.optionPretty = optionPretty;
 const optionInline = value => union(struct({
   _tag: literal("None")
@@ -1494,8 +1505,8 @@ const optionInline = value => union(struct({
  */
 const option = value => {
   return declare([value], optionInline(value), value => {
-    const parseResult = P.parseResult(value);
-    return (u, options, self) => !O.isOption(u) ? PR.failure(PR.type(self, u)) : O.isNone(u) ? PR.success(O.none()) : PR.map(parseResult(u.value, options), O.some);
+    const validateResult = P.validateResult(value);
+    return (u, options, self) => !O.isOption(u) ? PR.failure(PR.type(self, u)) : O.isNone(u) ? PR.success(O.none()) : PR.map(validateResult(u.value, options), O.some);
   }, {
     [AST.TitleAnnotationId]: "Option",
     [AST.DescriptionAnnotationId]: "an Option",
@@ -1523,8 +1534,8 @@ exports.readonlyMapPretty = readonlyMapPretty;
 const readonlyMap = (key, value) => declare([key, value], struct({
   size: number
 }), (key, value) => {
-  const parseResult = P.parseResult(array(tuple(key, value)));
-  return (u, options, self) => !isMap(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.entries()), options), as => new Map(as));
+  const validateResult = P.validateResult(array(tuple(key, value)));
+  return (u, options, self) => !isMap(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(Array.from(u.entries()), options), as => new Map(as));
 }, {
   [AST.TitleAnnotationId]: "ReadonlyMap",
   [AST.DescriptionAnnotationId]: "a ReadonlyMap",
@@ -1551,8 +1562,8 @@ exports.readonlySetPretty = readonlySetPretty;
 const readonlySet = item => declare([item], struct({
   size: number
 }), item => (u, options, self) => {
-  const parseResult = P.parseResult(array(item));
-  return !isSet(u) ? PR.failure(PR.type(self, u)) : PR.map(parseResult(Array.from(u.values()), options), as => new Set(as));
+  const validateResult = P.validateResult(array(item));
+  return !isSet(u) ? PR.failure(PR.type(self, u)) : PR.map(validateResult(Array.from(u.values()), options), as => new Set(as));
 }, {
   [AST.TitleAnnotationId]: "ReadonlySet",
   [AST.DescriptionAnnotationId]: "a ReadonlySet",

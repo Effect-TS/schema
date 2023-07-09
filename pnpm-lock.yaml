@@ -6,14 +6,14 @@ settings:
 
 dependencies:
   '@effect/data':
-    specifier: ^0.12.9
-    version: 0.12.9
+    specifier: ^0.13.5
+    version: 0.13.5
   '@effect/io':
-    specifier: ^0.27.0
-    version: 0.27.0
+    specifier: ^0.31.3
+    version: 0.31.3
   fast-check:
-    specifier: ^3.10.0
-    version: 3.10.0
+    specifier: ^3.11.0
+    version: 3.11.0
 
 devDependencies:
   '@babel/cli':
@@ -728,8 +728,8 @@ packages:
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
     dev: true
 
-  /@effect/data@0.12.9:
-    resolution: {integrity: sha512-nuzFo+2LK4yG9H16WRv51MDhUAIuUGhmKYkuSrgCApwwLy2eUATaioQEbbR2rHOTprOiYpbIYKwvPsylEm/Fdw==}
+  /@effect/data@0.13.5:
+    resolution: {integrity: sha512-s9HYZkRHkN3doqOy+ICSKMr33hTe+YSod34Twt9oDI2OWgxoynsVjQ1gpM/BDn92SHv3Rgz6KTmVBKqYaqh/mQ==}
     dev: false
 
   /@effect/docgen@0.1.1(@types/node@18.16.0)(typescript@5.0.4):
@@ -755,10 +755,10 @@ packages:
       - '@types/node'
     dev: true
 
-  /@effect/io@0.27.0:
-    resolution: {integrity: sha512-3ZUaf6B+aH83HPJ84KTthd4glgrRk6DXj9M915OB9G4cMbbJAwE/709tgamzD2IxcfSlqPowtvx73Cs4N7Ywrw==}
+  /@effect/io@0.31.3:
+    resolution: {integrity: sha512-v8OltakxYj+TBUYk8ZnhrcebGd8xKavZZLjZm1p/uJqnqU8EgJq1aKCHaH7H5UdMsaZIunJG1W0NL2zDtdDYbw==}
     dependencies:
-      '@effect/data': 0.12.9
+      '@effect/data': 0.13.5
     dev: false
 
   /@effect/language-service@0.0.19:
@@ -3569,8 +3569,8 @@ packages:
     engines: {'0': node >=0.6.0}
     dev: true
 
-  /fast-check@3.10.0:
-    resolution: {integrity: sha512-I2FldZwnCbcY6iL+H0rp9m4D+O3PotuFu9FasWjMCzUedYHMP89/37JbSt6/n7Yq/IZmJDW0B2h30sPYdzrfzw==}
+  /fast-check@3.11.0:
+    resolution: {integrity: sha512-H2tctb7AGfFQfz+DEr3UWhJ3s47LXsGp5g3jeJr5tHjnf4xUvpArIqiwcDmL2EXiv+auLHIpF5MqaIpIKvpxiA==}
     engines: {node: '>=8.0.0'}
     dependencies:
       pure-rand: 6.0.1

@@ -33,7 +33,10 @@ const getHook = /*#__PURE__*/AST.getAnnotation(ArbitraryHookId);
 export const go = (ast, constraints) => {
   switch (ast._tag) {
     case "Declaration":
-      return pipe(getHook(ast), O.match(() => go(ast.type), handler => handler(...ast.typeParameters.map(p => go(p)))));
+      return pipe(getHook(ast), O.match({
+        onNone: () => go(ast.type),
+        onSome: handler => handler(...ast.typeParameters.map(p => go(p)))
+      }));
     case "Literal":
       return fc => fc.constant(ast.literal);
     case "UniqueSymbol":
@@ -173,10 +176,13 @@ export const go = (ast, constraints) => {
         return fc => fc.oneof(...types.map(arb => arb(fc)));
       }
     case "Lazy":
-      return pipe(getHook(ast), O.match(() => {
-        const get = I.memoizeThunk(() => go(ast.f()));
-        return fc => fc.constant(null).chain(() => get()(fc));
-      }, handler => handler()));
+      return pipe(getHook(ast), O.match({
+        onNone: () => {
+          const get = I.memoizeThunk(() => go(ast.f()));
+          return fc => fc.constant(null).chain(() => get()(fc));
+        },
+        onSome: handler => handler()
+      }));
     case "Enums":
       {
         if (ast.enums.length === 0) {
@@ -187,7 +193,10 @@ export const go = (ast, constraints) => {
     case "Refinement":
       {
         const from = go(ast.from, combineConstraints(constraints, getConstraints(ast)));
-        return pipe(getHook(ast), O.match(() => fc => from(fc).filter(a => O.isNone(ast.filter(a, defaultParseOption, ast))), handler => handler(from)));
+        return pipe(getHook(ast), O.match({
+          onNone: () => fc => from(fc).filter(a => O.isNone(ast.filter(a, defaultParseOption, ast))),
+          onSome: handler => handler(from)
+        }));
       }
     case "Transform":
       throw new Error("cannot build an Arbitrary for transformations");

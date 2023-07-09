@@ -57,10 +57,10 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
     case "Declaration":
       return pipe(
         getHook(ast),
-        O.match(
-          () => go(ast.type),
-          (handler) => handler(...ast.typeParameters.map((p) => go(p)))
-        )
+        O.match({
+          onNone: () => go(ast.type),
+          onSome: (handler) => handler(...ast.typeParameters.map((p) => go(p)))
+        })
       )
     case "Literal":
       return (fc) => fc.constant(ast.literal)
@@ -198,13 +198,13 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
     case "Lazy":
       return pipe(
         getHook(ast),
-        O.match(
-          () => {
+        O.match({
+          onNone: () => {
             const get = I.memoizeThunk(() => go(ast.f()))
             return (fc) => fc.constant(null).chain(() => get()(fc))
           },
-          (handler) => handler()
-        )
+          onSome: (handler) => handler()
+        })
       )
     case "Enums": {
       if (ast.enums.length === 0) {
@@ -216,10 +216,11 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
       const from = go(ast.from, combineConstraints(constraints, getConstraints(ast)))
       return pipe(
         getHook(ast),
-        O.match(
-          () => (fc) => from(fc).filter((a) => O.isNone(ast.filter(a, defaultParseOption, ast))),
-          (handler) => handler(from)
-        )
+        O.match({
+          onNone: () =>
+            (fc) => from(fc).filter((a) => O.isNone(ast.filter(a, defaultParseOption, ast))),
+          onSome: (handler) => handler(from)
+        })
       )
     }
     case "Transform":

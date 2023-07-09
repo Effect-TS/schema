@@ -38,7 +38,10 @@ const format = () => _TreeFormatter.formatActual;
  * @since 1.0.0
  */
 const match = {
-  "Declaration": (ast, go) => (0, _Function.pipe)(getHook(ast), O.match(() => go(ast.type), handler => handler(...ast.typeParameters.map(go)))),
+  "Declaration": (ast, go) => (0, _Function.pipe)(getHook(ast), O.match({
+    onNone: () => go(ast.type),
+    onSome: handler => handler(...ast.typeParameters.map(go))
+  })),
   "VoidKeyword": () => () => "void(0)",
   "NeverKeyword": () => () => {
     throw new Error("cannot pretty print a `never` value");

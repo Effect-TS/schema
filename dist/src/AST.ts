@@ -6,9 +6,9 @@ import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import * as Order from "@effect/data/Order"
 import { isNumber, isString, isSymbol } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
-import * as Order from "@effect/data/typeclass/Order"
 import * as I from "@effect/schema/internal/common"
 import type { ParseError, ParseResult } from "@effect/schema/ParseResult"
 
@@ -986,15 +986,15 @@ export const appendElement = (
   }
   return pipe(
     ast.rest,
-    O.match(
-      () => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly),
-      (rest) => {
+    O.match({
+      onNone: () => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly),
+      onSome: (rest) => {
         if (newElement.isOptional) {
           throw new Error("An optional element cannot follow a rest element. ts(1266)")
         }
         return createTuple(ast.elements, O.some([...rest, newElement.type]), ast.isReadonly)
       }
-    )
+    })
   )
 }
 
@@ -1178,6 +1178,20 @@ export const getCompiler = <A>(match: Match<A>): Compiler<A> => {
   return compile
 }
 
+/** @internal */
+export const getToPropertySignatures = (
+  ps: ReadonlyArray<PropertySignature>
+): Array<PropertySignature> =>
+  ps.map((p) =>
+    createPropertySignature(p.name, to(p.type), p.isOptional, p.isReadonly, p.annotations)
+  )
+
+/** @internal */
+export const getToIndexSignatures = (
+  ps: ReadonlyArray<IndexSignature>
+): Array<IndexSignature> =>
+  ps.map((is) => createIndexSignature(is.parameter, to(is.type), is.isReadonly))
+
 /**
  * @since 1.0.0
  */
@@ -1192,12 +1206,8 @@ export const to = (ast: AST): AST => {
       )
     case "TypeLiteral":
       return createTypeLiteral(
-        ast.propertySignatures.map((p) =>
-          createPropertySignature(p.name, to(p.type), p.isOptional, p.isReadonly, p.annotations)
-        ),
-        ast.indexSignatures.map((is) =>
-          createIndexSignature(is.parameter, to(is.type), is.isReadonly)
-        ),
+        getToPropertySignatures(ast.propertySignatures),
+        getToIndexSignatures(ast.indexSignatures),
         ast.annotations
       )
     case "Union":

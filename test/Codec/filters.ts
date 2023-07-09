@@ -55,8 +55,8 @@ describe.concurrent("string filters", () => {
         Util.identityTransform(S.string),
         C.pattern(regex)
       )
-      expect(C.decode(codec)("A")).toEqual("A")
-      expect(C.decode(codec)("A")).toEqual("A")
+      expect(C.decodeSync(codec)("A")).toEqual("A")
+      expect(C.decodeSync(codec)("A")).toEqual("A")
     })
   })
 

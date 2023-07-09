@@ -185,11 +185,11 @@ Added in v1.0.0
   - [optional](#optional)
 - [validating](#validating)
   - [validate](#validate)
-  - [validateEffect](#validateeffect)
   - [validateEither](#validateeither)
   - [validateOption](#validateoption)
   - [validatePromise](#validatepromise)
   - [validateResult](#validateresult)
+  - [validateSync](#validatesync)
 
 ---
 
@@ -875,7 +875,7 @@ export declare const declare: (
   type: Schema<any>,
   decode: (
     ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => PR.ParseResult<any>,
   annotations?: AST.Annotated['annotations']
 ) => Schema<any>
 ```
@@ -1964,17 +1964,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const validate: <A>(schema: Schema<A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
-## validateEffect
-
-**Signature**
-
-```ts
-export declare const validateEffect: <A>(
+export declare const validate: <A>(
   schema: Schema<A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
@@ -2025,6 +2015,16 @@ Added in v1.0.0
 export declare const validateResult: <A>(
   schema: Schema<A>
 ) => (a: unknown, options?: AST.ParseOptions | undefined) => PR.ParseResult<A>
+```
+
+Added in v1.0.0
+
+## validateSync
+
+**Signature**
+
+```ts
+export declare const validateSync: <A>(schema: Schema<A>) => (a: unknown, options?: AST.ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0

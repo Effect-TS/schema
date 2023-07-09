@@ -80,18 +80,18 @@ Added in v1.0.0
   - [to](#to)
 - [decoding](#decoding)
   - [decode](#decode)
-  - [decodeEffect](#decodeeffect)
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
   - [decodePromise](#decodepromise)
   - [decodeResult](#decoderesult)
+  - [decodeSync](#decodesync)
 - [encoding](#encoding)
   - [encode](#encode)
-  - [encodeEffect](#encodeeffect)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
   - [encodePromise](#encodepromise)
   - [encodeResult](#encoderesult)
+  - [encodeSync](#encodesync)
 - [model](#model)
   - [Codec (interface)](#codec-interface)
 - [number filters](#number-filters)
@@ -114,11 +114,11 @@ Added in v1.0.0
   - [numberFromString](#numberfromstring)
 - [parsing](#parsing)
   - [parse](#parse)
-  - [parseEffect](#parseeffect)
   - [parseEither](#parseeither)
   - [parseOption](#parseoption)
   - [parsePromise](#parsepromise)
   - [parseResult](#parseresult)
+  - [parseSync](#parsesync)
 - [string filters](#string-filters)
   - [endsWith](#endswith)
   - [includes](#includes)
@@ -566,7 +566,7 @@ const Shape = C.union(
   C.attachPropertySignature(Square, 'kind', 'square')
 )
 
-assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
+assert.deepStrictEqual(C.decodeSync(Shape)({ radius: 10 }), {
   kind: 'circle',
   radius: 10,
 })
@@ -893,17 +893,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decode: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
-## decodeEffect
-
-**Signature**
-
-```ts
-export declare const decodeEffect: <I, A>(
+export declare const decode: <I, A>(
   schema: Codec<I, A>
 ) => (i: I, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
@@ -958,6 +948,16 @@ export declare const decodeResult: <I, A>(
 
 Added in v1.0.0
 
+## decodeSync
+
+**Signature**
+
+```ts
+export declare const decodeSync: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
 # encoding
 
 ## encode
@@ -965,17 +965,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const encode: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions | undefined) => I
-```
-
-Added in v1.0.0
-
-## encodeEffect
-
-**Signature**
-
-```ts
-export declare const encodeEffect: <I, A>(
+export declare const encode: <I, A>(
   schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, I>
 ```
@@ -1026,6 +1016,16 @@ Added in v1.0.0
 export declare const encodeResult: <I, A>(
   schema: Codec<I, A>
 ) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
+```
+
+Added in v1.0.0
+
+## encodeSync
+
+**Signature**
+
+```ts
+export declare const encodeSync: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions | undefined) => I
 ```
 
 Added in v1.0.0
@@ -1266,17 +1266,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parse: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
-## parseEffect
-
-**Signature**
-
-```ts
-export declare const parseEffect: <I, A>(
+export declare const parse: <I, A>(
   schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
@@ -1327,6 +1317,16 @@ Added in v1.0.0
 export declare const parseResult: <I, A>(
   schema: Codec<I, A>
 ) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+```
+
+Added in v1.0.0
+
+## parseSync
+
+**Signature**
+
+```ts
+export declare const parseSync: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions | undefined) => A
 ```
 
 Added in v1.0.0

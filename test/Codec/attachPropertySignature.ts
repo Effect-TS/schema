@@ -13,22 +13,22 @@ describe.concurrent("attachPropertySignature", () => {
       C.attachPropertySignature(Square, "kind", "square")
     )
 
-    expect(C.decode(DiscriminatedShape)({ radius: 10 })).toEqual({
+    expect(C.decodeSync(DiscriminatedShape)({ radius: 10 })).toEqual({
       kind: "circle",
       radius: 10
     })
     expect(
-      C.encode(DiscriminatedShape)({
+      C.encodeSync(DiscriminatedShape)({
         kind: "circle",
         radius: 10
       })
     ).toEqual({ radius: 10 })
-    expect(C.decode(DiscriminatedShape)({ sideLength: 10 })).toEqual({
+    expect(C.decodeSync(DiscriminatedShape)({ sideLength: 10 })).toEqual({
       kind: "square",
       sideLength: 10
     })
     expect(
-      C.encode(DiscriminatedShape)({
+      C.encodeSync(DiscriminatedShape)({
         kind: "square",
         sideLength: 10
       })
@@ -58,12 +58,12 @@ describe.concurrent("attachPropertySignature", () => {
       ),
       C.attachPropertySignature("_tag", "Circle")
     )
-    expect(C.decode(Circle)({ radius: 10, _isVisible: true })).toEqual({
+    expect(C.decodeSync(Circle)({ radius: 10, _isVisible: true })).toEqual({
       _tag: "Circle",
       _isVisible: true,
       radius: 10
     })
-    expect(C.encode(Circle)({ _tag: "Circle", radius: 10, _isVisible: true })).toEqual({
+    expect(C.encodeSync(Circle)({ _tag: "Circle", radius: 10, _isVisible: true })).toEqual({
       radius: 10
     })
   })

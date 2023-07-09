@@ -9,11 +9,7 @@ import type * as AST from "@effect/schema/AST";
 /**
  * @since 1.0.0
  */
-export type IO<E, A> = Effect.Effect<never, E, A> | E.Either<E, A>;
-/**
- * @since 1.0.0
- */
-export type ParseResult<A> = IO<ParseError, A>;
+export type ParseResult<A> = Effect.Effect<never, ParseError, A>;
 /**
  * @since 1.0.0
  */
@@ -174,25 +170,25 @@ export declare const failures: (es: readonly [ParseErrors, ...ParseErrors[]]) =>
  * @category optimisation
  * @since 1.0.0
  */
-export declare const eitherOrUndefined: <E, A>(self: IO<E, A>) => E.Either<E, A> | undefined;
+export declare const eitherOrUndefined: <A>(self: ParseResult<A>) => E.Either<ParseError, A> | undefined;
 /**
  * @category optimisation
  * @since 1.0.0
  */
-export declare const flatMap: <E, E1, A, B>(self: IO<E, A>, f: (a: A) => IO<E1, B>) => IO<E | E1, B>;
+export declare const flatMap: <A, B>(self: ParseResult<A>, f: (self: A) => ParseResult<B>) => ParseResult<B>;
 /**
  * @category optimisation
  * @since 1.0.0
  */
-export declare const map: <E, A, B>(self: IO<E, A>, f: (a: A) => B) => IO<E, B>;
+export declare const map: <A, B>(self: ParseResult<A>, f: (self: A) => B) => ParseResult<B>;
 /**
  * @category optimisation
  * @since 1.0.0
  */
-export declare const mapLeft: <E1, A, E2>(self: IO<E1, A>, f: (e1: E1) => E2) => IO<E2, A>;
+export declare const mapLeft: <A>(self: ParseResult<A>, f: (e1: ParseError) => ParseError) => ParseResult<A>;
 /**
  * @category optimisation
  * @since 1.0.0
  */
-export declare const bimap: <E1, E2, A, B>(self: IO<E1, A>, f: (e1: E1) => E2, g: (a: A) => B) => IO<E2, B>;
+export declare const bimap: <A, B>(self: ParseResult<A>, f: (e1: ParseError) => ParseError, g: (a: A) => B) => ParseResult<B>;
 //# sourceMappingURL=ParseResult.d.ts.map

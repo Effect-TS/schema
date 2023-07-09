@@ -40,8 +40,8 @@ describe.concurrent("Option", () => {
       await Util.expectParseSuccess(codec, null, O.none())
       await Util.expectParseSuccess(codec, "1", O.some(1))
 
-      expect(O.isOption(C.decode(codec)(null))).toEqual(true)
-      expect(O.isOption(C.decode(codec)("1"))).toEqual(true)
+      expect(O.isOption(C.decodeSync(codec)(null))).toEqual(true)
+      expect(O.isOption(C.decodeSync(codec)("1"))).toEqual(true)
 
       await Util.expectParseFailure(
         codec,

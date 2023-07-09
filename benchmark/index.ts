@@ -1,10 +1,7 @@
-import * as D from "@effect/data/Debug"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as t from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
-
-D.runtimeDebug.tracingEnabled = true
 
 /*
 validateEither (good) x 283,841 ops/sec ±0.55% (86 runs sampled)

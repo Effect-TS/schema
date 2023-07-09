@@ -20,11 +20,11 @@ describe.concurrent("formatErrors", () => {
       S.number,
       S.filter((n) => n > 0, { message: () => "mymessage" })
     )
-    expect(() => S.validate(schema)("a")).toThrowError(
+    expect(() => S.validateSync(schema)("a")).toThrowError(
       new Error(`error(s) found
 └─ Expected a number, actual "a"`)
     )
-    expect(() => S.validate(schema)(-1)).toThrowError(
+    expect(() => S.validateSync(schema)(-1)).toThrowError(
       new Error(`error(s) found
 └─ mymessage`)
     )
@@ -32,7 +32,7 @@ describe.concurrent("formatErrors", () => {
 
   it("forbidden", async () => {
     const schema = Util.effectify(S.struct({ a: S.string }), "all")
-    expect(() => C.parse(schema)({ a: "a" })).toThrowError(
+    expect(() => C.parseSync(schema)({ a: "a" })).toThrowError(
       new Error(`error(s) found
 └─ ["a"]
    └─ is forbidden`)

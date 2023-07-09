@@ -3,13 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.voidKeyword = exports.unknownKeyword = exports.undefinedKeyword = exports.to = exports.symbolKeyword = exports.stringKeyword = exports.required = exports.pick = exports.partial = exports.omit = exports.objectKeyword = exports.numberKeyword = exports.neverKeyword = exports.mergeAnnotations = exports.keyof = exports.isVoidKeyword = exports.isUnknownKeyword = exports.isUniqueSymbol = exports.isUnion = exports.isUndefinedKeyword = exports.isTypeLiteralTransformation = exports.isTypeLiteral = exports.isTuple = exports.isTransform = exports.isTemplateLiteral = exports.isSymbolKeyword = exports.isStringKeyword = exports.isRefinement = exports.isParameter = exports.isObjectKeyword = exports.isNumberKeyword = exports.isNeverKeyword = exports.isLiteral = exports.isLazy = exports.isEnums = exports.isDeclaration = exports.isBooleanKeyword = exports.isBigIntKeyword = exports.isAnyKeyword = exports.getWeight = exports.getPropertySignatures = exports.getParameterBase = exports.getCompiler = exports.getCardinality = exports.getAnnotation = exports.from = exports.createUniqueSymbol = exports.createUnion = exports.createTypeLiteralTransformation = exports.createTypeLiteral = exports.createTuple = exports.createTransform = exports.createTemplateLiteral = exports.createRefinement = exports.createRecord = exports.createPropertySignatureTransformation = exports.createPropertySignature = exports.createLiteral = exports.createLazy = exports.createIndexSignature = exports.createFinalTransformation = exports.createFinalPropertySignatureTransformation = exports.createEnums = exports.createElement = exports.createDeclaration = exports.composeTransformation = exports.booleanKeyword = exports.bigIntKeyword = exports.appendRestElement = exports.appendElement = exports.anyKeyword = exports.TypeAnnotationId = exports.TitleAnnotationId = exports.MessageAnnotationId = exports.JSONSchemaAnnotationId = exports.IdentifierAnnotationId = exports.ExamplesAnnotationId = exports.DocumentationAnnotationId = exports.DescriptionAnnotationId = exports.BrandAnnotationId = void 0;
+exports.voidKeyword = exports.unknownKeyword = exports.undefinedKeyword = exports.to = exports.symbolKeyword = exports.stringKeyword = exports.required = exports.pick = exports.partial = exports.omit = exports.objectKeyword = exports.numberKeyword = exports.neverKeyword = exports.mergeAnnotations = exports.keyof = exports.isVoidKeyword = exports.isUnknownKeyword = exports.isUniqueSymbol = exports.isUnion = exports.isUndefinedKeyword = exports.isTypeLiteralTransformation = exports.isTypeLiteral = exports.isTuple = exports.isTransform = exports.isTemplateLiteral = exports.isSymbolKeyword = exports.isStringKeyword = exports.isRefinement = exports.isParameter = exports.isObjectKeyword = exports.isNumberKeyword = exports.isNeverKeyword = exports.isLiteral = exports.isLazy = exports.isEnums = exports.isDeclaration = exports.isBooleanKeyword = exports.isBigIntKeyword = exports.isAnyKeyword = exports.getWeight = exports.getToPropertySignatures = exports.getToIndexSignatures = exports.getPropertySignatures = exports.getParameterBase = exports.getCompiler = exports.getCardinality = exports.getAnnotation = exports.from = exports.createUniqueSymbol = exports.createUnion = exports.createTypeLiteralTransformation = exports.createTypeLiteral = exports.createTuple = exports.createTransform = exports.createTemplateLiteral = exports.createRefinement = exports.createRecord = exports.createPropertySignatureTransformation = exports.createPropertySignature = exports.createLiteral = exports.createLazy = exports.createIndexSignature = exports.createFinalTransformation = exports.createFinalPropertySignatureTransformation = exports.createEnums = exports.createElement = exports.createDeclaration = exports.composeTransformation = exports.booleanKeyword = exports.bigIntKeyword = exports.appendRestElement = exports.appendElement = exports.anyKeyword = exports.TypeAnnotationId = exports.TitleAnnotationId = exports.MessageAnnotationId = exports.JSONSchemaAnnotationId = exports.IdentifierAnnotationId = exports.ExamplesAnnotationId = exports.DocumentationAnnotationId = exports.DescriptionAnnotationId = exports.BrandAnnotationId = void 0;
 var _Function = /*#__PURE__*/require("@effect/data/Function");
 var Number = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Number"));
 var O = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Option"));
+var Order = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Order"));
 var _Predicate = /*#__PURE__*/require("@effect/data/Predicate");
 var ReadonlyArray = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/ReadonlyArray"));
-var Order = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/typeclass/Order"));
 var I = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/internal/common"));
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -589,11 +589,14 @@ const appendElement = (ast, newElement) => {
   if (ast.elements.some(e => e.isOptional) && !newElement.isOptional) {
     throw new Error("A required element cannot follow an optional element. ts(1257)");
   }
-  return (0, _Function.pipe)(ast.rest, O.match(() => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly), rest => {
-    if (newElement.isOptional) {
-      throw new Error("An optional element cannot follow a rest element. ts(1266)");
+  return (0, _Function.pipe)(ast.rest, O.match({
+    onNone: () => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly),
+    onSome: rest => {
+      if (newElement.isOptional) {
+        throw new Error("An optional element cannot follow a rest element. ts(1266)");
+      }
+      return createTuple(ast.elements, O.some([...rest, newElement.type]), ast.isReadonly);
     }
-    return createTuple(ast.elements, O.some([...rest, newElement.type]), ast.isReadonly);
   }));
 };
 /**
@@ -732,16 +735,22 @@ const getCompiler = match => {
   const compile = ast => match[ast._tag](ast, compile);
   return compile;
 };
+/** @internal */
+exports.getCompiler = getCompiler;
+const getToPropertySignatures = ps => ps.map(p => createPropertySignature(p.name, to(p.type), p.isOptional, p.isReadonly, p.annotations));
+/** @internal */
+exports.getToPropertySignatures = getToPropertySignatures;
+const getToIndexSignatures = ps => ps.map(is => createIndexSignature(is.parameter, to(is.type), is.isReadonly));
 /**
  * @since 1.0.0
  */
-exports.getCompiler = getCompiler;
+exports.getToIndexSignatures = getToIndexSignatures;
 const to = ast => {
   switch (ast._tag) {
     case "Tuple":
       return createTuple(ast.elements.map(e => createElement(to(e.type), e.isOptional)), O.map(ast.rest, ReadonlyArray.mapNonEmpty(to)), ast.isReadonly, ast.annotations);
     case "TypeLiteral":
-      return createTypeLiteral(ast.propertySignatures.map(p => createPropertySignature(p.name, to(p.type), p.isOptional, p.isReadonly, p.annotations)), ast.indexSignatures.map(is => createIndexSignature(is.parameter, to(is.type), is.isReadonly)), ast.annotations);
+      return createTypeLiteral(getToPropertySignatures(ast.propertySignatures), getToIndexSignatures(ast.indexSignatures), ast.annotations);
     case "Union":
       return createUnion(ast.types.map(to), ast.annotations);
     case "Lazy":

@@ -8,7 +8,6 @@ import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
 import * as D from "@effect/data/Data"
-import { untracedMethod } from "@effect/data/Debug"
 import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
@@ -88,11 +87,6 @@ export {
    * @category validating
    * @since 1.0.0
    */
-  validateEffect,
-  /**
-   * @category validating
-   * @since 1.0.0
-   */
   validateEither,
   /**
    * @category validating
@@ -108,7 +102,12 @@ export {
    * @category validating
    * @since 1.0.0
    */
-  validateResult
+  validateResult,
+  /**
+   * @category validating
+   * @since 1.0.0
+   */
+  validateSync
 } from "@effect/schema/Parser"
 
 export type {
@@ -314,14 +313,12 @@ export const fromBrand = <C extends Brand<string | symbol>>(
   options?: FilterAnnotations<Brand.Unbranded<C>>
 ) =>
   <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
-    const filter = untracedMethod(() =>
-      (a: A, _, self: AST.AST): Option<PR.ParseError> => {
-        const e = constructor.either(a)
-        return E.isLeft(e) ?
-          O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
-          O.none()
-      }
-    )
+    const filter = (a: A, _: ParseOptions, self: AST.AST): Option<PR.ParseError> => {
+      const e = constructor.either(a)
+      return E.isLeft(e) ?
+        O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
+        O.none()
+    }
     const ast = AST.createRefinement(
       self.ast,
       filter,
@@ -870,7 +867,7 @@ export const brand = <B extends string | symbol, A>(
   (self: Schema<A>): BrandSchema<A & Brand<B>> => {
     const ast = addBrand(self.ast, brand, options)
     const schema = make(ast)
-    const validate = P.validate(schema)
+    const validate = P.validateSync(schema)
     const validateOption = P.validateOption(schema)
     const validateEither = P.validateEither(schema)
     const is = P.is(schema)
@@ -2071,10 +2068,10 @@ export const eitherArbitrary = <E, A>(
 
 /** @internal */
 export const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
-  E.match(
-    (e) => `left(${left(e)})`,
-    (a) => `right(${right(a)})`
-  )
+  E.match({
+    onLeft: (e) => `left(${left(e)})`,
+    onRight: (a) => `right(${right(a)})`
+  })
 
 const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
   union(
@@ -2207,10 +2204,10 @@ export const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> =>
 
 /** @internal */
 export const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
-  O.match(
-    () => "none()",
-    (a) => `some(${value(a)})`
-  )
+  O.match({
+    onNone: () => "none()",
+    onSome: (a) => `some(${value(a)})`
+  })
 
 const optionInline = <A>(value: Schema<A>) =>
   union(

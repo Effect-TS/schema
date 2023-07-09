@@ -1,7 +1,6 @@
 /**
  * @since 1.0.0
  */
-import { untraced, untracedMethod } from "@effect/data/Debug";
 import * as E from "@effect/data/Either";
 import { pipe } from "@effect/data/Function";
 import * as O from "@effect/data/Option";
@@ -12,7 +11,7 @@ import * as AST from "@effect/schema/AST";
 import * as I from "@effect/schema/internal/common";
 import * as PR from "@effect/schema/ParseResult";
 import { formatErrors } from "@effect/schema/TreeFormatter";
-const get = (ast, isDecoding) => {
+const getSync = (ast, isDecoding) => {
   const parser = go(ast, isDecoding);
   return (input, options) => {
     const result = parser(input, options);
@@ -25,8 +24,8 @@ const get = (ast, isDecoding) => {
   };
 };
 const getOption = (ast, isDecoding) => {
-  const parser = go(ast, isDecoding);
-  return (input, options) => O.fromEither(parser(input, options));
+  const parser = getEither(ast, isDecoding);
+  return (input, options) => O.getRight(parser(input, options));
 };
 const getEither = (ast, isDecoding) => {
   const parser = go(ast, isDecoding);
@@ -50,7 +49,7 @@ const getEffect = (ast, isDecoding) => {
  * @category parsing
  * @since 1.0.0
  */
-export const parse = schema => get(schema.ast, true);
+export const parseSync = schema => getSync(schema.ast, true);
 /**
  * @category parsing
  * @since 1.0.0
@@ -75,12 +74,12 @@ export const parsePromise = schema => getPromise(schema.ast, true);
  * @category parsing
  * @since 1.0.0
  */
-export const parseEffect = schema => getEffect(schema.ast, true);
+export const parse = schema => getEffect(schema.ast, true);
 /**
  * @category decoding
  * @since 1.0.0
  */
-export const decode = parse;
+export const decodeSync = parseSync;
 /**
  * @category decoding
  * @since 1.0.0
@@ -105,12 +104,12 @@ export const decodePromise = parsePromise;
  * @category decoding
  * @since 1.0.0
  */
-export const decodeEffect = parseEffect;
+export const decode = parse;
 /**
  * @category validation
  * @since 1.0.0
  */
-export const validate = schema => get(schema.ast, true);
+export const validateSync = schema => getSync(schema.ast, true);
 /**
  * @category validation
  * @since 1.0.0
@@ -135,7 +134,7 @@ export const validatePromise = schema => getPromise(schema.ast, true);
  * @category validation
  * @since 1.0.0
  */
-export const validateEffect = schema => getEffect(schema.ast, true);
+export const validate = schema => getEffect(schema.ast, true);
 /**
  * @category validation
  * @since 1.0.0
@@ -149,7 +148,7 @@ export const is = schema => {
  * @since 1.0.0
  */
 export const asserts = schema => {
-  const get = validate(schema);
+  const get = validateSync(schema);
   return (a, options) => {
     get(a, options);
   };
@@ -158,7 +157,7 @@ export const asserts = schema => {
  * @category encoding
  * @since 1.0.0
  */
-export const encode = schema => get(schema.ast, false);
+export const encodeSync = schema => getSync(schema.ast, false);
 /**
  * @category encoding
  * @since 1.0.0
@@ -183,18 +182,21 @@ export const encodePromise = schema => getPromise(schema.ast, false);
  * @category encoding
  * @since 1.0.0
  */
-export const encodeEffect = schema => getEffect(schema.ast, false);
+export const encode = schema => getEffect(schema.ast, false);
 /**
  * @since 1.0.0"decoding" | "encoding"
  */
 export const defaultParseOption = {};
-const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
+const go = (ast, isDecoding) => {
   switch (ast._tag) {
     case "Refinement":
       {
         if (isDecoding) {
           const from = go(ast.from, true);
-          return (i, options) => handleForbidden(PR.flatMap(from(i, options), a => O.match(ast.filter(a, options ?? defaultParseOption, ast), () => PR.success(a), PR.fail)), options);
+          return (i, options) => handleForbidden(PR.flatMap(from(i, options), a => O.match(ast.filter(a, options ?? defaultParseOption, ast), {
+            onNone: () => PR.success(a),
+            onSome: PR.fail
+          })), options);
         } else {
           const from = go(AST.to(ast), true);
           const to = go(dropRightRefinement(ast.from), false);
@@ -324,7 +326,7 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                 if (!queue) {
                   queue = [];
                 }
-                queue.push(untracedMethod(() => ({
+                queue.push(({
                   es,
                   output
                 }) => Effect.flatMap(Effect.either(te), t => {
@@ -333,14 +335,14 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                     const e = PR.index(index, t.left.errors);
                     if (allErrors) {
                       es.push([nk, e]);
-                      return Effect.unit();
+                      return Effect.unit;
                     } else {
                       return PR.failures(mutableAppend(sortByIndex(es), e));
                     }
                   }
                   output.push([nk, t.right]);
-                  return Effect.unit();
-                })));
+                  return Effect.unit;
+                }));
               }
             }
           }
@@ -371,7 +373,7 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                 if (!queue) {
                   queue = [];
                 }
-                queue.push(untracedMethod(() => ({
+                queue.push(({
                   es,
                   output
                 }) => Effect.flatMap(Effect.either(te), t => {
@@ -379,15 +381,15 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                     const e = PR.index(index, t.left.errors);
                     if (allErrors) {
                       es.push([nk, e]);
-                      return Effect.unit();
+                      return Effect.unit;
                     } else {
                       return PR.failures(mutableAppend(sortByIndex(es), e));
                     }
                   } else {
                     output.push([nk, t.right]);
-                    return Effect.unit();
+                    return Effect.unit;
                   }
-                })));
+                }));
               }
             }
             // ---------------------------------------------
@@ -418,7 +420,7 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                   if (!queue) {
                     queue = [];
                   }
-                  queue.push(untracedMethod(() => ({
+                  queue.push(({
                     es,
                     output
                   }) => Effect.flatMap(Effect.either(te), t => {
@@ -427,14 +429,14 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                       const e = PR.index(index, t.left.errors);
                       if (allErrors) {
                         es.push([nk, e]);
-                        return Effect.unit();
+                        return Effect.unit;
                       } else {
                         return PR.failures(mutableAppend(sortByIndex(es), e));
                       }
                     }
                     output.push([nk, t.right]);
-                    return Effect.unit();
-                  })));
+                    return Effect.unit;
+                  }));
                 }
               }
             }
@@ -448,13 +450,16 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
           }) => RA.isNonEmptyArray(es) ? PR.failures(sortByIndex(es)) : PR.success(sortByIndex(output));
           if (queue && queue.length > 0) {
             const cqueue = queue;
-            return untraced(() => Effect.suspend(() => {
+            return Effect.suspend(() => {
               const state = {
                 es: Array.from(es),
                 output: Array.from(output)
               };
-              return Effect.flatMap(Effect.forEachParDiscard(cqueue, f => f(state)), () => computeResult(state));
-            }));
+              return Effect.flatMap(Effect.forEach(cqueue, f => f(state), {
+                concurrency: "unbounded",
+                discard: true
+              }), () => computeResult(state));
+            });
           }
           return computeResult({
             output,
@@ -540,7 +545,7 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                 if (!queue) {
                   queue = [];
                 }
-                queue.push(untracedMethod(() => ({
+                queue.push(({
                   es,
                   output
                 }) => Effect.flatMap(Effect.either(te), t => {
@@ -549,14 +554,14 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                     const e = PR.key(index, t.left.errors);
                     if (allErrors) {
                       es.push([nk, e]);
-                      return Effect.unit();
+                      return Effect.unit;
                     } else {
                       return PR.failures(mutableAppend(sortByIndex(es), e));
                     }
                   }
                   output[index] = t.right;
-                  return Effect.unit();
-                })));
+                  return Effect.unit;
+                }));
               }
             } else {
               // ---------------------------------------------
@@ -622,7 +627,7 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                 if (!queue) {
                   queue = [];
                 }
-                queue.push(untracedMethod(() => ({
+                queue.push(({
                   es,
                   output
                 }) => Effect.flatMap(Effect.either(vpr), tv => {
@@ -630,7 +635,7 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                     const e = PR.key(index, tv.left.errors);
                     if (allErrors) {
                       es.push([nk, e]);
-                      return Effect.unit();
+                      return Effect.unit;
                     } else {
                       return PR.failures(mutableAppend(sortByIndex(es), e));
                     }
@@ -638,9 +643,9 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                     if (!Object.prototype.hasOwnProperty.call(expectedKeys, key)) {
                       output[key] = tv.right;
                     }
-                    return Effect.unit();
+                    return Effect.unit;
                   }
-                })));
+                }));
               }
             }
           }
@@ -653,13 +658,16 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
           }) => RA.isNonEmptyArray(es) ? PR.failures(sortByIndex(es)) : PR.success(output);
           if (queue && queue.length > 0) {
             const cqueue = queue;
-            return untraced(() => Effect.suspend(() => {
+            return Effect.suspend(() => {
               const state = {
                 es: Array.from(es),
                 output: Object.assign({}, output)
               };
-              return Effect.flatMap(Effect.forEachParDiscard(cqueue, f => f(state)), () => computeResult(state));
-            }));
+              return Effect.flatMap(Effect.forEach(cqueue, f => f(state), {
+                concurrency: "unbounded",
+                discard: true
+              }), () => computeResult(state));
+            });
           }
           return computeResult({
             es,
@@ -725,9 +733,9 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
               if (!queue) {
                 queue = [];
               }
-              queue.push(untracedMethod(() => state => Effect.suspend(() => {
+              queue.push(state => Effect.suspend(() => {
                 if ("finalResult" in state) {
-                  return Effect.unit();
+                  return Effect.unit;
                 } else {
                   return Effect.flatMap(Effect.either(pr), t => {
                     if (E.isRight(t)) {
@@ -735,10 +743,10 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
                     } else {
                       state.es.push([nk, PR.unionMember(t.left.errors)]);
                     }
-                    return Effect.unit();
+                    return Effect.unit;
                   });
                 }
-              })));
+              }));
             }
           }
           // ---------------------------------------------
@@ -749,17 +757,20 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
           PR.failure(PR.type(AST.neverKeyword, input));
           if (queue && queue.length > 0) {
             const cqueue = queue;
-            return untraced(() => Effect.suspend(() => {
+            return Effect.suspend(() => {
               const state = {
                 es: Array.from(es)
               };
-              return Effect.flatMap(Effect.forEachDiscard(cqueue, f => f(state)), () => {
+              return Effect.flatMap(Effect.forEach(cqueue, f => f(state), {
+                concurrency: 1,
+                discard: true
+              }), () => {
                 if ("finalResult" in state) {
                   return state.finalResult;
                 }
                 return computeResult(state.es);
               });
-            }));
+            });
           }
           return computeResult(es);
         };
@@ -770,7 +781,7 @@ const go = /*#__PURE__*/untracedMethod(() => (ast, isDecoding) => {
         return (a, options) => get()(a, options);
       }
   }
-});
+};
 const fromRefinement = (ast, refinement) => u => refinement(u) ? PR.success(u) : PR.failure(PR.type(ast, u));
 /** @internal */
 export const _getLiterals = ast => {

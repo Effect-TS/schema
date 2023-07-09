@@ -1,15 +1,15 @@
 {
   "name": "@effect/schema",
-  "version": "0.20.1-dev.20230610",
+  "version": "0.21.1",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/effect-ts/schema.git"
   },
   "dependencies": {
-    "@effect/data": "^0.12.2",
-    "@effect/io": "^0.26.0",
-    "fast-check": "^3.8.1"
+    "@effect/data": "^0.13.5",
+    "@effect/io": "^0.31.3",
+    "fast-check": "^3.11.0"
   },
   "publishConfig": {
     "access": "public"

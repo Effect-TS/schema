@@ -10,12 +10,6 @@ Object.defineProperty(exports, "decode", {
     return P.decode;
   }
 });
-Object.defineProperty(exports, "decodeEffect", {
-  enumerable: true,
-  get: function () {
-    return P.decodeEffect;
-  }
-});
 Object.defineProperty(exports, "decodeEither", {
   enumerable: true,
   get: function () {
@@ -40,17 +34,17 @@ Object.defineProperty(exports, "decodeResult", {
     return P.decodeResult;
   }
 });
+Object.defineProperty(exports, "decodeSync", {
+  enumerable: true,
+  get: function () {
+    return P.decodeSync;
+  }
+});
 exports.element = exports.eitherFromSelf = exports.either = void 0;
 Object.defineProperty(exports, "encode", {
   enumerable: true,
   get: function () {
     return P.encode;
-  }
-});
-Object.defineProperty(exports, "encodeEffect", {
-  enumerable: true,
-  get: function () {
-    return P.encodeEffect;
   }
 });
 Object.defineProperty(exports, "encodeEither", {
@@ -77,6 +71,12 @@ Object.defineProperty(exports, "encodeResult", {
     return P.encodeResult;
   }
 });
+Object.defineProperty(exports, "encodeSync", {
+  enumerable: true,
+  get: function () {
+    return P.encodeSync;
+  }
+});
 exports.extend = exports.endsWith = void 0;
 exports.filter = filter;
 exports.optionalElement = exports.optional = exports.optionFromSelf = exports.optionFromNullable = exports.option = exports.omit = exports.numberFromString = exports.nullable = exports.not = exports.nonPositiveBigint = exports.nonPositive = exports.nonNegativeBigint = exports.nonNegative = exports.nonNaN = exports.nonEmptyArray = exports.nonEmpty = exports.negativeBigint = exports.negative = exports.multipleOf = exports.minLength = exports.minItems = exports.maxLength = exports.maxItems = exports.make = exports.lessThanOrEqualToBigint = exports.lessThanOrEqualTo = exports.lessThanBigint = exports.lessThan = exports.length = exports.lazy = exports.itemsCount = exports.int = exports.includes = exports.greaterThanOrEqualToBigint = exports.greaterThanOrEqualTo = exports.greaterThanBigint = exports.greaterThan = exports.from = exports.finite = void 0;
@@ -84,12 +84,6 @@ Object.defineProperty(exports, "parse", {
   enumerable: true,
   get: function () {
     return P.parse;
-  }
-});
-Object.defineProperty(exports, "parseEffect", {
-  enumerable: true,
-  get: function () {
-    return P.parseEffect;
   }
 });
 Object.defineProperty(exports, "parseEither", {
@@ -114,6 +108,12 @@ Object.defineProperty(exports, "parseResult", {
   enumerable: true,
   get: function () {
     return P.parseResult;
+  }
+});
+Object.defineProperty(exports, "parseSync", {
+  enumerable: true,
+  get: function () {
+    return P.parseSync;
   }
 });
 exports.union = exports.tuple = exports.trimmed = exports.trim = exports.transformResult = exports.transform = exports.to = exports.struct = exports.startsWith = exports.rest = exports.record = exports.readonlySetFromSelf = exports.readonlySet = exports.readonlyMapFromSelf = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = void 0;
@@ -166,7 +166,7 @@ const make = ast => ({
   ast
 });
 // ---------------------------------------------
-// combinators
+// codec combinators
 // ---------------------------------------------
 /**
  * Create a new `Codec` by transforming the input and output of an existing `Schema`
@@ -186,6 +186,9 @@ const transformResult = /*#__PURE__*/(0, _Function.dual)(4, (from, to, decode, e
  */
 exports.transformResult = transformResult;
 const transform = /*#__PURE__*/(0, _Function.dual)(4, (from, to, decode, encode, annotations) => transformResult(from, to, a => E.right(decode(a)), b => E.right(encode(b)), annotations));
+// ---------------------------------------------
+// combinators
+// ---------------------------------------------
 /**
  * @category combinators
  * @since 1.0.0
@@ -197,13 +200,7 @@ const union = (...members) => make(AST.createUnion(members.map(m => m.ast)));
  * @since 1.0.0
  */
 exports.union = union;
-const nullable = self => {
-  const parseResult = P.parseResult(self);
-  const encodeResult = P.encodeResult(self);
-  return transformResult(S.nullable(from(self)), S.nullable(to(self)), (nullable, options) => nullable === null ? PR.success(null) : parseResult(nullable, options), (nullable, options) => nullable === null ? PR.success(null) : encodeResult(nullable, options), {
-    [AST.DocumentationAnnotationId]: "nullable"
-  });
-};
+const nullable = self => union(S.null, self);
 /**
  * @category combinators
  * @since 1.0.0

@@ -40,11 +40,6 @@ decode,
  * @category decoding
  * @since 1.0.0
  */
-decodeEffect,
-/**
- * @category decoding
- * @since 1.0.0
- */
 decodeEither,
 /**
  * @category decoding
@@ -62,15 +57,15 @@ decodePromise,
  */
 decodeResult,
 /**
- * @category encoding
+ * @category decoding
  * @since 1.0.0
  */
-encode,
+decodeSync,
 /**
  * @category encoding
  * @since 1.0.0
  */
-encodeEffect,
+encode,
 /**
  * @category encoding
  * @since 1.0.0
@@ -92,15 +87,15 @@ encodePromise,
  */
 encodeResult,
 /**
- * @category parsing
+ * @category encoding
  * @since 1.0.0
  */
-parse,
+encodeSync,
 /**
  * @category parsing
  * @since 1.0.0
  */
-parseEffect,
+parse,
 /**
  * @category parsing
  * @since 1.0.0
@@ -120,7 +115,12 @@ parsePromise,
  * @category parsing
  * @since 1.0.0
  */
-parseResult } from "@effect/schema/Parser";
+parseResult,
+/**
+ * @category parsing
+ * @since 1.0.0
+ */
+parseSync } from "@effect/schema/Parser";
 /* c8 ignore end */
 // ---------------------------------------------
 // constructors
@@ -133,7 +133,7 @@ export const make = ast => ({
   ast
 });
 // ---------------------------------------------
-// combinators
+// codec combinators
 // ---------------------------------------------
 /**
  * Create a new `Codec` by transforming the input and output of an existing `Schema`
@@ -151,6 +151,9 @@ export const transformResult = /*#__PURE__*/dual(4, (from, to, decode, encode, a
  * @since 1.0.0
  */
 export const transform = /*#__PURE__*/dual(4, (from, to, decode, encode, annotations) => transformResult(from, to, a => E.right(decode(a)), b => E.right(encode(b)), annotations));
+// ---------------------------------------------
+// combinators
+// ---------------------------------------------
 /**
  * @category combinators
  * @since 1.0.0
@@ -160,13 +163,7 @@ export const union = (...members) => make(AST.createUnion(members.map(m => m.ast
  * @category combinators
  * @since 1.0.0
  */
-export const nullable = self => {
-  const parseResult = P.parseResult(self);
-  const encodeResult = P.encodeResult(self);
-  return transformResult(S.nullable(from(self)), S.nullable(to(self)), (nullable, options) => nullable === null ? PR.success(null) : parseResult(nullable, options), (nullable, options) => nullable === null ? PR.success(null) : encodeResult(nullable, options), {
-    [AST.DocumentationAnnotationId]: "nullable"
-  });
-};
+export const nullable = self => union(S.null, self);
 /**
  * @category combinators
  * @since 1.0.0

@@ -6,9 +6,9 @@ import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import * as Order from "@effect/data/Order"
 import { isNumber, isString, isSymbol } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
-import * as Order from "@effect/data/typeclass/Order"
 import * as I from "@effect/schema/internal/common"
 import type { ParseError, ParseResult } from "@effect/schema/ParseResult"
 
@@ -986,15 +986,15 @@ export const appendElement = (
   }
   return pipe(
     ast.rest,
-    O.match(
-      () => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly),
-      (rest) => {
+    O.match({
+      onNone: () => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly),
+      onSome: (rest) => {
         if (newElement.isOptional) {
           throw new Error("An optional element cannot follow a rest element. ts(1266)")
         }
         return createTuple(ast.elements, O.some([...rest, newElement.type]), ast.isReadonly)
       }
-    )
+    })
   )
 }
 

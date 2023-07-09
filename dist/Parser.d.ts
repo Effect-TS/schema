@@ -13,7 +13,7 @@ import type { Schema } from "@effect/schema/Schema";
  * @category parsing
  * @since 1.0.0
  */
-export declare const parse: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions) => A;
+export declare const parseSync: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions) => A;
 /**
  * @category parsing
  * @since 1.0.0
@@ -38,12 +38,12 @@ export declare const parsePromise: <I, A>(schema: Codec<I, A>) => (i: unknown, o
  * @category parsing
  * @since 1.0.0
  */
-export declare const parseEffect: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>;
+export declare const parse: <I, A>(schema: Codec<I, A>) => (i: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>;
 /**
  * @category decoding
  * @since 1.0.0
  */
-export declare const decode: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions) => A;
+export declare const decodeSync: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions) => A;
 /**
  * @category decoding
  * @since 1.0.0
@@ -68,12 +68,12 @@ export declare const decodePromise: <I, A>(schema: Codec<I, A>) => (i: I, option
  * @category decoding
  * @since 1.0.0
  */
-export declare const decodeEffect: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>;
+export declare const decode: <I, A>(schema: Codec<I, A>) => (i: I, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>;
 /**
  * @category validation
  * @since 1.0.0
  */
-export declare const validate: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => A;
+export declare const validateSync: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => A;
 /**
  * @category validation
  * @since 1.0.0
@@ -98,7 +98,7 @@ export declare const validatePromise: <A>(schema: Schema<A>) => (i: unknown, opt
  * @category validation
  * @since 1.0.0
  */
-export declare const validateEffect: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>;
+export declare const validate: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>;
 /**
  * @category validation
  * @since 1.0.0
@@ -117,7 +117,7 @@ export declare const asserts: <A>(schema: Schema<A>) => (a: unknown, options?: P
  * @category encoding
  * @since 1.0.0
  */
-export declare const encode: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions) => I;
+export declare const encodeSync: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions) => I;
 /**
  * @category encoding
  * @since 1.0.0
@@ -142,7 +142,7 @@ export declare const encodePromise: <I, A>(schema: Codec<I, A>) => (a: A, option
  * @category encoding
  * @since 1.0.0
  */
-export declare const encodeEffect: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, I>;
+export declare const encode: <I, A>(schema: Codec<I, A>) => (a: A, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, I>;
 /**
  * @since 1.0.0"decoding" | "encoding"
  */

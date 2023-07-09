@@ -12,6 +12,7 @@ import * as ReadonlyArray from "@effect/data/ReadonlyArray";
 import type { Arbitrary } from "@effect/schema/Arbitrary";
 import * as AST from "@effect/schema/AST";
 import type { ParseOptions } from "@effect/schema/AST";
+import * as PR from "@effect/schema/ParseResult";
 import type { ParseResult } from "@effect/schema/ParseResult";
 /**
  * @category model
@@ -59,11 +60,6 @@ validate,
  * @category validating
  * @since 1.0.0
  */
-validateEffect, 
-/**
- * @category validating
- * @since 1.0.0
- */
 validateEither, 
 /**
  * @category validating
@@ -79,7 +75,12 @@ validatePromise,
  * @category validating
  * @since 1.0.0
  */
-validateResult } from "@effect/schema/Parser";
+validateResult, 
+/**
+ * @category validating
+ * @since 1.0.0
+ */
+validateSync } from "@effect/schema/Parser";
 export type { 
 /**
  * @category asserts
@@ -100,7 +101,7 @@ export declare const make: <A>(ast: AST.AST) => Schema<A>;
   @category constructors
   @since 1.0.0
 */
-export declare const declare: (typeParameters: ReadonlyArray<Schema<any>>, type: Schema<any>, decode: (...typeParameters: ReadonlyArray<Schema<any>>) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>, annotations?: AST.Annotated["annotations"]) => Schema<any>;
+export declare const declare: (typeParameters: ReadonlyArray<Schema<any>>, type: Schema<any>, decode: (...typeParameters: ReadonlyArray<Schema<any>>) => (input: any, options: ParseOptions, ast: AST.AST) => PR.ParseResult<any>, annotations?: AST.Annotated["annotations"]) => Schema<any>;
 /**
  * @category constructors
  * @since 1.0.0
@@ -301,7 +302,7 @@ export declare const optional: <A>(schema: Schema<A>, options?: DocAnnotations<A
 /**
  * @since 1.0.0
  */
-export type Spread<A> = {
+export type Simplify<A> = {
     readonly [K in keyof A]: A[K];
 } extends infer B ? B : never;
 /**
@@ -314,7 +315,7 @@ export type ToOptionalKeys<Fields> = {
  * @category combinators
  * @since 1.0.0
  */
-export declare const struct: <Fields extends Record<PropertyKey, Schema<any> | Schema<never> | SchemaPropertySignature<any, boolean, any, boolean> | SchemaPropertySignature<never, boolean, never, boolean>>>(fields: Fields) => Schema<Spread<{ readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>; } & { readonly [K_1 in ToOptionalKeys<Fields>]?: To<Fields[K_1]>; }>>;
+export declare const struct: <Fields extends Record<PropertyKey, Schema<any> | Schema<never> | SchemaPropertySignature<any, boolean, any, boolean> | SchemaPropertySignature<never, boolean, never, boolean>>>(fields: Fields) => Schema<Simplify<{ readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>; } & { readonly [K_1 in ToOptionalKeys<Fields>]?: To<Fields[K_1]>; }>>;
 /**
  * @category combinators
  * @since 1.0.0
@@ -325,19 +326,19 @@ export declare const record: <K extends string | symbol, A>(key: Schema<K>, valu
  * @since 1.0.0
  */
 export declare const extend: {
-    <B>(that: Schema<B>): <A>(self: Schema<A>) => Schema<Spread<A & B>>;
-    <A, B>(self: Schema<A>, that: Schema<B>): Schema<Spread<A & B>>;
+    <B>(that: Schema<B>): <A>(self: Schema<A>) => Schema<Simplify<A & B>>;
+    <A, B>(self: Schema<A>, that: Schema<B>): Schema<Simplify<A & B>>;
 };
 /**
  * @category combinators
  * @since 1.0.0
  */
-export declare const pick: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: Schema<A>) => Schema<Spread<Pick<A, Keys[number]>>>;
+export declare const pick: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: Schema<A>) => Schema<Simplify<Pick<A, Keys[number]>>>;
 /**
  * @category combinators
  * @since 1.0.0
  */
-export declare const omit: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: Schema<A>) => Schema<Spread<Omit<A, Keys[number]>>>;
+export declare const omit: <A, Keys extends readonly (keyof A)[]>(...keys: Keys) => (self: Schema<A>) => Schema<Simplify<Omit<A, Keys[number]>>>;
 /**
  * @since 1.0.0
  */
@@ -368,12 +369,12 @@ export declare const brand: <B extends string | symbol, A>(brand: B, options?: D
  * @category combinators
  * @since 1.0.0
  */
-export declare const partial: <A>(self: Schema<A>) => Schema<Spread<Partial<A>>>;
+export declare const partial: <A>(self: Schema<A>) => Schema<Simplify<Partial<A>>>;
 /**
  * @category combinators
  * @since 1.0.0
  */
-export declare const required: <A>(self: Schema<A>) => Schema<Spread<Required<A>>>;
+export declare const required: <A>(self: Schema<A>) => Schema<Simplify<Required<A>>>;
 /**
  * @since 1.0.0
  */

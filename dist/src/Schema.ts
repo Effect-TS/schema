@@ -2,12 +2,12 @@
  * @since 1.0.0
  */
 
+import * as BI from "@effect/data/Bigint"
 import type { Brand } from "@effect/data/Brand"
 import { RefinedConstructorsTypeId } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
 import * as D from "@effect/data/Data"
-import { untracedMethod } from "@effect/data/Debug"
 import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
@@ -17,8 +17,9 @@ import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
-import { isDate } from "@effect/data/Predicate"
+import { isDate, not } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
+import * as Str from "@effect/data/String"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -86,11 +87,6 @@ export {
    * @category validating
    * @since 1.0.0
    */
-  validateEffect,
-  /**
-   * @category validating
-   * @since 1.0.0
-   */
   validateEither,
   /**
    * @category validating
@@ -106,7 +102,12 @@ export {
    * @category validating
    * @since 1.0.0
    */
-  validateResult
+  validateResult,
+  /**
+   * @category validating
+   * @since 1.0.0
+   */
+  validateSync
 } from "@effect/schema/Parser"
 
 export type {
@@ -312,14 +313,12 @@ export const fromBrand = <C extends Brand<string | symbol>>(
   options?: FilterAnnotations<Brand.Unbranded<C>>
 ) =>
   <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
-    const filter = untracedMethod(() =>
-      (a: A, _, self: AST.AST): Option<PR.ParseError> => {
-        const e = constructor.either(a)
-        return E.isLeft(e) ?
-          O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
-          O.none()
-      }
-    )
+    const filter = (a: A, _: ParseOptions, self: AST.AST): Option<PR.ParseError> => {
+      const e = constructor.either(a)
+      return E.isLeft(e) ?
+        O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
+        O.none()
+    }
     const ast = AST.createRefinement(
       self.ast,
       filter,
@@ -639,7 +638,7 @@ export const optional = <A>(
 /**
  * @since 1.0.0
  */
-export type Spread<A> = {
+export type Simplify<A> = {
   readonly [K in keyof A]: A[K]
 } extends infer B ? B : never
 
@@ -668,7 +667,7 @@ export const struct = <
 >(
   fields: Fields
 ): Schema<
-  Spread<
+  Simplify<
     & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
@@ -708,6 +707,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
       return ys.map((y) => {
         if (AST.isTypeLiteral(x)) {
           if (AST.isTypeLiteral(y)) {
+            // isTypeLiteral(x) && isTypeLiteral(y)
             return AST.createTypeLiteral(
               x.propertySignatures.concat(y.propertySignatures),
               x.indexSignatures.concat(y.indexSignatures)
@@ -716,13 +716,14 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
             AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
+            // isTypeLiteral(x) && isTransform(y)
             const from = AST.createTypeLiteral(
               x.propertySignatures.concat(y.from.propertySignatures),
               x.indexSignatures.concat(y.from.indexSignatures)
             )
             const to = AST.createTypeLiteral(
-              x.propertySignatures.concat(y.to.propertySignatures),
-              x.indexSignatures.concat(y.to.indexSignatures)
+              AST.getToPropertySignatures(x.propertySignatures).concat(y.to.propertySignatures),
+              AST.getToIndexSignatures(x.indexSignatures).concat(y.to.indexSignatures)
             )
             return AST.createTransform(
               from,
@@ -737,13 +738,14 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
           AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
         ) {
           if (AST.isTypeLiteral(y)) {
+            // isTransform(x) && isTypeLiteral(y)
             const from = AST.createTypeLiteral(
               x.from.propertySignatures.concat(y.propertySignatures),
               x.from.indexSignatures.concat(y.indexSignatures)
             )
             const to = AST.createTypeLiteral(
-              x.to.propertySignatures.concat(y.propertySignatures),
-              x.to.indexSignatures.concat(y.indexSignatures)
+              x.to.propertySignatures.concat(AST.getToPropertySignatures(y.propertySignatures)),
+              x.to.indexSignatures.concat(AST.getToIndexSignatures(y.indexSignatures))
             )
             return AST.createTransform(
               from,
@@ -756,6 +758,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
             AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
+            // isTransform(x) && isTransform(y)
             const from = AST.createTypeLiteral(
               x.from.propertySignatures.concat(y.from.propertySignatures),
               x.from.indexSignatures.concat(y.from.indexSignatures)
@@ -788,17 +791,17 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
 export const extend: {
   <B>(
     that: Schema<B>
-  ): <A>(self: Schema<A>) => Schema<Spread<A & B>>
+  ): <A>(self: Schema<A>) => Schema<Simplify<A & B>>
   <A, B>(
     self: Schema<A>,
     that: Schema<B>
-  ): Schema<Spread<A & B>>
+  ): Schema<Simplify<A & B>>
 } = dual(
   2,
   <A, B>(
     self: Schema<A>,
     that: Schema<B>
-  ): Schema<Spread<A & B>> =>
+  ): Schema<Simplify<A & B>> =>
     make(
       intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -812,14 +815,14 @@ export const extend: {
  * @since 1.0.0
  */
 export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (self: Schema<A>): Schema<Spread<Pick<A, Keys[number]>>> => make(AST.pick(self.ast, keys))
+  (self: Schema<A>): Schema<Simplify<Pick<A, Keys[number]>>> => make(AST.pick(self.ast, keys))
 
 /**
  * @category combinators
  * @since 1.0.0
  */
 export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
-  (self: Schema<A>): Schema<Spread<Omit<A, Keys[number]>>> => make(AST.omit(self.ast, keys))
+  (self: Schema<A>): Schema<Simplify<Omit<A, Keys[number]>>> => make(AST.omit(self.ast, keys))
 
 /**
  * @since 1.0.0
@@ -864,7 +867,7 @@ export const brand = <B extends string | symbol, A>(
   (self: Schema<A>): BrandSchema<A & Brand<B>> => {
     const ast = addBrand(self.ast, brand, options)
     const schema = make(ast)
-    const validate = P.validate(schema)
+    const validate = P.validateSync(schema)
     const validateOption = P.validateOption(schema)
     const validateEither = P.validateEither(schema)
     const is = P.is(schema)
@@ -893,7 +896,7 @@ export const getBrands = (ast: AST.AST): Array<string> =>
  */
 export const partial = <A>(
   self: Schema<A>
-): Schema<Spread<Partial<A>>> => make(AST.partial(self.ast))
+): Schema<Simplify<Partial<A>>> => make(AST.partial(self.ast))
 
 /**
  * @category combinators
@@ -901,7 +904,7 @@ export const partial = <A>(
  */
 export const required = <A>(
   self: Schema<A>
-): Schema<Spread<Required<A>>> => make(AST.required(self.ast))
+): Schema<Simplify<Required<A>>> => make(AST.required(self.ast))
 
 /** @internal */
 export const toAnnotations = <A>(
@@ -1013,7 +1016,7 @@ export const _minLength = <A extends string>(
   minLength: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.length >= minLength, {
+  _filter(ast, (a) => a.length >= minLength, {
     typeId: MinLengthTypeId,
     description: `a string at least ${minLength} character(s) long`,
     jsonSchema: { minLength },
@@ -1049,7 +1052,7 @@ export const _maxLength = <A extends string>(
   maxLength: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.length <= maxLength, {
+  _filter(ast, (a) => a.length <= maxLength, {
     typeId: MaxLengthTypeId,
     description: `a string at most ${maxLength} character(s) long`,
     jsonSchema: { maxLength },
@@ -1086,7 +1089,7 @@ export const _pattern = <A extends string>(
   regex: RegExp,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => {
+  _filter(ast, (a) => {
     // The following line ensures that `lastIndex` is reset to `0` in case the user has specified the `g` flag
     regex.lastIndex = 0
     return regex.test(a)
@@ -1118,7 +1121,7 @@ export const _startsWith = <A extends string>(
   startsWith: string,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.startsWith(startsWith), {
+  _filter(ast, Str.startsWith(startsWith), {
     typeId: { id: StartsWithTypeId, params: { startsWith } },
     description: `a string starting with ${JSON.stringify(startsWith)}`,
     jsonSchema: { pattern: `^${startsWith}` },
@@ -1146,7 +1149,7 @@ export const _endsWith = <A extends string>(
   endsWith: string,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.endsWith(endsWith), {
+  _filter(ast, Str.endsWith(endsWith), {
     typeId: { id: EndsWithTypeId, params: { endsWith } },
     description: `a string ending with ${JSON.stringify(endsWith)}`,
     jsonSchema: { pattern: `^.*${endsWith}$` },
@@ -1174,7 +1177,7 @@ export const _includes = <A extends string>(
   searchString: string,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a.includes(searchString), {
+  _filter(ast, Str.includes(searchString), {
     typeId: { id: IncludesTypeId, params: { includes: searchString } },
     description: `a string including ${JSON.stringify(searchString)}`,
     jsonSchema: { pattern: `.*${searchString}.*` },
@@ -1203,7 +1206,7 @@ export const _trimmed = <A extends string>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => trimmedRegex.test(a), {
+  _filter(ast, (a) => trimmedRegex.test(a), {
     typeId: TrimmedTypeId,
     description: "a string with no leading or trailing whitespace",
     jsonSchema: {
@@ -1241,7 +1244,7 @@ export const _greaterThan = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a > min, {
+  _filter(ast, N.greaterThan(min), {
     typeId: GreaterThanTypeId,
     description: min === 0 ? "a positive number" : `a number greater than ${min}`,
     jsonSchema: { exclusiveMinimum: min },
@@ -1269,7 +1272,7 @@ export const _greaterThanOrEqualTo = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a >= min, {
+  _filter(ast, N.greaterThanOrEqualTo(min), {
     typeId: GreaterThanOrEqualToTypeId,
     description: min === 0 ? "a non-negative number" : `a number greater than or equal to ${min}`,
     jsonSchema: { minimum: min },
@@ -1297,7 +1300,7 @@ export const _lessThan = <A extends number>(
   max: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a < max, {
+  _filter(ast, N.lessThan(max), {
     typeId: LessThanTypeId,
     description: max === 0 ? "a negative number" : `a number less than ${max}`,
     jsonSchema: { exclusiveMaximum: max },
@@ -1323,7 +1326,7 @@ export const _lessThanOrEqualTo = <A extends number>(
   max: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a <= max, {
+  _filter(ast, N.lessThanOrEqualTo(max), {
     typeId: LessThanOrEqualToTypeId,
     description: max === 0 ? "a non-positive number" : `a number less than or equal to ${max}`,
     jsonSchema: { maximum: max },
@@ -1350,7 +1353,7 @@ export const _int = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => Number.isInteger(a), {
+  _filter(ast, Number.isInteger, {
     typeId: IntTypeId,
     description: "an integer",
     jsonSchema: { type: "integer" },
@@ -1375,7 +1378,7 @@ export const _finite = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => Number.isFinite(a), {
+  _filter(ast, Number.isFinite, {
     typeId: FiniteTypeId,
     description: "a finite number",
     ...options
@@ -1429,7 +1432,7 @@ export const _nonNaN = <A extends number>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => !Number.isNaN(a), {
+  _filter(ast, not(Number.isNaN), {
     typeId: NonNaNTypeId,
     description: "a number NaN excluded",
     ...options
@@ -1510,7 +1513,7 @@ export const _multipleOf = <A extends number>(
   divisor: number,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => N.remainder(a, divisor) === 0, {
+  _filter(ast, (a) => N.remainder(a, divisor) === 0, {
     typeId: MultipleOfTypeId,
     description: `a number divisible by ${divisor}`,
     jsonSchema: { multipleOf: Math.abs(divisor) }, // spec requires positive divisor
@@ -1542,7 +1545,7 @@ export const _greaterThanBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a > min, {
+  _filter(ast, BI.greaterThan(min), {
     typeId: GreaterThanBigintTypeId,
     description: min === 0n ? "a positive bigint" : `a bigint greater than ${min}n`,
     jsonSchema: { exclusiveMinimum: min },
@@ -1572,7 +1575,7 @@ export const _greaterThanOrEqualToBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a >= min, {
+  _filter(ast, BI.greaterThanOrEqualTo(min), {
     typeId: GreaterThanOrEqualToBigintTypeId,
     description: min === 0n ? "a non-negative bigint" : `a bigint greater than or equal to ${min}n`,
     jsonSchema: { minimum: min },
@@ -1600,7 +1603,7 @@ export const _lessThanBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a < max, {
+  _filter(ast, BI.lessThan(max), {
     typeId: LessThanBigintTypeId,
     description: max === 0n ? "a negative bigint" : `a bigint less than ${max}n`,
     jsonSchema: { exclusiveMaximum: max },
@@ -1630,7 +1633,7 @@ export const _lessThanOrEqualToBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a): a is A => a <= max, {
+  _filter(ast, BI.lessThanOrEqualTo(max), {
     typeId: LessThanOrEqualToBigintTypeId,
     description: max === 0n ? "a non-positive bigint" : `a bigint less than or equal to ${max}n`,
     jsonSchema: { maximum: max },
@@ -1992,12 +1995,12 @@ export const chunk = <A>(item: Schema<A>): Schema<Chunk<A>> =>
       length: number
     }),
     <A>(item: Schema<A>) => {
-      const parseResult = P.parseResult(array(item))
+      const validateResult = P.validateResult(array(item))
       return (u: unknown, options, self) =>
         !C.isChunk(u) ?
           PR.failure(PR.type(self, u)) :
           PR.map(
-            parseResult(C.toReadonlyArray(u), options),
+            validateResult(C.toReadonlyArray(u), options),
             C.fromIterable
           )
     },
@@ -2039,11 +2042,11 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
     [item],
     item,
     <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(item: Schema<A>) => {
-      const parseResult = P.parseResult(item)
+      const validateResult = P.validateResult(item)
       return (u: unknown, options, self) =>
         !Equal.isEqual(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(u, options), toData)
+          PR.map(validateResult(u, options), toData)
     },
     {
       [AST.TitleAnnotationId]: "Data",
@@ -2065,10 +2068,10 @@ export const eitherArbitrary = <E, A>(
 
 /** @internal */
 export const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
-  E.match(
-    (e) => `left(${left(e)})`,
-    (a) => `right(${right(a)})`
-  )
+  E.match({
+    onLeft: (e) => `left(${left(e)})`,
+    onRight: (a) => `right(${right(a)})`
+  })
 
 const eitherInline = <E, A>(left: Schema<E>, right: Schema<A>) =>
   union(
@@ -2094,14 +2097,14 @@ export const either = <E, A>(
     [left, right],
     eitherInline(left, right),
     <E, A>(left: Schema<E>, right: Schema<A>) => {
-      const parseResultLeft = P.parseResult(left)
-      const parseResultRight = P.parseResult(right)
+      const validateResultLeft = P.validateResult(left)
+      const validateResultRight = P.validateResult(right)
       return (u: unknown, options, self) =>
         !E.isEither(u) ?
           PR.failure(PR.type(self, u)) :
           E.isLeft(u) ?
-          PR.map(parseResultLeft(u.left, options), E.left) :
-          PR.map(parseResultRight(u.right, options), E.right)
+          PR.map(validateResultLeft(u.left, options), E.left) :
+          PR.map(validateResultRight(u.right, options), E.right)
     },
     {
       [AST.TitleAnnotationId]: "Either",
@@ -2201,10 +2204,10 @@ export const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> =>
 
 /** @internal */
 export const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
-  O.match(
-    () => "none()",
-    (a) => `some(${value(a)})`
-  )
+  O.match({
+    onNone: () => "none()",
+    onSome: (a) => `some(${value(a)})`
+  })
 
 const optionInline = <A>(value: Schema<A>) =>
   union(
@@ -2226,13 +2229,13 @@ export const option = <A>(value: Schema<A>): Schema<Option<A>> => {
     [value],
     optionInline(value),
     <A>(value: Schema<A>) => {
-      const parseResult = P.parseResult(value)
+      const validateResult = P.validateResult(value)
       return (u: unknown, options, self) =>
         !O.isOption(u) ?
           PR.failure(PR.type(self, u)) :
           O.isNone(u) ?
           PR.success(O.none()) :
-          PR.map(parseResult(u.value, options), O.some)
+          PR.map(validateResult(u.value, options), O.some)
     },
     {
       [AST.TitleAnnotationId]: "Option",
@@ -2283,11 +2286,11 @@ export const readonlyMap = <K, V>(
       size: number
     }),
     <K, V>(key: Schema<K>, value: Schema<V>) => {
-      const parseResult = P.parseResult(array(tuple(key, value)))
+      const validateResult = P.validateResult(array(tuple(key, value)))
       return (u: unknown, options, self) =>
         !isMap(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(Array.from(u.entries()), options), (as) => new Map(as))
+          PR.map(validateResult(Array.from(u.entries()), options), (as) => new Map(as))
     },
     {
       [AST.TitleAnnotationId]: "ReadonlyMap",
@@ -2326,10 +2329,10 @@ export const readonlySet = <A>(
     }),
     <A>(item: Schema<A>) =>
       (u: unknown, options, self) => {
-        const parseResult = P.parseResult(array(item))
+        const validateResult = P.validateResult(array(item))
         return !isSet(u) ?
           PR.failure(PR.type(self, u)) :
-          PR.map(parseResult(Array.from(u.values()), options), (as) => new Set(as))
+          PR.map(validateResult(Array.from(u.values()), options), (as) => new Set(as))
       },
     {
       [AST.TitleAnnotationId]: "ReadonlySet",
