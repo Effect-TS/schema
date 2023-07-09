@@ -1851,6 +1851,28 @@ export const UUID: Schema<string> = pipe(
   })
 )
 
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const ULIDTypeId = Symbol.for("@effect/schema/ULIDTypeId")
+
+const ulidRegex = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/i
+
+/**
+ * @category string constructors
+ * @since 1.0.0
+ */
+export const ULID: Schema<string> = pipe(
+  string,
+  pattern(ulidRegex, {
+    typeId: ULIDTypeId,
+    title: "ULID",
+    description: "a ULID",
+    arbitrary: (): Arbitrary<string> => (fc) => fc.ulid()
+  })
+)
+
 // ---------------------------------------------
 // number constructors
 // ---------------------------------------------

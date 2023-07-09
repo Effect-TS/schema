@@ -708,6 +708,16 @@ export declare const UUIDTypeId: unique symbol;
  */
 export declare const UUID: Schema<string>;
 /**
+ * @category type id
+ * @since 1.0.0
+ */
+export declare const ULIDTypeId: unique symbol;
+/**
+ * @category string constructors
+ * @since 1.0.0
+ */
+export declare const ULID: Schema<string>;
+/**
  * @category number constructors
  * @since 1.0.0
  */

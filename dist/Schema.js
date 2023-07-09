@@ -3,15 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.array = exports.any = exports.annotations = exports.addBrand = exports._trimmed = exports._startsWith = exports._positiveBigint = exports._positive = exports._pattern = exports._nonPositiveBigint = exports._nonPositive = exports._nonNegativeBigint = exports._nonNegative = exports._nonNaN = exports._negativeBigint = exports._negative = exports._multipleOf = exports._minLength = exports._minItems = exports._maxLength = exports._maxItems = exports._lessThanOrEqualToBigint = exports._lessThanOrEqualTo = exports._lessThanBigint = exports._lessThan = exports._itemsCount = exports._int = exports._includes = exports._greaterThanOrEqualToBigint = exports._greaterThanOrEqualTo = exports._greaterThanBigint = exports._greaterThan = exports._finite = exports._filter = exports._endsWith = exports._betweenBigint = exports._between = exports.ValidDateTypeId = exports.ValidDate = exports.UUIDTypeId = exports.UUID = exports.TrimmedTypeId = exports.Trimmed = exports.StartsWithTypeId = exports.SchemaTypeId = exports.PropertySignatureImpl = exports.PositiveBigint = exports.Positive = exports.PatternTypeId = exports.NonPositiveBigint = exports.NonPositive = exports.NonNegativeBigint = exports.NonNegative = exports.NonNaNTypeId = exports.NonNaN = exports.NegativeBigint = exports.Negative = exports.MultipleOfTypeId = exports.MinLengthTypeId = exports.MinItemsTypeId = exports.MaxLengthTypeId = exports.MaxItemsTypeId = exports.LessThanTypeId = exports.LessThanOrEqualToTypeId = exports.LessThanOrEqualToBigintTypeId = exports.LessThanBigintTypeId = exports.JsonNumberTypeId = exports.JsonNumber = exports.IntTypeId = exports.Int = exports.InstanceOfTypeId = exports.IncludesTypeId = exports.GreaterThanTypeId = exports.GreaterThanOrEqualToTypeId = exports.GreaterThanOrEqualToBigintTypeId = exports.GreaterThanBigintTypeId = exports.FiniteTypeId = exports.Finite = exports.EndsWithTypeId = exports.Date = exports.BrandTypeId = void 0;
+exports.array = exports.any = exports.annotations = exports.addBrand = exports._trimmed = exports._startsWith = exports._positiveBigint = exports._positive = exports._pattern = exports._nonPositiveBigint = exports._nonPositive = exports._nonNegativeBigint = exports._nonNegative = exports._nonNaN = exports._negativeBigint = exports._negative = exports._multipleOf = exports._minLength = exports._minItems = exports._maxLength = exports._maxItems = exports._lessThanOrEqualToBigint = exports._lessThanOrEqualTo = exports._lessThanBigint = exports._lessThan = exports._itemsCount = exports._int = exports._includes = exports._greaterThanOrEqualToBigint = exports._greaterThanOrEqualTo = exports._greaterThanBigint = exports._greaterThan = exports._finite = exports._filter = exports._endsWith = exports._betweenBigint = exports._between = exports.ValidDateTypeId = exports.ValidDate = exports.UUIDTypeId = exports.UUID = exports.ULIDTypeId = exports.ULID = exports.TrimmedTypeId = exports.Trimmed = exports.StartsWithTypeId = exports.SchemaTypeId = exports.PropertySignatureImpl = exports.PositiveBigint = exports.Positive = exports.PatternTypeId = exports.NonPositiveBigint = exports.NonPositive = exports.NonNegativeBigint = exports.NonNegative = exports.NonNaNTypeId = exports.NonNaN = exports.NegativeBigint = exports.Negative = exports.MultipleOfTypeId = exports.MinLengthTypeId = exports.MinItemsTypeId = exports.MaxLengthTypeId = exports.MaxItemsTypeId = exports.LessThanTypeId = exports.LessThanOrEqualToTypeId = exports.LessThanOrEqualToBigintTypeId = exports.LessThanBigintTypeId = exports.JsonNumberTypeId = exports.JsonNumber = exports.IntTypeId = exports.Int = exports.InstanceOfTypeId = exports.IncludesTypeId = exports.GreaterThanTypeId = exports.GreaterThanOrEqualToTypeId = exports.GreaterThanOrEqualToBigintTypeId = exports.GreaterThanBigintTypeId = exports.FiniteTypeId = exports.Finite = exports.EndsWithTypeId = exports.Date = exports.BrandTypeId = void 0;
 Object.defineProperty(exports, "asserts", {
   enumerable: true,
   get: function () {
     return P.asserts;
   }
 });
-exports.enums = exports.endsWith = exports.element = exports.eitherPretty = exports.eitherArbitrary = exports.either = exports.declare = exports.dataPretty = exports.dataArbitrary = exports.data = exports.chunkPretty = exports.chunkArbitrary = exports.chunk = exports.brand = exports.boolean = exports.bigint = exports.betweenBigint = exports.between = void 0;
-exports.extend = void 0;
+exports.element = exports.eitherPretty = exports.eitherArbitrary = exports.either = exports.declare = exports.dataPretty = exports.dataArbitrary = exports.data = exports.chunkPretty = exports.chunkArbitrary = exports.chunk = exports.brand = exports.boolean = exports.bigint = exports.betweenBigint = exports.between = void 0;
+exports.extend = exports.enums = exports.endsWith = void 0;
 exports.filter = filter;
 exports.intersectUnionMembers = exports.int = exports.instanceOf = exports.includes = exports.greaterThanOrEqualToBigint = exports.greaterThanOrEqualTo = exports.greaterThanBigint = exports.greaterThan = exports.getBrands = exports.fromBrand = exports.finite = void 0;
 Object.defineProperty(exports, "is", {
@@ -1248,6 +1248,24 @@ const UUID = /*#__PURE__*/(0, _Function.pipe)(string, /*#__PURE__*/pattern(uuidR
   description: "a UUID",
   arbitrary: () => fc => fc.uuid()
 }));
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+exports.UUID = UUID;
+const ULIDTypeId = /*#__PURE__*/Symbol.for("@effect/schema/ULIDTypeId");
+exports.ULIDTypeId = ULIDTypeId;
+const ulidRegex = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/i;
+/**
+ * @category string constructors
+ * @since 1.0.0
+ */
+const ULID = /*#__PURE__*/(0, _Function.pipe)(string, /*#__PURE__*/pattern(ulidRegex, {
+  typeId: ULIDTypeId,
+  title: "ULID",
+  description: "a ULID",
+  arbitrary: () => fc => fc.ulid()
+}));
 // ---------------------------------------------
 // number constructors
 // ---------------------------------------------
@@ -1255,7 +1273,7 @@ const UUID = /*#__PURE__*/(0, _Function.pipe)(string, /*#__PURE__*/pattern(uuidR
  * @category number constructors
  * @since 1.0.0
  */
-exports.UUID = UUID;
+exports.ULID = ULID;
 const NonNaN = /*#__PURE__*/(0, _Function.pipe)(number, /*#__PURE__*/nonNaN());
 /**
  * @category number constructors

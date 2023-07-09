@@ -1102,6 +1102,22 @@ export const UUID = /*#__PURE__*/pipe(string, /*#__PURE__*/pattern(uuidRegex, {
   description: "a UUID",
   arbitrary: () => fc => fc.uuid()
 }));
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const ULIDTypeId = /*#__PURE__*/Symbol.for("@effect/schema/ULIDTypeId");
+const ulidRegex = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/i;
+/**
+ * @category string constructors
+ * @since 1.0.0
+ */
+export const ULID = /*#__PURE__*/pipe(string, /*#__PURE__*/pattern(ulidRegex, {
+  typeId: ULIDTypeId,
+  title: "ULID",
+  description: "a ULID",
+  arbitrary: () => fc => fc.ulid()
+}));
 // ---------------------------------------------
 // number constructors
 // ---------------------------------------------
