@@ -952,6 +952,10 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       const get = I.memoizeThunk(() => go(ast.f(), isDecoding))
       return (a, options) => get()(a, options)
     }
+    case "Lazy": {
+      const get = I.memoizeThunk(() => go(ast.f(), isBoundary))
+      return (a, options) => get()(a, options)
+    }
   }
 }
 

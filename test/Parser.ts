@@ -145,6 +145,11 @@ describe.concurrent("Parser", () => {
     expect(C.encodeResult(transform)(1)).toEqual(E.right("1"))
   })
 
+  it("encodeEither", () => {
+    const schema = S.NumberFromString
+    expect(P.encodeEither(schema)(1)).toEqual(E.right("1"))
+  })
+
   it("encodePromise", async () => {
     const transform = C.NumberFromString
     await expect(C.encodePromise(transform)(1)).resolves.toEqual("1")

@@ -246,6 +246,16 @@ export declare const parseSync: <I, A>(schema: Codec<I, A>) => (i: unknown, opti
 
 Added in v1.0.0
 
+## parseSync
+
+**Signature**
+
+```ts
+export declare const parseSync: <_, A>(schema: Schema<_, A>) => (i: unknown, options?: ParseOptions) => A
+```
+
+Added in v1.0.0
+
 # utils
 
 ## ToAsserts (type alias)
@@ -350,6 +360,16 @@ Added in v1.0.0
 
 ```ts
 export declare const validateSync: <A>(schema: Schema<A>) => (a: unknown, options?: ParseOptions) => A
+```
+
+Added in v1.0.0
+
+## validateSync
+
+**Signature**
+
+```ts
+export declare const validateSync: <_, A>(schema: Schema<_, A>) => (a: unknown, options?: ParseOptions) => A
 ```
 
 Added in v1.0.0

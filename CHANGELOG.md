@@ -1,5 +1,35 @@
 # @effect/schema
 
+## 0.25.0
+
+### Minor Changes
+
+- [#322](https://github.com/Effect-TS/schema/pull/322) [`5f5bcb5`](https://github.com/Effect-TS/schema/commit/5f5bcb5ba62eda9b4454a1f5ffb74d90581459de) Thanks [@tim-smart](https://github.com/tim-smart)! - rename \*Effect parser methods
+
+## 0.24.0
+
+### Minor Changes
+
+- [#318](https://github.com/Effect-TS/schema/pull/318) [`0c6cc97`](https://github.com/Effect-TS/schema/commit/0c6cc978616e7942fa1f2fafcdb8412c96f80b97) Thanks [@vecerek](https://github.com/vecerek)! - Add schema for [ULID](https://github.com/ulid/spec)
+
+- [#321](https://github.com/Effect-TS/schema/pull/321) [`7f0e5bd`](https://github.com/Effect-TS/schema/commit/7f0e5bdaa9e2a92847cea98db77f39ecb1ee5afe) Thanks [@gcanti](https://github.com/gcanti)! - upgrade to latest versions
+
+### Patch Changes
+
+- [#320](https://github.com/Effect-TS/schema/pull/320) [`8f09893`](https://github.com/Effect-TS/schema/commit/8f09893fcbfee209081a6e78246b08be8b3891f0) Thanks [@gcanti](https://github.com/gcanti)! - UUID: add title annotation
+
+## 0.23.0
+
+### Minor Changes
+
+- [#316](https://github.com/Effect-TS/schema/pull/316) [`7c9e0ae`](https://github.com/Effect-TS/schema/commit/7c9e0ae48d01ff687e93992ecfbc86fed2e803cd) Thanks [@gcanti](https://github.com/gcanti)! - update effect/io
+
+## 0.22.0
+
+### Minor Changes
+
+- [#314](https://github.com/Effect-TS/schema/pull/314) [`81f2529`](https://github.com/Effect-TS/schema/commit/81f2529e71da2b8dcd00c903ff72fbabbe346fca) Thanks [@gcanti](https://github.com/gcanti)! - upgrade to latest deps
+
 ## 0.21.1
 
 ### Patch Changes
