@@ -1244,6 +1244,8 @@ const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
  */
 const UUID = /*#__PURE__*/(0, _Function.pipe)(string, /*#__PURE__*/pattern(uuidRegex, {
   typeId: UUIDTypeId,
+  title: "UUID",
+  description: "a UUID",
   arbitrary: () => fc => fc.uuid()
 }));
 // ---------------------------------------------

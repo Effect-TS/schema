@@ -287,7 +287,7 @@ export declare const compose: {
  *   C.attachPropertySignature(Square, "kind", "square")
  * )
  *
- * assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
+ * assert.deepStrictEqual(C.decodeSync(Shape)({ radius: 10 }), {
  *   kind: "circle",
  *   radius: 10
  * })

@@ -1098,6 +1098,8 @@ const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
  */
 export const UUID = /*#__PURE__*/pipe(string, /*#__PURE__*/pattern(uuidRegex, {
   typeId: UUIDTypeId,
+  title: "UUID",
+  description: "a UUID",
   arbitrary: () => fc => fc.uuid()
 }));
 // ---------------------------------------------

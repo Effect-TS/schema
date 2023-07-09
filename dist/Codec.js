@@ -423,7 +423,7 @@ const compose = /*#__PURE__*/(0, _Function.dual)(2, (self, that) => make(AST.cre
  *   C.attachPropertySignature(Square, "kind", "square")
  * )
  *
- * assert.deepStrictEqual(C.decode(Shape)({ radius: 10 }), {
+ * assert.deepStrictEqual(C.decodeSync(Shape)({ radius: 10 }), {
  *   kind: "circle",
  *   radius: 10
  * })
