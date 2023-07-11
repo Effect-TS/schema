@@ -1,4 +1,3 @@
-import { pipe } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -11,7 +10,7 @@ describe.concurrent("string transformations", () => {
     })
 
     it("decode / encode", async () => {
-      const codec = pipe(S.string, S.minLength(1), C.trim)
+      const codec = S.string.pipe(S.minLength(1), C.trim)
       await Util.expectParseSuccess(codec, "a", "a")
       await Util.expectParseSuccess(codec, "a ", "a")
       await Util.expectParseSuccess(codec, " a ", "a")
@@ -60,7 +59,7 @@ describe.concurrent("string transformations", () => {
 describe.concurrent("number transformations", () => {
   describe.concurrent("clamp", () => {
     it("decode / encode", async () => {
-      const codec = pipe(S.number, C.clamp(-1, 1))
+      const codec = S.number.pipe(C.clamp(-1, 1))
 
       await Util.expectParseSuccess(codec, 3, 1)
       await Util.expectParseSuccess(codec, 0, 0)
@@ -108,7 +107,7 @@ describe.concurrent("number transformations", () => {
 describe.concurrent("boolean transformations", () => {
   describe.concurrent("not", () => {
     it("decode / encode", async () => {
-      const codec = pipe(S.boolean, C.not)
+      const codec = S.boolean.pipe(C.not)
 
       await Util.expectParseSuccess(codec, true, false)
       await Util.expectParseSuccess(codec, false, true)
@@ -121,7 +120,7 @@ describe.concurrent("boolean transformations", () => {
 describe.concurrent("bigint transformations", () => {
   describe.concurrent("clampBigint", () => {
     it("decode / encode", async () => {
-      const codec = pipe(S.bigint, C.clampBigint(-1n, 1n))
+      const codec = S.bigint.pipe(C.clampBigint(-1n, 1n))
 
       await Util.expectParseSuccess(codec, 3n, 1n)
       await Util.expectParseSuccess(codec, 0n, 0n)

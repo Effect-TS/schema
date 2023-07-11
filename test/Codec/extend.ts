@@ -1,20 +1,17 @@
-import { pipe } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("extend", () => {
   it(`struct with defaults + struct`, async () => {
-    const schema = pipe(
-      C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }),
+    const schema = C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }).pipe(
       C.extend(S.struct({ c: S.number }))
     )
     await Util.expectParseSuccess(schema, { b: "b", c: 1 }, { a: "", b: "b", c: 1 })
   })
 
   it(`struct + struct with defaults`, async () => {
-    const schema = pipe(
-      S.struct({ a: S.number }),
+    const schema = S.struct({ a: S.number }).pipe(
       C.extend(
         C.struct({ b: S.string, c: C.optional(S.string).withDefault(() => "") })
       )
@@ -23,8 +20,7 @@ describe.concurrent("extend", () => {
   })
 
   it(`struct with defaults + struct with defaults `, async () => {
-    const schema = pipe(
-      C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }),
+    const schema = C.struct({ a: C.optional(S.string).withDefault(() => ""), b: S.string }).pipe(
       C.extend(
         C.struct({ c: C.optional(S.number).withDefault(() => 0), d: S.boolean })
       )
@@ -33,17 +29,16 @@ describe.concurrent("extend", () => {
   })
 
   it(`union with defaults + union with defaults `, async () => {
-    const schema = pipe(
-      C.union(
-        C.struct({
-          a: C.optional(S.string).withDefault(() => "a"),
-          b: S.string
-        }),
-        C.struct({
-          c: C.optional(S.string).withDefault(() => "c"),
-          d: S.string
-        })
-      ),
+    const schema = C.union(
+      C.struct({
+        a: C.optional(S.string).withDefault(() => "a"),
+        b: S.string
+      }),
+      C.struct({
+        c: C.optional(S.string).withDefault(() => "c"),
+        d: S.string
+      })
+    ).pipe(
       C.extend(
         C.union(
           C.struct({
@@ -72,8 +67,7 @@ describe.concurrent("extend", () => {
   })
 
   it("struct + struct + record(string, X3)", async () => {
-    const transform = pipe(
-      S.struct({ a: S.string }),
+    const transform = S.struct({ a: S.string }).pipe(
       C.extend(C.struct({ b: Util.X2 })),
       C.extend(C.record(S.string, Util.X3))
     )
@@ -93,8 +87,7 @@ describe.concurrent("extend", () => {
   })
 
   it("struct + struct + record(symbol, X3)", async () => {
-    const transform = pipe(
-      S.struct({ a: S.string }),
+    const transform = S.struct({ a: S.string }).pipe(
       C.extend(C.struct({ b: Util.X2 })),
       C.extend(C.record(S.symbol, Util.X3))
     )
@@ -115,8 +108,7 @@ describe.concurrent("extend", () => {
   })
 
   it("should fail on illegal types", async () => {
-    const transform = pipe(
-      S.struct({ a: S.number }), // <= this is illegal
+    const transform = S.struct({ a: S.number }).pipe( // <= this is illegal
       C.extend(C.record(S.string, C.NumberFromString))
     )
     await Util.expectParseFailure(transform, { a: 1 }, "/a Expected a string, actual 1")
@@ -131,10 +123,9 @@ describe.concurrent("extend", () => {
     )
 
     it("optional, transformation", async () => {
-      const schema = pipe(
-        C.struct({
-          a: S.optional(S.boolean).withDefault(() => true)
-        }),
+      const schema = C.struct({
+        a: S.optional(S.boolean).withDefault(() => true)
+      }).pipe(
         C.extend(
           C.struct({
             b: C.array(BoolFromString)
@@ -148,10 +139,9 @@ describe.concurrent("extend", () => {
     })
 
     it("transformation, optional", async () => {
-      const schema = pipe(
-        C.struct({
-          b: C.array(BoolFromString)
-        }),
+      const schema = C.struct({
+        b: C.array(BoolFromString)
+      }).pipe(
         C.extend(
           C.struct({
             a: S.optional(S.boolean).withDefault(() => true)

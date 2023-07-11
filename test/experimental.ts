@@ -1,4 +1,3 @@
-import { pipe } from "@effect/data/Function"
 import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 
@@ -29,11 +28,10 @@ describe.concurrent("experimental", () => {
         throw new Error("cannot rename")
       }
 
-    const schema = pipe(
-      S.struct({
-        a: S.string,
-        b: S.number
-      }),
+    const schema = S.struct({
+      a: S.string,
+      b: S.number
+    }).pipe(
       rename("a", "aa")
     )
     const is = S.is(schema)

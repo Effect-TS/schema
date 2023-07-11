@@ -1,4 +1,3 @@
-import { pipe } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -6,8 +5,7 @@ import * as Util from "@effect/schema/test/util"
 describe.concurrent("omit", () => {
   it("struct", async () => {
     const a = Symbol.for("@effect/schema/test/a")
-    const schema = pipe(
-      C.struct({ [a]: S.string, b: C.NumberFromString, c: S.boolean }),
+    const schema = C.struct({ [a]: S.string, b: C.NumberFromString, c: S.boolean }).pipe(
       C.omit("c")
     )
     await Util.expectParseSuccess(schema, { [a]: "a", b: "1" }, { [a]: "a", b: 1 })
@@ -26,8 +24,7 @@ describe.concurrent("omit", () => {
   })
 
   it("struct with optionals", async () => {
-    const schema = pipe(
-      C.struct({ a: S.optional(S.string), b: C.NumberFromString, c: S.boolean }),
+    const schema = C.struct({ a: S.optional(S.string), b: C.NumberFromString, c: S.boolean }).pipe(
       C.omit("c")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
@@ -48,7 +45,7 @@ describe.concurrent("omit", () => {
         as: C.array(A)
       })
     )
-    const schema = pipe(A, C.omit("a"))
+    const schema = A.pipe(C.omit("a"))
     await Util.expectParseSuccess(schema, { as: [] })
     await Util.expectParseSuccess(schema, { as: [{ a: "a", as: [] }] })
 
@@ -56,12 +53,11 @@ describe.concurrent("omit", () => {
   })
 
   it("struct with property signature transformations", async () => {
-    const schema = pipe(
-      C.struct({
-        a: C.optional(S.string).withDefault(() => ""),
-        b: C.NumberFromString,
-        c: S.boolean
-      }),
+    const schema = C.struct({
+      a: C.optional(S.string).withDefault(() => ""),
+      b: C.NumberFromString,
+      c: S.boolean
+    }).pipe(
       C.omit("c")
     )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })

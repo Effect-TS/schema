@@ -1,10 +1,9 @@
-import { pipe } from "@effect/data/Function"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("optionalElement", () => {
   it("should throw on unsupported schemas", () => {
-    const schema = pipe(S.tuple(), S.filter(() => true))
-    expect(() => pipe(schema, S.optionalElement(S.number))).toThrowError(
+    const schema = S.tuple().pipe(S.filter(() => true))
+    expect(() => schema.pipe(S.optionalElement(S.number))).toThrowError(
       new Error("`optionalElement` is not supported on this schema")
     )
   })

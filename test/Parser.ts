@@ -1,5 +1,4 @@
 import * as E from "@effect/data/Either"
-import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as Effect from "@effect/io/Effect"
 import * as AST from "@effect/schema/AST"
@@ -158,8 +157,7 @@ describe.concurrent("Parser", () => {
     // Refinement
     expect(
       P._getLiterals(
-        pipe(
-          S.struct({ _tag: S.literal("a") }),
+        S.struct({ _tag: S.literal("a") }).pipe(
           S.filter(() => true)
         ).ast
       )
@@ -178,7 +176,7 @@ describe.concurrent("Parser", () => {
     // Transform
     expect(
       P._getLiterals(
-        pipe(S.struct({ radius: S.number }), C.attachPropertySignature("kind", "circle")).ast
+        S.struct({ radius: S.number }).pipe(C.attachPropertySignature("kind", "circle")).ast
       )
     ).toEqual([])
   })

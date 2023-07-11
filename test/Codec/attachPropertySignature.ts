@@ -1,5 +1,4 @@
 import * as Either from "@effect/data/Either"
-import { pipe } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -36,8 +35,7 @@ describe.concurrent("attachPropertySignature", () => {
   })
 
   it("should be compatible with extend", async () => {
-    const schema = pipe(
-      S.struct({ a: S.string }),
+    const schema = S.struct({ a: S.string }).pipe(
       C.attachPropertySignature("_tag", "b"),
       C.extend(S.struct({ c: S.number }))
     )
@@ -49,13 +47,12 @@ describe.concurrent("attachPropertySignature", () => {
     const From = S.struct({ radius: S.number, _isVisible: S.optional(S.boolean) })
     const To = S.struct({ radius: S.number, _isVisible: S.boolean })
 
-    const Circle = pipe(
-      C.transformResult(
-        From,
-        To,
-        C.parseEither(To),
-        ({ _isVisible, ...rest }) => Either.right(rest)
-      ),
+    const Circle = C.transformResult(
+      From,
+      To,
+      C.parseEither(To),
+      ({ _isVisible, ...rest }) => Either.right(rest)
+    ).pipe(
       C.attachPropertySignature("_tag", "Circle")
     )
     expect(C.decodeSync(Circle)({ radius: 10, _isVisible: true })).toEqual({

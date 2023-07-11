@@ -1037,7 +1037,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Codec<From, To> {
+export interface Codec<From, To> extends Pipeable {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ast: AST.AST

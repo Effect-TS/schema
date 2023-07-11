@@ -999,7 +999,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Schema<A> {
+export interface Schema<A> extends Pipeable {
   readonly [SchemaTypeId]: (_: A) => A
   readonly From: (_: A) => A
   readonly To: (_: A) => A

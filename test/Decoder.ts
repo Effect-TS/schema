@@ -1,4 +1,3 @@
-import { pipe } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -19,16 +18,16 @@ describe.concurrent("Decoder", () => {
   })
 
   it("annotations/message refinement", async () => {
-    const schema = pipe(
+    const schema =
       // initial schema, a string
-      S.string,
-      // add an error message for non-string values
-      S.annotations({ message: () => "not a string" }),
-      // add a constraint to the schema, only non-empty strings are valid
-      S.nonEmpty({ message: () => "required" }),
-      // add a constraint to the schema, only strings with a length less or equal than 10 are valid
-      S.maxLength(10, { message: (s) => `${s} is too long` })
-    )
+      S.string.pipe(
+        // add an error message for non-string values
+        S.annotations({ message: () => "not a string" }),
+        // add a constraint to the schema, only non-empty strings are valid
+        S.nonEmpty({ message: () => "required" }),
+        // add a constraint to the schema, only strings with a length less or equal than 10 are valid
+        S.maxLength(10, { message: (s) => `${s} is too long` })
+      )
 
     await Util.expectParseFailure(schema, null, "not a string")
     await Util.expectParseFailure(schema, "", "required")
@@ -278,7 +277,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. optional element", async () => {
-    const schema = pipe(C.tuple(), C.optionalElement(S.number))
+    const schema = C.tuple().pipe(C.optionalElement(S.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
 
@@ -296,7 +295,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. optional element with undefined", async () => {
-    const schema = pipe(C.tuple(), C.optionalElement(S.union(S.number, S.undefined)))
+    const schema = C.tuple().pipe(C.optionalElement(S.union(S.number, S.undefined)))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, [undefined])
@@ -315,7 +314,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e e?", async () => {
-    const schema = pipe(C.tuple(S.string), C.optionalElement(S.number))
+    const schema = C.tuple(S.string).pipe(C.optionalElement(S.number))
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
 
@@ -324,7 +323,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e r", async () => {
-    const schema = pipe(C.tuple(S.string), C.rest(S.number))
+    const schema = C.tuple(S.string).pipe(C.rest(S.number))
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
     await Util.expectParseSuccess(schema, ["a", 1, 2])
@@ -333,7 +332,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e? r", async () => {
-    const schema = pipe(C.tuple(), C.optionalElement(S.string), C.rest(S.number))
+    const schema = C.tuple().pipe(C.optionalElement(S.string), C.rest(S.number))
     await Util.expectParseSuccess(schema, [])
     await Util.expectParseSuccess(schema, ["a"])
     await Util.expectParseSuccess(schema, ["a", 1])
@@ -353,7 +352,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. r e", async () => {
-    const schema = pipe(C.array(S.string), C.element(S.number))
+    const schema = C.array(S.string).pipe(C.element(S.number))
     await Util.expectParseSuccess(schema, [1])
     await Util.expectParseSuccess(schema, ["a", 1])
     await Util.expectParseSuccess(schema, ["a", "b", 1])
@@ -364,7 +363,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("tuple. e r e", async () => {
-    const schema = pipe(C.tuple(S.string), C.rest(S.number), C.element(S.boolean))
+    const schema = C.tuple(S.string).pipe(C.rest(S.number), C.element(S.boolean))
     await Util.expectParseSuccess(schema, ["a", true])
     await Util.expectParseSuccess(schema, ["a", 1, true])
     await Util.expectParseSuccess(schema, ["a", 1, 2, true])
@@ -584,7 +583,7 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ record(keyof struct({ a, b } & Record<string, string>), number)", async () => {
     const schema = S.record(
-      S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.string, S.string)))),
+      S.keyof(S.struct({ a: S.string, b: S.string }).pipe(S.extend(S.record(S.string, S.string)))),
       S.number
     )
     await Util.expectParseSuccess(schema, { a: 1, b: 2 })
@@ -597,7 +596,7 @@ describe.concurrent("Decoder", () => {
 
   it("struct/ record(keyof struct({ a, b } & Record<symbol, string>), number)", async () => {
     const schema = S.record(
-      S.keyof(pipe(S.struct({ a: S.string, b: S.string }), S.extend(S.record(S.symbol, S.string)))),
+      S.keyof(S.struct({ a: S.string, b: S.string }).pipe(S.extend(S.record(S.symbol, S.string)))),
       S.number
     )
     await Util.expectParseSuccess(schema, { a: 1, b: 2 })
@@ -655,7 +654,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("struct/ record(minLength(1), number)", async () => {
-    const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
+    const schema = S.record(S.string.pipe(S.minLength(2)), S.number)
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { "aa": 1 })
     await Util.expectParseSuccess(schema, { "aaa": 1 })
@@ -833,7 +832,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("maxLength", async () => {
-    const schema = pipe(S.string, S.maxLength(1))
+    const schema = S.string.pipe(S.maxLength(1))
     await Util.expectParseSuccess(schema, "")
     await Util.expectParseSuccess(schema, "a")
 
@@ -845,7 +844,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("nonEmpty", async () => {
-    const schema = pipe(S.string, S.nonEmpty())
+    const schema = S.string.pipe(S.nonEmpty())
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "aa")
 
@@ -857,7 +856,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("length", async () => {
-    const schema = pipe(S.string, S.length(1))
+    const schema = S.string.pipe(S.length(1))
     await Util.expectParseSuccess(schema, "a")
 
     await Util.expectParseFailure(
@@ -873,7 +872,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("startsWith", async () => {
-    const schema = pipe(S.string, S.startsWith("a"))
+    const schema = S.string.pipe(S.startsWith("a"))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "ab")
 
@@ -890,7 +889,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("endsWith", async () => {
-    const schema = pipe(S.string, S.endsWith("a"))
+    const schema = S.string.pipe(S.endsWith("a"))
     await Util.expectParseSuccess(schema, "a")
     await Util.expectParseSuccess(schema, "ba")
 
@@ -907,7 +906,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("pattern", async () => {
-    const schema = pipe(S.string, S.pattern(/^abb+$/))
+    const schema = S.string.pipe(S.pattern(/^abb+$/))
     await Util.expectParseSuccess(schema, "abb")
     await Util.expectParseSuccess(schema, "abbb")
 
@@ -928,7 +927,7 @@ describe.concurrent("Decoder", () => {
   // ---------------------------------------------
 
   it("allErrors/tuple. e r e", async () => {
-    const schema = pipe(C.tuple(S.string), C.rest(S.number), C.element(S.boolean))
+    const schema = C.tuple(S.string).pipe(C.rest(S.number), C.element(S.boolean))
     await Util.expectParseFailure(
       schema,
       [true],
@@ -963,7 +962,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple/rest: wrong type for values", async () => {
-    const schema = pipe(C.tuple(S.string), C.rest(S.number))
+    const schema = C.tuple(S.string).pipe(C.rest(S.number))
     await Util.expectParseFailure(
       schema,
       ["a", "b", "c"],
@@ -973,7 +972,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/tuple/post rest elements: wrong type for values", async () => {
-    const schema = pipe(C.array(S.boolean), C.element(S.number), C.element(S.number))
+    const schema = C.array(S.boolean).pipe(C.element(S.number), C.element(S.number))
     await Util.expectParseFailure(
       schema,
       ["a", "b"],
@@ -1008,7 +1007,7 @@ describe.concurrent("Decoder", () => {
   })
 
   it("allErrors/record: wrong type for keys", async () => {
-    const schema = S.record(pipe(S.string, S.minLength(2)), S.number)
+    const schema = S.record(S.string.pipe(S.minLength(2)), S.number)
     await Util.expectParseFailure(
       schema,
       { a: 1, b: 2 },

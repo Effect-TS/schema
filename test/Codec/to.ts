@@ -1,12 +1,10 @@
-import { pipe } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("to", async () => {
   it("Transform", async () => {
-    const schema = pipe(
-      S.string,
+    const schema = S.string.pipe(
       C.transform(
         C.tuple(C.NumberFromString, C.NumberFromString),
         (s) => [s, s] as const,
@@ -18,9 +16,8 @@ describe.concurrent("to", async () => {
   })
 
   it("Refinement", async () => {
-    const schema = pipe(
-      C.NumberFromString,
-      C.compose(pipe(S.number, S.greaterThanOrEqualTo(1), S.lessThanOrEqualTo(2))),
+    const schema = C.NumberFromString.pipe(
+      C.compose(S.number.pipe(S.greaterThanOrEqualTo(1), S.lessThanOrEqualTo(2))),
       C.to
     )
     await Util.expectParseFailure(
@@ -34,10 +31,9 @@ describe.concurrent("to", async () => {
   })
 
   it("Refinement (struct)", async () => {
-    const schema = pipe(
-      C.struct({
-        a: pipe(C.NumberFromString, C.compose(pipe(S.number, S.greaterThanOrEqualTo(1))))
-      }),
+    const schema = C.struct({
+      a: C.NumberFromString.pipe(C.compose(S.number.pipe(S.greaterThanOrEqualTo(1))))
+    }).pipe(
       C.filter(({ a }) => a > 0),
       C.to
     )

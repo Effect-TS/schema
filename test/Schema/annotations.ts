@@ -1,12 +1,10 @@
-import { pipe } from "@effect/data/Function"
 import { ArbitraryHookId } from "@effect/schema/Arbitrary"
 import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 
 describe.concurrent("annotations", () => {
   it("on filter", () => {
-    const schema = pipe(
-      S.string,
+    const schema = S.string.pipe(
       S.filter((s): s is string => s.length === 1, {
         typeId: Symbol.for("Char"),
         description: "description",
@@ -36,8 +34,7 @@ describe.concurrent("annotations", () => {
   })
 
   it("toAnnotation (message)", () => {
-    const schema = pipe(
-      S.string,
+    const schema = S.string.pipe(
       S.filter((s): s is string => s.length === 1, {
         message: () => "message"
       })
@@ -48,8 +45,7 @@ describe.concurrent("annotations", () => {
   })
 
   it("toAnnotation (arbitrary)", () => {
-    const schema = pipe(
-      S.string,
+    const schema = S.string.pipe(
       S.filter((s): s is string => s.length === 1, {
         arbitrary: () => (fc) => fc.string({ minLength: 1, maxLength: 1 })
       })

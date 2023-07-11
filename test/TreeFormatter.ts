@@ -1,4 +1,3 @@
-import { pipe } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -16,8 +15,7 @@ describe.concurrent("formatExpected", () => {
 
 describe.concurrent("formatErrors", () => {
   it("refinement", () => {
-    const schema = pipe(
-      S.number,
+    const schema = S.number.pipe(
       S.filter((n) => n > 0, { message: () => "mymessage" })
     )
     expect(() => S.validateSync(schema)("a")).toThrowError(

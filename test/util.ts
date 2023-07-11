@@ -287,7 +287,7 @@ export const printAST = <I, A>(codec: Codec<I, A>) => {
 }
 
 export const identityTransform = <A>(schema: S.Schema<A>): C.Codec<A, A> =>
-  pipe(schema, C.compose(schema))
+  schema.pipe(C.compose(schema))
 
 export const X2 = C.transform(
   S.string,

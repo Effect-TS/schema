@@ -1,4 +1,4 @@
-import { identity, pipe } from "@effect/data/Function"
+import { identity } from "@effect/data/Function"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -10,7 +10,7 @@ describe.concurrent("required", () => {
 
   it("struct", async () => {
     const transform = S.required(S.struct({
-      a: S.optional(pipe(S.number, S.greaterThan(0)))
+      a: S.optional(S.number.pipe(S.greaterThan(0)))
     }))
 
     await Util.expectParseSuccess(transform, { a: 1 }, { a: 1 })
@@ -25,14 +25,14 @@ describe.concurrent("required", () => {
   it("tuple/ e?", async () => {
     // type A = [string?]
     // type B = Required<A>
-    const transform = S.required(pipe(S.tuple(), S.optionalElement(S.number)))
+    const transform = S.required(S.tuple().pipe(S.optionalElement(S.number)))
 
     await Util.expectParseSuccess(transform, [1], [1])
     await Util.expectParseFailure(transform, [], "/0 is missing")
   })
 
   it("tuple/ e + e?", async () => {
-    const transform = S.required(pipe(S.tuple(S.number), S.optionalElement(S.string)))
+    const transform = S.required(S.tuple(S.number).pipe(S.optionalElement(S.string)))
 
     await Util.expectParseSuccess(transform, [0, ""], [0, ""])
     await Util.expectParseFailure(transform, [0], "/1 is missing")
@@ -42,7 +42,7 @@ describe.concurrent("required", () => {
     // type A = readonly [string, ...Array<number>, boolean]
     // type B = Required<A> // [string, ...(number | boolean)[], number | boolean]
 
-    const schema = S.required(pipe(S.tuple(S.string), S.rest(S.number), S.element(S.boolean)))
+    const schema = S.required(S.tuple(S.string).pipe(S.rest(S.number), S.element(S.boolean)))
 
     await Util.expectParseSuccess(schema, ["", 0], ["", 0])
     await Util.expectParseSuccess(schema, ["", true], ["", true])
@@ -58,7 +58,7 @@ describe.concurrent("required", () => {
     // type B = Required<A> // [string, ...(number | boolean)[], number | boolean, number | boolean]
 
     const schema = S.required(
-      pipe(S.tuple(S.string), S.rest(S.number), S.element(S.boolean), S.element(S.boolean))
+      S.tuple(S.string).pipe(S.rest(S.number), S.element(S.boolean), S.element(S.boolean))
     )
 
     await Util.expectParseSuccess(schema, ["", 0, true])
@@ -115,7 +115,7 @@ describe.concurrent("required", () => {
   })
 
   it("refinements should throw", async () => {
-    expect(() => S.required(pipe(S.string, S.minLength(2)))).toThrowError(
+    expect(() => S.required(S.string.pipe(S.minLength(2)))).toThrowError(
       new Error("`required` cannot handle refinements")
     )
   })

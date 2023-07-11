@@ -1,14 +1,13 @@
-import { pipe } from "@effect/data/Function"
 import * as O from "@effect/data/Option"
 import * as C from "@effect/schema/Codec"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 // raises an error while encoding from a number if the string is not a char
-const NumberFromChar = pipe(S.string, S.maxLength(1), C.numberFromString)
+const NumberFromChar = S.string.pipe(S.maxLength(1), C.numberFromString)
 
 // raises an error while encoding if the string is not a char
-const Char = pipe(S.string, S.maxLength(1))
+const Char = S.string.pipe(S.maxLength(1))
 
 describe.concurrent("Encoder", () => {
   it("encode", () => {
@@ -21,7 +20,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("encodeOption", () => {
-    const codec = pipe(S.string, S.maxLength(1), C.numberFromString)
+    const codec = S.string.pipe(S.maxLength(1), C.numberFromString)
     expect(C.encodeOption(codec)(1)).toEqual(O.some("1"))
     expect(C.encodeOption(codec)(10)).toEqual(O.none())
   })
@@ -130,7 +129,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e?", async () => {
-    const schema = pipe(C.tuple(), C.optionalElement(NumberFromChar))
+    const schema = C.tuple().pipe(C.optionalElement(NumberFromChar))
     await Util.expectEncodeSuccess(schema, [], [])
     await Util.expectEncodeSuccess(schema, [1], ["1"])
     await Util.expectEncodeFailure(
@@ -142,7 +141,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e? with undefined", async () => {
-    const schema = pipe(C.tuple(), C.optionalElement(C.union(NumberFromChar, S.undefined)))
+    const schema = C.tuple().pipe(C.optionalElement(C.union(NumberFromChar, S.undefined)))
     await Util.expectEncodeSuccess(schema, [], [])
     await Util.expectEncodeSuccess(schema, [1], ["1"])
     await Util.expectEncodeSuccess(schema, [undefined], [undefined])
@@ -150,20 +149,20 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e + e?", async () => {
-    const schema = pipe(C.tuple(S.string), C.optionalElement(NumberFromChar))
+    const schema = C.tuple(S.string).pipe(C.optionalElement(NumberFromChar))
     await Util.expectEncodeSuccess(schema, ["a"], ["a"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
   })
 
   it("tuple/e + r", async () => {
-    const schema = pipe(C.tuple(S.string), C.rest(NumberFromChar))
+    const schema = C.tuple(S.string).pipe(C.rest(NumberFromChar))
     await Util.expectEncodeSuccess(schema, ["a"], ["a"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
     await Util.expectEncodeSuccess(schema, ["a", 1, 2], ["a", "1", "2"])
   })
 
   it("tuple/e? + r", async () => {
-    const schema = pipe(C.tuple(), C.optionalElement(S.string), C.rest(NumberFromChar))
+    const schema = C.tuple().pipe(C.optionalElement(S.string), C.rest(NumberFromChar))
     await Util.expectEncodeSuccess(schema, [], [])
     await Util.expectEncodeSuccess(schema, ["a"], ["a"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
@@ -183,7 +182,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/r + e", async () => {
-    const schema = pipe(C.array(S.string), C.element(NumberFromChar))
+    const schema = C.array(S.string).pipe(C.element(NumberFromChar))
     await Util.expectEncodeSuccess(schema, [1], ["1"])
     await Util.expectEncodeSuccess(schema, ["a", 1], ["a", "1"])
     await Util.expectEncodeSuccess(schema, ["a", "b", 1], ["a", "b", "1"])
@@ -196,7 +195,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("tuple/e + r + e", async () => {
-    const schema = pipe(C.tuple(S.string), C.rest(NumberFromChar), C.element(S.boolean))
+    const schema = C.tuple(S.string).pipe(C.rest(NumberFromChar), C.element(S.boolean))
     await Util.expectEncodeSuccess(schema, ["a", true], ["a", true])
     await Util.expectEncodeSuccess(schema, ["a", 1, true], ["a", "1", true])
     await Util.expectEncodeSuccess(schema, ["a", 1, 2, true], ["a", "1", "2", true])
@@ -374,7 +373,7 @@ describe.concurrent("Encoder", () => {
   })
 
   it("allErrors/tuple/post rest elements: wrong type for values", async () => {
-    const schema = pipe(C.array(S.string), C.element(NumberFromChar), C.element(NumberFromChar))
+    const schema = C.array(S.string).pipe(C.element(NumberFromChar), C.element(NumberFromChar))
     await Util.expectEncodeFailure(
       schema,
       [10, 10],
