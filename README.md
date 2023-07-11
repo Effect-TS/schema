@@ -640,6 +640,24 @@ S.nullable(S.string);
 S.union(S.string, S.number);
 ```
 
+### Union of literals
+
+While the following is perfectly acceptable:
+
+```ts
+// $ExpectType Schema<"a" | "b" | "c">
+const schema = S.union(S.literal("a"), S.literal("b"), S.literal("c"));
+```
+
+It is possible to use `literal` and pass multiple literals, which is less cumbersome:
+
+```ts
+// $ExpectType Schema<"a" | "b" | "c">
+const schema = S.literal("a", "b", "c");
+```
+
+Under the hood, they are the same, as `literal(...literals)` will be converted into a union.
+
 ### Discriminated unions
 
 TypeScript reference: https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions
