@@ -4,9 +4,10 @@
 import * as B from "@effect/data/Bigint";
 import * as C from "@effect/data/Chunk";
 import * as E from "@effect/data/Either";
-import { dual, identity, pipe } from "@effect/data/Function";
+import { dual, identity } from "@effect/data/Function";
 import * as N from "@effect/data/Number";
 import * as O from "@effect/data/Option";
+import { pipeArguments } from "@effect/data/Pipeable";
 import * as RA from "@effect/data/ReadonlyArray";
 import * as AST from "@effect/schema/AST";
 import * as I from "@effect/schema/internal/common";
@@ -125,13 +126,22 @@ parseSync } from "@effect/schema/Parser";
 // ---------------------------------------------
 // constructors
 // ---------------------------------------------
+class CodecImpl {
+  ast;
+  From;
+  To;
+  constructor(ast) {
+    this.ast = ast;
+  }
+  pipe() {
+    return pipeArguments(this, arguments);
+  }
+}
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const make = ast => ({
-  ast
-});
+export const make = ast => new CodecImpl(ast);
 // ---------------------------------------------
 // codec combinators
 // ---------------------------------------------
@@ -208,7 +218,7 @@ export const array = item => make(AST.createTuple([], O.some([item.ast]), true))
  * @category combinators
  * @since 1.0.0
  */
-export const nonEmptyArray = item => pipe(tuple(item), rest(item));
+export const nonEmptyArray = item => tuple(item).pipe(rest(item));
 /**
  * @category combinators
  * @since 1.0.0
@@ -378,7 +388,7 @@ export const compose = /*#__PURE__*/dual(2, (self, that) => make(AST.createTrans
  * @category combinators
  * @since 1.0.0
  */
-export const attachPropertySignature = /*#__PURE__*/dual(3, (codec, key, value) => make(AST.createTransform(codec.ast, pipe(to(codec), extend(struct({
+export const attachPropertySignature = /*#__PURE__*/dual(3, (codec, key, value) => make(AST.createTransform(codec.ast, to(codec).pipe(extend(struct({
   [key]: S.literal(value)
 }))).ast, AST.createTypeLiteralTransformation([AST.createPropertySignatureTransformation(key, key, AST.createFinalPropertySignatureTransformation(() => O.some(value), () => O.none()))]))));
 // ---------------------------------------------
@@ -581,7 +591,7 @@ export const itemsCount = (n, options) => self => make(S._itemsCount(self.ast, n
  * @category string transformations
  * @since 1.0.0
  */
-export const trim = self => transform(self, pipe(to(self), S.trimmed()), s => s.trim(), identity, {
+export const trim = self => transform(self, to(self).pipe(S.trimmed()), s => s.trim(), identity, {
   [AST.DocumentationAnnotationId]: "trim"
 });
 /**
@@ -600,7 +610,7 @@ export const Trim = /*#__PURE__*/trim(S.string);
  * @category number transformations
  * @since 1.0.0
  */
-export const clamp = (min, max) => self => transform(self, pipe(to(self), S.between(min, max)), n => N.clamp(n, min, max), identity, {
+export const clamp = (min, max) => self => transform(self, to(self).pipe(S.between(min, max)), n => N.clamp(n, min, max), identity, {
   [AST.DocumentationAnnotationId]: "clamp"
 });
 /**
@@ -665,7 +675,7 @@ export const not = self => transform(self, to(self), b => !b, b => !b, {
  * @category bigint transformations
  * @since 1.0.0
  */
-export const clampBigint = (min, max) => self => transform(self, pipe(to(self), S.betweenBigint(min, max)), input => B.clamp(input, min, max), identity, {
+export const clampBigint = (min, max) => self => transform(self, to(self).pipe(S.betweenBigint(min, max)), input => B.clamp(input, min, max), identity, {
   [AST.DocumentationAnnotationId]: "clampBigint"
 });
 // ---------------------------------------------

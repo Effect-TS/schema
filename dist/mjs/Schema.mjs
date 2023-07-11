@@ -7,9 +7,10 @@ import * as C from "@effect/data/Chunk";
 import * as D from "@effect/data/Data";
 import * as E from "@effect/data/Either";
 import * as Equal from "@effect/data/Equal";
-import { dual, identity, pipe } from "@effect/data/Function";
+import { dual, identity } from "@effect/data/Function";
 import * as N from "@effect/data/Number";
 import * as O from "@effect/data/Option";
+import { pipeArguments } from "@effect/data/Pipeable";
 import { isDate, not } from "@effect/data/Predicate";
 import * as ReadonlyArray from "@effect/data/ReadonlyArray";
 import * as Str from "@effect/data/String";
@@ -82,14 +83,23 @@ export const annotations = options => self => make(AST.mergeAnnotations(self.ast
 // ---------------------------------------------
 // constructors
 // ---------------------------------------------
+class SchemaImpl {
+  ast;
+  From;
+  To;
+  [SchemaTypeId] = identity;
+  constructor(ast) {
+    this.ast = ast;
+  }
+  pipe() {
+    return pipeArguments(this, arguments);
+  }
+}
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const make = ast => ({
-  [SchemaTypeId]: identity,
-  ast
-});
+export const make = ast => new SchemaImpl(ast);
 /**
   @category constructors
   @since 1.0.0
@@ -117,7 +127,7 @@ export const enums = enums => make(AST.createEnums(Object.keys(enums).filter(key
 export const templateLiteral = (...[head, ...tail]) => {
   let types = getTemplateLiterals(head.ast);
   for (const span of tail) {
-    types = pipe(types, ReadonlyArray.flatMap(a => getTemplateLiterals(span.ast).map(b => combineTemplateLiterals(a, b))));
+    types = ReadonlyArray.flatMap(types, a => getTemplateLiterals(span.ast).map(b => combineTemplateLiterals(a, b)));
   }
   return make(AST.createUnion(types));
 };
@@ -126,15 +136,15 @@ const combineTemplateLiterals = (a, b) => {
     return AST.isLiteral(b) ? AST.createLiteral(String(a.literal) + String(b.literal)) : AST.createTemplateLiteral(String(a.literal) + b.head, b.spans);
   }
   if (AST.isLiteral(b)) {
-    return AST.createTemplateLiteral(a.head, pipe(a.spans, ReadonlyArray.modifyNonEmptyLast(span => ({
+    return AST.createTemplateLiteral(a.head, ReadonlyArray.modifyNonEmptyLast(a.spans, span => ({
       ...span,
       literal: span.literal + String(b.literal)
-    }))));
+    })));
   }
-  return AST.createTemplateLiteral(a.head, pipe(a.spans, ReadonlyArray.modifyNonEmptyLast(span => ({
+  return AST.createTemplateLiteral(a.head, ReadonlyArray.appendAll(ReadonlyArray.modifyNonEmptyLast(a.spans, span => ({
     ...span,
     literal: span.literal + String(b.head)
-  })), ReadonlyArray.appendAll(b.spans)));
+  })), b.spans));
 };
 const getTemplateLiterals = ast => {
   switch (ast._tag) {
@@ -147,7 +157,7 @@ const getTemplateLiterals = ast => {
         literal: ""
       }])];
     case "Union":
-      return pipe(ast.types, ReadonlyArray.flatMap(getTemplateLiterals));
+      return ReadonlyArray.flatMap(ast.types, getTemplateLiterals);
     default:
       throw new Error(`templateLiteral: unsupported template literal span ${ast._tag}`);
   }
@@ -323,7 +333,7 @@ export const array = item => make(AST.createTuple([], O.some([item.ast]), true))
  * @category combinators
  * @since 1.0.0
  */
-export const nonEmptyArray = item => pipe(tuple(item), rest(item));
+export const nonEmptyArray = item => tuple(item).pipe(rest(item));
 /**
  * @category combinators
  * @since 1.0.0
@@ -477,7 +487,10 @@ export const brand = (brand, options) => self => {
       meta: input,
       message: formatErrors(e.errors)
     }]),
-    refine: input => is(input)
+    refine: input => is(input),
+    pipe() {
+      return pipeArguments(this, arguments);
+    }
   });
   return out;
 };
@@ -584,7 +597,7 @@ export const maxLength = (maxLength, options) => self => make(_maxLength(self.as
  * @category string filters
  * @since 1.0.0
  */
-export const length = (length, options) => self => pipe(self, minLength(length), maxLength(length, options));
+export const length = (length, options) => self => self.pipe(minLength(length), maxLength(length, options));
 /**
  * @category type id
  * @since 1.0.0
@@ -829,7 +842,7 @@ export const finite = options => self => make(_finite(self.ast, options));
  * @category number constructors
  * @since 1.0.0
  */
-export const Finite = /*#__PURE__*/pipe(number, /*#__PURE__*/finite());
+export const Finite = /*#__PURE__*/number.pipe( /*#__PURE__*/finite());
 /** @internal */
 export const _between = (ast, min, max, options) => _lessThanOrEqualTo(_greaterThanOrEqualTo(ast, min), max, {
   description: `a number between ${min} and ${max}`,
@@ -1085,7 +1098,7 @@ export const itemsCount = (n, options) => self => make(_itemsCount(self.ast, n, 
  * @category string constructors
  * @since 1.0.0
  */
-export const Trimmed = /*#__PURE__*/pipe(string, /*#__PURE__*/trimmed());
+export const Trimmed = /*#__PURE__*/string.pipe( /*#__PURE__*/trimmed());
 /**
  * @category type id
  * @since 1.0.0
@@ -1096,7 +1109,7 @@ const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
  * @category string constructors
  * @since 1.0.0
  */
-export const UUID = /*#__PURE__*/pipe(string, /*#__PURE__*/pattern(uuidRegex, {
+export const UUID = /*#__PURE__*/string.pipe( /*#__PURE__*/pattern(uuidRegex, {
   typeId: UUIDTypeId,
   title: "UUID",
   description: "a UUID",
@@ -1112,7 +1125,7 @@ const ulidRegex = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/i;
  * @category string constructors
  * @since 1.0.0
  */
-export const ULID = /*#__PURE__*/pipe(string, /*#__PURE__*/pattern(ulidRegex, {
+export const ULID = /*#__PURE__*/string.pipe( /*#__PURE__*/pattern(ulidRegex, {
   typeId: ULIDTypeId,
   title: "ULID",
   description: "a ULID",
@@ -1125,32 +1138,32 @@ export const ULID = /*#__PURE__*/pipe(string, /*#__PURE__*/pattern(ulidRegex, {
  * @category number constructors
  * @since 1.0.0
  */
-export const NonNaN = /*#__PURE__*/pipe(number, /*#__PURE__*/nonNaN());
+export const NonNaN = /*#__PURE__*/number.pipe( /*#__PURE__*/nonNaN());
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Int = /*#__PURE__*/pipe(number, /*#__PURE__*/int());
+export const Int = /*#__PURE__*/number.pipe( /*#__PURE__*/int());
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Positive = /*#__PURE__*/pipe(number, /*#__PURE__*/positive());
+export const Positive = /*#__PURE__*/number.pipe( /*#__PURE__*/positive());
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Negative = /*#__PURE__*/pipe(number, /*#__PURE__*/negative());
+export const Negative = /*#__PURE__*/number.pipe( /*#__PURE__*/negative());
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const NonNegative = /*#__PURE__*/pipe(number, /*#__PURE__*/nonNegative());
+export const NonNegative = /*#__PURE__*/number.pipe( /*#__PURE__*/nonNegative());
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const NonPositive = /*#__PURE__*/pipe(number, /*#__PURE__*/nonPositive());
+export const NonPositive = /*#__PURE__*/number.pipe( /*#__PURE__*/nonPositive());
 // ---------------------------------------------
 // bigint constructors
 // ---------------------------------------------
@@ -1158,22 +1171,22 @@ export const NonPositive = /*#__PURE__*/pipe(number, /*#__PURE__*/nonPositive())
  * @category bigint constructors
  * @since 1.0.0
  */
-export const PositiveBigint = /*#__PURE__*/pipe(bigint, /*#__PURE__*/positiveBigint());
+export const PositiveBigint = /*#__PURE__*/bigint.pipe( /*#__PURE__*/positiveBigint());
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NegativeBigint = /*#__PURE__*/pipe(bigint, /*#__PURE__*/negativeBigint());
+export const NegativeBigint = /*#__PURE__*/bigint.pipe( /*#__PURE__*/negativeBigint());
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NonNegativeBigint = /*#__PURE__*/pipe(bigint, /*#__PURE__*/nonNegativeBigint());
+export const NonNegativeBigint = /*#__PURE__*/bigint.pipe( /*#__PURE__*/nonNegativeBigint());
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NonPositiveBigint = /*#__PURE__*/pipe(bigint, /*#__PURE__*/nonPositiveBigint());
+export const NonPositiveBigint = /*#__PURE__*/bigint.pipe( /*#__PURE__*/nonPositiveBigint());
 // ---------------------------------------------
 // Date
 // ---------------------------------------------
@@ -1199,7 +1212,7 @@ export const ValidDateTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Va
  * @category Date combinators
  * @since 1.0.0
  */
-export const validDate = options => self => pipe(self, filter(a => !isNaN(a.getTime()), {
+export const validDate = options => self => self.pipe(filter(a => !isNaN(a.getTime()), {
   typeId: ValidDateTypeId,
   description: "a valid Date",
   ...options
@@ -1210,7 +1223,7 @@ export const validDate = options => self => pipe(self, filter(a => !isNaN(a.getT
  * @category Date constructors
  * @since 1.0.0
  */
-export const ValidDate = /*#__PURE__*/pipe(Date, /*#__PURE__*/validDate());
+export const ValidDate = /*#__PURE__*/Date.pipe( /*#__PURE__*/validDate());
 // ---------------------------------------------
 // Chunk
 // ---------------------------------------------
@@ -1313,7 +1326,7 @@ export const JsonNumberTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/J
  * @category Json constructors
  * @since 1.0.0
  */
-export const JsonNumber = /*#__PURE__*/pipe(number, /*#__PURE__*/filter(n => !isNaN(n) && isFinite(n), {
+export const JsonNumber = /*#__PURE__*/number.pipe( /*#__PURE__*/filter(n => !isNaN(n) && isFinite(n), {
   typeId: JsonNumberTypeId,
   title: "JSONNumber",
   description: "a JSON number"

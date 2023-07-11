@@ -7,6 +7,7 @@ import * as D from "@effect/data/Data";
 import * as E from "@effect/data/Either";
 import type { Either } from "@effect/data/Either";
 import type { Option } from "@effect/data/Option";
+import type { Pipeable } from "@effect/data/Pipeable";
 import type { Predicate, Refinement } from "@effect/data/Predicate";
 import * as ReadonlyArray from "@effect/data/ReadonlyArray";
 import type { Arbitrary } from "@effect/schema/Arbitrary";
@@ -28,7 +29,7 @@ export type SchemaTypeId = typeof SchemaTypeId;
  * @category model
  * @since 1.0.0
  */
-export interface Schema<A> {
+export interface Schema<A> extends Pipeable {
     readonly [SchemaTypeId]: (_: A) => A;
     readonly From: (_: A) => A;
     readonly To: (_: A) => A;

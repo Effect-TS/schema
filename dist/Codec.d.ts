@@ -6,6 +6,7 @@ import type { Chunk } from "@effect/data/Chunk";
 import type * as D from "@effect/data/Data";
 import type { Either } from "@effect/data/Either";
 import type { Option } from "@effect/data/Option";
+import type { Pipeable } from "@effect/data/Pipeable";
 import type { Predicate, Refinement } from "@effect/data/Predicate";
 import type { ParseOptions } from "@effect/schema/AST";
 import * as AST from "@effect/schema/AST";
@@ -15,7 +16,7 @@ import * as S from "@effect/schema/Schema";
  * @category model
  * @since 1.0.0
  */
-export interface Codec<From, To> {
+export interface Codec<From, To> extends Pipeable {
     readonly From: (_: From) => From;
     readonly To: (_: To) => To;
     readonly ast: AST.AST;

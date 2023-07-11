@@ -1,6 +1,4 @@
-import { pipe } from "@effect/data/Function"
 import type { ParseOptions } from "@effect/schema/AST"
-// import * as D from "@effect/data/Debug"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
@@ -20,8 +18,8 @@ const UserZod = z.object({
 })
 
 const schema = S.struct({
-  name: pipe(S.string, S.minLength(3), S.maxLength(20)),
-  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
+  name: S.string.pipe(S.minLength(3), S.maxLength(20)),
+  age: S.number.pipe(S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120))
 })
 
 const good = {

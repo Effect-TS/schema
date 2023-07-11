@@ -9,10 +9,12 @@ import * as C from "@effect/data/Chunk"
 import type * as D from "@effect/data/Data"
 import type { Either } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
-import { dual, identity, pipe } from "@effect/data/Function"
+import { dual, identity } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import type { Pipeable } from "@effect/data/Pipeable"
+import { pipeArguments } from "@effect/data/Pipeable"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
@@ -31,7 +33,7 @@ import * as S from "@effect/schema/Schema"
  * @category model
  * @since 1.0.0
  */
-export interface Codec<From, To> {
+export interface Codec<From, To> extends Pipeable {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ast: AST.AST
@@ -166,11 +168,20 @@ export {
 // constructors
 // ---------------------------------------------
 
+class CodecImpl<From, To> implements Codec<From, To> {
+  readonly From!: (_: From) => From
+  readonly To!: (_: To) => To
+  constructor(readonly ast: AST.AST) {}
+  pipe() {
+    return pipeArguments(this, arguments)
+  }
+}
+
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const make = <I, A>(ast: AST.AST): Codec<I, A> => ({ ast }) as any
+export const make = <I, A>(ast: AST.AST): Codec<I, A> => new CodecImpl(ast)
 
 // ---------------------------------------------
 // codec combinators
@@ -336,7 +347,7 @@ export const array = <I, A>(item: Codec<I, A>): Codec<ReadonlyArray<I>, Readonly
  */
 export const nonEmptyArray = <I, A>(
   item: Codec<I, A>
-): Codec<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => pipe(tuple(item), rest(item))
+): Codec<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => tuple(item).pipe(rest(item))
 
 /**
  * @category combinators
@@ -674,7 +685,7 @@ export const attachPropertySignature: {
 ): Codec<I, S.Simplify<A & { readonly [k in K]: V }>> =>
   make(AST.createTransform(
     codec.ast,
-    pipe(to(codec), extend(struct({ [key]: S.literal(value) }))).ast,
+    to(codec).pipe(extend(struct({ [key]: S.literal(value) }))).ast,
     AST.createTypeLiteralTransformation(
       [
         AST.createPropertySignatureTransformation(
@@ -1017,7 +1028,7 @@ export const itemsCount = <A>(
 export const trim = <I>(self: Codec<I, string>): Codec<I, string> =>
   transform(
     self,
-    pipe(to(self), S.trimmed()),
+    to(self).pipe(S.trimmed()),
     (s) => s.trim(),
     identity,
     { [AST.DocumentationAnnotationId]: "trim" }
@@ -1045,7 +1056,7 @@ export const clamp = (min: number, max: number) =>
   <I>(self: Codec<I, number>): Codec<I, number> =>
     transform(
       self,
-      pipe(to(self), S.between(min, max)),
+      to(self).pipe(S.between(min, max)),
       (n) => N.clamp(n, min, max),
       identity,
       { [AST.DocumentationAnnotationId]: "clamp" }
@@ -1132,7 +1143,7 @@ export const clampBigint = (min: bigint, max: bigint) =>
   <I>(self: Codec<I, bigint>): Codec<I, bigint> =>
     transform(
       self,
-      pipe(to(self), S.betweenBigint(min, max)),
+      to(self).pipe(S.betweenBigint(min, max)),
       (input) => B.clamp(input, min, max),
       identity,
       { [AST.DocumentationAnnotationId]: "clampBigint" }

@@ -123,6 +123,7 @@ var E = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data
 var _Function = /*#__PURE__*/require("@effect/data/Function");
 var N = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Number"));
 var O = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Option"));
+var _Pipeable = /*#__PURE__*/require("@effect/data/Pipeable");
 var RA = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/ReadonlyArray"));
 var AST = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/AST"));
 var I = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/internal/common"));
@@ -158,13 +159,22 @@ exports.to = to;
 // ---------------------------------------------
 // constructors
 // ---------------------------------------------
+class CodecImpl {
+  ast;
+  From;
+  To;
+  constructor(ast) {
+    this.ast = ast;
+  }
+  pipe() {
+    return (0, _Pipeable.pipeArguments)(this, arguments);
+  }
+}
 /**
  * @category constructors
  * @since 1.0.0
  */
-const make = ast => ({
-  ast
-});
+const make = ast => new CodecImpl(ast);
 // ---------------------------------------------
 // codec combinators
 // ---------------------------------------------
@@ -251,7 +261,7 @@ const array = item => make(AST.createTuple([], O.some([item.ast]), true));
  * @since 1.0.0
  */
 exports.array = array;
-const nonEmptyArray = item => (0, _Function.pipe)(tuple(item), rest(item));
+const nonEmptyArray = item => tuple(item).pipe(rest(item));
 /**
  * @category combinators
  * @since 1.0.0
@@ -432,7 +442,7 @@ const compose = /*#__PURE__*/(0, _Function.dual)(2, (self, that) => make(AST.cre
  * @since 1.0.0
  */
 exports.compose = compose;
-const attachPropertySignature = /*#__PURE__*/(0, _Function.dual)(3, (codec, key, value) => make(AST.createTransform(codec.ast, (0, _Function.pipe)(to(codec), extend(struct({
+const attachPropertySignature = /*#__PURE__*/(0, _Function.dual)(3, (codec, key, value) => make(AST.createTransform(codec.ast, to(codec).pipe(extend(struct({
   [key]: S.literal(value)
 }))).ast, AST.createTypeLiteralTransformation([AST.createPropertySignatureTransformation(key, key, AST.createFinalPropertySignatureTransformation(() => O.some(value), () => O.none()))]))));
 // ---------------------------------------------
@@ -670,7 +680,7 @@ const itemsCount = (n, options) => self => make(S._itemsCount(self.ast, n, optio
  * @since 1.0.0
  */
 exports.itemsCount = itemsCount;
-const trim = self => transform(self, (0, _Function.pipe)(to(self), S.trimmed()), s => s.trim(), _Function.identity, {
+const trim = self => transform(self, to(self).pipe(S.trimmed()), s => s.trim(), _Function.identity, {
   [AST.DocumentationAnnotationId]: "trim"
 });
 /**
@@ -691,7 +701,7 @@ const Trim = /*#__PURE__*/trim(S.string);
  * @since 1.0.0
  */
 exports.Trim = Trim;
-const clamp = (min, max) => self => transform(self, (0, _Function.pipe)(to(self), S.between(min, max)), n => N.clamp(n, min, max), _Function.identity, {
+const clamp = (min, max) => self => transform(self, to(self).pipe(S.between(min, max)), n => N.clamp(n, min, max), _Function.identity, {
   [AST.DocumentationAnnotationId]: "clamp"
 });
 /**
@@ -760,7 +770,7 @@ const not = self => transform(self, to(self), b => !b, b => !b, {
  * @since 1.0.0
  */
 exports.not = not;
-const clampBigint = (min, max) => self => transform(self, (0, _Function.pipe)(to(self), S.betweenBigint(min, max)), input => B.clamp(input, min, max), _Function.identity, {
+const clampBigint = (min, max) => self => transform(self, to(self).pipe(S.betweenBigint(min, max)), input => B.clamp(input, min, max), _Function.identity, {
   [AST.DocumentationAnnotationId]: "clampBigint"
 });
 // ---------------------------------------------

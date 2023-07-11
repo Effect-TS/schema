@@ -12,10 +12,12 @@ import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
 import type { LazyArg } from "@effect/data/Function"
-import { dual, identity, pipe } from "@effect/data/Function"
+import { dual, identity } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
+import type { Pipeable } from "@effect/data/Pipeable"
+import { pipeArguments } from "@effect/data/Pipeable"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import { isDate, not } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
@@ -50,7 +52,7 @@ export type SchemaTypeId = typeof SchemaTypeId
  * @category model
  * @since 1.0.0
  */
-export interface Schema<A> {
+export interface Schema<A> extends Pipeable {
   readonly [SchemaTypeId]: (_: A) => A
   readonly From: (_: A) => A
   readonly To: (_: A) => A
@@ -133,11 +135,21 @@ export const annotations = <A>(options: DocAnnotations<A>) =>
 // constructors
 // ---------------------------------------------
 
+class SchemaImpl<A> implements Schema<A> {
+  readonly From!: (_: A) => A
+  readonly To!: (_: A) => A
+  readonly [SchemaTypeId] = identity
+  constructor(readonly ast: AST.AST) {}
+  pipe() {
+    return pipeArguments(this, arguments)
+  }
+}
+
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const make = <A>(ast: AST.AST): Schema<A> => ({ [SchemaTypeId]: identity, ast }) as any
+export const make = <A>(ast: AST.AST): Schema<A> => new SchemaImpl(ast)
 
 /**
   @category constructors
@@ -210,11 +222,9 @@ export const templateLiteral = <T extends [Schema<any>, ...Array<Schema<any>>]>(
 ): Schema<Join<{ [K in keyof T]: To<T[K]> }>> => {
   let types: ReadonlyArray<AST.TemplateLiteral | AST.Literal> = getTemplateLiterals(head.ast)
   for (const span of tail) {
-    types = pipe(
+    types = ReadonlyArray.flatMap(
       types,
-      ReadonlyArray.flatMap((a) =>
-        getTemplateLiterals(span.ast).map((b) => combineTemplateLiterals(a, b))
-      )
+      (a) => getTemplateLiterals(span.ast).map((b) => combineTemplateLiterals(a, b))
     )
   }
   return make(AST.createUnion(types))
@@ -232,24 +242,20 @@ const combineTemplateLiterals = (
   if (AST.isLiteral(b)) {
     return AST.createTemplateLiteral(
       a.head,
-      pipe(
-        a.spans,
-        ReadonlyArray.modifyNonEmptyLast((span) => ({
-          ...span,
-          literal: span.literal + String(b.literal)
-        }))
-      )
+      ReadonlyArray.modifyNonEmptyLast(a.spans, (span) => ({
+        ...span,
+        literal: span.literal + String(b.literal)
+      }))
     )
   }
   return AST.createTemplateLiteral(
     a.head,
-    pipe(
-      a.spans,
-      ReadonlyArray.modifyNonEmptyLast((span) => ({
+    ReadonlyArray.appendAll(
+      ReadonlyArray.modifyNonEmptyLast(a.spans, (span) => ({
         ...span,
         literal: span.literal + String(b.head)
       })),
-      ReadonlyArray.appendAll(b.spans)
+      b.spans
     )
   )
 }
@@ -264,7 +270,7 @@ const getTemplateLiterals = (
     case "StringKeyword":
       return [AST.createTemplateLiteral("", [{ type: ast, literal: "" }])]
     case "Union":
-      return pipe(ast.types, ReadonlyArray.flatMap(getTemplateLiterals))
+      return ReadonlyArray.flatMap(ast.types, getTemplateLiterals)
     default:
       throw new Error(`templateLiteral: unsupported template literal span ${ast._tag}`)
   }
@@ -503,7 +509,7 @@ export const array = <A>(item: Schema<A>): Schema<ReadonlyArray<A>> =>
  */
 export const nonEmptyArray = <A>(
   item: Schema<A>
-): Schema<readonly [A, ...Array<A>]> => pipe(tuple(item), rest(item))
+): Schema<readonly [A, ...Array<A>]> => tuple(item).pipe(rest(item))
 
 /**
  * @category combinators
@@ -881,7 +887,10 @@ export const brand = <B extends string | symbol, A>(
           validateEither(input),
           (e) => [{ meta: input, message: formatErrors(e.errors) }]
         ),
-      refine: (input: unknown): input is A & Brand<B> => is(input)
+      refine: (input: unknown): input is A & Brand<B> => is(input),
+      pipe() {
+        return pipeArguments(this, arguments)
+      }
     })
     return out
   }
@@ -1075,7 +1084,7 @@ export const maxLength = <A extends string>(
 export const length = <A extends string>(
   length: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => pipe(self, minLength(length), maxLength(length, options))
+) => (self: Schema<A>): Schema<A> => self.pipe(minLength(length), maxLength(length, options))
 
 /**
  * @category type id
@@ -1395,7 +1404,7 @@ export const finite = <A extends number>(options?: FilterAnnotations<A>) =>
  * @category number constructors
  * @since 1.0.0
  */
-export const Finite: Schema<number> = pipe(number, finite())
+export const Finite: Schema<number> = number.pipe(finite())
 
 /** @internal */
 export const _between = <A extends number>(
@@ -1827,7 +1836,7 @@ export const itemsCount = <A>(
  * @category string constructors
  * @since 1.0.0
  */
-export const Trimmed: Schema<string> = pipe(string, trimmed())
+export const Trimmed: Schema<string> = string.pipe(trimmed())
 
 /**
  * @category type id
@@ -1841,8 +1850,7 @@ const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
  * @category string constructors
  * @since 1.0.0
  */
-export const UUID: Schema<string> = pipe(
-  string,
+export const UUID: Schema<string> = string.pipe(
   pattern(uuidRegex, {
     typeId: UUIDTypeId,
     title: "UUID",
@@ -1863,8 +1871,7 @@ const ulidRegex = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/i
  * @category string constructors
  * @since 1.0.0
  */
-export const ULID: Schema<string> = pipe(
-  string,
+export const ULID: Schema<string> = string.pipe(
   pattern(ulidRegex, {
     typeId: ULIDTypeId,
     title: "ULID",
@@ -1881,37 +1888,37 @@ export const ULID: Schema<string> = pipe(
  * @category number constructors
  * @since 1.0.0
  */
-export const NonNaN: Schema<number> = pipe(number, nonNaN())
+export const NonNaN: Schema<number> = number.pipe(nonNaN())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Int: Schema<number> = pipe(number, int())
+export const Int: Schema<number> = number.pipe(int())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Positive: Schema<number> = pipe(number, positive())
+export const Positive: Schema<number> = number.pipe(positive())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Negative: Schema<number> = pipe(number, negative())
+export const Negative: Schema<number> = number.pipe(negative())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const NonNegative: Schema<number> = pipe(number, nonNegative())
+export const NonNegative: Schema<number> = number.pipe(nonNegative())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const NonPositive: Schema<number> = pipe(number, nonPositive())
+export const NonPositive: Schema<number> = number.pipe(nonPositive())
 
 // ---------------------------------------------
 // bigint constructors
@@ -1921,25 +1928,25 @@ export const NonPositive: Schema<number> = pipe(number, nonPositive())
  * @category bigint constructors
  * @since 1.0.0
  */
-export const PositiveBigint: Schema<bigint> = pipe(bigint, positiveBigint())
+export const PositiveBigint: Schema<bigint> = bigint.pipe(positiveBigint())
 
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NegativeBigint: Schema<bigint> = pipe(bigint, negativeBigint())
+export const NegativeBigint: Schema<bigint> = bigint.pipe(negativeBigint())
 
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NonNegativeBigint: Schema<bigint> = pipe(bigint, nonNegativeBigint())
+export const NonNegativeBigint: Schema<bigint> = bigint.pipe(nonNegativeBigint())
 
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NonPositiveBigint: Schema<bigint> = pipe(bigint, nonPositiveBigint())
+export const NonPositiveBigint: Schema<bigint> = bigint.pipe(nonPositiveBigint())
 
 // ---------------------------------------------
 // Date
@@ -1978,8 +1985,7 @@ export const ValidDateTypeId = Symbol.for("@effect/schema/TypeId/ValidDate")
  */
 export const validDate = (options?: FilterAnnotations<Date>) =>
   (self: Schema<Date>): Schema<Date> =>
-    pipe(
-      self,
+    self.pipe(
       filter((a) => !isNaN(a.getTime()), {
         typeId: ValidDateTypeId,
         description: "a valid Date",
@@ -1993,7 +1999,7 @@ export const validDate = (options?: FilterAnnotations<Date>) =>
  * @category Date constructors
  * @since 1.0.0
  */
-export const ValidDate: Schema<Date> = pipe(Date, validDate())
+export const ValidDate: Schema<Date> = Date.pipe(validDate())
 
 // ---------------------------------------------
 // Chunk
@@ -2193,8 +2199,7 @@ export const JsonNumberTypeId = Symbol.for("@effect/schema/TypeId/JsonNumber")
  * @category Json constructors
  * @since 1.0.0
  */
-export const JsonNumber = pipe(
-  number,
+export const JsonNumber = number.pipe(
   filter((n) => !isNaN(n) && isFinite(n), {
     typeId: JsonNumberTypeId,
     title: "JSONNumber",
