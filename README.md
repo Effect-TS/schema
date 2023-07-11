@@ -1151,11 +1151,11 @@ const parse = (id: string) =>
     TF.formatErrors(e.errors)
   );
 
-Effect.runPromiseEither(parse("1")).then(console.log);
-// { _tag: 'Right', right: '1' }
+Effect.runPromiseExit(parse("1")).then(console.log);
+// Exit.Success(1)
 
-Effect.runPromiseEither(parse("fail")).then(console.log);
-// { _tag: 'Left', left: 'error(s) found\n└─ Error: 404' }
+Effect.runPromiseExit(parse("fail")).then(console.log);
+// Exit.Failure('error(s) found\n└─ Error: 404')
 ```
 
 ### String transformations
@@ -1526,6 +1526,7 @@ Annotations can be read using the `getAnnotation` helper, here's an example:
 
 ```ts
 import * as O from "@effect/data/Option";
+import { pipe } from "@effect/data/Function";
 
 const isDeprecated = <A>(schema: S.Schema<A>): boolean =>
   pipe(

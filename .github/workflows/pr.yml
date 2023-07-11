@@ -46,4 +46,5 @@ jobs:
       - run: pnpm circular
       - run: pnpm test
       - run: pnpm lint
+      - run: pnpm dtslint
       - run: pnpm run docs
