@@ -7,8 +7,8 @@
     "url": "https://github.com/effect-ts/schema.git"
   },
   "dependencies": {
-    "@effect/data": "^0.13.5",
-    "@effect/io": "^0.31.3",
+    "@effect/data": "^0.14.1",
+    "@effect/io": "^0.32.1",
     "fast-check": "^3.11.0"
   },
   "publishConfig": {
