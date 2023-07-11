@@ -1,7 +1,5 @@
-import { pipe } from "@effect/data/Function"
 import type { ParseOptions } from "@effect/schema/AST"
-// import * as D from "@effect/data/Debug"
-import * as S from "@effect/schema/Schema"
+import * as Schema from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
 import { z } from "zod"
 
@@ -26,15 +24,15 @@ const UserZod = z.object({
   })
 })
 
-const schema = S.struct({
-  name: pipe(S.string, S.minLength(3), S.maxLength(20)),
-  age: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120)),
-  address: S.struct({
-    street: pipe(S.string, S.minLength(3), S.maxLength(200)),
-    number: pipe(S.number, S.greaterThanOrEqualTo(0), S.lessThanOrEqualTo(120)),
-    city: pipe(S.string, S.minLength(3), S.maxLength(200)),
-    country: pipe(S.string, S.minLength(3), S.maxLength(200)),
-    zip: pipe(S.string, S.minLength(3), S.maxLength(200))
+const schema = Schema.struct({
+  name: Schema.string.pipe(Schema.minLength(3), Schema.maxLength(20)),
+  age: Schema.number.pipe(Schema.greaterThanOrEqualTo(0), Schema.lessThanOrEqualTo(120)),
+  address: Schema.struct({
+    street: Schema.string.pipe(Schema.minLength(3), Schema.maxLength(200)),
+    number: Schema.number.pipe(Schema.greaterThanOrEqualTo(0), Schema.lessThanOrEqualTo(120)),
+    city: Schema.string.pipe(Schema.minLength(3), Schema.maxLength(200)),
+    country: Schema.string.pipe(Schema.minLength(3), Schema.maxLength(200)),
+    zip: Schema.string.pipe(Schema.minLength(3), Schema.maxLength(200))
   })
 })
 
@@ -62,7 +60,7 @@ const bad = {
   }
 }
 
-const parseEither = S.parseEither(schema)
+const parseEither = Schema.parseEither(schema)
 const options: ParseOptions = { errors: "all" }
 
 // console.log(UserZod.safeParse(good))

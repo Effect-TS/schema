@@ -585,8 +585,8 @@ import { pipe } from '@effect/data/Function'
 const Circle = S.struct({ radius: S.number })
 const Square = S.struct({ sideLength: S.number })
 const Shape = S.union(
-  pipe(Circle, S.attachPropertySignature('kind', 'circle')),
-  pipe(Square, S.attachPropertySignature('kind', 'square'))
+  Circle.pipe(S.attachPropertySignature('kind', 'circle')),
+  Square.pipe(S.attachPropertySignature('kind', 'square'))
 )
 
 assert.deepStrictEqual(S.decodeSync(Shape)({ radius: 10 }), {
@@ -618,9 +618,8 @@ export declare const brand: <B extends string | symbol, A>(
 
 ```ts
 import * as S from '@effect/schema/Schema'
-import { pipe } from '@effect/data/Function'
 
-const Int = pipe(S.number, S.int(), S.brand('Int'))
+const Int = S.number.pipe(S.int(), S.brand('Int'))
 type Int = S.To<typeof Int> // number & Brand<"Int">
 ```
 
@@ -1437,7 +1436,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Schema<From, To = From> {
+export interface Schema<From, To = From> extends Pipeable {
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ast: AST.AST

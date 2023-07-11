@@ -359,7 +359,7 @@ import * as fc from "fast-check";
 
 const Person = S.struct({
   name: S.string,
-  age: pipe(S.string, S.numberFromString, S.int()),
+  age: S.string.pipe(S.numberFromString, S.int()),
 });
 
 // Arbitrary for the To type
@@ -470,15 +470,15 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 ### String filters
 
 ```ts
-pipe(S.string, S.maxLength(5));
-pipe(S.string, S.minLength(5));
-pipe(S.string, nonEmpty()); // same as S.minLength(1)
-pipe(S.string, S.length(5));
-pipe(S.string, S.pattern(regex));
-pipe(S.string, S.startsWith(string));
-pipe(S.string, S.endsWith(string));
-pipe(S.string, S.includes(searchString));
-pipe(S.string, S.trimmed()); // verifies that a string contains no leading or trailing whitespaces
+S.string.pipe(S.maxLength(5));
+S.string.pipe(S.minLength(5));
+S.string.pipe(nonEmpty()); // same as S.minLength(1)
+S.string.pipe(S.length(5));
+S.string.pipe(S.pattern(regex));
+S.string.pipe(S.startsWith(string));
+S.string.pipe(S.endsWith(string));
+S.string.pipe(S.includes(searchString));
+S.string.pipe(S.trimmed()); // verifies that a string contains no leading or trailing whitespaces
 ```
 
 **Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator ot the `Trim` schema.
@@ -486,23 +486,23 @@ pipe(S.string, S.trimmed()); // verifies that a string contains no leading or tr
 ### Number filters
 
 ```ts
-pipe(S.number, S.greaterThan(5));
-pipe(S.number, S.greaterThanOrEqualTo(5));
-pipe(S.number, S.lessThan(5));
-pipe(S.number, S.lessThanOrEqualTo(5));
-pipe(S.number, S.between(-2, 2)); // -2 <= x <= 2
+S.number.pipe(S.greaterThan(5));
+S.number.pipe(S.greaterThanOrEqualTo(5));
+S.number.pipe(S.lessThan(5));
+S.number.pipe(S.lessThanOrEqualTo(5));
+S.number.pipe(S.between(-2, 2)); // -2 <= x <= 2
 
-pipe(S.number, S.int()); // value must be an integer
+S.number.pipe(S.int()); // value must be an integer
 
-pipe(S.number, S.nonNaN()); // not NaN
-pipe(S.number, S.finite()); // ensures that the value being parsed is finite and not equal to Infinity or -Infinity
+S.number.pipe(S.nonNaN()); // not NaN
+S.number.pipe(S.finite()); // ensures that the value being parsed is finite and not equal to Infinity or -Infinity
 
-pipe(S.number, S.positive()); // > 0
-pipe(S.number, S.nonNegative()); // >= 0
-pipe(S.number, S.negative()); // < 0
-pipe(S.number, S.nonPositive()); // <= 0
+S.number.pipe(S.positive()); // > 0
+S.number.pipe(S.nonNegative()); // >= 0
+S.number.pipe(S.negative()); // < 0
+S.number.pipe(S.nonPositive()); // <= 0
 
-pipe(S.number, S.multipleOf(5)); // evenly divisible by 5
+S.number.pipe(S.multipleOf(5)); // evenly divisible by 5
 ```
 
 ### Bigint filters
@@ -510,16 +510,16 @@ pipe(S.number, S.multipleOf(5)); // evenly divisible by 5
 ```ts
 import * as S from "@effect/schema/Schema";
 
-pipe(S.bigint, S.greaterThanBigint(5n));
-pipe(S.bigint, S.greaterThanOrEqualToBigint(5n));
-pipe(S.bigint, S.lessThanBigint(5n));
-pipe(S.bigint, S.lessThanOrEqualToBigint(5n));
-pipe(S.bigint, S.betweenBigint(-2n, 2n)); // -2n <= x <= 2n
+S.bigint.pipe(S.greaterThanBigint(5n));
+S.bigint.pipe(S.greaterThanOrEqualToBigint(5n));
+S.bigint.pipe(S.lessThanBigint(5n));
+S.bigint.pipe(S.lessThanOrEqualToBigint(5n));
+S.bigint.pipe(S.betweenBigint(-2n, 2n)); // -2n <= x <= 2n
 
-pipe(S.bigint, S.positiveBigint()); // > 0n
-pipe(S.bigint, S.nonNegativeBigint()); // >= 0n
-pipe(S.bigint, S.negativeBigint()); // < 0n
-pipe(S.bigint, S.nonPositiveBigint()); // <= 0n
+S.bigint.pipe(S.positiveBigint()); // > 0n
+S.bigint.pipe(S.nonNegativeBigint()); // >= 0n
+S.bigint.pipe(S.negativeBigint()); // < 0n
+S.bigint.pipe(S.nonPositiveBigint()); // <= 0n
 ```
 
 ### Array filters
@@ -527,9 +527,9 @@ pipe(S.bigint, S.nonPositiveBigint()); // <= 0n
 ```ts
 import * as S from "@effect/schema/Schema";
 
-pipe(S.array(S.number), S.maxItems(2)); // max array length
-pipe(S.array(S.number), S.minItems(2)); // min array length
-pipe(S.array(S.number), S.itemsCount(2)); // exact array length
+S.array(S.number).pipe(S.maxItems(2)); // max array length
+S.array(S.number).pipe(S.minItems(2)); // min array length
+S.array(S.number).pipe(S.itemsCount(2)); // exact array length
 ```
 
 ## Branded types
@@ -579,7 +579,7 @@ To define a schema for a branded type from scratch, you can use the `brand` comb
 import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
-const UserId = pipe(S.string, S.brand("UserId"));
+const UserId = S.string.pipe(S.brand("UserId"));
 type UserId = S.To<typeof UserId>; // string & Brand<"UserId">
 ```
 
@@ -590,7 +590,7 @@ import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserIdBrand = Symbol.for("UserId");
-const UserId = pipe(S.string, S.brand(UserIdBrand));
+const UserId = S.string.pipe(S.brand(UserIdBrand));
 type UserId = S.To<typeof UserId>; // string & Brand<typeof UserIdBrand>
 ```
 
@@ -609,7 +609,7 @@ import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
 // Define a schema for the branded type
-const UserIdSchema = pipe(S.string, S.fromBrand(UserId));
+const UserIdSchema = S.string.pipe(S.fromBrand(UserId));
 ```
 
 ## Native enums
@@ -741,18 +741,16 @@ const Square = S.struct({
 });
 
 const DiscriminatedShape = S.union(
-  pipe(
-    Circle,
+  Circle.pipe(
     S.transform(
-      pipe(Circle, S.extend(S.struct({ kind: S.literal("circle") }))), // Add a "kind" property with the literal value "circle" to Circle
+      Circle.pipe(S.extend(S.struct({ kind: S.literal("circle") }))), // Add a "kind" property with the literal value "circle" to Circle
       (circle) => ({ ...circle, kind: "circle" as const }), // Add the discriminant property to Circle
       ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
     )
   ),
-  pipe(
-    Square,
+  Square.pipe(
     S.transform(
-      pipe(Square, S.extend(S.struct({ kind: S.literal("square") }))), // Add a "kind" property with the literal value "square" to Square
+      Square.pipe(S.extend(S.struct({ kind: S.literal("square") }))), // Add a "kind" property with the literal value "square" to Square
       (square) => ({ ...square, kind: "square" as const }), // Add the discriminant property to Square
       ({ kind: _kind, ...rest }) => rest // Remove the discriminant property
     )
@@ -780,8 +778,8 @@ The previous solution works perfectly and shows how we can add and remove proper
 const Circle = S.struct({ radius: S.number });
 const Square = S.struct({ sideLength: S.number });
 const DiscriminatedShape = S.union(
-  pipe(Circle, S.attachPropertySignature("kind", "circle")),
-  pipe(Square, S.attachPropertySignature("kind", "square"))
+  Circle.pipe(S.attachPropertySignature("kind", "circle")),
+  Square.pipe(S.attachPropertySignature("kind", "square"))
 );
 
 // parsing
@@ -810,21 +808,21 @@ S.tuple(S.string, S.number);
 
 ```ts
 // $ExpectType Schema<readonly [string, number, boolean]>
-pipe(S.tuple(S.string, S.number), S.element(S.boolean));
+S.tuple(S.string, S.number).pipe(S.element(S.boolean));
 ```
 
 ### Append an optional element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, boolean?]>
-pipe(S.tuple(S.string, S.number), S.optionalElement(S.boolean));
+S.tuple(S.string, S.number).pipe(S.optionalElement(S.boolean));
 ```
 
 ### Append a rest element
 
 ```ts
 // $ExpectType Schema<readonly [string, number, ...boolean[]]>
-pipe(S.tuple(S.string, S.number), S.rest(S.boolean));
+S.tuple(S.string, S.number).pipe(S.rest(S.boolean));
 ```
 
 ## Arrays
@@ -860,7 +858,7 @@ S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean) });
 ```ts
 S.struct({
   // the use of S.optional should be the last step in the pipeline and not preceeded by other combinators like S.nullable
-  c: pipe(S.boolean, S.optional, S.nullable), // type checker error
+  c: S.boolean.pipe(S.optional, S.nullable), // type checker error
 });
 ```
 
@@ -868,7 +866,7 @@ and it must be rewritten like this:
 
 ```ts
 S.struct({
-  c: pipe(S.boolean, S.nullable, S.optional), // ok
+  c: S.boolean.pipe(S.nullable, S.optional), // ok
 });
 ```
 
@@ -935,14 +933,14 @@ shape.age; // S.number
 
 ```ts
 // $ExpectType Schema<{ readonly a: string; }>
-pipe(S.struct({ a: S.string, b: S.number }), S.pick("a"));
+S.struct({ a: S.string, b: S.number }).pipe(S.pick("a"));
 ```
 
 ## Omit
 
 ```ts
 // $ExpectType Schema<{ readonly b: number; }>
-pipe(S.struct({ a: S.string, b: S.number }), S.omit("a"));
+S.struct({ a: S.string, b: S.number }).pipe(S.omit("a"));
 ```
 
 ## Partial
@@ -975,7 +973,7 @@ S.record(S.union(S.literal("a"), S.literal("b")), S.string);
 
 ```ts
 // $ExpectType Schema<{ readonly [x: string]: string; }>
-S.record(pipe(S.string, S.minLength(2)), S.string);
+S.record(S.string.pipe(S.minLength(2)), S.string);
 ```
 
 ### Symbol keys
@@ -998,8 +996,7 @@ The `extend` combinator allows you to add additional fields or index signatures 
 
 ```ts
 // $ExpectType Schema<{ [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
-pipe(
-  S.struct({ a: S.string, b: S.string }),
+S.struct({ a: S.string, b: S.string }).pipe(
   S.extend(S.struct({ c: S.string })), // <= you can add more fields
   S.extend(S.record(S.string, S.string)) // <= you can add index signatures
 );
@@ -1141,18 +1138,18 @@ import { pipe } from "@effect/data/Function";
 import * as TF from "@effect/schema/TreeFormatter";
 
 const api = (url: string) =>
-  Effect.tryCatchPromise(
-    () =>
+  Effect.tryPromise({
+    try: () =>
       fetch(url).then((res) => {
         if (res.ok) {
           return res.json() as Promise<unknown>;
         }
         throw new Error(String(res.status));
       }),
-    (e) => new Error(String(e))
-  );
+    catch: (e) => new Error(String(e)),
+  });
 
-const PeopleId = pipe(S.string, S.brand("PeopleId"));
+const PeopleId = S.string.pipe(S.brand("PeopleId"));
 
 const PeopleIdFromString = S.transformResult(
   S.string,
@@ -1171,11 +1168,11 @@ const parse = (id: string) =>
     TF.formatErrors(e.errors)
   );
 
-Effect.runPromiseEither(parse("1")).then(console.log);
-// { _tag: 'Right', right: '1' }
+Effect.runPromiseExit(parse("1")).then(console.log);
+// Exit.Success(1)
 
-Effect.runPromiseEither(parse("fail")).then(console.log);
-// { _tag: 'Left', left: 'error(s) found\n└─ Error: 404' }
+Effect.runPromiseExit(parse("fail")).then(console.log);
+// Exit.Failure('error(s) found\n└─ Error: 404')
 ```
 
 ### String transformations
@@ -1234,7 +1231,7 @@ Clamps a `number` between a minimum and a maximum value.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<number, number>
-const schema = pipe(S.number, S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
+const schema = S.number.pipe(S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
 const parse = S.parseSync(schema);
 parse(-3); // -1
@@ -1252,7 +1249,7 @@ Clamps a `bigint` between a minimum and a maximum value.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<bigint, bigint>
-const schema = pipe(S.bigint, S.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
+const schema = S.bigint.pipe(S.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
 const parse = S.parseSync(schema);
 parse(-3n); // -1n
@@ -1270,7 +1267,7 @@ Negates a boolean value.
 import * as S from "@effect/schema/Schema";
 
 // const schema: S.Schema<boolean, boolean>
-const schema = pipe(S.boolean, S.not);
+const schema = S.boolean.pipe(S.not);
 
 const parse = S.parseSync(schema);
 parse(true); // false
@@ -1385,8 +1382,7 @@ The easiest way to define a new data type is through the `filter` combinator.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-const LongString = pipe(
-  S.string,
+const LongString = S.string.pipe(
   S.filter((s) => s.length >= 10, {
     message: () => "a string at least 10 characters long",
   })
@@ -1402,8 +1398,7 @@ error(s) found
 It is good practice to add as much metadata as possible so that it can be used later by introspecting the schema.
 
 ```ts
-const LongString = pipe(
-  S.string,
+const LongString = S.string.pipe(
   S.filter((s) => s.length >= 10, {
     message: () => "a string at least 10 characters long",
     identifier: "LongString",
@@ -1481,32 +1476,32 @@ Let's see some examples:
 import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
-const Password = pipe(
+const Password =
   // initial schema, a string
-  S.string,
-  // add an error message for non-string values (annotation)
-  S.message(() => "not a string"),
-  // add a constraint to the schema, only non-empty strings are valid
-  // and add an error message for empty strings (annotation)
-  S.nonEmpty({ message: () => "required" }),
-  // add a constraint to the schema, only strings with a length less or equal than 10 are valid
-  // and add an error message for strings that are too long (annotation)
-  S.maxLength(10, { message: (s) => `${s} is too long` }),
-  // add an identifier to the schema (annotation)
-  S.identifier("Password"),
-  // add a title to the schema (annotation)
-  S.title("password"),
-  // add a description to the schema (annotation)
-  S.description(
-    "A password is a string of characters used to verify the identity of a user during the authentication process"
-  ),
-  // add examples to the schema (annotation)
-  S.examples(["1Ki77y", "jelly22fi$h"]),
-  // add documentation to the schema (annotation)
-  S.documentation(`
+  S.string.pipe(
+    // add an error message for non-string values (annotation)
+    S.message(() => "not a string"),
+    // add a constraint to the schema, only non-empty strings are valid
+    // and add an error message for empty strings (annotation)
+    S.nonEmpty({ message: () => "required" }),
+    // add a constraint to the schema, only strings with a length less or equal than 10 are valid
+    // and add an error message for strings that are too long (annotation)
+    S.maxLength(10, { message: (s) => `${s} is too long` }),
+    // add an identifier to the schema (annotation)
+    S.identifier("Password"),
+    // add a title to the schema (annotation)
+    S.title("password"),
+    // add a description to the schema (annotation)
+    S.description(
+      "A password is a string of characters used to verify the identity of a user during the authentication process"
+    ),
+    // add examples to the schema (annotation)
+    S.examples(["1Ki77y", "jelly22fi$h"]),
+    // add documentation to the schema (annotation)
+    S.documentation(`
     jsDoc documentation...
   `)
-);
+  );
 ```
 
 The example shows some built-in combinators to add meta information, but users can easily add their own meta information by defining a custom combinator.
@@ -1516,14 +1511,13 @@ Here's an example of how to add a `deprecated` annotation:
 ```ts
 import * as S from "@effect/schema/Schema";
 import * as AST from "@effect/schema/AST";
-import { pipe } from "@effect/data/Function";
 
 const DeprecatedId = "some/unique/identifier/for/the/custom/annotation";
 
 const deprecated = <A>(self: S.Schema<A>): S.Schema<A> =>
   S.make(AST.setAnnotation(self.ast, DeprecatedId, true));
 
-const schema = pipe(S.string, deprecated);
+const schema = S.string.pipe(deprecated);
 
 console.log(schema);
 /*
@@ -1543,6 +1537,7 @@ Annotations can be read using the `getAnnotation` helper, here's an example:
 
 ```ts
 import * as O from "@effect/data/Option";
+import { pipe } from "@effect/data/Function";
 
 const isDeprecated = <A>(schema: S.Schema<A>): boolean =>
   pipe(
