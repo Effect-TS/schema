@@ -101,7 +101,7 @@ devDependencies:
     specifier: 0.17.0
     version: 0.17.0
   eslint-plugin-deprecation:
-    specifier: ^1.4.0
+    specifier: ^1.4.1
     version: 1.4.1(eslint@8.39.0)(typescript@5.0.4)
   eslint-plugin-import:
     specifier: ^2.27.5
