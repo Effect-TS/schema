@@ -1393,7 +1393,7 @@ export const getCardinality = (ast: AST): number => {
 }
 
 const sortPropertySignatures = RA.sort(
-  pipe(Number.Order, Order.contramap((ps: PropertySignature) => getCardinality(ps.type)))
+  pipe(Number.Order, Order.mapInput((ps: PropertySignature) => getCardinality(ps.type)))
 )
 
 /** @internal */
@@ -1424,7 +1424,7 @@ export const getWeight = (ast: AST): number => {
   }
 }
 
-const sortUnionMembers = RA.sort(Order.reverse(Order.contramap(Number.Order, getWeight)))
+const sortUnionMembers = RA.sort(Order.reverse(Order.mapInput(Number.Order, getWeight)))
 
 const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   let out = pipe(
