@@ -42,7 +42,7 @@ module.exports = {
     "import/order": "off",
     "simple-import-sort/imports": "off",
     "sort-destructure-keys/sort-destructure-keys": "error",
-    "deprecation/deprecation": "off",
+    "deprecation/deprecation": "error",
     "@typescript-eslint/array-type": ["warn", { "default": "generic", "readonly": "generic" }],
     "@typescript-eslint/prefer-readonly": "warn",
     "@typescript-eslint/member-delimiter-style": 0,
