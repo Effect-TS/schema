@@ -5,6 +5,7 @@ import * as AST from "@effect/schema/AST"
 import * as P from "@effect/schema/Parser"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
+import { expectEqualEither } from "./util"
 
 describe.concurrent("Parser", () => {
   it("exports", () => {
@@ -52,10 +53,9 @@ describe.concurrent("Parser", () => {
 
   it("parse", async () => {
     const schema = S.NumberFromString
-    expect(await Effect.runPromise(Effect.either(P.parse(schema)("1")))).toEqual(
-      E.right(1)
-    )
-    expect(await Effect.runPromise(Effect.either(P.parse(schema)("a")))).toEqual(
+    expectEqualEither(await Effect.runPromise(Effect.either(P.parse(schema)("1"))), E.right(1))
+    expectEqualEither(
+      await Effect.runPromise(Effect.either(P.parse(schema)("a"))),
       E.left(PR.parseError([PR.type(schema.ast, "a")]))
     )
   })
@@ -89,8 +89,9 @@ describe.concurrent("Parser", () => {
 
   it("decode", async () => {
     const schema = S.NumberFromString
-    expect(await Effect.runPromise(Effect.either(P.decode(schema)("1")))).toEqual(E.right(1))
-    expect(await Effect.runPromise(Effect.either(P.decode(schema)("a")))).toEqual(
+    expectEqualEither(await Effect.runPromise(Effect.either(P.decode(schema)("1"))), E.right(1))
+    expectEqualEither(
+      await Effect.runPromise(Effect.either(P.decode(schema)("a"))),
       E.left(PR.parseError([PR.type(schema.ast, "a")]))
     )
   })
@@ -135,8 +136,9 @@ describe.concurrent("Parser", () => {
 
   it("validate", async () => {
     const schema = S.NumberFromString
-    expect(await Effect.runPromise(Effect.either(P.validate(schema)(1)))).toEqual(E.right(1))
-    expect(await Effect.runPromise(Effect.either(P.validate(schema)("1")))).toEqual(
+    expectEqualEither(await Effect.runPromise(Effect.either(P.validate(schema)(1))), E.right(1))
+    expectEqualEither(
+      await Effect.runPromise(Effect.either(P.validate(schema)("1"))),
       E.left(PR.parseError([PR.type(S.number.ast, "1")]))
     )
   })
