@@ -811,37 +811,53 @@ const getCardinality = ast => {
   }
 };
 exports.getCardinality = getCardinality;
-const sortPropertySignatures = /*#__PURE__*/ReadonlyArray.sort( /*#__PURE__*/(0, _Function.pipe)(Number.Order, /*#__PURE__*/Order.contramap(ps => getCardinality(ps.type))));
+const sortPropertySignatures = /*#__PURE__*/ReadonlyArray.sort( /*#__PURE__*/(0, _Function.pipe)(Number.Order, /*#__PURE__*/Order.mapInput(ps => getCardinality(ps.type))));
+const WeightOrder = /*#__PURE__*/Order.tuple(Number.Order, Number.Order, Number.Order);
+const maxWeight = /*#__PURE__*/Order.max(WeightOrder);
+const emptyWeight = [0, 0, 0];
+const maxWeightAll = weights => weights.reduce(maxWeight, emptyWeight);
 /** @internal */
 const getWeight = ast => {
   switch (ast._tag) {
-    case "Declaration":
-      return getWeight(ast.type);
     case "Tuple":
-      return ast.elements.length + (O.isSome(ast.rest) ? ast.rest.value.length : 0);
+      {
+        const y = ast.elements.length;
+        const z = O.isSome(ast.rest) ? ast.rest.value.length : 0;
+        return [2, y, z];
+      }
     case "TypeLiteral":
       {
-        const out = ast.propertySignatures.length + ast.indexSignatures.length;
-        return out === 0 ? -2 : out;
+        const y = ast.propertySignatures.length;
+        const z = ast.indexSignatures.length;
+        return y + z === 0 ? [-4, 0, 0] : [4, y, z];
       }
-    case "Union":
-      return ast.types.reduce((n, member) => n + getWeight(member), 0);
+    case "Declaration":
+      {
+        const [_, y, z] = getWeight(ast.type);
+        return [6, y, z];
+      }
     case "Lazy":
-      return 10;
+      return [8, 0, 0];
+    case "Union":
+      return maxWeightAll(ast.types.map(getWeight));
     case "Refinement":
+      {
+        const [x, y, z] = getWeight(ast.from);
+        return [x + 1, y, z];
+      }
     case "Transform":
       return getWeight(ast.from);
     case "ObjectKeyword":
-      return -1;
+      return [-2, 0, 0];
     case "UnknownKeyword":
     case "AnyKeyword":
-      return -2;
+      return [-4, 0, 0];
     default:
-      return 0;
+      return emptyWeight;
   }
 };
 exports.getWeight = getWeight;
-const sortUnionMembers = /*#__PURE__*/ReadonlyArray.sort( /*#__PURE__*/Order.reverse( /*#__PURE__*/Order.contramap(Number.Order, getWeight)));
+const sortUnionMembers = /*#__PURE__*/ReadonlyArray.sort( /*#__PURE__*/Order.reverse( /*#__PURE__*/Order.mapInput(WeightOrder, getWeight)));
 const unify = candidates => {
   let out = (0, _Function.pipe)(candidates, ReadonlyArray.flatMap(ast => {
     switch (ast._tag) {
