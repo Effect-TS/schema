@@ -239,6 +239,7 @@ describe.concurrent("Arbitrary", () => {
     property(schema)
   })
 
+  // 71 MB heap used
   it.skip("lazy/to struct", () => {
     interface A {
       readonly a: string
@@ -253,6 +254,7 @@ describe.concurrent("Arbitrary", () => {
     property(schema)
   })
 
+  // 37 MB heap used
   it.skip("lazy/to record", () => {
     type A = {
       [_: string]: A
