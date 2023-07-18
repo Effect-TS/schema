@@ -9,8 +9,8 @@ dependencies:
     specifier: ^0.15.1
     version: 0.15.1
   '@effect/io':
-    specifier: ^0.33.0
-    version: 0.33.0
+    specifier: ^0.34.0
+    version: 0.34.0
   fast-check:
     specifier: ^3.11.0
     version: 3.11.0
@@ -809,8 +809,8 @@ packages:
       - '@types/node'
     dev: true
 
-  /@effect/io@0.33.0:
-    resolution: {integrity: sha512-CwEiAKLZG368t2lNti7u3sX2wi0SS5c+Z0Xb3QVE0fA0WoRidNqlVwzvjMyUqYW6Rtwn0vCqyhAsfK3YVze5FQ==}
+  /@effect/io@0.34.0:
+    resolution: {integrity: sha512-v3elB62xFAoHEXxgJIRwEChw1kLB6139TNO/wOY7nLmHrGyVbonhzfBGlXF6bYleCgSeeM4bfEyoVydm9qWNZQ==}
     dependencies:
       '@effect/data': 0.15.1
     dev: false
@@ -3523,8 +3523,8 @@ packages:
       eslint: ^6.0.0 || ^7.0.0 || ^8.0.0
       typescript: ^3.7.5 || ^4.0.0 || ^5.0.0
     dependencies:
-      '@typescript-eslint/utils': 5.59.0(eslint@8.39.0)(typescript@5.0.4)
-      eslint: 8.39.0
+      '@typescript-eslint/utils': 5.62.0(eslint@8.45.0)(typescript@5.1.6)
+      eslint: 8.45.0
       tslib: 2.5.0
       tsutils: 3.21.0(typescript@5.1.6)
       typescript: 5.1.6
