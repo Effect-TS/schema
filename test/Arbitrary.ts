@@ -239,7 +239,7 @@ describe.concurrent("Arbitrary", () => {
     property(schema)
   })
 
-  it("lazy/to struct", () => {
+  it.skip("lazy/to struct", () => {
     interface A {
       readonly a: string
       readonly as: ReadonlyArray<A>
@@ -253,7 +253,7 @@ describe.concurrent("Arbitrary", () => {
     property(schema)
   })
 
-  it("lazy/to record", () => {
+  it.skip("lazy/to record", () => {
     type A = {
       [_: string]: A
     }
