@@ -8,7 +8,7 @@ export default defineConfig({
     exclude: ["./test/**/util.ts"],
     globals: true,
     coverage: {
-      provider: "c8"
+      provider: "v8"
     }
   },
   resolve: {
