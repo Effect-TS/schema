@@ -1,5 +1,17 @@
 # @effect/schema
 
+## 0.29.1
+
+### Patch Changes
+
+- [#341](https://github.com/Effect-TS/schema/pull/341) [`a73a943`](https://github.com/Effect-TS/schema/commit/a73a943e3612ddfc08e591048a83c52c34862b2e) Thanks [@gcanti](https://github.com/gcanti)! - fix trimmed definition, closes #340
+
+## 0.29.0
+
+### Minor Changes
+
+- [#338](https://github.com/Effect-TS/schema/pull/338) [`b2560df`](https://github.com/Effect-TS/schema/commit/b2560dfa3b8bcb0c225aa09e95a43dd1783d1f50) Thanks [@tim-smart](https://github.com/tim-smart)! - update /io and /data
+
 ## 0.28.0
 
 ### Minor Changes
