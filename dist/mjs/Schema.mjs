@@ -703,15 +703,10 @@ export const includes = (searchString, options) => self => make(_includes(self.a
  * @since 1.0.0
  */
 export const TrimmedTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Trimmed");
-const trimmedRegex = /^\S.*\S$|^\S$|^$/;
 /** @internal */
-export const _trimmed = (ast, options) => _filter(ast, a => trimmedRegex.test(a), {
+export const _trimmed = (ast, options) => _filter(ast, a => a === a.trim(), {
   typeId: TrimmedTypeId,
   description: "a string with no leading or trailing whitespace",
-  jsonSchema: {
-    type: "string",
-    pattern: trimmedRegex.source
-  },
   ...options
 });
 /**
@@ -1302,7 +1297,9 @@ export const either = (left, right) => {
     [I.ArbitraryHookId]: eitherArbitrary
   });
 };
-const arbitraryJson = fc => fc.jsonValue().map(json => json);
+// ---------------------------------------------
+// Json
+// ---------------------------------------------
 /**
  * @category type id
  * @since 1.0.0
@@ -1331,13 +1328,6 @@ export const JsonNumber = /*#__PURE__*/number.pipe( /*#__PURE__*/filter(n => !is
   title: "JSONNumber",
   description: "a JSON number"
 }));
-/**
- * @category Json constructors
- * @since 1.0.0
- */
-export const json = /*#__PURE__*/lazy(() => union(_null, string, JsonNumber, boolean, array(json), record(string, json)), {
-  [I.ArbitraryHookId]: () => arbitraryJson
-});
 // ---------------------------------------------
 // Option
 // ---------------------------------------------

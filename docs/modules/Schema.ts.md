@@ -23,13 +23,8 @@ Added in v1.0.0
   - [ValidDate](#validdate)
 - [Either constructors](#either-constructors)
   - [either](#either)
-- [Json](#json)
-  - [Json (type alias)](#json-type-alias)
-  - [JsonArray (type alias)](#jsonarray-type-alias)
-  - [JsonObject (type alias)](#jsonobject-type-alias)
 - [Json constructors](#json-constructors)
   - [JsonNumber](#jsonnumber)
-  - [json](#json)
 - [Option constructors](#option-constructors)
   - [option](#option)
 - [ReadonlyArray filters](#readonlyarray-filters)
@@ -271,38 +266,6 @@ export declare const either: <E, A>(left: Schema<E>, right: Schema<A>) => Schema
 
 Added in v1.0.0
 
-# Json
-
-## Json (type alias)
-
-**Signature**
-
-```ts
-export type Json = null | boolean | number | string | JsonArray | JsonObject
-```
-
-Added in v1.0.0
-
-## JsonArray (type alias)
-
-**Signature**
-
-```ts
-export type JsonArray = ReadonlyArray<Json>
-```
-
-Added in v1.0.0
-
-## JsonObject (type alias)
-
-**Signature**
-
-```ts
-export type JsonObject = { readonly [key: string]: Json }
-```
-
-Added in v1.0.0
-
 # Json constructors
 
 ## JsonNumber
@@ -328,16 +291,6 @@ assert.deepStrictEqual(is(42), true)
 assert.deepStrictEqual(is(Number.NaN), false)
 assert.deepStrictEqual(is(Number.POSITIVE_INFINITY), false)
 assert.deepStrictEqual(is(Number.NEGATIVE_INFINITY), false)
-```
-
-Added in v1.0.0
-
-## json
-
-**Signature**
-
-```ts
-export declare const json: Schema<Json>
 ```
 
 Added in v1.0.0

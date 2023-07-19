@@ -20,7 +20,7 @@ Object.defineProperty(exports, "is", {
     return P.is;
   }
 });
-exports.validDate = exports.unknown = exports.uniqueSymbol = exports.union = exports.undefined = exports.tuple = exports.trimmed = exports.toData = exports.toAnnotations = exports.templateLiteral = exports.symbol = exports.struct = exports.string = exports.startsWith = exports.rest = exports.required = exports.record = exports.readonlySetPretty = exports.readonlySetArbitrary = exports.readonlySet = exports.readonlyMapPretty = exports.readonlyMapArbitrary = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = exports.partial = exports.optionalElement = exports.optional = exports.optionPretty = exports.optionArbitrary = exports.option = exports.omit = exports.object = exports.number = exports.nullable = exports.null = exports.nonPositiveBigint = exports.nonPositive = exports.nonNegativeBigint = exports.nonNegative = exports.nonNaN = exports.nonEmptyArray = exports.nonEmpty = exports.never = exports.negativeBigint = exports.negative = exports.multipleOf = exports.minLength = exports.minItems = exports.maxLength = exports.maxItems = exports.make = exports.literal = exports.lessThanOrEqualToBigint = exports.lessThanOrEqualTo = exports.lessThanBigint = exports.lessThan = exports.length = exports.lazy = exports.keyof = exports.json = exports.itemsCount = exports.isSet = exports.isMap = void 0;
+exports.validDate = exports.unknown = exports.uniqueSymbol = exports.union = exports.undefined = exports.tuple = exports.trimmed = exports.toData = exports.toAnnotations = exports.templateLiteral = exports.symbol = exports.struct = exports.string = exports.startsWith = exports.rest = exports.required = exports.record = exports.readonlySetPretty = exports.readonlySetArbitrary = exports.readonlySet = exports.readonlyMapPretty = exports.readonlyMapArbitrary = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = exports.partial = exports.optionalElement = exports.optional = exports.optionPretty = exports.optionArbitrary = exports.option = exports.omit = exports.object = exports.number = exports.nullable = exports.null = exports.nonPositiveBigint = exports.nonPositive = exports.nonNegativeBigint = exports.nonNegative = exports.nonNaN = exports.nonEmptyArray = exports.nonEmpty = exports.never = exports.negativeBigint = exports.negative = exports.multipleOf = exports.minLength = exports.minItems = exports.maxLength = exports.maxItems = exports.make = exports.literal = exports.lessThanOrEqualToBigint = exports.lessThanOrEqualTo = exports.lessThanBigint = exports.lessThan = exports.length = exports.lazy = exports.keyof = exports.itemsCount = exports.isSet = exports.isMap = void 0;
 Object.defineProperty(exports, "validate", {
   enumerable: true,
   get: function () {
@@ -779,16 +779,11 @@ const includes = (searchString, options) => self => make(_includes(self.ast, sea
  */
 exports.includes = includes;
 const TrimmedTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/Trimmed");
-exports.TrimmedTypeId = TrimmedTypeId;
-const trimmedRegex = /^\S.*\S$|^\S$|^$/;
 /** @internal */
-const _trimmed = (ast, options) => _filter(ast, a => trimmedRegex.test(a), {
+exports.TrimmedTypeId = TrimmedTypeId;
+const _trimmed = (ast, options) => _filter(ast, a => a === a.trim(), {
   typeId: TrimmedTypeId,
   description: "a string with no leading or trailing whitespace",
-  jsonSchema: {
-    type: "string",
-    pattern: trimmedRegex.source
-  },
   ...options
 });
 /**
@@ -1474,12 +1469,14 @@ const either = (left, right) => {
     [I.ArbitraryHookId]: eitherArbitrary
   });
 };
-exports.either = either;
-const arbitraryJson = fc => fc.jsonValue().map(json => json);
+// ---------------------------------------------
+// Json
+// ---------------------------------------------
 /**
  * @category type id
  * @since 1.0.0
  */
+exports.either = either;
 const JsonNumberTypeId = /*#__PURE__*/Symbol.for("@effect/schema/TypeId/JsonNumber");
 /**
  * The `JsonNumber` is a schema for representing JSON numbers. It ensures that the provided value is a valid
@@ -1505,19 +1502,11 @@ const JsonNumber = /*#__PURE__*/number.pipe( /*#__PURE__*/filter(n => !isNaN(n) 
   title: "JSONNumber",
   description: "a JSON number"
 }));
-/**
- * @category Json constructors
- * @since 1.0.0
- */
-exports.JsonNumber = JsonNumber;
-const json = /*#__PURE__*/lazy(() => union(_null, string, JsonNumber, boolean, array(json), record(string, json)), {
-  [I.ArbitraryHookId]: () => arbitraryJson
-});
 // ---------------------------------------------
 // Option
 // ---------------------------------------------
 /** @internal */
-exports.json = json;
+exports.JsonNumber = JsonNumber;
 const optionArbitrary = value => fc => fc.oneof(fc.constant(O.none()), value(fc).map(O.some));
 /** @internal */
 exports.optionArbitrary = optionArbitrary;

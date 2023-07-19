@@ -1208,20 +1208,14 @@ export const includes = <A extends string>(
  */
 export const TrimmedTypeId = Symbol.for("@effect/schema/TypeId/Trimmed")
 
-const trimmedRegex = /^\S.*\S$|^\S$|^$/
-
 /** @internal */
 export const _trimmed = <A extends string>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a) => trimmedRegex.test(a), {
+  _filter(ast, (a) => a === a.trim(), {
     typeId: TrimmedTypeId,
     description: "a string with no leading or trailing whitespace",
-    jsonSchema: {
-      type: "string",
-      pattern: trimmedRegex.source
-    },
     ...options
   })
 
@@ -2150,32 +2144,6 @@ export const either = <E, A>(
 // ---------------------------------------------
 
 /**
- * @category Json
- * @since 1.0.0
- */
-export type JsonArray = ReadonlyArray<Json>
-
-/**
- * @category Json
- * @since 1.0.0
- */
-export type JsonObject = { readonly [key: string]: Json }
-
-/**
- * @category Json
- * @since 1.0.0
- */
-export type Json =
-  | null
-  | boolean
-  | number
-  | string
-  | JsonArray
-  | JsonObject
-
-const arbitraryJson: Arbitrary<Json> = (fc) => fc.jsonValue().map((json) => json as Json)
-
-/**
  * @category type id
  * @since 1.0.0
  */
@@ -2206,22 +2174,6 @@ export const JsonNumber = number.pipe(
     description: "a JSON number"
   })
 )
-
-/**
- * @category Json constructors
- * @since 1.0.0
- */
-export const json: Schema<Json> = lazy(() =>
-  union(
-    _null,
-    string,
-    JsonNumber,
-    boolean,
-    array(json),
-    record(string, json)
-  ), {
-  [I.ArbitraryHookId]: () => arbitraryJson
-})
 
 // ---------------------------------------------
 // Option

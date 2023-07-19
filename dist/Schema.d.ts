@@ -808,23 +808,6 @@ export declare const data: <A extends readonly any[] | Readonly<Record<string, a
  */
 export declare const either: <E, A>(left: Schema<E>, right: Schema<A>) => Schema<E.Either<E, A>>;
 /**
- * @category Json
- * @since 1.0.0
- */
-export type JsonArray = ReadonlyArray<Json>;
-/**
- * @category Json
- * @since 1.0.0
- */
-export type JsonObject = {
-    readonly [key: string]: Json;
-};
-/**
- * @category Json
- * @since 1.0.0
- */
-export type Json = null | boolean | number | string | JsonArray | JsonObject;
-/**
  * @category type id
  * @since 1.0.0
  */
@@ -848,11 +831,6 @@ export declare const JsonNumberTypeId: unique symbol;
  * @since 1.0.0
  */
 export declare const JsonNumber: Schema<number>;
-/**
- * @category Json constructors
- * @since 1.0.0
- */
-export declare const json: Schema<Json>;
 /**
  * @category Option constructors
  * @since 1.0.0
