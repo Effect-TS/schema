@@ -1208,20 +1208,14 @@ export const includes = <A extends string>(
  */
 export const TrimmedTypeId = Symbol.for("@effect/schema/TypeId/Trimmed")
 
-const trimmedRegex = /^\S.*\S$|^\S$|^$/
-
 /** @internal */
 export const _trimmed = <A extends string>(
   ast: AST.AST,
   options?: FilterAnnotations<A>
 ): AST.AST =>
-  _filter(ast, (a) => trimmedRegex.test(a), {
+  _filter(ast, (a) => a === a.trim(), {
     typeId: TrimmedTypeId,
     description: "a string with no leading or trailing whitespace",
-    jsonSchema: {
-      type: "string",
-      pattern: trimmedRegex.source
-    },
     ...options
   })
 

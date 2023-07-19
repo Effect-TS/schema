@@ -143,6 +143,7 @@ describe.concurrent("string filters", () => {
     it("decode / encode", async () => {
       await Util.expectParseSuccess(schema, "a")
       await Util.expectParseSuccess(schema, "")
+      await Util.expectParseSuccess(schema, "a\nb")
       await Util.expectParseFailure(
         schema,
         "a ",
