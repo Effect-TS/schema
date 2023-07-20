@@ -81,7 +81,7 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 ```
 
@@ -119,7 +119,7 @@ import * as E from "@effect/data/Either";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 const parsePerson = S.parseEither(Person);
@@ -184,14 +184,14 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 console.log(
   S.parseSync(Person)({
     name: "Bob",
     age: 40,
-    email: "bob@example.com",
+    email: "bob@example.com"
   })
 );
 /*
@@ -202,7 +202,7 @@ S.parseSync(Person)(
   {
     name: "Bob",
     age: 40,
-    email: "bob@example.com",
+    email: "bob@example.com"
   },
   { onExcessProperty: "error" }
 );
@@ -225,14 +225,14 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 S.parseSync(Person)(
   {
     name: "Bob",
     age: "abc",
-    email: "bob@example.com",
+    email: "bob@example.com"
   },
   { errors: "all", onExcessProperty: "error" }
 );
@@ -259,7 +259,7 @@ const Age = S.numberFromString(S.string);
 
 const Person = S.struct({
   name: S.string,
-  age: Age,
+  age: Age
 });
 
 const encoded = S.encodeEither(Person)({ name: "Alice", age: 30 });
@@ -281,7 +281,7 @@ import * as E from "@effect/data/Either";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 const result = S.parseEither(Person)({});
@@ -306,7 +306,7 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 // const isPerson: (u: unknown) => u is Person
@@ -324,7 +324,7 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 // const assertsPerson: (input: unknown) => asserts input is Person
@@ -359,7 +359,7 @@ import * as fc from "fast-check";
 
 const Person = S.struct({
   name: S.string,
-  age: S.string.pipe(S.numberFromString, S.int()),
+  age: S.string.pipe(S.numberFromString, S.int())
 });
 
 // Arbitrary for the To type
@@ -394,7 +394,7 @@ import * as P from "@effect/schema/Pretty";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 const PersonPretty = P.to(Person);
@@ -617,7 +617,7 @@ const UserIdSchema = S.string.pipe(S.fromBrand(UserId));
 ```ts
 enum Fruits {
   Apple,
-  Banana,
+  Banana
 }
 
 // $ExpectType Schema<Fruits>
@@ -689,12 +689,12 @@ import * as S from "@effect/schema/Schema";
 
 const Circle = S.struct({
   kind: S.literal("circle"),
-  radius: S.number,
+  radius: S.number
 });
 
 const Square = S.struct({
   kind: S.literal("square"),
-  sideLength: S.number,
+  sideLength: S.number
 });
 
 const Shape = S.union(Circle, Square);
@@ -714,11 +714,11 @@ If you're working on a TypeScript project and you've defined a simple union to r
 import * as S from "@effect/schema/Schema";
 
 const Circle = S.struct({
-  radius: S.number,
+  radius: S.number
 });
 
 const Square = S.struct({
-  sideLength: S.number,
+  sideLength: S.number
 });
 
 const Shape = S.union(Circle, Square);
@@ -733,11 +733,11 @@ import * as S from "@effect/schema/Schema";
 import { pipe } from "@effect/data/Function";
 
 const Circle = S.struct({
-  radius: S.number,
+  radius: S.number
 });
 
 const Square = S.struct({
-  sideLength: S.number,
+  sideLength: S.number
 });
 
 const DiscriminatedShape = S.union(
@@ -759,12 +759,12 @@ const DiscriminatedShape = S.union(
 
 expect(S.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
-  radius: 10,
+  radius: 10
 });
 
 expect(S.parseSync(DiscriminatedShape)({ sideLength: 10 })).toEqual({
   kind: "square",
-  sideLength: 10,
+  sideLength: 10
 });
 ```
 
@@ -785,14 +785,14 @@ const DiscriminatedShape = S.union(
 // parsing
 expect(S.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
-  radius: 10,
+  radius: 10
 });
 
 // encoding
 expect(
   S.encodeSync(DiscriminatedShape)({
     kind: "circle",
-    radius: 10,
+    radius: 10
   })
 ).toEqual({ radius: 10 });
 ```
@@ -858,7 +858,7 @@ S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean) });
 ```ts
 S.struct({
   // the use of S.optional should be the last step in the pipeline and not preceeded by other combinators like S.nullable
-  c: S.boolean.pipe(S.optional, S.nullable), // type checker error
+  c: S.boolean.pipe(S.optional, S.nullable) // type checker error
 });
 ```
 
@@ -866,7 +866,7 @@ and it must be rewritten like this:
 
 ```ts
 S.struct({
-  c: S.boolean.pipe(S.nullable, S.optional), // ok
+  c: S.boolean.pipe(S.nullable, S.optional) // ok
 });
 ```
 
@@ -919,7 +919,7 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number,
+  age: S.number
 });
 
 // get the schema for each property of `Person`
@@ -1028,7 +1028,7 @@ interface Category {
 const Category: S.Schema<Category> = S.lazy(() =>
   S.struct({
     name: S.string,
-    subcategories: S.array(Category),
+    subcategories: S.array(Category)
   })
 );
 ```
@@ -1051,7 +1051,7 @@ interface Operation {
 const Expression: S.Schema<Expression> = S.lazy(() =>
   S.struct({
     type: S.literal("expression"),
-    value: S.union(S.number, Operation),
+    value: S.union(S.number, Operation)
   })
 );
 
@@ -1060,7 +1060,7 @@ const Operation: S.Schema<Operation> = S.lazy(() =>
     type: S.literal("operation"),
     operator: S.union(S.literal("+"), S.literal("-")),
     left: Expression,
-    right: Expression,
+    right: Expression
   })
 );
 ```
@@ -1146,7 +1146,7 @@ const api = (url: string) =>
         }
         throw new Error(String(res.status));
       }),
-    catch: (e) => new Error(String(e)),
+    catch: (e) => new Error(String(e))
   });
 
 const PeopleId = S.string.pipe(S.brand("PeopleId"));
@@ -1325,7 +1325,7 @@ const schema: S.Schema<{
 */
 const schema = S.struct({
   a: S.string,
-  b: S.optionFromNullable(S.number),
+  b: S.optionFromNullable(S.number)
 });
 
 // parsing
@@ -1371,7 +1371,7 @@ const parse = S.parseSync(schema);
 parse([
   [1, "a"],
   [2, "b"],
-  [3, "c"],
+  [3, "c"]
 ]); // new Map([[1, "a"], [2, "b"], [3, "c"]])
 ```
 
@@ -1384,7 +1384,7 @@ import * as S from "@effect/schema/Schema";
 
 const LongString = S.string.pipe(
   S.filter((s) => s.length >= 10, {
-    message: () => "a string at least 10 characters long",
+    message: () => "a string at least 10 characters long"
   })
 );
 
@@ -1404,7 +1404,7 @@ const LongString = S.string.pipe(
     identifier: "LongString",
     jsonSchema: { minLength: 10 },
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
   })
 );
 ```
@@ -1588,9 +1588,10 @@ We welcome contributions via pull requests! Here are some guidelines to help you
 3. Install dependencies: `pnpm install` (`pnpm@8.x`)
 4. Make your changes and add tests if applicable.
 5. Run the tests: `pnpm test`
-6. Commit your changes: `git commit -am 'Add some feature'`
-7. Push your changes to your fork: `git push origin my-new-feature`
-8. Open a pull request against our `main` branch.
+6. Create a changeset for your changes: before committing your changes, create a changeset to document the modifications. This helps in tracking and communicating the changes effectively. To create a changeset, run the following command: `pnpm changeset`.
+7. Commit your changes: after creating the changeset, commit your changes with a descriptive commit message: `git commit -am 'Add some feature'`.
+8. Push your changes to your fork: `git push origin my-new-feature`.
+9. Open a pull request against our `main` branch.
 
 ### Pull Request Guidelines
 
