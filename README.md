@@ -910,25 +910,6 @@ encode({ a: O.none() }) // {}
 encode({ a: O.some(1) }) // { a: 1 }
 ```
 
-### Access the schema for a particular key
-
-The `getPropertySignatures` function takes a `Schema<A>` and returns a new object of type `{ [K in keyof A]: Schema<A[K]> }`. The new object has properties that are the same keys as those in the original object, and each of these properties is a schema for the corresponding property in the original object.
-
-```ts
-import * as S from "@effect/schema/Schema";
-
-const Person = S.struct({
-  name: S.string,
-  age: S.number
-});
-
-// get the schema for each property of `Person`
-const shape = S.getPropertySignatures(Person);
-
-shape.name; // S.string
-shape.age; // S.number
-```
-
 ## Pick
 
 ```ts
