@@ -1222,6 +1222,29 @@ parse(3); // 1
 
 ### Bigint transformations
 
+#### BigintFromString
+
+Transforms a `string` into a `bigint` by parsing the string using `BigInt`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// const schema: S.Schema<string, bigint>
+const schema = S.BigintFromString;
+const parse = S.parseSync(schema);
+
+// success cases
+parse("1"); // 1n
+parse("-1"); // -1n
+
+// failure cases
+parse("a"); // throws
+parse("1.5"); // throws
+parse("NaN"); // throws
+parse("Infinity"); // throws
+parse("-Infinity"); // throws
+```
+
 #### clamp
 
 Clamps a `bigint` between a minimum and a maximum value.
