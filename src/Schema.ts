@@ -21,6 +21,7 @@ import { pipeArguments } from "@effect/data/Pipeable"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
 import { isDate } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import * as S from "@effect/data/String"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -2331,6 +2332,31 @@ export const itemsCount = <A>(
         jsonSchema: { minItems: n, maxItems: n },
         ...options
       })
+    )
+
+/**
+ * This function returns a combinator that transforms a delimited `string` into `readonly A[]` by splitting the string
+ * by the provided separator and then applying the provided schema.
+ *
+ * It returns an error if the value can't be converted (for example when the items don't represent the values prescribed by the schema).
+ *
+ * @param separator - A string representing the separator between items, common examples are commas, colons, and hyphens
+ *
+ * @category array
+ * @since 1.0.0
+ */
+
+export const arrayFromDelimitedString = (
+  separator: string
+) =>
+  <A>(
+    item: Schema<string, A>
+  ): Schema<string, ReadonlyArray<A>> =>
+    transform(
+      string,
+      array(item),
+      S.split(separator),
+      RA.join(separator)
     )
 
 // ---------------------------------------------
