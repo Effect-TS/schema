@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@effect/data':
-    specifier: ^0.16.1
-    version: 0.16.1
+    specifier: ^0.16.2
+    version: 0.16.2
   '@effect/io':
     specifier: ^0.35.2
     version: 0.35.2
@@ -782,8 +782,8 @@ packages:
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
     dev: true
 
-  /@effect/data@0.16.1:
-    resolution: {integrity: sha512-rIoLk+5xY1lakbzd7k5xbuPvfiR+BSQSrOyxX5Fo5oXWt1a29k31K/0Cq+9NtwqsAE7aNMlQtw6Z1d0Sxw1i9Q==}
+  /@effect/data@0.16.2:
+    resolution: {integrity: sha512-Q3ugteQz5gFGauskdZFdbCujA2op/sFu2PEArCjoJ8yHAQis/Fxq5Rc5dBdvqOlXCqmYHJBy57KGgudlT4+Ayw==}
     dev: false
 
   /@effect/docgen@0.1.2(@types/node@20.4.4)(typescript@5.1.6):
@@ -812,7 +812,7 @@ packages:
   /@effect/io@0.35.2:
     resolution: {integrity: sha512-+F9A5785QmjK8OOO5d5SDHcZjNwpp0D8nAf7PlGSXPBFxeex2S5qYhhlUbE1zBQeTZoDwp40UIIMtgTb8yFOTw==}
     dependencies:
-      '@effect/data': 0.16.1
+      '@effect/data': 0.16.2
     dev: false
 
   /@effect/language-service@0.0.19:
