@@ -1284,6 +1284,51 @@ validateSync(new Date(0)); // new Date(0)
 validateSync(new Date("fail")); // throws
 ```
 
+## Interop with `@effect/data/Data`
+
+The `@effect/data/Data` module in the Effect ecosystem serves as a utility module that simplifies the process of comparing values for equality without the need for explicit implementations of the `Equal` and `Hash` interfaces. It provides convenient APIs that automatically generate default implementations for equality checks, making it easier for developers to perform equality comparisons in their applications.
+
+```ts
+import * as Data from "@effect/data/Data";
+import * as Equal from "@effect/data/Equal";
+
+const person1 = Data.struct({ name: "Alice", age: 30 });
+const person2 = Data.struct({ name: "Alice", age: 30 });
+
+console.log(Equal.equals(person1, person2)); // true
+```
+
+You can use the `Schema.data(schema)` combinator to build a schema from an existing schema that can decode a value `A` to a value `Data<A>`:
+
+```ts
+import * as Equal from "@effect/data/Equal";
+import * as C from "@effect/schema/Codec";
+import * as S from "@effect/schema/Schema";
+
+/*
+C.Codec<{
+    readonly name: string;
+    readonly age: number;
+}, Data<{
+    readonly name: string;
+    readonly age: number;
+}>>
+*/
+const schema = C.data(
+  S.struct({
+    name: S.string,
+    age: S.number
+  })
+);
+
+const parseSync = C.parseSync(schema);
+
+const person1 = parseSync({ name: "Alice", age: 30 });
+const person2 = parseSync({ name: "Alice", age: 30 });
+
+console.log(Equal.equals(person1, person2)); // true
+```
+
 ## Option
 
 ### Parsing from nullable fields
