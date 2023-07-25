@@ -983,6 +983,15 @@ S.struct({ a: S.string, b: S.string }).pipe(
 );
 ```
 
+## Compose
+
+The `compose` combinator allows you to combine two schemas.
+
+```ts
+// $ExpectType Schema<string, readonly number[]>
+S.compose(S.split(S.string, ","), S.array(S.NumberFromString));
+```
+
 ## InstanceOf
 
 In the following section, we demonstrate how to use the `instanceOf` combinator to create a `Schema` for a class instance.
