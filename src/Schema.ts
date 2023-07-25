@@ -19,7 +19,7 @@ import * as O from "@effect/data/Option"
 import type { Pipeable } from "@effect/data/Pipeable"
 import { pipeArguments } from "@effect/data/Pipeable"
 import type { Predicate, Refinement } from "@effect/data/Predicate"
-import { isDate, not } from "@effect/data/Predicate"
+import { isDate, isObject, not } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import * as Str from "@effect/data/String"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
@@ -35,6 +35,20 @@ import { formatErrors } from "@effect/schema/TreeFormatter"
 // ---------------------------------------------
 // model
 // ---------------------------------------------
+
+const TypeId: unique symbol = Symbol.for("@effect/schema/Schema")
+
+/** @internal */
+export const CodecTypeId: unique symbol = Symbol.for("@effect/schema/Codec")
+
+/** @internal */
+export type CodecTypeId = typeof CodecTypeId
+
+/**
+ * @since 1.0.0
+ * @category symbol
+ */
+export type TypeId = typeof TypeId
 
 /**
  * @category model
@@ -53,6 +67,8 @@ export type SchemaTypeId = typeof SchemaTypeId
  * @since 1.0.0
  */
 export interface Schema<A> extends Pipeable {
+  readonly _id: TypeId
+  readonly _codecId: CodecTypeId
   readonly [SchemaTypeId]: (_: A) => A
   readonly From: (_: A) => A
   readonly To: (_: A) => A
@@ -136,6 +152,8 @@ export const annotations = <A>(options: DocAnnotations<A>) =>
 // ---------------------------------------------
 
 class SchemaImpl<A> implements Schema<A> {
+  readonly _id: TypeId = TypeId
+  readonly _codecId: CodecTypeId = CodecTypeId
   readonly From!: (_: A) => A
   readonly To!: (_: A) => A
   readonly [SchemaTypeId] = identity
@@ -150,6 +168,15 @@ class SchemaImpl<A> implements Schema<A> {
  * @since 1.0.0
  */
 export const make = <A>(ast: AST.AST): Schema<A> => new SchemaImpl(ast)
+
+/**
+ * Tests if a value is a `Schema`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+export const isSchema = (input: unknown): input is Schema<unknown> =>
+  isObject(input) && "_id" in input && input["_id"] === TypeId
 
 /**
   @category constructors
@@ -880,6 +907,8 @@ export const brand = <B extends string | symbol, A>(
     const out: any = Object.assign((input: unknown) => validate(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
       [SchemaTypeId]: identity,
+      _id: TypeId,
+      _codecId: CodecTypeId,
       ast,
       option: (input: unknown) => validateOption(input),
       either: (input: unknown) =>

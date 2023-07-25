@@ -86,6 +86,7 @@ Added in v1.0.0
   - [uniqueSymbol](#uniquesymbol)
 - [guards](#guards)
   - [is](#is)
+  - [isSchema](#isschema)
 - [model](#model)
   - [Schema (interface)](#schema-interface)
   - [SchemaTypeId](#schematypeid)
@@ -139,6 +140,8 @@ Added in v1.0.0
   - [pattern](#pattern)
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
+- [symbol](#symbol-1)
+  - [TypeId (type alias)](#typeid-type-alias)
 - [type id](#type-id)
   - [BrandTypeId](#brandtypeid)
   - [EndsWithTypeId](#endswithtypeid)
@@ -945,6 +948,18 @@ export declare const is: <A>(schema: Schema<A>) => (a: unknown) => a is A
 
 Added in v1.0.0
 
+## isSchema
+
+Tests if a value is a `Schema`.
+
+**Signature**
+
+```ts
+export declare const isSchema: (input: unknown) => input is Schema<unknown>
+```
+
+Added in v1.0.0
+
 # model
 
 ## Schema (interface)
@@ -953,6 +968,8 @@ Added in v1.0.0
 
 ```ts
 export interface Schema<A> extends Pipeable {
+  readonly _id: TypeId
+  readonly _codecId: CodecTypeId
   readonly [SchemaTypeId]: (_: A) => A
   readonly From: (_: A) => A
   readonly To: (_: A) => A
@@ -1493,6 +1510,18 @@ If what you were looking for was a combinator to trim strings, then check out th
 export declare const trimmed: <A extends string>(
   options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+# symbol
+
+## TypeId (type alias)
+
+**Signature**
+
+```ts
+export type TypeId = typeof TypeId
 ```
 
 Added in v1.0.0

@@ -79,7 +79,7 @@ Object.defineProperty(exports, "encodeSync", {
 });
 exports.extend = exports.endsWith = void 0;
 exports.filter = filter;
-exports.optionalElement = exports.optional = exports.optionFromSelf = exports.optionFromNullable = exports.option = exports.omit = exports.numberFromString = exports.nullable = exports.not = exports.nonPositiveBigint = exports.nonPositive = exports.nonNegativeBigint = exports.nonNegative = exports.nonNaN = exports.nonEmptyArray = exports.nonEmpty = exports.negativeBigint = exports.negative = exports.multipleOf = exports.minLength = exports.minItems = exports.maxLength = exports.maxItems = exports.make = exports.lessThanOrEqualToBigint = exports.lessThanOrEqualTo = exports.lessThanBigint = exports.lessThan = exports.length = exports.lazy = exports.itemsCount = exports.int = exports.includes = exports.greaterThanOrEqualToBigint = exports.greaterThanOrEqualTo = exports.greaterThanBigint = exports.greaterThan = exports.from = exports.finite = void 0;
+exports.optionalElement = exports.optional = exports.optionFromSelf = exports.optionFromNullable = exports.option = exports.omit = exports.numberFromString = exports.nullable = exports.not = exports.nonPositiveBigint = exports.nonPositive = exports.nonNegativeBigint = exports.nonNegative = exports.nonNaN = exports.nonEmptyArray = exports.nonEmpty = exports.negativeBigint = exports.negative = exports.multipleOf = exports.minLength = exports.minItems = exports.maxLength = exports.maxItems = exports.make = exports.lessThanOrEqualToBigint = exports.lessThanOrEqualTo = exports.lessThanBigint = exports.lessThan = exports.length = exports.lazy = exports.itemsCount = exports.isCodec = exports.int = exports.includes = exports.greaterThanOrEqualToBigint = exports.greaterThanOrEqualTo = exports.greaterThanBigint = exports.greaterThan = exports.from = exports.finite = void 0;
 Object.defineProperty(exports, "parse", {
   enumerable: true,
   get: function () {
@@ -124,6 +124,7 @@ var _Function = /*#__PURE__*/require("@effect/data/Function");
 var N = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Number"));
 var O = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Option"));
 var _Pipeable = /*#__PURE__*/require("@effect/data/Pipeable");
+var _Predicate = /*#__PURE__*/require("@effect/data/Predicate");
 var RA = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/ReadonlyArray"));
 var AST = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/AST"));
 var I = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/internal/common"));
@@ -161,6 +162,7 @@ exports.to = to;
 // ---------------------------------------------
 class CodecImpl {
   ast;
+  _codecId = S.CodecTypeId;
   From;
   To;
   constructor(ast) {
@@ -175,6 +177,14 @@ class CodecImpl {
  * @since 1.0.0
  */
 const make = ast => new CodecImpl(ast);
+/**
+ * Tests if a value is a `Codec`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+exports.make = make;
+const isCodec = input => (0, _Predicate.isObject)(input) && "_codecId" in input && input["_codecId"] === S.CodecTypeId;
 // ---------------------------------------------
 // codec combinators
 // ---------------------------------------------
@@ -185,7 +195,7 @@ const make = ast => new CodecImpl(ast);
  * @category constructors
  * @since 1.0.0
  */
-exports.make = make;
+exports.isCodec = isCodec;
 const transformResult = /*#__PURE__*/(0, _Function.dual)(4, (from, to, decode, encode, annotations) => make(AST.createTransform(from.ast, to.ast, AST.createFinalTransformation(decode, encode), annotations)));
 /**
  * Create a new `Codec` by transforming the input and output of an existing `Schema`

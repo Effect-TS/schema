@@ -11,7 +11,7 @@ import { dual, identity } from "@effect/data/Function";
 import * as N from "@effect/data/Number";
 import * as O from "@effect/data/Option";
 import { pipeArguments } from "@effect/data/Pipeable";
-import { isDate, not } from "@effect/data/Predicate";
+import { isDate, isObject, not } from "@effect/data/Predicate";
 import * as ReadonlyArray from "@effect/data/ReadonlyArray";
 import * as Str from "@effect/data/String";
 import * as AST from "@effect/schema/AST";
@@ -22,6 +22,9 @@ import { formatErrors } from "@effect/schema/TreeFormatter";
 // ---------------------------------------------
 // model
 // ---------------------------------------------
+const TypeId = /*#__PURE__*/Symbol.for("@effect/schema/Schema");
+/** @internal */
+export const CodecTypeId = /*#__PURE__*/Symbol.for("@effect/schema/Codec");
 /**
  * @category model
  * @since 1.0.0
@@ -85,6 +88,8 @@ export const annotations = options => self => make(AST.mergeAnnotations(self.ast
 // ---------------------------------------------
 class SchemaImpl {
   ast;
+  _id = TypeId;
+  _codecId = CodecTypeId;
   From;
   To;
   [SchemaTypeId] = identity;
@@ -100,6 +105,13 @@ class SchemaImpl {
  * @since 1.0.0
  */
 export const make = ast => new SchemaImpl(ast);
+/**
+ * Tests if a value is a `Schema`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+export const isSchema = input => isObject(input) && "_id" in input && input["_id"] === TypeId;
 /**
   @category constructors
   @since 1.0.0
@@ -481,6 +493,8 @@ export const brand = (brand, options) => self => {
   const out = Object.assign(input => validate(input), {
     [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
     [SchemaTypeId]: identity,
+    _id: TypeId,
+    _codecId: CodecTypeId,
     ast,
     option: input => validateOption(input),
     either: input => E.mapLeft(validateEither(input), e => [{

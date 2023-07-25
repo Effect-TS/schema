@@ -15,7 +15,7 @@ import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
 import type { Pipeable } from "@effect/data/Pipeable"
 import { pipeArguments } from "@effect/data/Pipeable"
-import type { Predicate, Refinement } from "@effect/data/Predicate"
+import { isObject, type Predicate, type Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -30,10 +30,17 @@ import * as S from "@effect/schema/Schema"
 // ---------------------------------------------
 
 /**
+ * @since 1.0.0
+ * @category symbol
+ */
+export type CodecTypeId = S.CodecTypeId
+
+/**
  * @category model
  * @since 1.0.0
  */
 export interface Codec<From, To> extends Pipeable {
+  readonly _codecId: CodecTypeId
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ast: AST.AST
@@ -169,6 +176,7 @@ export {
 // ---------------------------------------------
 
 class CodecImpl<From, To> implements Codec<From, To> {
+  readonly _codecId: CodecTypeId = S.CodecTypeId
   readonly From!: (_: From) => From
   readonly To!: (_: To) => To
   constructor(readonly ast: AST.AST) {}
@@ -182,6 +190,15 @@ class CodecImpl<From, To> implements Codec<From, To> {
  * @since 1.0.0
  */
 export const make = <I, A>(ast: AST.AST): Codec<I, A> => new CodecImpl(ast)
+
+/**
+ * Tests if a value is a `Codec`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+export const isCodec = (input: unknown): input is Codec<unknown, unknown> =>
+  isObject(input) && "_codecId" in input && input["_codecId"] === S.CodecTypeId
 
 // ---------------------------------------------
 // codec combinators

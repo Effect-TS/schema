@@ -7,16 +7,22 @@ import type * as D from "@effect/data/Data";
 import type { Either } from "@effect/data/Either";
 import type { Option } from "@effect/data/Option";
 import type { Pipeable } from "@effect/data/Pipeable";
-import type { Predicate, Refinement } from "@effect/data/Predicate";
+import { type Predicate, type Refinement } from "@effect/data/Predicate";
 import type { ParseOptions } from "@effect/schema/AST";
 import * as AST from "@effect/schema/AST";
 import type { ParseResult } from "@effect/schema/ParseResult";
 import * as S from "@effect/schema/Schema";
 /**
+ * @since 1.0.0
+ * @category symbol
+ */
+export type CodecTypeId = S.CodecTypeId;
+/**
  * @category model
  * @since 1.0.0
  */
 export interface Codec<From, To> extends Pipeable {
+    readonly _codecId: CodecTypeId;
     readonly From: (_: From) => From;
     readonly To: (_: To) => To;
     readonly ast: AST.AST;
@@ -139,6 +145,13 @@ parseSync } from "@effect/schema/Parser";
  * @since 1.0.0
  */
 export declare const make: <I, A>(ast: AST.AST) => Codec<I, A>;
+/**
+ * Tests if a value is a `Codec`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+export declare const isCodec: (input: unknown) => input is Codec<unknown, unknown>;
 /**
  * Create a new `Codec` by transforming the input and output of an existing `Schema`
  * using the provided decoding functions.

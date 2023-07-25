@@ -8,6 +8,7 @@ import { dual, identity } from "@effect/data/Function";
 import * as N from "@effect/data/Number";
 import * as O from "@effect/data/Option";
 import { pipeArguments } from "@effect/data/Pipeable";
+import { isObject } from "@effect/data/Predicate";
 import * as RA from "@effect/data/ReadonlyArray";
 import * as AST from "@effect/schema/AST";
 import * as I from "@effect/schema/internal/common";
@@ -128,6 +129,7 @@ parseSync } from "@effect/schema/Parser";
 // ---------------------------------------------
 class CodecImpl {
   ast;
+  _codecId = S.CodecTypeId;
   From;
   To;
   constructor(ast) {
@@ -142,6 +144,13 @@ class CodecImpl {
  * @since 1.0.0
  */
 export const make = ast => new CodecImpl(ast);
+/**
+ * Tests if a value is a `Codec`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+export const isCodec = input => isObject(input) && "_codecId" in input && input["_codecId"] === S.CodecTypeId;
 // ---------------------------------------------
 // codec combinators
 // ---------------------------------------------

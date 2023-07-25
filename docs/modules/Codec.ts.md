@@ -92,6 +92,8 @@ Added in v1.0.0
   - [encodePromise](#encodepromise)
   - [encodeResult](#encoderesult)
   - [encodeSync](#encodesync)
+- [guards](#guards)
+  - [isCodec](#iscodec)
 - [model](#model)
   - [Codec (interface)](#codec-interface)
 - [number filters](#number-filters)
@@ -132,6 +134,8 @@ Added in v1.0.0
 - [string transformations](#string-transformations)
   - [Trim](#trim)
   - [trim](#trim)
+- [symbol](#symbol)
+  - [CodecTypeId (type alias)](#codectypeid-type-alias)
 - [utils](#utils)
   - [From (type alias)](#from-type-alias)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
@@ -1030,6 +1034,20 @@ export declare const encodeSync: <I, A>(schema: Codec<I, A>) => (a: A, options?:
 
 Added in v1.0.0
 
+# guards
+
+## isCodec
+
+Tests if a value is a `Codec`.
+
+**Signature**
+
+```ts
+export declare const isCodec: (input: unknown) => input is Codec<unknown, unknown>
+```
+
+Added in v1.0.0
+
 # model
 
 ## Codec (interface)
@@ -1038,6 +1056,7 @@ Added in v1.0.0
 
 ```ts
 export interface Codec<From, To> extends Pipeable {
+  readonly _codecId: CodecTypeId
   readonly From: (_: From) => From
   readonly To: (_: To) => To
   readonly ast: AST.AST
@@ -1475,6 +1494,18 @@ This combinator allows removing whitespaces from the beginning and end of a stri
 
 ```ts
 export declare const trim: <I>(self: Codec<I, string>) => Codec<I, string>
+```
+
+Added in v1.0.0
+
+# symbol
+
+## CodecTypeId (type alias)
+
+**Signature**
+
+```ts
+export type CodecTypeId = S.CodecTypeId
 ```
 
 Added in v1.0.0

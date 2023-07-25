@@ -15,6 +15,12 @@ import * as AST from "@effect/schema/AST";
 import type { ParseOptions } from "@effect/schema/AST";
 import * as PR from "@effect/schema/ParseResult";
 import type { ParseResult } from "@effect/schema/ParseResult";
+declare const TypeId: unique symbol;
+/**
+ * @since 1.0.0
+ * @category symbol
+ */
+export type TypeId = typeof TypeId;
 /**
  * @category model
  * @since 1.0.0
@@ -30,6 +36,8 @@ export type SchemaTypeId = typeof SchemaTypeId;
  * @since 1.0.0
  */
 export interface Schema<A> extends Pipeable {
+    readonly _id: TypeId;
+    readonly _codecId: CodecTypeId;
     readonly [SchemaTypeId]: (_: A) => A;
     readonly From: (_: A) => A;
     readonly To: (_: A) => A;
@@ -98,6 +106,13 @@ export declare const annotations: <A>(options: DocAnnotations<A>) => (self: Sche
  * @since 1.0.0
  */
 export declare const make: <A>(ast: AST.AST) => Schema<A>;
+/**
+ * Tests if a value is a `Schema`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+export declare const isSchema: (input: unknown) => input is Schema<unknown>;
 /**
   @category constructors
   @since 1.0.0

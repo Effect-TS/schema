@@ -3,15 +3,15 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.array = exports.any = exports.annotations = exports.addBrand = exports._trimmed = exports._startsWith = exports._positiveBigint = exports._positive = exports._pattern = exports._nonPositiveBigint = exports._nonPositive = exports._nonNegativeBigint = exports._nonNegative = exports._nonNaN = exports._negativeBigint = exports._negative = exports._multipleOf = exports._minLength = exports._minItems = exports._maxLength = exports._maxItems = exports._lessThanOrEqualToBigint = exports._lessThanOrEqualTo = exports._lessThanBigint = exports._lessThan = exports._itemsCount = exports._int = exports._includes = exports._greaterThanOrEqualToBigint = exports._greaterThanOrEqualTo = exports._greaterThanBigint = exports._greaterThan = exports._finite = exports._filter = exports._endsWith = exports._betweenBigint = exports._between = exports.ValidDateTypeId = exports.ValidDate = exports.UUIDTypeId = exports.UUID = exports.ULIDTypeId = exports.ULID = exports.TrimmedTypeId = exports.Trimmed = exports.StartsWithTypeId = exports.SchemaTypeId = exports.PropertySignatureImpl = exports.PositiveBigint = exports.Positive = exports.PatternTypeId = exports.NonPositiveBigint = exports.NonPositive = exports.NonNegativeBigint = exports.NonNegative = exports.NonNaNTypeId = exports.NonNaN = exports.NegativeBigint = exports.Negative = exports.MultipleOfTypeId = exports.MinLengthTypeId = exports.MinItemsTypeId = exports.MaxLengthTypeId = exports.MaxItemsTypeId = exports.LessThanTypeId = exports.LessThanOrEqualToTypeId = exports.LessThanOrEqualToBigintTypeId = exports.LessThanBigintTypeId = exports.JsonNumberTypeId = exports.JsonNumber = exports.IntTypeId = exports.Int = exports.InstanceOfTypeId = exports.IncludesTypeId = exports.GreaterThanTypeId = exports.GreaterThanOrEqualToTypeId = exports.GreaterThanOrEqualToBigintTypeId = exports.GreaterThanBigintTypeId = exports.FiniteTypeId = exports.Finite = exports.EndsWithTypeId = exports.Date = exports.BrandTypeId = void 0;
+exports.array = exports.any = exports.annotations = exports.addBrand = exports._trimmed = exports._startsWith = exports._positiveBigint = exports._positive = exports._pattern = exports._nonPositiveBigint = exports._nonPositive = exports._nonNegativeBigint = exports._nonNegative = exports._nonNaN = exports._negativeBigint = exports._negative = exports._multipleOf = exports._minLength = exports._minItems = exports._maxLength = exports._maxItems = exports._lessThanOrEqualToBigint = exports._lessThanOrEqualTo = exports._lessThanBigint = exports._lessThan = exports._itemsCount = exports._int = exports._includes = exports._greaterThanOrEqualToBigint = exports._greaterThanOrEqualTo = exports._greaterThanBigint = exports._greaterThan = exports._finite = exports._filter = exports._endsWith = exports._betweenBigint = exports._between = exports.ValidDateTypeId = exports.ValidDate = exports.UUIDTypeId = exports.UUID = exports.ULIDTypeId = exports.ULID = exports.TrimmedTypeId = exports.Trimmed = exports.StartsWithTypeId = exports.SchemaTypeId = exports.PropertySignatureImpl = exports.PositiveBigint = exports.Positive = exports.PatternTypeId = exports.NonPositiveBigint = exports.NonPositive = exports.NonNegativeBigint = exports.NonNegative = exports.NonNaNTypeId = exports.NonNaN = exports.NegativeBigint = exports.Negative = exports.MultipleOfTypeId = exports.MinLengthTypeId = exports.MinItemsTypeId = exports.MaxLengthTypeId = exports.MaxItemsTypeId = exports.LessThanTypeId = exports.LessThanOrEqualToTypeId = exports.LessThanOrEqualToBigintTypeId = exports.LessThanBigintTypeId = exports.JsonNumberTypeId = exports.JsonNumber = exports.IntTypeId = exports.Int = exports.InstanceOfTypeId = exports.IncludesTypeId = exports.GreaterThanTypeId = exports.GreaterThanOrEqualToTypeId = exports.GreaterThanOrEqualToBigintTypeId = exports.GreaterThanBigintTypeId = exports.FiniteTypeId = exports.Finite = exports.EndsWithTypeId = exports.Date = exports.CodecTypeId = exports.BrandTypeId = void 0;
 Object.defineProperty(exports, "asserts", {
   enumerable: true,
   get: function () {
     return P.asserts;
   }
 });
-exports.element = exports.eitherPretty = exports.eitherArbitrary = exports.either = exports.declare = exports.dataPretty = exports.dataArbitrary = exports.data = exports.chunkPretty = exports.chunkArbitrary = exports.chunk = exports.brand = exports.boolean = exports.bigint = exports.betweenBigint = exports.between = void 0;
-exports.extend = exports.enums = exports.endsWith = void 0;
+exports.eitherPretty = exports.eitherArbitrary = exports.either = exports.declare = exports.dataPretty = exports.dataArbitrary = exports.data = exports.chunkPretty = exports.chunkArbitrary = exports.chunk = exports.brand = exports.boolean = exports.bigint = exports.betweenBigint = exports.between = void 0;
+exports.extend = exports.enums = exports.endsWith = exports.element = void 0;
 exports.filter = filter;
 exports.intersectUnionMembers = exports.int = exports.instanceOf = exports.includes = exports.greaterThanOrEqualToBigint = exports.greaterThanOrEqualTo = exports.greaterThanBigint = exports.greaterThan = exports.getBrands = exports.fromBrand = exports.finite = void 0;
 Object.defineProperty(exports, "is", {
@@ -20,7 +20,7 @@ Object.defineProperty(exports, "is", {
     return P.is;
   }
 });
-exports.validDate = exports.unknown = exports.uniqueSymbol = exports.union = exports.undefined = exports.tuple = exports.trimmed = exports.toData = exports.toAnnotations = exports.templateLiteral = exports.symbol = exports.struct = exports.string = exports.startsWith = exports.rest = exports.required = exports.record = exports.readonlySetPretty = exports.readonlySetArbitrary = exports.readonlySet = exports.readonlyMapPretty = exports.readonlyMapArbitrary = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = exports.partial = exports.optionalElement = exports.optional = exports.optionPretty = exports.optionArbitrary = exports.option = exports.omit = exports.object = exports.number = exports.nullable = exports.null = exports.nonPositiveBigint = exports.nonPositive = exports.nonNegativeBigint = exports.nonNegative = exports.nonNaN = exports.nonEmptyArray = exports.nonEmpty = exports.never = exports.negativeBigint = exports.negative = exports.multipleOf = exports.minLength = exports.minItems = exports.maxLength = exports.maxItems = exports.make = exports.literal = exports.lessThanOrEqualToBigint = exports.lessThanOrEqualTo = exports.lessThanBigint = exports.lessThan = exports.length = exports.lazy = exports.keyof = exports.itemsCount = exports.isSet = exports.isMap = void 0;
+exports.validDate = exports.unknown = exports.uniqueSymbol = exports.union = exports.undefined = exports.tuple = exports.trimmed = exports.toData = exports.toAnnotations = exports.templateLiteral = exports.symbol = exports.struct = exports.string = exports.startsWith = exports.rest = exports.required = exports.record = exports.readonlySetPretty = exports.readonlySetArbitrary = exports.readonlySet = exports.readonlyMapPretty = exports.readonlyMapArbitrary = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = exports.partial = exports.optionalElement = exports.optional = exports.optionPretty = exports.optionArbitrary = exports.option = exports.omit = exports.object = exports.number = exports.nullable = exports.null = exports.nonPositiveBigint = exports.nonPositive = exports.nonNegativeBigint = exports.nonNegative = exports.nonNaN = exports.nonEmptyArray = exports.nonEmpty = exports.never = exports.negativeBigint = exports.negative = exports.multipleOf = exports.minLength = exports.minItems = exports.maxLength = exports.maxItems = exports.make = exports.literal = exports.lessThanOrEqualToBigint = exports.lessThanOrEqualTo = exports.lessThanBigint = exports.lessThan = exports.length = exports.lazy = exports.keyof = exports.itemsCount = exports.isSet = exports.isSchema = exports.isMap = void 0;
 Object.defineProperty(exports, "validate", {
   enumerable: true,
   get: function () {
@@ -85,10 +85,14 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 // ---------------------------------------------
 // model
 // ---------------------------------------------
+const TypeId = /*#__PURE__*/Symbol.for("@effect/schema/Schema");
+/** @internal */
+const CodecTypeId = /*#__PURE__*/Symbol.for("@effect/schema/Codec");
 /**
  * @category model
  * @since 1.0.0
  */
+exports.CodecTypeId = CodecTypeId;
 const SchemaTypeId = /*#__PURE__*/Symbol.for("@effect/schema/Schema");
 // ---------------------------------------------
 // validating / asserts / guards
@@ -109,6 +113,8 @@ const annotations = options => self => make(AST.mergeAnnotations(self.ast, toAnn
 exports.annotations = annotations;
 class SchemaImpl {
   ast;
+  _id = TypeId;
+  _codecId = CodecTypeId;
   From;
   To;
   [SchemaTypeId] = _Function.identity;
@@ -125,10 +131,18 @@ class SchemaImpl {
  */
 const make = ast => new SchemaImpl(ast);
 /**
+ * Tests if a value is a `Schema`.
+ *
+ * @category guards
+ * @since 1.0.0
+ */
+exports.make = make;
+const isSchema = input => (0, _Predicate.isObject)(input) && "_id" in input && input["_id"] === TypeId;
+/**
   @category constructors
   @since 1.0.0
 */
-exports.make = make;
+exports.isSchema = isSchema;
 const declare = (typeParameters, type, decode, annotations) => make(AST.createDeclaration(typeParameters.map(schema => schema.ast), type.ast, (...typeParameters) => decode(...typeParameters.map(make)), annotations));
 /**
  * @category constructors
@@ -531,6 +545,8 @@ const brand = (brand, options) => self => {
   const out = Object.assign(input => validate(input), {
     [_Brand.RefinedConstructorsTypeId]: _Brand.RefinedConstructorsTypeId,
     [SchemaTypeId]: _Function.identity,
+    _id: TypeId,
+    _codecId: CodecTypeId,
     ast,
     option: input => validateOption(input),
     either: input => E.mapLeft(validateEither(input), e => [{
