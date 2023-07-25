@@ -89,8 +89,6 @@ Added in v1.0.0
   - [isSchema](#isschema)
 - [model](#model)
   - [Schema (interface)](#schema-interface)
-  - [SchemaTypeId](#schematypeid)
-  - [SchemaTypeId (type alias)](#schematypeid-type-alias)
 - [number constructors](#number-constructors)
   - [Finite](#finite)
   - [Int](#int)
@@ -141,6 +139,7 @@ Added in v1.0.0
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
 - [symbol](#symbol-1)
+  - [SchemaPropertySignatureTypeId (type alias)](#schemapropertysignaturetypeid-type-alias)
   - [TypeId (type alias)](#typeid-type-alias)
 - [type id](#type-id)
   - [BrandTypeId](#brandtypeid)
@@ -970,31 +969,10 @@ Added in v1.0.0
 export interface Schema<A> extends Pipeable {
   readonly _id: TypeId
   readonly _codecId: CodecTypeId
-  readonly [SchemaTypeId]: (_: A) => A
   readonly From: (_: A) => A
   readonly To: (_: A) => A
   readonly ast: AST.AST
 }
-```
-
-Added in v1.0.0
-
-## SchemaTypeId
-
-**Signature**
-
-```ts
-export declare const SchemaTypeId: typeof SchemaTypeId
-```
-
-Added in v1.0.0
-
-## SchemaTypeId (type alias)
-
-**Signature**
-
-```ts
-export type SchemaTypeId = typeof SchemaTypeId
 ```
 
 Added in v1.0.0
@@ -1516,6 +1494,16 @@ Added in v1.0.0
 
 # symbol
 
+## SchemaPropertySignatureTypeId (type alias)
+
+**Signature**
+
+```ts
+export type SchemaPropertySignatureTypeId = typeof SchemaPropertySignatureTypeId
+```
+
+Added in v1.0.0
+
 ## TypeId (type alias)
 
 **Signature**
@@ -1874,7 +1862,7 @@ Added in v1.0.0
 ```ts
 export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
   extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly [SchemaTypeId]: (_: From) => From
+  readonly _id: SchemaPropertySignatureTypeId
 }
 ```
 
@@ -1902,7 +1890,7 @@ Added in v1.0.0
 ```ts
 export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
   extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly [SchemaTypeId]: (_: From) => From
+  readonly _id: SchemaPropertySignatureTypeId
 }
 ```
 

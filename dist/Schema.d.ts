@@ -25,20 +25,9 @@ export type TypeId = typeof TypeId;
  * @category model
  * @since 1.0.0
  */
-export declare const SchemaTypeId: unique symbol;
-/**
- * @category model
- * @since 1.0.0
- */
-export type SchemaTypeId = typeof SchemaTypeId;
-/**
- * @category model
- * @since 1.0.0
- */
 export interface Schema<A> extends Pipeable {
     readonly _id: TypeId;
     readonly _codecId: CodecTypeId;
-    readonly [SchemaTypeId]: (_: A) => A;
     readonly From: (_: A) => A;
     readonly To: (_: A) => A;
     readonly ast: AST.AST;
@@ -294,17 +283,23 @@ export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptiona
     readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>;
     readonly toOption: () => PropertySignature<From, true, Option<To>, false>;
 }
+declare const SchemaPropertySignatureTypeId: unique symbol;
+/**
+ * @since 1.0.0
+ * @category symbol
+ */
+export type SchemaPropertySignatureTypeId = typeof SchemaPropertySignatureTypeId;
 /**
  * @since 1.0.0
  */
 export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional> extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-    readonly [SchemaTypeId]: (_: From) => From;
+    readonly _id: SchemaPropertySignatureTypeId;
 }
 /**
  * @since 1.0.0
  */
 export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional> extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional> {
-    readonly [SchemaTypeId]: (_: From) => From;
+    readonly _id: SchemaPropertySignatureTypeId;
 }
 /**
  * @since 1.0.0

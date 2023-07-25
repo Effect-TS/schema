@@ -12,7 +12,7 @@ import * as E from "@effect/data/Either"
 import type { Either } from "@effect/data/Either"
 import * as Equal from "@effect/data/Equal"
 import type { LazyArg } from "@effect/data/Function"
-import { dual, identity } from "@effect/data/Function"
+import { dual } from "@effect/data/Function"
 import * as N from "@effect/data/Number"
 import type { Option } from "@effect/data/Option"
 import * as O from "@effect/data/Option"
@@ -36,13 +36,13 @@ import { formatErrors } from "@effect/schema/TreeFormatter"
 // model
 // ---------------------------------------------
 
-const TypeId: unique symbol = Symbol.for("@effect/schema/Schema")
-
 /** @internal */
 export const CodecTypeId: unique symbol = Symbol.for("@effect/schema/Codec")
 
 /** @internal */
 export type CodecTypeId = typeof CodecTypeId
+
+const TypeId: unique symbol = Symbol.for("@effect/schema/Schema")
 
 /**
  * @since 1.0.0
@@ -54,22 +54,9 @@ export type TypeId = typeof TypeId
  * @category model
  * @since 1.0.0
  */
-export const SchemaTypeId = Symbol.for("@effect/schema/Schema")
-
-/**
- * @category model
- * @since 1.0.0
- */
-export type SchemaTypeId = typeof SchemaTypeId
-
-/**
- * @category model
- * @since 1.0.0
- */
 export interface Schema<A> extends Pipeable {
   readonly _id: TypeId
   readonly _codecId: CodecTypeId
-  readonly [SchemaTypeId]: (_: A) => A
   readonly From: (_: A) => A
   readonly To: (_: A) => A
   readonly ast: AST.AST
@@ -156,7 +143,6 @@ class SchemaImpl<A> implements Schema<A> {
   readonly _codecId: CodecTypeId = CodecTypeId
   readonly From!: (_: A) => A
   readonly To!: (_: A) => A
-  readonly [SchemaTypeId] = identity
   constructor(readonly ast: AST.AST) {}
   pipe() {
     return pipeArguments(this, arguments)
@@ -567,22 +553,28 @@ export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptiona
   readonly toOption: () => PropertySignature<From, true, Option<To>, false>
 }
 
+const SchemaPropertySignatureTypeId: unique symbol = Symbol.for("@effect/schema/SchemaPropertySignature")
+
+/**
+ * @since 1.0.0
+ * @category symbol
+ */
+export type SchemaPropertySignatureTypeId = typeof SchemaPropertySignatureTypeId
+
 /**
  * @since 1.0.0
  */
 export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
-{
-  readonly [SchemaTypeId]: (_: From) => From
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>{
+  readonly _id: SchemaPropertySignatureTypeId
 }
 
 /**
  * @since 1.0.0
  */
 export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
-{
-  readonly [SchemaTypeId]: (_: From) => From
+  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>{
+  readonly _id: SchemaPropertySignatureTypeId
 }
 
 /** @internal */
@@ -611,7 +603,7 @@ export type PropertySignatureConfig =
 
 /** @internal */
 export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
-  readonly [SchemaTypeId]: (_: From) => From = identity
+  readonly _id: SchemaPropertySignatureTypeId = SchemaPropertySignatureTypeId
   readonly From!: (_: From) => From
   readonly FromIsOptional!: FromIsOptional
   readonly To!: (_: To) => To
@@ -906,7 +898,6 @@ export const brand = <B extends string | symbol, A>(
     const is = P.is(schema)
     const out: any = Object.assign((input: unknown) => validate(input), {
       [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
-      [SchemaTypeId]: identity,
       _id: TypeId,
       _codecId: CodecTypeId,
       ast,

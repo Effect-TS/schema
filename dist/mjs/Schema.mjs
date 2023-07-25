@@ -7,7 +7,7 @@ import * as C from "@effect/data/Chunk";
 import * as D from "@effect/data/Data";
 import * as E from "@effect/data/Either";
 import * as Equal from "@effect/data/Equal";
-import { dual, identity } from "@effect/data/Function";
+import { dual } from "@effect/data/Function";
 import * as N from "@effect/data/Number";
 import * as O from "@effect/data/Option";
 import { pipeArguments } from "@effect/data/Pipeable";
@@ -22,14 +22,9 @@ import { formatErrors } from "@effect/schema/TreeFormatter";
 // ---------------------------------------------
 // model
 // ---------------------------------------------
-const TypeId = /*#__PURE__*/Symbol.for("@effect/schema/Schema");
 /** @internal */
 export const CodecTypeId = /*#__PURE__*/Symbol.for("@effect/schema/Codec");
-/**
- * @category model
- * @since 1.0.0
- */
-export const SchemaTypeId = /*#__PURE__*/Symbol.for("@effect/schema/Schema");
+const TypeId = /*#__PURE__*/Symbol.for("@effect/schema/Schema");
 // ---------------------------------------------
 // validating / asserts / guards
 // ---------------------------------------------
@@ -92,7 +87,6 @@ class SchemaImpl {
   _codecId = CodecTypeId;
   From;
   To;
-  [SchemaTypeId] = identity;
   constructor(ast) {
     this.ast = ast;
   }
@@ -351,10 +345,11 @@ export const nonEmptyArray = item => tuple(item).pipe(rest(item));
  * @since 1.0.0
  */
 export const lazy = (f, annotations) => make(AST.createLazy(() => f().ast, annotations));
+const SchemaPropertySignatureTypeId = /*#__PURE__*/Symbol.for("@effect/schema/SchemaPropertySignature");
 /** @internal */
 export class PropertySignatureImpl {
   config;
-  [SchemaTypeId] = identity;
+  _id = SchemaPropertySignatureTypeId;
   From;
   FromIsOptional;
   To;
@@ -492,7 +487,6 @@ export const brand = (brand, options) => self => {
   const is = P.is(schema);
   const out = Object.assign(input => validate(input), {
     [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
-    [SchemaTypeId]: identity,
     _id: TypeId,
     _codecId: CodecTypeId,
     ast,
