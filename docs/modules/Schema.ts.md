@@ -959,6 +959,20 @@ export declare const isSchema: (input: unknown) => input is Schema<unknown>
 
 Added in v1.0.0
 
+# guards
+
+## isSchema
+
+Tests if a value is a `Schema`.
+
+**Signature**
+
+```ts
+export declare const isSchema: (input: unknown) => input is Schema<unknown, unknown>
+```
+
+Added in v1.0.0
+
 # model
 
 ## Schema (interface)

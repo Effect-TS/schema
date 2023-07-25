@@ -1,5 +1,19 @@
 # @effect/schema
 
+## 0.30.3
+
+### Patch Changes
+
+- [#357](https://github.com/Effect-TS/schema/pull/357) [`00c2a47`](https://github.com/Effect-TS/schema/commit/00c2a47aae82a975755a90cb14ce27727efcfb21) Thanks [@sukovanej](https://github.com/sukovanej)! - Update /data.
+
+- [#357](https://github.com/Effect-TS/schema/pull/357) [`00c2a47`](https://github.com/Effect-TS/schema/commit/00c2a47aae82a975755a90cb14ce27727efcfb21) Thanks [@sukovanej](https://github.com/sukovanej)! - Add `_id` to `Schema`. Add `isSchema` guard.
+
+## 0.30.2
+
+### Patch Changes
+
+- [#355](https://github.com/Effect-TS/schema/pull/355) [`d6930c1`](https://github.com/Effect-TS/schema/commit/d6930c1a2194afe4700389a65f0d741cc8eed9f1) Thanks [@IMax153](https://github.com/IMax153)! - upgrade to `@effect/data@0.16.1` and `@effect/io@0.35.2`
+
 ## 0.30.1
 
 ### Patch Changes
