@@ -553,7 +553,9 @@ export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptiona
   readonly toOption: () => PropertySignature<From, true, Option<To>, false>
 }
 
-const SchemaPropertySignatureTypeId: unique symbol = Symbol.for("@effect/schema/SchemaPropertySignature")
+const SchemaPropertySignatureTypeId: unique symbol = Symbol.for(
+  "@effect/schema/SchemaPropertySignature"
+)
 
 /**
  * @since 1.0.0
@@ -565,7 +567,8 @@ export type SchemaPropertySignatureTypeId = typeof SchemaPropertySignatureTypeId
  * @since 1.0.0
  */
 export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>{
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
+{
   readonly _id: SchemaPropertySignatureTypeId
 }
 
@@ -573,7 +576,8 @@ export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
  * @since 1.0.0
  */
 export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>{
+  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
+{
   readonly _id: SchemaPropertySignatureTypeId
 }
 

@@ -109,10 +109,5 @@
     "vite": "^4.4.6",
     "vitest": "0.33.0",
     "zod": "^3.21.4"
-  },
-  "dependencies": {
-    "@effect/data": "^0.16.2",
-    "@effect/io": "^0.35.2",
-    "fast-check": "^3.11.0"
   }
 }
