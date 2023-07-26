@@ -87,4 +87,36 @@ describe.concurrent("Option", () => {
       await Util.expectEncodeSuccess(schema, O.some(1), "1")
     })
   })
+
+  describe.concurrent("optionFromEmptyString", () => {
+    it("property tests", () => {
+      Util.roundtrip(S.optionFromEmptyString(S.string))
+    })
+
+    it("Decoder", async () => {
+      const schema = S.optionFromEmptyString(S.string)
+      await Util.expectParseSuccess(schema, "", O.none())
+      await Util.expectParseSuccess(schema, "foo", O.some("foo"))
+
+      expect(O.isOption(S.decodeSync(schema)(""))).toEqual(true)
+      expect(O.isOption(S.decodeSync(schema)("foo"))).toEqual(true)
+
+      await Util.expectParseFailure(
+        schema,
+        undefined,
+        `Expected string, actual undefined`
+      )
+      await Util.expectParseFailure(
+        schema,
+        {},
+        `Expected string, actual {}`
+      )
+    })
+
+    it("Encoder", async () => {
+      const schema = S.optionFromEmptyString(S.string)
+      await Util.expectEncodeSuccess(schema, O.none(), "")
+      await Util.expectEncodeSuccess(schema, O.some("foo"), "foo")
+    })
+  })
 })
