@@ -918,8 +918,8 @@ export const extend: {
  * @since 1.0.0
  */
 export const compose: {
-  <B, C>(bc: Schema<B, C>): <A>(ab: Schema<A, B>) => Schema<A, C>
-  <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C>
+  <B1, B2 extends B1, C>(bc: Schema<B2, C>): <A>(ab: Schema<A, B1>) => Schema<A, C>
+  <A, B1, B2 extends B1, C>(ab: Schema<A, B1>, bc: Schema<B2, C>): Schema<A, C>
 } = dual(
   2,
   <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C> =>

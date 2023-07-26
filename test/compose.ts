@@ -13,4 +13,10 @@ describe.concurrent("compose", async () => {
     )
     await Util.expectParseSuccess(schema, { a: "1,2,3" }, { a: [1, 2, 3] })
   })
+
+  it("unknown record compose struct", async () => {
+    const schema = S.record(S.string, S.unknown).pipe(S.compose(S.struct({ a: S.string })))
+    await Util.expectParseSuccess(schema, { a: "1" }, { a: "1" })
+    await Util.expectParseFailure(schema, { a: 1 }, "/a Expected string, actual 1")
+  })
 })
