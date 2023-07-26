@@ -64,6 +64,7 @@ Added in v1.0.0
   - [omit](#omit)
   - [option](#option)
   - [optionFromSelf](#optionfromself)
+  - [optionFromEmptyString](#optionFromEmptyString)
   - [optionalElement](#optionalelement)
   - [partial](#partial)
   - [pick](#pick)
@@ -1647,6 +1648,18 @@ Added in v1.0.0
 
 ```ts
 export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option<A>>
+```
+
+Added in v1.0.0
+
+## optionFromEmptyString
+
+**Signature**
+
+```ts
+export declare const optionFromEmptyString: <I, A>(
+  value: Schema<I, A>
+) => Schema<I, Option<A>>;
 ```
 
 Added in v1.0.0
