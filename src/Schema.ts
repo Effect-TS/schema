@@ -2331,6 +2331,20 @@ export const optionFromNullable = <I, A>(
 ): Schema<I | null, Option<A>> =>
   transform(nullable(value), to(optionFromSelf(value)), O.fromNullable, O.getOrNull)
 
+/**
+ * @category option
+ * @since 1.0.0
+ */
+export const optionFromEmptyString = <I, A extends string>(
+  value: Schema<I, A>
+): Schema<I, Option<A>> =>
+  transform(
+    value,
+    to(optionFromSelf(value)),
+    (s) => s.length > 0 ? O.some(s) : O.none(),
+    O.getOrElse(() => "" as A)
+  )
+
 // ---------------------------------------------
 // data/ReadonlyArray
 // ---------------------------------------------
