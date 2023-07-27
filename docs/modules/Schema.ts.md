@@ -30,7 +30,9 @@ Added in v1.0.0
   - [maxItems](#maxitems)
   - [minItems](#minitems)
 - [bigint](#bigint)
+  - [BigintFromString](#bigintfromstring)
   - [betweenBigint](#betweenbigint)
+  - [bigintFromString](#bigintfromstring)
   - [clampBigint](#clampbigint)
   - [greaterThanBigint](#greaterthanbigint)
   - [greaterThanOrEqualToBigint](#greaterthanorequaltobigint)
@@ -48,6 +50,7 @@ Added in v1.0.0
   - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
   - [chunk](#chunk)
+  - [compose](#compose)
   - [data](#data)
   - [dataFromSelf](#datafromself)
   - [declare](#declare)
@@ -161,6 +164,7 @@ Added in v1.0.0
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
   - [pattern](#pattern)
+  - [split](#split)
   - [startsWith](#startswith)
   - [trim](#trim)
   - [trimmed](#trimmed)
@@ -394,6 +398,20 @@ Added in v1.0.0
 
 # bigint
 
+## BigintFromString
+
+This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+
+**Signature**
+
+```ts
+export declare const BigintFromString: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
 ## betweenBigint
 
 **Signature**
@@ -404,6 +422,20 @@ export declare const betweenBigint: <A extends bigint>(
   max: bigint,
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## bigintFromString
+
+This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+
+**Signature**
+
+```ts
+export declare const bigintFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, bigint>
 ```
 
 Added in v1.0.0
@@ -631,6 +663,19 @@ Added in v1.0.0
 
 ```ts
 export declare const chunk: <I, A>(item: Schema<I, A>) => Schema<readonly I[], Chunk<A>>
+```
+
+Added in v1.0.0
+
+## compose
+
+**Signature**
+
+```ts
+export declare const compose: {
+  <B, C>(bc: Schema<B, C>): <A>(ab: Schema<A, B>) => Schema<A, C>
+  <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C>
+}
 ```
 
 Added in v1.0.0
@@ -1945,6 +1990,21 @@ export declare const pattern: <A extends string>(
   regex: RegExp,
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## split
+
+This combinator allows splitting a string into an array of strings.
+
+**Signature**
+
+```ts
+export declare const split: {
+  (separator: string): <I>(self: Schema<I, string>) => Schema<I, readonly string[]>
+  <I>(self: Schema<I, string>, separator: string): Schema<I, readonly string[]>
+}
 ```
 
 Added in v1.0.0
