@@ -2748,6 +2748,12 @@ export const trim = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
  */
 export const Trim: Schema<string, string> = trim(string)
 
+// TODO: move this to data/String maybe?
+type Split<S extends string, D extends string> = string extends S ? Array<string>
+  : S extends "" ? []
+  : S extends `${infer T}${D}${infer U}` ? [T, ...Split<U, D>]
+  : [S]
+
 /**
  * This combinator allows splitting a string into an array of strings.
  *
@@ -2755,17 +2761,25 @@ export const Trim: Schema<string, string> = trim(string)
  * @since 1.0.0
  */
 export const split: {
-  (separator: string): <I>(self: Schema<I, string>) => Schema<I, ReadonlyArray<string>>
-  <I>(self: Schema<I, string>, separator: string): Schema<I, ReadonlyArray<string>>
+  <S extends string>(
+    separator: S
+  ): <I, A extends string>(self: Schema<I, A>) => Schema<I, Readonly<Split<A, S>>>
+  <I, A extends string, S extends string>(
+    self: Schema<I, A>,
+    separator: S
+  ): Schema<I, Readonly<Split<A, S>>>
 } = dual(
   2,
-  <I>(self: Schema<I, string>, separator: string): Schema<I, ReadonlyArray<string>> =>
+  <I, A extends string, S extends string>(
+    self: Schema<I, A>,
+    separator: S
+  ): Schema<I, Readonly<Split<A, S>>> =>
     transform(
       self,
       array(string),
       S.split(separator),
-      RA.join(separator)
-    )
+      (_) => RA.join(_, separator) as A
+    ) as any
 )
 
 /**
