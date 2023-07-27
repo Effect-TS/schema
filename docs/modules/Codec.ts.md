@@ -49,6 +49,8 @@ Added in v1.0.0
   - [nonPositiveBigint](#nonpositivebigint)
   - [positiveBigint](#positivebigint)
 - [bigint transformations](#bigint-transformations)
+  - [BigintFromString](#bigintfromstring)
+  - [bigintFromString](#bigintfromstring)
   - [clampBigint](#clampbigint)
 - [boolean transformations](#boolean-transformations)
   - [not](#not)
@@ -497,6 +499,34 @@ export declare const positiveBigint: <A extends bigint>(
 Added in v1.0.0
 
 # bigint transformations
+
+## BigintFromString
+
+This codec transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+
+**Signature**
+
+```ts
+export declare const BigintFromString: Codec<string, bigint>
+```
+
+Added in v1.0.0
+
+## bigintFromString
+
+This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+
+**Signature**
+
+```ts
+export declare const bigintFromString: <I>(self: Codec<I, string>) => Codec<I, bigint>
+```
+
+Added in v1.0.0
 
 ## clampBigint
 

@@ -1225,6 +1225,29 @@ parseSync(3); // 1
 
 ### Bigint transformations
 
+#### BigintFromString
+
+Transforms a `string` into a `bigint` by parsing the string using `BigInt`.
+
+```ts
+import * as C from "@effect/schema/Codec";
+
+// const schema: C.Codec<string, bigint>
+const schema = C.BigintFromString;
+const parseSync = C.parseSync(schema);
+
+// success cases
+parseSync("1"); // 1n
+parseSync("-1"); // -1n
+
+// failure cases
+parseSync("a"); // throws
+parseSync("1.5"); // throws
+parseSync("NaN"); // throws
+parseSync("Infinity"); // throws
+parseSync("-Infinity"); // throws
+```
+
 #### clamp
 
 Clamps a `bigint` between a minimum and a maximum value.

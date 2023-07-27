@@ -118,6 +118,40 @@ describe.concurrent("boolean transformations", () => {
 })
 
 describe.concurrent("bigint transformations", () => {
+  describe.concurrent("bigintFromString", () => {
+    const codec = C.BigintFromString
+
+    it("property tests", () => {
+      Util.roundtrip(codec)
+    })
+
+    it("Decoder", async () => {
+      await Util.expectParseSuccess(codec, "0", 0n)
+      await Util.expectParseSuccess(codec, "-0", -0n)
+      await Util.expectParseSuccess(codec, "1", 1n)
+
+      await Util.expectParseFailure(codec, "", `Expected (a string -> a bigint), actual ""`)
+      await Util.expectParseFailure(codec, " ", `Expected (a string -> a bigint), actual " "`)
+      await Util.expectParseFailure(codec, "1.2", `Expected (a string -> a bigint), actual "1.2"`)
+      await Util.expectParseFailure(codec, "1AB", `Expected (a string -> a bigint), actual "1AB"`)
+      await Util.expectParseFailure(codec, "AB1", `Expected (a string -> a bigint), actual "AB1"`)
+      await Util.expectParseFailure(
+        codec,
+        "a",
+        `Expected (a string -> a bigint), actual "a"`
+      )
+      await Util.expectParseFailure(
+        codec,
+        "a1",
+        `Expected (a string -> a bigint), actual "a1"`
+      )
+    })
+
+    it("Encoder", async () => {
+      await Util.expectEncodeSuccess(codec, 1n, "1")
+    })
+  })
+
   describe.concurrent("clampBigint", () => {
     it("decode / encode", async () => {
       const codec = S.bigint.pipe(C.clampBigint(-1n, 1n))

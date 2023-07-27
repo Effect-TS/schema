@@ -679,6 +679,38 @@ export const not = self => transform(self, to(self), b => !b, b => !b, {
 // bigint transformations
 // ---------------------------------------------
 /**
+ * This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+ *
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+ *
+ * @param self - The codec representing the input string
+ *
+ * @category bigint transformations
+ * @since 1.0.0
+ */
+export const bigintFromString = self => {
+  const schema = transformResult(self, S.bigint, s => {
+    if (s.trim() === "") {
+      return PR.failure(PR.type(schema.ast, s));
+    }
+    try {
+      return PR.success(BigInt(s));
+    } catch (_) {
+      return PR.failure(PR.type(schema.ast, s));
+    }
+  }, n => PR.success(String(n)));
+  return schema;
+};
+/**
+ * This codec transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+ *
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+ *
+ * @category bigint transformations
+ * @since 1.0.0
+ */
+export const BigintFromString = /*#__PURE__*/bigintFromString(S.string);
+/**
  * Clamps a bigint between a minimum and a maximum value.
  *
  * @category bigint transformations

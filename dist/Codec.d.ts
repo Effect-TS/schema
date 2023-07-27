@@ -237,7 +237,7 @@ export type FromOptionalKeys<Fields> = {
  * @category combinators
  * @since 1.0.0
  */
-export declare const struct: <Fields extends Record<PropertyKey, S.PropertySignature<any, boolean, any, boolean> | S.PropertySignature<never, boolean, never, boolean> | Codec<any, any> | Codec<never, never>>>(fields: Fields) => Codec<S.Simplify<{ readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>; } & { readonly [K_1 in FromOptionalKeys<Fields>]?: From<Fields[K_1]>; }>, S.Simplify<{ readonly [K_2 in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K_2]>; } & { readonly [K_3 in S.ToOptionalKeys<Fields>]?: To<Fields[K_3]>; }>>;
+export declare const struct: <Fields extends Record<PropertyKey, Codec<any, any> | Codec<never, never> | S.PropertySignature<any, boolean, any, boolean> | S.PropertySignature<never, boolean, never, boolean>>>(fields: Fields) => Codec<S.Simplify<{ readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>; } & { readonly [K_1 in FromOptionalKeys<Fields>]?: From<Fields[K_1]>; }>, S.Simplify<{ readonly [K_2 in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K_2]>; } & { readonly [K_3 in S.ToOptionalKeys<Fields>]?: To<Fields[K_3]>; }>>;
 /**
  * @category combinators
  * @since 1.0.0
@@ -548,6 +548,26 @@ export declare const NumberFromString: Codec<string, number>;
  * @since 1.0.0
  */
 export declare const not: <I>(self: Codec<I, boolean>) => Codec<I, boolean>;
+/**
+ * This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+ *
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+ *
+ * @param self - The codec representing the input string
+ *
+ * @category bigint transformations
+ * @since 1.0.0
+ */
+export declare const bigintFromString: <I>(self: Codec<I, string>) => Codec<I, bigint>;
+/**
+ * This codec transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+ *
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+ *
+ * @category bigint transformations
+ * @since 1.0.0
+ */
+export declare const BigintFromString: Codec<string, bigint>;
 /**
  * Clamps a bigint between a minimum and a maximum value.
  *

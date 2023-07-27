@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.dateFromString = exports.dataFromSelf = exports.data = exports.compose = exports.clampBigint = exports.clamp = exports.chunkFromSelf = exports.chunk = exports.brand = exports.betweenBigint = exports.between = exports.attachPropertySignature = exports.array = exports.Trim = exports.NumberFromString = exports.Date = void 0;
+exports.dateFromString = exports.dataFromSelf = exports.data = exports.compose = exports.clampBigint = exports.clamp = exports.chunkFromSelf = exports.chunk = exports.brand = exports.bigintFromString = exports.betweenBigint = exports.between = exports.attachPropertySignature = exports.array = exports.Trim = exports.NumberFromString = exports.Date = exports.BigintFromString = void 0;
 Object.defineProperty(exports, "decode", {
   enumerable: true,
   get: function () {
@@ -116,7 +116,8 @@ Object.defineProperty(exports, "parseSync", {
     return P.parseSync;
   }
 });
-exports.union = exports.tuple = exports.trimmed = exports.trim = exports.transformResult = exports.transform = exports.to = exports.struct = exports.startsWith = exports.rest = exports.record = exports.readonlySetFromSelf = exports.readonlySet = exports.readonlyMapFromSelf = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = void 0;
+exports.trimmed = exports.trim = exports.transformResult = exports.transform = exports.to = exports.struct = exports.startsWith = exports.rest = exports.record = exports.readonlySetFromSelf = exports.readonlySet = exports.readonlyMapFromSelf = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = void 0;
+exports.union = exports.tuple = void 0;
 var B = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Bigint"));
 var C = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Chunk"));
 var E = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Either"));
@@ -774,12 +775,46 @@ const not = self => transform(self, to(self), b => !b, b => !b, {
 // bigint transformations
 // ---------------------------------------------
 /**
- * Clamps a bigint between a minimum and a maximum value.
+ * This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+ *
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+ *
+ * @param self - The codec representing the input string
  *
  * @category bigint transformations
  * @since 1.0.0
  */
 exports.not = not;
+const bigintFromString = self => {
+  const schema = transformResult(self, S.bigint, s => {
+    if (s.trim() === "") {
+      return PR.failure(PR.type(schema.ast, s));
+    }
+    try {
+      return PR.success(BigInt(s));
+    } catch (_) {
+      return PR.failure(PR.type(schema.ast, s));
+    }
+  }, n => PR.success(String(n)));
+  return schema;
+};
+/**
+ * This codec transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+ *
+ * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+ *
+ * @category bigint transformations
+ * @since 1.0.0
+ */
+exports.bigintFromString = bigintFromString;
+const BigintFromString = /*#__PURE__*/bigintFromString(S.string);
+/**
+ * Clamps a bigint between a minimum and a maximum value.
+ *
+ * @category bigint transformations
+ * @since 1.0.0
+ */
+exports.BigintFromString = BigintFromString;
 const clampBigint = (min, max) => self => transform(self, to(self).pipe(S.betweenBigint(min, max)), input => B.clamp(input, min, max), _Function.identity, {
   [AST.DocumentationAnnotationId]: "clampBigint"
 });
