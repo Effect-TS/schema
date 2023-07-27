@@ -483,6 +483,9 @@ const FooterLocaleIDs = S.literal("footer_title", "footer_sendoff")
 // $ExpectType Schema<"welcome_email_id" | "email_heading_id" | "footer_title_id" | "footer_sendoff_id", "welcome_email_id" | "email_heading_id" | "footer_title_id" | "footer_sendoff_id">
 S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"))
 
+// $ExpectType Schema<`a.${string}`, readonly ["a", ...string[]]>
+pipe(S.templateLiteral(S.literal('a'), S.literal('.'), S.string), S.split("."))
+
 // ---------------------------------------------
 // attachPropertySignature
 // ---------------------------------------------
