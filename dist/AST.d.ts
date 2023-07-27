@@ -378,7 +378,10 @@ export interface Enums extends Annotated {
  * @category constructors
  * @since 1.0.0
  */
-export declare const createEnums: (enums: ReadonlyArray<readonly [string, string | number]>) => Enums;
+export declare const createEnums: (enums: ReadonlyArray<readonly [
+    string,
+    string | number
+]>) => Enums;
 /**
  * @category guards
  * @since 1.0.0

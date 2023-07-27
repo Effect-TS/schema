@@ -1048,6 +1048,18 @@ const Operation: S.Schema<Operation> = S.lazy(() =>
 );
 ```
 
+## Compose
+
+The `compose` combinator allows you to combine two schemas.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as C from "@effect/schema/Codec";
+
+// $ExpectType Codec<string, readonly number[]>
+C.compose(C.split(S.string, ","), S.array(C.NumberFromString));
+```
+
 ## Transformations
 
 In some cases, we may need to transform the output of a schema to a different type. For instance, we may want to parse a string into a number, or we may want to transform a date string into a `Date` object.
