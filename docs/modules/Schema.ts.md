@@ -136,6 +136,7 @@ Added in v1.0.0
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
   - [pattern](#pattern)
+  - [split](#split)
   - [startsWith](#startswith)
   - [trimmed](#trimmed)
 - [symbol](#symbol-1)
@@ -1458,6 +1459,21 @@ export declare const pattern: <A extends string>(
   regex: RegExp,
   options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## split
+
+This combinator allows splitting a string into an array of strings.
+
+**Signature**
+
+```ts
+export declare const split: {
+  (separator: string): <I>(self: Schema<I, string>) => Schema<I, readonly string[]>
+  <I>(self: Schema<I, string>, separator: string): Schema<I, readonly string[]>
+}
 ```
 
 Added in v1.0.0
