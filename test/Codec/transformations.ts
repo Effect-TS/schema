@@ -3,6 +3,37 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("string transformations", () => {
+  describe.concurrent("split", () => {
+    it("data-last", async () => {
+      const schema = S.string.pipe(C.split(","))
+
+      Util.roundtrip(schema)
+
+      // Decoding
+      await Util.expectParseSuccess(schema, "", [""])
+      await Util.expectParseSuccess(schema, ",", ["", ""])
+      await Util.expectParseSuccess(schema, "a", ["a"])
+      await Util.expectParseSuccess(schema, ",a", ["", "a"])
+      await Util.expectParseSuccess(schema, "a,", ["a", ""])
+      await Util.expectParseSuccess(schema, "a,b", ["a", "b"])
+
+      // Encoding
+      await Util.expectEncodeSuccess(schema, [], "")
+      await Util.expectEncodeSuccess(schema, [""], "")
+      await Util.expectEncodeSuccess(schema, ["", ""], ",")
+      await Util.expectEncodeSuccess(schema, ["a"], "a")
+      await Util.expectEncodeSuccess(schema, ["", "a"], ",a")
+      await Util.expectEncodeSuccess(schema, ["a", ""], "a,")
+      await Util.expectEncodeSuccess(schema, ["a", "b"], "a,b")
+    })
+
+    it("data-first", async () => {
+      const schema = C.split(S.string, ",")
+
+      await Util.expectParseSuccess(schema, "a,b", ["a", "b"])
+    })
+  })
+
   describe.concurrent("trim", () => {
     it("property tests", () => {
       const codec = C.Trim

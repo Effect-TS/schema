@@ -17,6 +17,7 @@ import type { Pipeable } from "@effect/data/Pipeable"
 import { pipeArguments } from "@effect/data/Pipeable"
 import { isObject, type Predicate, type Refinement } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
+import * as Str from "@effect/data/String"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
 import * as I from "@effect/schema/internal/common"
@@ -1035,6 +1036,26 @@ export const itemsCount = <A>(
 // ---------------------------------------------
 // string transformations
 // ---------------------------------------------
+
+/**
+ * This combinator allows splitting a string into an array of strings.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+export const split: {
+  (separator: string): <I>(self: Codec<I, string>) => Codec<I, ReadonlyArray<string>>
+  <I>(self: Codec<I, string>, separator: string): Codec<I, ReadonlyArray<string>>
+} = dual(
+  2,
+  <I>(self: Codec<I, string>, separator: string): Codec<I, ReadonlyArray<string>> =>
+    transform(
+      self,
+      array(S.string),
+      Str.split(separator),
+      RA.join(separator)
+    )
+)
 
 /**
  * This combinator allows removing whitespaces from the beginning and end of a string.

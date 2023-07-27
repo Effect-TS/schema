@@ -116,8 +116,8 @@ Object.defineProperty(exports, "parseSync", {
     return P.parseSync;
   }
 });
-exports.trimmed = exports.trim = exports.transformResult = exports.transform = exports.to = exports.struct = exports.startsWith = exports.rest = exports.record = exports.readonlySetFromSelf = exports.readonlySet = exports.readonlyMapFromSelf = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = void 0;
-exports.union = exports.tuple = void 0;
+exports.trim = exports.transformResult = exports.transform = exports.to = exports.struct = exports.startsWith = exports.split = exports.rest = exports.record = exports.readonlySetFromSelf = exports.readonlySet = exports.readonlyMapFromSelf = exports.readonlyMap = exports.propertySignature = exports.positiveBigint = exports.positive = exports.pick = exports.pattern = void 0;
+exports.union = exports.tuple = exports.trimmed = void 0;
 var B = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Bigint"));
 var C = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Chunk"));
 var E = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/Either"));
@@ -127,6 +127,7 @@ var O = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data
 var _Pipeable = /*#__PURE__*/require("@effect/data/Pipeable");
 var _Predicate = /*#__PURE__*/require("@effect/data/Predicate");
 var RA = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/ReadonlyArray"));
+var Str = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/data/String"));
 var AST = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/AST"));
 var I = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/internal/common"));
 var P = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/require("@effect/schema/Parser"));
@@ -685,12 +686,20 @@ const itemsCount = (n, options) => self => make(S._itemsCount(self.ast, n, optio
 // string transformations
 // ---------------------------------------------
 /**
- * This combinator allows removing whitespaces from the beginning and end of a string.
+ * This combinator allows splitting a string into an array of strings.
  *
  * @category string transformations
  * @since 1.0.0
  */
 exports.itemsCount = itemsCount;
+const split = /*#__PURE__*/(0, _Function.dual)(2, (self, separator) => transform(self, array(S.string), Str.split(separator), RA.join(separator)));
+/**
+ * This combinator allows removing whitespaces from the beginning and end of a string.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+exports.split = split;
 const trim = self => transform(self, to(self).pipe(S.trimmed()), s => s.trim(), _Function.identity, {
   [AST.DocumentationAnnotationId]: "trim"
 });

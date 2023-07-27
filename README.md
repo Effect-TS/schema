@@ -1160,6 +1160,24 @@ Effect.runPromiseExit(parse("fail")).then(console.log);
 
 ### String transformations
 
+#### split
+
+The `split` combinator allows splitting a string into an array of strings.
+
+```ts
+import * as C from "@effect/codec/Codec";
+import * as S from "@effect/schema/Schema";
+
+// const schema: Codec.Codec<string, string>
+const schema = S.string.pipe(C.split(","));
+const parseSync = S.parseSync(schema);
+
+parseSync(""); // [""]
+parseSync(","); // ["", ""]
+parseSync("a,"); // ["a", ""]
+parseSync("a,b"); // ["a", "b"]
+```
+
 #### Trim
 
 The `Trim` schema allows removing whitespaces from the beginning and end of a string.

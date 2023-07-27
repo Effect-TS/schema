@@ -135,6 +135,7 @@ Added in v1.0.0
   - [trimmed](#trimmed)
 - [string transformations](#string-transformations)
   - [Trim](#trim)
+  - [split](#split)
   - [trim](#trim)
 - [symbol](#symbol)
   - [CodecTypeId (type alias)](#codectypeid-type-alias)
@@ -1512,6 +1513,21 @@ This transformation allows removing whitespaces from the beginning and end of a 
 
 ```ts
 export declare const Trim: Codec<string, string>
+```
+
+Added in v1.0.0
+
+## split
+
+This combinator allows splitting a string into an array of strings.
+
+**Signature**
+
+```ts
+export declare const split: {
+  (separator: string): <I>(self: Codec<I, string>) => Codec<I, readonly string[]>
+  <I>(self: Codec<I, string>, separator: string): Codec<I, readonly string[]>
+}
 ```
 
 Added in v1.0.0

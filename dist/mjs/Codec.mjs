@@ -10,6 +10,7 @@ import * as O from "@effect/data/Option";
 import { pipeArguments } from "@effect/data/Pipeable";
 import { isObject } from "@effect/data/Predicate";
 import * as RA from "@effect/data/ReadonlyArray";
+import * as Str from "@effect/data/String";
 import * as AST from "@effect/schema/AST";
 import * as I from "@effect/schema/internal/common";
 import * as P from "@effect/schema/Parser";
@@ -594,6 +595,13 @@ export const itemsCount = (n, options) => self => make(S._itemsCount(self.ast, n
 // ---------------------------------------------
 // string transformations
 // ---------------------------------------------
+/**
+ * This combinator allows splitting a string into an array of strings.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+export const split = /*#__PURE__*/dual(2, (self, separator) => transform(self, array(S.string), Str.split(separator), RA.join(separator)));
 /**
  * This combinator allows removing whitespaces from the beginning and end of a string.
  *

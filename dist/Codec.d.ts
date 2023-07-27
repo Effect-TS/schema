@@ -497,6 +497,16 @@ export declare const maxItems: <A>(n: number, options?: S.FilterAnnotations<read
  */
 export declare const itemsCount: <A>(n: number, options?: S.FilterAnnotations<readonly A[]> | undefined) => <I>(self: Codec<I, A>) => Codec<I, A>;
 /**
+ * This combinator allows splitting a string into an array of strings.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+export declare const split: {
+    (separator: string): <I>(self: Codec<I, string>) => Codec<I, ReadonlyArray<string>>;
+    <I>(self: Codec<I, string>, separator: string): Codec<I, ReadonlyArray<string>>;
+};
+/**
  * This combinator allows removing whitespaces from the beginning and end of a string.
  *
  * @category string transformations
