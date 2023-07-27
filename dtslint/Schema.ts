@@ -105,6 +105,10 @@ pipe(S.string, S.includes('a'));
 // $ExpectType Schema<string, ReadonlyArray<string>>
 pipe(S.string, S.split('.'));
 
+// ---------------------------------------------
+// numbers
+// ---------------------------------------------
+
 // $ExpectType Schema<number, number>
 pipe(S.number, S.greaterThan(5));
 
