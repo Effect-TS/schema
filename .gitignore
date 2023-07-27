@@ -8,3 +8,4 @@ tmp/
 build/
 dist/
 .direnv/
+out/

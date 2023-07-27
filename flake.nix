@@ -24,8 +24,12 @@
         default = pkgs.mkShell {
           buildInputs = with pkgs; [
             nodejs-18_x
-            nodePackages.pnpm
           ];
+          shellHook = ''
+            mkdir -p $out/bin
+            ${pkgs.nodejs-18_x}/bin/corepack enable --install-directory $out/bin
+            export PATH="$out/bin:$PATH"
+          '';
         };
       };
     });
