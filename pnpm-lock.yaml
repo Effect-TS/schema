@@ -6,11 +6,11 @@ settings:
 
 dependencies:
   '@effect/data':
-    specifier: ^0.17.0
-    version: 0.17.0
+    specifier: ^0.17.1
+    version: 0.17.1
   '@effect/io':
-    specifier: ^0.36.0
-    version: 0.36.0
+    specifier: ^0.37.0
+    version: 0.37.0
   fast-check:
     specifier: ^3.12.0
     version: 3.12.0
@@ -782,8 +782,8 @@ packages:
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
     dev: true
 
-  /@effect/data@0.17.0:
-    resolution: {integrity: sha512-hBncTBQ4F3lggBjFgCgJVcPuesMSVRH2SSdGPbY4DDaGu19xyRX8dImJuoN6uniZG307MacHpwn/dDkqAVzITA==}
+  /@effect/data@0.17.1:
+    resolution: {integrity: sha512-QCYkLE5Y5Dm5Yax5R3GmW4ZIgTx7W+kSZ7yq5eqQ/mFWa8i4yxbLuu8cudqzdeZtRtTGZKlhDxfFfgVtMywXJg==}
     dev: false
 
   /@effect/docgen@0.1.2(@types/node@20.4.5)(typescript@5.1.6):
@@ -809,10 +809,10 @@ packages:
       - '@types/node'
     dev: true
 
-  /@effect/io@0.36.0:
-    resolution: {integrity: sha512-4ZjG/OwiJfuj/ldPa8d81HHR1DKrlrQS5/Sl09MSdWL3nf8D0M6DL35dqP5rAlBqU267/oecgaiQr+xy2gcj5A==}
+  /@effect/io@0.37.0:
+    resolution: {integrity: sha512-Y45STkhyBmv/oep/+6kGEces9Btp/cfWkSX5Qqi4ar5MRK13DJrexWF8+jAuixGhXWwWQHHasE9z6w6lFgQWJQ==}
     dependencies:
-      '@effect/data': 0.17.0
+      '@effect/data': 0.17.1
     dev: false
 
   /@effect/language-service@0.0.19:
