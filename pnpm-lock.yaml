@@ -5,12 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  '@effect/data':
-    specifier: ^0.17.1
-    version: 0.17.1
-  '@effect/io':
-    specifier: ^0.37.0
-    version: 0.37.0
   fast-check:
     specifier: ^3.12.0
     version: 3.12.0
@@ -40,9 +34,15 @@ devDependencies:
   '@effect-ts/core':
     specifier: ^0.60.5
     version: 0.60.5
+  '@effect/data':
+    specifier: ^0.17.1
+    version: 0.17.1
   '@effect/docgen':
     specifier: ^0.1.2
     version: 0.1.2(@types/node@20.4.5)(typescript@5.1.6)
+  '@effect/io':
+    specifier: ^0.37.1
+    version: 0.37.1
   '@effect/language-service':
     specifier: ^0.0.19
     version: 0.0.19
@@ -784,7 +784,7 @@ packages:
 
   /@effect/data@0.17.1:
     resolution: {integrity: sha512-QCYkLE5Y5Dm5Yax5R3GmW4ZIgTx7W+kSZ7yq5eqQ/mFWa8i4yxbLuu8cudqzdeZtRtTGZKlhDxfFfgVtMywXJg==}
-    dev: false
+    dev: true
 
   /@effect/docgen@0.1.2(@types/node@20.4.5)(typescript@5.1.6):
     resolution: {integrity: sha512-qy1pA8SKsqla7/35Q2NuUeT/VwO/olg9hdmmY929wSrKhRVVPOmnF4cbCvFxbykikYek0/6/thupSUenYV0DvQ==}
@@ -809,11 +809,11 @@ packages:
       - '@types/node'
     dev: true
 
-  /@effect/io@0.37.0:
-    resolution: {integrity: sha512-Y45STkhyBmv/oep/+6kGEces9Btp/cfWkSX5Qqi4ar5MRK13DJrexWF8+jAuixGhXWwWQHHasE9z6w6lFgQWJQ==}
+  /@effect/io@0.37.1:
+    resolution: {integrity: sha512-Ez3GfcG+gDDfAiBXtSjJpSrPU5Guiyw69LsYkMtIukFwyNwpHWLhYaVgfVbVjoQasil8KiFSQJSd5DbJL6nqPg==}
     dependencies:
       '@effect/data': 0.17.1
-    dev: false
+    dev: true
 
   /@effect/language-service@0.0.19:
     resolution: {integrity: sha512-sKNVo031dkwLfe1jHZzdTiF1UXgLq1lAYd2JG7q416dlmMoxRcMXrZWyw6a/SxIDM0hyIJAEmrz5iUkQPcPdBQ==}
