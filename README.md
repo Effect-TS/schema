@@ -932,15 +932,13 @@ class PersonWithAge extends S.ClassExtends(Person, {
   }
 }
 
-const person = new Person({ id: 1, name: "Tim" }); // constructors validate the props
+const tim = new Person({ id: 1, name: "Tim" }); // constructors validate the props
 const parsePerson = S.parse(Person.schema());
 
 assert(person instanceof Data.Class); // extends Data for equality checks
 
 // clone a instance and validate the props
-const john = person.copyWith({ name: "John" });
-
-assert(john.id === 1);
+const john = Person.copyWith(tim, { name: "John" });
 ```
 
 ## Pick
