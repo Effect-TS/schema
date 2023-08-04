@@ -41,8 +41,8 @@ devDependencies:
     specifier: ^0.1.2
     version: 0.1.2
   '@effect/io':
-    specifier: ^0.37.1
-    version: 0.37.1
+    specifier: ^0.38.0
+    version: 0.38.0(@effect/data@0.17.1)
   '@effect/language-service':
     specifier: ^0.0.19
     version: 0.0.19
@@ -726,8 +726,10 @@ packages:
       diff: 5.1.0
     dev: true
 
-  /@effect/io@0.37.1:
-    resolution: {integrity: sha512-Ez3GfcG+gDDfAiBXtSjJpSrPU5Guiyw69LsYkMtIukFwyNwpHWLhYaVgfVbVjoQasil8KiFSQJSd5DbJL6nqPg==}
+  /@effect/io@0.38.0(@effect/data@0.17.1):
+    resolution: {integrity: sha512-qlVC9ASxNC+L2NKX5qOV9672CE5wWizfwBSFaX2XLI7CC118WRvohCTIPQ52n50Bj5TmR20+na+U9C7e4VkqzA==}
+    peerDependencies:
+      '@effect/data': ^0.17.1
     dependencies:
       '@effect/data': 0.17.1
     dev: true
