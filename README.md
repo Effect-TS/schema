@@ -1154,7 +1154,7 @@ const PeopleIdFromString = S.transformResult(
 );
 
 const parse = (id: string) =>
-  Effect.mapError(S.parseEffect(PeopleIdFromString)(id), (e) =>
+  Effect.mapError(S.parse(PeopleIdFromString)(id), (e) =>
     TF.formatErrors(e.errors)
   );
 
