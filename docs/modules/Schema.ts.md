@@ -1630,7 +1630,6 @@ export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To
 ```
 
 Added in v1.0.0
- 
 
 ## Class (interface)
 
