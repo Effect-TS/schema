@@ -3,14 +3,8 @@ import * as O from "@effect/data/Option"
 import * as Effect from "@effect/io/Effect"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
-import {
-  Class,
-  ClassExtends,
-  ClassTransform,
-  ClassTransformFrom
-} from "@effect/schema/Schema"
 
-class Person extends Class({
+class Person extends S.Class({
   id: S.number,
   name: S.string
 }) {
@@ -19,7 +13,7 @@ class Person extends Class({
   }
 }
 
-class PersonWithAge extends ClassExtends(Person, {
+class PersonWithAge extends S.ClassExtends(Person, {
   age: S.number
 }) {
   get isAdult() {
@@ -27,11 +21,11 @@ class PersonWithAge extends ClassExtends(Person, {
   }
 }
 
-class PersonWithNick extends ClassExtends(PersonWithAge, {
+class PersonWithNick extends S.ClassExtends(PersonWithAge, {
   nick: S.string
 }) {}
 
-class PersonWithTransform extends ClassTransform(
+class PersonWithTransform extends S.ClassTransform(
   Person,
   { thing: S.optional(S.struct({ id: S.number })).toOption() },
   (input) =>
@@ -42,7 +36,7 @@ class PersonWithTransform extends ClassTransform(
   PR.success
 ) {}
 
-class PersonWithTransformFrom extends ClassTransformFrom(
+class PersonWithTransformFrom extends S.ClassTransformFrom(
   Person,
   { thing: S.optional(S.struct({ id: S.number })).toOption() },
   (input) =>
