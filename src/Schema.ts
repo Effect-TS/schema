@@ -1222,8 +1222,6 @@ export interface Class<I, A> {
   ): Schema<I, InstanceType<T>>
 
   structSchema(): Schema<I, A>
-
-  readonly fields: Record<string, Schema<I, A>>
 }
 
 /**
@@ -1280,8 +1278,6 @@ export interface ClassExtends<C extends Class<any, any>, I, A> {
   ): Schema<I, InstanceType<T>>
 
   structSchema(): Schema<I, A>
-
-  readonly fields: Record<string, Schema<I, A>>
 }
 
 /**
@@ -1432,12 +1428,12 @@ export const ClassExtends = <
   >
 > => {
   const schema = struct({
-    ...base.fields,
+    ...(base as any).fields,
     ...fields
   })
   const fn = makeClass(schema, base.prototype)
   fn.fields = {
-    ...base.fields,
+    ...(base as any).fields,
     ...fields
   }
   return fn
@@ -1495,7 +1491,7 @@ export const ClassTransform = <
     base.structSchema(),
     to(
       struct({
-        ...base.fields,
+        ...(base as any).fields,
         ...fields
       })
     ) as any,
@@ -1504,7 +1500,7 @@ export const ClassTransform = <
   )
   const fn = makeClass(schema, base.prototype)
   fn.fields = {
-    ...base.fields,
+    ...(base as any).fields,
     ...fields
   }
   return fn
@@ -1561,7 +1557,7 @@ export const ClassTransformFrom = <
   const schema = transformResult(
     from(base.structSchema()),
     struct({
-      ...base.fields,
+      ...(base as any).fields,
       ...fields
     }) as any,
     decode,
@@ -1569,7 +1565,7 @@ export const ClassTransformFrom = <
   )
   const fn = makeClass(schema, D.Class.prototype)
   fn.fields = {
-    ...base.fields,
+    ...(base as any).fields,
     ...fields
   }
   return fn

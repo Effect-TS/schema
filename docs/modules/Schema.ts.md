@@ -629,8 +629,6 @@ export interface Class<I, A> {
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
 
   structSchema(): Schema<I, A>
-
-  readonly fields: Record<string, Schema<I, A>>
 }
 ```
 
@@ -689,8 +687,6 @@ export interface ClassExtends<C extends Class<any, any>, I, A> {
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
 
   structSchema(): Schema<I, A>
-
-  readonly fields: Record<string, Schema<I, A>>
 }
 ```
 
