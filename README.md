@@ -938,7 +938,7 @@ const parsePerson = S.parse(Person.schema());
 assert(person instanceof Data.Class); // extends Data for equality checks
 
 // clone a instance and validate the props
-const john = Person.copyWith(tim, { name: "John" });
+const john = Person.copy(tim, { name: "John" });
 ```
 
 ## Pick
