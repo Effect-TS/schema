@@ -1185,20 +1185,16 @@ export const documentation =
     make(AST.setAnnotation(self.ast, AST.DocumentationAnnotationId, documentation))
 
 // ---------------------------------------------
-// class
+// classes
 // ---------------------------------------------
 
-/**
- * @category model
- * @since 1.0.0
- */
 interface CopyWith<A> {
   copy<T>(this: T, props: Partial<A>): T
   unsafeCopy<T>(this: T, props: Partial<A>): T
 }
 
 /**
- * @category model
+ * @category classes
  * @since 1.0.0
  */
 export interface Class<I, A> {
@@ -1239,7 +1235,7 @@ export namespace Class {
 }
 
 /**
- * @category model
+ * @category classes
  * @since 1.0.0
  */
 export interface ClassExtends<C extends Class<any, any>, I, A> {
@@ -1271,7 +1267,7 @@ export interface ClassExtends<C extends Class<any, any>, I, A> {
 }
 
 /**
- * @category model
+ * @category classes
  * @since 1.0.0
  */
 export interface ClassTransform<C extends Class<any, any>, I, A> {
@@ -1337,7 +1333,7 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
 }
 
 /**
- * @category constructor
+ * @category classes
  * @since 1.0.0
  */
 export const Class = <
@@ -1373,7 +1369,7 @@ export const Class = <
 }
 
 /**
- * @category constructor
+ * @category classes
  * @since 1.0.0
  */
 export const ClassExtends = <
@@ -1422,7 +1418,7 @@ export const ClassExtends = <
 }
 
 /**
- * @category constructor
+ * @category classes
  * @since 1.0.0
  */
 export const ClassTransform = <
@@ -1489,7 +1485,7 @@ export const ClassTransform = <
 }
 
 /**
- * @category constructor
+ * @category classes
  * @since 1.0.0
  */
 export const ClassTransformFrom = <

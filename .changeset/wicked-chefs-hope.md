@@ -2,4 +2,4 @@
 "@effect/schema": patch
 ---
 
-Added `SchemaClass`
+Added `Class` module
