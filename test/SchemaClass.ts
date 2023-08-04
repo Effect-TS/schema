@@ -1,16 +1,16 @@
 import * as Data from "@effect/data/Data"
-import { isSome, some } from "@effect/data/Option"
+import * as O from "@effect/data/Option"
 import * as Effect from "@effect/io/Effect"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import {
-  SchemaClass,
-  SchemaClassExtends,
-  SchemaClassTransform,
-  SchemaClassTransformFrom
-} from "@effect/schema/SchemaClass"
+  Class,
+  ClassExtends,
+  ClassTransform,
+  ClassTransformFrom
+} from "@effect/schema/Schema"
 
-class Person extends SchemaClass({
+class Person extends Class({
   id: S.number,
   name: S.string
 }) {
@@ -19,7 +19,7 @@ class Person extends SchemaClass({
   }
 }
 
-class PersonWithAge extends SchemaClassExtends(Person, {
+class PersonWithAge extends ClassExtends(Person, {
   age: S.number
 }) {
   get isAdult() {
@@ -27,22 +27,22 @@ class PersonWithAge extends SchemaClassExtends(Person, {
   }
 }
 
-class PersonWithNick extends SchemaClassExtends(PersonWithAge, {
+class PersonWithNick extends ClassExtends(PersonWithAge, {
   nick: S.string
 }) {}
 
-class PersonWithTransform extends SchemaClassTransform(
+class PersonWithTransform extends ClassTransform(
   Person,
   { thing: S.optional(S.struct({ id: S.number })).toOption() },
   (input) =>
     PR.success({
       ...input,
-      thing: some({ id: 123 })
+      thing: O.some({ id: 123 })
     }),
   PR.success
 ) {}
 
-class PersonWithTransformFrom extends SchemaClassTransformFrom(
+class PersonWithTransformFrom extends ClassTransformFrom(
   Person,
   { thing: S.optional(S.struct({ id: S.number })).toOption() },
   (input) =>
@@ -53,7 +53,7 @@ class PersonWithTransformFrom extends SchemaClassTransformFrom(
   PR.success
 ) {}
 
-describe("SchemaClass", () => {
+describe("Class", () => {
   it("constructor", () => {
     const person = new Person({ id: 1, name: "John" })
     assert(person.name === "John")
@@ -125,7 +125,7 @@ describe("SchemaClass", () => {
     })
     assert(person.id === 1)
     assert(person.name === "John")
-    assert(isSome(person.thing) && person.thing.value.id === 123)
+    assert(O.isSome(person.thing) && person.thing.value.id === 123)
   })
 
   it("transform from", () => {
@@ -136,7 +136,7 @@ describe("SchemaClass", () => {
     })
     assert(person.id === 1)
     assert(person.name === "John")
-    assert(isSome(person.thing) && person.thing.value.id === 123)
+    assert(O.isSome(person.thing) && person.thing.value.id === 123)
   })
 
   it("unsafe", () => {

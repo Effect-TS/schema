@@ -94,6 +94,10 @@ Added in v1.0.0
   - [readonlySetFromSelf](#readonlysetfromself)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
+  - [Class](#class)
+  - [ClassExtends](#classextends)
+  - [ClassTransform](#classtransform)
+  - [ClassTransformFrom](#classtransformfrom)
 - [decoding](#decoding)
   - [decode](#decode)
   - [decodeEither](#decodeeither)
@@ -116,6 +120,9 @@ Added in v1.0.0
   - [From (type alias)](#from-type-alias)
   - [Schema (interface)](#schema-interface)
   - [To (type alias)](#to-type-alias)
+  - [Class (interface)](#class-interface)
+  - [ClassExtends (interface)](#classextends-interface)
+  - [ClassTransform (interface)](#classtransform-interface)
 - [number](#number)
   - [NumberFromString](#numberfromstring)
   - [between](#between)
@@ -1250,6 +1257,155 @@ export declare const uniqueSymbol: <S extends symbol>(
 
 Added in v1.0.0
 
+## Class
+
+**Signature**
+
+```ts
+export declare const Class: <
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any, any>
+    | Schema<never, never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  fields: Fields
+) => Class<
+  Spread<
+    { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
+      readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
+    }
+  >,
+  Spread<
+    { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
+      readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
+    }
+  >
+>
+```
+
+Added in v1.0.0
+
+## ClassExtends
+
+**Signature**
+
+```ts
+export declare const ClassExtends: <
+  Base extends Class<any, any>,
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any, any>
+    | Schema<never, never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  base: Base,
+  fields: Fields
+) => ClassExtends<
+  Base,
+  Spread<
+    Omit<Class.From<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
+    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined }
+  >,
+  Spread<
+    Omit<Class.To<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
+    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
+  >
+>
+```
+
+Added in v1.0.0
+
+## ClassTransform
+
+**Signature**
+
+```ts
+export declare const ClassTransform: <
+  Base extends Class<any, any>,
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any, any>
+    | Schema<never, never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  base: Base,
+  fields: Fields,
+  decode: (
+    input: Class.To<Base>
+  ) => ParseResult<
+    Omit<Class.To<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
+    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
+  >,
+  encode: (
+    input: Omit<Class.To<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
+    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
+  ) => ParseResult<Class.To<Base>>
+) => ClassTransform<
+  Base,
+  Class.From<Base>,
+  Spread<
+    Omit<Class.To<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
+    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
+  >
+>
+```
+
+Added in v1.0.0
+
+## ClassTransformFrom
+
+**Signature**
+
+```ts
+export declare const ClassTransformFrom: <
+  Base extends Class<any, any>,
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any, any>
+    | Schema<never, never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  base: Base,
+  fields: Fields,
+  decode: (
+    input: Class.From<Base>
+  ) => ParseResult<
+    Omit<Class.From<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
+    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined }
+  >,
+  encode: (
+    input: Omit<Class.From<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
+    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined }
+  ) => ParseResult<Class.From<Base>>
+) => ClassTransform<
+  Base,
+  Class.From<Base>,
+  Spread<
+    Omit<Class.To<Base>, keyof Fields> & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
+    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
+  >
+>
+```
+
+Added in v1.0.0
+
 # decoding
 
 ## decode
@@ -1471,6 +1627,69 @@ Added in v1.0.0
 
 ```ts
 export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
+```
+
+Added in v1.0.0
+ 
+
+## Class (interface)
+
+**Signature**
+
+```ts
+export interface Class<I, A> {
+  new (props: A): A & CopyWith<A> & Data.Case
+
+  effect<T extends new (...args: any) => any>(this: T, props: A): Effect.Effect<never, ParseError, InstanceType<T>>
+
+  unsafe<T extends new (...args: any) => any>(this: T, props: A): InstanceType<T>
+
+  schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
+
+  structSchema(): Schema<I, A>
+
+  readonly fields: Record<string, Schema<I, A>>
+}
+```
+
+Added in v1.0.0
+
+## ClassExtends (interface)
+
+**Signature**
+
+```ts
+export interface ClassExtends<C extends Class<any, any>, I, A> {
+  new (props: A): A & CopyWith<A> & Data.Case & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+
+  effect<T extends new (...args: any) => any>(this: T, props: A): Effect.Effect<never, ParseError, InstanceType<T>>
+
+  unsafe<T extends new (...args: any) => any>(this: T, props: A): InstanceType<T>
+
+  schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
+
+  structSchema(): Schema<I, A>
+
+  readonly fields: Record<string, Schema<I, A>>
+}
+```
+
+Added in v1.0.0
+
+## ClassTransform (interface)
+
+**Signature**
+
+```ts
+export interface ClassTransform<C extends Class<any, any>, I, A> {
+  new (props: A): A & CopyWith<A> & Data.Case & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+
+  unsafe<T extends new (...args: any) => any>(this: T, props: A): InstanceType<T>
+
+  schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
+
+  structSchema(): Schema<I, A>
+}
 ```
 
 Added in v1.0.0

@@ -22,6 +22,7 @@ import type { Predicate, Refinement } from "@effect/data/Predicate"
 import { isDate, isObject } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as S from "@effect/data/String"
+import * as Effect from "@effect/io/Effect"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -1182,6 +1183,375 @@ export const examples =
 export const documentation =
   (documentation: AST.DocumentationAnnotation) => <I, A>(self: Schema<I, A>): Schema<I, A> =>
     make(AST.setAnnotation(self.ast, AST.DocumentationAnnotationId, documentation))
+
+// ---------------------------------------------
+// class
+// ---------------------------------------------
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+interface CopyWith<A> {
+  copy<T>(this: T, props: Partial<A>): T
+  unsafeCopy<T>(this: T, props: Partial<A>): T
+}
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface Class<I, A> {
+  new(props: A): A & CopyWith<A> & D.Case
+
+  effect<T extends new(...args: any) => any>(
+    this: T,
+    props: A
+  ): Effect.Effect<never, PR.ParseError, InstanceType<T>>
+
+  unsafe<T extends new(...args: any) => any>(
+    this: T,
+    props: A
+  ): InstanceType<T>
+
+  schema<T extends new(...args: any) => any>(
+    this: T
+  ): Schema<I, InstanceType<T>>
+
+  structSchema(): Schema<I, A>
+
+  readonly fields: Record<string, Schema<I, A>>
+}
+
+/**
+ * @since 1.0.0
+ */
+export namespace Class {
+  /**
+   * @since 1.0.0
+   */
+  export type To<A> = A extends Class<infer _F, infer T> ? T : never
+
+  /**
+   * @since 1.0.0
+   */
+  export type From<A> = A extends Class<infer F, infer _T> ? F : never
+}
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface ClassExtends<C extends Class<any, any>, I, A> {
+  new(
+    props: A
+  ):
+    & A
+    & CopyWith<A>
+    & D.Case
+    & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+
+  effect<T extends new(...args: any) => any>(
+    this: T,
+    props: A
+  ): Effect.Effect<never, PR.ParseError, InstanceType<T>>
+
+  unsafe<T extends new(...args: any) => any>(
+    this: T,
+    props: A
+  ): InstanceType<T>
+
+  schema<T extends new(...args: any) => any>(
+    this: T
+  ): Schema<I, InstanceType<T>>
+
+  structSchema(): Schema<I, A>
+
+  readonly fields: Record<string, Schema<I, A>>
+}
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface ClassTransform<C extends Class<any, any>, I, A> {
+  new(
+    props: A
+  ):
+    & A
+    & CopyWith<A>
+    & D.Case
+    & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+
+  unsafe<T extends new(...args: any) => any>(
+    this: T,
+    props: A
+  ): InstanceType<T>
+
+  schema<T extends new(...args: any) => any>(
+    this: T
+  ): Schema<I, InstanceType<T>>
+
+  structSchema(): Schema<I, A>
+}
+
+const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
+  const validater = P.validateSync(schema_)
+  const validateEffect = P.validate(schema_)
+
+  const fn = function(this: any, props: unknown) {
+    Object.assign(this, validater(props))
+  }
+  fn.prototype = Object.create(base)
+  fn.effect = function effect(props: unknown) {
+    return Effect.map(
+      validateEffect(props),
+      (props) => Object.setPrototypeOf(props, this.prototype)
+    )
+  }
+  fn.unsafe = function unsafe(props: unknown) {
+    return Object.assign(Object.create(this.prototype), props)
+  }
+  fn.structSchema = function structSchema() {
+    return schema_
+  }
+  fn.schema = function schema(this: any) {
+    return transform(
+      schema_,
+      unknown,
+      (input) => Object.assign(Object.create(this.prototype), input),
+      (input) => ({ ...(input as any) })
+    )
+  }
+  fn.prototype.copy = function copy(this: any, props: any) {
+    return new (this.constructor as any)({
+      ...this,
+      ...props
+    })
+  }
+  fn.prototype.unsafeCopy = function unsafeCopy(this: any, props: any) {
+    return Object.assign(Object.create(this.constructor.prototype), this, props)
+  }
+
+  return fn as any
+}
+
+/**
+ * @category constructor
+ * @since 1.0.0
+ */
+export const Class = <
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any>
+    | Schema<never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  fields: Fields
+): Class<
+  Spread<
+    {
+      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
+        Fields[K]
+      >
+    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+  >,
+  Spread<
+    {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
+        Fields[K]
+      >
+    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  >
+> => {
+  const schema = struct(fields)
+  const fn = makeClass(schema, D.Class.prototype)
+  fn.fields = fields
+  return fn
+}
+
+/**
+ * @category constructor
+ * @since 1.0.0
+ */
+export const ClassExtends = <
+  Base extends Class<any, any>,
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any>
+    | Schema<never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  base: Base,
+  fields: Fields
+): ClassExtends<
+  Base,
+  Spread<
+    & Omit<Class.From<Base>, keyof Fields>
+    & {
+      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
+        Fields[K]
+      >
+    }
+    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+  >,
+  Spread<
+    & Omit<Class.To<Base>, keyof Fields>
+    & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
+        Fields[K]
+      >
+    }
+    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  >
+> => {
+  const schema = struct({
+    ...base.fields,
+    ...fields
+  })
+  const fn = makeClass(schema, base.prototype)
+  fn.fields = {
+    ...base.fields,
+    ...fields
+  }
+  return fn
+}
+
+/**
+ * @category constructor
+ * @since 1.0.0
+ */
+export const ClassTransform = <
+  Base extends Class<any, any>,
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any>
+    | Schema<never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  base: Base,
+  fields: Fields,
+  decode: (input: Class.To<Base>) => ParseResult<
+    & Omit<Class.To<Base>, keyof Fields>
+    & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
+        Fields[K]
+      >
+    }
+    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  >,
+  encode: (
+    input:
+      & Omit<Class.To<Base>, keyof Fields>
+      & {
+        readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
+          Fields[K]
+        >
+      }
+      & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  ) => ParseResult<Class.To<Base>>
+): ClassTransform<
+  Base,
+  Class.From<Base>,
+  Spread<
+    & Omit<Class.To<Base>, keyof Fields>
+    & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
+        Fields[K]
+      >
+    }
+    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  >
+> => {
+  const schema = transformResult(
+    base.structSchema(),
+    to(
+      struct({
+        ...base.fields,
+        ...fields
+      })
+    ) as any,
+    decode,
+    encode
+  )
+  const fn = makeClass(schema, base.prototype)
+  fn.fields = {
+    ...base.fields,
+    ...fields
+  }
+  return fn
+}
+
+/**
+ * @category constructor
+ * @since 1.0.0
+ */
+export const ClassTransformFrom = <
+  Base extends Class<any, any>,
+  Fields extends Record<
+    PropertyKey,
+    | Schema<any>
+    | Schema<never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+  >
+>(
+  base: Base,
+  fields: Fields,
+  decode: (input: Class.From<Base>) => ParseResult<
+    & Omit<Class.From<Base>, keyof Fields>
+    & {
+      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
+        Fields[K]
+      >
+    }
+    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+  >,
+  encode: (
+    input:
+      & Omit<Class.From<Base>, keyof Fields>
+      & {
+        readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
+          Fields[K]
+        >
+      }
+      & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+  ) => ParseResult<Class.From<Base>>
+): ClassTransform<
+  Base,
+  Class.From<Base>,
+  Spread<
+    & Omit<Class.To<Base>, keyof Fields>
+    & {
+      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
+        Fields[K]
+      >
+    }
+    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  >
+> => {
+  const schema = transformResult(
+    from(base.structSchema()),
+    struct({
+      ...base.fields,
+      ...fields
+    }) as any,
+    decode,
+    encode
+  )
+  const fn = makeClass(schema, D.Class.prototype)
+  fn.fields = {
+    ...base.fields,
+    ...fields
+  }
+  return fn
+}
 
 // ---------------------------------------------
 // data
