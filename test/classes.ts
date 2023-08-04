@@ -99,14 +99,14 @@ describe("Class", () => {
 
   it("copy", () => {
     const person = new Person({ id: 1, name: "John" })
-    const joe = person.copy({ name: "Joe" })
+    const joe = Person.copy(person, { name: "Joe" })
     assert(joe.id === 1)
     assert(joe.name === "Joe")
   })
 
   it("unsafeCopy", () => {
     const person = new Person({ id: 1, name: "John" })
-    const joe = person.unsafeCopy({ name: "Joe" })
+    const joe = Person.unsafeCopy(person, { name: "Joe" })
     assert(joe.id === 1)
     assert(joe.name === "Joe")
   })

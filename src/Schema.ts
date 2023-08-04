@@ -1188,17 +1188,24 @@ export const documentation =
 // classes
 // ---------------------------------------------
 
-interface CopyWith<A> {
-  copy<T>(this: T, props: Partial<A>): T
-  unsafeCopy<T>(this: T, props: Partial<A>): T
-}
-
 /**
  * @category classes
  * @since 1.0.0
  */
 export interface Class<I, A> {
-  new(props: A): A & CopyWith<A> & D.Case
+  new(props: A): A & D.Case
+
+  copy<T extends new(...args: any) => any>(
+    this: T,
+    from: InstanceType<T>,
+    props: Partial<A>
+  ): InstanceType<T>
+
+  unsafeCopy<T extends new(...args: any) => any>(
+    this: T,
+    from: InstanceType<T>,
+    props: Partial<A>
+  ): InstanceType<T>
 
   effect<T extends new(...args: any) => any>(
     this: T,
@@ -1243,9 +1250,20 @@ export interface ClassExtends<C extends Class<any, any>, I, A> {
     props: A
   ):
     & A
-    & CopyWith<A>
     & D.Case
-    & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+    & Omit<InstanceType<C>, keyof A>
+
+  copy<T extends new(...args: any) => any>(
+    this: T,
+    from: InstanceType<T>,
+    props: Partial<A>
+  ): InstanceType<T>
+
+  unsafeCopy<T extends new(...args: any) => any>(
+    this: T,
+    from: InstanceType<T>,
+    props: Partial<A>
+  ): InstanceType<T>
 
   effect<T extends new(...args: any) => any>(
     this: T,
@@ -1275,9 +1293,20 @@ export interface ClassTransform<C extends Class<any, any>, I, A> {
     props: A
   ):
     & A
-    & CopyWith<A>
     & D.Case
-    & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+    & Omit<InstanceType<C>, keyof A>
+
+  copy<T extends new(...args: any) => any>(
+    this: T,
+    from: InstanceType<T>,
+    props: Partial<A>
+  ): InstanceType<T>
+
+  unsafeCopy<T extends new(...args: any) => any>(
+    this: T,
+    from: InstanceType<T>,
+    props: Partial<A>
+  ): InstanceType<T>
 
   unsafe<T extends new(...args: any) => any>(
     this: T,
@@ -1319,14 +1348,11 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
       (input) => ({ ...(input as any) })
     )
   }
-  fn.prototype.copy = function copy(this: any, props: any) {
-    return new (this.constructor as any)({
-      ...this,
-      ...props
-    })
+  fn.copy = function copy(this: any, from: any, props: any) {
+    return new (this as any)({ ...from, ...props })
   }
-  fn.prototype.unsafeCopy = function unsafeCopy(this: any, props: any) {
-    return Object.assign(Object.create(this.constructor.prototype), this, props)
+  fn.unsafeCopy = function unsafeCopy(this: any, from: any, props: any) {
+    return Object.assign(Object.create(this.prototype), from, props)
   }
 
   return fn as any

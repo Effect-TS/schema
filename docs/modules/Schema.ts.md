@@ -616,7 +616,11 @@ Added in v1.0.0
 
 ```ts
 export interface Class<I, A> {
-  new (props: A): A & CopyWith<A> & D.Case
+  new (props: A): A & D.Case
+
+  copy<T extends new (...args: any) => any>(this: T, from: InstanceType<T>, props: Partial<A>): InstanceType<T>
+
+  unsafeCopy<T extends new (...args: any) => any>(this: T, from: InstanceType<T>, props: Partial<A>): InstanceType<T>
 
   effect<T extends new (...args: any) => any>(this: T, props: A): Effect.Effect<never, PR.ParseError, InstanceType<T>>
 
@@ -672,7 +676,11 @@ Added in v1.0.0
 
 ```ts
 export interface ClassExtends<C extends Class<any, any>, I, A> {
-  new (props: A): A & CopyWith<A> & D.Case & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+  new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
+
+  copy<T extends new (...args: any) => any>(this: T, from: InstanceType<T>, props: Partial<A>): InstanceType<T>
+
+  unsafeCopy<T extends new (...args: any) => any>(this: T, from: InstanceType<T>, props: Partial<A>): InstanceType<T>
 
   effect<T extends new (...args: any) => any>(this: T, props: A): Effect.Effect<never, PR.ParseError, InstanceType<T>>
 
@@ -736,7 +744,11 @@ Added in v1.0.0
 
 ```ts
 export interface ClassTransform<C extends Class<any, any>, I, A> {
-  new (props: A): A & CopyWith<A> & D.Case & Omit<InstanceType<C>, keyof CopyWith<unknown> | keyof A>
+  new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
+
+  copy<T extends new (...args: any) => any>(this: T, from: InstanceType<T>, props: Partial<A>): InstanceType<T>
+
+  unsafeCopy<T extends new (...args: any) => any>(this: T, from: InstanceType<T>, props: Partial<A>): InstanceType<T>
 
   unsafe<T extends new (...args: any) => any>(this: T, props: A): InstanceType<T>
 
