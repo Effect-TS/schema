@@ -74,6 +74,7 @@ describe.concurrent("Chunk", () => {
   it("chunk. decoder", async () => {
     const schema = S.chunk(S.number)
     await Util.expectParseSuccess(schema, [], C.empty())
+    await Util.expectParseSuccess(schema, C.empty(), C.empty())
     await Util.expectParseSuccess(schema, [1, 2, 3], C.fromIterable([1, 2, 3]))
 
     await Util.expectParseFailure(
