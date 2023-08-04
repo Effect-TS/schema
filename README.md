@@ -910,6 +910,39 @@ encode({ a: O.none() }) // {}
 encode({ a: O.some(1) }) // { a: 1 }
 ```
 
+## Classes
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+class Person extends S.Class({
+  id: S.number,
+  name: S.string
+}) {
+  get upperName() {
+    return this.name.toUpperCase();
+  }
+}
+
+class PersonWithAge extends S.ClassExtends(Person, {
+  age: S.number
+}) {
+  get isAdult() {
+    return this.age >= 18;
+  }
+}
+
+const person = new Person({ id: 1, name: "Tim" }); // constructors validate the props
+const parsePerson = S.parse(Person.schema());
+
+assert(person instanceof Data.Class); // extends Data for equality checks
+
+// clone a instance and validate the props
+const john = person.copyWith({ name: "John" });
+
+assert(john.id === 1);
+```
+
 ## Pick
 
 ```ts
