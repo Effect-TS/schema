@@ -912,18 +912,32 @@ encode({ a: O.some(1) }) // { a: 1 }
 
 ## Classes
 
+As an alternative to the `struct` constructor, you can create schemas as classes by extending the `Class` utility.
+
+They offer a few conveniences that can help with some common use cases:
+
+- you can define a schema and an opaque type in one pass
+- attach common functionality using class methods or getters
+- `Class` implements `Data.Case` for checking equality by value and hashing
+- `ClassExtends` to easily extend a previously defined schema `Class`
+
+Take a look at the following example:
+
 ```ts
 import * as S from "@effect/schema/Schema";
 
+// Define your schema by extending `Class` with the desired fields
 class Person extends S.Class({
   id: S.number,
   name: S.string
 }) {
+  // Add getters and methods
   get upperName() {
     return this.name.toUpperCase();
   }
 }
 
+// Extend an existing schema `Class` using the `ClassExtends` utility
 class PersonWithAge extends S.ClassExtends(Person, {
   age: S.number
 }) {
@@ -932,13 +946,27 @@ class PersonWithAge extends S.ClassExtends(Person, {
   }
 }
 
-const tim = new Person({ id: 1, name: "Tim" }); // constructors validate the props
-const parsePerson = S.parse(Person.schema());
+// You can use the class constructor to validate and then create a new instance from some properties
+const tim = new Person({ id: 1, name: "Tim" });
 
-assert(person instanceof Data.Class); // extends Data for equality checks
+// You can use the `unsafe` constructor to create a new instance _without_ validating the input
+Person.unsafe({ id: 1, name: "Tim" });
 
-// clone a instance and validate the props
-const john = Person.copy(tim, { name: "John" });
+// There is also an `effect` constructor, to construct an instance as an `Effect`
+// $ExpectType Effect<never, ParseError, Person>
+Person.effect({ id: 1, name: "Tim" });
+
+// $ExpectType Schema<{ readonly id: number; name: string; }, Person>
+Person.schema();
+
+// $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
+Person.structSchema();
+
+// static `copy` method for modifying an instance
+Person.copy(tim, { name: "John" });
+
+// you can use `unsafeCopy` to skip validation
+Person.unsafeCopy(tim, { name: "John" });
 ```
 
 ## Pick
