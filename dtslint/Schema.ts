@@ -1,5 +1,6 @@
 import { Brand } from "@effect/data/Brand";
 import { pipe } from "@effect/data/Function";
+import { Refinement } from "@effect/data/Predicate";
 import * as S from "@effect/schema/Schema";
 
 declare const NumberFromString: S.Schema<string, number>
@@ -520,3 +521,9 @@ pipe(UnionFilter, S.filter(S.is(S.struct({ b: S.string }))))
 
 // $ExpectType Schema<number, number & Brand<"MyNumber">>
 pipe(S.number, S.filter((n): n is number & Brand<"MyNumber"> => n > 0))
+
+
+const isString: Refinement<unknown, string> = (u: unknown): u is string => typeof u === "string"
+
+// $ExpectType Schema<readonly unknown[], readonly string[]>
+const schema = S.array(S.unknown).pipe(S.every(isString))

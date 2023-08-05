@@ -2833,3 +2833,35 @@ export const length = <A extends string>(
 export const nonEmpty = <A extends string>(
   options?: AnnotationOptions<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> => minLength(1, options)
+
+export const EveryTypeId = "@effect/schema/EveryTypeId"
+
+/**
+ * @category array
+ * @since 1.0.0
+ */
+export const every: {
+  <A, B extends A>(
+    refinement: Refinement<A, B>,
+    options?: AnnotationOptions<ReadonlyArray<A>>
+  ): <I>(
+    self: Schema<I, ReadonlyArray<A>>
+  ) => Schema<I, ReadonlyArray<B>>
+
+  <A>(predicate: Predicate<A>, options?: AnnotationOptions<ReadonlyArray<A>>): <I>(
+    self: Schema<I, ReadonlyArray<A>>
+  ) => Schema<I, ReadonlyArray<A>>
+} = <A, B extends A>(
+  predicate: Predicate<A>,
+  options?: AnnotationOptions<ReadonlyArray<A>>
+) =>
+<I>(self: Schema<I, ReadonlyArray<A>>): Schema<I, ReadonlyArray<B>> =>
+  self.pipe(
+    filter<ReadonlyArray<A>, ReadonlyArray<B>>(
+      (a): a is ReadonlyArray<B> => RA.every(predicate)(a),
+      {
+        typeId: EveryTypeId,
+        ...options
+      }
+    )
+  )
