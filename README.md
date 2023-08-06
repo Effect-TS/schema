@@ -1458,6 +1458,33 @@ parse("Infinity"); // throws
 parse("-Infinity"); // throws
 ```
 
+#### BigintFromNumber
+
+Transforms a `number` into a `bigint` by parsing the number using `BigInt`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// const schema: S.Schema<number, bigint>
+const schema = S.BigintFromNumber;
+const parse = S.parseSync(schema);
+const encode = S.encodeSync(schema);
+
+// success cases
+parse(1); // 1n
+parse(-1); // -1n
+encode(1n); // 1
+encode(-1n); // -1
+
+// failure cases
+parse(1.5); // throws
+parse(NaN); // throws
+parse(Infinity); // throws
+parse(-Infinity); // throws
+encode(BigInt(Number.MAX_SAFE_INTEGER) + 1n); // throws
+encode(BigInt(Number.MIN_SAFE_INTEGER) - 1n); // throws
+```
+
 #### clamp
 
 Clamps a `bigint` between a minimum and a maximum value.
