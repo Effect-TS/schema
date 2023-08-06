@@ -160,6 +160,11 @@ describe.concurrent("bigintFromNumber", () => {
     await Util.expectParseFailure(schema, 1.2, `Expected number -> bigint, actual 1.2`)
     await Util.expectParseFailure(
       schema,
+      NaN,
+      `Expected number -> bigint, actual NaN`
+    )
+    await Util.expectParseFailure(
+      schema,
       Infinity,
       `Expected number -> bigint, actual Infinity`
     )
