@@ -1705,6 +1705,42 @@ export const bigintFromString = <I, A extends string>(self: Schema<I, A>): Schem
  */
 export const BigintFromString: Schema<string, bigint> = bigintFromString(string)
 
+/**
+ * This combinator transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
+ *
+ * It returns an error if the value can't be safely encoded as a `number` due to being out of range.
+ *
+ * @param self - The schema representing the input number
+ *
+ * @category bigint
+ * @since 1.0.0
+ */
+export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schema<I, bigint> => {
+  const schema: Schema<I, bigint> = transformResult(
+    self,
+    bigint,
+    (n) => PR.success(BigInt(n)),
+    (b) => {
+      if (b > BigInt(Number.MAX_SAFE_INTEGER) || b < BigInt(Number.MIN_SAFE_INTEGER)) {
+        return PR.failure(PR.type(schema.ast, b))
+      }
+
+      return PR.success(Number(b) as A)
+    }
+  )
+  return schema
+}
+
+/**
+ * This schema transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
+ *
+ * It returns an error if the value can't be safely encoded as a `number` due to being out of range.
+ *
+ * @category bigint
+ * @since 1.0.0
+ */
+export const BigintFromNumber: Schema<number, bigint> = bigintFromNumber(number)
+
 // ---------------------------------------------
 // data/Boolean
 // ---------------------------------------------

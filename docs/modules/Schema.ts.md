@@ -30,8 +30,10 @@ Added in v1.0.0
   - [maxItems](#maxitems)
   - [minItems](#minitems)
 - [bigint](#bigint)
+  - [BigintFromNumber](#bigintfromnumber)
   - [BigintFromString](#bigintfromstring)
   - [betweenBigint](#betweenbigint)
+  - [bigintFromNumber](#bigintfromnumber-1)
   - [bigintFromString](#bigintfromstring-1)
   - [clampBigint](#clampbigint)
   - [greaterThanBigint](#greaterthanbigint)
@@ -406,6 +408,20 @@ Added in v1.0.0
 
 # bigint
 
+## BigintFromNumber
+
+This schema transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
+
+It returns an error if the value can't be safely encoded as a `number` due to being out of range.
+
+**Signature**
+
+```ts
+export declare const BigintFromNumber: Schema<number, bigint>
+```
+
+Added in v1.0.0
+
 ## BigintFromString
 
 This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
@@ -430,6 +446,20 @@ export declare const betweenBigint: <A extends bigint>(
   max: bigint,
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## bigintFromNumber
+
+This combinator transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
+
+It returns an error if the value can't be safely encoded as a `number` due to being out of range.
+
+**Signature**
+
+```ts
+export declare const bigintFromNumber: <I, A extends number>(self: Schema<I, A>) => Schema<I, bigint>
 ```
 
 Added in v1.0.0
