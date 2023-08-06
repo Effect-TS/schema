@@ -1719,7 +1719,13 @@ export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schem
   const schema: Schema<I, bigint> = transformResult(
     self,
     bigint,
-    (n) => PR.success(BigInt(n)),
+    (n) => {
+      try {
+        return PR.success(BigInt(n))
+      } catch (_) {
+        return PR.failure(PR.type(schema.ast, n))
+      }
+    },
     (b) => {
       if (b > BigInt(Number.MAX_SAFE_INTEGER) || b < BigInt(Number.MIN_SAFE_INTEGER)) {
         return PR.failure(PR.type(schema.ast, b))
