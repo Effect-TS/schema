@@ -570,28 +570,41 @@ export type FromOptionalKeys<Fields> = {
 }[keyof Fields]
 
 /**
+ * @since 1.0.0
+ */
+export type StructFields = Record<
+  PropertyKey,
+  | Schema<any>
+  | Schema<never>
+  | PropertySignature<any, boolean, any, boolean>
+  | PropertySignature<never, boolean, never, boolean>
+>
+
+/**
+ * @since 1.0.0
+ */
+export type FromStruct<Fields extends StructFields> =
+  & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
+  & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+
+/**
+ * @since 1.0.0
+ */
+export type ToStruct<Fields extends StructFields> =
+  & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
+  & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+
+/**
  * @category combinators
  * @since 1.0.0
  */
 export const struct = <
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any>
-    | Schema<never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
+  Fields extends StructFields
 >(
   fields: Fields
 ): Schema<
-  Spread<
-    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
-  >,
-  Spread<
-    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >
+  Spread<FromStruct<Fields>>,
+  Spread<ToStruct<Fields>>
 > => {
   const ownKeys = I.ownKeys(fields)
   const propertySignatures: Array<AST.PropertySignature> = []
@@ -1278,24 +1291,12 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
  * @since 1.0.0
  */
 export const Class = <
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any>
-    | Schema<never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
+  Fields extends StructFields
 >(
   fields: Fields
 ): Class<
-  Spread<
-    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
-  >,
-  Spread<
-    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >
+  Spread<FromStruct<Fields>>,
+  Spread<ToStruct<Fields>>
 > => {
   const schema = struct(fields)
   const fn = makeClass(schema, D.Class.prototype)
@@ -1309,28 +1310,14 @@ export const Class = <
  */
 export const ClassExtends = <
   Base extends Class<any, any>,
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any>
-    | Schema<never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
+  Fields extends StructFields
 >(
   base: Base,
   fields: Fields
 ): ClassExtends<
   Base,
-  Spread<
-    & Omit<Class.From<Base>, keyof Fields>
-    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
-  >,
-  Spread<
-    & Omit<Class.To<Base>, keyof Fields>
-    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >
+  Spread<Omit<Class.From<Base>, keyof Fields> & FromStruct<Fields>>,
+  Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
 > => {
   const schema = struct({
     ...(base as any).fields,
@@ -1350,35 +1337,20 @@ export const ClassExtends = <
  */
 export const ClassTransform = <
   Base extends Class<any, any>,
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any>
-    | Schema<never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
+  Fields extends StructFields
 >(
   base: Base,
   fields: Fields,
-  decode: (input: Class.To<Base>) => ParseResult<
-    & Omit<Class.To<Base>, keyof Fields>
-    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >,
+  decode: (
+    input: Class.To<Base>
+  ) => ParseResult<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>,
   encode: (
-    input:
-      & Omit<Class.To<Base>, keyof Fields>
-      & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-      & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+    input: Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>
   ) => ParseResult<Class.To<Base>>
 ): ClassTransform<
   Base,
   Class.From<Base>,
-  Spread<
-    & Omit<Class.To<Base>, keyof Fields>
-    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >
+  Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
 > => {
   const schema = transformResult(
     base.structSchema(),
@@ -1405,39 +1377,20 @@ export const ClassTransform = <
  */
 export const ClassTransformFrom = <
   Base extends Class<any, any>,
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any>
-    | Schema<never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
+  Fields extends StructFields
 >(
   base: Base,
   fields: Fields,
-  decode: (input: Class.From<Base>) => ParseResult<
-    & Omit<Class.From<Base>, keyof Fields>
-    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
-  >,
+  decode: (
+    input: Class.From<Base>
+  ) => ParseResult<Omit<Class.From<Base>, keyof Fields> & FromStruct<Fields>>,
   encode: (
-    input:
-      & Omit<Class.From<Base>, keyof Fields>
-      & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
-      & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+    input: Omit<Class.From<Base>, keyof Fields> & FromStruct<Fields>
   ) => ParseResult<Class.From<Base>>
 ): ClassTransform<
   Base,
   Class.From<Base>,
-  Spread<
-    & Omit<Class.To<Base>, keyof Fields>
-    & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
-        Fields[K]
-      >
-    }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >
+  Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
 > => {
   const schema = transformResult(
     from(base.structSchema()),

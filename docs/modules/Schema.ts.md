@@ -220,11 +220,14 @@ Added in v1.0.0
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
+  - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Spread (type alias)](#spread-type-alias)
+  - [StructFields (type alias)](#structfields-type-alias)
   - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
+  - [ToStruct (type alias)](#tostruct-type-alias)
   - [from](#from)
   - [optional](#optional)
   - [to](#to)
@@ -585,28 +588,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const Class: <
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any, any>
-    | Schema<never, never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
->(
+export declare const Class: <Fields extends StructFields>(
   fields: Fields
-) => Class<
-  Spread<
-    { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
-      readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
-    }
-  >,
-  Spread<
-    { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
-      readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
-    }
-  >
->
+) => Class<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>>
 ```
 
 Added in v1.0.0
@@ -628,16 +612,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ClassExtends: <
-  Base extends Class<any, any>,
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any, any>
-    | Schema<never, never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
->(
+export declare const ClassExtends: <Base extends Class<any, any>, Fields extends StructFields>(
   base: Base,
   fields: Fields
 ) => ClassExtends<
@@ -690,16 +665,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ClassTransform: <
-  Base extends Class<any, any>,
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any, any>
-    | Schema<never, never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
->(
+export declare const ClassTransform: <Base extends Class<any, any>, Fields extends StructFields>(
   base: Base,
   fields: Fields,
   decode: (
@@ -744,16 +710,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ClassTransformFrom: <
-  Base extends Class<any, any>,
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any, any>
-    | Schema<never, never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
->(
+export declare const ClassTransformFrom: <Base extends Class<any, any>, Fields extends StructFields>(
   base: Base,
   fields: Fields,
   decode: (
@@ -1201,28 +1158,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const struct: <
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any, any>
-    | Schema<never, never>
-    | PropertySignature<any, boolean, any, boolean>
-    | PropertySignature<never, boolean, never, boolean>
-  >
->(
+export declare const struct: <Fields extends StructFields>(
   fields: Fields
-) => Schema<
-  Spread<
-    { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
-      readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
-    }
-  >,
-  Spread<
-    { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
-      readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
-    }
-  >
->
+) => Schema<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>>
 ```
 
 Added in v1.0.0
@@ -2675,6 +2613,18 @@ export type FromOptionalKeys<Fields> = {
 
 Added in v1.0.0
 
+## FromStruct (type alias)
+
+**Signature**
+
+```ts
+export type FromStruct<Fields extends StructFields> = {
+  readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
+} & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+```
+
+Added in v1.0.0
+
 ## Join (type alias)
 
 **Signature**
@@ -2719,6 +2669,22 @@ export type Spread<A> = {
 
 Added in v1.0.0
 
+## StructFields (type alias)
+
+**Signature**
+
+```ts
+export type StructFields = Record<
+  PropertyKey,
+  | Schema<any>
+  | Schema<never>
+  | PropertySignature<any, boolean, any, boolean>
+  | PropertySignature<never, boolean, never, boolean>
+>
+```
+
+Added in v1.0.0
+
 ## ToAsserts
 
 **Signature**
@@ -2741,6 +2707,18 @@ export type ToOptionalKeys<Fields> = {
     ? K
     : never
 }[keyof Fields]
+```
+
+Added in v1.0.0
+
+## ToStruct (type alias)
+
+**Signature**
+
+```ts
+export type ToStruct<Fields extends StructFields> = {
+  readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
+} & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
 ```
 
 Added in v1.0.0
