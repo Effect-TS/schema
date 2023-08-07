@@ -1227,12 +1227,7 @@ export namespace Class {
  * @since 1.0.0
  */
 export interface ClassExtends<C extends Class<any, any>, I, A> {
-  new(
-    props: A
-  ):
-    & A
-    & D.Case
-    & Omit<InstanceType<C>, keyof A>
+  new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
 
   effect<T extends new(...args: any) => any>(
     this: T,
@@ -1251,12 +1246,7 @@ export interface ClassExtends<C extends Class<any, any>, I, A> {
  * @since 1.0.0
  */
 export interface ClassTransform<C extends Class<any, any>, I, A> {
-  new(
-    props: A
-  ):
-    & A
-    & D.Case
-    & Omit<InstanceType<C>, keyof A>
+  new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
 
   schema<T extends new(...args: any) => any>(
     this: T
@@ -1310,18 +1300,12 @@ export const Class = <
   fields: Fields
 ): Class<
   Spread<
-    {
-      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
-        Fields[K]
-      >
-    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
+    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
   Spread<
-    {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
-        Fields[K]
-      >
-    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
+    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
 > => {
   const schema = struct(fields)
@@ -1350,20 +1334,12 @@ export const ClassExtends = <
   Base,
   Spread<
     & Omit<Class.From<Base>, keyof Fields>
-    & {
-      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
-        Fields[K]
-      >
-    }
+    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
     & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
   Spread<
     & Omit<Class.To<Base>, keyof Fields>
-    & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
-        Fields[K]
-      >
-    }
+    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
 > => {
@@ -1397,21 +1373,13 @@ export const ClassTransform = <
   fields: Fields,
   decode: (input: Class.To<Base>) => ParseResult<
     & Omit<Class.To<Base>, keyof Fields>
-    & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
-        Fields[K]
-      >
-    }
+    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >,
   encode: (
     input:
       & Omit<Class.To<Base>, keyof Fields>
-      & {
-        readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
-          Fields[K]
-        >
-      }
+      & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
       & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   ) => ParseResult<Class.To<Base>>
 ): ClassTransform<
@@ -1419,11 +1387,7 @@ export const ClassTransform = <
   Class.From<Base>,
   Spread<
     & Omit<Class.To<Base>, keyof Fields>
-    & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<
-        Fields[K]
-      >
-    }
+    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
     & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
   >
 > => {
@@ -1464,21 +1428,13 @@ export const ClassTransformFrom = <
   fields: Fields,
   decode: (input: Class.From<Base>) => ParseResult<
     & Omit<Class.From<Base>, keyof Fields>
-    & {
-      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
-        Fields[K]
-      >
-    }
+    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
     & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   >,
   encode: (
     input:
       & Omit<Class.From<Base>, keyof Fields>
-      & {
-        readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<
-          Fields[K]
-        >
-      }
+      & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
       & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
   ) => ParseResult<Class.From<Base>>
 ): ClassTransform<
