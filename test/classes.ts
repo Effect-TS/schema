@@ -128,12 +128,6 @@ describe("Class", () => {
     assert(O.isSome(person.thing) && person.thing.value.id === 123)
   })
 
-  it("unsafe", () => {
-    const person = Person.unsafe({ id: 1, name: "John" })
-    assert(person.id === 1)
-    assert(person.name === "John")
-  })
-
   it("effect", () => {
     const person = Effect.runSync(Person.effect({ id: 1, name: "John" }))
     assert(person.id === 1)

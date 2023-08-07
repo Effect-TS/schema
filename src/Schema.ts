@@ -1200,11 +1200,6 @@ export interface Class<I, A> {
     props: A
   ): Effect.Effect<never, PR.ParseError, InstanceType<T>>
 
-  unsafe<T extends new(...args: any) => any>(
-    this: T,
-    props: A
-  ): InstanceType<T>
-
   schema<T extends new(...args: any) => any>(
     this: T
   ): Schema<I, InstanceType<T>>
@@ -1244,11 +1239,6 @@ export interface ClassExtends<C extends Class<any, any>, I, A> {
     props: A
   ): Effect.Effect<never, PR.ParseError, InstanceType<T>>
 
-  unsafe<T extends new(...args: any) => any>(
-    this: T,
-    props: A
-  ): InstanceType<T>
-
   schema<T extends new(...args: any) => any>(
     this: T
   ): Schema<I, InstanceType<T>>
@@ -1267,11 +1257,6 @@ export interface ClassTransform<C extends Class<any, any>, I, A> {
     & A
     & D.Case
     & Omit<InstanceType<C>, keyof A>
-
-  unsafe<T extends new(...args: any) => any>(
-    this: T,
-    props: A
-  ): InstanceType<T>
 
   schema<T extends new(...args: any) => any>(
     this: T
@@ -1293,9 +1278,6 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
       validateEffect(props),
       (props) => Object.setPrototypeOf(props, this.prototype)
     )
-  }
-  fn.unsafe = function unsafe(props: unknown) {
-    return Object.assign(Object.create(this.prototype), props)
   }
   fn.structSchema = function structSchema() {
     return schema_
