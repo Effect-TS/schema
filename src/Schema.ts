@@ -1195,18 +1195,6 @@ export const documentation =
 export interface Class<I, A> {
   new(props: A): A & D.Case
 
-  copy<T extends new(...args: any) => any>(
-    this: T,
-    from: InstanceType<T>,
-    props: Partial<A>
-  ): InstanceType<T>
-
-  unsafeCopy<T extends new(...args: any) => any>(
-    this: T,
-    from: InstanceType<T>,
-    props: Partial<A>
-  ): InstanceType<T>
-
   effect<T extends new(...args: any) => any>(
     this: T,
     props: A
@@ -1251,18 +1239,6 @@ export interface ClassExtends<C extends Class<any, any>, I, A> {
     & D.Case
     & Omit<InstanceType<C>, keyof A>
 
-  copy<T extends new(...args: any) => any>(
-    this: T,
-    from: InstanceType<T>,
-    props: Partial<A>
-  ): InstanceType<T>
-
-  unsafeCopy<T extends new(...args: any) => any>(
-    this: T,
-    from: InstanceType<T>,
-    props: Partial<A>
-  ): InstanceType<T>
-
   effect<T extends new(...args: any) => any>(
     this: T,
     props: A
@@ -1291,18 +1267,6 @@ export interface ClassTransform<C extends Class<any, any>, I, A> {
     & A
     & D.Case
     & Omit<InstanceType<C>, keyof A>
-
-  copy<T extends new(...args: any) => any>(
-    this: T,
-    from: InstanceType<T>,
-    props: Partial<A>
-  ): InstanceType<T>
-
-  unsafeCopy<T extends new(...args: any) => any>(
-    this: T,
-    from: InstanceType<T>,
-    props: Partial<A>
-  ): InstanceType<T>
 
   unsafe<T extends new(...args: any) => any>(
     this: T,
@@ -1343,12 +1307,6 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
       (input) => Object.assign(Object.create(this.prototype), input),
       (input) => ({ ...(input as any) })
     )
-  }
-  fn.copy = function copy(this: any, from: any, props: any) {
-    return new (this as any)({ ...from, ...props })
-  }
-  fn.unsafeCopy = function unsafeCopy(this: any, from: any, props: any) {
-    return Object.assign(Object.create(this.prototype), from, props)
   }
 
   return fn as any

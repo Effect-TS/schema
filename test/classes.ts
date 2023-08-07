@@ -106,20 +106,6 @@ describe("Class", () => {
     assert(personAge instanceof Data.Class)
   })
 
-  it("copy", () => {
-    const person = new Person({ id: 1, name: "John" })
-    const joe = Person.copy(person, { name: "Joe" })
-    assert(joe.id === 1)
-    assert(joe.name === "Joe")
-  })
-
-  it("unsafeCopy", () => {
-    const person = new Person({ id: 1, name: "John" })
-    const joe = Person.unsafeCopy(person, { name: "Joe" })
-    assert(joe.id === 1)
-    assert(joe.name === "Joe")
-  })
-
   it("transform", () => {
     const decode = S.decodeSync(PersonWithTransform.schema())
     const person = decode({
