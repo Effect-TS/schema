@@ -1339,7 +1339,7 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
   fn.schema = function schema(this: any) {
     return transform(
       schema_,
-      unknown,
+      instanceOf(this),
       (input) => Object.assign(Object.create(this.prototype), input),
       (input) => ({ ...(input as any) })
     )

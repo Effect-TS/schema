@@ -3,6 +3,7 @@ import * as O from "@effect/data/Option"
 import * as Effect from "@effect/io/Effect"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
+import * as Util from "@effect/schema/test/util"
 
 class Person extends S.Class({
   id: S.number,
@@ -57,6 +58,14 @@ describe("Class", () => {
   it("schema", () => {
     const person = S.parseSync(Person.schema())({ id: 1, name: "John" })
     assert(person.name === "John")
+
+    const PersonFromSelf = S.to(Person.schema())
+    Util.expectParseSuccess(PersonFromSelf, new Person({ id: 1, name: "John" }))
+    Util.expectParseFailure(
+      PersonFromSelf,
+      { id: 1, name: "John" },
+      `Expected an instance of Person, actual {"id":1,"name":"John"}`
+    )
   })
 
   it("extends", () => {
