@@ -1192,9 +1192,7 @@ export const documentation =
  * @category classes
  * @since 1.0.0
  */
-export interface Class<I, A> {
-  new(props: A): A & D.Case
-
+export interface ClassMethods<I, A> {
   effect<T extends new(...args: any) => any>(
     this: T,
     props: A
@@ -1205,6 +1203,14 @@ export interface Class<I, A> {
   ): Schema<I, InstanceType<T>>
 
   structSchema(): Schema<I, A>
+}
+
+/**
+ * @category classes
+ * @since 1.0.0
+ */
+export interface Class<I, A> extends ClassMethods<I, A> {
+  new(props: A): A & D.Case
 }
 
 /**
@@ -1226,33 +1232,16 @@ export namespace Class {
  * @category classes
  * @since 1.0.0
  */
-export interface ClassExtends<C extends Class<any, any>, I, A> {
+export interface ClassExtends<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
   new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
-
-  effect<T extends new(...args: any) => any>(
-    this: T,
-    props: A
-  ): Effect.Effect<never, PR.ParseError, InstanceType<T>>
-
-  schema<T extends new(...args: any) => any>(
-    this: T
-  ): Schema<I, InstanceType<T>>
-
-  structSchema(): Schema<I, A>
 }
 
 /**
  * @category classes
  * @since 1.0.0
  */
-export interface ClassTransform<C extends Class<any, any>, I, A> {
+export interface ClassTransform<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
   new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
-
-  schema<T extends new(...args: any) => any>(
-    this: T
-  ): Schema<I, InstanceType<T>>
-
-  structSchema(): Schema<I, A>
 }
 
 const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {

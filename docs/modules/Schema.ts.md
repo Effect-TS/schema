@@ -49,6 +49,7 @@ Added in v1.0.0
   - [Class (interface)](#class-interface)
   - [ClassExtends](#classextends)
   - [ClassExtends (interface)](#classextends-interface)
+  - [ClassMethods (interface)](#classmethods-interface)
   - [ClassTransform](#classtransform)
   - [ClassTransform (interface)](#classtransform-interface)
   - [ClassTransformFrom](#classtransformfrom)
@@ -615,14 +616,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Class<I, A> {
+export interface Class<I, A> extends ClassMethods<I, A> {
   new (props: A): A & D.Case
-
-  effect<T extends new (...args: any) => any>(this: T, props: A): Effect.Effect<never, PR.ParseError, InstanceType<T>>
-
-  schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-
-  structSchema(): Schema<I, A>
 }
 ```
 
@@ -667,9 +662,19 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface ClassExtends<C extends Class<any, any>, I, A> {
+export interface ClassExtends<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
   new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
+}
+```
 
+Added in v1.0.0
+
+## ClassMethods (interface)
+
+**Signature**
+
+```ts
+export interface ClassMethods<I, A> {
   effect<T extends new (...args: any) => any>(this: T, props: A): Effect.Effect<never, PR.ParseError, InstanceType<T>>
 
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
@@ -727,12 +732,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface ClassTransform<C extends Class<any, any>, I, A> {
+export interface ClassTransform<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
   new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
-
-  schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-
-  structSchema(): Schema<I, A>
 }
 ```
 
