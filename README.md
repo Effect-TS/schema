@@ -916,10 +916,9 @@ As an alternative to the `struct` constructor, you can create schemas as classes
 
 They offer a few conveniences that can help with some common use cases:
 
-- you can define a schema and an opaque type in one pass
+- define a schema and an opaque type in one pass
 - attach common functionality using class methods or getters
-- `Class` implements `Data.Case` for checking equality by value and hashing
-- `ClassExtends` to easily extend a previously defined schema `Class`
+- check equality by value and hashing (`Class` implements `Data.Case`)
 
 Take a look at the following example:
 
@@ -961,12 +960,6 @@ Person.schema();
 
 // $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
 Person.structSchema();
-
-// static `copy` method for modifying an instance
-Person.copy(tim, { name: "John" });
-
-// you can use `unsafeCopy` to skip validation
-Person.unsafeCopy(tim, { name: "John" });
 ```
 
 ## Pick
