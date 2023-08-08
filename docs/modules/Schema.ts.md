@@ -651,7 +651,7 @@ Added in v1.0.0
 ```ts
 export interface ClassMethods<I, A> {
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-  structSchema(): Schema<I, A>
+  struct(): Schema<I, A>
 }
 ```
 

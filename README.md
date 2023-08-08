@@ -959,7 +959,7 @@ Person.effect({ id: 1, name: "Tim" });
 Person.schema();
 
 // $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
-Person.structSchema();
+Person.struct();
 ```
 
 ## Pick

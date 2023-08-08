@@ -1206,7 +1206,7 @@ export const documentation =
  */
 export interface ClassMethods<I, A> {
   schema<T extends new(...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-  structSchema(): Schema<I, A>
+  struct(): Schema<I, A>
 }
 
 /**
@@ -1255,7 +1255,7 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
     Object.assign(this, validater(props))
   }
   fn.prototype = Object.create(base)
-  fn.structSchema = function structSchema() {
+  fn.struct = function struct() {
     return schema_
   }
   fn.schema = function schema(this: any) {
@@ -1337,7 +1337,7 @@ export const ClassTransform = <
   Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
 > => {
   const schema = transformResult(
-    base.structSchema(),
+    base.struct(),
     to(
       struct({
         ...(base as any).fields,
@@ -1377,7 +1377,7 @@ export const ClassTransformFrom = <
   Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
 > => {
   const schema = transformResult(
-    from(base.structSchema()),
+    from(base.struct()),
     struct({
       ...(base as any).fields,
       ...fields
