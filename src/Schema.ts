@@ -1290,33 +1290,36 @@ const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, bas
     )
   }
   fn.extend = function extend(this: any, fields: any) {
+    const newFields = { ...selfFields, ...fields }
     return makeClass(
-      struct({ ...selfFields, ...fields }),
-      { ...selfFields, ...fields },
+      struct(newFields),
+      newFields,
       this.prototype
     )
   }
   fn.transform = function transform(this: any, fields: any, decode: any, encode: any) {
+    const newFields = { ...selfFields, ...fields }
     return makeClass(
       transformResult(
         selfSchema,
-        to(struct({ ...selfFields, ...fields })),
+        to(struct(newFields)),
         decode,
         encode
       ),
-      { ...selfFields, ...fields },
+      newFields,
       this.prototype
     )
   }
   fn.transformFrom = function transform(this: any, fields: any, decode: any, encode: any) {
+    const newFields = { ...selfFields, ...fields }
     return makeClass(
       transformResult(
         from(selfSchema),
-        struct({ ...selfFields, ...fields }),
+        struct(newFields),
         decode,
         encode
       ),
-      { ...selfFields, ...fields },
+      newFields,
       this.prototype
     )
   }
