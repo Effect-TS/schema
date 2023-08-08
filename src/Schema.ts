@@ -1204,7 +1204,9 @@ export const documentation =
  * @category classes
  * @since 1.0.0
  */
-export interface ClassMethods<I, A> {
+export interface Class<I, A, C extends new(...args: any) => any = any> {
+  new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
+
   schema<T extends new(...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   struct(): Schema<I, A>
   extend<
@@ -1213,10 +1215,10 @@ export interface ClassMethods<I, A> {
   >(
     this: T,
     fields: Fields
-  ): ClassExtends<
-    T,
+  ): Class<
     Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    T
   >
   transform<
     T extends new(...args: any) => any,
@@ -1230,10 +1232,10 @@ export interface ClassMethods<I, A> {
     encode: (
       input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>
     ) => ParseResult<Class.To<T>>
-  ): ClassTransform<
-    T,
+  ): Class<
     Class.From<T>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    T
   >
   transformFrom<
     T extends new(...args: any) => any,
@@ -1247,19 +1249,11 @@ export interface ClassMethods<I, A> {
     encode: (
       input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>
     ) => ParseResult<Class.From<T>>
-  ): ClassTransform<
-    T,
+  ): Class<
     Class.From<T>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    T
   >
-}
-
-/**
- * @category classes
- * @since 1.0.0
- */
-export interface Class<I, A> extends ClassMethods<I, A> {
-  new(props: A): A & D.Case
 }
 
 /**
@@ -1275,24 +1269,6 @@ export namespace Class {
    * @since 1.0.0
    */
   export type From<A> = A extends Class<infer F, infer _T> ? F : never
-}
-
-/**
- * @category classes
- * @since 1.0.0
- */
-export interface ClassExtends<C extends new(...args: any) => any, I, A> extends ClassMethods<I, A> {
-  new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
-}
-
-/**
- * @category classes
- * @since 1.0.0
- */
-export interface ClassTransform<C extends new(...args: any) => any, I, A>
-  extends ClassMethods<I, A>
-{
-  new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
 }
 
 const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {

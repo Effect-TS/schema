@@ -47,9 +47,6 @@ Added in v1.0.0
 - [classes](#classes)
   - [Class](#class)
   - [Class (interface)](#class-interface)
-  - [ClassExtends (interface)](#classextends-interface)
-  - [ClassMethods (interface)](#classmethods-interface)
-  - [ClassTransform (interface)](#classtransform-interface)
 - [combinators](#combinators)
   - [annotations](#annotations-1)
   - [array](#array-1)
@@ -587,7 +584,7 @@ Added in v1.0.0
 ```ts
 export declare const Class: <Fields extends StructFields>(
   fields: Fields
-) => Class<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>>
+) => Class<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>, any>
 ```
 
 Added in v1.0.0
@@ -597,65 +594,31 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Class<I, A> extends ClassMethods<I, A> {
-  new (props: A): A & D.Case
-}
-```
-
-Added in v1.0.0
-
-## ClassExtends (interface)
-
-**Signature**
-
-```ts
-export interface ClassExtends<C extends new (...args: any) => any, I, A> extends ClassMethods<I, A> {
+export interface Class<I, A, C extends new (...args: any) => any = any> {
   new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
-}
-```
 
-Added in v1.0.0
-
-## ClassMethods (interface)
-
-**Signature**
-
-```ts
-export interface ClassMethods<I, A> {
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   struct(): Schema<I, A>
   extend<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields
-  ): ClassExtends<
-    T,
+  ): Class<
     Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    T
   >
   transform<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
     decode: (input: Class.To<T>) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
     encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult<Class.To<T>>
-  ): ClassTransform<T, Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>>
+  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, T>
   transformFrom<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
     decode: (input: Class.From<T>) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
     encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult<Class.From<T>>
-  ): ClassTransform<T, Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>>
-}
-```
-
-Added in v1.0.0
-
-## ClassTransform (interface)
-
-**Signature**
-
-```ts
-export interface ClassTransform<C extends new (...args: any) => any, I, A> extends ClassMethods<I, A> {
-  new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
+  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, T>
 }
 ```
 
