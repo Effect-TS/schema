@@ -936,8 +936,8 @@ class Person extends S.Class({
   }
 }
 
-// Extend an existing schema `Class` using the `ClassExtends` utility
-class PersonWithAge extends S.ClassExtends(Person, {
+// Extend an existing schema `Class` using the `extend` utility
+class PersonWithAge extends Person.extend({
   age: S.number
 }) {
   get isAdult() {
@@ -947,13 +947,6 @@ class PersonWithAge extends S.ClassExtends(Person, {
 
 // You can use the class constructor to validate and then create a new instance from some properties
 const tim = new Person({ id: 1, name: "Tim" });
-
-// You can use the `unsafe` constructor to create a new instance _without_ validating the input
-Person.unsafe({ id: 1, name: "Tim" });
-
-// There is also an `effect` constructor, to construct an instance as an `Effect`
-// $ExpectType Effect<never, ParseError, Person>
-Person.effect({ id: 1, name: "Tim" });
 
 // $ExpectType Schema<{ readonly id: number; name: string; }, Person>
 Person.schema();
