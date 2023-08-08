@@ -47,12 +47,9 @@ Added in v1.0.0
 - [classes](#classes)
   - [Class](#class)
   - [Class (interface)](#class-interface)
-  - [ClassExtends](#classextends)
   - [ClassExtends (interface)](#classextends-interface)
   - [ClassMethods (interface)](#classmethods-interface)
-  - [ClassTransform](#classtransform)
   - [ClassTransform (interface)](#classtransform-interface)
-  - [ClassTransformFrom](#classtransformfrom)
 - [combinators](#combinators)
   - [annotations](#annotations-1)
   - [array](#array-1)
@@ -607,37 +604,12 @@ export interface Class<I, A> extends ClassMethods<I, A> {
 
 Added in v1.0.0
 
-## ClassExtends
-
-**Signature**
-
-```ts
-export declare const ClassExtends: <Base extends Class<any, any>, Fields extends StructFields>(
-  base: Base,
-  fields: Fields
-) => ClassExtends<
-  Base,
-  Spread<
-    Omit<Class.From<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
-    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined }
-  >,
-  Spread<
-    Omit<Class.To<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
-    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
-  >
->
-```
-
-Added in v1.0.0
-
 ## ClassExtends (interface)
 
 **Signature**
 
 ```ts
-export interface ClassExtends<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
+export interface ClassExtends<C extends new (...args: any) => any, I, A> extends ClassMethods<I, A> {
   new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
 }
 ```
@@ -652,40 +624,27 @@ Added in v1.0.0
 export interface ClassMethods<I, A> {
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   struct(): Schema<I, A>
-}
-```
-
-Added in v1.0.0
-
-## ClassTransform
-
-**Signature**
-
-```ts
-export declare const ClassTransform: <Base extends Class<any, any>, Fields extends StructFields>(
-  base: Base,
-  fields: Fields,
-  decode: (
-    input: Class.To<Base>
-  ) => ParseResult<
-    Omit<Class.To<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
-    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
-  >,
-  encode: (
-    input: Omit<Class.To<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
-    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
-  ) => ParseResult<Class.To<Base>>
-) => ClassTransform<
-  Base,
-  Class.From<Base>,
-  Spread<
-    Omit<Class.To<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
-    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
+  extend<T extends new (...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields
+  ): ClassExtends<
+    T,
+    Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
   >
->
+  transform<T extends new (...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields,
+    decode: (input: Class.To<T>) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult<Class.To<T>>
+  ): ClassTransform<T, Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>>
+  transformFrom<T extends new (...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields,
+    decode: (input: Class.From<T>) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult<Class.From<T>>
+  ): ClassTransform<T, Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>>
+}
 ```
 
 Added in v1.0.0
@@ -695,42 +654,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface ClassTransform<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
+export interface ClassTransform<C extends new (...args: any) => any, I, A> extends ClassMethods<I, A> {
   new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
 }
-```
-
-Added in v1.0.0
-
-## ClassTransformFrom
-
-**Signature**
-
-```ts
-export declare const ClassTransformFrom: <Base extends Class<any, any>, Fields extends StructFields>(
-  base: Base,
-  fields: Fields,
-  decode: (
-    input: Class.From<Base>
-  ) => ParseResult<
-    Omit<Class.From<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
-    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined }
-  >,
-  encode: (
-    input: Omit<Class.From<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
-    } & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined }
-  ) => ParseResult<Class.From<Base>>
-) => ClassTransform<
-  Base,
-  Class.From<Base>,
-  Spread<
-    Omit<Class.To<Base>, keyof Fields> & {
-      readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
-    } & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined }
-  >
->
 ```
 
 Added in v1.0.0

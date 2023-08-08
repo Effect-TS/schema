@@ -1207,6 +1207,51 @@ export const documentation =
 export interface ClassMethods<I, A> {
   schema<T extends new(...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   struct(): Schema<I, A>
+  extend<
+    T extends new(...args: any) => any,
+    Fields extends StructFields
+  >(
+    this: T,
+    fields: Fields
+  ): ClassExtends<
+    T,
+    Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
+  >
+  transform<
+    T extends new(...args: any) => any,
+    Fields extends StructFields
+  >(
+    this: T,
+    fields: Fields,
+    decode: (
+      input: Class.To<T>
+    ) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    encode: (
+      input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>
+    ) => ParseResult<Class.To<T>>
+  ): ClassTransform<
+    T,
+    Class.From<T>,
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
+  >
+  transformFrom<
+    T extends new(...args: any) => any,
+    Fields extends StructFields
+  >(
+    this: T,
+    fields: Fields,
+    decode: (
+      input: Class.From<T>
+    ) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    encode: (
+      input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>
+    ) => ParseResult<Class.From<T>>
+  ): ClassTransform<
+    T,
+    Class.From<T>,
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>
+  >
 }
 
 /**
@@ -1236,7 +1281,7 @@ export namespace Class {
  * @category classes
  * @since 1.0.0
  */
-export interface ClassExtends<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
+export interface ClassExtends<C extends new(...args: any) => any, I, A> extends ClassMethods<I, A> {
   new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
 }
 
@@ -1244,7 +1289,9 @@ export interface ClassExtends<C extends Class<any, any>, I, A> extends ClassMeth
  * @category classes
  * @since 1.0.0
  */
-export interface ClassTransform<C extends Class<any, any>, I, A> extends ClassMethods<I, A> {
+export interface ClassTransform<C extends new(...args: any) => any, I, A>
+  extends ClassMethods<I, A>
+{
   new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
 }
 
@@ -1266,6 +1313,54 @@ const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
       (input) => ({ ...(input as any) })
     )
   }
+  fn.extend = function extend(this: any, fields: any) {
+    const schema = struct({
+      ...this.fields,
+      ...fields
+    })
+    const fn = makeClass(schema, this.prototype)
+    fn.fields = {
+      ...this.fields,
+      ...fields
+    }
+    return fn
+  }
+  fn.transform = function transform(this: any, fields: any, decode: any, encode: any) {
+    const schema = transformResult(
+      this.struct(),
+      to(
+        struct({
+          ...this.fields,
+          ...fields
+        })
+      ),
+      decode,
+      encode
+    )
+    const fn = makeClass(schema, this.prototype)
+    fn.fields = {
+      ...this.fields,
+      ...fields
+    }
+    return fn
+  }
+  fn.transformFrom = function transform(this: any, fields: any, decode: any, encode: any) {
+    const schema = transformResult(
+      from(this.struct()),
+      struct({
+        ...this.fields,
+        ...fields
+      }),
+      decode,
+      encode
+    )
+    const fn = makeClass(schema, D.Class.prototype)
+    fn.fields = {
+      ...this.fields,
+      ...fields
+    }
+    return fn
+  }
 
   return fn as any
 }
@@ -1285,111 +1380,6 @@ export const Class = <
   const schema = struct(fields)
   const fn = makeClass(schema, D.Class.prototype)
   fn.fields = fields
-  return fn
-}
-
-/**
- * @category classes
- * @since 1.0.0
- */
-export const ClassExtends = <
-  Base extends Class<any, any>,
-  Fields extends StructFields
->(
-  base: Base,
-  fields: Fields
-): ClassExtends<
-  Base,
-  Spread<Omit<Class.From<Base>, keyof Fields> & FromStruct<Fields>>,
-  Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
-> => {
-  const schema = struct({
-    ...(base as any).fields,
-    ...fields
-  })
-  const fn = makeClass(schema, base.prototype)
-  fn.fields = {
-    ...(base as any).fields,
-    ...fields
-  }
-  return fn
-}
-
-/**
- * @category classes
- * @since 1.0.0
- */
-export const ClassTransform = <
-  Base extends Class<any, any>,
-  Fields extends StructFields
->(
-  base: Base,
-  fields: Fields,
-  decode: (
-    input: Class.To<Base>
-  ) => ParseResult<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>,
-  encode: (
-    input: Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>
-  ) => ParseResult<Class.To<Base>>
-): ClassTransform<
-  Base,
-  Class.From<Base>,
-  Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
-> => {
-  const schema = transformResult(
-    base.struct(),
-    to(
-      struct({
-        ...(base as any).fields,
-        ...fields
-      })
-    ) as any,
-    decode,
-    encode
-  )
-  const fn = makeClass(schema, base.prototype)
-  fn.fields = {
-    ...(base as any).fields,
-    ...fields
-  }
-  return fn
-}
-
-/**
- * @category classes
- * @since 1.0.0
- */
-export const ClassTransformFrom = <
-  Base extends Class<any, any>,
-  Fields extends StructFields
->(
-  base: Base,
-  fields: Fields,
-  decode: (
-    input: Class.From<Base>
-  ) => ParseResult<Omit<Class.From<Base>, keyof Fields> & FromStruct<Fields>>,
-  encode: (
-    input: Omit<Class.From<Base>, keyof Fields> & FromStruct<Fields>
-  ) => ParseResult<Class.From<Base>>
-): ClassTransform<
-  Base,
-  Class.From<Base>,
-  Spread<Omit<Class.To<Base>, keyof Fields> & ToStruct<Fields>>
-> => {
-  const schema = transformResult(
-    from(base.struct()),
-    struct({
-      ...(base as any).fields,
-      ...fields
-    }) as any,
-    decode,
-    encode
-  )
-  const fn = makeClass(schema, D.Class.prototype)
-  fn.fields = {
-    ...(base as any).fields,
-    ...fields
-  }
   return fn
 }
 

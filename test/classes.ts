@@ -13,7 +13,7 @@ class Person extends S.Class({
   }
 }
 
-class PersonWithAge extends S.ClassExtends(Person, {
+class PersonWithAge extends Person.extend({
   age: S.number
 }) {
   get isAdult() {
@@ -21,13 +21,14 @@ class PersonWithAge extends S.ClassExtends(Person, {
   }
 }
 
-class PersonWithNick extends S.ClassExtends(PersonWithAge, {
+class PersonWithNick extends PersonWithAge.extend({
   nick: S.string
 }) {}
 
-class PersonWithTransform extends S.ClassTransform(
-  Person,
-  { thing: S.optional(S.struct({ id: S.number })).toOption() },
+class PersonWithTransform extends Person.transform(
+  {
+    thing: S.optional(S.struct({ id: S.number })).toOption()
+  },
   (input) =>
     PR.success({
       ...input,
@@ -36,9 +37,10 @@ class PersonWithTransform extends S.ClassTransform(
   PR.success
 ) {}
 
-class PersonWithTransformFrom extends S.ClassTransformFrom(
-  Person,
-  { thing: S.optional(S.struct({ id: S.number })).toOption() },
+class PersonWithTransformFrom extends Person.transformFrom(
+  {
+    thing: S.optional(S.struct({ id: S.number })).toOption()
+  },
   (input) =>
     PR.success({
       ...input,
