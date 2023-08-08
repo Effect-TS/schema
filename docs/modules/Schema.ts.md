@@ -584,7 +584,7 @@ Added in v1.0.0
 ```ts
 export declare const Class: <Fields extends StructFields>(
   fields: Fields
-) => Class<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>, any>
+) => Class<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>, {}>
 ```
 
 Added in v1.0.0
@@ -594,8 +594,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Class<I, A, C extends new (...args: any) => any = any> {
-  new (props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
+export interface Class<I, A, Inherited = {}> {
+  new (props: A): A & D.Case & Omit<Inherited, keyof A>
 
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   struct(): Schema<I, A>
@@ -605,20 +605,20 @@ export interface Class<I, A, C extends new (...args: any) => any = any> {
   ): Class<
     Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
     Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    T
+    InstanceType<T>
   >
   transform<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
     decode: (input: Class.To<T>) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
     encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult<Class.To<T>>
-  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, T>
+  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
   transformFrom<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
     decode: (input: Class.From<T>) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
     encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult<Class.From<T>>
-  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, T>
+  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
 }
 ```
 
