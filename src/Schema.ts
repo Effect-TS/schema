@@ -1204,8 +1204,8 @@ export const documentation =
  * @category classes
  * @since 1.0.0
  */
-export interface Class<I, A, C extends new(...args: any) => any = any> {
-  new(props: A): A & D.Case & Omit<InstanceType<C>, keyof A>
+export interface Class<I, A, Inherited = {}> {
+  new(props: A): A & D.Case & Omit<Inherited, keyof A>
 
   schema<T extends new(...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   struct(): Schema<I, A>
@@ -1218,7 +1218,7 @@ export interface Class<I, A, C extends new(...args: any) => any = any> {
   ): Class<
     Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
     Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    T
+    InstanceType<T>
   >
   transform<
     T extends new(...args: any) => any,
@@ -1235,7 +1235,7 @@ export interface Class<I, A, C extends new(...args: any) => any = any> {
   ): Class<
     Class.From<T>,
     Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    T
+    InstanceType<T>
   >
   transformFrom<
     T extends new(...args: any) => any,
@@ -1252,7 +1252,7 @@ export interface Class<I, A, C extends new(...args: any) => any = any> {
   ): Class<
     Class.From<T>,
     Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    T
+    InstanceType<T>
   >
 }
 
@@ -1271,71 +1271,54 @@ export namespace Class {
   export type From<A> = A extends Class<infer F, infer _T> ? F : never
 }
 
-const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
-  const validater = P.validateSync(schema_)
+const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, base: any) => {
+  const validater = P.validateSync(selfSchema)
 
   const fn = function(this: any, props: unknown) {
     Object.assign(this, validater(props))
   }
   fn.prototype = Object.create(base)
   fn.struct = function struct() {
-    return schema_
+    return selfSchema
   }
   fn.schema = function schema(this: any) {
     return transform(
-      schema_,
+      selfSchema,
       instanceOf(this),
       (input) => Object.assign(Object.create(this.prototype), input),
       (input) => ({ ...(input as any) })
     )
   }
   fn.extend = function extend(this: any, fields: any) {
-    const schema = struct({
-      ...this.fields,
-      ...fields
-    })
-    const fn = makeClass(schema, this.prototype)
-    fn.fields = {
-      ...this.fields,
-      ...fields
-    }
-    return fn
+    return makeClass(
+      struct({ ...selfFields, ...fields }),
+      { ...selfFields, ...fields },
+      this.prototype
+    )
   }
   fn.transform = function transform(this: any, fields: any, decode: any, encode: any) {
-    const schema = transformResult(
-      this.struct(),
-      to(
-        struct({
-          ...this.fields,
-          ...fields
-        })
+    return makeClass(
+      transformResult(
+        selfSchema,
+        to(struct({ ...selfFields, ...fields })),
+        decode,
+        encode
       ),
-      decode,
-      encode
+      { ...selfFields, ...fields },
+      this.prototype
     )
-    const fn = makeClass(schema, this.prototype)
-    fn.fields = {
-      ...this.fields,
-      ...fields
-    }
-    return fn
   }
   fn.transformFrom = function transform(this: any, fields: any, decode: any, encode: any) {
-    const schema = transformResult(
-      from(this.struct()),
-      struct({
-        ...this.fields,
-        ...fields
-      }),
-      decode,
-      encode
+    return makeClass(
+      transformResult(
+        from(selfSchema),
+        struct({ ...selfFields, ...fields }),
+        decode,
+        encode
+      ),
+      { ...selfFields, ...fields },
+      this.prototype
     )
-    const fn = makeClass(schema, D.Class.prototype)
-    fn.fields = {
-      ...this.fields,
-      ...fields
-    }
-    return fn
   }
 
   return fn as any
@@ -1352,12 +1335,7 @@ export const Class = <
 ): Class<
   Spread<FromStruct<Fields>>,
   Spread<ToStruct<Fields>>
-> => {
-  const schema = struct(fields)
-  const fn = makeClass(schema, D.Class.prototype)
-  fn.fields = fields
-  return fn
-}
+> => makeClass(struct(fields), fields, D.Class.prototype)
 
 // ---------------------------------------------
 // data

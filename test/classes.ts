@@ -1,4 +1,5 @@
 import * as Data from "@effect/data/Data"
+import * as Equal from "@effect/data/Equal"
 import * as O from "@effect/data/Option"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
@@ -54,6 +55,7 @@ describe("Class", () => {
     const person = new Person({ id: 1, name: "John" })
     assert(person.name === "John")
     assert(person.upperName === "JOHN")
+    expectTypeOf(person.upperName).toEqualTypeOf("string")
   })
 
   it("schema", () => {
@@ -76,9 +78,10 @@ describe("Class", () => {
       age: 30
     })
     assert(person.name === "John")
-    assert(person.upperName === "JOHN")
     assert(person.age === 30)
     assert(person.isAdult === true)
+    assert(person.upperName === "JOHN")
+    expectTypeOf(person.upperName).toEqualTypeOf("string")
   })
 
   it("extends extends", () => {
@@ -105,6 +108,12 @@ describe("Class", () => {
     const personAge = new PersonWithAge({ id: 1, name: "John", age: 30 })
     assert(person instanceof Data.Class)
     assert(personAge instanceof Data.Class)
+
+    const person2 = new Person({ id: 1, name: "John" })
+    assert(Equal.equals(person, person2))
+
+    const person3 = new Person({ id: 2, name: "John" })
+    assert(!Equal.equals(person, person3))
   })
 
   it("transform", () => {
@@ -116,6 +125,8 @@ describe("Class", () => {
     assert(person.id === 1)
     assert(person.name === "John")
     assert(O.isSome(person.thing) && person.thing.value.id === 123)
+    assert(person.upperName === "JOHN")
+    expectTypeOf(person.upperName).toEqualTypeOf("string")
   })
 
   it("transform from", () => {
@@ -127,5 +138,7 @@ describe("Class", () => {
     assert(person.id === 1)
     assert(person.name === "John")
     assert(O.isSome(person.thing) && person.thing.value.id === 123)
+    assert(person.upperName === "JOHN")
+    expectTypeOf(person.upperName).toEqualTypeOf("string")
   })
 })
