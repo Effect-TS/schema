@@ -650,10 +650,7 @@ Added in v1.0.0
 
 ```ts
 export interface ClassMethods<I, A> {
-  effect<T extends new (...args: any) => any>(this: T, props: A): Effect.Effect<never, PR.ParseError, InstanceType<T>>
-
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-
   structSchema(): Schema<I, A>
 }
 ```
@@ -1409,7 +1406,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
+) => (i: I, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1481,7 +1478,7 @@ Added in v1.0.0
 ```ts
 export declare const encode: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, I>
+) => (a: A, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, I>
 ```
 
 Added in v1.0.0
@@ -1855,7 +1852,7 @@ Added in v1.0.0
 ```ts
 export declare const parse: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -2787,7 +2784,7 @@ Added in v1.0.0
 ```ts
 export declare const validate: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
+) => (a: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0

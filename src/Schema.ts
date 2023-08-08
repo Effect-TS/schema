@@ -22,7 +22,6 @@ import type { Predicate, Refinement } from "@effect/data/Predicate"
 import { isDate, isObject } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
 import * as S from "@effect/data/String"
-import * as Effect from "@effect/io/Effect"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -1206,15 +1205,7 @@ export const documentation =
  * @since 1.0.0
  */
 export interface ClassMethods<I, A> {
-  effect<T extends new(...args: any) => any>(
-    this: T,
-    props: A
-  ): Effect.Effect<never, PR.ParseError, InstanceType<T>>
-
-  schema<T extends new(...args: any) => any>(
-    this: T
-  ): Schema<I, InstanceType<T>>
-
+  schema<T extends new(...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   structSchema(): Schema<I, A>
 }
 
@@ -1259,18 +1250,11 @@ export interface ClassTransform<C extends Class<any, any>, I, A> extends ClassMe
 
 const makeClass = <I, A>(schema_: Schema<I, A>, base: any) => {
   const validater = P.validateSync(schema_)
-  const validateEffect = P.validate(schema_)
 
   const fn = function(this: any, props: unknown) {
     Object.assign(this, validater(props))
   }
   fn.prototype = Object.create(base)
-  fn.effect = function effect(props: unknown) {
-    return Effect.map(
-      validateEffect(props),
-      (props) => Object.setPrototypeOf(props, this.prototype)
-    )
-  }
   fn.structSchema = function structSchema() {
     return schema_
   }

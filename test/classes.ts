@@ -1,6 +1,5 @@
 import * as Data from "@effect/data/Data"
 import * as O from "@effect/data/Option"
-import * as Effect from "@effect/io/Effect"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -126,11 +125,5 @@ describe("Class", () => {
     assert(person.id === 1)
     assert(person.name === "John")
     assert(O.isSome(person.thing) && person.thing.value.id === 123)
-  })
-
-  it("effect", () => {
-    const person = Effect.runSync(Person.effect({ id: 1, name: "John" }))
-    assert(person.id === 1)
-    assert(person.name === "John")
   })
 })
