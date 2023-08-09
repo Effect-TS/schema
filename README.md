@@ -952,7 +952,7 @@ const tim = new Person({ id: 1, name: "Tim" });
 Person.schema();
 
 // $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
-Person.struct();
+Person.structSchema();
 ```
 
 ## Pick

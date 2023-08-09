@@ -1208,7 +1208,7 @@ export interface Class<I, A, Inherited = {}> {
   new(props: A): A & D.Case & Omit<Inherited, keyof A>
 
   schema<T extends new(...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-  struct(): Schema<I, A>
+  structSchema(): Schema<I, A>
   extend<
     T extends new(...args: any) => any,
     Fields extends StructFields
@@ -1278,7 +1278,7 @@ const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, bas
     Object.assign(this, validater(props))
   }
   fn.prototype = Object.create(base)
-  fn.struct = function struct() {
+  fn.structSchema = function structSchema() {
     return selfSchema
   }
   fn.schema = function schema(this: any) {
