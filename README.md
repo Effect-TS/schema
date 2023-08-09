@@ -1123,8 +1123,6 @@ The transformation may also be async:
 import * as S from "@effect/schema/Schema";
 import * as PR from "@effect/schema/ParseResult";
 import * as Effect from "@effect/io/Effect";
-import fetch from "node-fetch";
-import { pipe } from "@effect/data/Function";
 import * as TF from "@effect/schema/TreeFormatter";
 
 const api = (url: string) =>
@@ -1145,11 +1143,10 @@ const PeopleIdFromString = S.transformResult(
   S.string,
   PeopleId,
   (s) =>
-    Effect.mapBoth(
-      api(`https://swapi.dev/api/people/${s}`),
-      (e) => PR.parseError([PR.type(PeopleId.ast, s, e.message)]),
-      () => s
-    ),
+    Effect.mapBoth(api(`https://swapi.dev/api/people/${s}`), {
+      onFailure: (e) => PR.parseError([PR.type(PeopleId.ast, s, e.message)]),
+      onSuccess: () => s
+    }),
   PR.success
 );
 
