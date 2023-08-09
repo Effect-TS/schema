@@ -56,9 +56,11 @@ describe("Class", () => {
     assert(john.name === "John")
     assert(john.upperName === "JOHN")
     expectTypeOf(john.upperName).toEqualTypeOf("string")
-    expect(() => new Person({ id: 1, name: '' })).toThrowError(new Error(`error(s) found
+    expect(() => new Person({ id: 1, name: "" })).toThrowError(
+      new Error(`error(s) found
 └─ ["name"]
-   └─ Expected a string at least 1 character(s) long, actual ""`))
+   └─ Expected a string at least 1 character(s) long, actual ""`)
+    )
   })
 
   it("schema", () => {
