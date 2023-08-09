@@ -910,6 +910,93 @@ encode({ a: O.none() }) // {}
 encode({ a: O.some(1) }) // { a: 1 }
 ```
 
+## Classes
+
+As an alternative to the `struct` constructor, you can create schemas as classes by extending the `Class` utility.
+
+They offer a few conveniences that can help with some common use cases:
+
+- define a schema and an opaque type in one pass
+- attach common functionality using class methods or getters
+- check equality by value and hashing (`Class` implements `Data.Case`)
+
+Take a look at the following example:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// Define your schema by extending `Class` with the desired fields
+class Person extends S.Class({
+  id: S.number,
+  name: S.string
+}) {
+  // Add getters and methods
+  get upperName() {
+    return this.name.toUpperCase();
+  }
+}
+
+// Extend an existing schema `Class` using the `extend` utility
+class PersonWithAge extends Person.extend({
+  age: S.number
+}) {
+  get isAdult() {
+    return this.age >= 18;
+  }
+}
+
+// You can use the class constructor to validate and then create a new instance from some properties
+const tim = new Person({ id: 1, name: "Tim" });
+
+// $ExpectType Schema<{ readonly id: number; name: string; }, Person>
+Person.schema();
+
+// $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
+Person.schemaStruct();
+```
+
+#### Transforms
+
+You can enhance a class with (effectful) transforms. This can be useful if you want to embellish or validate an entity from a data store.
+
+```ts
+import * as Effect from "@effect/io/Effect";
+import * as S from "@effect/schema/Schema";
+import * as O from "@effect/data/Option";
+import * as PR from "@effect/schema/ParseResult";
+
+class Person extends S.Class({
+  id: S.number,
+  name: S.string
+})
+
+function fetchThing(id: number): Effect.Effect<never, Error, string> { ... }
+
+class PersonWithTransform extends Person.transform(
+  {
+    thing: S.optional(S.string).toOption(),
+  },
+  (input) =>
+    Effect.mapBoth(fetchThing(input.id), {
+      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
+      onSuccess: (thing) => ({ ...input, thing: O.some(thing) })
+    }),
+  PR.success
+) {}
+
+class PersonWithTransformFrom extends Person.transformFrom(
+  {
+    thing: S.optional(S.string).toOption(),
+  },
+  (input) =>
+    Effect.mapBoth(fetchThing(input.id), {
+      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
+      onSuccess: (thing) => ({ ...input, thing })
+    }),
+  PR.success
+) {}
+```
+
 ## Pick
 
 ```ts
