@@ -955,6 +955,48 @@ Person.schema();
 Person.schemaStruct();
 ```
 
+#### Transforms
+
+You can enhance a class with (effectful) transforms. This can be useful if you want to embellish or validate an entity from a data store.
+
+```ts
+import * as Effect from "@effect/io/Effect";
+import * as S from "@effect/schema/Schema";
+import * as O from "@effect/data/Option";
+import * as PR from "@effect/schema/ParseResult";
+
+class Person extends S.Class({
+  id: S.number,
+  name: S.string
+})
+
+function fetchThing(id: number): Effect.Effect<never, Error, string> { ... }
+
+class PersonWithTransform extends Person.transform(
+  {
+    thing: S.optional(S.string).toOption(),
+  },
+  (input) =>
+    Effect.mapBoth(fetchThing(input.id), {
+      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
+      onSuccess: (thing) => ({ ...input, thing: O.some(thing) })
+    }),
+  PR.success
+) {}
+
+class PersonWithTransformFrom extends Person.transformFrom(
+  {
+    thing: S.optional(S.string).toOption(),
+  },
+  (input) =>
+    Effect.mapBoth(fetchThing(input.id), {
+      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
+      onSuccess: (thing) => ({ ...input, thing })
+    }),
+  PR.success
+) {}
+```
+
 ## Pick
 
 ```ts
