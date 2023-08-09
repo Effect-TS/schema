@@ -598,7 +598,7 @@ export interface Class<I, A, Inherited = {}> {
   new (props: A): A & D.Case & Omit<Inherited, keyof A>
 
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-  structSchema(): Schema<I, A>
+  schemaStruct(): Schema<I, A>
   extend<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields
