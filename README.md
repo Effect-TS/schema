@@ -912,15 +912,17 @@ encode({ a: O.some(1) }) // { a: 1 }
 
 ## Classes
 
-As an alternative to the `struct` constructor, you can create schemas as classes by extending the `Class` utility.
+When working with schemas, you have a choice beyond the `S.struct` constructor. You can leverage the power of classes through the `Class` utility, which comes with its own set of advantages tailored to common use cases.
 
-They offer a few conveniences that can help with some common use cases:
+### The Benefits of Using Classes
 
-- define a schema and an opaque type in one pass
-- attach common functionality using class methods or getters
-- check equality by value and hashing (`Class` implements `Data.Case`)
+Classes offer several features that simplify the schema creation process:
 
-Take a look at the following example:
+- **All-in-One Definition**: With classes, you can define both a schema and an opaque type simultaneously.
+- **Shared Functionality**: You can incorporate shared functionality using class methods or getters.
+- **Value Equality and Hashing**: Utilize the built-in capability for checking value equality and applying hashing (thanks to `Class` implementing `Data.Case`).
+
+Let's dive into an illustrative example to better understand how classes work:
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -928,14 +930,67 @@ import * as S from "@effect/schema/Schema";
 // Define your schema by extending `Class` with the desired fields
 class Person extends S.Class({
   id: S.number,
-  name: S.string
+  name: S.string.pipe(S.nonEmpty())
+}) {}
+```
+
+### Validation and Instantiation
+
+The class constructor serves as a validation and instantiation tool. It ensures that the provided properties meet the schema requirements:
+
+```ts
+const tim = new Person({ id: 1, name: "Tim" });
+```
+
+Keep in mind that it throws an error for invalid properties:
+
+```ts
+new Person({ id: 1, name: "" });
+/* throws
+error(s) found
+└─ ["name"]
+   └─ Expected a string at least 1 character(s) long, actual ""
+*/
+```
+
+### Custom Getters and Methods
+
+For more flexibility, you can also introduce custom getters and methods:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+class Person extends S.Class({
+  id: S.number,
+  name: S.string.pipe(S.nonEmpty())
 }) {
-  // Add getters and methods
   get upperName() {
     return this.name.toUpperCase();
   }
 }
 
+const john = new Person({ id: 1, name: "John" });
+
+john.upperName; // "JOHN"
+```
+
+### Accessing Related Schemas
+
+If you need to work with related schemas, you can easily retrieve them using the provided static `schema*` functions:
+
+```ts
+// $ExpectType Schema<{ readonly id: number; name: string; }, Person>
+Person.schema();
+
+// $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
+Person.schemaStruct();
+```
+
+### Extending existing Classes
+
+In situations where you need to augment your existing class with more fields, the built-in `extend` utility comes in handy:
+
+```ts
 // Extend an existing schema `Class` using the `extend` utility
 class PersonWithAge extends Person.extend({
   age: S.number
@@ -944,20 +999,11 @@ class PersonWithAge extends Person.extend({
     return this.age >= 18;
   }
 }
-
-// You can use the class constructor to validate and then create a new instance from some properties
-const tim = new Person({ id: 1, name: "Tim" });
-
-// $ExpectType Schema<{ readonly id: number; name: string; }, Person>
-Person.schema();
-
-// $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
-Person.schemaStruct();
 ```
 
-#### Transforms
+### Transforms
 
-You can enhance a class with (effectful) transforms. This can be useful if you want to embellish or validate an entity from a data store.
+You have the option to enhance a class with (effectful) transforms. This becomes valuable when you want to enrich or validate an entity sourced from a data store.
 
 ```ts
 import * as Effect from "@effect/io/Effect";
