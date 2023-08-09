@@ -1272,10 +1272,10 @@ export namespace Class {
 }
 
 const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, base: any) => {
-  const validater = P.validateSync(selfSchema)
+  const validator = P.validateSync(selfSchema)
 
   const fn = function(this: any, props: unknown) {
-    Object.assign(this, validater(props))
+    Object.assign(this, validator(props))
   }
   fn.prototype = Object.create(base)
   fn.structSchema = function structSchema() {
