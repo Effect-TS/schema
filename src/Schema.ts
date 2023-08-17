@@ -3017,22 +3017,36 @@ export const nonEmpty = <A extends string>(
 ): <I>(self: Schema<I, A>) => Schema<I, A> => minLength(1, options)
 
 /**
+ * The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
+ * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+ *
+ * @category string
+ * @since 1.0.0
+ */
+export const parseJson = <I, A extends string>(self: Schema<I, A>, options?: {
+  revivier?: Parameters<typeof JSON.parse>[1]
+  replacer?: Parameters<typeof JSON.stringify>[1]
+  space?: Parameters<typeof JSON.stringify>[2]
+}): Schema<I, unknown> =>
+  transformResult(self, unknown, (s) => {
+    try {
+      return PR.success<unknown>(JSON.parse(s, options?.revivier))
+    } catch (e: any) {
+      return PR.failure(PR.type(ParseJson.ast, s, e.message))
+    }
+  }, (u) => {
+    try {
+      return PR.success(JSON.stringify(u, options?.replacer, options?.space) as A) // this is safe because `self` will check its input anyway
+    } catch (e: any) {
+      return PR.failure(PR.type(ParseJson.ast, u, e.message))
+    }
+  })
+
+/**
  * The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
  * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
  *
  * @category string
  * @since 1.0.0
  */
-export const ParseJson: Schema<string, unknown> = transformResult(string, unknown, (s) => {
-  try {
-    return PR.success<unknown>(JSON.parse(s))
-  } catch (e: any) {
-    return PR.failure(PR.type(ParseJson.ast, s, e.message))
-  }
-}, (u) => {
-  try {
-    return PR.success(JSON.stringify(u))
-  } catch (e: any) {
-    return PR.failure(PR.type(ParseJson.ast, u, e.message))
-  }
-})
+export const ParseJson: Schema<string, unknown> = parseJson(string)

@@ -167,6 +167,7 @@ Added in v1.0.0
   - [maxLength](#maxlength)
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
+  - [parseJson](#parsejson-1)
   - [pattern](#pattern)
   - [split](#split)
   - [startsWith](#startswith)
@@ -2031,6 +2032,26 @@ Added in v1.0.0
 export declare const nonEmpty: <A extends string>(
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## parseJson
+
+The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const parseJson: <I, A extends string>(
+  self: Schema<I, A>,
+  options?: {
+    revivier?: Parameters<typeof JSON.parse>[1]
+    replacer?: Parameters<typeof JSON.stringify>[1]
+    space?: Parameters<typeof JSON.stringify>[2]
+  }
+) => Schema<I, unknown>
 ```
 
 Added in v1.0.0
