@@ -1333,6 +1333,22 @@ parse(" a "); // "a"
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
 
+#### ParseJson
+
+The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// const schema: S.Schema<string, unknown>
+const schema = S.ParseJson;
+const parse = S.parseSync(schema);
+
+parse("{}"); // {}
+parse(`{"a":"b"}`); // { "a": "b" }
+parse(""); // throws Unexpected end of JSON input
+```
+
 ### Number transformations
 
 #### NumberFromString

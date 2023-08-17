@@ -1899,15 +1899,13 @@ export const ValidDateFromSelf = DateFromSelf.pipe(validDate())
   @category Date
   @since 1.0.0
 */
-export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, Date> => {
-  const schema: Schema<I, Date> = transformResult(
+export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, Date> =>
+  transformResult(
     self,
     ValidDateFromSelf,
     (s) => PR.success(new Date(s)),
     (n) => PR.success(n.toISOString() as A) // this is safe because `self` will check its input anyway
   )
-  return schema
-}
 
 const _Date: Schema<string, Date> = dateFromString(string)
 
@@ -2990,3 +2988,24 @@ export const length = <A extends string>(
 export const nonEmpty = <A extends string>(
   options?: AnnotationOptions<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> => minLength(1, options)
+
+/**
+ * The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
+ * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+ *
+ * @category string
+ * @since 1.0.0
+ */
+export const ParseJson: Schema<string, unknown> = transformResult(string, unknown, (s) => {
+  try {
+    return PR.success<unknown>(JSON.parse(s))
+  } catch (e: any) {
+    return PR.failure(PR.type(ParseJson.ast, s, e.message))
+  }
+}, (u) => {
+  try {
+    return PR.success(JSON.stringify(u))
+  } catch (e: any) {
+    return PR.failure(PR.type(ParseJson.ast, u, e.message))
+  }
+})

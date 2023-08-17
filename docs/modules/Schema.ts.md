@@ -159,6 +159,7 @@ Added in v1.0.0
   - [unknown](#unknown)
   - [void](#void)
 - [string](#string-1)
+  - [ParseJson](#parsejson)
   - [Trim](#trim)
   - [endsWith](#endswith)
   - [includes](#includes)
@@ -1927,6 +1928,19 @@ export declare const void: Schema<void, void>
 Added in v1.0.0
 
 # string
+
+## ParseJson
+
+The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const ParseJson: Schema<string, unknown>
+```
+
+Added in v1.0.0
 
 ## Trim
 
