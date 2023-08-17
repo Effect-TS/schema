@@ -39,4 +39,12 @@ describe.concurrent("ParseJson", () => {
     --- property 'a' closes the circle`
     )
   })
+
+  it("compose", async () => {
+    const schema = S.ParseJson.pipe(S.compose(S.struct({ a: S.number }), { force: "decoding" }))
+    await Util.expectParseSuccess(schema, `{"a":1}`, { a: 1 })
+    await Util.expectParseFailure(schema, `{"a"}`, `Unexpected token } in JSON at position 4`)
+    await Util.expectParseFailure(schema, `{"a":"b"}`, `/a Expected number, actual "b"`)
+    await Util.expectEncodeSuccess(schema, { a: 1 }, `{"a":1}`)
+  })
 })
