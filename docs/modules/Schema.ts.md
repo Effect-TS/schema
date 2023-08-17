@@ -2047,7 +2047,7 @@ functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
 export declare const parseJson: <I, A extends string>(
   self: Schema<I, A>,
   options?: {
-    revivier?: Parameters<typeof JSON.parse>[1]
+    reviver?: Parameters<typeof JSON.parse>[1]
     replacer?: Parameters<typeof JSON.stringify>[1]
     space?: Parameters<typeof JSON.stringify>[2]
   }

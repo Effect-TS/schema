@@ -3024,13 +3024,13 @@ export const nonEmpty = <A extends string>(
  * @since 1.0.0
  */
 export const parseJson = <I, A extends string>(self: Schema<I, A>, options?: {
-  revivier?: Parameters<typeof JSON.parse>[1]
+  reviver?: Parameters<typeof JSON.parse>[1]
   replacer?: Parameters<typeof JSON.stringify>[1]
   space?: Parameters<typeof JSON.stringify>[2]
 }): Schema<I, unknown> =>
   transformResult(self, unknown, (s) => {
     try {
-      return PR.success<unknown>(JSON.parse(s, options?.revivier))
+      return PR.success<unknown>(JSON.parse(s, options?.reviver))
     } catch (e: any) {
       return PR.failure(PR.type(ParseJson.ast, s, e.message))
     }
