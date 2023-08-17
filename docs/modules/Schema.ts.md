@@ -730,7 +730,11 @@ Added in v1.0.0
 ```ts
 export declare const compose: {
   <B, C>(bc: Schema<B, C>): <A>(ab: Schema<A, B>) => Schema<A, C>
+  <B, C extends B, D>(cd: Schema<C, D>, options: { force: 'decoding' }): <A>(ab: Schema<A, B>) => Schema<A, D>
+  <C, D>(cd: Schema<C, D>, options: { force: 'encoding' }): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
   <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C>
+  <A, B, C extends B, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'decoding' }): Schema<A, D>
+  <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'encoding' }): Schema<A, D>
 }
 ```
 

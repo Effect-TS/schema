@@ -937,11 +937,38 @@ export const extend: {
  */
 export const compose: {
   <B, C>(bc: Schema<B, C>): <A>(ab: Schema<A, B>) => Schema<A, C>
+  <B, C extends B, D>(
+    cd: Schema<C, D>,
+    options: { force: "decoding" }
+  ): <A>(ab: Schema<A, B>) => Schema<A, D>
+  <C, D>(
+    cd: Schema<C, D>,
+    options: { force: "encoding" }
+  ): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
   <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C>
+  <A, B, C extends B, D>(
+    ab: Schema<A, B>,
+    cd: Schema<C, D>,
+    options: { force: "decoding" }
+  ): Schema<A, D>
+  <A, B extends C, C, D>(
+    ab: Schema<A, B>,
+    cd: Schema<C, D>,
+    options: { force: "encoding" }
+  ): Schema<A, D>
 } = dual(
-  2,
-  <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C> =>
-    transform(ab, bc, identity, identity)
+  (args) => isSchema(args[1]),
+  (ab: any, cd: any, options?: { force: "decoding" | "encoding" }) => {
+    if (options) {
+      if (options.force === "decoding") {
+        return transformResult(ab, cd, P.validateResult(from(cd)), PR.success)
+      } else {
+        return transformResult(ab, cd, PR.success, P.validateResult(to(ab)))
+      }
+    } else {
+      return transform(ab, cd, identity, identity)
+    }
+  }
 )
 
 /**
