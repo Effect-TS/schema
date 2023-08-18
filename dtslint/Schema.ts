@@ -520,3 +520,6 @@ pipe(UnionFilter, S.filter(S.is(S.struct({ b: S.string }))))
 
 // $ExpectType Schema<number, number & Brand<"MyNumber">>
 pipe(S.number, S.filter((n): n is number & Brand<"MyNumber"> => n > 0))
+
+// $ExpectType Schema<readonly string[], readonly number[]>
+S.array(S.string).pipe(S.findAll(NumberFromString))

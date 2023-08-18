@@ -2990,3 +2990,120 @@ export const length = <A extends string>(
 export const nonEmpty = <A extends string>(
   options?: AnnotationOptions<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> => minLength(1, options)
+
+/**
+ * Finds all values within an array that match a given schema.
+ *
+ * @example
+ * import * as S from "@effect-ts/schema";
+ *
+ * const IntFromString = S.NumberFromString.pipe(S.int())
+ * const schema = S.findAll(S.array(S.string), IntFromString) // string[] -> int[]
+ *
+ * expect(S.parseSync(schema)(["1", "a", "2", "1.5"])).toEqual([1, 2])
+ * expect(S.encodeSync(schema)([1])).toEqual(["1"])
+ *
+ * @param inner
+ * @returns
+ */
+export const findAll: {
+  <A1, A2>(
+    inner: Schema<A1, A2>
+  ): <I>(
+    that: Schema<I, ReadonlyArray<A1>>
+  ) => Schema<I, ReadonlyArray<A2>>
+
+  <I, A1, A2>(
+    that: Schema<I, ReadonlyArray<A1>>,
+    inner: Schema<A1, A2>
+  ): Schema<I, ReadonlyArray<A2>>
+} = dual(2, <I, A1, A2>(that: Schema<I, ReadonlyArray<A1>>, inner: Schema<A1, A2>) => {
+  const decodeOption = P.decodeOption(inner)
+
+  return transform(
+    that,
+    array(inner),
+    RA.filter((s) => O.isSome(decodeOption(s))),
+    identity
+  )
+})
+
+/**
+ * Finds the first value in an array that matches a given schema.
+ *
+ * @example
+ * import * as S from "@effect-ts/schema";
+ *
+ * const IntFromString = S.NumberFromString.pipe(S.int())
+ * const schema = S.findFirst(S.array(S.string), IntFromString) // string[] -> int
+ * const parse = S.parseSync(schema)
+ *
+ * expect(parse(["1"])).toEqual(1)
+ * expect(parse(["1", "2"])).toEqual(1)
+ * expect(parse(["a", "1"])).toEqual(1)
+ *
+ * @param inner
+ * @returns
+ */
+export const findFirst: {
+  <I, A1, A2>(that: Schema<I, ReadonlyArray<A1>>, inner: Schema<A1, A2>): Schema<I, A2>
+  <A1, A2>(inner: Schema<A1, A2>): <I>(that: Schema<I, ReadonlyArray<A1>>) => Schema<I, A2>
+} = dual(
+  2,
+  <I, A1, A2>(that: Schema<I, ReadonlyArray<A1>>, inner: Schema<A1, A2>) => {
+    const decodeOption = P.decodeOption(inner)
+
+    return transformResult(
+      that,
+      inner,
+      (s) =>
+        RA.findFirst(s, (x) => O.isSome(decodeOption(x))).pipe(
+          O.match({
+            onSome: (res) => PR.success(res),
+            onNone: () => PR.failure(PR.type(that.ast, s))
+          })
+        ),
+      (s) => PR.success([s])
+    )
+  }
+)
+
+/**
+ * Finds the last value in an array that matches a given schema.
+ *
+ * @example
+ * import * as S from "@effect-ts/schema";
+ *
+ * const IntFromString = S.NumberFromString.pipe(S.int())
+ * const schema = S.findLast(S.array(S.string), IntFromString) // string[] -> int
+ * const parse = S.parseSync(schema)
+ *
+ * expect(parse(["1", "2"])).toEqual(2)
+ * expect(parse(["a", "1"])).toEqual(1)
+ * expect(parse(["a", "1", "2"])).toEqual(2)
+ *
+ * @param inner
+ * @returns
+ */
+export const findLast: {
+  <I, A1, A2>(that: Schema<I, ReadonlyArray<A1>>, inner: Schema<A1, A2>): Schema<I, A2>
+  <A1, A2>(inner: Schema<A1, A2>): <I>(that: Schema<I, ReadonlyArray<A1>>) => Schema<I, A2>
+} = dual(
+  2,
+  <I, A1, A2>(that: Schema<I, ReadonlyArray<A1>>, inner: Schema<A1, A2>) => {
+    const decodeOption = P.decodeOption(inner)
+
+    return transformResult(
+      that,
+      inner,
+      (s) =>
+        RA.findLast(s, (x) => O.isSome(decodeOption(x))).pipe(
+          O.match({
+            onSome: (res) => PR.success(res),
+            onNone: () => PR.failure(PR.type(that.ast, s))
+          })
+        ),
+      (s) => PR.success([s])
+    )
+  }
+)
