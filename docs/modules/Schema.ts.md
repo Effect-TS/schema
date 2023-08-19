@@ -159,6 +159,7 @@ Added in v1.0.0
   - [unknown](#unknown)
   - [void](#void)
 - [string](#string-1)
+  - [ParseJson](#parsejson)
   - [Trim](#trim)
   - [endsWith](#endswith)
   - [includes](#includes)
@@ -166,6 +167,7 @@ Added in v1.0.0
   - [maxLength](#maxlength)
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
+  - [parseJson](#parsejson-1)
   - [pattern](#pattern)
   - [split](#split)
   - [startsWith](#startswith)
@@ -729,7 +731,11 @@ Added in v1.0.0
 ```ts
 export declare const compose: {
   <B, C>(bc: Schema<B, C>): <A>(ab: Schema<A, B>) => Schema<A, C>
+  <B, C extends B, D>(cd: Schema<C, D>, options: { force: 'decoding' }): <A>(ab: Schema<A, B>) => Schema<A, D>
+  <C, D>(cd: Schema<C, D>, options: { force: 'encoding' }): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
   <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C>
+  <A, B, C extends B, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'decoding' }): Schema<A, D>
+  <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'encoding' }): Schema<A, D>
 }
 ```
 
@@ -1928,6 +1934,19 @@ Added in v1.0.0
 
 # string
 
+## ParseJson
+
+The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const ParseJson: Schema<string, unknown>
+```
+
+Added in v1.0.0
+
 ## Trim
 
 This schema allows removing whitespaces from the beginning and end of a string.
@@ -2013,6 +2032,26 @@ Added in v1.0.0
 export declare const nonEmpty: <A extends string>(
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## parseJson
+
+The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const parseJson: <I, A extends string>(
+  self: Schema<I, A>,
+  options?: {
+    reviver?: Parameters<typeof JSON.parse>[1]
+    replacer?: Parameters<typeof JSON.stringify>[1]
+    space?: Parameters<typeof JSON.stringify>[2]
+  }
+) => Schema<I, unknown>
 ```
 
 Added in v1.0.0
