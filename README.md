@@ -1118,11 +1118,39 @@ S.struct({ a: S.string, b: S.string }).pipe(
 
 ## Compose
 
-The `compose` combinator allows you to combine two schemas.
+Combining and reusing schemas is a common requirement, the `compose` combinator allows you to do just that. It enables you to merge two schemas, `Schema<A, B>` and `Schema<B, C>`, into a single schema `Schema<A, C>`:
 
 ```ts
+// $ExpectType Schema<string, readonly string[]>
+const schema1 = S.split(S.string, ",");
+
+// $ExpectType Schema<readonly string[], readonly number[]>
+const schema2 = S.array(S.NumberFromString);
+
 // $ExpectType Schema<string, readonly number[]>
-S.compose(S.split(S.string, ","), S.array(S.NumberFromString));
+const composedSchema = S.compose(schema1, schema2);
+```
+
+In this example, we have two schemas, `schema1` and `schema2`. The first schema, `schema1`, takes a string and splits it into an array using a comma as the delimiter. The second schema, `schema2`, transforms an array of strings into an array of numbers.
+
+Now, by using the `compose` combinator, we can create a new schema, `composedSchema`, that combines the functionality of both `schema1` and `schema2`. This allows us to parse a string and directly obtain an array of numbers as a result.
+
+If you need to compose two schemas, `Schema<A, B>` and `Schema<C, D>`, where `C` is a subtype of `B` then you have to add an extra option, `force: "decoding"`:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<string, unknown>
+const schema1 = S.ParseJson;
+
+// $ExpectType Schema<{ readonly a: number; }, { readonly a: number; }>
+const schema2 = S.struct({ a: S.number });
+
+// $ExpectType Schema<string, { readonly a: number; }>
+const composedSchema = S.compose(schema1, schema2, {
+  // { readonly a: number; } is a subtype of unknown, you need to add an extra option
+  force: "decoding"
+});
 ```
 
 ## InstanceOf
@@ -1304,7 +1332,7 @@ The `split` combinator allows splitting a string into an array of strings.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<string, string>
+// $ExpectType Schema<string, string>
 const schema = S.string.pipe(S.split(","));
 const parse = S.parseSync(schema);
 
@@ -1321,7 +1349,7 @@ The `Trim` schema allows removing whitespaces from the beginning and end of a st
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<string, string>
+// $ExpectType Schema<string, string>
 const schema = S.Trim;
 const parse = S.parseSync(schema);
 
@@ -1340,7 +1368,7 @@ The `ParseJson` schema offers a method to convert JSON strings into the `unknown
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<string, unknown>
+// $ExpectType Schema<string, unknown>
 const schema = S.ParseJson;
 const parse = S.parseSync(schema);
 
@@ -1348,6 +1376,19 @@ parse("{}"); // {}
 parse(`{"a":"b"}`); // { "a": "b" }
 parse(""); // throws Unexpected end of JSON input
 ```
+
+You can also compose the `ParseJson` schema with other schemas to refine the parsing result:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<string, { readonly a: number; }>
+const schema = S.ParseJson.pipe(
+  S.compose(S.struct({ a: S.number }), { force: "decoding" })
+);
+```
+
+In this example, we've composed the `ParseJson` schema with a struct schema to ensure that the result will have a specific shape, including an object with a numeric property "a".
 
 ### Number transformations
 
@@ -1360,7 +1401,7 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<string, number>
+// $ExpectType Schema<string, number>
 const schema = S.NumberFromString;
 const parse = S.parseSync(schema);
 
@@ -1383,7 +1424,7 @@ Clamps a `number` between a minimum and a maximum value.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<number, number>
+// $ExpectType Schema<number, number>
 const schema = S.number.pipe(S.clamp(-1, 1)); // clamps the input to -1 <= x <= 1
 
 const parse = S.parseSync(schema);
@@ -1401,7 +1442,7 @@ Transforms a `string` into a `bigint` by parsing the string using `BigInt`.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<string, bigint>
+// $ExpectType Schema<string, bigint>
 const schema = S.BigintFromString;
 const parse = S.parseSync(schema);
 
@@ -1424,7 +1465,7 @@ Clamps a `bigint` between a minimum and a maximum value.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<bigint, bigint>
+// $ExpectType Schema<bigint, bigint>
 const schema = S.bigint.pipe(S.clampBigint(-1n, 1n)); // clamps the input to -1n <= x <= 1n
 
 const parse = S.parseSync(schema);
@@ -1442,7 +1483,7 @@ Negates a boolean value.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<boolean, boolean>
+// $ExpectType Schema<boolean, boolean>
 const schema = S.boolean.pipe(S.not);
 
 const parse = S.parseSync(schema);
@@ -1459,7 +1500,7 @@ Transforms a `string` into a valid `Date`.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<string, Date>
+// $ExpectType Schema<string, Date>
 const schema = S.Date;
 const parse = S.parseSync(schema);
 
@@ -1567,7 +1608,7 @@ In the following section, we demonstrate how to use the `readonlySet` combinator
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<readonly number[], ReadonlySet<number>>
+// $ExpectType Schema<readonly number[], ReadonlySet<number>>
 const schema = S.readonlySet(S.number); // define a schema for ReadonlySet with number values
 const parse = S.parseSync(schema);
 
@@ -1581,7 +1622,7 @@ In the following section, we demonstrate how to use the `readonlyMap` combinator
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// const schema: S.Schema<readonly (readonly [number, string])[], ReadonlyMap<number, string>>
+// $ExpectType Schema<readonly (readonly [number, string])[], ReadonlyMap<number, string>>
 const schema = S.readonlyMap(S.number, S.string); // define the schema for ReadonlyMap with number keys and string values
 const parse = S.parseSync(schema);
 
