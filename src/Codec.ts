@@ -649,12 +649,12 @@ export function filter<A>(
  * @since 1.0.0
  */
 export const compose: {
-  <A, B>(that: Codec<A, B>): <I>(self: Codec<I, A>) => Codec<I, B>
-  <I, A, B>(self: Codec<I, A>, that: Codec<A, B>): Codec<I, B>
+  <C, D>(bc: Codec<C, D>): <A, B>(ab: Codec<A, B>) => Codec<A, D>
+  <A, B, C, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D>
 } = dual(
   2,
-  <I, A, B>(self: Codec<I, A>, that: Codec<A, B>): Codec<I, B> =>
-    make(AST.createTransform(self.ast, that.ast, AST.composeTransformation))
+  <A, B, C, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D> =>
+    make(AST.createTransform(ab.ast, cd.ast, AST.composeTransformation))
 )
 
 /**
@@ -1079,6 +1079,40 @@ export const trim = <I>(self: Codec<I, string>): Codec<I, string> =>
  * @since 1.0.0
  */
 export const Trim: Codec<string, string> = trim(S.string)
+
+/**
+ * The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
+ * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+export const parseJson = <I, A extends string>(self: Codec<I, A>, options?: {
+  reviver?: Parameters<typeof JSON.parse>[1]
+  replacer?: Parameters<typeof JSON.stringify>[1]
+  space?: Parameters<typeof JSON.stringify>[2]
+}): Codec<I, unknown> => transformResult(self, S.unknown, (s, _, ast) => {
+  try {
+    return PR.success<unknown>(JSON.parse(s, options?.reviver))
+  } catch (e: any) {
+    return PR.failure(PR.type(ast, s, e.message))
+  }
+}, (u, _, ast) => {
+  try {
+    return PR.success(JSON.stringify(u, options?.replacer, options?.space) as A) // this is safe because `self` will check its input anyway
+  } catch (e: any) {
+    return PR.failure(PR.type(ast, u, e.message))
+  }
+})
+
+/**
+ * The `ParseJson` codec offers a method to convert JSON strings into the `unknown` type using the underlying
+ * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+ *
+ * @category string
+ * @since 1.0.0
+ */
+export const ParseJson: Codec<string, unknown> = parseJson(S.string)
 
 // ---------------------------------------------
 // number transformations

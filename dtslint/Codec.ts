@@ -346,3 +346,34 @@ pipe(UnionFilter, C.filter(S.is(S.struct({ b: S.string }))))
 
 // $ExpectType Codec<number, number & Brand<"MyNumber">>
 pipe(S.number, C.filter((n): n is number & Brand<"MyNumber"> => n > 0))
+
+// ---------------------------------------------
+// compose
+// ---------------------------------------------
+
+// plain
+
+// $ExpectType Codec<string, readonly number[]>
+C.compose(C.split(S.string, ","), C.array(C.NumberFromString))
+
+// $ExpectType Codec<string, readonly number[]>
+C.split(S.string, ",").pipe(C.compose(C.array(C.NumberFromString)))
+
+// $ExpectType Codec<string, readonly number[]>
+C.compose(C.array(C.NumberFromString))(C.split(S.string, ","))
+
+// decoding
+
+// $ExpectType Codec<string | null, number>
+C.compose(S.union(S.null, S.string), C.NumberFromString)
+
+// $ExpectType Codec<string | null, number>
+S.union(S.null, S.string).pipe(C.compose(C.NumberFromString))
+
+// encoding
+
+// $ExpectType Codec<string, number | null>
+C.compose(C.NumberFromString, S.union(S.null, S.number))
+
+// $ExpectType Codec<string, number | null>
+C.NumberFromString.pipe(C.compose(S.union(S.null, S.number)))

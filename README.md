@@ -987,12 +987,24 @@ S.struct({ a: S.string, b: S.string }).pipe(
 
 ## Compose
 
-The `compose` combinator allows you to combine two schemas.
+Combining and reusing codecs is a common requirement, the `compose` combinator allows you to do just that. It enables you to merge two codecs, `Codec<A, B>` and `Codec<C, D>`, into a single codec `Codec<A, D>`:
 
 ```ts
-// $ExpectType Schema<string, readonly number[]>
-S.compose(S.split(S.string, ","), S.array(S.NumberFromString));
+import * as C from "@effect/schema/Codec";
+
+// $ExpectType Codec<string, readonly string[]>
+const codec1 = C.split(S.string, ",");
+
+// $ExpectType Schema<readonly string[], readonly number[]>
+const codec2 = C.array(S.NumberFromString);
+
+// $ExpectType Codec<string, readonly number[]>
+const composedCodec = C.compose(codec1, codec2);
 ```
+
+In this example, we have two codecs, `codec1` and `codec2`. The first codec, `codec1`, takes a string and splits it into an array using a comma as the delimiter. The second codec, `codec2`, transforms an array of strings into an array of numbers.
+
+Now, by using the `compose` combinator, we can create a new codec, `composedCodec`, that combines the functionality of both `codec1` and `codec2`. This allows us to parse a string and directly obtain an array of numbers as a result.
 
 ## InstanceOf
 
@@ -1217,6 +1229,34 @@ parseSync(" a "); // "a"
 ```
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
+
+#### ParseJson
+
+The `ParseJson` codec offers a method to convert JSON strings into the `unknown` type using the underlying functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+```ts
+import * as C from "@effect/schema/Codec";
+
+// $ExpectType Codec<string, unknown>
+const codec = C.ParseJson;
+const parse = C.parseSync(codec);
+
+parse("{}"); // {}
+parse(`{"a":"b"}`); // { "a": "b" }
+parse(""); // throws Unexpected end of JSON input
+```
+
+You can also compose the `ParseJson` codec with other codecs to refine the parsing result:
+
+```ts
+import * as C from "@effect/schema/Codec";
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Codec<string, { readonly a: number; }>
+const codec = C.ParseJson.pipe(C.compose(S.struct({ a: S.number })));
+```
+
+In this example, we've composed the `ParseJson` codec with a struct schema to ensure that the result will have a specific shape, including an object with a numeric property "a".
 
 ### Number transformations
 
