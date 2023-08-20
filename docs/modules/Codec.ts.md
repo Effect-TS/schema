@@ -50,7 +50,7 @@ Added in v1.0.0
   - [positiveBigint](#positivebigint)
 - [bigint transformations](#bigint-transformations)
   - [BigintFromString](#bigintfromstring)
-  - [bigintFromString](#bigintfromstring)
+  - [bigintFromString](#bigintfromstring-1)
   - [clampBigint](#clampbigint)
 - [boolean transformations](#boolean-transformations)
   - [not](#not)
@@ -115,7 +115,7 @@ Added in v1.0.0
 - [number transformations](#number-transformations)
   - [NumberFromString](#numberfromstring)
   - [clamp](#clamp)
-  - [numberFromString](#numberfromstring)
+  - [numberFromString](#numberfromstring-1)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEither](#parseeither)
@@ -123,6 +123,8 @@ Added in v1.0.0
   - [parsePromise](#parsepromise)
   - [parseResult](#parseresult)
   - [parseSync](#parsesync)
+- [string](#string)
+  - [ParseJson](#parsejson)
 - [string filters](#string-filters)
   - [endsWith](#endswith)
   - [includes](#includes)
@@ -135,8 +137,9 @@ Added in v1.0.0
   - [trimmed](#trimmed)
 - [string transformations](#string-transformations)
   - [Trim](#trim)
+  - [parseJson](#parsejson-1)
   - [split](#split)
-  - [trim](#trim)
+  - [trim](#trim-1)
 - [symbol](#symbol)
   - [CodecTypeId (type alias)](#codectypeid-type-alias)
 - [utils](#utils)
@@ -628,8 +631,10 @@ Added in v1.0.0
 
 ```ts
 export declare const compose: {
-  <A, B>(that: Codec<A, B>): <I>(self: Codec<I, A>) => Codec<I, B>
-  <I, A, B>(self: Codec<I, A>, that: Codec<A, B>): Codec<I, B>
+  <B, C extends B, D>(bc: Codec<C, D>): <A>(ab: Codec<A, B>) => Codec<A, D>
+  <C, D>(bc: Codec<C, D>): <A, B extends C>(ab: Codec<A, B>) => Codec<A, D>
+  <A, B, C extends B, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D>
+  <A, B extends C, C, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D>
 }
 ```
 
@@ -1381,6 +1386,21 @@ export declare const parseSync: <I, A>(schema: Codec<I, A>) => (i: unknown, opti
 
 Added in v1.0.0
 
+# string
+
+## ParseJson
+
+The `ParseJson` codec offers a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const ParseJson: Codec<string, unknown>
+```
+
+Added in v1.0.0
+
 # string filters
 
 ## endsWith
@@ -1513,6 +1533,26 @@ This transformation allows removing whitespaces from the beginning and end of a 
 
 ```ts
 export declare const Trim: Codec<string, string>
+```
+
+Added in v1.0.0
+
+## parseJson
+
+The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const parseJson: <I, A extends string>(
+  self: Codec<I, A>,
+  options?: {
+    reviver?: Parameters<typeof JSON.parse>[1]
+    replacer?: Parameters<typeof JSON.stringify>[1]
+    space?: Parameters<typeof JSON.stringify>[2]
+  }
+) => Codec<I, unknown>
 ```
 
 Added in v1.0.0

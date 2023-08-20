@@ -20,7 +20,7 @@ Added in v1.0.0
   - [validDate](#validdate)
 - [Date constructors](#date-constructors)
   - [Date](#date)
-  - [ValidDate](#validdate)
+  - [ValidDate](#validdate-1)
 - [Either constructors](#either-constructors)
   - [either](#either)
 - [Json constructors](#json-constructors)
@@ -49,10 +49,10 @@ Added in v1.0.0
   - [greaterThanOrEqualToBigint](#greaterthanorequaltobigint)
   - [lessThanBigint](#lessthanbigint)
   - [lessThanOrEqualToBigint](#lessthanorequaltobigint)
-  - [negativeBigint](#negativebigint)
-  - [nonNegativeBigint](#nonnegativebigint)
-  - [nonPositiveBigint](#nonpositivebigint)
-  - [positiveBigint](#positivebigint)
+  - [negativeBigint](#negativebigint-1)
+  - [nonNegativeBigint](#nonnegativebigint-1)
+  - [nonPositiveBigint](#nonpositivebigint-1)
+  - [positiveBigint](#positivebigint-1)
 - [combinators](#combinators)
   - [annotations](#annotations)
   - [array](#array)
@@ -99,18 +99,18 @@ Added in v1.0.0
   - [Positive](#positive)
 - [number filters](#number-filters)
   - [between](#between)
-  - [finite](#finite)
+  - [finite](#finite-1)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
-  - [int](#int)
+  - [int](#int-1)
   - [lessThan](#lessthan)
   - [lessThanOrEqualTo](#lessthanorequalto)
   - [multipleOf](#multipleof)
-  - [negative](#negative)
-  - [nonNaN](#nonnan)
-  - [nonNegative](#nonnegative)
-  - [nonPositive](#nonpositive)
-  - [positive](#positive)
+  - [negative](#negative-1)
+  - [nonNaN](#nonnan-1)
+  - [nonNegative](#nonnegative-1)
+  - [nonPositive](#nonpositive-1)
+  - [positive](#positive-1)
 - [primitives](#primitives)
   - [any](#any)
   - [bigint](#bigint)
@@ -136,9 +136,8 @@ Added in v1.0.0
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
   - [pattern](#pattern)
-  - [split](#split)
   - [startsWith](#startswith)
-  - [trimmed](#trimmed)
+  - [trimmed](#trimmed-1)
 - [symbol](#symbol-1)
   - [SchemaPropertySignatureTypeId (type alias)](#schemapropertysignaturetypeid-type-alias)
   - [TypeId (type alias)](#typeid-type-alias)
@@ -1459,21 +1458,6 @@ export declare const pattern: <A extends string>(
   regex: RegExp,
   options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
-```
-
-Added in v1.0.0
-
-## split
-
-This combinator allows splitting a string into an array of strings.
-
-**Signature**
-
-```ts
-export declare const split: {
-  (separator: string): <I>(self: Schema<I, string>) => Schema<I, readonly string[]>
-  <I>(self: Schema<I, string>, separator: string): Schema<I, readonly string[]>
-}
 ```
 
 Added in v1.0.0

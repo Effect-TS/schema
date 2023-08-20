@@ -649,8 +649,10 @@ export function filter<A>(
  * @since 1.0.0
  */
 export const compose: {
-  <C, D>(bc: Codec<C, D>): <A, B>(ab: Codec<A, B>) => Codec<A, D>
-  <A, B, C, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D>
+  <B, C extends B, D>(bc: Codec<C, D>): <A>(ab: Codec<A, B>) => Codec<A, D>
+  <C, D>(bc: Codec<C, D>): <A, B extends C>(ab: Codec<A, B>) => Codec<A, D>
+  <A, B, C extends B, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D>
+  <A, B extends C, C, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D>
 } = dual(
   2,
   <A, B, C, D>(ab: Codec<A, B>, cd: Codec<C, D>): Codec<A, D> =>

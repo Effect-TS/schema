@@ -6,5 +6,5 @@ yarn-error.log
 .DS_Store
 tmp/
 build/
-# dist/
+dist/
 .direnv/

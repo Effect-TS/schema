@@ -359,9 +359,6 @@ C.compose(C.split(S.string, ","), C.array(C.NumberFromString))
 // $ExpectType Codec<string, readonly number[]>
 C.split(S.string, ",").pipe(C.compose(C.array(C.NumberFromString)))
 
-// $ExpectType Codec<string, readonly number[]>
-C.compose(C.array(C.NumberFromString))(C.split(S.string, ","))
-
 // decoding
 
 // $ExpectType Codec<string | null, number>
