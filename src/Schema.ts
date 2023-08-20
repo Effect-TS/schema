@@ -131,8 +131,8 @@ export type {
  * @category combinators
  * @since 1.0.0
  */
-export const annotations = <A>(options: DocAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> => make(AST.mergeAnnotations(self.ast, toAnnotations(options)))
+export const annotations = <A>(options: DocAnnotations<A>) => (self: Schema<A>): Schema<A> =>
+  make(AST.mergeAnnotations(self.ast, toAnnotations(options)))
 
 // ---------------------------------------------
 // constructors
@@ -306,9 +306,8 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
   declare(
     [],
     struct({}),
-    () =>
-      (input, _, self) =>
-        input instanceof constructor ? PR.success(input) : PR.failure(PR.type(self, input)),
+    () => (input, _, self) =>
+      input instanceof constructor ? PR.success(input) : PR.failure(PR.type(self, input)),
     {
       [AST.TypeAnnotationId]: InstanceOfTypeId,
       [InstanceOfTypeId]: { constructor },
@@ -331,20 +330,20 @@ export const fromBrand = <C extends Brand<string | symbol>>(
   constructor: Brand.Constructor<C>,
   options?: FilterAnnotations<Brand.Unbranded<C>>
 ) =>
-  <A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
-    const filter = (a: A, _: ParseOptions, self: AST.AST): Option<PR.ParseError> => {
-      const e = constructor.either(a)
-      return E.isLeft(e) ?
-        O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
-        O.none()
-    }
-    const ast = AST.createRefinement(
-      self.ast,
-      filter,
-      toAnnotations({ typeId: { id: BrandTypeId, params: { constructor } }, ...options })
-    )
-    return make(ast)
+<A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
+  const filter = (a: A, _: ParseOptions, self: AST.AST): Option<PR.ParseError> => {
+    const e = constructor.either(a)
+    return E.isLeft(e) ?
+      O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
+      O.none()
   }
+  const ast = AST.createRefinement(
+    self.ast,
+    filter,
+    toAnnotations({ typeId: { id: BrandTypeId, params: { constructor } }, ...options })
+  )
+  return make(ast)
+}
 
 // ---------------------------------------------
 // primitives
@@ -472,42 +471,42 @@ export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
  * @since 1.0.0
  */
 export const optionalElement = <E>(element: Schema<E>) =>
-  <A extends ReadonlyArray<any>>(
-    self: Schema<A>
-  ): Schema<readonly [...A, E?]> => {
-    if (AST.isTuple(self.ast)) {
-      return make(AST.appendElement(self.ast, AST.createElement(element.ast, true)))
-    }
-    throw new Error("`optionalElement` is not supported on this schema")
+<A extends ReadonlyArray<any>>(
+  self: Schema<A>
+): Schema<readonly [...A, E?]> => {
+  if (AST.isTuple(self.ast)) {
+    return make(AST.appendElement(self.ast, AST.createElement(element.ast, true)))
   }
+  throw new Error("`optionalElement` is not supported on this schema")
+}
 
 /**
  * @category combinators
  * @since 1.0.0
  */
 export const rest = <R>(rest: Schema<R>) =>
-  <A extends ReadonlyArray<any>>(
-    self: Schema<A>
-  ): Schema<readonly [...A, ...Array<R>]> => {
-    if (AST.isTuple(self.ast)) {
-      return make(AST.appendRestElement(self.ast, rest.ast))
-    }
-    throw new Error("`rest` is not supported on this schema")
+<A extends ReadonlyArray<any>>(
+  self: Schema<A>
+): Schema<readonly [...A, ...Array<R>]> => {
+  if (AST.isTuple(self.ast)) {
+    return make(AST.appendRestElement(self.ast, rest.ast))
   }
+  throw new Error("`rest` is not supported on this schema")
+}
 
 /**
  * @category combinators
  * @since 1.0.0
  */
 export const element = <E>(element: Schema<E>) =>
-  <A extends ReadonlyArray<any>>(
-    self: Schema<A>
-  ): Schema<readonly [...A, E]> => {
-    if (AST.isTuple(self.ast)) {
-      return make(AST.appendElement(self.ast, AST.createElement(element.ast, false)))
-    }
-    throw new Error("`element` is not supported on this schema")
+<A extends ReadonlyArray<any>>(
+  self: Schema<A>
+): Schema<readonly [...A, E]> => {
+  if (AST.isTuple(self.ast)) {
+    return make(AST.appendElement(self.ast, AST.createElement(element.ast, false)))
   }
+  throw new Error("`element` is not supported on this schema")
+}
 
 /**
  * @category combinators
@@ -843,14 +842,16 @@ export const extend: {
  * @category combinators
  * @since 1.0.0
  */
-export const pick = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
+export const pick =
+  <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   (self: Schema<A>): Schema<Simplify<Pick<A, Keys[number]>>> => make(AST.pick(self.ast, keys))
 
 /**
  * @category combinators
  * @since 1.0.0
  */
-export const omit = <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
+export const omit =
+  <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   (self: Schema<A>): Schema<Simplify<Omit<A, Keys[number]>>> => make(AST.omit(self.ast, keys))
 
 /**
@@ -893,31 +894,31 @@ export const brand = <B extends string | symbol, A>(
   brand: B,
   options?: DocAnnotations<A>
 ) =>
-  (self: Schema<A>): BrandSchema<A & Brand<B>> => {
-    const ast = addBrand(self.ast, brand, options)
-    const schema = make(ast)
-    const validate = P.validateSync(schema)
-    const validateOption = P.validateOption(schema)
-    const validateEither = P.validateEither(schema)
-    const is = P.is(schema)
-    const out: any = Object.assign((input: unknown) => validate(input), {
-      [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
-      _id: TypeId,
-      _codecId: CodecTypeId,
-      ast,
-      option: (input: unknown) => validateOption(input),
-      either: (input: unknown) =>
-        E.mapLeft(
-          validateEither(input),
-          (e) => [{ meta: input, message: formatErrors(e.errors) }]
-        ),
-      refine: (input: unknown): input is A & Brand<B> => is(input),
-      pipe() {
-        return pipeArguments(this, arguments)
-      }
-    })
-    return out
-  }
+(self: Schema<A>): BrandSchema<A & Brand<B>> => {
+  const ast = addBrand(self.ast, brand, options)
+  const schema = make(ast)
+  const validate = P.validateSync(schema)
+  const validateOption = P.validateOption(schema)
+  const validateEither = P.validateEither(schema)
+  const is = P.is(schema)
+  const out: any = Object.assign((input: unknown) => validate(input), {
+    [RefinedConstructorsTypeId]: RefinedConstructorsTypeId,
+    _id: TypeId,
+    _codecId: CodecTypeId,
+    ast,
+    option: (input: unknown) => validateOption(input),
+    either: (input: unknown) =>
+      E.mapLeft(
+        validateEither(input),
+        (e) => [{ meta: input, message: formatErrors(e.errors) }]
+      ),
+    refine: (input: unknown): input is A & Brand<B> => is(input),
+    pipe() {
+      return pipeArguments(this, arguments)
+    }
+  })
+  return out
+}
 
 /** @internal */
 export const getBrands = (ast: AST.AST): Array<string> =>
@@ -1063,7 +1064,8 @@ export const _minLength = <A extends string>(
 export const minLength = <A extends string>(
   minLength: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_minLength(self.ast, minLength, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_minLength(self.ast, minLength, options))
 
 /**
  * @category string filters
@@ -1099,7 +1101,8 @@ export const _maxLength = <A extends string>(
 export const maxLength = <A extends string>(
   maxLength: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_maxLength(self.ast, maxLength, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_maxLength(self.ast, maxLength, options))
 
 /**
  * @category string filters
@@ -1108,7 +1111,8 @@ export const maxLength = <A extends string>(
 export const length = <A extends string>(
   length: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => self.pipe(minLength(length), maxLength(length, options))
+) =>
+(self: Schema<A>): Schema<A> => self.pipe(minLength(length), maxLength(length, options))
 
 /**
  * @category type id
@@ -1141,7 +1145,8 @@ export const _pattern = <A extends string>(
 export const pattern = <A extends string>(
   regex: RegExp,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_pattern(self.ast, regex, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_pattern(self.ast, regex, options))
 
 /**
  * @category type id
@@ -1169,7 +1174,8 @@ export const _startsWith = <A extends string>(
 export const startsWith = <A extends string>(
   startsWith: string,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_startsWith(self.ast, startsWith, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_startsWith(self.ast, startsWith, options))
 
 /**
  * @category type id
@@ -1197,7 +1203,8 @@ export const _endsWith = <A extends string>(
 export const endsWith = <A extends string>(
   endsWith: string,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_endsWith(self.ast, endsWith, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_endsWith(self.ast, endsWith, options))
 
 /**
  * @category type id
@@ -1225,7 +1232,8 @@ export const _includes = <A extends string>(
 export const includes = <A extends string>(
   searchString: string,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_includes(self.ast, searchString, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_includes(self.ast, searchString, options))
 
 /**
  * @category type id
@@ -1253,8 +1261,9 @@ export const _trimmed = <A extends string>(
  * @category string filters
  * @since 1.0.0
  */
-export const trimmed = <A extends string>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> => make(_trimmed(self.ast, options))
+export const trimmed =
+  <A extends string>(options?: FilterAnnotations<A>) => (self: Schema<A>): Schema<A> =>
+    make(_trimmed(self.ast, options))
 
 // ---------------------------------------------
 // number filters
@@ -1286,7 +1295,8 @@ export const _greaterThan = <A extends number>(
 export const greaterThan = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_greaterThan(self.ast, min, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_greaterThan(self.ast, min, options))
 
 /**
  * @category type id
@@ -1314,7 +1324,8 @@ export const _greaterThanOrEqualTo = <A extends number>(
 export const greaterThanOrEqualTo = <A extends number>(
   min: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_greaterThanOrEqualTo(self.ast, min, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_greaterThanOrEqualTo(self.ast, min, options))
 
 /**
  * @category type id
@@ -1339,8 +1350,9 @@ export const _lessThan = <A extends number>(
  * @category number filters
  * @since 1.0.0
  */
-export const lessThan = <A extends number>(max: number, options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> => make(_lessThan(self.ast, max, options))
+export const lessThan =
+  <A extends number>(max: number, options?: FilterAnnotations<A>) => (self: Schema<A>): Schema<A> =>
+    make(_lessThan(self.ast, max, options))
 
 /**
  * @category type id
@@ -1368,7 +1380,8 @@ export const _lessThanOrEqualTo = <A extends number>(
 export const lessThanOrEqualTo = <A extends number>(
   max: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_lessThanOrEqualTo(self.ast, max, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_lessThanOrEqualTo(self.ast, max, options))
 
 /**
  * @category type id
@@ -1392,8 +1405,9 @@ export const _int = <A extends number>(
  * @category number filters
  * @since 1.0.0
  */
-export const int = <A extends number>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> => make(_int(self.ast, options))
+export const int =
+  <A extends number>(options?: FilterAnnotations<A>) => (self: Schema<A>): Schema<A> =>
+    make(_int(self.ast, options))
 
 /**
  * @category type id
@@ -1416,8 +1430,9 @@ export const _finite = <A extends number>(
  * @category number filters
  * @since 1.0.0
  */
-export const finite = <A extends number>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> => make(_finite(self.ast, options))
+export const finite =
+  <A extends number>(options?: FilterAnnotations<A>) => (self: Schema<A>): Schema<A> =>
+    make(_finite(self.ast, options))
 
 /**
  * @category number constructors
@@ -1447,7 +1462,8 @@ export const between = <A extends number>(
   min: number,
   max: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_between(self.ast, min, max, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_between(self.ast, min, max, options))
 
 /**
  * @category type id
@@ -1470,8 +1486,9 @@ export const _nonNaN = <A extends number>(
  * @category number filters
  * @since 1.0.0
  */
-export const nonNaN = <A extends number>(options?: FilterAnnotations<A>) =>
-  (self: Schema<A>): Schema<A> => make(_nonNaN(self.ast, options))
+export const nonNaN =
+  <A extends number>(options?: FilterAnnotations<A>) => (self: Schema<A>): Schema<A> =>
+    make(_nonNaN(self.ast, options))
 
 /** @internal */
 export const _positive = <A extends number>(
@@ -1485,7 +1502,8 @@ export const _positive = <A extends number>(
  */
 export const positive = <A extends number>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_positive(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_positive(self.ast, options))
 
 /** @internal */
 export const _negative = <A extends number>(
@@ -1499,7 +1517,8 @@ export const _negative = <A extends number>(
  */
 export const negative = <A extends number>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_negative(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_negative(self.ast, options))
 
 /** @internal */
 export const _nonNegative = <A extends number>(
@@ -1513,7 +1532,8 @@ export const _nonNegative = <A extends number>(
  */
 export const nonNegative = <A extends number>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_nonNegative(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_nonNegative(self.ast, options))
 
 /** @internal */
 export const _nonPositive = <A extends number>(
@@ -1527,7 +1547,8 @@ export const _nonPositive = <A extends number>(
  */
 export const nonPositive = <A extends number>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_nonPositive(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_nonPositive(self.ast, options))
 
 /**
  * @category type id
@@ -1555,7 +1576,8 @@ export const _multipleOf = <A extends number>(
 export const multipleOf = <A extends number>(
   divisor: number,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_multipleOf(self.ast, divisor, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_multipleOf(self.ast, divisor, options))
 
 // ---------------------------------------------
 // bigint filters
@@ -1587,7 +1609,8 @@ export const _greaterThanBigint = <A extends bigint>(
 export const greaterThanBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_greaterThanBigint(self.ast, min, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_greaterThanBigint(self.ast, min, options))
 
 /**
  * @category type id
@@ -1617,7 +1640,8 @@ export const _greaterThanOrEqualToBigint = <A extends bigint>(
 export const greaterThanOrEqualToBigint = <A extends bigint>(
   min: bigint,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_greaterThanOrEqualToBigint(self.ast, min, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_greaterThanOrEqualToBigint(self.ast, min, options))
 
 /**
  * @category type id
@@ -1645,7 +1669,8 @@ export const _lessThanBigint = <A extends bigint>(
 export const lessThanBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_lessThanBigint(self.ast, max, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_lessThanBigint(self.ast, max, options))
 
 /**
  * @category type id
@@ -1675,7 +1700,8 @@ export const _lessThanOrEqualToBigint = <A extends bigint>(
 export const lessThanOrEqualToBigint = <A extends bigint>(
   max: bigint,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_lessThanOrEqualToBigint(self.ast, max, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_lessThanOrEqualToBigint(self.ast, max, options))
 
 /** @internal */
 export const _betweenBigint = <A extends bigint>(
@@ -1699,7 +1725,8 @@ export const betweenBigint = <A extends bigint>(
   min: bigint,
   max: bigint,
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_betweenBigint(self.ast, min, max, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_betweenBigint(self.ast, min, max, options))
 
 /** @internal */
 export const _positiveBigint = <A extends bigint>(
@@ -1713,7 +1740,8 @@ export const _positiveBigint = <A extends bigint>(
  */
 export const positiveBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_positiveBigint(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_positiveBigint(self.ast, options))
 
 /** @internal */
 export const _negativeBigint = <A extends bigint>(
@@ -1727,7 +1755,8 @@ export const _negativeBigint = <A extends bigint>(
  */
 export const negativeBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_negativeBigint(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_negativeBigint(self.ast, options))
 
 /** @internal */
 export const _nonPositiveBigint = <A extends bigint>(
@@ -1741,7 +1770,8 @@ export const _nonPositiveBigint = <A extends bigint>(
  */
 export const nonPositiveBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_nonPositiveBigint(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_nonPositiveBigint(self.ast, options))
 
 /** @internal */
 export const _nonNegativeBigint = <A extends bigint>(
@@ -1755,7 +1785,8 @@ export const _nonNegativeBigint = <A extends bigint>(
  */
 export const nonNegativeBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
-) => (self: Schema<A>): Schema<A> => make(_nonNegativeBigint(self.ast, options))
+) =>
+(self: Schema<A>): Schema<A> => make(_nonNegativeBigint(self.ast, options))
 
 // ---------------------------------------------
 // ReadonlyArray filters
@@ -1788,8 +1819,7 @@ export const minItems = <A>(
   n: number,
   options?: FilterAnnotations<ReadonlyArray<A>>
 ) =>
-  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    make(_minItems(self.ast, n, options))
+(self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> => make(_minItems(self.ast, n, options))
 
 /**
  * @category type id
@@ -1818,8 +1848,7 @@ export const maxItems = <A>(
   n: number,
   options?: FilterAnnotations<ReadonlyArray<A>>
 ) =>
-  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    make(_maxItems(self.ast, n, options))
+(self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> => make(_maxItems(self.ast, n, options))
 
 /** @internal */
 export const _itemsCount = <A>(
@@ -1840,8 +1869,8 @@ export const itemsCount = <A>(
   n: number,
   options?: FilterAnnotations<ReadonlyArray<A>>
 ) =>
-  (self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
-    make(_itemsCount(self.ast, n, options))
+(self: Schema<ReadonlyArray<A>>): Schema<ReadonlyArray<A>> =>
+  make(_itemsCount(self.ast, n, options))
 
 // ---------------------------------------------
 // data types
@@ -2002,8 +2031,8 @@ export const ValidDateTypeId = Symbol.for("@effect/schema/TypeId/ValidDate")
  * @category Date combinators
  * @since 1.0.0
  */
-export const validDate = (options?: FilterAnnotations<Date>) =>
-  (self: Schema<Date>): Schema<Date> =>
+export const validDate =
+  (options?: FilterAnnotations<Date>) => (self: Schema<Date>): Schema<Date> =>
     self.pipe(
       filter((a) => !isNaN(a.getTime()), {
         typeId: ValidDateTypeId,
@@ -2025,12 +2054,12 @@ export const ValidDate: Schema<Date> = Date.pipe(validDate())
 // ---------------------------------------------
 
 /** @internal */
-export const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> =>
-  (fc) => fc.array(item(fc)).map(C.fromIterable)
+export const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk<A>> => (fc) =>
+  fc.array(item(fc)).map(C.fromIterable)
 
 /** @internal */
-export const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> =>
-  (c) => `Chunk(${C.toReadonlyArray(c).map(item).join(", ")})`
+export const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> => (c) =>
+  `Chunk(${C.toReadonlyArray(c).map(item).join(", ")})`
 
 /**
  * @category Chunk constructors
@@ -2073,12 +2102,14 @@ export const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<a
 /** @internal */
 export const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Arbitrary<A>
-): Arbitrary<D.Data<A>> => (fc) => item(fc).map(toData)
+): Arbitrary<D.Data<A>> =>
+(fc) => item(fc).map(toData)
 
 /** @internal */
 export const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
   item: Pretty<A>
-): Pretty<D.Data<A>> => (d) => `Data(${item(d)})`
+): Pretty<D.Data<A>> =>
+(d) => `Data(${item(d)})`
 
 /**
  * @category Data constructors
@@ -2113,7 +2144,8 @@ export const data = <A extends Readonly<Record<string, any>> | ReadonlyArray<any
 export const eitherArbitrary = <E, A>(
   left: Arbitrary<E>,
   right: Arbitrary<A>
-): Arbitrary<Either<E, A>> => (fc) => fc.oneof(left(fc).map(E.left), right(fc).map(E.right))
+): Arbitrary<Either<E, A>> =>
+(fc) => fc.oneof(left(fc).map(E.left), right(fc).map(E.right))
 
 /** @internal */
 export const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either<E, A>> =>
@@ -2205,8 +2237,8 @@ export const JsonNumber = number.pipe(
 // ---------------------------------------------
 
 /** @internal */
-export const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> =>
-  (fc) => fc.oneof(fc.constant(O.none()), value(fc).map(O.some))
+export const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option<A>> => (fc) =>
+  fc.oneof(fc.constant(O.none()), value(fc).map(O.some))
 
 /** @internal */
 export const optionPretty = <A>(value: Pretty<A>): Pretty<Option<A>> =>
@@ -2264,19 +2296,19 @@ export const readonlyMapArbitrary = <K, V>(
   key: Arbitrary<K>,
   value: Arbitrary<V>
 ): Arbitrary<ReadonlyMap<K, V>> =>
-  (fc) => fc.array(fc.tuple(key(fc), value(fc))).map((as) => new Map(as))
+(fc) => fc.array(fc.tuple(key(fc), value(fc))).map((as) => new Map(as))
 
 /** @internal */
 export const readonlyMapPretty = <K, V>(
   key: Pretty<K>,
   value: Pretty<V>
 ): Pretty<ReadonlyMap<K, V>> =>
-  (map) =>
-    `new Map([${
-      Array.from(map.entries())
-        .map(([k, v]) => `[${key(k)}, ${value(v)}]`)
-        .join(", ")
-    }])`
+(map) =>
+  `new Map([${
+    Array.from(map.entries())
+      .map(([k, v]) => `[${key(k)}, ${value(v)}]`)
+      .join(", ")
+  }])`
 
 /**
  * @category ReadonlyMap constructors
@@ -2314,12 +2346,12 @@ export const readonlyMap = <K, V>(
 export const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
 /** @internal */
-export const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> =>
-  (fc) => fc.array(item(fc)).map((as) => new Set(as))
+export const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> => (fc) =>
+  fc.array(item(fc)).map((as) => new Set(as))
 
 /** @internal */
-export const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> =>
-  (set) => `new Set([${Array.from(set.values()).map((a) => item(a)).join(", ")}])`
+export const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> => (set) =>
+  `new Set([${Array.from(set.values()).map((a) => item(a)).join(", ")}])`
 
 /**
  * @category ReadonlySet constructors
@@ -2333,13 +2365,12 @@ export const readonlySet = <A>(
     struct({
       size: number
     }),
-    <A>(item: Schema<A>) =>
-      (u: unknown, options, self) => {
-        const validateResult = P.validateResult(array(item))
-        return !isSet(u) ?
-          PR.failure(PR.type(self, u)) :
-          PR.map(validateResult(Array.from(u.values()), options), (as) => new Set(as))
-      },
+    <A>(item: Schema<A>) => (u: unknown, options, self) => {
+      const validateResult = P.validateResult(array(item))
+      return !isSet(u) ?
+        PR.failure(PR.type(self, u)) :
+        PR.map(validateResult(Array.from(u.values()), options), (as) => new Set(as))
+    },
     {
       [AST.TitleAnnotationId]: "ReadonlySet",
       [AST.DescriptionAnnotationId]: "a ReadonlySet",

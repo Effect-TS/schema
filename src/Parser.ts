@@ -955,8 +955,9 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
   }
 }
 
-const fromRefinement = <A>(ast: AST.AST, refinement: (u: unknown) => u is A): Parser<unknown, A> =>
-  (u) => refinement(u) ? PR.success(u) : PR.failure(PR.type(ast, u))
+const fromRefinement =
+  <A>(ast: AST.AST, refinement: (u: unknown) => u is A): Parser<unknown, A> => (u) =>
+    refinement(u) ? PR.success(u) : PR.failure(PR.type(ast, u))
 
 /** @internal */
 export const _getLiterals = (

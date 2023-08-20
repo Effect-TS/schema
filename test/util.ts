@@ -28,7 +28,7 @@ export const effectifyDecode = (
   decode: (input: any, options: ParseOptions, self: AST.AST) => PR.ParseResult<any>,
   override: AST.AST
 ): (input: any, options: ParseOptions, self: AST.AST) => PR.ParseResult<any> =>
-  (input, options) => PR.flatMap(sleep, () => decode(input, options, override))
+(input, options) => PR.flatMap(sleep, () => decode(input, options, override))
 
 let skip = false
 
@@ -94,45 +94,45 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
 export const effectify = <I, A>(schema: Codec<I, A>, mode: "all" | "semi"): Codec<I, A> =>
   C.make(effectifyAST(schema.ast, mode))
 
-  export const roundtrip = <I, A>(codec: Codec<I, A>) => {
-    if (!doRoundtrip) {
-      return
+export const roundtrip = <I, A>(codec: Codec<I, A>) => {
+  if (!doRoundtrip) {
+    return
+  }
+  const to = C.to(codec)
+  const arb = A.build(to)
+  const is = S.is(to)
+  const encode = C.encode(codec)
+  const decode = C.decode(codec)
+  fc.assert(fc.property(arb(fc), (a) => {
+    const roundtrip = encode(a).pipe(
+      Effect.mapError(() => "encoding" as const),
+      Effect.flatMap((i) => decode(i).pipe(Effect.mapError(() => "decoding" as const))),
+      Effect.either,
+      Effect.runSync
+    )
+    if (Either.isLeft(roundtrip)) {
+      return roundtrip.left === "encoding"
     }
-    const to = C.to(codec)
-    const arb = A.build(to)
-    const is = S.is(to)
-    const encode = C.encode(codec)
-    const decode = C.decode(codec)
-    fc.assert(fc.property(arb(fc), (a) => {
-      const roundtrip = encode(a).pipe(
+    return is(roundtrip.right)
+  }))
+  if (doEffectify) {
+    const effectCodec = effectify(codec, "all")
+    const encode = C.encode(effectCodec)
+    const decode = C.decode(effectCodec)
+    fc.assert(fc.asyncProperty(arb(fc), async (a) => {
+      const roundtrip = await encode(a).pipe(
         Effect.mapError(() => "encoding" as const),
         Effect.flatMap((i) => decode(i).pipe(Effect.mapError(() => "decoding" as const))),
         Effect.either,
-        Effect.runSync
+        Effect.runPromise
       )
       if (Either.isLeft(roundtrip)) {
         return roundtrip.left === "encoding"
       }
       return is(roundtrip.right)
     }))
-    if (doEffectify) {
-      const effectCodec = effectify(codec, "all")
-      const encode = C.encode(effectCodec)
-      const decode = C.decode(effectCodec)
-      fc.assert(fc.asyncProperty(arb(fc), async (a) => {
-        const roundtrip = await encode(a).pipe(
-          Effect.mapError(() => "encoding" as const),
-          Effect.flatMap((i) => decode(i).pipe(Effect.mapError(() => "decoding" as const))),
-          Effect.either,
-          Effect.runPromise
-        )
-        if (Either.isLeft(roundtrip)) {
-          return roundtrip.left === "encoding"
-        }
-        return is(roundtrip.right)
-      }))
-    }
   }
+}
 
 export const onExcessPropertyError: ParseOptions = {
   onExcessProperty: "error"

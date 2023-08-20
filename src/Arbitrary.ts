@@ -217,8 +217,8 @@ export const go = (ast: AST.AST, constraints?: Constraints): Arbitrary<any> => {
       return pipe(
         getHook(ast),
         O.match({
-          onNone: () =>
-            (fc) => from(fc).filter((a) => O.isNone(ast.filter(a, defaultParseOption, ast))),
+          onNone: () => (fc) =>
+            from(fc).filter((a) => O.isNone(ast.filter(a, defaultParseOption, ast))),
           onSome: (handler) => handler(from)
         })
       )
