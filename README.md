@@ -1135,24 +1135,6 @@ In this example, we have two schemas, `schema1` and `schema2`. The first schema,
 
 Now, by using the `compose` combinator, we can create a new schema, `composedSchema`, that combines the functionality of both `schema1` and `schema2`. This allows us to parse a string and directly obtain an array of numbers as a result.
 
-If you need to compose two schemas, `Schema<A, B>` and `Schema<C, D>`, where `C` is a subtype of `B` then you have to add an extra option, `force: "decoding"`:
-
-```ts
-import * as S from "@effect/schema/Schema";
-
-// $ExpectType Schema<string, unknown>
-const schema1 = S.ParseJson;
-
-// $ExpectType Schema<{ readonly a: number; }, { readonly a: number; }>
-const schema2 = S.struct({ a: S.number });
-
-// $ExpectType Schema<string, { readonly a: number; }>
-const composedSchema = S.compose(schema1, schema2, {
-  // { readonly a: number; } is a subtype of unknown, you need to add an extra option
-  force: "decoding"
-});
-```
-
 ## InstanceOf
 
 In the following section, we demonstrate how to use the `instanceOf` combinator to create a `Schema` for a class instance.
@@ -1383,9 +1365,7 @@ You can also compose the `ParseJson` schema with other schemas to refine the par
 import * as S from "@effect/schema/Schema";
 
 // $ExpectType Schema<string, { readonly a: number; }>
-const schema = S.ParseJson.pipe(
-  S.compose(S.struct({ a: S.number }), { force: "decoding" })
-);
+const schema = S.ParseJson.pipe(S.compose(S.struct({ a: S.number })));
 ```
 
 In this example, we've composed the `ParseJson` schema with a struct schema to ensure that the result will have a specific shape, including an object with a numeric property "a".
