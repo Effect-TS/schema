@@ -1727,7 +1727,7 @@ export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schem
       }
     },
     (b) => {
-      if (b > BigInt(Number.MAX_SAFE_INTEGER) || b < BigInt(Number.MIN_SAFE_INTEGER)) {
+      if (b > I.maxSafeInteger || b < I.minSafeInteger) {
         return PR.failure(PR.type(schema.ast, b))
       }
 
