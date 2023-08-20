@@ -145,9 +145,12 @@ Added in v1.0.0
 - [utils](#utils)
   - [From (type alias)](#from-type-alias)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
+  - [FromStruct (type alias)](#fromstruct-type-alias)
   - [JSONEither (type alias)](#jsoneither-type-alias)
   - [JSONOption (type alias)](#jsonoption-type-alias)
+  - [StructFields (type alias)](#structfields-type-alias)
   - [To (type alias)](#to-type-alias)
+  - [ToStruct (type alias)](#tostruct-type-alias)
   - [optional](#optional)
   - [propertySignature](#propertysignature)
 
@@ -788,28 +791,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const struct: <
-  Fields extends Record<
-    PropertyKey,
-    | Codec<any, any>
-    | Codec<never, never>
-    | S.PropertySignature<any, boolean, any, boolean>
-    | S.PropertySignature<never, boolean, never, boolean>
-  >
->(
+export declare const struct: <Fields extends StructFields>(
   fields: Fields
-) => Codec<
-  S.Simplify<
-    { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> } & {
-      readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> | undefined
-    }
-  >,
-  S.Simplify<
-    { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
-      readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
-    }
-  >
->
+) => Codec<S.Simplify<FromStruct<Fields>>, S.Simplify<ToStruct<Fields>>>
 ```
 
 Added in v1.0.0
@@ -1624,6 +1608,18 @@ export type FromOptionalKeys<Fields> = {
 
 Added in v1.0.0
 
+## FromStruct (type alias)
+
+**Signature**
+
+```ts
+export type FromStruct<Fields extends StructFields> = {
+  readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
+} & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+```
+
+Added in v1.0.0
+
 ## JSONEither (type alias)
 
 **Signature**
@@ -1649,12 +1645,40 @@ export type JSONOption<A> = { readonly _tag: 'None' } | { readonly _tag: 'Some';
 
 Added in v1.0.0
 
+## StructFields (type alias)
+
+**Signature**
+
+```ts
+export type StructFields = Record<
+  PropertyKey,
+  | Codec<any, any>
+  | Codec<never, never>
+  | S.PropertySignature<any, boolean, any, boolean>
+  | S.PropertySignature<never, boolean, never, boolean>
+>
+```
+
+Added in v1.0.0
+
 ## To (type alias)
 
 **Signature**
 
 ```ts
 export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
+```
+
+Added in v1.0.0
+
+## ToStruct (type alias)
+
+**Signature**
+
+```ts
+export type ToStruct<Fields extends StructFields> = {
+  readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]>
+} & { readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> }
 ```
 
 Added in v1.0.0

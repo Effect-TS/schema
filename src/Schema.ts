@@ -681,25 +681,30 @@ export type ToOptionalKeys<Fields> = {
 }[keyof Fields]
 
 /**
+ * @since 1.0.0
+ */
+export type StructFields = Record<
+  PropertyKey,
+  | Schema<any>
+  | Schema<never>
+  | SchemaPropertySignature<any, boolean, any, boolean>
+  | SchemaPropertySignature<never, boolean, never, boolean>
+>
+
+/**
+ * @since 1.0.0
+ */
+export type ToStruct<Fields extends StructFields> =
+  & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
+  & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+
+/**
  * @category combinators
  * @since 1.0.0
  */
-export const struct = <
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any>
-    | Schema<never>
-    | SchemaPropertySignature<any, boolean, any, boolean>
-    | SchemaPropertySignature<never, boolean, never, boolean>
-  >
->(
+export const struct = <Fields extends StructFields>(
   fields: Fields
-): Schema<
-  Simplify<
-    & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >
-> =>
+): Schema<Simplify<ToStruct<Fields>>> =>
   make(
     AST.createTypeLiteral(
       I.ownKeys(fields).map((key) => {

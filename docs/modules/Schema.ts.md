@@ -179,8 +179,10 @@ Added in v1.0.0
   - [PropertySignature (interface)](#propertysignature-interface)
   - [SchemaPropertySignature (interface)](#schemapropertysignature-interface)
   - [Simplify (type alias)](#simplify-type-alias)
+  - [StructFields (type alias)](#structfields-type-alias)
   - [To (type alias)](#to-type-alias)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
+  - [ToStruct (type alias)](#tostruct-type-alias)
   - [optional](#optional)
 - [validating](#validating)
   - [validate](#validate)
@@ -777,23 +779,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const struct: <
-  Fields extends Record<
-    PropertyKey,
-    | Schema<any>
-    | Schema<never>
-    | SchemaPropertySignature<any, boolean, any, boolean>
-    | SchemaPropertySignature<never, boolean, never, boolean>
-  >
->(
-  fields: Fields
-) => Schema<
-  Simplify<
-    { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> } & {
-      readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> | undefined
-    }
-  >
->
+export declare const struct: <Fields extends StructFields>(fields: Fields) => Schema<Simplify<ToStruct<Fields>>>
 ```
 
 Added in v1.0.0
@@ -1910,6 +1896,22 @@ export type Simplify<A> = {
 
 Added in v1.0.0
 
+## StructFields (type alias)
+
+**Signature**
+
+```ts
+export type StructFields = Record<
+  PropertyKey,
+  | Schema<any>
+  | Schema<never>
+  | SchemaPropertySignature<any, boolean, any, boolean>
+  | SchemaPropertySignature<never, boolean, never, boolean>
+>
+```
+
+Added in v1.0.0
+
 ## To (type alias)
 
 **Signature**
@@ -1932,6 +1934,18 @@ export type ToOptionalKeys<Fields> = {
     ? K
     : never
 }[keyof Fields]
+```
+
+Added in v1.0.0
+
+## ToStruct (type alias)
+
+**Signature**
+
+```ts
+export type ToStruct<Fields extends StructFields> = {
+  readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
+} & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
 ```
 
 Added in v1.0.0

@@ -416,29 +416,37 @@ export type FromOptionalKeys<Fields> = {
 }[keyof Fields]
 
 /**
+ * @since 1.0.0
+ */
+export type StructFields = Record<
+  PropertyKey,
+  | Codec<any, any>
+  | Codec<never, never>
+  | S.PropertySignature<any, boolean, any, boolean>
+  | S.PropertySignature<never, boolean, never, boolean>
+>
+
+/**
+ * @since 1.0.0
+ */
+export type FromStruct<Fields extends StructFields> =
+  & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
+  & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+
+/**
+ * @since 1.0.0
+ */
+export type ToStruct<Fields extends StructFields> =
+  & { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> }
+  & { readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> }
+
+/**
  * @category combinators
  * @since 1.0.0
  */
-export const struct = <
-  Fields extends Record<
-    PropertyKey,
-    | Codec<any, any>
-    | Codec<never, never>
-    | S.PropertySignature<any, boolean, any, boolean>
-    | S.PropertySignature<never, boolean, never, boolean>
-  >
->(
+export const struct = <Fields extends StructFields>(
   fields: Fields
-): Codec<
-  S.Simplify<
-    & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
-    & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
-  >,
-  S.Simplify<
-    & { readonly [K in Exclude<keyof Fields, S.ToOptionalKeys<Fields>>]: To<Fields[K]> }
-    & { readonly [K in S.ToOptionalKeys<Fields>]?: To<Fields[K]> }
-  >
-> => {
+): Codec<S.Simplify<FromStruct<Fields>>, S.Simplify<ToStruct<Fields>>> => {
   const ownKeys = I.ownKeys(fields)
   const pss: Array<AST.PropertySignature> = []
   const froms: Array<AST.PropertySignature> = []
