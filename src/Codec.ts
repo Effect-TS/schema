@@ -6,7 +6,7 @@ import * as B from "@effect/data/Bigint"
 import type { Brand } from "@effect/data/Brand"
 import type { Chunk } from "@effect/data/Chunk"
 import * as C from "@effect/data/Chunk"
-import type * as D from "@effect/data/Data"
+import * as D from "@effect/data/Data"
 import type { Either } from "@effect/data/Either"
 import * as E from "@effect/data/Either"
 import { dual, identity } from "@effect/data/Function"
@@ -1649,3 +1649,116 @@ export const data = <
     (data) => Array.isArray(data) ? Array.from(data) : Object.assign({}, data) as any,
     { [AST.DocumentationAnnotationId]: "data" }
   )
+
+// ---------------------------------------------
+// classes
+// ---------------------------------------------
+
+/**
+ * @category classes
+ * @since 1.0.0
+ */
+export interface Class<I, A, Base = {}> {
+  new(props: A): A & D.Case & Omit<Base, keyof A>
+
+  codec<T extends new(...args: any) => any>(this: T): Codec<I, InstanceType<T>>
+  codecStruct(): Codec<I, A>
+  extend<T extends new(...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields
+  ): Class<
+    S.Simplify<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    S.Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    InstanceType<T>
+  >
+  transform<T extends new(...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields,
+    decode: (input: Class.To<T>) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult<Class.To<T>>
+  ): Class<
+    Class.From<T>,
+    S.Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    InstanceType<T>
+  >
+  transformFrom<T extends new(...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields,
+    decode: (
+      input: Class.From<T>
+    ) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    encode: (
+      input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>
+    ) => ParseResult<Class.From<T>>
+  ): Class<
+    Class.From<T>,
+    S.Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    InstanceType<T>
+  >
+}
+
+/**
+ * @since 1.0.0
+ */
+export namespace Class {
+  /**
+   * @since 1.0.0
+   */
+  export type To<A> = A extends Class<infer _F, infer T> ? T : never
+
+  /**
+   * @since 1.0.0
+   */
+  export type From<A> = A extends Class<infer F, infer _T> ? F : never
+}
+
+const makeClass = <I, A>(self: Codec<I, A>, selfFields: StructFields, base: any) => {
+  const validator = P.validateSync(to(self))
+
+  const fn = function(this: any, props: unknown) {
+    Object.assign(this, validator(props))
+  }
+  fn.prototype = Object.create(base)
+  fn.codecStruct = function codecStruct() {
+    return self
+  }
+  fn.codec = function codec(this: any) {
+    return transform(
+      self,
+      S.instanceOf(this),
+      (input) => Object.assign(Object.create(this.prototype), input),
+      (input) => ({ ...(input as any) })
+    )
+  }
+  fn.extend = function extend(this: any, fields: any) {
+    const newFields = { ...selfFields, ...fields }
+    return makeClass(struct(newFields), newFields, this.prototype)
+  }
+  fn.transform = function transform(this: any, fields: any, decode: any, encode: any) {
+    const newFields = { ...selfFields, ...fields }
+    return makeClass(
+      transformResult(self, to(struct(newFields)), decode, encode),
+      newFields,
+      this.prototype
+    )
+  }
+  fn.transformFrom = function transform(this: any, fields: any, decode: any, encode: any) {
+    const newFields = { ...selfFields, ...fields }
+    return makeClass(
+      transformResult(from(self), struct(newFields), decode, encode),
+      newFields,
+      this.prototype
+    )
+  }
+
+  return fn as any
+}
+
+/**
+ * @category classes
+ * @since 1.0.0
+ */
+export const Class = <Fields extends StructFields>(fields: Fields): Class<
+  S.Simplify<FromStruct<Fields>>,
+  S.Simplify<ToStruct<Fields>>
+> => makeClass(struct(fields), fields, D.Class.prototype)
