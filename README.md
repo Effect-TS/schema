@@ -912,6 +912,139 @@ encodeSync({ a: O.none() }); // {}
 encodeSync({ a: O.some(1) }); // { a: 1 }
 ```
 
+## Classes
+
+When working with schemas, you have a choice beyond the `S.struct` constructor. You can leverage the power of classes through the `Class` utility, which comes with its own set of advantages tailored to common use cases.
+
+### The Benefits of Using Classes
+
+Classes offer several features that simplify the schema creation process:
+
+- **All-in-One Definition**: With classes, you can define both a schema and an opaque type simultaneously.
+- **Shared Functionality**: You can incorporate shared functionality using class methods or getters.
+- **Value Equality and Hashing**: Utilize the built-in capability for checking value equality and applying hashing (thanks to `Class` implementing `Data.Case`).
+
+Let's dive into an illustrative example to better understand how classes work:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// Define your schema by extending `Class` with the desired fields
+class Person extends S.Class({
+  id: S.number,
+  name: S.string.pipe(S.nonEmpty())
+}) {}
+```
+
+### Validation and Instantiation
+
+The class constructor serves as a validation and instantiation tool. It ensures that the provided properties meet the schema requirements:
+
+```ts
+const tim = new Person({ id: 1, name: "Tim" });
+```
+
+Keep in mind that it throws an error for invalid properties:
+
+```ts
+new Person({ id: 1, name: "" });
+/* throws
+error(s) found
+└─ ["name"]
+   └─ Expected a string at least 1 character(s) long, actual ""
+*/
+```
+
+### Custom Getters and Methods
+
+For more flexibility, you can also introduce custom getters and methods:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+class Person extends S.Class({
+  id: S.number,
+  name: S.string.pipe(S.nonEmpty())
+}) {
+  get upperName() {
+    return this.name.toUpperCase();
+  }
+}
+
+const john = new Person({ id: 1, name: "John" });
+
+john.upperName; // "JOHN"
+```
+
+### Accessing Related Schemas
+
+If you need to work with related schemas, you can easily retrieve them using the provided static `schema*` functions:
+
+```ts
+// $ExpectType Schema<{ readonly id: number; name: string; }, Person>
+Person.schema();
+
+// $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
+Person.schemaStruct();
+```
+
+### Extending existing Classes
+
+In situations where you need to augment your existing class with more fields, the built-in `extend` utility comes in handy:
+
+```ts
+// Extend an existing schema `Class` using the `extend` utility
+class PersonWithAge extends Person.extend({
+  age: S.number
+}) {
+  get isAdult() {
+    return this.age >= 18;
+  }
+}
+```
+
+### Transforms
+
+You have the option to enhance a class with (effectful) transforms. This becomes valuable when you want to enrich or validate an entity sourced from a data store.
+
+```ts
+import * as Effect from "@effect/io/Effect";
+import * as S from "@effect/schema/Schema";
+import * as O from "@effect/data/Option";
+import * as PR from "@effect/schema/ParseResult";
+
+class Person extends S.Class({
+  id: S.number,
+  name: S.string
+})
+
+function fetchThing(id: number): Effect.Effect<never, Error, string> { ... }
+
+class PersonWithTransform extends Person.transform(
+  {
+    thing: S.optional(S.string).toOption(),
+  },
+  (input) =>
+    Effect.mapBoth(fetchThing(input.id), {
+      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
+      onSuccess: (thing) => ({ ...input, thing: O.some(thing) })
+    }),
+  PR.success
+) {}
+
+class PersonWithTransformFrom extends Person.transformFrom(
+  {
+    thing: S.optional(S.string).toOption(),
+  },
+  (input) =>
+    Effect.mapBoth(fetchThing(input.id), {
+      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
+      onSuccess: (thing) => ({ ...input, thing })
+    }),
+  PR.success
+) {}
+```
+
 ## Pick
 
 ```ts

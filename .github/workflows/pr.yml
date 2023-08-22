@@ -12,39 +12,42 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [18.16.1]
-
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Install nix
+        uses: cachix/install-nix-action@v22
         with:
-          node-version: ${{ matrix.node-version }}
-      - uses: pnpm/action-setup@v2.0.1
-        name: Install pnpm
-        id: pnpm-install
+          nix_path: nixpkgs=channel:nixos-unstable
+          extra_nix_config: |
+            auto-optimise-store = true
+            keep-outputs = true
+            keep-derivations = true
+      - name: Cache nix
+        uses: cachix/cachix-action@v12
         with:
-          version: 8
-          run_install: false
+          name: effect-ts
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+      - name: Setup direnv
+        uses: HatsuneMiku3939/direnv-action@v1
+        with:
+          direnvVersion: 2.32.2
       - name: Get pnpm store directory
         id: pnpm-cache
         run: |
           echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
       - uses: actions/cache@v3
-        name: Setup pnpm cache
+        name: Cache pnpm
         with:
           path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - run: pnpm install
-      - run: pnpm build
-      - run: pnpm circular
-      - run: pnpm test
-      - run: pnpm lint
-      - run: pnpm dtslint
+      - run: pnpm run build
+      - run: pnpm run circular
+      - run: pnpm run test --coverage
+      - run: pnpm run lint
+      - run: pnpm run dtslint
       - run: pnpm run docs

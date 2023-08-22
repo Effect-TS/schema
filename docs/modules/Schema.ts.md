@@ -135,6 +135,7 @@ Added in v1.0.0
   - [maxLength](#maxlength)
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
+  - [parseJson](#parsejson-1)
   - [pattern](#pattern)
   - [startsWith](#startswith)
   - [trimmed](#trimmed-1)
@@ -556,6 +557,55 @@ Added in v1.0.0
 export declare const positiveBigint: <A extends bigint>(
   options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+# classes
+
+## Class
+
+**Signature**
+
+```ts
+export declare const Class: <Fields extends StructFields>(
+  fields: Fields
+) => Class<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>, {}>
+```
+
+Added in v1.0.0
+
+## Class (interface)
+
+**Signature**
+
+```ts
+export interface Class<I, A, Inherited = {}> {
+  new (props: A): A & D.Case & Omit<Inherited, keyof A>
+
+  schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
+  schemaStruct(): Schema<I, A>
+  extend<T extends new (...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields
+  ): Class<
+    Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    InstanceType<T>
+  >
+  transform<T extends new (...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields,
+    decode: (input: Class.To<T>) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult<Class.To<T>>
+  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
+  transformFrom<T extends new (...args: any) => any, Fields extends StructFields>(
+    this: T,
+    fields: Fields,
+    decode: (input: Class.From<T>) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult<Class.From<T>>
+  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
+}
 ```
 
 Added in v1.0.0
@@ -1431,6 +1481,26 @@ Added in v1.0.0
 export declare const nonEmpty: <A extends string>(
   options?: FilterAnnotations<A> | undefined
 ) => (self: Schema<A>) => Schema<A>
+```
+
+Added in v1.0.0
+
+## parseJson
+
+The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const parseJson: <I, A extends string>(
+  self: Schema<I, A>,
+  options?: {
+    reviver?: Parameters<typeof JSON.parse>[1]
+    replacer?: Parameters<typeof JSON.stringify>[1]
+    space?: Parameters<typeof JSON.stringify>[2]
+  }
+) => Schema<I, unknown>
 ```
 
 Added in v1.0.0

@@ -1,5 +1,47 @@
 # @effect/schema
 
+## 0.33.2
+
+### Patch Changes
+
+- [#392](https://github.com/Effect-TS/schema/pull/392) [`4c1ed27`](https://github.com/Effect-TS/schema/commit/4c1ed27026e3be65bb441d7d8a6a989db420e28d) Thanks [@gcanti](https://github.com/gcanti)! - pattern filter: set default Arbitrary
+
+- [#388](https://github.com/Effect-TS/schema/pull/388) [`27a78bb`](https://github.com/Effect-TS/schema/commit/27a78bb7fbb08e6c2ad9cd29b21c59f41d2dfe28) Thanks [@gcanti](https://github.com/gcanti)! - compose: allow forcing decoding / encoding
+
+- [#388](https://github.com/Effect-TS/schema/pull/388) [`27a78bb`](https://github.com/Effect-TS/schema/commit/27a78bb7fbb08e6c2ad9cd29b21c59f41d2dfe28) Thanks [@gcanti](https://github.com/gcanti)! - add parseJson combinator
+
+- [#388](https://github.com/Effect-TS/schema/pull/388) [`27a78bb`](https://github.com/Effect-TS/schema/commit/27a78bb7fbb08e6c2ad9cd29b21c59f41d2dfe28) Thanks [@gcanti](https://github.com/gcanti)! - add ParseJson codec
+
+## 0.33.1
+
+### Patch Changes
+
+- [#372](https://github.com/Effect-TS/schema/pull/372) [`9c30196`](https://github.com/Effect-TS/schema/commit/9c3019669b63245dd19b84939326f62e652277d2) Thanks [@fubhy](https://github.com/fubhy)! - Added `Class` to `Schema` module
+
+## 0.33.0
+
+### Minor Changes
+
+- [#376](https://github.com/Effect-TS/schema/pull/376) [`64c2567`](https://github.com/Effect-TS/schema/commit/64c256769a69bce03fdb00b9fa4f7abdab794261) Thanks [@tim-smart](https://github.com/tim-smart)! - update /io
+
+### Patch Changes
+
+- [#375](https://github.com/Effect-TS/schema/pull/375) [`bd61bcf`](https://github.com/Effect-TS/schema/commit/bd61bcf94a82b65a2a5285ac57a31e7b3342ba33) Thanks [@tim-smart](https://github.com/tim-smart)! - update build tools
+
+- [#373](https://github.com/Effect-TS/schema/pull/373) [`e74455e`](https://github.com/Effect-TS/schema/commit/e74455e82aa0219f236a884b84117d69bac6de57) Thanks [@tim-smart](https://github.com/tim-smart)! - use peer deps for /data and /io
+
+## 0.32.0
+
+### Minor Changes
+
+- [#370](https://github.com/Effect-TS/schema/pull/370) [`70e4fff`](https://github.com/Effect-TS/schema/commit/70e4fff4fdc20ffe03b7c73416fdf286a218fe9c) Thanks [@tim-smart](https://github.com/tim-smart)! - update /data and /io
+
+## 0.31.0
+
+### Minor Changes
+
+- [#366](https://github.com/Effect-TS/schema/pull/366) [`77fffed`](https://github.com/Effect-TS/schema/commit/77fffedf4ffc69ed8e463e06510108351df164b3) Thanks [@tim-smart](https://github.com/tim-smart)! - update /data and /io
+
 ## 0.30.4
 
 ### Patch Changes
