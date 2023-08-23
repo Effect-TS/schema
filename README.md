@@ -479,6 +479,7 @@ S.string.pipe(S.startsWith(string));
 S.string.pipe(S.endsWith(string));
 S.string.pipe(S.includes(searchString));
 S.string.pipe(S.trimmed()); // verifies that a string contains no leading or trailing whitespaces
+S.string.pipe(S.lowercased()); // verifies that a string is lowercased
 ```
 
 **Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator ot the `Trim` schema.
@@ -1342,6 +1343,25 @@ parse(" a "); // "a"
 ```
 
 **Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
+
+#### Lowercase
+
+The `Lowercase` schema converts a string to lowercase.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// const schema: S.Schema<string, string>
+const schema = S.Lowercase;
+const parse = S.parseSync(schema);
+
+parse("A"); // "a"
+parse(" AB"); // " ab"
+parse("Ab "); // "ab "
+parse(" ABc "); // " abc "
+```
+
+**Note**. If you were looking for a combinator to check if a string is lowercased, check out the `lowercased` combinator.
 
 #### ParseJson
 
