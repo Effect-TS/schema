@@ -1433,6 +1433,22 @@ parse(0); // 0
 parse(3); // 1
 ```
 
+#### negate
+
+Negates a `number`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<number, number>
+const schema = S.number.pipe(S.negate());
+
+const parse = S.parseSync(schema);
+parse(-3); // 3
+parse(0); // -0
+parse(3); // -3
+```
+
 ### Bigint transformations
 
 #### BigintFromString
@@ -1499,6 +1515,22 @@ const parse = S.parseSync(schema);
 parse(-3n); // -1n
 parse(0n); // 0n
 parse(3n); // 1n
+```
+
+#### negateBigint
+
+Negates a `bigint`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<bigint, bigint>
+const schema = S.bigint.pipe(S.negateBigint());
+
+const parse = S.parseSync(schema);
+parse(-3n); // 3n
+parse(0n); // -0n
+parse(3n); // -3n
 ```
 
 ### Boolean transformations

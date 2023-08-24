@@ -1641,6 +1641,20 @@ export const clampBigint =
     )
 
 /**
+ * Negates a bigint
+ *
+ * @category bigint
+ * @since 1.0.0
+ */
+export const negateBigint = () => <I>(self: Schema<I, bigint>): Schema<I, bigint> =>
+  transform(
+    self,
+    to(self),
+    (self) => self * -1n,
+    (self) => self * -1n
+  )
+
+/**
  * This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
  *
  * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
@@ -2378,6 +2392,20 @@ export const clamp =
       (self) => N.clamp(self, min, max) as A, // this is safe because `self.pipe(to, between(min, max))` will check its input anyway
       identity
     )
+
+/**
+ * Negates a number.
+ *
+ * @category number
+ * @since 1.0.0
+ */
+export const negate = () => <I>(self: Schema<I, number>): Schema<I, number> =>
+  transform(
+    self,
+    to(self),
+    (self) => self * -1,
+    (self) => self * -1
+  )
 
 /**
  * This combinator transforms a `string` into a `number` by parsing the string using the `Number` function.

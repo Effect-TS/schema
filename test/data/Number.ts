@@ -10,6 +10,18 @@ describe.concurrent("Number", () => {
     await Util.expectParseSuccess(schema, -3, -1)
   })
 
+  it("negate", async () => {
+    const schema = S.number.pipe(S.negate())
+
+    await Util.expectParseSuccess(schema, 0, -0)
+    await Util.expectParseSuccess(schema, 1, -1)
+    await Util.expectParseSuccess(schema, -1, 1)
+
+    await Util.expectEncodeSuccess(schema, 0, -0)
+    await Util.expectEncodeSuccess(schema, 1, -1)
+    await Util.expectEncodeSuccess(schema, -1, 1)
+  })
+
   it("between", async () => {
     const schema = S.number.pipe(S.between(-1, 1))
 

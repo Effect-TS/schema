@@ -33,13 +33,14 @@ Added in v1.0.0
   - [BigintFromNumber](#bigintfromnumber)
   - [BigintFromString](#bigintfromstring)
   - [betweenBigint](#betweenbigint)
-  - [bigintFromNumber](#bigintfromnumber-1)
-  - [bigintFromString](#bigintfromstring-1)
+  - [bigintFromNumber](#bigintfromnumber)
+  - [bigintFromString](#bigintfromstring)
   - [clampBigint](#clampbigint)
   - [greaterThanBigint](#greaterthanbigint)
   - [greaterThanOrEqualToBigint](#greaterthanorequaltobigint)
   - [lessThanBigint](#lessthanbigint)
   - [lessThanOrEqualToBigint](#lessthanorequaltobigint)
+  - [negateBigint](#negatebigint)
   - [negativeBigint](#negativebigint)
   - [nonNegativeBigint](#nonnegativebigint)
   - [nonPositiveBigint](#nonpositivebigint)
@@ -132,11 +133,12 @@ Added in v1.0.0
   - [lessThan](#lessthan)
   - [lessThanOrEqualTo](#lessthanorequalto)
   - [multipleOf](#multipleof)
+  - [negate](#negate)
   - [negative](#negative)
   - [nonNaN](#nonnan)
   - [nonNegative](#nonnegative)
   - [nonPositive](#nonpositive)
-  - [numberFromString](#numberfromstring-1)
+  - [numberFromString](#numberfromstring)
   - [positive](#positive)
 - [option](#option-1)
   - [optionFromNullable](#optionfromnullable)
@@ -161,19 +163,22 @@ Added in v1.0.0
   - [unknown](#unknown)
   - [void](#void)
 - [string](#string-1)
+  - [Lowercase](#lowercase)
   - [ParseJson](#parsejson)
   - [Trim](#trim)
   - [endsWith](#endswith)
   - [includes](#includes)
   - [length](#length)
+  - [lowercase](#lowercase)
+  - [lowercased](#lowercased)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
   - [nonEmpty](#nonempty)
-  - [parseJson](#parsejson-1)
+  - [parseJson](#parsejson)
   - [pattern](#pattern)
   - [split](#split)
   - [startsWith](#startswith)
-  - [trim](#trim-1)
+  - [trim](#trim)
   - [trimmed](#trimmed)
 - [symbol](#symbol-1)
   - [TypeId (type alias)](#typeid-type-alias)
@@ -196,6 +201,7 @@ Added in v1.0.0
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
   - [LessThanTypeId](#lessthantypeid)
+  - [LowercasedTypeId](#lowercasedtypeid)
   - [MaxItemsTypeId](#maxitemstypeid)
   - [MaxLengthTypeId](#maxlengthtypeid)
   - [MinItemsTypeId](#minitemstypeid)
@@ -545,6 +551,18 @@ export declare const lessThanOrEqualToBigint: <A extends bigint>(
 
 Added in v1.0.0
 
+## negateBigint
+
+Negates a bigint
+
+**Signature**
+
+```ts
+export declare const negateBigint: () => <I>(self: Schema<I, bigint>) => Schema<I, bigint>
+```
+
+Added in v1.0.0
+
 ## negativeBigint
 
 **Signature**
@@ -760,12 +778,10 @@ Added in v1.0.0
 
 ```ts
 export declare const compose: {
-  <B, C>(bc: Schema<B, C>): <A>(ab: Schema<A, B>) => Schema<A, C>
-  <B, C extends B, D>(cd: Schema<C, D>, options: { force: 'decoding' }): <A>(ab: Schema<A, B>) => Schema<A, D>
-  <C, D>(cd: Schema<C, D>, options: { force: 'encoding' }): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
-  <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C>
-  <A, B, C extends B, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'decoding' }): Schema<A, D>
-  <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'encoding' }): Schema<A, D>
+  <B, C extends B, D>(bc: Schema<C, D>): <A>(ab: Schema<A, B>) => Schema<A, D>
+  <C, D>(bc: Schema<C, D>): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
+  <A, B, C extends B, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
+  <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
 }
 ```
 
@@ -1680,6 +1696,18 @@ export declare const multipleOf: <A extends number>(
 
 Added in v1.0.0
 
+## negate
+
+Negates a number.
+
+**Signature**
+
+```ts
+export declare const negate: () => <I>(self: Schema<I, number>) => Schema<I, number>
+```
+
+Added in v1.0.0
+
 ## negative
 
 **Signature**
@@ -1964,6 +1992,18 @@ Added in v1.0.0
 
 # string
 
+## Lowercase
+
+This combinator converts a string to lowercase
+
+**Signature**
+
+```ts
+export declare const Lowercase: Schema<string, string>
+```
+
+Added in v1.0.0
+
 ## ParseJson
 
 The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
@@ -2022,6 +2062,35 @@ Added in v1.0.0
 ```ts
 export declare const length: <A extends string>(
   length: number,
+  options?: AnnotationOptions<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lowercase
+
+This combinator converts a string to lowercase
+
+**Signature**
+
+```ts
+export declare const lowercase: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lowercased
+
+Verifies that a string is lowercased
+
+Note. This combinator does not make any transformations, it only validates.
+If what you were looking for was a combinator to lowercase strings, then check out the `lowercase` combinator.
+
+**Signature**
+
+```ts
+export declare const lowercased: <A extends string>(
   options?: AnnotationOptions<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
@@ -2346,6 +2415,16 @@ Added in v1.0.0
 
 ```ts
 export declare const LessThanTypeId: '@effect/schema/LessThanTypeId'
+```
+
+Added in v1.0.0
+
+## LowercasedTypeId
+
+**Signature**
+
+```ts
+export declare const LowercasedTypeId: '@effect/schema/LowercasedTypeId'
 ```
 
 Added in v1.0.0

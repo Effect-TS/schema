@@ -10,6 +10,18 @@ describe.concurrent("Bigint", () => {
     await Util.expectParseSuccess(schema, -3n, -1n)
   })
 
+  it("negateBigint", async () => {
+    const schema = S.bigint.pipe(S.negateBigint())
+
+    await Util.expectParseSuccess(schema, 0n, -0n)
+    await Util.expectParseSuccess(schema, 1n, -1n)
+    await Util.expectParseSuccess(schema, -1n, 1n)
+
+    await Util.expectEncodeSuccess(schema, 0n, -0n)
+    await Util.expectEncodeSuccess(schema, 1n, -1n)
+    await Util.expectEncodeSuccess(schema, -1n, 1n)
+  })
+
   it("greaterThanBigint", async () => {
     const schema = S.bigint.pipe(S.greaterThanBigint(0n))
 
