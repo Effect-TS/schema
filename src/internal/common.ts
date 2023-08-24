@@ -55,11 +55,3 @@ export const memoizeThunk = <A>(f: () => A): () => A => {
     return a
   }
 }
-
-/** @internal */
-export const isStringKeyword = (ast: AST.AST): ast is AST.StringKeyword =>
-  ast._tag === "StringKeyword"
-
-/** @internal */
-export const isSymbolKeyword = (ast: AST.AST): ast is AST.SymbolKeyword =>
-  ast._tag === "SymbolKeyword"

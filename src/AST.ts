@@ -419,7 +419,7 @@ export const stringKeyword: StringKeyword = {
  * @category guards
  * @since 1.0.0
  */
-export const isStringKeyword: (ast: AST) => ast is StringKeyword = I.isStringKeyword
+export const isStringKeyword = (ast: AST): ast is StringKeyword => ast._tag === "StringKeyword"
 
 /**
  * @category model
@@ -523,7 +523,7 @@ export const symbolKeyword: SymbolKeyword = {
  * @category guards
  * @since 1.0.0
  */
-export const isSymbolKeyword: (ast: AST) => ast is SymbolKeyword = I.isSymbolKeyword
+export const isSymbolKeyword = (ast: AST): ast is SymbolKeyword => ast._tag === "SymbolKeyword"
 
 /**
  * @category model
