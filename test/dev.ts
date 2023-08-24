@@ -1,35 +1,17 @@
-import * as Equal from "@effect/data/Equal"
-import * as C from "@effect/schema/Codec"
-import * as S from "@effect/schema/Schema"
+import * as O from "@effect/data/Option"
+import * as Codec from "@effect/schema/Codec"
+import * as Schema from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("dev", () => {
-  it.skip("dev", async () => {
-    const schema = S.number.pipe(S.int())
-    Util.printAST(schema)
-  })
-
-  it.skip("codec + schema", async () => {
-    const codec = C.NumberFromString
-    const schema = S.number.pipe(S.int())
-
-    const composition = codec.pipe(C.filter((n) => n > 0), C.compose(schema))
-    Util.printAST(composition)
-  })
-
-  it("data", () => {
-    const schema = C.data(
-      S.struct({
-        name: S.string,
-        age: S.number
-      })
+  it.skip("OptionFromString", async () => {
+    const OptionFromString: Codec.Codec<string, O.Option<string>> = Codec.transform(
+      Schema.string,
+      Schema.option(Schema.string), // better: Schema.option(Schema.string.pipe(Schema.nonEmpty(), Schema.brand("NonEmptyString")))
+      (s) => (s.length === 0 ? O.none() : O.some(s)),
+      (a) => (O.isNone(a) ? "" : a.value)
     )
-
-    const parseSync = C.parseSync(schema)
-
-    const person1 = parseSync({ name: "Alice", age: 30 })
-    const person2 = parseSync({ name: "Alice", age: 30 })
-
-    expect(Equal.equals(person1, person2)).toBe(true)
+    Util.expectParseSuccess(OptionFromString, "", O.none())
+    Util.expectParseSuccess(OptionFromString, "a", O.some("a"))
   })
 })
