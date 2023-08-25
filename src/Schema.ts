@@ -469,10 +469,8 @@ export const nonEmptyArray = <I, A>(
   item: Schema<I, A>
 ): Schema<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => tuple(item).pipe(rest(item))
 
-/**
- * @since 1.0.0
- */
-export type Spread<A> = {
+// TODO: replace with /data/Types#Simplify
+type Simplify<A> = {
   [K in keyof A]: A[K]
 } extends infer B ? B : never
 
@@ -602,8 +600,8 @@ export const struct = <
 >(
   fields: Fields
 ): Schema<
-  Spread<FromStruct<Fields>>,
-  Spread<ToStruct<Fields>>
+  Simplify<FromStruct<Fields>>,
+  Simplify<ToStruct<Fields>>
 > => {
   const ownKeys = I.ownKeys(fields)
   const propertySignatures: Array<AST.PropertySignature> = []
@@ -709,7 +707,7 @@ export const pick =
   <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Schema<I, A>
-  ): Schema<Spread<Pick<I, Keys[number]>>, Spread<Pick<A, Keys[number]>>> => {
+  ): Schema<Simplify<Pick<I, Keys[number]>>, Simplify<Pick<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
       return make(
@@ -733,7 +731,7 @@ export const omit =
   <A, Keys extends ReadonlyArray<keyof A>>(...keys: Keys) =>
   <I extends { [K in keyof A]?: any }>(
     self: Schema<I, A>
-  ): Schema<Spread<Omit<I, Keys[number]>>, Spread<Omit<A, Keys[number]>>> => {
+  ): Schema<Simplify<Omit<I, Keys[number]>>, Simplify<Omit<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
       return make(
@@ -814,8 +812,9 @@ const getBrands = (ast: AST.AST): Array<string> =>
  * @category combinators
  * @since 1.0.0
  */
-export const partial = <I, A>(self: Schema<I, A>): Schema<Spread<Partial<I>>, Spread<Partial<A>>> =>
-  make(AST.partial(self.ast))
+export const partial = <I, A>(
+  self: Schema<I, A>
+): Schema<Simplify<Partial<I>>, Simplify<Partial<A>>> => make(AST.partial(self.ast))
 
 /**
  * @category combinators
@@ -823,7 +822,7 @@ export const partial = <I, A>(self: Schema<I, A>): Schema<Spread<Partial<I>>, Sp
  */
 export const required = <I, A>(
   self: Schema<I, A>
-): Schema<Spread<Required<I>>, Spread<Required<A>>> => make(AST.required(self.ast))
+): Schema<Simplify<Required<I>>, Simplify<Required<A>>> => make(AST.required(self.ast))
 
 /**
  * @category combinators
@@ -918,11 +917,16 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
  * @since 1.0.0
  */
 export const extend: {
-  <IB, B>(that: Schema<IB, B>): <I, A>(self: Schema<I, A>) => Schema<Spread<I & IB>, Spread<A & B>>
-  <I, A, IB, B>(self: Schema<I, A>, that: Schema<IB, B>): Schema<Spread<I & IB>, Spread<A & B>>
+  <IB, B>(
+    that: Schema<IB, B>
+  ): <I, A>(self: Schema<I, A>) => Schema<Simplify<I & IB>, Simplify<A & B>>
+  <I, A, IB, B>(self: Schema<I, A>, that: Schema<IB, B>): Schema<Simplify<I & IB>, Simplify<A & B>>
 } = dual(
   2,
-  <I, A, IB, B>(self: Schema<I, A>, that: Schema<IB, B>): Schema<Spread<I & IB>, Spread<A & B>> =>
+  <I, A, IB, B>(
+    self: Schema<I, A>,
+    that: Schema<IB, B>
+  ): Schema<Simplify<I & IB>, Simplify<A & B>> =>
     make(
       intersectUnionMembers(
         AST.isUnion(self.ast) ? self.ast.types : [self.ast],
@@ -1127,7 +1131,7 @@ export const attachPropertySignature = <K extends PropertyKey, V extends AST.Lit
   key: K,
   value: V
 ) =>
-<I, A extends object>(schema: Schema<I, A>): Schema<I, Spread<A & { readonly [k in K]: V }>> =>
+<I, A extends object>(schema: Schema<I, A>): Schema<I, Simplify<A & { readonly [k in K]: V }>> =>
   make(AST.createTransformByPropertySignatureTransformations(
     schema.ast,
     to(schema).pipe(extend(struct({ [key]: literal(value) }))).ast,
@@ -1218,8 +1222,8 @@ export interface Class<I, A, Inherited = {}> {
     this: T,
     fields: Fields
   ): Class<
-    Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    Simplify<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
     InstanceType<T>
   >
   transform<
@@ -1236,7 +1240,7 @@ export interface Class<I, A, Inherited = {}> {
     ) => ParseResult<Class.To<T>>
   ): Class<
     Class.From<T>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
     InstanceType<T>
   >
   transformFrom<
@@ -1253,7 +1257,7 @@ export interface Class<I, A, Inherited = {}> {
     ) => ParseResult<Class.From<T>>
   ): Class<
     Class.From<T>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
     InstanceType<T>
   >
 }
@@ -1338,8 +1342,8 @@ export const Class = <
 >(
   fields: Fields
 ): Class<
-  Spread<FromStruct<Fields>>,
-  Spread<ToStruct<Fields>>
+  Simplify<FromStruct<Fields>>,
+  Simplify<ToStruct<Fields>>
 > => makeClass(struct(fields), fields, D.Class.prototype)
 
 // ---------------------------------------------

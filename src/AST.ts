@@ -204,9 +204,7 @@ export interface Declaration extends Annotated {
 export const createDeclaration = (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
-  decode: (
-    ...typeParameters: ReadonlyArray<AST>
-  ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
+  decode: Declaration["decode"],
   annotations: Annotated["annotations"] = {}
 ): Declaration => ({
   _tag: "Declaration",

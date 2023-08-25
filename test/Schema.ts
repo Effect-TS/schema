@@ -266,7 +266,7 @@ describe.concurrent("Schema", () => {
       const struct = <Fields extends Record<PropertyKey, S.Schema<any>>>(
         fields: Fields
       ): S.Schema<
-        S.Spread<
+        S.Simplify<
           & { readonly [K in RequiredKeys<Fields>]: S.To<Fields[K]> }
           & {
             readonly [K in OptionalKeys<Fields> as K extends `${infer S}?` ? S : K]+?: S.To<
