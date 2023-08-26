@@ -1,0 +1,22 @@
+import * as S from "@effect/schema/Schema"
+import * as Util from "@effect/schema/test/util"
+
+describe.concurrent("Schema/annotations", () => {
+  it("message refinement", async () => {
+    const schema =
+      // initial schema, a string
+      S.string.pipe(
+        // add an error message for non-string values
+        S.message(() => "not a string"),
+        // add a constraint to the schema, only non-empty strings are valid
+        S.nonEmpty({ message: () => "required" }),
+        // add a constraint to the schema, only strings with a length less or equal than 10 are valid
+        S.maxLength(10, { message: (s) => `${s} is too long` })
+      )
+
+    await Util.expectParseFailure(schema, null, "not a string")
+    await Util.expectParseFailure(schema, "", "required")
+    await Util.expectParseSuccess(schema, "a", "a")
+    await Util.expectParseFailure(schema, "aaaaaaaaaaaaaa", "aaaaaaaaaaaaaa is too long")
+  })
+})
