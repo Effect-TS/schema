@@ -28,7 +28,7 @@ describe.concurrent("Parser", () => {
     expect(P.parseSync(schema)("1")).toEqual(1)
     expect(() => P.parseSync(schema)("a")).toThrowError(
       new Error(`error(s) found
-└─ Expected string -> number, actual "a"`)
+└─ Expected string <-> number, actual "a"`)
     )
   })
 
@@ -65,7 +65,7 @@ describe.concurrent("Parser", () => {
     expect(P.decodeSync(schema)("1")).toEqual(1)
     expect(() => P.decodeSync(schema)("a")).toThrowError(
       new Error(`error(s) found
-└─ Expected string -> number, actual "a"`)
+└─ Expected string <-> number, actual "a"`)
     )
   })
 

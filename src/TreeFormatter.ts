@@ -135,7 +135,7 @@ export const formatExpected = (ast: AST.AST): string => {
     case "Transform":
       return O.getOrElse(
         getExpected(ast),
-        () => `${formatExpected(ast.from)} -> ${formatExpected(ast.to)}`
+        () => `${formatExpected(ast.from)} <-> ${formatExpected(ast.to)}`
       )
   }
 }

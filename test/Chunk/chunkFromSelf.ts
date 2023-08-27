@@ -32,7 +32,7 @@ describe.concurrent("Chunk/chunkFromSelf", () => {
     await Util.expectParseFailure(
       schema,
       C.fromIterable(["1", "a", "3"]),
-      `/1 Expected string -> number, actual "a"`
+      `/1 Expected string <-> number, actual "a"`
     )
   })
 

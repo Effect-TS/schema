@@ -25,7 +25,7 @@ describe.concurrent("ReadonlySet/readonlySetFromSelf", () => {
     await Util.expectParseFailure(
       schema,
       new Set(["1", "a", "3"]),
-      `/1 Expected string -> number, actual "a"`
+      `/1 Expected string <-> number, actual "a"`
     )
   })
 
