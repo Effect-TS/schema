@@ -157,7 +157,8 @@ describe.concurrent("Schema", () => {
 
   it("title", () => {
     expect(S.string.pipe(S.title("MyString")).ast.annotations).toEqual({
-      [AST.TitleAnnotationId]: "MyString"
+      [AST.TitleAnnotationId]: "MyString",
+      [AST.DescriptionAnnotationId]: "a string"
     })
   })
 
@@ -171,14 +172,16 @@ describe.concurrent("Schema", () => {
   it("examples", () => {
     expect(S.string.pipe(S.examples(["example"])).ast.annotations).toEqual({
       [AST.ExamplesAnnotationId]: ["example"],
-      [AST.TitleAnnotationId]: "string"
+      [AST.TitleAnnotationId]: "string",
+      [AST.DescriptionAnnotationId]: "a string"
     })
   })
 
   it("documentation", () => {
     expect(S.string.pipe(S.documentation("documentation")).ast.annotations).toEqual({
       [AST.DocumentationAnnotationId]: "documentation",
-      [AST.TitleAnnotationId]: "string"
+      [AST.TitleAnnotationId]: "string",
+      [AST.DescriptionAnnotationId]: "a string"
     })
   })
 

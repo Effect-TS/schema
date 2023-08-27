@@ -8,7 +8,7 @@ import { isNumber } from "@effect/data/Number"
 import * as Option from "@effect/data/Option"
 import * as Order from "@effect/data/Order"
 import { isString, isSymbol } from "@effect/data/Predicate"
-import * as RA from "@effect/data/ReadonlyArray"
+import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import { memoizeThunk } from "@effect/schema/internal/common"
 import type { ParseResult } from "@effect/schema/ParseResult"
 import * as PR from "@effect/schema/ParseResult"
@@ -415,7 +415,8 @@ export interface StringKeyword extends Annotated {
 export const stringKeyword: StringKeyword = {
   _tag: "StringKeyword",
   annotations: {
-    [TitleAnnotationId]: "string"
+    [TitleAnnotationId]: "string",
+    [DescriptionAnnotationId]: "a string"
   }
 }
 
@@ -440,7 +441,8 @@ export interface NumberKeyword extends Annotated {
 export const numberKeyword: NumberKeyword = {
   _tag: "NumberKeyword",
   annotations: {
-    [TitleAnnotationId]: "number"
+    [TitleAnnotationId]: "number",
+    [DescriptionAnnotationId]: "a number"
   }
 }
 
@@ -465,7 +467,8 @@ export interface BooleanKeyword extends Annotated {
 export const booleanKeyword: BooleanKeyword = {
   _tag: "BooleanKeyword",
   annotations: {
-    [TitleAnnotationId]: "boolean"
+    [TitleAnnotationId]: "boolean",
+    [DescriptionAnnotationId]: "a boolean"
   }
 }
 
@@ -490,7 +493,8 @@ export interface BigIntKeyword extends Annotated {
 export const bigIntKeyword: BigIntKeyword = {
   _tag: "BigIntKeyword",
   annotations: {
-    [TitleAnnotationId]: "bigint"
+    [TitleAnnotationId]: "bigint",
+    [DescriptionAnnotationId]: "a bigint"
   }
 }
 
@@ -515,7 +519,8 @@ export interface SymbolKeyword extends Annotated {
 export const symbolKeyword: SymbolKeyword = {
   _tag: "SymbolKeyword",
   annotations: {
-    [TitleAnnotationId]: "symbol"
+    [TitleAnnotationId]: "symbol",
+    [DescriptionAnnotationId]: "a symbol"
   }
 }
 
@@ -540,7 +545,8 @@ export interface ObjectKeyword extends Annotated {
 export const objectKeyword: ObjectKeyword = {
   _tag: "ObjectKeyword",
   annotations: {
-    [TitleAnnotationId]: "object"
+    [TitleAnnotationId]: "object",
+    [DescriptionAnnotationId]: "an object"
   }
 }
 
@@ -588,7 +594,7 @@ export interface TemplateLiteralSpan {
 export interface TemplateLiteral extends Annotated {
   readonly _tag: "TemplateLiteral"
   readonly head: string
-  readonly spans: RA.NonEmptyReadonlyArray<TemplateLiteralSpan>
+  readonly spans: ReadonlyArray.NonEmptyReadonlyArray<TemplateLiteralSpan>
 }
 
 /**
@@ -599,7 +605,7 @@ export const createTemplateLiteral = (
   head: string,
   spans: ReadonlyArray<TemplateLiteralSpan>
 ): TemplateLiteral | Literal =>
-  RA.isNonEmptyReadonlyArray(spans) ?
+  ReadonlyArray.isNonEmptyReadonlyArray(spans) ?
     { _tag: "TemplateLiteral", head, spans, annotations: {} } :
     createLiteral(head)
 
@@ -633,7 +639,7 @@ export const createElement = (
 export interface Tuple extends Annotated {
   readonly _tag: "Tuple"
   readonly elements: ReadonlyArray<Element>
-  readonly rest: Option.Option<RA.NonEmptyReadonlyArray<AST>>
+  readonly rest: Option.Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
 }
 
@@ -643,7 +649,7 @@ export interface Tuple extends Annotated {
  */
 export const createTuple = (
   elements: ReadonlyArray<Element>,
-  rest: Option.Option<RA.NonEmptyReadonlyArray<AST>>,
+  rest: Option.Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>,
   isReadonly: boolean,
   annotations: Annotated["annotations"] = {}
 ): Tuple => ({
@@ -789,13 +795,20 @@ export const createTypeLiteral = (
 export const isTypeLiteral = (ast: AST): ast is TypeLiteral => ast._tag === "TypeLiteral"
 
 /**
+ * @since 1.0.0
+ */
+export type Members<A> = readonly [A, A, ...Array<A>]
+
+/**
  * @category model
  * @since 1.0.0
  */
 export interface Union extends Annotated {
   readonly _tag: "Union"
-  readonly types: readonly [AST, AST, ...Array<AST>]
+  readonly types: Members<AST>
 }
+
+const isMembers = <A>(as: ReadonlyArray<A>): as is readonly [A, A, ...Array<A>] => as.length > 1
 
 /**
  * @category constructors
@@ -806,19 +819,17 @@ export const createUnion = (
   annotations: Annotated["annotations"] = {}
 ): AST => {
   const types = unify(candidates)
-  switch (types.length) {
-    case 0:
-      return neverKeyword
-    case 1:
-      return types[0]
-    default: {
-      return {
-        _tag: "Union",
-        types: sortUnionMembers(types) as any,
-        annotations
-      }
+  if (isMembers(types)) {
+    return {
+      _tag: "Union",
+      types: sortUnionMembers(types),
+      annotations
     }
   }
+  if (ReadonlyArray.isNonEmptyReadonlyArray(types)) {
+    return types[0]
+  }
+  return neverKeyword
 }
 
 /**
@@ -1221,7 +1232,7 @@ export const required = (ast: AST): AST => {
           ast.rest,
           Option.map((rest) => {
             const u = createUnion([...rest])
-            return RA.mapNonEmpty(rest, () => u)
+            return ReadonlyArray.mapNonEmpty(rest, () => u)
           })
         ),
         ast.isReadonly
@@ -1301,7 +1312,7 @@ export const to = (ast: AST): AST => {
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(to(e.type), e.isOptional)),
-        Option.map(ast.rest, RA.mapNonEmpty(to)),
+        Option.map(ast.rest, ReadonlyArray.mapNonEmpty(to)),
         ast.isReadonly,
         ast.annotations
       )
@@ -1338,7 +1349,7 @@ export const from = (ast: AST): AST => {
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(from(e.type), e.isOptional)),
-        Option.map(ast.rest, RA.mapNonEmpty(from)),
+        Option.map(ast.rest, ReadonlyArray.mapNonEmpty(from)),
         ast.isReadonly
       )
     case "TypeLiteral":
@@ -1390,7 +1401,7 @@ export const getCardinality = (ast: AST): number => {
   }
 }
 
-const sortPropertySignatures = RA.sort(
+const sortPropertySignatures = ReadonlyArray.sort(
   pipe(Number.Order, Order.mapInput((ps: PropertySignature) => getCardinality(ps.type)))
 )
 
@@ -1446,14 +1457,14 @@ export const getWeight = (ast: AST): Weight => {
   }
 }
 
-const sortUnionMembers = RA.sort(
+const sortUnionMembers: (self: Members<AST>) => Members<AST> = ReadonlyArray.sort(
   Order.reverse(Order.mapInput(WeightOrder, getWeight))
-)
+) as any
 
 const unify = (candidates: ReadonlyArray<AST>): ReadonlyArray<AST> => {
   let out = pipe(
     candidates,
-    RA.flatMap((ast: AST): ReadonlyArray<AST> => {
+    ReadonlyArray.flatMap((ast: AST): ReadonlyArray<AST> => {
       switch (ast._tag) {
         case "NeverKeyword":
           return []

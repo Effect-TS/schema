@@ -2,7 +2,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Schema/annotations", () => {
-  it("message refinement", async () => {
+  it("message as annotation options", async () => {
     const schema =
       // initial schema, a string
       S.string.pipe(
@@ -18,5 +18,10 @@ describe.concurrent("Schema/annotations", () => {
     await Util.expectParseFailure(schema, "", "required")
     await Util.expectParseSuccess(schema, "a", "a")
     await Util.expectParseFailure(schema, "aaaaaaaaaaaaaa", "aaaaaaaaaaaaaa is too long")
+  })
+
+  it.skip("message as annotation", async () => {
+    const schema = S.string.pipe(S.nonEmpty(), S.message(() => "custom message"))
+    await Util.expectParseFailure(schema, null, "custom message")
   })
 })
