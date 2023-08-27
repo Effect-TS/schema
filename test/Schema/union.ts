@@ -78,7 +78,7 @@ describe.concurrent("Schema/literal", () => {
 
   describe.concurrent("encoding", () => {
     // raises an error while encoding from a number if the string is not a char
-    const NumberFromChar = S.string.pipe(S.maxLength(1), S.numberFromString)
+    const NumberFromChar = S.string.pipe(S.length(1), S.numberFromString)
 
     it("union", async () => {
       const schema = S.union(S.string, NumberFromChar)

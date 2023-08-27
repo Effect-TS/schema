@@ -112,10 +112,10 @@ describe.concurrent("Schema/allErrors option", () => {
 
   describe.concurrent("encoding", () => {
     // raises an error while encoding from a number if the string is not a char
-    const NumberFromChar = S.string.pipe(S.maxLength(1), S.numberFromString)
+    const NumberFromChar = S.string.pipe(S.length(1), S.numberFromString)
 
     // raises an error while encoding if the string is not a char
-    const Char = S.string.pipe(S.maxLength(1))
+    const Char = S.string.pipe(S.length(1))
 
     describe.concurrent("tuple", () => {
       it("unexpected indexes", async () => {
@@ -133,7 +133,7 @@ describe.concurrent("Schema/allErrors option", () => {
         await Util.expectEncodeFailure(
           schema,
           [10, 10],
-          `/0 Expected a string at most 1 character(s) long, actual "10", /1 Expected a string at most 1 character(s) long, actual "10"`,
+          `/0 Expected a character, actual "10", /1 Expected a character, actual "10"`,
           Util.allErrors
         )
       })
@@ -143,7 +143,7 @@ describe.concurrent("Schema/allErrors option", () => {
         await Util.expectEncodeFailure(
           schema,
           [10, 10],
-          `/0 Expected a string at most 1 character(s) long, actual "10", /1 Expected a string at most 1 character(s) long, actual "10"`,
+          `/0 Expected a character, actual "10", /1 Expected a character, actual "10"`,
           Util.allErrors
         )
       })
@@ -153,7 +153,7 @@ describe.concurrent("Schema/allErrors option", () => {
         await Util.expectEncodeFailure(
           schema,
           [10, 10],
-          `/0 Expected a string at most 1 character(s) long, actual "10", /1 Expected a string at most 1 character(s) long, actual "10"`,
+          `/0 Expected a character, actual "10", /1 Expected a character, actual "10"`,
           Util.allErrors
         )
       })
@@ -165,7 +165,7 @@ describe.concurrent("Schema/allErrors option", () => {
         await Util.expectEncodeFailure(
           schema,
           { a: 10, b: 10 },
-          `/a Expected a string at most 1 character(s) long, actual "10", /b Expected a string at most 1 character(s) long, actual "10"`,
+          `/a Expected a character, actual "10", /b Expected a character, actual "10"`,
           Util.allErrors
         )
       })
@@ -177,7 +177,7 @@ describe.concurrent("Schema/allErrors option", () => {
         await Util.expectEncodeFailure(
           schema,
           { aa: "a", bb: "bb" },
-          `/aa Expected a string at most 1 character(s) long, actual "aa", /bb Expected a string at most 1 character(s) long, actual "bb"`,
+          `/aa Expected a character, actual "aa", /bb Expected a character, actual "bb"`,
           Util.allErrors
         )
       })
@@ -187,7 +187,7 @@ describe.concurrent("Schema/allErrors option", () => {
         await Util.expectEncodeFailure(
           schema,
           { a: "aa", b: "bb" },
-          `/a Expected a string at most 1 character(s) long, actual "aa", /b Expected a string at most 1 character(s) long, actual "bb"`,
+          `/a Expected a character, actual "aa", /b Expected a character, actual "bb"`,
           Util.allErrors
         )
       })

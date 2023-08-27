@@ -19,8 +19,8 @@ describe.concurrent("number/greaterThan", () => {
 
   it("decoding", async () => {
     await Util.expectParseSuccess(schema, 1)
-    await Util.expectParseFailure(schema, 0, `Expected a number greater than 0, actual 0`)
-    await Util.expectParseFailure(schema, -1, `Expected a number greater than 0, actual -1`)
+    await Util.expectParseFailure(schema, 0, `Expected a positive number, actual 0`)
+    await Util.expectParseFailure(schema, -1, `Expected a positive number, actual -1`)
   })
 
   it("pretty", () => {

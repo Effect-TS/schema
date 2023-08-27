@@ -35,10 +35,6 @@ describe.concurrent("Schema", () => {
     expect(S.LessThanBigintTypeId).exist
     expect(S.LessThanOrEqualToBigintTypeId).exist
     expect(S.BetweenBigintTypeId).exist
-    expect(S.PositiveBigintTypeId).exist
-    expect(S.NegativeBigintTypeId).exist
-    expect(S.NonNegativeBigintTypeId).exist
-    expect(S.NonPositiveBigintTypeId).exist
     expect(S.BrandTypeId).exist
     expect(S.FiniteTypeId).exist
     expect(S.GreaterThanTypeId).exist
@@ -49,10 +45,6 @@ describe.concurrent("Schema", () => {
     expect(S.LessThanOrEqualToTypeId).exist
     expect(S.BetweenTypeId).exist
     expect(S.NonNaNTypeId).exist
-    expect(S.PositiveTypeId).exist
-    expect(S.NegativeTypeId).exist
-    expect(S.NonNegativeTypeId).exist
-    expect(S.NonPositiveTypeId).exist
     expect(S.InstanceOfTypeId).exist
     expect(S.MinItemsTypeId).exist
     expect(S.MaxItemsTypeId).exist
@@ -93,7 +85,7 @@ describe.concurrent("Schema", () => {
       })
     )
     expect(Branded.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "@effect/schema/IntTypeId",
+      [AST.TypeAnnotationId]: Symbol.for("@effect/schema/TypeId/Int"),
       [AST.BrandAnnotationId]: ["A", "B"],
       [AST.DescriptionAnnotationId]: "a B brand",
       [AST.JSONSchemaAnnotationId]: { type: "integer" }
@@ -112,7 +104,7 @@ describe.concurrent("Schema", () => {
       })
     )
     expect(Branded.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "@effect/schema/IntTypeId",
+      [AST.TypeAnnotationId]: Symbol.for("@effect/schema/TypeId/Int"),
       [AST.BrandAnnotationId]: [A, B],
       [AST.DescriptionAnnotationId]: "a B brand",
       [AST.JSONSchemaAnnotationId]: { type: "integer" }
@@ -223,7 +215,7 @@ describe.concurrent("Schema", () => {
   it("filter/ annotation options", () => {
     const schema = S.string.pipe(
       S.filter((s): s is string => s.length === 1, {
-        typeId: "Char",
+        typeId: Symbol.for("Char"),
         description: "description",
         documentation: "documentation",
         examples: ["examples"],
@@ -233,7 +225,7 @@ describe.concurrent("Schema", () => {
       })
     )
     expect(schema.ast.annotations).toEqual({
-      [AST.TypeAnnotationId]: "Char",
+      [AST.TypeAnnotationId]: Symbol.for("Char"),
       [AST.DescriptionAnnotationId]: "description",
       [AST.DocumentationAnnotationId]: "documentation",
       [AST.ExamplesAnnotationId]: [

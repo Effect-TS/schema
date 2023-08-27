@@ -33,33 +33,43 @@ describe.concurrent("Schema/propertySignature", () => {
 
   it("should add annotations to propertySignature", () => {
     const schema = S.struct({
-      a: S.propertySignature(S.string, { a: "a" })
+      a: S.propertySignature(S.string, { [Symbol.for("custom-annotation")]: "a" })
     })
     const ast: any = schema.ast
-    expect(ast.propertySignatures[0].annotations).toEqual({ a: "a" })
+    expect(ast.propertySignatures[0].annotations).toEqual({
+      [Symbol.for("custom-annotation")]: "a"
+    })
   })
 
   it("should add annotations to propertySignature().optional()", () => {
     const schema = S.struct({
-      a: S.propertySignature(S.string, { a: "a" }).optional()
+      a: S.propertySignature(S.string, { [Symbol.for("custom-annotation")]: "a" }).optional()
     })
     const ast: any = schema.ast
-    expect(ast.propertySignatures[0].annotations).toEqual({ a: "a" })
+    expect(ast.propertySignatures[0].annotations).toEqual({
+      [Symbol.for("custom-annotation")]: "a"
+    })
   })
 
   it("should add annotations to propertySignature().withDefault()", () => {
     const schema = S.struct({
-      a: S.propertySignature(S.string, { a: "a" }).withDefault(() => "")
+      a: S.propertySignature(S.string, { [Symbol.for("custom-annotation")]: "a" }).withDefault(() =>
+        ""
+      )
     })
     const ast: any = schema.ast
-    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
+    expect(ast.to.propertySignatures[0].annotations).toEqual({
+      [Symbol.for("custom-annotation")]: "a"
+    })
   })
 
   it("should add annotations to propertySignature().toOption()", () => {
     const schema = S.struct({
-      a: S.propertySignature(S.string, { a: "a" }).toOption()
+      a: S.propertySignature(S.string, { [Symbol.for("custom-annotation")]: "a" }).toOption()
     })
     const ast: any = schema.ast
-    expect(ast.to.propertySignatures[0].annotations).toEqual({ a: "a" })
+    expect(ast.to.propertySignatures[0].annotations).toEqual({
+      [Symbol.for("custom-annotation")]: "a"
+    })
   })
 })

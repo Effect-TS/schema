@@ -161,7 +161,7 @@ describe.concurrent("Schema/tuple", () => {
 
   describe.concurrent("encoding", () => {
     // raises an error while encoding from a number if the string is not a char
-    const NumberFromChar = S.string.pipe(S.maxLength(1), S.numberFromString)
+    const NumberFromChar = S.string.pipe(S.length(1), S.numberFromString)
 
     it("empty", async () => {
       const schema = S.tuple()
@@ -174,7 +174,7 @@ describe.concurrent("Schema/tuple", () => {
       await Util.expectEncodeFailure(
         schema,
         [10],
-        `/0 Expected a string at most 1 character(s) long, actual "10"`
+        `/0 Expected a character, actual "10"`
       )
       await Util.expectEncodeFailure(schema, [1, "b"] as any, `/1 is unexpected`)
     })
@@ -193,7 +193,7 @@ describe.concurrent("Schema/tuple", () => {
       await Util.expectEncodeFailure(
         schema,
         [10],
-        `/0 Expected a string at most 1 character(s) long, actual "10"`
+        `/0 Expected a character, actual "10"`
       )
       await Util.expectEncodeFailure(schema, [1, "b"] as any, `/1 is unexpected`)
     })
@@ -235,7 +235,7 @@ describe.concurrent("Schema/tuple", () => {
       await Util.expectEncodeFailure(
         schema,
         [10],
-        `/0 Expected a string at most 1 character(s) long, actual "10"`
+        `/0 Expected a character, actual "10"`
       )
     })
 
@@ -248,7 +248,7 @@ describe.concurrent("Schema/tuple", () => {
       await Util.expectEncodeFailure(
         schema,
         [10],
-        `/0 Expected a string at most 1 character(s) long, actual "10"`
+        `/0 Expected a character, actual "10"`
       )
     })
 

@@ -5,8 +5,7 @@
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
 import { isNumber } from "@effect/data/Number"
-import type { Option } from "@effect/data/Option"
-import * as O from "@effect/data/Option"
+import * as Option from "@effect/data/Option"
 import * as Order from "@effect/data/Order"
 import { isString, isSymbol } from "@effect/data/Predicate"
 import * as RA from "@effect/data/ReadonlyArray"
@@ -60,19 +59,19 @@ export type BrandAnnotation = ReadonlyArray<string>
  * @category annotations
  * @since 1.0.0
  */
-export const BrandAnnotationId = "@effect/schema/BrandAnnotationId"
+export const BrandAnnotationId = Symbol.for("@effect/schema/annotation/Brand")
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export type TypeAnnotation = string | symbol
+export type TypeAnnotation = symbol
 
 /**
  * @category annotations
  * @since 1.0.0
  */
-export const TypeAnnotationId = "@effect/schema/TypeAnnotationId"
+export const TypeAnnotationId = Symbol.for("@effect/schema/annotation/Type")
 
 /**
  * @category annotations
@@ -84,7 +83,7 @@ export type MessageAnnotation<A> = (a: A) => string
  * @category annotations
  * @since 1.0.0
  */
-export const MessageAnnotationId = "@effect/schema/MessageAnnotationId"
+export const MessageAnnotationId = Symbol.for("@effect/schema/annotation/Message")
 
 /**
  * @category annotations
@@ -96,7 +95,7 @@ export type IdentifierAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const IdentifierAnnotationId = "@effect/schema/IdentifierAnnotationId"
+export const IdentifierAnnotationId = Symbol.for("@effect/schema/annotation/Identifier")
 
 /**
  * @category annotations
@@ -108,7 +107,7 @@ export type TitleAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const TitleAnnotationId = "@effect/schema/TitleAnnotationId"
+export const TitleAnnotationId = Symbol.for("@effect/schema/annotation/Title")
 
 /**
  * @category annotations
@@ -120,7 +119,7 @@ export type DescriptionAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const DescriptionAnnotationId = "@effect/schema/DescriptionAnnotationId"
+export const DescriptionAnnotationId = Symbol.for("@effect/schema/annotation/Description")
 
 /**
  * @category annotations
@@ -132,7 +131,7 @@ export type ExamplesAnnotation = ReadonlyArray<unknown>
  * @category annotations
  * @since 1.0.0
  */
-export const ExamplesAnnotationId = "@effect/schema/ExamplesAnnotationId"
+export const ExamplesAnnotationId = Symbol.for("@effect/schema/annotation/Examples")
 
 /**
  * @category annotations
@@ -144,7 +143,7 @@ export type JSONSchemaAnnotation = object
  * @category annotations
  * @since 1.0.0
  */
-export const JSONSchemaAnnotationId = "@effect/schema/JSONSchemaAnnotationId"
+export const JSONSchemaAnnotationId = Symbol.for("@effect/schema/annotation/JSONSchema")
 
 /**
  * @category annotations
@@ -156,17 +155,15 @@ export type DocumentationAnnotation = string
  * @category annotations
  * @since 1.0.0
  */
-export const DocumentationAnnotationId = "@effect/schema/DocumentationAnnotationId"
-
-// ---------------------------------------------
-// models
-// ---------------------------------------------
+export const DocumentationAnnotationId = Symbol.for("@effect/schema/annotation/Documentation")
 
 /**
  * @category model
  * @since 1.0.0
  */
-export interface Annotations extends Record<string | symbol, unknown> {}
+export interface Annotations {
+  [_: symbol]: unknown
+}
 
 /**
  * @category model
@@ -179,10 +176,14 @@ export interface Annotated {
 /**
  * @since 1.0.0
  */
-export const getAnnotation = <A>(key: PropertyKey) => (annotated: Annotated): O.Option<A> =>
+export const getAnnotation = <A>(key: symbol) => (annotated: Annotated): Option.Option<A> =>
   Object.prototype.hasOwnProperty.call(annotated.annotations, key) ?
-    O.some(annotated.annotations[key] as any) :
-    O.none()
+    Option.some(annotated.annotations[key] as any) :
+    Option.none()
+
+// ---------------------------------------------
+// models
+// ---------------------------------------------
 
 /**
  * @category model
@@ -632,7 +633,7 @@ export const createElement = (
 export interface Tuple extends Annotated {
   readonly _tag: "Tuple"
   readonly elements: ReadonlyArray<Element>
-  readonly rest: Option<RA.NonEmptyReadonlyArray<AST>>
+  readonly rest: Option.Option<RA.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
 }
 
@@ -642,7 +643,7 @@ export interface Tuple extends Annotated {
  */
 export const createTuple = (
   elements: ReadonlyArray<Element>,
-  rest: Option<RA.NonEmptyReadonlyArray<AST>>,
+  rest: Option.Option<RA.NonEmptyReadonlyArray<AST>>,
   isReadonly: boolean,
   annotations: Annotated["annotations"] = {}
 ): Tuple => ({
@@ -910,8 +911,8 @@ export interface ParseOptions {
 export interface PropertySignatureTransformation {
   readonly from: PropertyKey
   readonly to: PropertyKey
-  readonly decode: (o: Option<any>) => Option<any>
-  readonly encode: (o: Option<any>) => Option<any>
+  readonly decode: (o: Option.Option<any>) => Option.Option<any>
+  readonly encode: (o: Option.Option<any>) => Option.Option<any>
 }
 
 /**
@@ -921,8 +922,8 @@ export interface PropertySignatureTransformation {
 export const createPropertySignatureTransformation = (
   from: PropertyKey,
   to: PropertyKey,
-  decode: (o: Option<any>) => Option<any>,
-  encode: (o: Option<any>) => Option<any>
+  decode: (o: Option.Option<any>) => Option.Option<any>,
+  encode: (o: Option.Option<any>) => Option.Option<any>
 ): PropertySignatureTransformation => ({ from, to, decode, encode })
 
 /**
@@ -988,11 +989,11 @@ export const createTransformByPropertySignatureTransformations = (
         const t = propertySignatureTransformations[i]
         const name = t.from
         const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          O.some(input[name]) :
-          O.none()
+          Option.some(input[name]) :
+          Option.none()
         delete input[name]
         const to = t.decode(from)
-        if (O.isSome(to)) {
+        if (Option.isSome(to)) {
           input[t.to] = to.value
         }
       }
@@ -1003,11 +1004,11 @@ export const createTransformByPropertySignatureTransformations = (
         const t = propertySignatureTransformations[i]
         const name = t.to
         const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          O.some(input[name]) :
-          O.none()
+          Option.some(input[name]) :
+          Option.none()
         delete input[name]
         const to = t.encode(from)
-        if (O.isSome(to)) {
+        if (Option.isSome(to)) {
           input[t.from] = to.value
         }
       }
@@ -1042,9 +1043,9 @@ export const mergeAnnotations = (ast: AST, annotations: Annotated["annotations"]
  *
  * @since 1.0.0
  */
-export const setAnnotation = (ast: AST, id: PropertyKey, value: unknown): AST => ({
+export const setAnnotation = (ast: AST, sym: symbol, value: unknown): AST => ({
   ...ast,
-  annotations: { ...ast.annotations, [id]: value }
+  annotations: { ...ast.annotations, [sym]: value }
 })
 
 /**
@@ -1056,11 +1057,11 @@ export const appendRestElement = (
   ast: Tuple,
   restElement: AST
 ): Tuple => {
-  if (O.isSome(ast.rest)) {
+  if (Option.isSome(ast.rest)) {
     // example: `type A = [...string[], ...number[]]` is illegal
     throw new Error("A rest element cannot follow another rest element. ts(1265)")
   }
-  return createTuple(ast.elements, O.some([restElement]), ast.isReadonly)
+  return createTuple(ast.elements, Option.some([restElement]), ast.isReadonly)
 }
 
 /**
@@ -1079,13 +1080,13 @@ export const appendElement = (
   }
   return pipe(
     ast.rest,
-    O.match({
-      onNone: () => createTuple([...ast.elements, newElement], O.none(), ast.isReadonly),
+    Option.match({
+      onNone: () => createTuple([...ast.elements, newElement], Option.none(), ast.isReadonly),
       onSome: (rest) => {
         if (newElement.isOptional) {
           throw new Error("An optional element cannot follow a rest element. ts(1266)")
         }
-        return createTuple(ast.elements, O.some([...rest, newElement.type]), ast.isReadonly)
+        return createTuple(ast.elements, Option.some([...rest, newElement.type]), ast.isReadonly)
       }
     })
   )
@@ -1180,7 +1181,7 @@ export const partial = (ast: AST): AST => {
         ast.elements.map((e) => createElement(e.type, true)),
         pipe(
           ast.rest,
-          O.map((rest) => [createUnion([...rest, undefinedKeyword])])
+          Option.map((rest) => [createUnion([...rest, undefinedKeyword])])
         ),
         ast.isReadonly
       )
@@ -1218,7 +1219,7 @@ export const required = (ast: AST): AST => {
         ast.elements.map((e) => createElement(e.type, false)),
         pipe(
           ast.rest,
-          O.map((rest) => {
+          Option.map((rest) => {
             const u = createUnion([...rest])
             return RA.mapNonEmpty(rest, () => u)
           })
@@ -1300,7 +1301,7 @@ export const to = (ast: AST): AST => {
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(to(e.type), e.isOptional)),
-        O.map(ast.rest, RA.mapNonEmpty(to)),
+        Option.map(ast.rest, RA.mapNonEmpty(to)),
         ast.isReadonly,
         ast.annotations
       )
@@ -1337,7 +1338,7 @@ export const from = (ast: AST): AST => {
     case "Tuple":
       return createTuple(
         ast.elements.map((e) => createElement(from(e.type), e.isOptional)),
-        O.map(ast.rest, RA.mapNonEmpty(from)),
+        Option.map(ast.rest, RA.mapNonEmpty(from)),
         ast.isReadonly
       )
     case "TypeLiteral":
@@ -1411,7 +1412,7 @@ export const getWeight = (ast: AST): Weight => {
   switch (ast._tag) {
     case "Tuple": {
       const y = ast.elements.length
-      const z = O.isSome(ast.rest) ? ast.rest.value.length : 0
+      const z = Option.isSome(ast.rest) ? ast.rest.value.length : 0
       return [2, y, z]
     }
     case "TypeLiteral": {

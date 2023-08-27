@@ -241,7 +241,7 @@ describe.concurrent("Schema/extend", () => {
 
   describe.concurrent("encoding", () => {
     // raises an error while encoding from a number if the string is not a char
-    const NumberFromChar = S.string.pipe(S.maxLength(1), S.numberFromString)
+    const NumberFromChar = S.string.pipe(S.length(1), S.numberFromString)
 
     it("struct + record(string, NumberFromChar)", async () => {
       const schema = S.struct({ a: S.number }).pipe(

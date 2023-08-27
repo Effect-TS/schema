@@ -189,14 +189,14 @@ describe.concurrent("Schema/record", () => {
 
   describe.concurrent("encoding", () => {
     // raises an error while encoding if the string is not a char
-    const Char = S.string.pipe(S.maxLength(1))
+    const Char = S.string.pipe(S.length(1))
 
     it("key error", async () => {
       const schema = S.record(Char, S.string)
       await Util.expectEncodeFailure(
         schema,
         { aa: "a" },
-        `/aa Expected a string at most 1 character(s) long, actual "aa"`
+        `/aa Expected a character, actual "aa"`
       )
     })
 
@@ -205,7 +205,7 @@ describe.concurrent("Schema/record", () => {
       await Util.expectEncodeFailure(
         schema,
         { a: "aa" },
-        `/a Expected a string at most 1 character(s) long, actual "aa"`
+        `/a Expected a character, actual "aa"`
       )
     })
   })

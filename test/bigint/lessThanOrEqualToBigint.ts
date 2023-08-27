@@ -9,7 +9,7 @@ describe.concurrent("bigint/lessThanOrEqualToBigint", () => {
     await Util.expectParseFailure(
       schema,
       1n,
-      "Expected a bigint less than or equal to 0n, actual 1n"
+      "Expected a non-positive bigint, actual 1n"
     )
   })
 

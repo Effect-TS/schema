@@ -10,7 +10,7 @@ describe.concurrent("string/nonEmpty", () => {
     await Util.expectParseFailure(
       schema,
       "",
-      `Expected a string at least 1 character(s) long, actual ""`
+      `Expected a non empty string, actual ""`
     )
   })
 })

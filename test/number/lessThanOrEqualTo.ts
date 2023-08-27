@@ -22,7 +22,7 @@ describe.concurrent("number/lessThanOrEqualTo", () => {
     await Util.expectParseFailure(
       schema,
       1,
-      `Expected a number less than or equal to 0, actual 1`
+      `Expected a non-positive number, actual 1`
     )
   })
 

@@ -9,12 +9,12 @@ describe.concurrent("string/length", () => {
     await Util.expectParseFailure(
       schema,
       "",
-      `Expected a string at least 1 character(s) long, actual ""`
+      `Expected a character, actual ""`
     )
     await Util.expectParseFailure(
       schema,
       "aa",
-      `Expected a string at most 1 character(s) long, actual "aa"`
+      `Expected a character, actual "aa"`
     )
   })
 })

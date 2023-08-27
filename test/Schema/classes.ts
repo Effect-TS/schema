@@ -59,7 +59,7 @@ describe("Schema/classes", () => {
     expect(() => new Person({ id: 1, name: "" })).toThrowError(
       new Error(`error(s) found
 └─ ["name"]
-   └─ Expected a string at least 1 character(s) long, actual ""`)
+   └─ Expected a non empty string, actual ""`)
     )
   })
 
