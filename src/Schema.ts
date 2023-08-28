@@ -1203,22 +1203,22 @@ export function filter<A>(
 export const transformResult: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>,
+    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult<A1>,
     annotations?: AST.Annotated["annotations"]
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>,
+    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult<A1>,
     annotations?: AST.Annotated["annotations"]
   ): Schema<I1, A2>
 } = dual(4, <I1, A1, I2, A2>(
   from: Schema<I1, A1>,
   to: Schema<I2, A2>,
-  decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-  encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>,
+  decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult<I2>,
+  encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult<A1>,
   annotations?: AST.Annotated["annotations"]
 ): Schema<I1, A2> =>
   make(
@@ -1774,20 +1774,19 @@ export const parseJson = <I, A extends string>(self: Schema<I, A>, options?: {
   replacer?: Parameters<typeof JSON.stringify>[1]
   space?: Parameters<typeof JSON.stringify>[2]
 }): Schema<I, unknown> => {
-  const schema: Schema<I, unknown> = transformResult(self, unknown, (s) => {
+  return transformResult(self, unknown, (s, _, ast) => {
     try {
       return PR.success<unknown>(JSON.parse(s, options?.reviver))
     } catch (e: any) {
-      return PR.failure(PR.type(schema.ast, s, e.message))
+      return PR.failure(PR.type(ast, s, e.message))
     }
-  }, (u) => {
+  }, (u, _, ast) => {
     try {
       return PR.success(JSON.stringify(u, options?.replacer, options?.space) as A) // this is safe because `self` will check its input anyway
     } catch (e: any) {
-      return PR.failure(PR.type(schema.ast, u, e.message))
+      return PR.failure(PR.type(ast, u, e.message))
     }
   })
-  return schema
 }
 
 // ---------------------------------------------
@@ -2137,10 +2136,10 @@ export const clamp =
  * @since 1.0.0
  */
 export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, number> => {
-  const schema: Schema<I, number> = transformResult(
+  return transformResult(
     self,
     number,
-    (s) => {
+    (s, _, ast) => {
       if (s === "NaN") {
         return PR.success(NaN)
       }
@@ -2151,14 +2150,13 @@ export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schem
         return PR.success(-Infinity)
       }
       if (s.trim() === "") {
-        return PR.failure(PR.type(schema.ast, s))
+        return PR.failure(PR.type(ast, s))
       }
       const n = Number(s)
-      return isNaN(n) ? PR.failure(PR.type(schema.ast, s)) : PR.success(n)
+      return isNaN(n) ? PR.failure(PR.type(ast, s)) : PR.success(n)
     },
     (n) => PR.success(String(n) as A) // this is safe because `self` will check its input anyway
   )
-  return schema
 }
 
 // ---------------------------------------------
@@ -2472,23 +2470,22 @@ export const clampBigint =
  * @since 1.0.0
  */
 export const bigintFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, bigint> => {
-  const schema: Schema<I, bigint> = transformResult(
+  return transformResult(
     self,
     bigint,
-    (s) => {
+    (s, _, ast) => {
       if (s.trim() === "") {
-        return PR.failure(PR.type(schema.ast, s))
+        return PR.failure(PR.type(ast, s))
       }
 
       try {
         return PR.success(BigInt(s))
       } catch (_) {
-        return PR.failure(PR.type(schema.ast, s))
+        return PR.failure(PR.type(ast, s))
       }
     },
     (n) => PR.success(String(n) as A) // this is safe because `self` will check its input anyway
   )
-  return schema
 }
 
 /**
@@ -2502,25 +2499,24 @@ export const bigintFromString = <I, A extends string>(self: Schema<I, A>): Schem
  * @since 1.0.0
  */
 export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schema<I, bigint> => {
-  const schema: Schema<I, bigint> = transformResult(
+  return transformResult(
     self,
     bigint,
-    (n) => {
+    (n, _, ast) => {
       try {
         return PR.success(BigInt(n))
       } catch (_) {
-        return PR.failure(PR.type(schema.ast, n))
+        return PR.failure(PR.type(ast, n))
       }
     },
-    (b) => {
+    (b, _, ast) => {
       if (b > I.maxSafeInteger || b < I.minSafeInteger) {
-        return PR.failure(PR.type(schema.ast, b))
+        return PR.failure(PR.type(ast, b))
       }
 
       return PR.success(Number(b) as A)
     }
   )
-  return schema
 }
 
 // ---------------------------------------------
@@ -2715,11 +2711,11 @@ export const ValidDateFromSelf = DateFromSelf.pipe(validDate())
   @since 1.0.0
 */
 export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, Date> =>
-  transformResult(
+  transform(
     self,
     ValidDateFromSelf,
-    (s) => PR.success(new Date(s)),
-    (n) => PR.success(n.toISOString() as A) // this is safe because `self` will check its input anyway
+    (s) => new Date(s),
+    (n) => n.toISOString() as A // this is safe because `self` will check its input anyway
   )
 
 const _Date: Schema<string, Date> = dateFromString(string)

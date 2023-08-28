@@ -26,7 +26,7 @@ describe.concurrent("Schema/annotations", () => {
       await Util.expectParseFailure(schema, "", "custom message")
     })
 
-    it.skip("transformations", async () => {
+    it("transformations", async () => {
       const schema = S.NumberFromString.pipe(S.message(() => "custom message"))
       await Util.expectParseFailure(schema, "", "custom message")
     })
