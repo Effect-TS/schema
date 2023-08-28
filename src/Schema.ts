@@ -959,6 +959,24 @@ export interface BrandSchema<From, To extends Brand<any>>
   extends Schema<From, To>, Brand.Constructor<To>
 {}
 
+const appendBrandAnnotation = <B extends string | symbol, A>(
+  ast: AST.AST,
+  brand: B,
+  options?: DocAnnotations<A>
+): AST.AST => {
+  if (AST.isTransform(ast)) {
+    return AST.createTransform(
+      ast.from,
+      appendBrandAnnotation(ast.to, brand, options),
+      ast.transformAST,
+      ast.annotations
+    )
+  }
+  const annotations = toAnnotations(options)
+  annotations[AST.BrandAnnotationId] = [...getBrands(ast), brand]
+  return AST.mergeAnnotations(ast, annotations)
+}
+
 /**
  * Returns a nominal branded schema by applying a brand to a given schema.
  *
@@ -983,9 +1001,7 @@ export const brand = <B extends string | symbol, A>(
   options?: DocAnnotations<A>
 ) =>
 <I>(self: Schema<I, A>): BrandSchema<I, A & Brand<B>> => {
-  const annotations = toAnnotations(options)
-  annotations[AST.BrandAnnotationId] = [...getBrands(self.ast), brand]
-  const ast = AST.mergeAnnotations(self.ast, annotations)
+  const ast = appendBrandAnnotation(self.ast, brand, options)
   const schema = make(ast)
   const validate = P.validateSync(schema)
   const validateOption = P.validateOption(schema)
