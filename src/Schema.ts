@@ -2945,7 +2945,7 @@ export const trim = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
  * @category type id
  * @since 1.0.0
  */
-export const LowercasedTypeId = "@effect/schema/LowercasedTypeId"
+export const LowercasedTypeId = Symbol.for("@effect/schema/TypeId/Lowercased")
 
 /**
  * Verifies that a string is lowercased
@@ -2957,7 +2957,7 @@ export const LowercasedTypeId = "@effect/schema/LowercasedTypeId"
  * @since 1.0.0
  */
 export const lowercased =
-  <A extends string>(options?: AnnotationOptions<A>) => <I>(self: Schema<I, A>): Schema<I, A> =>
+  <A extends string>(options?: FilterAnnotations<A>) => <I>(self: Schema<I, A>): Schema<I, A> =>
     self.pipe(
       filter((a): a is A => a === a.toLowerCase(), {
         typeId: LowercasedTypeId,
