@@ -2,4 +2,4 @@
 "@effect/schema": minor
 ---
 
-change transformResult signature (add addition ast parameter to transformations)
+change transformResult signature (add additional ast parameter to transformations)
