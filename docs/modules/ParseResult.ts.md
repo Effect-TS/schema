@@ -13,6 +13,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [constructors](#constructors)
+  - [fail](#fail)
   - [failure](#failure)
   - [failures](#failures)
   - [forbidden](#forbidden)
@@ -33,9 +34,11 @@ Added in v1.0.0
   - [Unexpected (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
 - [optimisation](#optimisation)
+  - [bimap](#bimap)
   - [eitherOrUndefined](#eitherorundefined)
   - [flatMap](#flatmap)
   - [map](#map)
+  - [mapLeft](#mapleft)
 - [utils](#utils)
   - [ParseError (interface)](#parseerror-interface)
   - [ParseResult (type alias)](#parseresult-type-alias)
@@ -44,6 +47,16 @@ Added in v1.0.0
 ---
 
 # constructors
+
+## fail
+
+**Signature**
+
+```ts
+export declare const fail: (error: ParseError) => ParseResult<never>
+```
+
+Added in v1.0.0
 
 ## failure
 
@@ -279,6 +292,20 @@ Added in v1.0.0
 
 # optimisation
 
+## bimap
+
+**Signature**
+
+```ts
+export declare const bimap: <A, B>(
+  self: ParseResult<A>,
+  f: (e1: ParseError) => ParseError,
+  g: (a: A) => B
+) => ParseResult<B>
+```
+
+Added in v1.0.0
+
 ## eitherOrUndefined
 
 **Signature**
@@ -305,6 +332,16 @@ Added in v1.0.0
 
 ```ts
 export declare const map: <A, B>(self: ParseResult<A>, f: (self: A) => B) => ParseResult<B>
+```
+
+Added in v1.0.0
+
+## mapLeft
+
+**Signature**
+
+```ts
+export declare const mapLeft: <A>(self: ParseResult<A>, f: (e1: ParseError) => ParseError) => ParseResult<A>
 ```
 
 Added in v1.0.0

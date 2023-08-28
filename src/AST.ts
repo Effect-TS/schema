@@ -918,6 +918,10 @@ export interface Transform extends Annotated {
   readonly transformAST: TransformAST
 }
 
+/**
+ * @category model
+ * @since 1.0.0
+ */
 export const createTransform = (
   from: AST,
   to: AST,

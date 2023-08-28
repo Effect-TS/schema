@@ -51,7 +51,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ArbitraryHookId: '@effect/schema/ArbitraryHookId'
+export declare const ArbitraryHookId: symbol
 ```
 
 Added in v1.0.0

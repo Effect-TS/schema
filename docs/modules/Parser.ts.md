@@ -35,6 +35,7 @@ Added in v1.0.0
   - [parseSync](#parsesync)
 - [utils](#utils)
   - [ToAsserts (type alias)](#toasserts-type-alias)
+  - [defaultParseOption](#defaultparseoption)
 - [validation](#validation)
   - [asserts](#asserts)
   - [is](#is)
@@ -56,7 +57,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Effect.Effect<never, PR.ParseError, A>
+) => (i: I, options?: ParseOptions) => Effect.Effect<never, PR.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -98,9 +99,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const decodeResult: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => ParseResult<A>
+export declare const decodeResult: <I, A>(schema: Schema<I, A>) => (i: I, options?: ParseOptions) => ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -258,6 +257,16 @@ export type ToAsserts<S extends Schema<any>> = (input: unknown, options?: ParseO
 ```
 
 Added in v1.0.0
+
+## defaultParseOption
+
+**Signature**
+
+```ts
+export declare const defaultParseOption: ParseOptions
+```
+
+Added in v1.0.0"
 
 # validation
 
