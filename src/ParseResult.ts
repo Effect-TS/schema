@@ -170,10 +170,9 @@ export interface Unexpected {
  * @category constructors
  * @since 1.0.0
  */
-export const unexpected = (actual: unknown): Unexpected => ({
-  _tag: "Unexpected",
-  actual
-})
+export const unexpected = (
+  actual: unknown
+): Unexpected => ({ _tag: "Unexpected", actual })
 
 /**
  * Error that occurs when a member in a union has an error.
@@ -190,10 +189,9 @@ export interface UnionMember {
  * @category constructors
  * @since 1.0.0
  */
-export const unionMember = (errors: NonEmptyReadonlyArray<ParseErrors>): UnionMember => ({
-  _tag: "UnionMember",
-  errors
-})
+export const unionMember = (
+  errors: NonEmptyReadonlyArray<ParseErrors>
+): UnionMember => ({ _tag: "UnionMember", errors })
 
 /**
  * @category constructors
@@ -205,7 +203,13 @@ export const success: <A>(a: A) => ParseResult<A> = E.right
  * @category constructors
  * @since 1.0.0
  */
-export const failure = (e: ParseErrors): ParseResult<never> => E.left(parseError([e]))
+export const fail: (error: ParseError) => ParseResult<never> = E.left
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const failure = (e: ParseErrors): ParseResult<never> => fail(parseError([e]))
 
 /**
  * @category constructors
@@ -218,9 +222,7 @@ export const failures = (es: NonEmptyReadonlyArray<ParseErrors>): ParseResult<ne
  * @category optimisation
  * @since 1.0.0
  */
-export const eitherOrUndefined = <A>(
-  self: ParseResult<A>
-): E.Either<ParseError, A> | undefined => {
+export const eitherOrUndefined = <A>(self: ParseResult<A>): E.Either<ParseError, A> | undefined => {
   const s: any = self
   if (s["_tag"] === "Left" || s["_tag"] === "Right") {
     return s
@@ -258,4 +260,41 @@ export const map = <A, B>(self: ParseResult<A>, f: (self: A) => B): ParseResult<
     return E.right(f(s.right))
   }
   return Effect.map(self, f)
+}
+
+/**
+ * @category optimisation
+ * @since 1.0.0
+ */
+export const mapLeft = <A>(
+  self: ParseResult<A>,
+  f: (e1: ParseError) => ParseError
+): ParseResult<A> => {
+  const s: any = self
+  if (s["_tag"] === "Left") {
+    return E.left(f(s.left))
+  }
+  if (s["_tag"] === "Right") {
+    s
+  }
+  return Effect.mapError(self, f)
+}
+
+/**
+ * @category optimisation
+ * @since 1.0.0
+ */
+export const bimap = <A, B>(
+  self: ParseResult<A>,
+  f: (e1: ParseError) => ParseError,
+  g: (a: A) => B
+): ParseResult<B> => {
+  const s: any = self
+  if (s["_tag"] === "Left") {
+    return E.left(f(s.left))
+  }
+  if (s["_tag"] === "Right") {
+    return E.right(g(s.right))
+  }
+  return Effect.mapBoth(self, { onFailure: f, onSuccess: g })
 }

@@ -1,8 +1,5 @@
 import * as A from "@effect/schema/Arbitrary"
-import * as AST from "@effect/schema/AST"
-import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
-import * as Util from "@effect/schema/test/util"
 import * as fc from "fast-check"
 
 const doProperty = true
@@ -34,17 +31,6 @@ describe.concurrent("Arbitrary/Arbitrary", () => {
     const schema = S.NumberFromString
     expect(() => A.go(schema.ast)).toThrowError(
       new Error("cannot build an Arbitrary for transformations")
-    )
-  })
-
-  it("should throw on effectful refinements", () => {
-    const ast = AST.createRefinement(
-      S.number.ast,
-      Util.effectifyDecode(PR.success),
-      false
-    )
-    expect(() => fc.sample(A.go(ast)(fc), 1)).toThrowError(
-      new Error("cannot build an Arbitrary for effectful refinements")
     )
   })
 

@@ -36,7 +36,7 @@ describe.concurrent("Chunk/chunkFromSelf", () => {
     )
   })
 
-  it("encodin", async () => {
+  it("encoding", async () => {
     const schema = S.chunkFromSelf(S.NumberFromString)
     await Util.expectEncodeSuccess(schema, C.empty(), C.empty())
     await Util.expectEncodeSuccess(

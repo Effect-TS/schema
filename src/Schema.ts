@@ -358,14 +358,15 @@ export const declare = (
   typeParameters: ReadonlyArray<Schema<any>>,
   type: Schema<any>,
   decode: (
+    isDecoding: boolean,
     ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
   annotations?: AST.Annotated["annotations"]
 ): Schema<any> =>
   make(AST.createDeclaration(
     typeParameters.map((tp) => tp.ast),
     type.ast,
-    (...typeParameters) => decode(...typeParameters.map(make)),
+    (isDecoding, ...typeParameters) => decode(isDecoding, ...typeParameters.map(make)),
     annotations
   ))
 
@@ -482,79 +483,127 @@ export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly FromIsOptional: FromIsOptional
   readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
-  readonly optional: () => PropertySignature<From, true, To, true>
+}
+
+/**
+ * @since 1.0.0
+ */
+export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
+{
   readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
   readonly toOption: () => PropertySignature<From, true, Option<To>, false>
 }
 
-class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional>
-  implements PropertySignature<From, FromIsOptional, To, ToIsOptional>
+const SchemaPropertySignatureTypeId: unique symbol = Symbol.for(
+  "@effect/schema/SchemaPropertySignature"
+)
+
+/**
+ * @since 1.0.0
+ * @category symbol
+ */
+export type SchemaPropertySignatureTypeId = typeof SchemaPropertySignatureTypeId
+
+/**
+ * @since 1.0.0
+ */
+export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
 {
+  readonly _id: SchemaPropertySignatureTypeId
+}
+
+/**
+ * @since 1.0.0
+ */
+export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
+{
+  readonly _id: SchemaPropertySignatureTypeId
+}
+
+/** @internal */
+export type PropertySignatureConfig =
+  | {
+    readonly _tag: "PropertySignature"
+    readonly ast: AST.AST
+    readonly annotations: AST.Annotated["annotations"]
+  }
+  | {
+    readonly _tag: "Optional"
+    readonly ast: AST.AST
+    readonly annotations: AST.Annotated["annotations"] | undefined
+  }
+  | {
+    readonly _tag: "Default"
+    readonly ast: AST.AST
+    readonly value: LazyArg<any>
+    readonly annotations: AST.Annotated["annotations"] | undefined
+  }
+  | {
+    readonly _tag: "Option"
+    readonly ast: AST.AST
+    readonly annotations: AST.Annotated["annotations"] | undefined
+  }
+
+/** @internal */
+export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
+  readonly _id: SchemaPropertySignatureTypeId = SchemaPropertySignatureTypeId
   readonly From!: (_: From) => From
   readonly FromIsOptional!: FromIsOptional
   readonly To!: (_: To) => To
   readonly ToIsOptional!: ToIsOptional
 
   constructor(
-    readonly _from: AST.AST,
-    readonly _annotations?: AST.Annotated["annotations"],
-    readonly _optional?:
-      | { readonly to: "optional" }
-      | { readonly to: "Option" }
-      | {
-        readonly to: "default"
-        readonly value: LazyArg<To>
-      }
+    readonly config: PropertySignatureConfig
   ) {}
 
-  optional(): PropertySignature<From, true, To, true> {
-    if (this._optional) {
-      throw new Error(`duplicate optional configuration`)
-    }
-    return new PropertySignatureImpl(this._from, this._annotations, { to: "optional" })
+  withDefault(value: () => To): SchemaPropertySignature<From, true, To, false> {
+    return new PropertySignatureImpl(
+      {
+        _tag: "Default",
+        ast: this.config.ast,
+        value,
+        annotations: this.config.annotations
+      }
+    )
   }
 
-  withDefault(value: () => To): PropertySignature<From, true, To, false> {
-    if (this._optional && this._optional.to !== "optional") {
-      throw new Error(`duplicate optional configuration`)
-    }
-    return new PropertySignatureImpl(this._from, this._annotations, { to: "default", value })
-  }
-
-  toOption(): PropertySignature<From, true, Option<To>, false> {
-    if (this._optional && this._optional.to !== "optional") {
-      throw new Error(`duplicate optional configuration`)
-    }
-    return new PropertySignatureImpl(this._from, this._annotations, { to: "Option" })
+  toOption(): SchemaPropertySignature<From, true, Option<To>, false> {
+    return new PropertySignatureImpl({
+      _tag: "Option",
+      ast: this.config.ast,
+      annotations: this.config.annotations
+    })
   }
 }
 
 /**
  * @since 1.0.0
- * @category constructors
  */
 export const propertySignature = <I, A>(
   schema: Schema<I, A>,
-  annotations?: AST.Annotated["annotations"]
-): PropertySignature<I, false, A, false> => new PropertySignatureImpl(schema.ast, annotations)
+  options: DocAnnotations<A>
+): PropertySignature<I, false, A, false> =>
+  new PropertySignatureImpl({
+    _tag: "PropertySignature",
+    ast: schema.ast,
+    annotations: toAnnotations(options)
+  })
 
 /**
  * @since 1.0.0
  */
 export const optional = <I, A>(
   schema: Schema<I, A>,
-  annotations?: AST.Annotated["annotations"]
-): PropertySignature<I, true, A, true> => propertySignature(schema, annotations).optional()
-
-/**
- * @since 1.0.0
- */
-export type ToOptionalKeys<Fields> = {
-  [K in keyof Fields]: Fields[K] extends
-    | PropertySignature<any, boolean, any, true>
-    | PropertySignature<never, boolean, never, true> ? K
-    : never
-}[keyof Fields]
+  options?: DocAnnotations<A>
+): OptionalPropertySignature<I, true, A, true> =>
+  new PropertySignatureImpl({
+    _tag: "Optional",
+    ast: schema.ast,
+    annotations: toAnnotations(options)
+  })
 
 /**
  * @since 1.0.0
@@ -569,10 +618,20 @@ export type FromOptionalKeys<Fields> = {
 /**
  * @since 1.0.0
  */
+export type ToOptionalKeys<Fields> = {
+  [K in keyof Fields]: Fields[K] extends
+    | PropertySignature<any, boolean, any, true>
+    | PropertySignature<never, boolean, never, true> ? K
+    : never
+}[keyof Fields]
+
+/**
+ * @since 1.0.0
+ */
 export type StructFields = Record<
   PropertyKey,
-  | Schema<any>
-  | Schema<never>
+  | Schema<any, any>
+  | Schema<never, never>
   | PropertySignature<any, boolean, any, boolean>
   | PropertySignature<never, boolean, never, boolean>
 >
@@ -604,99 +663,75 @@ export const struct = <
   Simplify<ToStruct<Fields>>
 > => {
   const ownKeys = I.ownKeys(fields)
-  const propertySignatures: Array<AST.PropertySignature> = []
-  const fromPropertySignatures: Array<AST.PropertySignature> = []
-  const toPropertySignatures: Array<AST.PropertySignature> = []
+  const pss: Array<AST.PropertySignature> = []
+  const froms: Array<AST.PropertySignature> = []
+  const tos: Array<AST.PropertySignature> = []
   const propertySignatureTransformations: Array<AST.PropertySignatureTransformation> = []
   for (let i = 0; i < ownKeys.length; i++) {
     const key = ownKeys[i]
-    const field: Schema<any> | PropertySignatureImpl<any, boolean, any, boolean> =
-      fields[key] as any
-    if (field instanceof PropertySignatureImpl) {
-      const optional = field._optional
-      if (optional) {
-        switch (optional.to) {
-          case "optional": {
-            propertySignatures.push(
-              AST.createPropertySignature(key, field._from, true, true, field._annotations)
-            )
-            fromPropertySignatures.push(AST.createPropertySignature(key, field._from, true, true))
-            toPropertySignatures.push(
-              AST.createPropertySignature(
-                key,
-                AST.to(field._from),
-                true,
-                true,
-                field._annotations
+    const field = fields[key] as any
+    if ("config" in field) {
+      const config: PropertySignatureConfig = field.config
+      const from = config.ast
+      const to = AST.to(from)
+      const annotations = config.annotations
+      switch (config._tag) {
+        case "PropertySignature":
+          pss.push(AST.createPropertySignature(key, from, false, true, annotations))
+          froms.push(AST.createPropertySignature(key, from, false, true))
+          tos.push(AST.createPropertySignature(key, to, false, true, annotations))
+          break
+        case "Optional":
+          pss.push(AST.createPropertySignature(key, from, true, true, annotations))
+          froms.push(AST.createPropertySignature(key, from, true, true))
+          tos.push(AST.createPropertySignature(key, to, true, true, annotations))
+          break
+        case "Default":
+          froms.push(AST.createPropertySignature(key, from, true, true))
+          tos.push(AST.createPropertySignature(key, to, false, true, annotations))
+          propertySignatureTransformations.push(
+            AST.createPropertySignatureTransformation(
+              key,
+              key,
+              AST.createFinalPropertySignatureTransformation(
+                O.orElse(() => O.some(config.value())),
+                identity
               )
             )
-            break
-          }
-          case "default": {
-            fromPropertySignatures.push(AST.createPropertySignature(key, field._from, true, true))
-            toPropertySignatures.push(
-              AST.createPropertySignature(
-                key,
-                AST.to(field._from),
-                false,
-                true,
-                field._annotations
-              )
+          )
+          break
+        case "Option":
+          froms.push(AST.createPropertySignature(key, from, true, true))
+          tos.push(
+            AST.createPropertySignature(key, optionFromSelf(make(to)).ast, false, true, annotations)
+          )
+          propertySignatureTransformations.push(
+            AST.createPropertySignatureTransformation(
+              key,
+              key,
+              AST.createFinalPropertySignatureTransformation(O.some, O.flatten)
             )
-            propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
-              key,
-              key,
-              O.orElse(() => O.some(optional.value())),
-              identity
-            ))
-            break
-          }
-          case "Option": {
-            fromPropertySignatures.push(AST.createPropertySignature(key, field._from, true, true))
-            toPropertySignatures.push(
-              AST.createPropertySignature(
-                key,
-                optionFromSelf(make(AST.to(field._from))).ast,
-                false,
-                true,
-                field._annotations
-              )
-            )
-            propertySignatureTransformations.push(AST.createPropertySignatureTransformation(
-              key,
-              key,
-              O.some,
-              O.flatten
-            ))
-            break
-          }
-        }
-      } else {
-        propertySignatures.push(
-          AST.createPropertySignature(key, field._from, false, true, field._annotations)
-        )
-        fromPropertySignatures.push(AST.createPropertySignature(key, field._from, false, true))
-        toPropertySignatures.push(
-          AST.createPropertySignature(key, AST.to(field._from), false, true, field._annotations)
-        )
+          )
+          break
       }
     } else {
-      propertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-      fromPropertySignatures.push(AST.createPropertySignature(key, field.ast, false, true))
-      toPropertySignatures.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
+      pss.push(AST.createPropertySignature(key, field.ast, false, true))
+      froms.push(AST.createPropertySignature(key, field.ast, false, true))
+      tos.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
     }
   }
-  if (propertySignatureTransformations.length > 0) {
+  if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
     return make(
-      AST.createTransformByPropertySignatureTransformations(
-        AST.createTypeLiteral(fromPropertySignatures, []),
-        AST.createTypeLiteral(toPropertySignatures, []),
-        propertySignatureTransformations
+      AST.createTransform(
+        AST.createTypeLiteral(froms, []),
+        AST.createTypeLiteral(tos, []),
+        AST.createTypeLiteralTransformation(
+          propertySignatureTransformations
+        )
       )
     )
-  } else {
-    return make(AST.createTypeLiteral(propertySignatures, []))
   }
+  return make(AST.createTypeLiteral(pss, []))
 }
 
 /**
@@ -709,16 +744,23 @@ export const pick =
     self: Schema<I, A>
   ): Schema<Simplify<Pick<I, Keys[number]>>, Simplify<Pick<A, Keys[number]>>> => {
     const ast = self.ast
-    if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
-      return make(
-        AST.createTransformByPropertySignatureTransformations(
-          AST.pick(ast.from, keys),
-          AST.pick(ast.to, keys),
-          ast.propertySignatureTransformations.filter((t) =>
-            (keys as ReadonlyArray<PropertyKey>).includes(t.to)
+    if (AST.isTransform(ast)) {
+      if (AST.isTypeLiteralTransformation(ast.transformAST)) {
+        const propertySignatureTransformations = ast.transformAST.propertySignatureTransformations
+          .filter((t) => (keys as ReadonlyArray<PropertyKey>).includes(t.to))
+        if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
+          return make(
+            AST.createTransform(
+              AST.pick(ast.from, keys),
+              AST.pick(ast.to, keys),
+              AST.createTypeLiteralTransformation(propertySignatureTransformations)
+            )
           )
-        )
-      )
+        } else {
+          return make(AST.pick(ast.from, keys))
+        }
+      }
+      throw new Error(`pick: cannot handle this kind of transformation`)
     }
     return make(AST.pick(ast, keys))
   }
@@ -733,16 +775,23 @@ export const omit =
     self: Schema<I, A>
   ): Schema<Simplify<Omit<I, Keys[number]>>, Simplify<Omit<A, Keys[number]>>> => {
     const ast = self.ast
-    if (AST.isTransform(ast) && ast.propertySignatureTransformations.length > 0) {
-      return make(
-        AST.createTransformByPropertySignatureTransformations(
-          AST.omit(ast.from, keys),
-          AST.omit(ast.to, keys),
-          ast.propertySignatureTransformations.filter((t) =>
-            !(keys as ReadonlyArray<PropertyKey>).includes(t.to)
+    if (AST.isTransform(ast)) {
+      if (AST.isTypeLiteralTransformation(ast.transformAST)) {
+        const propertySignatureTransformations = ast.transformAST.propertySignatureTransformations
+          .filter((t) => !(keys as ReadonlyArray<PropertyKey>).includes(t.to))
+        if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
+          return make(
+            AST.createTransform(
+              AST.omit(ast.from, keys),
+              AST.omit(ast.to, keys),
+              AST.createTypeLiteralTransformation(propertySignatureTransformations)
+            )
           )
-        )
-      )
+        } else {
+          return make(AST.omit(ast.from, keys))
+        }
+      }
+      throw new Error(`omit: cannot handle this kind of transformation`)
     }
     return make(AST.omit(ast, keys))
   }
@@ -834,7 +883,8 @@ export const record = <K extends string | symbol, I, A>(
 ): Schema<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
   make(AST.createRecord(key.ast, value.ast, true))
 
-const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST.AST>) => {
+/** @internal */
+export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST.AST>) => {
   return AST.createUnion(
     xs.flatMap((x) => {
       return ys.map((y) => {
@@ -846,7 +896,7 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
               x.indexSignatures.concat(y.indexSignatures)
             )
           } else if (
-            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
+            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             // isTypeLiteral(x) && isTransform(y)
@@ -858,14 +908,16 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
               AST.getToPropertySignatures(x.propertySignatures).concat(y.to.propertySignatures),
               AST.getToIndexSignatures(x.indexSignatures).concat(y.to.indexSignatures)
             )
-            return AST.createTransformByPropertySignatureTransformations(
+            return AST.createTransform(
               from,
               to,
-              y.propertySignatureTransformations
+              AST.createTypeLiteralTransformation(
+                y.transformAST.propertySignatureTransformations
+              )
             )
           }
         } else if (
-          AST.isTransform(x) && x.propertySignatureTransformations.length > 0 &&
+          AST.isTransform(x) && AST.isTypeLiteralTransformation(x.transformAST) &&
           AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
         ) {
           if (AST.isTypeLiteral(y)) {
@@ -878,13 +930,15 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
               x.to.propertySignatures.concat(AST.getToPropertySignatures(y.propertySignatures)),
               x.to.indexSignatures.concat(AST.getToIndexSignatures(y.indexSignatures))
             )
-            return AST.createTransformByPropertySignatureTransformations(
+            return AST.createTransform(
               from,
               to,
-              x.propertySignatureTransformations
+              AST.createTypeLiteralTransformation(
+                x.transformAST.propertySignatureTransformations
+              )
             )
           } else if (
-            AST.isTransform(y) && y.propertySignatureTransformations.length > 0 &&
+            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             // isTransform(x) && isTransform(y)
@@ -896,13 +950,14 @@ const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyArray<AST
               x.to.propertySignatures.concat(y.to.propertySignatures),
               x.to.indexSignatures.concat(y.to.indexSignatures)
             )
-            const propertySignatureTransformations = x.propertySignatureTransformations.concat(
-              y.propertySignatureTransformations
-            )
-            return AST.createTransformByPropertySignatureTransformations(
+            return AST.createTransform(
               from,
               to,
-              propertySignatureTransformations
+              AST.createTypeLiteralTransformation(
+                x.transformAST.propertySignatureTransformations.concat(
+                  y.transformAST.propertySignatureTransformations
+                )
+              )
             )
           }
         }
@@ -946,8 +1001,8 @@ export const compose: {
   <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
 } = dual(
   2,
-  <A, B, C>(ab: Schema<A, B>, cd: Schema<B, C>): Schema<A, C> =>
-    transform(ab, cd, identity, identity)
+  <A, B, C, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D> =>
+    make(AST.createTransform(ab.ast, cd.ast, AST.composeTransformation))
 )
 
 /**
@@ -1037,16 +1092,12 @@ export function filter<A>(
   predicate: Predicate<A>,
   options?: FilterAnnotations<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> {
-  return (self) => {
-    const decode = (a: A) => predicate(a) ? PR.success(a) : PR.failure(PR.type(ast, a))
-    const ast: AST.Refinement = AST.createRefinement(
+  return (self) =>
+    make(AST.createRefinement(
       self.ast,
-      decode,
-      false,
+      (a: A, _, ast: AST.AST) => predicate(a) ? O.none() : O.some(PR.parseError([PR.type(ast, a)])),
       toAnnotations(options)
-    )
-    return make(ast)
-  }
+    ))
 }
 
 /**
@@ -1060,20 +1111,31 @@ export const transformResult: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
     decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
+    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>,
+    annotations?: AST.Annotated["annotations"]
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
     to: Schema<I2, A2>,
     decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
+    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>,
+    annotations?: AST.Annotated["annotations"]
   ): Schema<I1, A2>
 } = dual(4, <I1, A1, I2, A2>(
   from: Schema<I1, A1>,
   to: Schema<I2, A2>,
   decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-  encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
-): Schema<I1, A2> => make(AST.createTransform(from.ast, to.ast, decode, encode)))
+  encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>,
+  annotations?: AST.Annotated["annotations"]
+): Schema<I1, A2> =>
+  make(
+    AST.createTransform(
+      from.ast,
+      to.ast,
+      AST.createFinalTransformation(decode, encode),
+      annotations
+    )
+  ))
 
 /**
   Create a new `Schema` by transforming the input and output of an existing `Schema`
@@ -1133,21 +1195,39 @@ export const transform: {
  * @category combinators
  * @since 1.0.0
  */
-export const attachPropertySignature = <K extends PropertyKey, V extends AST.LiteralValue>(
+export const attachPropertySignature: {
+  <K extends PropertyKey, V extends AST.LiteralValue>(
+    key: K,
+    value: V
+  ): <I, A extends object>(
+    schema: Schema<I, A>
+  ) => Schema<I, Simplify<A & { readonly [k in K]: V }>>
+  <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
+    schema: Schema<I, A>,
+    key: K,
+    value: V
+  ): Schema<I, Simplify<A & { readonly [k in K]: V }>>
+} = dual(3, <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
+  schema: Schema<I, A>,
   key: K,
   value: V
-) =>
-<I, A extends object>(schema: Schema<I, A>): Schema<I, Simplify<A & { readonly [k in K]: V }>> =>
-  make(AST.createTransformByPropertySignatureTransformations(
+): Schema<I, Simplify<A & { readonly [k in K]: V }>> =>
+  make(AST.createTransform(
     schema.ast,
     to(schema).pipe(extend(struct({ [key]: literal(value) }))).ast,
-    [AST.createPropertySignatureTransformation(
-      key,
-      key,
-      () => O.some(value),
-      () => O.none()
-    )]
-  ))
+    AST.createTypeLiteralTransformation(
+      [
+        AST.createPropertySignatureTransformation(
+          key,
+          key,
+          AST.createFinalPropertySignatureTransformation(
+            () => O.some(value),
+            () => O.none()
+          )
+        )
+      ]
+    )
+  )))
 
 // ---------------------------------------------
 // annotations
@@ -1723,26 +1803,24 @@ export const not = <I>(self: Schema<I, boolean>): Schema<I, boolean> =>
 export const BrandTypeId = Symbol.for("@effect/schema/TypeId/Brand")
 
 /**
- * @category combinators
+ * @category constructors
  * @since 1.0.0
  */
 export const fromBrand = <C extends Brand<string | symbol>>(
   constructor: Brand.Constructor<C>,
   options?: FilterAnnotations<Brand.Unbranded<C>>
 ) =>
-<I, A extends Brand.Unbranded<C>>(self: Schema<I, A>): Schema<I, A & C> => {
-  const decode = (a: A): ParseResult<C> =>
-    E.mapLeft(
-      constructor.either(a),
-      (brandErrors) =>
-        PR.parseError([PR.type(ast, a, brandErrors.map((v) => v.message).join(", "))])
-    )
-
+<A extends Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
+  const filter = (a: A, _: ParseOptions, self: AST.AST): Option<PR.ParseError> => {
+    const e = constructor.either(a)
+    return E.isLeft(e) ?
+      O.some(PR.parseError([PR.type(self, a, e.left.map((v) => v.message).join(", "))])) :
+      O.none()
+  }
   const ast = AST.createRefinement(
     self.ast,
-    decode,
-    false,
-    toAnnotations({ typeId: BrandTypeId, ...options })
+    filter,
+    toAnnotations({ typeId: { id: BrandTypeId, params: { constructor } }, ...options })
   )
   return make(ast)
 }
@@ -1762,17 +1840,17 @@ const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk<A>> => (c) =>
  * @since 1.0.0
  */
 export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<A>> => {
-  const schema = declare(
+  return declare(
     [item],
     struct({
       _id: uniqueSymbol(Symbol.for("@effect/data/Chunk")),
       length: number
     }),
-    <A>(item: Schema<A>) => {
-      const parse = P.parseResult(array(item))
-      return (u, options) =>
+    (isDecoding, item) => {
+      const parse = isDecoding ? P.parseResult(array(item)) : P.encodeResult(array(item))
+      return (u, options, ast) =>
         !C.isChunk(u) ?
-          PR.failure(PR.type(schema.ast, u)) :
+          PR.failure(PR.type(ast, u)) :
           PR.map(parse(C.toReadonlyArray(u), options), C.fromIterable)
     },
     {
@@ -1781,7 +1859,6 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk<I>, Chunk<
       [I.ArbitraryHookId]: chunkArbitrary
     }
   )
-  return schema
 }
 
 /**
@@ -1818,16 +1895,14 @@ export const dataFromSelf = <
 >(
   item: Schema<I, A>
 ): Schema<D.Data<I>, D.Data<A>> => {
-  const schema = declare(
+  return declare(
     [item],
     item,
-    <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-      item: Schema<A>
-    ) => {
-      const parse = P.parseResult(item)
-      return (u, options) =>
+    (isDecoding, item) => {
+      const parse = isDecoding ? P.parseResult(item) : P.encodeResult(item)
+      return (u, options, ast) =>
         !Equal.isEqual(u) ?
-          PR.failure(PR.type(schema.ast, u)) :
+          PR.failure(PR.type(ast, u)) :
           PR.map(parse(u, options), toData)
     },
     {
@@ -1836,7 +1911,6 @@ export const dataFromSelf = <
       [I.ArbitraryHookId]: dataArbitrary
     }
   )
-  return schema
 }
 
 /**
@@ -1871,7 +1945,7 @@ const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date
 export const DateFromSelf: Schema<Date> = declare(
   [],
   struct({}),
-  () => (u) => !isDate(u) ? PR.failure(PR.type(DateFromSelf.ast, u)) : PR.success(u),
+  () => (u, _, ast) => !isDate(u) ? PR.failure(PR.type(ast, u)) : PR.success(u),
   {
     [AST.IdentifierAnnotationId]: "Date",
     [I.PrettyHookId]: datePretty,
@@ -1971,18 +2045,15 @@ export const eitherFromSelf = <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
 ): Schema<Either<IE, IA>, Either<E, A>> => {
-  const schema = declare(
+  return declare(
     [left, right],
     eitherInline(left, right),
-    <E, A>(
-      left: Schema<E>,
-      right: Schema<A>
-    ) => {
-      const parseLeft = P.parseResult(left)
-      const parseRight = P.parseResult(right)
-      return (u, options) =>
+    (isDecoding, left, right) => {
+      const parseLeft = isDecoding ? P.parseResult(left) : P.encodeResult(left)
+      const parseRight = isDecoding ? P.parseResult(right) : P.encodeResult(right)
+      return (u, options, ast) =>
         !E.isEither(u) ?
-          PR.failure(PR.type(schema.ast, u)) :
+          PR.failure(PR.type(ast, u)) :
           E.isLeft(u) ?
           PR.map(parseLeft(u.left, options), E.left) :
           PR.map(parseRight(u.right, options), E.right)
@@ -1993,7 +2064,6 @@ export const eitherFromSelf = <IE, E, IA, A>(
       [I.ArbitraryHookId]: eitherArbitrary
     }
   )
-  return schema
 }
 
 /**
@@ -2375,11 +2445,11 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
   constructor: A,
   options?: FilterAnnotations<object>
 ): Schema<InstanceType<A>, InstanceType<A>> => {
-  const schema = declare(
+  return declare(
     [],
     struct({}),
-    () => (input) =>
-      input instanceof constructor ? PR.success(input) : PR.failure(PR.type(schema.ast, input)),
+    () => (input, _, ast) =>
+      input instanceof constructor ? PR.success(input) : PR.failure(PR.type(ast, input)),
     {
       [AST.TypeAnnotationId]: InstanceOfTypeId,
       [InstanceOfTypeId]: { constructor },
@@ -2387,7 +2457,6 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
       ...toAnnotations(options)
     }
   )
-  return schema
 }
 
 // ---------------------------------------------
@@ -2419,14 +2488,14 @@ const optionInline = <I, A>(value: Schema<I, A>) =>
  * @since 1.0.0
  */
 export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Option<A>> => {
-  const schema = declare(
+  return declare(
     [value],
     optionInline(value),
-    <A>(value: Schema<A>) => {
-      const parse = P.parseResult(value)
-      return (u, options) =>
+    (isDecoding, value) => {
+      const parse = isDecoding ? P.parseResult(value) : P.encodeResult(value)
+      return (u, options, ast) =>
         !O.isOption(u) ?
-          PR.failure(PR.type(schema.ast, u)) :
+          PR.failure(PR.type(ast, u)) :
           O.isNone(u) ?
           PR.success(O.none()) :
           PR.map(parse(u.value, options), O.some)
@@ -2437,7 +2506,6 @@ export const optionFromSelf = <I, A>(value: Schema<I, A>): Schema<Option<I>, Opt
       [I.ArbitraryHookId]: optionArbitrary
     }
   )
-  return schema
 }
 
 /**
@@ -2573,19 +2641,18 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
   key: Schema<IK, K>,
   value: Schema<IV, V>
 ): Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>> => {
-  const schema = declare(
+  return declare(
     [key, value],
     struct({
       size: number
     }),
-    <K, V>(
-      key: Schema<K>,
-      value: Schema<V>
-    ) => {
-      const parse = P.parseResult(array(tuple(key, value)))
-      return (u, options) =>
+    (isDecoding, key, value) => {
+      const parse = isDecoding
+        ? P.parseResult(array(tuple(key, value)))
+        : P.encodeResult(array(tuple(key, value)))
+      return (u, options, ast) =>
         !isMap(u) ?
-          PR.failure(PR.type(schema.ast, u)) :
+          PR.failure(PR.type(ast, u)) :
           PR.map(parse(Array.from(u.entries()), options), (as) => new Map(as))
     },
     {
@@ -2594,7 +2661,6 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
       [I.ArbitraryHookId]: readonlyMapArbitrary
     }
   )
-  return schema
 }
 
 /**
@@ -2631,16 +2697,16 @@ const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> => (set) 
 export const readonlySetFromSelf = <I, A>(
   item: Schema<I, A>
 ): Schema<ReadonlySet<I>, ReadonlySet<A>> => {
-  const schema = declare(
+  return declare(
     [item],
     struct({
       size: number
     }),
-    <A>(item: Schema<A>) => {
-      const parse = P.parseResult(array(item))
-      return (u, options) =>
+    (isDecoding, item) => {
+      const parse = isDecoding ? P.parseResult(array(item)) : P.encodeResult(array(item))
+      return (u, options, ast) =>
         !isSet(u) ?
-          PR.failure(PR.type(schema.ast, u)) :
+          PR.failure(PR.type(ast, u)) :
           PR.map(parse(Array.from(u.values()), options), (as) => new Set(as))
     },
     {
@@ -2649,7 +2715,6 @@ export const readonlySetFromSelf = <I, A>(
       [I.ArbitraryHookId]: readonlySetArbitrary
     }
   )
-  return schema
 }
 
 /**

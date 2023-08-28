@@ -1,5 +1,4 @@
 import * as E from "@effect/data/Either"
-import * as AST from "@effect/schema/AST"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
@@ -48,20 +47,20 @@ describe.concurrent("Schema/Forbidden", () => {
   })
 
   it("declaration", () => {
-    const schema = S.declare(
+    const transform = S.declare(
       [],
       S.number,
       () => S.parse(Util.effectify(S.number, "all"))
     )
     expectMessage(
-      schema,
+      transform,
       1,
       "is forbidden"
     )
   })
 
   it("transform", () => {
-    const schema = S.transformResult(
+    const transform = S.transformResult(
       S.string,
       S.transformResult(
         S.string,
@@ -73,21 +72,7 @@ describe.concurrent("Schema/Forbidden", () => {
       E.right
     )
     expectMessage(
-      schema,
-      "a",
-      "is forbidden"
-    )
-  })
-
-  it("refinement", () => {
-    const ast = AST.createRefinement(
-      S.string.ast,
-      (input) => PR.flatMap(Util.sleep, () => PR.success(input)),
-      false
-    )
-    const schema: S.Schema<string, string> = S.make(ast)
-    expectMessage(
-      schema,
+      transform,
       "a",
       "is forbidden"
     )

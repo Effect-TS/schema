@@ -10,8 +10,7 @@ import * as Order from "@effect/data/Order"
 import { isString, isSymbol } from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import { memoizeThunk } from "@effect/schema/internal/common"
-import type { ParseResult } from "@effect/schema/ParseResult"
-import * as PR from "@effect/schema/ParseResult"
+import type * as ParseResult from "@effect/schema/ParseResult"
 
 // -------------------------------------------------------------------------------------
 // model
@@ -194,8 +193,9 @@ export interface Declaration extends Annotated {
   readonly typeParameters: ReadonlyArray<AST>
   readonly type: AST
   readonly decode: (
+    isDecoding: boolean,
     ...typeParameters: ReadonlyArray<AST>
-  ) => (input: any, options?: ParseOptions) => ParseResult<any>
+  ) => (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
 }
 
 /**
@@ -873,8 +873,11 @@ export const isLazy = (ast: AST): ast is Lazy => ast._tag === "Lazy"
 export interface Refinement<From = AST> extends Annotated {
   readonly _tag: "Refinement"
   readonly from: From
-  readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly isReversed: boolean
+  readonly filter: (
+    input: any,
+    options: ParseOptions,
+    self: AST
+  ) => Option.Option<ParseResult.ParseError>
 }
 
 /**
@@ -883,10 +886,9 @@ export interface Refinement<From = AST> extends Annotated {
  */
 export const createRefinement = <From extends AST = AST>(
   from: From,
-  decode: Refinement["decode"],
-  isReversed: boolean,
+  filter: Refinement["filter"],
   annotations: Annotated["annotations"] = {}
-): Refinement<From> => ({ _tag: "Refinement", from, decode, isReversed, annotations })
+): Refinement<From> => ({ _tag: "Refinement", from, filter, annotations })
 
 /**
  * @category guards
@@ -906,40 +908,6 @@ export interface ParseOptions {
 }
 
 /**
- * Represents a `PropertySignature -> PropertySignature` transformation
- *
- * The semantic of `decode` is:
- * - `none()` represents the absence of the key/value pair
- * - `some(value)` represents the presence of the key/value pair
- *
- * The semantic of `encode` is:
- * - `none()` you don't want to output the key/value pair
- * - `some(value)` you want to output the key/value pair
- *
- * @category model
- * @since 1.0.0
- */
-export interface PropertySignatureTransformation {
-  readonly from: PropertyKey
-  readonly to: PropertyKey
-  readonly decode: (o: Option.Option<any>) => Option.Option<any>
-  readonly encode: (o: Option.Option<any>) => Option.Option<any>
-}
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const createPropertySignatureTransformation = (
-  from: PropertyKey,
-  to: PropertyKey,
-  decode: (o: Option.Option<any>) => Option.Option<any>,
-  encode: (o: Option.Option<any>) => Option.Option<any>
-): PropertySignatureTransformation => ({ from, to, decode, encode })
-
-/**
- * If `propertySignatureTransformations.length > 0` then `decode` / `encode` are derived.
- *
  * @category model
  * @since 1.0.0
  */
@@ -947,87 +915,15 @@ export interface Transform extends Annotated {
   readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
-  readonly decode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly encode: (input: any, options?: ParseOptions) => ParseResult<any>
-  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
+  readonly transformAST: TransformAST
 }
 
-/** @internal */
-export const _createTransform = (
-  from: AST,
-  to: AST,
-  decode: Transform["decode"],
-  encode: Transform["encode"],
-  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>,
-  annotations: Annotated["annotations"] = {}
-): Transform => ({
-  _tag: "Transform",
-  from,
-  to,
-  decode,
-  encode,
-  propertySignatureTransformations,
-  annotations
-})
-
-/**
- * @category constructors
- * @since 1.0.0
- */
 export const createTransform = (
   from: AST,
   to: AST,
-  decode: Transform["decode"],
-  encode: Transform["encode"],
+  transformAST: TransformAST,
   annotations: Annotated["annotations"] = {}
-): Transform => _createTransform(from, to, decode, encode, [], annotations)
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const createTransformByPropertySignatureTransformations = (
-  from: AST,
-  to: AST,
-  propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>,
-  annotations: Annotated["annotations"] = {}
-): Transform =>
-  _createTransform(
-    from,
-    to,
-    (input: any) => {
-      for (let i = 0; i < propertySignatureTransformations.length; i++) {
-        const t = propertySignatureTransformations[i]
-        const name = t.from
-        const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          Option.some(input[name]) :
-          Option.none()
-        delete input[name]
-        const to = t.decode(from)
-        if (Option.isSome(to)) {
-          input[t.to] = to.value
-        }
-      }
-      return PR.success(input)
-    },
-    (input: any) => {
-      for (let i = 0; i < propertySignatureTransformations.length; i++) {
-        const t = propertySignatureTransformations[i]
-        const name = t.to
-        const from = Object.prototype.hasOwnProperty.call(input, name) ?
-          Option.some(input[name]) :
-          Option.none()
-        delete input[name]
-        const to = t.encode(from)
-        if (Option.isSome(to)) {
-          input[t.from] = to.value
-        }
-      }
-      return PR.success(input)
-    },
-    propertySignatureTransformations,
-    annotations
-  )
+): Transform => ({ _tag: "Transform", from, to, transformAST, annotations })
 
 /**
  * @category guards
@@ -1327,7 +1223,7 @@ export const to = (ast: AST): AST => {
     case "Lazy":
       return createLazy(() => to(ast.f()), ast.annotations)
     case "Refinement":
-      return createRefinement(to(ast.from), ast.decode, false, ast.annotations)
+      return createRefinement(to(ast.from), ast.filter, ast.annotations)
     case "Transform":
       return to(ast.to)
   }
@@ -1536,3 +1432,139 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
       throw new Error(`keyof: unsupported schema (${ast._tag})`)
   }
 }
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export type TransformAST =
+  | FinalTransformation
+  | ComposeTransformation
+  | TypeLiteralTransformation
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface FinalTransformation {
+  readonly _tag: "FinalTransformation"
+  readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+  readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createFinalTransformation = (
+  decode: FinalTransformation["decode"],
+  encode: FinalTransformation["encode"]
+): FinalTransformation => ({ _tag: "FinalTransformation", decode, encode })
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface ComposeTransformation {
+  readonly _tag: "ComposeTransformation"
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const composeTransformation: ComposeTransformation = { _tag: "ComposeTransformation" }
+
+/**
+ * Represents a `PropertySignature -> PropertySignature` transformation
+ *
+ * The semantic of `decode` is:
+ * - `none()` represents the absence of the key/value pair
+ * - `some(value)` represents the presence of the key/value pair
+ *
+ * The semantic of `encode` is:
+ * - `none()` you don't want to output the key/value pair
+ * - `some(value)` you want to output the key/value pair
+ *
+ * @category model
+ * @since 1.0.0
+ */
+export interface FinalPropertySignatureTransformation {
+  readonly _tag: "FinalPropertySignatureTransformation"
+  readonly decode: (o: Option.Option<any>) => Option.Option<any>
+  readonly encode: (o: Option.Option<any>) => Option.Option<any>
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createFinalPropertySignatureTransformation = (
+  decode: FinalPropertySignatureTransformation["decode"],
+  encode: FinalPropertySignatureTransformation["encode"]
+): FinalPropertySignatureTransformation => ({
+  _tag: "FinalPropertySignatureTransformation",
+  decode,
+  encode
+})
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface PropertySignatureTransformation {
+  readonly from: PropertyKey
+  readonly to: PropertyKey
+  readonly transformation: FinalPropertySignatureTransformation
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createPropertySignatureTransformation = (
+  from: PropertyKey,
+  to: PropertyKey,
+  transformation: PropertySignatureTransformation["transformation"]
+): PropertySignatureTransformation => ({ from, to, transformation })
+
+/**
+ * @category model
+ * @since 1.0.0
+ */
+export interface TypeLiteralTransformation {
+  readonly _tag: "TypeLiteralTransformation"
+  readonly propertySignatureTransformations: ReadonlyArray<
+    PropertySignatureTransformation
+  >
+}
+
+/**
+ * @category constructors
+ * @since 1.0.0
+ */
+export const createTypeLiteralTransformation = (
+  propertySignatureTransformations: TypeLiteralTransformation["propertySignatureTransformations"]
+): TypeLiteralTransformation => {
+  // check for duplicate property signature transformations
+  const keys: Record<PropertyKey, true> = {}
+  for (const pst of propertySignatureTransformations) {
+    const key = pst.from
+    if (keys[key]) {
+      throw new Error(`Duplicate property signature transformation ${String(key)}`)
+    }
+    keys[key] = true
+  }
+
+  return {
+    _tag: "TypeLiteralTransformation",
+    propertySignatureTransformations
+  }
+}
+
+/**
+ * @category guard
+ * @since 1.0.0
+ */
+export const isTypeLiteralTransformation = (ast: TransformAST): ast is TypeLiteralTransformation =>
+  ast._tag === "TypeLiteralTransformation"

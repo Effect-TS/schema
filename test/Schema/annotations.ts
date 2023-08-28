@@ -20,8 +20,15 @@ describe.concurrent("Schema/annotations", () => {
     await Util.expectParseFailure(schema, "aaaaaaaaaaaaaa", "aaaaaaaaaaaaaa is too long")
   })
 
-  it.skip("message as annotation", async () => {
-    const schema = S.string.pipe(S.nonEmpty(), S.message(() => "custom message"))
-    await Util.expectParseFailure(schema, null, "custom message")
+  describe.concurrent("message as annotation", () => {
+    it("primitives", async () => {
+      const schema = S.string.pipe(S.nonEmpty(), S.message(() => "custom message"))
+      await Util.expectParseFailure(schema, "", "custom message")
+    })
+
+    it.skip("transformations", async () => {
+      const schema = S.NumberFromString.pipe(S.message(() => "custom message"))
+      await Util.expectParseFailure(schema, "", "custom message")
+    })
   })
 })
