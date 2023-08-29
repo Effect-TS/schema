@@ -2,6 +2,27 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Schema/tuple", () => {
+  it("rest: should throw on unsupported schemas", () => {
+    const schema = S.tuple().pipe(S.filter(() => true))
+    expect(() => schema.pipe(S.rest(S.number))).toThrowError(
+      new Error("`rest` is not supported on this schema")
+    )
+  })
+
+  it("element: should throw on unsupported schemas", () => {
+    const schema = S.tuple().pipe(S.filter(() => true))
+    expect(() => schema.pipe(S.element(S.number))).toThrowError(
+      new Error("`element` is not supported on this schema")
+    )
+  })
+
+  it("optionalElement: should throw on unsupported schemas", () => {
+    const schema = S.tuple().pipe(S.filter(() => true))
+    expect(() => schema.pipe(S.optionalElement(S.number))).toThrowError(
+      new Error("`optionalElement` is not supported on this schema")
+    )
+  })
+
   describe.concurrent("decoding", () => {
     it("empty", async () => {
       const schema = S.tuple()
