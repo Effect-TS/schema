@@ -13,6 +13,8 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [annotations](#annotations)
+  - [Annotated (interface)](#annotated-interface)
+  - [Annotations (interface)](#annotations-interface)
   - [BrandAnnotation (type alias)](#brandannotation-type-alias)
   - [BrandAnnotationId](#brandannotationid)
   - [DescriptionAnnotation (type alias)](#descriptionannotation-type-alias)
@@ -31,6 +33,7 @@ Added in v1.0.0
   - [TitleAnnotationId](#titleannotationid)
   - [TypeAnnotation (type alias)](#typeannotation-type-alias)
   - [TypeAnnotationId](#typeannotationid)
+  - [getAnnotation](#getannotation)
 - [constructors](#constructors)
   - [anyKeyword](#anykeyword)
   - [bigIntKeyword](#bigintkeyword)
@@ -42,7 +45,7 @@ Added in v1.0.0
   - [createFinalTransformation](#createfinaltransformation)
   - [createLazy](#createlazy)
   - [createLiteral](#createliteral)
-  - [createPropertySignatureTransformation](#createpropertysignaturetransformation)
+  - [createPropertySignatureTransform](#createpropertysignaturetransform)
   - [createRefinement](#createrefinement)
   - [createTemplateLiteral](#createtemplateliteral)
   - [createTuple](#createtuple)
@@ -59,6 +62,9 @@ Added in v1.0.0
   - [unknownKeyword](#unknownkeyword)
   - [voidKeyword](#voidkeyword)
 - [guard](#guard)
+  - [isComposeTransformation](#iscomposetransformation)
+  - [isFinalPropertySignatureTransformation](#isfinalpropertysignaturetransformation)
+  - [isFinalTransformation](#isfinaltransformation)
   - [isTypeLiteralTransformation](#istypeliteraltransformation)
 - [guards](#guards)
   - [isAnyKeyword](#isanykeyword)
@@ -85,8 +91,6 @@ Added in v1.0.0
   - [isVoidKeyword](#isvoidkeyword)
 - [model](#model)
   - [AST (type alias)](#ast-type-alias)
-  - [Annotated (interface)](#annotated-interface)
-  - [Annotations (interface)](#annotations-interface)
   - [AnyKeyword (interface)](#anykeyword-interface)
   - [BigIntKeyword (interface)](#bigintkeyword-interface)
   - [BooleanKeyword (interface)](#booleankeyword-interface)
@@ -102,13 +106,14 @@ Added in v1.0.0
   - [NumberKeyword (interface)](#numberkeyword-interface)
   - [ObjectKeyword (interface)](#objectkeyword-interface)
   - [ParseOptions (interface)](#parseoptions-interface)
-  - [PropertySignatureTransformation (interface)](#propertysignaturetransformation-interface)
+  - [PropertySignatureTransform (interface)](#propertysignaturetransform-interface)
+  - [PropertySignatureTransformation (type alias)](#propertysignaturetransformation-type-alias)
   - [Refinement (interface)](#refinement-interface)
   - [StringKeyword (interface)](#stringkeyword-interface)
   - [SymbolKeyword (interface)](#symbolkeyword-interface)
   - [TemplateLiteral (interface)](#templateliteral-interface)
   - [Transform (interface)](#transform-interface)
-  - [TransformAST (type alias)](#transformast-type-alias)
+  - [Transformation (type alias)](#transformation-type-alias)
   - [Tuple (interface)](#tuple-interface)
   - [TypeLiteral (interface)](#typeliteral-interface)
   - [TypeLiteralTransformation (interface)](#typeliteraltransformation-interface)
@@ -134,7 +139,6 @@ Added in v1.0.0
   - [createPropertySignature](#createpropertysignature)
   - [createRecord](#createrecord)
   - [from](#from)
-  - [getAnnotation](#getannotation)
   - [getCompiler](#getcompiler)
   - [getPropertySignatures](#getpropertysignatures)
   - [isParameter](#isparameter)
@@ -150,6 +154,30 @@ Added in v1.0.0
 ---
 
 # annotations
+
+## Annotated (interface)
+
+**Signature**
+
+```ts
+export interface Annotated {
+  readonly annotations: Annotations
+}
+```
+
+Added in v1.0.0
+
+## Annotations (interface)
+
+**Signature**
+
+```ts
+export interface Annotations {
+  [_: symbol]: unknown
+}
+```
+
+Added in v1.0.0
 
 ## BrandAnnotation (type alias)
 
@@ -331,6 +359,16 @@ export declare const TypeAnnotationId: typeof TypeAnnotationId
 
 Added in v1.0.0
 
+## getAnnotation
+
+**Signature**
+
+```ts
+export declare const getAnnotation: <A>(key: symbol) => (annotated: Annotated) => Option.Option<A>
+```
+
+Added in v1.0.0
+
 # constructors
 
 ## anyKeyword
@@ -444,16 +482,16 @@ export declare const createLiteral: (literal: LiteralValue) => Literal
 
 Added in v1.0.0
 
-## createPropertySignatureTransformation
+## createPropertySignatureTransform
 
 **Signature**
 
 ```ts
-export declare const createPropertySignatureTransformation: (
+export declare const createPropertySignatureTransform: (
   from: PropertyKey,
   to: PropertyKey,
-  transformation: PropertySignatureTransformation['transformation']
-) => PropertySignatureTransformation
+  propertySignatureTransformation: PropertySignatureTransformation
+) => PropertySignatureTransform
 ```
 
 Added in v1.0.0
@@ -463,11 +501,11 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createRefinement: <From extends AST = AST>(
+export declare const createRefinement: <From extends AST>(
   from: From,
   filter: Refinement['filter'],
   annotations?: Annotated['annotations']
-) => Refinement<From>
+) => Transform | Refinement<From>
 ```
 
 Added in v1.0.0
@@ -628,12 +666,44 @@ Added in v1.0.0
 
 # guard
 
+## isComposeTransformation
+
+**Signature**
+
+```ts
+export declare const isComposeTransformation: (ast: Transformation) => ast is ComposeTransformation
+```
+
+Added in v1.0.0
+
+## isFinalPropertySignatureTransformation
+
+**Signature**
+
+```ts
+export declare const isFinalPropertySignatureTransformation: (
+  ast: PropertySignatureTransformation
+) => ast is FinalPropertySignatureTransformation
+```
+
+Added in v1.0.0
+
+## isFinalTransformation
+
+**Signature**
+
+```ts
+export declare const isFinalTransformation: (ast: Transformation) => ast is FinalTransformation
+```
+
+Added in v1.0.0
+
 ## isTypeLiteralTransformation
 
 **Signature**
 
 ```ts
-export declare const isTypeLiteralTransformation: (ast: TransformAST) => ast is TypeLiteralTransformation
+export declare const isTypeLiteralTransformation: (ast: Transformation) => ast is TypeLiteralTransformation
 ```
 
 Added in v1.0.0
@@ -884,36 +954,14 @@ export type AST =
   | ObjectKeyword
   | Enums
   | TemplateLiteral
+  // possible transformations
+  | Refinement
   | Tuple
   | TypeLiteral
   | Union
   | Lazy
-  | Refinement
+  // transformations
   | Transform
-```
-
-Added in v1.0.0
-
-## Annotated (interface)
-
-**Signature**
-
-```ts
-export interface Annotated {
-  readonly annotations: Annotations
-}
-```
-
-Added in v1.0.0
-
-## Annotations (interface)
-
-**Signature**
-
-```ts
-export interface Annotations {
-  [_: symbol]: unknown
-}
 ```
 
 Added in v1.0.0
@@ -1124,16 +1172,26 @@ export interface ParseOptions {
 
 Added in v1.0.0
 
-## PropertySignatureTransformation (interface)
+## PropertySignatureTransform (interface)
 
 **Signature**
 
 ```ts
-export interface PropertySignatureTransformation {
+export interface PropertySignatureTransform {
   readonly from: PropertyKey
   readonly to: PropertyKey
-  readonly transformation: FinalPropertySignatureTransformation
+  readonly propertySignatureTransformation: FinalPropertySignatureTransformation
 }
+```
+
+Added in v1.0.0
+
+## PropertySignatureTransformation (type alias)
+
+**Signature**
+
+```ts
+export type PropertySignatureTransformation = FinalPropertySignatureTransformation
 ```
 
 Added in v1.0.0
@@ -1199,18 +1257,18 @@ export interface Transform extends Annotated {
   readonly _tag: 'Transform'
   readonly from: AST
   readonly to: AST
-  readonly transformAST: TransformAST
+  readonly transformation: Transformation
 }
 ```
 
 Added in v1.0.0
 
-## TransformAST (type alias)
+## Transformation (type alias)
 
 **Signature**
 
 ```ts
-export type TransformAST = FinalTransformation | ComposeTransformation | TypeLiteralTransformation
+export type Transformation = FinalTransformation | ComposeTransformation | TypeLiteralTransformation
 ```
 
 Added in v1.0.0
@@ -1251,7 +1309,7 @@ Added in v1.0.0
 ```ts
 export interface TypeLiteralTransformation {
   readonly _tag: 'TypeLiteralTransformation'
-  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransformation>
+  readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransform>
 }
 ```
 
@@ -1327,7 +1385,7 @@ Added in v1.0.0
 export declare const createTransform: (
   from: AST,
   to: AST,
-  transformAST: TransformAST,
+  transformation: Transformation,
   annotations?: Annotated['annotations']
 ) => Transform
 ```
@@ -1514,16 +1572,6 @@ Added in v1.0.0
 
 ```ts
 export declare const from: (ast: AST) => AST
-```
-
-Added in v1.0.0
-
-## getAnnotation
-
-**Signature**
-
-```ts
-export declare const getAnnotation: <A>(key: symbol) => (annotated: Annotated) => Option.Option<A>
 ```
 
 Added in v1.0.0

@@ -1813,13 +1813,13 @@ export const parseJson = <I, A extends string>(self: Schema<I, A>, options?: {
  * @category string constructors
  * @since 1.0.0
  */
-export const NonEmpty = string.pipe(nonEmpty())
+export const NonEmpty: Schema<string, string> = string.pipe(nonEmpty())
 
 /**
  * @category string constructors
  * @since 1.0.0
  */
-export const Trimmed = string.pipe(trimmed())
+export const Trimmed: Schema<string, string> = string.pipe(trimmed())
 
 /**
  * @category type id
@@ -1833,7 +1833,7 @@ const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-
  * @category string constructors
  * @since 1.0.0
  */
-export const UUID: Schema<string> = string.pipe(
+export const UUID: Schema<string, string> = string.pipe(
   pattern(uuidRegex, {
     typeId: UUIDTypeId,
     title: "UUID",
@@ -1854,7 +1854,7 @@ const ulidRegex = /^[0-7][0-9A-HJKMNP-TV-Z]{25}$/i
  * @category string constructors
  * @since 1.0.0
  */
-export const ULID: Schema<string> = string.pipe(
+export const ULID: Schema<string, string> = string.pipe(
   pattern(ulidRegex, {
     typeId: ULIDTypeId,
     title: "ULID",
@@ -2183,43 +2183,43 @@ export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schem
  * @category number constructors
  * @since 1.0.0
  */
-export const Finite = number.pipe(finite())
+export const Finite: Schema<number, number> = number.pipe(finite())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Int = number.pipe(int())
+export const Int: Schema<number, number> = number.pipe(int())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const NonNaN = number.pipe(nonNaN())
+export const NonNaN: Schema<number, number> = number.pipe(nonNaN())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Positive = number.pipe(positive())
+export const Positive: Schema<number, number> = number.pipe(positive())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const Negative = number.pipe(negative())
+export const Negative: Schema<number, number> = number.pipe(negative())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const NonPositive = number.pipe(nonPositive())
+export const NonPositive: Schema<number, number> = number.pipe(nonPositive())
 
 /**
  * @category number constructors
  * @since 1.0.0
  */
-export const NonNegative = number.pipe(nonNegative())
+export const NonNegative: Schema<number, number> = number.pipe(nonNegative())
 
 /**
  * This schema transforms a `string` into a `number` by parsing the string using the `Number` function.
@@ -2231,7 +2231,7 @@ export const NonNegative = number.pipe(nonNegative())
  * @category number constructors
  * @since 1.0.0
  */
-export const NumberFromString = numberFromString(string)
+export const NumberFromString: Schema<string, number> = numberFromString(string)
 
 /**
  * @category type id
@@ -2257,7 +2257,7 @@ export const JsonNumberTypeId = Symbol.for("@effect/schema/TypeId/JsonNumber")
  * @category number constructors
  * @since 1.0.0
  */
-export const JsonNumber = number.pipe(
+export const JsonNumber: Schema<number, number> = number.pipe(
   filter((n) => !isNaN(n) && isFinite(n), {
     typeId: JsonNumberTypeId,
     title: "JsonNumber",
@@ -2291,7 +2291,7 @@ export const not = <I>(self: Schema<I, boolean>): Schema<I, boolean> =>
  * @category boolean constructors
  * @since 1.0.0
  */
-export const Not = not(boolean)
+export const Not: Schema<boolean, boolean> = not(boolean)
 
 // ---------------------------------------------
 // bigint filters
@@ -2543,25 +2543,25 @@ export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schem
  * @category bigint constructors
  * @since 1.0.0
  */
-export const PositiveBigint = bigint.pipe(positiveBigint())
+export const PositiveBigint: Schema<bigint, bigint> = bigint.pipe(positiveBigint())
 
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NegativeBigint = bigint.pipe(negativeBigint())
+export const NegativeBigint: Schema<bigint, bigint> = bigint.pipe(negativeBigint())
 
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NonPositiveBigint = bigint.pipe(nonPositiveBigint())
+export const NonPositiveBigint: Schema<bigint, bigint> = bigint.pipe(nonPositiveBigint())
 
 /**
  * @category bigint constructors
  * @since 1.0.0
  */
-export const NonNegativeBigint = bigint.pipe(nonNegativeBigint())
+export const NonNegativeBigint: Schema<bigint, bigint> = bigint.pipe(nonNegativeBigint())
 
 /**
  * This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
@@ -2697,7 +2697,7 @@ const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date
  * @category Date constructors
  * @since 1.0.0
  */
-export const DateFromSelf: Schema<Date> = declare(
+export const DateFromSelf: Schema<Date, Date> = declare(
   [],
   struct({}),
   () => (u, _, ast) => !isDate(u) ? PR.failure(PR.type(ast, u)) : PR.success(u),
@@ -2714,7 +2714,7 @@ export const DateFromSelf: Schema<Date> = declare(
  * @category Date constructors
  * @since 1.0.0
  */
-export const ValidDateFromSelf = DateFromSelf.pipe(validDate())
+export const ValidDateFromSelf: Schema<Date, Date> = DateFromSelf.pipe(validDate())
 
 // ---------------------------------------------
 // Date transformations
@@ -2735,6 +2735,14 @@ export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<
   )
 
 const _Date: Schema<string, Date> = dateFromString(string)
+
+/**
+ * A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
+ *
+ * @category Date constructors
+ * @since 1.0.0
+ */
+export const ValidDate: Schema<string, Date> = _Date.pipe(validDate())
 
 export {
   /**

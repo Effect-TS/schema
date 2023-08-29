@@ -21,9 +21,10 @@ Added in v1.0.0
 - [Date constructors](#date-constructors)
   - [Date](#date)
   - [DateFromSelf](#datefromself)
+  - [ValidDate](#validdate)
   - [ValidDateFromSelf](#validdatefromself)
 - [Date filters](#date-filters)
-  - [validDate](#validdate)
+  - [validDate](#validdate-1)
 - [Date transformations](#date-transformations)
   - [dateFromString](#datefromstring)
 - [Either transformations](#either-transformations)
@@ -344,6 +345,18 @@ Added in v1.0.0
 
 ```ts
 export declare const DateFromSelf: Schema<Date, Date>
+```
+
+Added in v1.0.0
+
+## ValidDate
+
+A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
+
+**Signature**
+
+```ts
+export declare const ValidDate: Schema<string, Date>
 ```
 
 Added in v1.0.0
