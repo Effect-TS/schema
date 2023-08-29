@@ -168,7 +168,7 @@ describe.concurrent("Schema/record", () => {
       )
     })
 
-    it("record(minLength(1), number)", async () => {
+    it("record(minLength(2), number)", async () => {
       const schema = S.record(S.string.pipe(S.minLength(2)), S.number)
       await Util.expectParseSuccess(schema, {})
       await Util.expectParseSuccess(schema, { "aa": 1 })
@@ -183,6 +183,18 @@ describe.concurrent("Schema/record", () => {
         schema,
         { "a": 1 },
         `/a Expected a string at least 2 character(s) long, actual "a"`
+      )
+    })
+
+    it("should support branded keys", async () => {
+      const schema = S.record(S.NonEmpty.pipe(S.brand("UserId")), S.number)
+      await Util.expectParseSuccess(schema, {})
+      await Util.expectParseSuccess(schema, { "a": 1 })
+
+      await Util.expectParseFailure(
+        schema,
+        { "": 1 },
+        `/ Expected a non empty string, actual ""`
       )
     })
   })

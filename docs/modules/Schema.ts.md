@@ -1220,10 +1220,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const record: <K extends string | symbol, I, A>(
-  key: Schema<K, K>,
-  value: Schema<I, A>
-) => Schema<{ readonly [k in K]: I }, { readonly [k in K]: A }>
+export declare const record: <IK extends string | symbol, AK extends IK, IV, AV>(
+  key: Schema<IK, AK>,
+  value: Schema<IV, AV>
+) => Schema<{ readonly [k in IK]: IV }, { readonly [k in AK]: AV }>
 ```
 
 Added in v1.0.0

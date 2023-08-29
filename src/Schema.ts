@@ -1050,10 +1050,10 @@ export const required = <I, A>(
  * @category combinators
  * @since 1.0.0
  */
-export const record = <K extends string | symbol, I, A>(
-  key: Schema<K>,
-  value: Schema<I, A>
-): Schema<{ readonly [k in K]: I }, { readonly [k in K]: A }> =>
+export const record = <IK extends string | symbol, AK extends IK, IV, AV>(
+  key: Schema<IK, AK>,
+  value: Schema<IV, AV>
+): Schema<{ readonly [k in IK]: IV }, { readonly [k in AK]: AV }> =>
   make(AST.createRecord(key.ast, value.ast, true))
 
 /** @internal */

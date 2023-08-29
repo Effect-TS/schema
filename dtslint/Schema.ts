@@ -378,6 +378,12 @@ S.record(S.symbol, S.string)
 // $ExpectType Schema<{ readonly [x: `a${string}`]: string; }, { readonly [x: `a${string}`]: string; }>
 S.record(S.templateLiteral(S.literal('a'), S.string), S.string)
 
+// $ExpectType Schema<{ readonly [x: string]: string; }, { readonly [x: string & Brand<"UserId">]: string; }>
+S.record(S.string.pipe(S.brand('UserId')), S.string)
+
+// $ExpectType Schema<{ readonly [x: string]: string; }, { readonly [x: string & Brand<symbol>]: string; }>
+S.record(S.string.pipe(S.brand(Symbol.for('UserId'))), S.string)
+
 // ---------------------------------------------
 // Extend
 // ---------------------------------------------
