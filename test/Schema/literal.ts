@@ -1,7 +1,22 @@
+import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Schema/literal", () => {
+  it("should return never with no literals", () => {
+    expect(S.literal().ast).toEqual(AST.neverKeyword)
+  })
+
+  it("should return an unwrapped AST with exactly one literal", () => {
+    expect(S.literal(1).ast).toEqual(AST.createLiteral(1))
+  })
+
+  it("should return a union with more than one literal", () => {
+    expect(S.literal(1, 2).ast).toEqual(
+      AST.createUnion([AST.createLiteral(1), AST.createLiteral(2)])
+    )
+  })
+
   describe.concurrent("decoding", () => {
     it("1 member", async () => {
       const schema = S.literal(1)

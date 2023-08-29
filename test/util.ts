@@ -70,10 +70,10 @@ const effectifyAST = (ast: AST.AST, mode: "all" | "semi"): AST.AST => {
         AST.createFinalTransformation(
           // I need to override with the original ast here in order to not change the error message
           // ------------------------------------------------v
-          effectifyDecode(getDecode(ast.transformAST, true), ast),
+          effectifyDecode(getDecode(ast.transformation, true), ast),
           // I need to override with the original ast here in order to not change the error message
           // ------------------------------------------------v
-          effectifyDecode(getDecode(ast.transformAST, false), ast)
+          effectifyDecode(getDecode(ast.transformation, false), ast)
         ),
         ast.annotations
       )

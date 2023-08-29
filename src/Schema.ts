@@ -821,7 +821,7 @@ export const struct = <
   const pss: Array<AST.PropertySignature> = []
   const froms: Array<AST.PropertySignature> = []
   const tos: Array<AST.PropertySignature> = []
-  const propertySignatureTransformations: Array<AST.PropertySignatureTransformation> = []
+  const propertySignatureTransformations: Array<AST.PropertySignatureTransform> = []
   for (let i = 0; i < ownKeys.length; i++) {
     const key = ownKeys[i]
     const field = fields[key] as any
@@ -845,7 +845,7 @@ export const struct = <
           froms.push(AST.createPropertySignature(key, from, true, true))
           tos.push(AST.createPropertySignature(key, to, false, true, annotations))
           propertySignatureTransformations.push(
-            AST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransform(
               key,
               key,
               AST.createFinalPropertySignatureTransformation(
@@ -861,7 +861,7 @@ export const struct = <
             AST.createPropertySignature(key, optionFromSelf(make(to)).ast, false, true, annotations)
           )
           propertySignatureTransformations.push(
-            AST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransform(
               key,
               key,
               AST.createFinalPropertySignatureTransformation(O.some, O.flatten)
@@ -900,8 +900,8 @@ export const pick =
   ): Schema<Simplify<Pick<I, Keys[number]>>, Simplify<Pick<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
-      if (AST.isTypeLiteralTransformation(ast.transformAST)) {
-        const propertySignatureTransformations = ast.transformAST.propertySignatureTransformations
+      if (AST.isTypeLiteralTransformation(ast.transformation)) {
+        const propertySignatureTransformations = ast.transformation.propertySignatureTransformations
           .filter((t) => (keys as ReadonlyArray<PropertyKey>).includes(t.to))
         if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
           return make(
@@ -931,8 +931,8 @@ export const omit =
   ): Schema<Simplify<Omit<I, Keys[number]>>, Simplify<Omit<A, Keys[number]>>> => {
     const ast = self.ast
     if (AST.isTransform(ast)) {
-      if (AST.isTypeLiteralTransformation(ast.transformAST)) {
-        const propertySignatureTransformations = ast.transformAST.propertySignatureTransformations
+      if (AST.isTypeLiteralTransformation(ast.transformation)) {
+        const propertySignatureTransformations = ast.transformation.propertySignatureTransformations
           .filter((t) => !(keys as ReadonlyArray<PropertyKey>).includes(t.to))
         if (RA.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
           return make(
@@ -968,7 +968,7 @@ const appendBrandAnnotation = <B extends string | symbol, A>(
     return AST.createTransform(
       ast.from,
       appendBrandAnnotation(ast.to, brand, options),
-      ast.transformAST,
+      ast.transformation,
       ast.annotations
     )
   }
@@ -1067,7 +1067,7 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               x.indexSignatures.concat(y.indexSignatures)
             )
           } else if (
-            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
+            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformation) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             // isTypeLiteral(x) && isTransform(y)
@@ -1083,12 +1083,12 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               from,
               to,
               AST.createTypeLiteralTransformation(
-                y.transformAST.propertySignatureTransformations
+                y.transformation.propertySignatureTransformations
               )
             )
           }
         } else if (
-          AST.isTransform(x) && AST.isTypeLiteralTransformation(x.transformAST) &&
+          AST.isTransform(x) && AST.isTypeLiteralTransformation(x.transformation) &&
           AST.isTypeLiteral(x.from) && AST.isTypeLiteral(x.to)
         ) {
           if (AST.isTypeLiteral(y)) {
@@ -1105,11 +1105,11 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               from,
               to,
               AST.createTypeLiteralTransformation(
-                x.transformAST.propertySignatureTransformations
+                x.transformation.propertySignatureTransformations
               )
             )
           } else if (
-            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformAST) &&
+            AST.isTransform(y) && AST.isTypeLiteralTransformation(y.transformation) &&
             AST.isTypeLiteral(y.from) && AST.isTypeLiteral(y.to)
           ) {
             // isTransform(x) && isTransform(y)
@@ -1125,8 +1125,8 @@ export const intersectUnionMembers = (xs: ReadonlyArray<AST.AST>, ys: ReadonlyAr
               from,
               to,
               AST.createTypeLiteralTransformation(
-                x.transformAST.propertySignatureTransformations.concat(
-                  y.transformAST.propertySignatureTransformations
+                x.transformation.propertySignatureTransformations.concat(
+                  y.transformation.propertySignatureTransformations
                 )
               )
             )
@@ -1326,7 +1326,7 @@ export const attachPropertySignature: {
     to(schema).pipe(extend(struct({ [key]: literal(value) }))).ast,
     AST.createTypeLiteralTransformation(
       [
-        AST.createPropertySignatureTransformation(
+        AST.createPropertySignatureTransform(
           key,
           key,
           AST.createFinalPropertySignatureTransformation(

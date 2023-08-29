@@ -9,7 +9,7 @@ describe.concurrent("AST/createRecord", () => {
 
   it("should throw on unsupported keys", () => {
     expect(() => AST.createRecord(AST.undefinedKeyword, AST.numberKeyword, true)).toThrowError(
-      new Error("createRecord: unsupported key UndefinedKeyword")
+      new Error("createRecord: unsupported key schema (UndefinedKeyword)")
     )
   })
 

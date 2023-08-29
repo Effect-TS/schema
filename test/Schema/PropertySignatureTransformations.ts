@@ -12,7 +12,7 @@ describe.concurrent("Schema/PropertySignatureTransformations", () => {
         S.struct({ a: S.number }).ast,
         AST.createTypeLiteralTransformation(
           [
-            AST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransform(
               "a",
               "a",
               AST.createFinalPropertySignatureTransformation(
@@ -43,7 +43,7 @@ describe.concurrent("Schema/PropertySignatureTransformations", () => {
         S.struct({ a: S.number }).ast,
         AST.createTypeLiteralTransformation(
           [
-            AST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransform(
               "a",
               "a",
               AST.createFinalPropertySignatureTransformation(
@@ -75,7 +75,7 @@ describe.concurrent("Schema/PropertySignatureTransformations", () => {
           S.struct({ a: S.optionFromSelf(S.number) }).ast,
           AST.createTypeLiteralTransformation(
             [
-              AST.createPropertySignatureTransformation(
+              AST.createPropertySignatureTransform(
                 "a",
                 "a",
                 AST.createFinalPropertySignatureTransformation(
@@ -106,7 +106,7 @@ describe.concurrent("Schema/PropertySignatureTransformations", () => {
         S.struct({ a: S.optional(S.string) }).ast,
         AST.createTypeLiteralTransformation(
           [
-            AST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransform(
               "a",
               "a",
               AST.createFinalPropertySignatureTransformation(
@@ -131,7 +131,7 @@ describe.concurrent("Schema/PropertySignatureTransformations", () => {
         S.struct({ b: S.number }).ast,
         AST.createTypeLiteralTransformation(
           [
-            AST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransform(
               "a",
               "b",
               AST.createFinalPropertySignatureTransformation(
@@ -155,7 +155,7 @@ describe.concurrent("Schema/PropertySignatureTransformations", () => {
         S.struct({ a: S.optional(S.number) }).ast,
         AST.createTypeLiteralTransformation(
           [
-            AST.createPropertySignatureTransformation(
+            AST.createPropertySignatureTransform(
               "a",
               "a",
               AST.createFinalPropertySignatureTransformation(
@@ -172,27 +172,5 @@ describe.concurrent("Schema/PropertySignatureTransformations", () => {
 
     await Util.expectEncodeSuccess(transform, {}, { a: 0 })
     await Util.expectEncodeSuccess(transform, { a: 1 }, { a: 1 })
-  })
-
-  it("string -> number", async () => {
-    const ast = S.NumberFromString.ast as any
-    const transform: S.Schema<{ readonly a: string }, { readonly a: number }> = S.make(
-      AST.createTransform(
-        S.struct({ a: S.string }).ast,
-        S.struct({ a: S.number }).ast,
-        AST.createTypeLiteralTransformation(
-          [
-            AST.createPropertySignatureTransformation(
-              "a",
-              "a",
-              ast.transformAST
-            )
-          ]
-        )
-      )
-    )
-    await Util.expectParseSuccess(transform, { a: "1" }, { a: 1 })
-
-    await Util.expectEncodeSuccess(transform, { a: 1 }, { a: "1" })
   })
 })

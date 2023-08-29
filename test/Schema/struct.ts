@@ -2,6 +2,11 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Schema/struct", () => {
+  it("should allow a \"constructor\" field name", () => {
+    const schema = S.struct({ constructor: S.string })
+    expect(schema.ast._tag).toEqual("TypeLiteral")
+  })
+
   describe.concurrent("decoding", () => {
     it("empty", async () => {
       const schema = S.struct({})

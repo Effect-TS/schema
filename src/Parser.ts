@@ -318,7 +318,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       }
     }
     case "Transform": {
-      const decode = getDecode(ast.transformAST, isDecoding)
+      const decode = getDecode(ast.transformation, isDecoding)
       const from = isDecoding ? go(ast.from, true) : go(ast.to, false)
       const to = isDecoding ? go(ast.to, true) : go(ast.from, false)
       return (i1, options) =>
@@ -1093,13 +1093,13 @@ function sortByIndex(es: Array<[number, any]>): any {
 // -------------------------------------------------------------------------------------
 
 const isFinalPropertySignatureTransformation = (
-  ast: AST.FinalPropertySignatureTransformation | AST.TransformAST
+  ast: AST.FinalPropertySignatureTransformation | AST.Transformation
 ): ast is AST.FinalPropertySignatureTransformation =>
   ast._tag === "FinalPropertySignatureTransformation"
 
 /** @internal */
 export const getDecode = (
-  transform: AST.TransformAST,
+  transform: AST.Transformation,
   isDecoding: boolean
 ): (input: any, options: ParseOptions, self: AST.AST) => ParseResult<any> => {
   switch (transform._tag) {
@@ -1118,7 +1118,7 @@ export const getDecode = (
           const [from, to] = isDecoding ?
             [pst.from, pst.to] :
             [pst.to, pst.from]
-          const t = pst.transformation
+          const t = pst.propertySignatureTransformation
           if (isFinalPropertySignatureTransformation(t)) {
             const parse = isDecoding ? t.decode : t.encode
             const f = (input: any) => {

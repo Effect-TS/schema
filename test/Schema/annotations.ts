@@ -1,7 +1,38 @@
+import * as AST from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("Schema/annotations", () => {
+  it("title", () => {
+    expect(S.string.pipe(S.title("MyString")).ast.annotations).toEqual({
+      [AST.TitleAnnotationId]: "MyString",
+      [AST.DescriptionAnnotationId]: "a string"
+    })
+  })
+
+  it("description", () => {
+    expect(S.string.pipe(S.description("description")).ast.annotations).toEqual({
+      [AST.DescriptionAnnotationId]: "description",
+      [AST.TitleAnnotationId]: "string"
+    })
+  })
+
+  it("examples", () => {
+    expect(S.string.pipe(S.examples(["example"])).ast.annotations).toEqual({
+      [AST.ExamplesAnnotationId]: ["example"],
+      [AST.TitleAnnotationId]: "string",
+      [AST.DescriptionAnnotationId]: "a string"
+    })
+  })
+
+  it("documentation", () => {
+    expect(S.string.pipe(S.documentation("documentation")).ast.annotations).toEqual({
+      [AST.DocumentationAnnotationId]: "documentation",
+      [AST.TitleAnnotationId]: "string",
+      [AST.DescriptionAnnotationId]: "a string"
+    })
+  })
+
   it("message as annotation options", async () => {
     const schema =
       // initial schema, a string
