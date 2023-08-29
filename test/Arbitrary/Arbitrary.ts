@@ -120,7 +120,7 @@ describe.concurrent("Arbitrary/Arbitrary", () => {
   })
 
   it("bigint", () => {
-    propertyTo(S.bigint)
+    propertyTo(S.bigintFromSelf)
   })
 
   it("symbol", () => {

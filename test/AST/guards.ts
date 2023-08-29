@@ -83,7 +83,7 @@ describe.concurrent("AST/guards", () => {
   })
 
   it("isBigIntKeyword", () => {
-    expect(AST.isBigIntKeyword(S.bigint.ast)).toEqual(true)
+    expect(AST.isBigIntKeyword(S.bigintFromSelf.ast)).toEqual(true)
     expect(AST.isBigIntKeyword(S.unknown.ast)).toEqual(false)
   })
 

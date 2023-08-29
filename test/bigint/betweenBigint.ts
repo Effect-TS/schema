@@ -2,7 +2,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("bigint/betweenBigint", () => {
-  const schema = S.bigint.pipe(S.betweenBigint(-1n, 1n))
+  const schema = S.bigintFromSelf.pipe(S.betweenBigint(-1n, 1n))
 
   it("decoding", async () => {
     await Util.expectParseSuccess(schema, 0n, 0n)

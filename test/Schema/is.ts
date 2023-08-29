@@ -30,7 +30,7 @@ describe.concurrent("Schema/is", () => {
   })
 
   it("bigint", () => {
-    const is = P.is(S.bigint)
+    const is = P.is(S.bigintFromSelf)
     expect(is(0n)).toEqual(true)
     expect(is(1n)).toEqual(true)
     expect(is(BigInt("1"))).toEqual(true)

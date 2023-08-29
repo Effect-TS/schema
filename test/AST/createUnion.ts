@@ -40,7 +40,7 @@ describe.concurrent("AST/createUnion", () => {
   })
 
   it("should unify bigint literals with bigint", () => {
-    expect(S.union(S.literal(1n), S.bigint).ast).toEqual(S.bigint.ast)
+    expect(S.union(S.literal(1n), S.bigintFromSelf).ast).toEqual(S.bigintFromSelf.ast)
   })
 
   it("should unify symbol literals with symbol", () => {

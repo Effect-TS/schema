@@ -2,7 +2,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("nigint/bigintFromString", () => {
-  const schema = S.BigintFromString
+  const schema = S.bigint
 
   it("property tests", () => {
     Util.roundtrip(schema)

@@ -2,7 +2,7 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
 describe.concurrent("bigint/nonNegativeBigint", () => {
-  const schema = S.bigint.pipe(S.nonNegativeBigint())
+  const schema = S.bigintFromSelf.pipe(S.nonNegativeBigint())
 
   it("decoding", async () => {
     await Util.expectParseSuccess(schema, 0n, 0n)

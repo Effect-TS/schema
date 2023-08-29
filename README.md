@@ -413,7 +413,7 @@ import * as S from "@effect/schema/Schema";
 // primitive values
 S.string;
 S.number;
-S.bigint;
+S.bigint; // Schema<string, bigint>
 S.boolean;
 S.symbol;
 S.object;
