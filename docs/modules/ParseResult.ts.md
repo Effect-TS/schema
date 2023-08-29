@@ -41,7 +41,7 @@ Added in v1.0.0
   - [mapLeft](#mapleft)
 - [utils](#utils)
   - [ParseError (interface)](#parseerror-interface)
-  - [ParseResult (type alias)](#parseresult-type-alias)
+  - [ParseResult (interface)](#parseresult-interface)
   - [parseError](#parseerror)
 
 ---
@@ -361,12 +361,12 @@ export interface ParseError {
 
 Added in v1.0.0
 
-## ParseResult (type alias)
+## ParseResult (interface)
 
 **Signature**
 
 ```ts
-export type ParseResult<A> = Effect.Effect<never, ParseError, A>
+export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
 ```
 
 Added in v1.0.0

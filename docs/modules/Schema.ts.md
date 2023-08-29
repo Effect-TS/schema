@@ -54,11 +54,15 @@ Added in v1.0.0
   - [title](#title)
 - [bigint constructors](#bigint-constructors)
   - [BigintFromNumber](#bigintfromnumber)
-  - [BigintFromString](#bigintfromstring)
   - [NegativeBigint](#negativebigint)
+  - [NegativeBigintFromSelf](#negativebigintfromself)
   - [NonNegativeBigint](#nonnegativebigint)
+  - [NonNegativeBigintFromSelf](#nonnegativebigintfromself)
   - [NonPositiveBigint](#nonpositivebigint)
+  - [NonPositiveBigintFromSelf](#nonpositivebigintfromself)
   - [PositiveBigint](#positivebigint)
+  - [PositiveBigintFromSelf](#positivebigintfromself)
+  - [bigint](#bigint)
 - [bigint filters](#bigint-filters)
   - [betweenBigint](#betweenbigint)
   - [greaterThanBigint](#greaterthanbigint)
@@ -71,7 +75,7 @@ Added in v1.0.0
   - [positiveBigint](#positivebigint-1)
 - [bigint transformations](#bigint-transformations)
   - [bigintFromNumber](#bigintfromnumber-1)
-  - [bigintFromString](#bigintfromstring-1)
+  - [bigintFromString](#bigintfromstring)
   - [clampBigint](#clampbigint)
 - [boolean constructors](#boolean-constructors)
   - [Not](#not)
@@ -170,7 +174,7 @@ Added in v1.0.0
   - [parseSync](#parsesync)
 - [primitives](#primitives)
   - [any](#any)
-  - [bigint](#bigint)
+  - [bigintFromSelf](#bigintfromself)
   - [boolean](#boolean)
   - [never](#never)
   - [null](#null)
@@ -646,26 +650,22 @@ export declare const BigintFromNumber: Schema<number, bigint>
 
 Added in v1.0.0
 
-## BigintFromString
-
-This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
-
-It returns an error if the value can't be converted (for example when non-numeric characters are provided).
-
-**Signature**
-
-```ts
-export declare const BigintFromString: Schema<string, bigint>
-```
-
-Added in v1.0.0
-
 ## NegativeBigint
 
 **Signature**
 
 ```ts
-export declare const NegativeBigint: Schema<bigint, bigint>
+export declare const NegativeBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## NegativeBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const NegativeBigintFromSelf: Schema<bigint, bigint>
 ```
 
 Added in v1.0.0
@@ -675,7 +675,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonNegativeBigint: Schema<bigint, bigint>
+export declare const NonNegativeBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## NonNegativeBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const NonNegativeBigintFromSelf: Schema<bigint, bigint>
 ```
 
 Added in v1.0.0
@@ -685,7 +695,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonPositiveBigint: Schema<bigint, bigint>
+export declare const NonPositiveBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## NonPositiveBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const NonPositiveBigintFromSelf: Schema<bigint, bigint>
 ```
 
 Added in v1.0.0
@@ -695,7 +715,31 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PositiveBigint: Schema<bigint, bigint>
+export declare const PositiveBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## PositiveBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const PositiveBigintFromSelf: Schema<bigint, bigint>
+```
+
+Added in v1.0.0
+
+## bigint
+
+This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+
+**Signature**
+
+```ts
+export declare const bigint: Schema<string, bigint>
 ```
 
 Added in v1.0.0
@@ -1991,12 +2035,12 @@ export declare const any: Schema<any, any>
 
 Added in v1.0.0
 
-## bigint
+## bigintFromSelf
 
 **Signature**
 
 ```ts
-export declare const bigint: Schema<bigint, bigint>
+export declare const bigintFromSelf: Schema<bigint, bigint>
 ```
 
 Added in v1.0.0

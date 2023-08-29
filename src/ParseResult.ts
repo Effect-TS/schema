@@ -11,7 +11,7 @@ import type * as AST from "@effect/schema/AST"
 /**
  * @since 1.0.0
  */
-export type ParseResult<A> = Effect.Effect<never, ParseError, A>
+export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
 
 /**
  * @since 1.0.0
