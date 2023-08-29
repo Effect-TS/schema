@@ -140,6 +140,9 @@ export const formatExpected = (ast: AST.AST): string => {
   }
 }
 
+const isCollapsible = (es: Forest<string>, errors: NonEmptyReadonlyArray<ParseErrors>): boolean =>
+  es.length === 1 && es[0].forest.length !== 0 && errors[0]._tag !== "UnionMember"
+
 const go = (e: ParseErrors): Tree<string> => {
   switch (e._tag) {
     case "Type":
@@ -157,7 +160,7 @@ const go = (e: ParseErrors): Tree<string> => {
       return make("is forbidden")
     case "Index": {
       const es = e.errors.map(go)
-      if (es.length === 1 && es[0].forest.length !== 0) {
+      if (isCollapsible(es, e.errors)) {
         return make(`[${e.index}]${es[0].value}`, es[0].forest)
       }
       return make(`[${e.index}]`, es)
@@ -166,7 +169,7 @@ const go = (e: ParseErrors): Tree<string> => {
       return make(`is unexpected`)
     case "Key": {
       const es = e.errors.map(go)
-      if (es.length === 1 && es[0].forest.length !== 0) {
+      if (isCollapsible(es, e.errors)) {
         return make(`[${formatActual(e.key)}]${es[0].value}`, es[0].forest)
       }
       return make(`[${formatActual(e.key)}]`, es)
