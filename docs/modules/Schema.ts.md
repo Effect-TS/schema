@@ -282,7 +282,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunk: <I, A>(item: Schema<I, A>) => Schema<readonly I[], Chunk<A>>
+export declare const chunk: <I, A>(item: Schema<I, A>) => Schema<readonly I[], Chunk.Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -292,7 +292,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const chunkFromSelf: <I, A>(item: Schema<I, A>) => Schema<Chunk<I>, Chunk<A>>
+export declare const chunkFromSelf: <I, A>(item: Schema<I, A>) => Schema<Chunk.Chunk<I>, Chunk.Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -309,7 +309,7 @@ export declare const data: <
   A extends readonly any[] | Readonly<Record<string, any>>
 >(
   item: Schema<I, A>
-) => Schema<I, D.Data<A>>
+) => Schema<I, Data.Data<A>>
 ```
 
 Added in v1.0.0
@@ -324,7 +324,7 @@ export declare const dataFromSelf: <
   A extends readonly any[] | Readonly<Record<string, any>>
 >(
   item: Schema<I, A>
-) => Schema<D.Data<I>, D.Data<A>>
+) => Schema<Data.Data<I>, Data.Data<A>>
 ```
 
 Added in v1.0.0
@@ -415,7 +415,10 @@ Added in v1.0.0
 export declare const either: <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
-) => Schema<{ readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA }, Either<E, A>>
+) => Schema<
+  { readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA },
+  Either.Either<E, A>
+>
 ```
 
 Added in v1.0.0
@@ -428,7 +431,7 @@ Added in v1.0.0
 export declare const eitherFromSelf: <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
-) => Schema<Either<IE, IA>, Either<E, A>>
+) => Schema<Either.Either<IE, IA>, Either.Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -442,7 +445,7 @@ Added in v1.0.0
 ```ts
 export declare const option: <I, A>(
   value: Schema<I, A>
-) => Schema<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
+) => Schema<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option.Option<A>>
 ```
 
 Added in v1.0.0
@@ -452,7 +455,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option<A>>
+export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option.Option<A>>
 ```
 
 Added in v1.0.0
@@ -462,7 +465,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionFromSelf: <I, A>(value: Schema<I, A>) => Schema<Option<I>, Option<A>>
+export declare const optionFromSelf: <I, A>(value: Schema<I, A>) => Schema<Option.Option<I>, Option.Option<A>>
 ```
 
 Added in v1.0.0
@@ -951,7 +954,7 @@ Added in v1.0.0
 
 ```ts
 export interface Class<I, A, Inherited = {}> {
-  new (props: A): A & D.Case & Omit<Inherited, keyof A>
+  new (props: A): A & Data.Case & Omit<Inherited, keyof A>
 
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   schemaStruct(): Schema<I, A>
@@ -966,14 +969,14 @@ export interface Class<I, A, Inherited = {}> {
   transform<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
-    decode: (input: Class.To<T>) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult<Class.To<T>>
+    decode: (input: Class.To<T>) => ParseResult.ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult.ParseResult<Class.To<T>>
   ): Class<Class.From<T>, Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
   transformFrom<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
-    decode: (input: Class.From<T>) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult<Class.From<T>>
+    decode: (input: Class.From<T>) => ParseResult.ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult.ParseResult<Class.From<T>>
   ): Class<Class.From<T>, Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
 }
 ```
@@ -1047,7 +1050,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 export declare const brand: <B extends string | symbol, A>(
   brand: B,
   options?: DocAnnotations<A> | undefined
-) => <I>(self: Schema<I, A>) => BrandSchema<I, A & Brand<B>>
+) => <I>(self: Schema<I, A>) => BrandSchema<I, A & Brand.Brand<B>>
 ```
 
 **Example**
@@ -1109,11 +1112,11 @@ Added in v1.0.0
 
 ```ts
 export declare function filter<C extends A, B extends A, A = C>(
-  refinement: Refinement<A, B>,
+  refinement: Predicate.Refinement<A, B>,
   options?: FilterAnnotations<A>
 ): <I>(self: Schema<I, C>) => Schema<I, C & B>
 export declare function filter<B extends A, A = B>(
-  predicate: Predicate<A>,
+  predicate: Predicate.Predicate<A>,
   options?: FilterAnnotations<A>
 ): <I>(self: Schema<I, B>) => Schema<I, B>
 ```
@@ -1293,15 +1296,15 @@ using the provided decoding functions.
 export declare const transformResult: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult<A1>,
+    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<A1>,
     annotations?: AST.Annotated['annotations']
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
     to: Schema<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult<A1>,
+    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<A1>,
     annotations?: AST.Annotated['annotations']
   ): Schema<I1, A2>
 }
@@ -1346,7 +1349,7 @@ export declare const declare: (
   decode: (
     isDecoding: boolean,
     ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult<any>,
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<any>,
   annotations?: AST.Annotated['annotations']
 ) => Schema<any>
 ```
@@ -1368,10 +1371,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const fromBrand: <C extends Brand<string | symbol>>(
-  constructor: Brand.Constructor<C>,
-  options?: FilterAnnotations<Brand.Unbranded<C>> | undefined
-) => <A extends Brand.Unbranded<C>>(self: Schema<A, A>) => Schema<A & C, A & C>
+export declare const fromBrand: <C extends Brand.Brand<string | symbol>>(
+  constructor: Brand.Brand.Constructor<C>,
+  options?: FilterAnnotations<Brand.Brand.Unbranded<C>> | undefined
+) => <A extends Brand.Brand.Unbranded<C>>(self: Schema<A, A>) => Schema<A & C, A & C>
 ```
 
 Added in v1.0.0
@@ -1445,7 +1448,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
+) => (i: I, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1457,7 +1460,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeEither: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
+) => (i: I, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1469,7 +1472,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeOption: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Option<A>
+) => (i: I, options?: ParseOptions | undefined) => Option.Option<A>
 ```
 
 Added in v1.0.0
@@ -1493,7 +1496,7 @@ Added in v1.0.0
 ```ts
 export declare const decodeResult: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => ParseResult<A>
+) => (i: I, options?: ParseOptions | undefined) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -1517,7 +1520,7 @@ Added in v1.0.0
 ```ts
 export declare const encode: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, I>
+) => (a: A, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, I>
 ```
 
 Added in v1.0.0
@@ -1529,7 +1532,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeEither: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Either<PR.ParseError, I>
+) => (a: A, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, I>
 ```
 
 Added in v1.0.0
@@ -1541,7 +1544,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeOption: <I, A>(
   schema: Schema<I, A>
-) => (input: A, options?: ParseOptions | undefined) => Option<I>
+) => (input: A, options?: ParseOptions | undefined) => Option.Option<I>
 ```
 
 Added in v1.0.0
@@ -1565,7 +1568,7 @@ Added in v1.0.0
 ```ts
 export declare const encodeResult: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
+) => (a: A, options?: ParseOptions | undefined) => ParseResult.ParseResult<I>
 ```
 
 Added in v1.0.0
@@ -1601,7 +1604,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface BrandSchema<From, To extends Brand<any>> extends Schema<From, To>, Brand.Constructor<To> {}
+export interface BrandSchema<From, To extends Brand.Brand<any>> extends Schema<From, To>, Brand.Brand.Constructor<To> {}
 ```
 
 Added in v1.0.0
@@ -1960,7 +1963,7 @@ Added in v1.0.0
 ```ts
 export declare const parse: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1972,7 +1975,7 @@ Added in v1.0.0
 ```ts
 export declare const parseEither: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1984,7 +1987,7 @@ Added in v1.0.0
 ```ts
 export declare const parseOption: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Option<A>
+) => (i: unknown, options?: ParseOptions | undefined) => Option.Option<A>
 ```
 
 Added in v1.0.0
@@ -2008,7 +2011,7 @@ Added in v1.0.0
 ```ts
 export declare const parseResult: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+) => (i: unknown, options?: ParseOptions | undefined) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -2849,7 +2852,7 @@ Added in v1.0.0
 export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
   extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
-  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
+  readonly toOption: () => PropertySignature<From, true, Option.Option<To>, false>
 }
 ```
 
@@ -2917,7 +2920,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ToAsserts: P.ToAsserts<S>
+export declare const ToAsserts: Parser.ToAsserts<S>
 ```
 
 Added in v1.0.0
@@ -3027,7 +3030,7 @@ Added in v1.0.0
 ```ts
 export declare const validate: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
+) => (a: unknown, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -3039,7 +3042,7 @@ Added in v1.0.0
 ```ts
 export declare const validateEither: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
+) => (a: unknown, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -3051,7 +3054,7 @@ Added in v1.0.0
 ```ts
 export declare const validateOption: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Option<A>
+) => (a: unknown, options?: ParseOptions | undefined) => Option.Option<A>
 ```
 
 Added in v1.0.0
@@ -3075,7 +3078,7 @@ Added in v1.0.0
 ```ts
 export declare const validateResult: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+) => (a: unknown, options?: ParseOptions | undefined) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0

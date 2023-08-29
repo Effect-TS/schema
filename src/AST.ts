@@ -4,12 +4,11 @@
 
 import { pipe } from "@effect/data/Function"
 import * as Number from "@effect/data/Number"
-import { isNumber } from "@effect/data/Number"
 import * as Option from "@effect/data/Option"
 import * as Order from "@effect/data/Order"
-import { isString, isSymbol } from "@effect/data/Predicate"
+import * as Predicate from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
-import * as I from "@effect/schema/internal/common"
+import * as Internal from "@effect/schema/internal/common"
 import type * as ParseResult from "@effect/schema/ParseResult"
 
 // -------------------------------------------------------------------------------------
@@ -843,7 +842,7 @@ export const createLazy = (
   annotations: Annotated["annotations"] = {}
 ): Lazy => ({
   _tag: "Lazy",
-  f: I.memoizeThunk(f),
+  f: Internal.memoizeThunk(f),
   annotations
 })
 
@@ -1208,7 +1207,7 @@ export const createRecord = (key: AST, value: AST, isReadonly: boolean): TypeLit
         indexSignatures.push(createIndexSignature(key, value, isReadonly))
         break
       case "Literal":
-        if (isString(key.literal) || isNumber(key.literal)) {
+        if (Predicate.isString(key.literal) || Predicate.isNumber(key.literal)) {
           propertySignatures.push(createPropertySignature(key.literal, value, false, isReadonly))
         } else {
           throw new Error(`createRecord: unsupported literal ${String(key.literal)}`)
@@ -1592,7 +1591,7 @@ const _keyof = (ast: AST): ReadonlyArray<AST> => {
       return _keyof(ast.type)
     case "TypeLiteral":
       return ast.propertySignatures.map((p): AST =>
-        isSymbol(p.name) ? createUniqueSymbol(p.name) : createLiteral(p.name)
+        Predicate.isSymbol(p.name) ? createUniqueSymbol(p.name) : createLiteral(p.name)
       ).concat(ast.indexSignatures.map((is) => getParameterBase(is.parameter)))
     case "Lazy":
       return _keyof(ast.f())

@@ -2,9 +2,9 @@
  * @since 1.0.0
  */
 
-import * as E from "@effect/data/Either"
-import * as O from "@effect/data/Option"
-import type { NonEmptyReadonlyArray } from "@effect/data/ReadonlyArray"
+import * as Either from "@effect/data/Either"
+import * as Option from "@effect/data/Option"
+import type * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import * as Effect from "@effect/io/Effect"
 import type * as AST from "@effect/schema/AST"
 
@@ -18,13 +18,15 @@ export interface ParseResult<A> extends Effect.Effect<never, ParseError, A> {}
  */
 export interface ParseError {
   readonly _tag: "ParseError"
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 
 /**
  * @since 1.0.0
  */
-export const parseError = (errors: NonEmptyReadonlyArray<ParseErrors>): ParseError => ({
+export const parseError = (
+  errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+): ParseError => ({
   _tag: "ParseError",
   errors
 })
@@ -58,7 +60,7 @@ export interface Type {
   readonly _tag: "Type"
   readonly expected: AST.AST
   readonly actual: unknown
-  readonly message: O.Option<string>
+  readonly message: Option.Option<string>
 }
 
 /**
@@ -79,7 +81,7 @@ export const type = (expected: AST.AST, actual: unknown, message?: string): Type
   _tag: "Type",
   expected,
   actual,
-  message: O.fromNullable(message)
+  message: Option.fromNullable(message)
 })
 
 /**
@@ -102,7 +104,7 @@ export const forbidden: Forbidden = {
 export interface Index {
   readonly _tag: "Index"
   readonly index: number
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 
 /**
@@ -111,7 +113,7 @@ export interface Index {
  */
 export const index = (
   index: number,
-  errors: NonEmptyReadonlyArray<ParseErrors>
+  errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 ): Index => ({ _tag: "Index", index, errors })
 
 /**
@@ -127,7 +129,7 @@ export const index = (
 export interface Key {
   readonly _tag: "Key"
   readonly key: PropertyKey
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 
 /**
@@ -136,7 +138,7 @@ export interface Key {
  */
 export const key = (
   key: PropertyKey,
-  errors: NonEmptyReadonlyArray<ParseErrors>
+  errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 ): Key => ({ _tag: "Key", key, errors })
 
 /**
@@ -182,7 +184,7 @@ export const unexpected = (
  */
 export interface UnionMember {
   readonly _tag: "UnionMember"
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 
 /**
@@ -190,20 +192,20 @@ export interface UnionMember {
  * @since 1.0.0
  */
 export const unionMember = (
-  errors: NonEmptyReadonlyArray<ParseErrors>
+  errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 ): UnionMember => ({ _tag: "UnionMember", errors })
 
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const success: <A>(a: A) => ParseResult<A> = E.right
+export const success: <A>(a: A) => ParseResult<A> = Either.right
 
 /**
  * @category constructors
  * @since 1.0.0
  */
-export const fail: (error: ParseError) => ParseResult<never> = E.left
+export const fail: (error: ParseError) => ParseResult<never> = Either.left
 
 /**
  * @category constructors
@@ -215,14 +217,17 @@ export const failure = (e: ParseErrors): ParseResult<never> => fail(parseError([
  * @category constructors
  * @since 1.0.0
  */
-export const failures = (es: NonEmptyReadonlyArray<ParseErrors>): ParseResult<never> =>
-  E.left(parseError(es))
+export const failures = (
+  es: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+): ParseResult<never> => Either.left(parseError(es))
 
 /**
  * @category optimisation
  * @since 1.0.0
  */
-export const eitherOrUndefined = <A>(self: ParseResult<A>): E.Either<ParseError, A> | undefined => {
+export const eitherOrUndefined = <A>(
+  self: ParseResult<A>
+): Either.Either<ParseError, A> | undefined => {
   const s: any = self
   if (s["_tag"] === "Left" || s["_tag"] === "Right") {
     return s
@@ -257,7 +262,7 @@ export const map = <A, B>(self: ParseResult<A>, f: (self: A) => B): ParseResult<
     return s
   }
   if (s["_tag"] === "Right") {
-    return E.right(f(s.right))
+    return Either.right(f(s.right))
   }
   return Effect.map(self, f)
 }
@@ -272,7 +277,7 @@ export const mapLeft = <A>(
 ): ParseResult<A> => {
   const s: any = self
   if (s["_tag"] === "Left") {
-    return E.left(f(s.left))
+    return Either.left(f(s.left))
   }
   if (s["_tag"] === "Right") {
     s
@@ -291,10 +296,10 @@ export const bimap = <A, B>(
 ): ParseResult<B> => {
   const s: any = self
   if (s["_tag"] === "Left") {
-    return E.left(f(s.left))
+    return Either.left(f(s.left))
   }
   if (s["_tag"] === "Right") {
-    return E.right(g(s.right))
+    return Either.right(g(s.right))
   }
   return Effect.mapBoth(self, { onFailure: f, onSuccess: g })
 }

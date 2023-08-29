@@ -187,7 +187,7 @@ that a specific element in an array did not match the expected type or value.
 export interface Index {
   readonly _tag: 'Index'
   readonly index: number
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 ```
 
@@ -207,7 +207,7 @@ which indicates that an unexpected key was found in the object being decoded.
 export interface Key {
   readonly _tag: 'Key'
   readonly key: PropertyKey
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 ```
 
@@ -254,7 +254,7 @@ export interface Type {
   readonly _tag: 'Type'
   readonly expected: AST.AST
   readonly actual: unknown
-  readonly message: O.Option<string>
+  readonly message: Option.Option<string>
 }
 ```
 
@@ -284,7 +284,7 @@ Error that occurs when a member in a union has an error.
 ```ts
 export interface UnionMember {
   readonly _tag: 'UnionMember'
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 ```
 
@@ -311,7 +311,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const eitherOrUndefined: <A>(self: ParseResult<A>) => E.Either<ParseError, A> | undefined
+export declare const eitherOrUndefined: <A>(self: ParseResult<A>) => Either.Either<ParseError, A> | undefined
 ```
 
 Added in v1.0.0
@@ -355,7 +355,7 @@ Added in v1.0.0
 ```ts
 export interface ParseError {
   readonly _tag: 'ParseError'
-  readonly errors: NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 ```
 
