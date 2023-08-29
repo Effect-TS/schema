@@ -105,7 +105,7 @@ Added in v1.0.0
   - [rest](#rest)
   - [struct](#struct)
   - [transform](#transform)
-  - [transformResult](#transformresult)
+  - [transformOrFail](#transformorfail)
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
@@ -1285,7 +1285,7 @@ export declare const transform: {
 
 Added in v1.0.0
 
-## transformResult
+## transformOrFail
 
 Create a new `Schema` by transforming the input and output of an existing `Schema`
 using the provided decoding functions.
@@ -1293,7 +1293,7 @@ using the provided decoding functions.
 **Signature**
 
 ```ts
-export declare const transformResult: {
+export declare const transformOrFail: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
     decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,

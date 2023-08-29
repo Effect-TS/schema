@@ -1221,7 +1221,7 @@ export function filter<A>(
   @category combinators
   @since 1.0.0
  */
-export const transformResult: {
+export const transformOrFail: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
     decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,
@@ -1278,7 +1278,7 @@ export const transform: {
     decode: (a1: A1) => I2,
     encode: (i2: I2) => A1
   ): Schema<I1, A2> =>
-    transformResult(from, to, (a) => Either.right(decode(a)), (b) => Either.right(encode(b)))
+    transformOrFail(from, to, (a) => Either.right(decode(a)), (b) => Either.right(encode(b)))
 )
 
 /**
@@ -1795,7 +1795,7 @@ export const parseJson = <I, A extends string>(self: Schema<I, A>, options?: {
   replacer?: Parameters<typeof JSON.stringify>[1]
   space?: Parameters<typeof JSON.stringify>[2]
 }): Schema<I, unknown> => {
-  return transformResult(self, unknown, (s, _, ast) => {
+  return transformOrFail(self, unknown, (s, _, ast) => {
     try {
       return ParseResult.success<unknown>(JSON.parse(s, options?.reviver))
     } catch (e: any) {
@@ -2157,7 +2157,7 @@ export const clamp =
  * @since 1.0.0
  */
 export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, number> => {
-  return transformResult(
+  return transformOrFail(
     self,
     number,
     (s, _, ast) => {
@@ -2491,7 +2491,7 @@ export const clampBigint =
  * @since 1.0.0
  */
 export const bigintFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, bigint> => {
-  return transformResult(
+  return transformOrFail(
     self,
     bigintFromSelf,
     (s, _, ast) => {
@@ -2520,7 +2520,7 @@ export const bigintFromString = <I, A extends string>(self: Schema<I, A>): Schem
  * @since 1.0.0
  */
 export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schema<I, bigint> => {
-  return transformResult(
+  return transformOrFail(
     self,
     bigintFromSelf,
     (n, _, ast) => {
@@ -3278,7 +3278,7 @@ const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, bas
   fn.transform = function transform(this: any, fields: any, decode: any, encode: any) {
     const newFields = { ...selfFields, ...fields }
     return makeClass(
-      transformResult(
+      transformOrFail(
         selfSchema,
         to(struct(newFields)),
         decode,
@@ -3291,7 +3291,7 @@ const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, bas
   fn.transformFrom = function transform(this: any, fields: any, decode: any, encode: any) {
     const newFields = { ...selfFields, ...fields }
     return makeClass(
-      transformResult(
+      transformOrFail(
         from(selfSchema),
         struct(newFields),
         decode,

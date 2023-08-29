@@ -46,7 +46,7 @@ describe.concurrent("Schema/attachPropertySignature", () => {
     const From = S.struct({ radius: S.number, _isVisible: S.optional(S.boolean) })
     const To = S.struct({ radius: S.number, _isVisible: S.boolean })
 
-    const Circle = S.transformResult(
+    const Circle = S.transformOrFail(
       From,
       To,
       S.parseEither(To),

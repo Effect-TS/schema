@@ -60,9 +60,9 @@ describe.concurrent("Schema/Forbidden", () => {
   })
 
   it("transform", () => {
-    const transform = S.transformResult(
+    const transform = S.transformOrFail(
       S.string,
-      S.transformResult(
+      S.transformOrFail(
         S.string,
         S.string,
         (s) => PR.flatMap(Util.sleep, () => PR.success(s)),

@@ -1238,15 +1238,15 @@ export const transformedSchema: S.Schema<string, readonly [string]> =
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to parse values of type `string` into values of type `[string]`.
 
-### transformResult
+### transformOrFail
 
-The `transformResult` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
+The `transformOrFail` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
 
 ```ts
 import * as PR from "@effect/schema/ParseResult";
 import * as S from "@effect/schema/Schema";
 
-export const transformedSchema: S.Schema<string, boolean> = S.transformResult(
+export const transformedSchema: S.Schema<string, boolean> = S.transformOrFail(
   S.string,
   S.boolean,
   // define a function that converts a string into a boolean
@@ -1283,7 +1283,7 @@ const api = (url: string) =>
 
 const PeopleId = S.string.pipe(S.brand("PeopleId"));
 
-const PeopleIdFromString = S.transformResult(
+const PeopleIdFromString = S.transformOrFail(
   S.string,
   PeopleId,
   (s) =>
