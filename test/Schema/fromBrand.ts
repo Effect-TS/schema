@@ -1,33 +1,33 @@
-import * as B from "@effect/data/Brand"
+import * as Brand from "@effect/data/Brand"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 
-type Int = number & B.Brand<"Int">
-const Int = B.refined<Int>(
+type Int = number & Brand.Brand<"Int">
+const Int = Brand.refined<Int>(
   (n) => Number.isInteger(n),
-  (n) => B.error(`Expected ${n} to be an integer`)
+  (n) => Brand.error(`Expected ${n} to be an integer`)
 )
 
-type Positive = number & B.Brand<"Positive">
-const Positive = B.refined<Positive>(
+type Positive = number & Brand.Brand<"Positive">
+const Positive = Brand.refined<Positive>(
   (n) => n > 0,
-  (n) => B.error(`Expected ${n} to be positive`)
+  (n) => Brand.error(`Expected ${n} to be positive`)
 )
 
 type PositiveInt = Positive & Int
-const PositiveInt = B.all(Int, Positive)
+const PositiveInt = Brand.all(Int, Positive)
 
-type Eur = number & B.Brand<"Eur">
-const Eur = B.nominal<Eur>()
+type Eur = number & Brand.Brand<"Eur">
+const Eur = Brand.nominal<Eur>()
 
 describe.concurrent("Schema/fromBrand", () => {
   it("property tests", () => {
-    Util.roundtrip(S.fromBrand(Int)(S.number)) // refined
-    Util.roundtrip(S.fromBrand(Eur)(S.number)) // nominal
+    Util.roundtrip(S.number.pipe(S.fromBrand(Int))) // refined
+    Util.roundtrip(S.number.pipe(S.fromBrand(Eur))) // nominal
   })
 
   it("refined", async () => {
-    const schema = S.number.pipe(S.fromBrand(B.all(Positive, Int)))
+    const schema = S.number.pipe(S.fromBrand(Brand.all(Positive, Int)))
 
     await Util.expectParseFailure(
       schema,

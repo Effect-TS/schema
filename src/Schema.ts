@@ -394,21 +394,21 @@ export const fromBrand = <C extends Brand.Brand<string | symbol>>(
   constructor: Brand.Brand.Constructor<C>,
   options?: FilterAnnotations<Brand.Brand.Unbranded<C>>
 ) =>
-<A extends Brand.Brand.Unbranded<C>>(self: Schema<A>): Schema<A & C> => {
-  const filter = (a: A, _: ParseOptions, self: AST.AST): Option.Option<ParseResult.ParseError> => {
-    const e = constructor.either(a)
-    return Either.isLeft(e) ?
-      Option.some(
-        ParseResult.parseError([ParseResult.type(self, a, e.left.map((v) => v.message).join(", "))])
-      ) :
-      Option.none()
-  }
-  const ast = AST.createRefinement(
+<I, A extends Brand.Brand.Unbranded<C>>(self: Schema<I, A>): Schema<I, A & C> => {
+  return make(AST.createRefinement(
     self.ast,
-    filter,
+    (a: A, _: ParseOptions, ast: AST.AST): Option.Option<ParseResult.ParseError> => {
+      const e = constructor.either(a)
+      return Either.isLeft(e) ?
+        Option.some(
+          ParseResult.parseError([
+            ParseResult.type(ast, a, e.left.map((v) => v.message).join(", "))
+          ])
+        ) :
+        Option.none()
+    },
     toAnnotations({ typeId: { id: BrandTypeId, params: { constructor } }, ...options })
-  )
-  return make(ast)
+  ))
 }
 
 /**
@@ -1005,11 +1005,11 @@ export const brand = <B extends string | symbol, A>(
 <I>(self: Schema<I, A>): BrandSchema<I, A & Brand.Brand<B>> => {
   const ast = appendBrandAnnotation(self.ast, brand, options)
   const schema = make(ast)
-  const validate = Parser.validateSync(schema)
+  const validateSync = Parser.validateSync(schema)
   const validateOption = Parser.validateOption(schema)
   const validateEither = Parser.validateEither(schema)
   const is = Parser.is(schema)
-  const out: any = Object.assign((input: unknown) => validate(input), {
+  const out: any = Object.assign((input: unknown) => validateSync(input), {
     [Brand.RefinedConstructorsTypeId]: Brand.RefinedConstructorsTypeId,
     _id: TypeId,
     ast,

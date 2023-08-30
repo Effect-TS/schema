@@ -1,4 +1,4 @@
-import { Brand } from "@effect/data/Brand";
+import * as Brand from "@effect/data/Brand"
 import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
@@ -523,7 +523,7 @@ declare const UnionFilter: S.Schema<{ readonly a: string } | { readonly b: strin
 pipe(UnionFilter, S.filter(S.is(S.struct({ b: S.string }))))
 
 // $ExpectType Schema<number, number & Brand<"MyNumber">>
-pipe(S.number, S.filter((n): n is number & Brand<"MyNumber"> => n > 0))
+pipe(S.number, S.filter((n): n is number & Brand.Brand<"MyNumber"> => n > 0))
 
 // ---------------------------------------------
 // compose
@@ -557,3 +557,13 @@ S.NumberFromString.pipe(S.compose(S.union(S.null, S.number)))
 
 // @ts-expect-error
 S.compose(S.string, S.number)
+
+// ---------------------------------------------
+// fromBrand
+// ---------------------------------------------
+
+type Eur = number & Brand.Brand<"Eur">
+const Eur = Brand.nominal<Eur>()
+
+// $ExpectType Schema<number, number & Brand<"Eur">>
+S.number.pipe(S.fromBrand(Eur))

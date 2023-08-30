@@ -1374,7 +1374,7 @@ Added in v1.0.0
 export declare const fromBrand: <C extends Brand.Brand<string | symbol>>(
   constructor: Brand.Brand.Constructor<C>,
   options?: FilterAnnotations<Brand.Brand.Unbranded<C>> | undefined
-) => <A extends Brand.Brand.Unbranded<C>>(self: Schema<A, A>) => Schema<A & C, A & C>
+) => <I, A extends Brand.Brand.Unbranded<C>>(self: Schema<I, A>) => Schema<I, A & C>
 ```
 
 Added in v1.0.0
