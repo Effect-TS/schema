@@ -54,6 +54,61 @@ This library was inspired by the following projects:
 }
 ```
 
+### Understanding `exactOptionalPropertyTypes`
+
+The `@effect/schema` library takes advantage of the `exactOptionalPropertyTypes` option of `tsconfig.json`. This option affects how optional properties are typed (to learn more about this option, you can refer to the official [TypeScript documentation](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes)).
+
+Let's delve into this with an example.
+
+**With `exactOptionalPropertyTypes` Enabled**
+
+```ts
+import * as Schema from "@effect/schema/Schema";
+
+/*
+const schema: Schema.Schema<{
+    readonly myfield?: string; // the type is strict
+}, {
+    readonly myfield?: string; // the type is strict
+}>
+*/
+const schema = Schema.struct({
+  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty()))
+});
+
+Schema.decodeSync(schema)({ myfield: undefined }); // Error: Type 'undefined' is not assignable to type 'string'.ts(2379)
+```
+
+Here, notice that the type of `myfield` is strict (`string`), which means the type checker will catch any attempt to assign an invalid value (like `undefined`).
+
+**With `exactOptionalPropertyTypes` Disabled**
+
+If, for some reason, you can't enable the `exactOptionalPropertyTypes` option (perhaps due to conflicts with other third-party libraries), you can still use `@effect/schema`. However, there will be a mismatch between the types and the runtime behavior:
+
+```ts
+import * as Schema from "@effect/schema/Schema";
+
+/*
+const schema: Schema.Schema<{
+    readonly myfield?: string | undefined; // the type is widened to string | undefined
+}, {
+    readonly myfield?: string | undefined; // the type is widened to string | undefined
+}>
+*/
+const schema = Schema.struct({
+  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty()))
+});
+
+Schema.decodeSync(schema)({ myfield: undefined }); // No type error, but a decoding failure occurs
+/*
+Error: error(s) found
+└─ ["a"]
+   └─ Expected string, actual undefined
+*/
+```
+
+In this case, the type of `myfield` is widened to `string | undefined`, which means the type checker won't catch the invalid value (`undefined`). However, during decoding, you'll encounter an error, indicating that `undefined` is not allowed.
+
 ## Getting started
 
 To install the **alpha** version:
