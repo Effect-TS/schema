@@ -30,7 +30,7 @@ import * as TreeFormatter from "@effect/schema/TreeFormatter"
 // model
 // ---------------------------------------------
 
-const TypeId: unique symbol = Symbol.for("@effect/schema/Schema")
+const TypeId: unique symbol = Symbol.for("@effect/schema/Schema") as TypeId
 
 /**
  * @since 1.0.0
@@ -42,28 +42,37 @@ export type TypeId = typeof TypeId
  * @category model
  * @since 1.0.0
  */
-export interface Schema<From, To = From> extends Pipeable {
-  readonly _id: TypeId
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
+export interface Schema<From, To = From> extends Schema.Variance<From, To>, Pipeable {
   readonly ast: AST.AST
 }
 
-// ---------------------------------------------
-// converters
-// ---------------------------------------------
-
 /**
- * @category model
  * @since 1.0.0
  */
-export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S["From"]>[0]
+export declare module Schema {
+  /**
+   * @since 1.0.0
+   */
+  export interface Variance<From, To> {
+    readonly [TypeId]: {
+      readonly From: (_: From) => From
+      readonly To: (_: To) => To
+    }
+  }
 
-/**
- * @category model
- * @since 1.0.0
- */
-export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S["To"]>[0]
+  /**
+   * @since 1.0.0
+   */
+  export type From<S extends { readonly [TypeId]: { readonly From: (..._: any) => any } }> =
+    Parameters<S[TypeId]["From"]>[0]
+
+  /**
+   * @since 1.0.0
+   */
+  export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = Parameters<
+    S[TypeId]["To"]
+  >[0]
+}
 
 /**
  * @since 1.0.0
@@ -231,17 +240,20 @@ export type {
  * @category guards
  * @since 1.0.0
  */
-export const isSchema = (input: unknown): input is Schema<unknown, unknown> =>
-  Predicate.isObject(input) && "_id" in input && input["_id"] === TypeId
+export const isSchema = (u: unknown): u is Schema<unknown, unknown> =>
+  Predicate.isObject(u) && TypeId in u && "ast" in u
 
 // ---------------------------------------------
 // constructors
 // ---------------------------------------------
 
+const variance = {
+  From: (_: any) => _,
+  To: (_: any) => _
+}
+
 class SchemaImpl<From, To> implements Schema<From, To> {
-  readonly _id: TypeId = TypeId
-  readonly From!: (_: From) => From
-  readonly To!: (_: To) => To
+  readonly [TypeId] = variance
   constructor(readonly ast: AST.AST) {}
   pipe() {
     return pipeArguments(this, arguments)
@@ -303,7 +315,7 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
  */
 export const templateLiteral = <T extends [Schema<any>, ...Array<Schema<any>>]>(
   ...[head, ...tail]: T
-): Schema<Join<{ [K in keyof T]: To<T[K]> }>> => {
+): Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>> => {
   let types: ReadonlyArray<AST.TemplateLiteral | AST.Literal> = getTemplateLiterals(head.ast)
   for (const span of tail) {
     types = ReadonlyArray.flatMap(
@@ -533,7 +545,7 @@ export const object: Schema<object> = make(AST.objectKeyword)
  */
 export const union = <Members extends ReadonlyArray<Schema<any>>>(
   ...members: Members
-): Schema<From<Members[number]>, To<Members[number]>> =>
+): Schema<Schema.From<Members[number]>, Schema.To<Members[number]>> =>
   make(AST.createUnion(members.map((m) => m.ast)))
 
 /**
@@ -556,8 +568,8 @@ export const keyof = <I, A>(schema: Schema<I, A>): Schema<keyof A> => make(AST.k
 export const tuple = <Elements extends ReadonlyArray<Schema<any>>>(
   ...elements: Elements
 ): Schema<
-  { readonly [K in keyof Elements]: From<Elements[K]> },
-  { readonly [K in keyof Elements]: To<Elements[K]> }
+  { readonly [K in keyof Elements]: Schema.From<Elements[K]> },
+  { readonly [K in keyof Elements]: Schema.To<Elements[K]> }
 > =>
   make(
     AST.createTuple(
@@ -635,10 +647,10 @@ type Simplify<A> = {
 /**
  * @since 1.0.0
  */
-export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly From: (_: From) => From
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends Schema.Variance<From, To>
+{
   readonly FromIsOptional: FromIsOptional
-  readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
 }
 
@@ -652,36 +664,7 @@ export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptiona
   readonly toOption: () => PropertySignature<From, true, Option.Option<To>, false>
 }
 
-const SchemaPropertySignatureTypeId: unique symbol = Symbol.for(
-  "@effect/schema/SchemaPropertySignature"
-)
-
-/**
- * @since 1.0.0
- * @category symbol
- */
-export type SchemaPropertySignatureTypeId = typeof SchemaPropertySignatureTypeId
-
-/**
- * @since 1.0.0
- */
-export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
-{
-  readonly _id: SchemaPropertySignatureTypeId
-}
-
-/**
- * @since 1.0.0
- */
-export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
-{
-  readonly _id: SchemaPropertySignatureTypeId
-}
-
-/** @internal */
-export type PropertySignatureConfig =
+type PropertySignatureConfig =
   | {
     readonly _tag: "PropertySignature"
     readonly ast: AST.AST
@@ -706,17 +689,15 @@ export type PropertySignatureConfig =
 
 /** @internal */
 export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
-  readonly _id: SchemaPropertySignatureTypeId = SchemaPropertySignatureTypeId
-  readonly From!: (_: From) => From
+  readonly [TypeId] = variance
   readonly FromIsOptional!: FromIsOptional
-  readonly To!: (_: To) => To
   readonly ToIsOptional!: ToIsOptional
 
   constructor(
     readonly config: PropertySignatureConfig
   ) {}
 
-  withDefault(value: () => To): SchemaPropertySignature<From, true, To, false> {
+  withDefault(value: () => To): PropertySignature<From, true, To, false> {
     return new PropertySignatureImpl(
       {
         _tag: "Default",
@@ -727,7 +708,7 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
     )
   }
 
-  toOption(): SchemaPropertySignature<From, true, Option.Option<To>, false> {
+  toOption(): PropertySignature<From, true, Option.Option<To>, false> {
     return new PropertySignatureImpl({
       _tag: "Option",
       ast: this.config.ast,
@@ -797,15 +778,15 @@ export type StructFields = Record<
  * @since 1.0.0
  */
 export type FromStruct<Fields extends StructFields> =
-  & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]> }
-  & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+  & { readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]> }
+  & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> }
 
 /**
  * @since 1.0.0
  */
 export type ToStruct<Fields extends StructFields> =
-  & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]> }
-  & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  & { readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]> }
+  & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> }
 
 /**
  * @category combinators
@@ -990,10 +971,10 @@ const appendBrandAnnotation = <B extends string | symbol, A>(
  * @param brand - The brand to apply.
  *
  * @example
- * import * as S from "@effect/schema/Schema"
+ * import * as Schema from "@effect/schema/Schema"
  *
- * const Int = S.number.pipe(S.int(), S.brand("Int"))
- * type Int = S.To<typeof Int> // number & Brand<"Int">
+ * const Int = Schema.number.pipe(Schema.int(), Schema.brand("Int"))
+ * type Int = Schema.Schema.To<typeof Int> // number & Brand<"Int">
  *
  * @category combinators
  * @since 1.0.0
@@ -1011,7 +992,7 @@ export const brand = <B extends string | symbol, A>(
   const is = Parser.is(schema)
   const out: any = Object.assign((input: unknown) => validateSync(input), {
     [Brand.RefinedConstructorsTypeId]: Brand.RefinedConstructorsTypeId,
-    _id: TypeId,
+    [TypeId]: variance,
     ast,
     option: (input: unknown) => validateOption(input),
     either: (input: unknown) =>

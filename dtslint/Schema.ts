@@ -7,14 +7,14 @@ import * as S from "@effect/schema/Schema";
 // ---------------------------------------------
 
 // $ExpectType never
-export type FromNever = S.From<typeof S.never>
+export type FromNever = S.Schema.From<typeof S.never>
 
 // ---------------------------------------------
 // To
 // ---------------------------------------------
 
 // $ExpectType never
-export type ToNever = S.To<typeof S.never>
+export type ToNever = S.Schema.To<typeof S.never>
 
 // ---------------------------------------------
 // Primitives
@@ -227,10 +227,10 @@ S.struct({ a: S.string,  b: S.number });
 const MyModel = S.struct({ a: S.string,  b: S.NumberFromString });
 
 // $ExpectType { readonly a: string; readonly b: string; }
-export type MyModelFrom = S.From<typeof MyModel>
+export type MyModelFrom = S.Schema.From<typeof MyModel>
 
 // $ExpectType { readonly a: string; readonly b: number; }
-export type MyModelTo = S.To<typeof MyModel>
+export type MyModelTo = S.Schema.To<typeof MyModel>
 
 // $ExpectType Schema<{ readonly a: never; }, { readonly a: never; }>
 S.struct({ a: S.never })

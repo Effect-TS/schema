@@ -215,7 +215,7 @@ export const is = <_, A>(schema: Schema.Schema<_, A>) => {
 export type ToAsserts<S extends Schema.Schema<any>> = (
   input: unknown,
   options?: AST.ParseOptions
-) => asserts input is Schema.To<S>
+) => asserts input is Schema.Schema.To<S>
 
 /**
  * @category validation

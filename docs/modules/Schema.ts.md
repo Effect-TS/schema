@@ -135,9 +135,7 @@ Added in v1.0.0
   - [isSchema](#isschema)
 - [model](#model)
   - [BrandSchema (interface)](#brandschema-interface)
-  - [From (type alias)](#from-type-alias)
   - [Schema (interface)](#schema-interface)
-  - [To (type alias)](#to-type-alias)
 - [number constructors](#number-constructors)
   - [Finite](#finite)
   - [Int](#int)
@@ -210,7 +208,6 @@ Added in v1.0.0
   - [split](#split)
   - [trim](#trim-1)
 - [symbol](#symbol-1)
-  - [SchemaPropertySignatureTypeId (type alias)](#schemapropertysignaturetypeid-type-alias)
   - [TypeId (type alias)](#typeid-type-alias)
 - [type id](#type-id)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
@@ -247,17 +244,19 @@ Added in v1.0.0
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [Class (namespace)](#class-namespace)
-    - [From (type alias)](#from-type-alias-1)
-    - [To (type alias)](#to-type-alias-1)
+    - [From (type alias)](#from-type-alias)
+    - [To (type alias)](#to-type-alias)
   - [DocAnnotations (interface)](#docannotations-interface)
   - [FilterAnnotations (interface)](#filterannotations-interface)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
   - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
-  - [OptionalSchemaPropertySignature (interface)](#optionalschemapropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
-  - [SchemaPropertySignature (interface)](#schemapropertysignature-interface)
+  - [Schema (namespace)](#schema-namespace)
+    - [Variance (interface)](#variance-interface)
+    - [From (type alias)](#from-type-alias-1)
+    - [To (type alias)](#to-type-alias-1)
   - [StructFields (type alias)](#structfields-type-alias)
   - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
@@ -1059,10 +1058,10 @@ export declare const brand: <B extends string | symbol, A>(
 **Example**
 
 ```ts
-import * as S from '@effect/schema/Schema'
+import * as Schema from '@effect/schema/Schema'
 
-const Int = S.number.pipe(S.int(), S.brand('Int'))
-type Int = S.To<typeof Int> // number & Brand<"Int">
+const Int = Schema.number.pipe(Schema.int(), Schema.brand('Int'))
+type Int = Schema.Schema.To<typeof Int> // number & Brand<"Int">
 ```
 
 Added in v1.0.0
@@ -1322,7 +1321,10 @@ Added in v1.0.0
 ```ts
 export declare const tuple: <Elements extends readonly Schema<any, any>[]>(
   ...elements: Elements
-) => Schema<{ readonly [K in keyof Elements]: From<Elements[K]> }, { readonly [K in keyof Elements]: To<Elements[K]> }>
+) => Schema<
+  { readonly [K in keyof Elements]: Schema.From<Elements[K]> },
+  { readonly [K in keyof Elements]: Schema.To<Elements[K]> }
+>
 ```
 
 Added in v1.0.0
@@ -1334,7 +1336,7 @@ Added in v1.0.0
 ```ts
 export declare const union: <Members extends readonly Schema<any, any>[]>(
   ...members: Members
-) => Schema<From<Members[number]>, To<Members[number]>>
+) => Schema<Schema.From<Members[number]>, Schema.To<Members[number]>>
 ```
 
 Added in v1.0.0
@@ -1424,7 +1426,7 @@ Added in v1.0.0
 ```ts
 export declare const templateLiteral: <T extends [Schema<any, any>, ...Schema<any, any>[]]>(
   ...[head, ...tail]: T
-) => Schema<Join<{ [K in keyof T]: To<T[K]> }>, Join<{ [K in keyof T]: To<T[K]> }>>
+) => Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>, Join<{ [K in keyof T]: Schema.To<T[K]> }>>
 ```
 
 Added in v1.0.0
@@ -1595,7 +1597,7 @@ Tests if a value is a `Schema`.
 **Signature**
 
 ```ts
-export declare const isSchema: (input: unknown) => input is Schema<unknown, unknown>
+export declare const isSchema: (u: unknown) => u is Schema<unknown, unknown>
 ```
 
 Added in v1.0.0
@@ -1612,37 +1614,14 @@ export interface BrandSchema<From, To extends Brand.Brand<any>> extends Schema<F
 
 Added in v1.0.0
 
-## From (type alias)
-
-**Signature**
-
-```ts
-export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S['From']>[0]
-```
-
-Added in v1.0.0
-
 ## Schema (interface)
 
 **Signature**
 
 ```ts
-export interface Schema<From, To = From> extends Pipeable {
-  readonly _id: TypeId
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
+export interface Schema<From, To = From> extends Schema.Variance<From, To>, Pipeable {
   readonly ast: AST.AST
 }
-```
-
-Added in v1.0.0
-
-## To (type alias)
-
-**Signature**
-
-```ts
-export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
 ```
 
 Added in v1.0.0
@@ -2432,16 +2411,6 @@ Added in v1.0.0
 
 # symbol
 
-## SchemaPropertySignatureTypeId (type alias)
-
-**Signature**
-
-```ts
-export type SchemaPropertySignatureTypeId = typeof SchemaPropertySignatureTypeId
-```
-
-Added in v1.0.0
-
 ## TypeId (type alias)
 
 **Signature**
@@ -2853,8 +2822,8 @@ Added in v1.0.0
 
 ```ts
 export type FromStruct<Fields extends StructFields> = {
-  readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
-} & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+  readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
+} & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> }
 ```
 
 Added in v1.0.0
@@ -2885,43 +2854,56 @@ export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptiona
 
 Added in v1.0.0
 
-## OptionalSchemaPropertySignature (interface)
-
-**Signature**
-
-```ts
-export interface OptionalSchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly _id: SchemaPropertySignatureTypeId
-}
-```
-
-Added in v1.0.0
-
 ## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly From: (_: From) => From
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> extends Schema.Variance<From, To> {
   readonly FromIsOptional: FromIsOptional
-  readonly To: (_: To) => To
   readonly ToIsOptional: ToIsOptional
 }
 ```
 
 Added in v1.0.0
 
-## SchemaPropertySignature (interface)
+## Schema (namespace)
+
+Added in v1.0.0
+
+### Variance (interface)
 
 **Signature**
 
 ```ts
-export interface SchemaPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly _id: SchemaPropertySignatureTypeId
+export interface Variance<From, To> {
+  readonly [TypeId]: {
+    readonly From: (_: From) => From
+    readonly To: (_: To) => To
+  }
 }
+```
+
+Added in v1.0.0
+
+### From (type alias)
+
+**Signature**
+
+```ts
+export type From<S extends { readonly [TypeId]: { readonly From: (..._: any) => any } }> = Parameters<
+  S[TypeId]['From']
+>[0]
+```
+
+Added in v1.0.0
+
+### To (type alias)
+
+**Signature**
+
+```ts
+export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = Parameters<S[TypeId]['To']>[0]
 ```
 
 Added in v1.0.0
@@ -2974,8 +2956,8 @@ Added in v1.0.0
 
 ```ts
 export type ToStruct<Fields extends StructFields> = {
-  readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
-} & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
+} & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> }
 ```
 
 Added in v1.0.0

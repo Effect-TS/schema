@@ -274,7 +274,7 @@ Added in v1.0.0
 export type ToAsserts<S extends Schema.Schema<any>> = (
   input: unknown,
   options?: AST.ParseOptions
-) => asserts input is Schema.To<S>
+) => asserts input is Schema.Schema.To<S>
 ```
 
 Added in v1.0.0
