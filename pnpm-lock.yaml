@@ -35,8 +35,8 @@ devDependencies:
     specifier: ^0.17.1
     version: 0.17.1
   '@effect/docgen':
-    specifier: ^0.1.3
-    version: 0.1.3(@types/node@20.4.6)(typescript@5.2.2)
+    specifier: ^0.1.4
+    version: 0.1.4(@types/node@20.4.6)(typescript@5.2.2)
   '@effect/eslint-plugin':
     specifier: ^0.1.2
     version: 0.1.2
@@ -695,8 +695,8 @@ packages:
     resolution: {integrity: sha512-QCYkLE5Y5Dm5Yax5R3GmW4ZIgTx7W+kSZ7yq5eqQ/mFWa8i4yxbLuu8cudqzdeZtRtTGZKlhDxfFfgVtMywXJg==}
     dev: true
 
-  /@effect/docgen@0.1.3(@types/node@20.4.6)(typescript@5.2.2):
-    resolution: {integrity: sha512-pP9DN+c+a2Cux1LE48m6O1XO902k7uqW/T/iz7Oddh2dAS1ayRsNdpRKOk+2xv8gLvCFeMR9zYs52jaWG+EaxQ==}
+  /@effect/docgen@0.1.4(@types/node@20.4.6)(typescript@5.2.2):
+    resolution: {integrity: sha512-weC9RKjucxi87ryxRmSzC+DIPa0tqsdwwwbOjFRoTgajzDPjywlHTSciaG+uzBnfTVPAY52gFZpDFCc1+VgAKw==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     peerDependencies:

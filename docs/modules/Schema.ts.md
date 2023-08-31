@@ -246,6 +246,9 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
+  - [Class (namespace)](#class-namespace)
+    - [From (type alias)](#from-type-alias-1)
+    - [To (type alias)](#to-type-alias-1)
   - [DocAnnotations (interface)](#docannotations-interface)
   - [FilterAnnotations (interface)](#filterannotations-interface)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
@@ -2772,6 +2775,30 @@ export declare const ValidDateTypeId: typeof ValidDateTypeId
 Added in v1.0.0
 
 # utils
+
+## Class (namespace)
+
+Added in v1.0.0
+
+### From (type alias)
+
+**Signature**
+
+```ts
+export type From<A> = A extends Class<infer F, infer _T> ? F : never
+```
+
+Added in v1.0.0
+
+### To (type alias)
+
+**Signature**
+
+```ts
+export type To<A> = A extends Class<infer _F, infer T> ? T : never
+```
+
+Added in v1.0.0
 
 ## DocAnnotations (interface)
 

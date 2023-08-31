@@ -3237,7 +3237,7 @@ export interface Class<I, A, Inherited = {}> {
 /**
  * @since 1.0.0
  */
-export namespace Class {
+export declare namespace Class {
   /**
    * @since 1.0.0
    */
