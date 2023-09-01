@@ -12,91 +12,109 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [Date](#date)
-  - [Date](#date-1)
+- [Chunk transformations](#chunk-transformations)
+  - [chunk](#chunk)
+  - [chunkFromSelf](#chunkfromself)
+- [Data transformations](#data-transformations)
+  - [data](#data)
+  - [dataFromSelf](#datafromself)
+- [Date constructors](#date-constructors)
+  - [Date](#date)
   - [DateFromSelf](#datefromself)
+  - [ValidDate](#validdate)
   - [ValidDateFromSelf](#validdatefromself)
+- [Date filters](#date-filters)
+  - [validDate](#validdate-1)
+- [Date transformations](#date-transformations)
   - [dateFromString](#datefromstring)
-  - [validDate](#validdate)
+- [Either transformations](#either-transformations)
+  - [either](#either)
+  - [eitherFromSelf](#eitherfromself)
+- [Option transformations](#option-transformations)
+  - [option](#option)
+  - [optionFromNullable](#optionfromnullable)
+  - [optionFromSelf](#optionfromself)
+- [ReadonlyArray filters](#readonlyarray-filters)
+  - [itemsCount](#itemscount)
+  - [maxItems](#maxitems)
+  - [minItems](#minitems)
+- [ReadonlyMap transformations](#readonlymap-transformations)
+  - [readonlyMap](#readonlymap)
+  - [readonlyMapFromSelf](#readonlymapfromself)
+- [ReadonlySet transformations](#readonlyset-transformations)
+  - [readonlySet](#readonlyset)
+  - [readonlySetFromSelf](#readonlysetfromself)
 - [annotations](#annotations)
+  - [annotations](#annotations-1)
   - [description](#description)
   - [documentation](#documentation)
   - [examples](#examples)
   - [identifier](#identifier)
   - [message](#message)
   - [title](#title)
-- [array](#array)
-  - [itemsCount](#itemscount)
-  - [maxItems](#maxitems)
-  - [minItems](#minitems)
-- [bigint](#bigint)
+- [bigint constructors](#bigint-constructors)
   - [BigintFromNumber](#bigintfromnumber)
-  - [BigintFromString](#bigintfromstring)
+  - [NegativeBigint](#negativebigint)
+  - [NegativeBigintFromSelf](#negativebigintfromself)
+  - [NonNegativeBigint](#nonnegativebigint)
+  - [NonNegativeBigintFromSelf](#nonnegativebigintfromself)
+  - [NonPositiveBigint](#nonpositivebigint)
+  - [NonPositiveBigintFromSelf](#nonpositivebigintfromself)
+  - [PositiveBigint](#positivebigint)
+  - [PositiveBigintFromSelf](#positivebigintfromself)
+  - [bigint](#bigint)
+- [bigint filters](#bigint-filters)
   - [betweenBigint](#betweenbigint)
-  - [bigintFromNumber](#bigintfromnumber-1)
-  - [bigintFromString](#bigintfromstring-1)
-  - [clampBigint](#clampbigint)
   - [greaterThanBigint](#greaterthanbigint)
   - [greaterThanOrEqualToBigint](#greaterthanorequaltobigint)
   - [lessThanBigint](#lessthanbigint)
   - [lessThanOrEqualToBigint](#lessthanorequaltobigint)
-  - [negativeBigint](#negativebigint)
-  - [nonNegativeBigint](#nonnegativebigint)
-  - [nonPositiveBigint](#nonpositivebigint)
-  - [positiveBigint](#positivebigint)
-- [boolean](#boolean)
-  - [not](#not)
+  - [negativeBigint](#negativebigint-1)
+  - [nonNegativeBigint](#nonnegativebigint-1)
+  - [nonPositiveBigint](#nonpositivebigint-1)
+  - [positiveBigint](#positivebigint-1)
+- [bigint transformations](#bigint-transformations)
+  - [bigintFromNumber](#bigintfromnumber-1)
+  - [bigintFromString](#bigintfromstring)
+  - [clampBigint](#clampbigint)
+- [boolean constructors](#boolean-constructors)
+  - [Not](#not)
+- [boolean transformations](#boolean-transformations)
+  - [not](#not-1)
 - [classes](#classes)
   - [Class](#class)
   - [Class (interface)](#class-interface)
 - [combinators](#combinators)
-  - [annotations](#annotations-1)
-  - [array](#array-1)
+  - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
   - [brand](#brand)
-  - [chunk](#chunk)
   - [compose](#compose)
-  - [data](#data)
-  - [dataFromSelf](#datafromself)
-  - [declare](#declare)
-  - [either](#either)
-  - [eitherFromSelf](#eitherfromself)
   - [element](#element)
   - [extend](#extend)
   - [filter](#filter)
-  - [fromBrand](#frombrand)
   - [keyof](#keyof)
   - [lazy](#lazy)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
   - [omit](#omit)
-  - [option](#option)
-  - [optionFromSelf](#optionfromself)
   - [optionalElement](#optionalelement)
   - [partial](#partial)
   - [pick](#pick)
-  - [readonlyMap](#readonlymap)
-  - [readonlySet](#readonlyset)
   - [record](#record)
   - [required](#required)
   - [rest](#rest)
   - [struct](#struct)
   - [transform](#transform)
-  - [transformResult](#transformresult)
+  - [transformOrFail](#transformorfail)
   - [tuple](#tuple)
   - [union](#union)
 - [constructors](#constructors)
-  - [JsonNumber](#jsonnumber)
-  - [ULID](#ulid)
-  - [UUID](#uuid)
-  - [chunkFromSelf](#chunkfromself)
+  - [declare](#declare)
   - [enums](#enums)
+  - [fromBrand](#frombrand)
   - [instanceOf](#instanceof)
   - [literal](#literal)
   - [make](#make)
-  - [propertySignature](#propertysignature)
-  - [readonlyMapFromSelf](#readonlymapfromself)
-  - [readonlySetFromSelf](#readonlysetfromself)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [decoding](#decoding)
@@ -116,30 +134,35 @@ Added in v1.0.0
 - [guards](#guards)
   - [isSchema](#isschema)
 - [model](#model)
-  - [AnnotationOptions (type alias)](#annotationoptions-type-alias)
   - [BrandSchema (interface)](#brandschema-interface)
-  - [From (type alias)](#from-type-alias)
   - [Schema (interface)](#schema-interface)
-  - [To (type alias)](#to-type-alias)
-- [number](#number)
+- [number constructors](#number-constructors)
+  - [Finite](#finite)
+  - [Int](#int)
+  - [JsonNumber](#jsonnumber)
+  - [Negative](#negative)
+  - [NonNaN](#nonnan)
+  - [NonNegative](#nonnegative)
+  - [NonPositive](#nonpositive)
   - [NumberFromString](#numberfromstring)
+  - [Positive](#positive)
+- [number filters](#number-filters)
   - [between](#between)
-  - [clamp](#clamp)
-  - [finite](#finite)
+  - [finite](#finite-1)
   - [greaterThan](#greaterthan)
   - [greaterThanOrEqualTo](#greaterthanorequalto)
-  - [int](#int)
+  - [int](#int-1)
   - [lessThan](#lessthan)
   - [lessThanOrEqualTo](#lessthanorequalto)
   - [multipleOf](#multipleof)
-  - [negative](#negative)
-  - [nonNaN](#nonnan)
-  - [nonNegative](#nonnegative)
-  - [nonPositive](#nonpositive)
+  - [negative](#negative-1)
+  - [nonNaN](#nonnan-1)
+  - [nonNegative](#nonnegative-1)
+  - [nonPositive](#nonpositive-1)
+  - [positive](#positive-1)
+- [number transformations](#number-transformations)
+  - [clamp](#clamp)
   - [numberFromString](#numberfromstring-1)
-  - [positive](#positive)
-- [option](#option-1)
-  - [optionFromNullable](#optionfromnullable)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEither](#parseeither)
@@ -149,32 +172,41 @@ Added in v1.0.0
   - [parseSync](#parsesync)
 - [primitives](#primitives)
   - [any](#any)
-  - [bigint](#bigint-1)
-  - [boolean](#boolean-1)
+  - [bigintFromSelf](#bigintfromself)
+  - [boolean](#boolean)
   - [never](#never)
   - [null](#null)
-  - [number](#number-1)
+  - [number](#number)
   - [object](#object)
   - [string](#string)
   - [symbol](#symbol)
   - [undefined](#undefined)
   - [unknown](#unknown)
   - [void](#void)
-- [string](#string-1)
+- [string constructors](#string-constructors)
+  - [NonEmpty](#nonempty)
   - [ParseJson](#parsejson)
   - [Trim](#trim)
+  - [Trimmed](#trimmed)
+  - [ULID](#ulid)
+  - [UUID](#uuid)
+- [string filters](#string-filters)
   - [endsWith](#endswith)
   - [includes](#includes)
   - [length](#length)
+  - [lowercased](#lowercased)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
-  - [nonEmpty](#nonempty)
-  - [parseJson](#parsejson-1)
+  - [nonEmpty](#nonempty-1)
   - [pattern](#pattern)
-  - [split](#split)
   - [startsWith](#startswith)
+  - [trimmed](#trimmed-1)
+- [string transformations](#string-transformations)
+  - [Lowercase](#lowercase)
+  - [lowercase](#lowercase-1)
+  - [parseJson](#parsejson-1)
+  - [split](#split)
   - [trim](#trim-1)
-  - [trimmed](#trimmed)
 - [symbol](#symbol-1)
   - [TypeId (type alias)](#typeid-type-alias)
 - [type id](#type-id)
@@ -192,42 +224,46 @@ Added in v1.0.0
   - [IntTypeId](#inttypeid)
   - [ItemsCountTypeId](#itemscounttypeid)
   - [JsonNumberTypeId](#jsonnumbertypeid)
+  - [LengthTypeId](#lengthtypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
   - [LessThanTypeId](#lessthantypeid)
+  - [LowercasedTypeId](#lowercasedtypeid)
   - [MaxItemsTypeId](#maxitemstypeid)
   - [MaxLengthTypeId](#maxlengthtypeid)
   - [MinItemsTypeId](#minitemstypeid)
   - [MinLengthTypeId](#minlengthtypeid)
   - [MultipleOfTypeId](#multipleoftypeid)
-  - [NegativeBigintTypeId](#negativebiginttypeid)
-  - [NegativeTypeId](#negativetypeid)
   - [NonNaNTypeId](#nonnantypeid)
-  - [NonNegativeBigintTypeId](#nonnegativebiginttypeid)
-  - [NonNegativeTypeId](#nonnegativetypeid)
-  - [NonPositiveBigintTypeId](#nonpositivebiginttypeid)
-  - [NonPositiveTypeId](#nonpositivetypeid)
   - [PatternTypeId](#patterntypeid)
-  - [PositiveBigintTypeId](#positivebiginttypeid)
-  - [PositiveTypeId](#positivetypeid)
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
   - [ULIDTypeId](#ulidtypeid)
   - [UUIDTypeId](#uuidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
+  - [Class (namespace)](#class-namespace)
+    - [From (type alias)](#from-type-alias)
+    - [To (type alias)](#to-type-alias)
+  - [DocAnnotations (interface)](#docannotations-interface)
+  - [FilterAnnotations (interface)](#filterannotations-interface)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
+  - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
-  - [Spread (type alias)](#spread-type-alias)
+  - [Schema (namespace)](#schema-namespace)
+    - [Variance (interface)](#variance-interface)
+    - [From (type alias)](#from-type-alias-1)
+    - [To (type alias)](#to-type-alias-1)
   - [StructFields (type alias)](#structfields-type-alias)
   - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [ToStruct (type alias)](#tostruct-type-alias)
   - [from](#from)
   - [optional](#optional)
+  - [propertySignature](#propertysignature)
   - [to](#to)
 - [validation](#validation)
   - [asserts](#asserts)
@@ -241,7 +277,61 @@ Added in v1.0.0
 
 ---
 
-# Date
+# Chunk transformations
+
+## chunk
+
+**Signature**
+
+```ts
+export declare const chunk: <I, A>(item: Schema<I, A>) => Schema<readonly I[], Chunk.Chunk<A>>
+```
+
+Added in v1.0.0
+
+## chunkFromSelf
+
+**Signature**
+
+```ts
+export declare const chunkFromSelf: <I, A>(item: Schema<I, A>) => Schema<Chunk.Chunk<I>, Chunk.Chunk<A>>
+```
+
+Added in v1.0.0
+
+# Data transformations
+
+## data
+
+**Signature**
+
+```ts
+export declare const data: <
+  I extends readonly any[] | Readonly<Record<string, any>>,
+  A extends readonly any[] | Readonly<Record<string, any>>
+>(
+  item: Schema<I, A>
+) => Schema<I, Data.Data<A>>
+```
+
+Added in v1.0.0
+
+## dataFromSelf
+
+**Signature**
+
+```ts
+export declare const dataFromSelf: <
+  I extends readonly any[] | Readonly<Record<string, any>>,
+  A extends readonly any[] | Readonly<Record<string, any>>
+>(
+  item: Schema<I, A>
+) => Schema<Data.Data<I>, Data.Data<A>>
+```
+
+Added in v1.0.0
+
+# Date constructors
 
 ## Date
 
@@ -265,6 +355,18 @@ export declare const DateFromSelf: Schema<Date, Date>
 
 Added in v1.0.0
 
+## ValidDate
+
+A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
+
+**Signature**
+
+```ts
+export declare const ValidDate: Schema<string, Date>
+```
+
+Added in v1.0.0
+
 ## ValidDateFromSelf
 
 A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
@@ -276,6 +378,22 @@ export declare const ValidDateFromSelf: Schema<Date, Date>
 ```
 
 Added in v1.0.0
+
+# Date filters
+
+## validDate
+
+A filter excluding invalid dates (e.g. `new Date("fail")`).
+
+**Signature**
+
+```ts
+export declare const validDate: (options?: FilterAnnotations<Date>) => <I>(self: Schema<I, Date>) => Schema<I, Date>
+```
+
+Added in v1.0.0
+
+# Date transformations
 
 ## dateFromString
 
@@ -289,19 +407,175 @@ export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) =
 
 Added in v1.0.0
 
-## validDate
+# Either transformations
 
-A filter excluding invalid dates (e.g. `new Date("fail")`).
+## either
 
 **Signature**
 
 ```ts
-export declare const validDate: (options?: AnnotationOptions<Date>) => <I>(self: Schema<I, Date>) => Schema<I, Date>
+export declare const either: <IE, E, IA, A>(
+  left: Schema<IE, E>,
+  right: Schema<IA, A>
+) => Schema<
+  { readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA },
+  Either.Either<E, A>
+>
+```
+
+Added in v1.0.0
+
+## eitherFromSelf
+
+**Signature**
+
+```ts
+export declare const eitherFromSelf: <IE, E, IA, A>(
+  left: Schema<IE, E>,
+  right: Schema<IA, A>
+) => Schema<Either.Either<IE, IA>, Either.Either<E, A>>
+```
+
+Added in v1.0.0
+
+# Option transformations
+
+## option
+
+**Signature**
+
+```ts
+export declare const option: <I, A>(
+  value: Schema<I, A>
+) => Schema<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option.Option<A>>
+```
+
+Added in v1.0.0
+
+## optionFromNullable
+
+**Signature**
+
+```ts
+export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option.Option<A>>
+```
+
+Added in v1.0.0
+
+## optionFromSelf
+
+**Signature**
+
+```ts
+export declare const optionFromSelf: <I, A>(value: Schema<I, A>) => Schema<Option.Option<I>, Option.Option<A>>
+```
+
+Added in v1.0.0
+
+# ReadonlyArray filters
+
+## itemsCount
+
+**Signature**
+
+```ts
+export declare const itemsCount: <A>(
+  n: number,
+  options?: FilterAnnotations<readonly A[]> | undefined
+) => <I>(self: Schema<I, readonly A[]>) => Schema<I, readonly A[]>
+```
+
+Added in v1.0.0
+
+## maxItems
+
+**Signature**
+
+```ts
+export declare const maxItems: <A>(
+  n: number,
+  options?: FilterAnnotations<readonly A[]> | undefined
+) => <I>(self: Schema<I, readonly A[]>) => Schema<I, readonly A[]>
+```
+
+Added in v1.0.0
+
+## minItems
+
+**Signature**
+
+```ts
+export declare const minItems: <A>(
+  n: number,
+  options?: FilterAnnotations<readonly A[]> | undefined
+) => <I>(self: Schema<I, readonly A[]>) => Schema<I, readonly A[]>
+```
+
+Added in v1.0.0
+
+# ReadonlyMap transformations
+
+## readonlyMap
+
+**Signature**
+
+```ts
+export declare const readonlyMap: <IK, K, IV, V>(
+  key: Schema<IK, K>,
+  value: Schema<IV, V>
+) => Schema<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
+```
+
+Added in v1.0.0
+
+## readonlyMapFromSelf
+
+**Signature**
+
+```ts
+export declare const readonlyMapFromSelf: <IK, K, IV, V>(
+  key: Schema<IK, K>,
+  value: Schema<IV, V>
+) => Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
+```
+
+Added in v1.0.0
+
+# ReadonlySet transformations
+
+## readonlySet
+
+**Signature**
+
+```ts
+export declare const readonlySet: <I, A>(item: Schema<I, A>) => Schema<readonly I[], ReadonlySet<A>>
+```
+
+Added in v1.0.0
+
+## readonlySetFromSelf
+
+**Signature**
+
+```ts
+export declare const readonlySetFromSelf: <I, A>(item: Schema<I, A>) => Schema<ReadonlySet<I>, ReadonlySet<A>>
 ```
 
 Added in v1.0.0
 
 # annotations
+
+## annotations
+
+**Signature**
+
+```ts
+export declare const annotations: (
+  annotations: AST.Annotated['annotations']
+) => <I, A>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
 
 ## description
 
@@ -365,48 +639,7 @@ export declare const title: (title: AST.TitleAnnotation) => <I, A>(self: Schema<
 
 Added in v1.0.0
 
-# array
-
-## itemsCount
-
-**Signature**
-
-```ts
-export declare const itemsCount: <A>(
-  n: number,
-  options?: AnnotationOptions<readonly A[]> | undefined
-) => <I>(self: Schema<I, readonly A[]>) => Schema<I, readonly A[]>
-```
-
-Added in v1.0.0
-
-## maxItems
-
-**Signature**
-
-```ts
-export declare const maxItems: <A>(
-  n: number,
-  options?: AnnotationOptions<readonly A[]> | undefined
-) => <I>(self: Schema<I, readonly A[]>) => Schema<I, readonly A[]>
-```
-
-Added in v1.0.0
-
-## minItems
-
-**Signature**
-
-```ts
-export declare const minItems: <A>(
-  n: number,
-  options?: AnnotationOptions<readonly A[]> | undefined
-) => <I>(self: Schema<I, readonly A[]>) => Schema<I, readonly A[]>
-```
-
-Added in v1.0.0
-
-# bigint
+# bigint constructors
 
 ## BigintFromNumber
 
@@ -422,7 +655,87 @@ export declare const BigintFromNumber: Schema<number, bigint>
 
 Added in v1.0.0
 
-## BigintFromString
+## NegativeBigint
+
+**Signature**
+
+```ts
+export declare const NegativeBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## NegativeBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const NegativeBigintFromSelf: Schema<bigint, bigint>
+```
+
+Added in v1.0.0
+
+## NonNegativeBigint
+
+**Signature**
+
+```ts
+export declare const NonNegativeBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## NonNegativeBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const NonNegativeBigintFromSelf: Schema<bigint, bigint>
+```
+
+Added in v1.0.0
+
+## NonPositiveBigint
+
+**Signature**
+
+```ts
+export declare const NonPositiveBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## NonPositiveBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const NonPositiveBigintFromSelf: Schema<bigint, bigint>
+```
+
+Added in v1.0.0
+
+## PositiveBigint
+
+**Signature**
+
+```ts
+export declare const PositiveBigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
+## PositiveBigintFromSelf
+
+**Signature**
+
+```ts
+export declare const PositiveBigintFromSelf: Schema<bigint, bigint>
+```
+
+Added in v1.0.0
+
+## bigint
 
 This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
 
@@ -431,10 +744,12 @@ It returns an error if the value can't be converted (for example when non-numeri
 **Signature**
 
 ```ts
-export declare const BigintFromString: Schema<string, bigint>
+export declare const bigint: Schema<string, bigint>
 ```
 
 Added in v1.0.0
+
+# bigint filters
 
 ## betweenBigint
 
@@ -444,11 +759,113 @@ Added in v1.0.0
 export declare const betweenBigint: <A extends bigint>(
   min: bigint,
   max: bigint,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
+
+## greaterThanBigint
+
+**Signature**
+
+```ts
+export declare const greaterThanBigint: <A extends bigint>(
+  min: bigint,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanOrEqualToBigint
+
+**Signature**
+
+```ts
+export declare const greaterThanOrEqualToBigint: <A extends bigint>(
+  min: bigint,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanBigint
+
+**Signature**
+
+```ts
+export declare const lessThanBigint: <A extends bigint>(
+  max: bigint,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanOrEqualToBigint
+
+**Signature**
+
+```ts
+export declare const lessThanOrEqualToBigint: <A extends bigint>(
+  max: bigint,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## negativeBigint
+
+**Signature**
+
+```ts
+export declare const negativeBigint: <A extends bigint>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## nonNegativeBigint
+
+**Signature**
+
+```ts
+export declare const nonNegativeBigint: <A extends bigint>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## nonPositiveBigint
+
+**Signature**
+
+```ts
+export declare const nonPositiveBigint: <A extends bigint>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## positiveBigint
+
+**Signature**
+
+```ts
+export declare const positiveBigint: <A extends bigint>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+# bigint transformations
 
 ## bigintFromNumber
 
@@ -493,107 +910,19 @@ export declare const clampBigint: (
 
 Added in v1.0.0
 
-## greaterThanBigint
+# boolean constructors
+
+## Not
 
 **Signature**
 
 ```ts
-export declare const greaterThanBigint: <A extends bigint>(
-  min: bigint,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
+export declare const Not: Schema<boolean, boolean>
 ```
 
 Added in v1.0.0
 
-## greaterThanOrEqualToBigint
-
-**Signature**
-
-```ts
-export declare const greaterThanOrEqualToBigint: <A extends bigint>(
-  min: bigint,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## lessThanBigint
-
-**Signature**
-
-```ts
-export declare const lessThanBigint: <A extends bigint>(
-  max: bigint,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## lessThanOrEqualToBigint
-
-**Signature**
-
-```ts
-export declare const lessThanOrEqualToBigint: <A extends bigint>(
-  max: bigint,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## negativeBigint
-
-**Signature**
-
-```ts
-export declare const negativeBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## nonNegativeBigint
-
-**Signature**
-
-```ts
-export declare const nonNegativeBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## nonPositiveBigint
-
-**Signature**
-
-```ts
-export declare const nonPositiveBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## positiveBigint
-
-**Signature**
-
-```ts
-export declare const positiveBigint: <A extends bigint>(
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-# boolean
+# boolean transformations
 
 ## not
 
@@ -616,7 +945,7 @@ Added in v1.0.0
 ```ts
 export declare const Class: <Fields extends StructFields>(
   fields: Fields
-) => Class<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>, {}>
+) => Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, {}>
 ```
 
 Added in v1.0.0
@@ -627,7 +956,7 @@ Added in v1.0.0
 
 ```ts
 export interface Class<I, A, Inherited = {}> {
-  new (props: A): A & D.Case & Omit<Inherited, keyof A>
+  new (props: A): A & Data.Case & Omit<Inherited, keyof A>
 
   schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
   schemaStruct(): Schema<I, A>
@@ -635,40 +964,28 @@ export interface Class<I, A, Inherited = {}> {
     this: T,
     fields: Fields
   ): Class<
-    Spread<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    Simplify<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
     InstanceType<T>
   >
   transform<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
-    decode: (input: Class.To<T>) => ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult<Class.To<T>>
-  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
+    decode: (input: Class.To<T>) => ParseResult.ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
+    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult.ParseResult<Class.To<T>>
+  ): Class<Class.From<T>, Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
   transformFrom<T extends new (...args: any) => any, Fields extends StructFields>(
     this: T,
     fields: Fields,
-    decode: (input: Class.From<T>) => ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult<Class.From<T>>
-  ): Class<Class.From<T>, Spread<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
+    decode: (input: Class.From<T>) => ParseResult.ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
+    encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult.ParseResult<Class.From<T>>
+  ): Class<Class.From<T>, Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
 }
 ```
 
 Added in v1.0.0
 
 # combinators
-
-## annotations
-
-**Signature**
-
-```ts
-export declare const annotations: (
-  annotations: AST.Annotated['annotations']
-) => <I, A>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
 
 ## array
 
@@ -689,10 +1006,15 @@ but rather maps to another schema, for example when you want to add a discrimina
 **Signature**
 
 ```ts
-export declare const attachPropertySignature: <K extends PropertyKey, V extends AST.LiteralValue>(
-  key: K,
-  value: V
-) => <I, A extends object>(schema: Schema<I, A>) => Schema<I, Spread<A & { readonly [k in K]: V }>>
+export declare const attachPropertySignature: {
+  <K extends PropertyKey, V extends AST.LiteralValue>(key: K, value: V): <I, A extends object>(
+    schema: Schema<I, A>
+  ) => Schema<I, Simplify<A & { readonly [k in K]: V }>>
+  <I, A, K extends PropertyKey, V extends AST.LiteralValue>(schema: Schema<I, A>, key: K, value: V): Schema<
+    I,
+    Simplify<A & { readonly [k in K]: V }>
+  >
+}
 ```
 
 **Example**
@@ -729,27 +1051,17 @@ Schema<A> + B -> Schema<A & Brand<B>>
 ```ts
 export declare const brand: <B extends string | symbol, A>(
   brand: B,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => BrandSchema<I, A & Brand<B>>
+  options?: DocAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => BrandSchema<I, A & Brand.Brand<B>>
 ```
 
 **Example**
 
 ```ts
-import * as S from '@effect/schema/Schema'
+import * as Schema from '@effect/schema/Schema'
 
-const Int = S.number.pipe(S.int(), S.brand('Int'))
-type Int = S.To<typeof Int> // number & Brand<"Int">
-```
-
-Added in v1.0.0
-
-## chunk
-
-**Signature**
-
-```ts
-export declare const chunk: <I, A>(item: Schema<I, A>) => Schema<readonly I[], Chunk<A>>
+const Int = Schema.number.pipe(Schema.int(), Schema.brand('Int'))
+type Int = Schema.Schema.To<typeof Int> // number & Brand<"Int">
 ```
 
 Added in v1.0.0
@@ -760,86 +1072,11 @@ Added in v1.0.0
 
 ```ts
 export declare const compose: {
-  <B, C>(bc: Schema<B, C>): <A>(ab: Schema<A, B>) => Schema<A, C>
-  <B, C extends B, D>(cd: Schema<C, D>, options: { force: 'decoding' }): <A>(ab: Schema<A, B>) => Schema<A, D>
-  <C, D>(cd: Schema<C, D>, options: { force: 'encoding' }): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
-  <A, B, C>(ab: Schema<A, B>, bc: Schema<B, C>): Schema<A, C>
-  <A, B, C extends B, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'decoding' }): Schema<A, D>
-  <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>, options: { force: 'encoding' }): Schema<A, D>
+  <B, C extends B, D>(bc: Schema<C, D>): <A>(ab: Schema<A, B>) => Schema<A, D>
+  <C, D>(bc: Schema<C, D>): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
+  <A, B, C extends B, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
+  <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
 }
-```
-
-Added in v1.0.0
-
-## data
-
-**Signature**
-
-```ts
-export declare const data: <
-  I extends readonly any[] | Readonly<Record<string, any>>,
-  A extends readonly any[] | Readonly<Record<string, any>>
->(
-  item: Schema<I, A>
-) => Schema<I, D.Data<A>>
-```
-
-Added in v1.0.0
-
-## dataFromSelf
-
-**Signature**
-
-```ts
-export declare const dataFromSelf: <
-  I extends readonly any[] | Readonly<Record<string, any>>,
-  A extends readonly any[] | Readonly<Record<string, any>>
->(
-  item: Schema<I, A>
-) => Schema<D.Data<I>, D.Data<A>>
-```
-
-Added in v1.0.0
-
-## declare
-
-**Signature**
-
-```ts
-export declare const declare: (
-  typeParameters: ReadonlyArray<Schema<any>>,
-  type: Schema<any>,
-  decode: (
-    ...typeParameters: ReadonlyArray<Schema<any>>
-  ) => (input: unknown, options?: ParseOptions) => ParseResult<any>,
-  annotations?: AST.Annotated['annotations']
-) => Schema<any>
-```
-
-Added in v1.0.0
-
-## either
-
-**Signature**
-
-```ts
-export declare const either: <IE, E, IA, A>(
-  left: Schema<IE, E>,
-  right: Schema<IA, A>
-) => Schema<{ readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA }, Either<E, A>>
-```
-
-Added in v1.0.0
-
-## eitherFromSelf
-
-**Signature**
-
-```ts
-export declare const eitherFromSelf: <IE, E, IA, A>(
-  left: Schema<IE, E>,
-  right: Schema<IA, A>
-) => Schema<Either<IE, IA>, Either<E, A>>
 ```
 
 Added in v1.0.0
@@ -864,8 +1101,8 @@ Added in v1.0.0
 
 ```ts
 export declare const extend: {
-  <IB, B>(that: Schema<IB, B>): <I, A>(self: Schema<I, A>) => Schema<Spread<I & IB>, Spread<A & B>>
-  <I, A, IB, B>(self: Schema<I, A>, that: Schema<IB, B>): Schema<Spread<I & IB>, Spread<A & B>>
+  <IB, B>(that: Schema<IB, B>): <I, A>(self: Schema<I, A>) => Schema<Simplify<I & IB>, Simplify<A & B>>
+  <I, A, IB, B>(self: Schema<I, A>, that: Schema<IB, B>): Schema<Simplify<I & IB>, Simplify<A & B>>
 }
 ```
 
@@ -877,26 +1114,13 @@ Added in v1.0.0
 
 ```ts
 export declare function filter<C extends A, B extends A, A = C>(
-  refinement: Refinement<A, B>,
-  options?: AnnotationOptions<A>
+  refinement: Predicate.Refinement<A, B>,
+  options?: FilterAnnotations<A>
 ): <I>(self: Schema<I, C>) => Schema<I, C & B>
 export declare function filter<B extends A, A = B>(
-  predicate: Predicate<A>,
-  options?: AnnotationOptions<A>
+  predicate: Predicate.Predicate<A>,
+  options?: FilterAnnotations<A>
 ): <I>(self: Schema<I, B>) => Schema<I, B>
-```
-
-Added in v1.0.0
-
-## fromBrand
-
-**Signature**
-
-```ts
-export declare const fromBrand: <C extends Brand<string | symbol>>(
-  constructor: Brand.Constructor<C>,
-  options?: AnnotationOptions<Brand.Unbranded<C>> | undefined
-) => <I, A extends Brand.Unbranded<C>>(self: Schema<I, A>) => Schema<I, A & C>
 ```
 
 Added in v1.0.0
@@ -950,29 +1174,7 @@ export declare const omit: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Schema<I, A>
-) => Schema<Spread<Omit<I, Keys[number]>>, Spread<Omit<A, Keys[number]>>>
-```
-
-Added in v1.0.0
-
-## option
-
-**Signature**
-
-```ts
-export declare const option: <I, A>(
-  value: Schema<I, A>
-) => Schema<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option<A>>
-```
-
-Added in v1.0.0
-
-## optionFromSelf
-
-**Signature**
-
-```ts
-export declare const optionFromSelf: <I, A>(value: Schema<I, A>) => Schema<Option<I>, Option<A>>
+) => Schema<Simplify<Omit<I, Keys[number]>>, Simplify<Omit<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -996,7 +1198,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const partial: <I, A>(self: Schema<I, A>) => Schema<Spread<Partial<I>>, Spread<Partial<A>>>
+export declare const partial: <I, A>(self: Schema<I, A>) => Schema<Simplify<Partial<I>>, Simplify<Partial<A>>>
 ```
 
 Added in v1.0.0
@@ -1010,30 +1212,7 @@ export declare const pick: <A, Keys extends readonly (keyof A)[]>(
   ...keys: Keys
 ) => <I extends { [K in keyof A]?: any }>(
   self: Schema<I, A>
-) => Schema<Spread<Pick<I, Keys[number]>>, Spread<Pick<A, Keys[number]>>>
-```
-
-Added in v1.0.0
-
-## readonlyMap
-
-**Signature**
-
-```ts
-export declare const readonlyMap: <IK, K, IV, V>(
-  key: Schema<IK, K>,
-  value: Schema<IV, V>
-) => Schema<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
-```
-
-Added in v1.0.0
-
-## readonlySet
-
-**Signature**
-
-```ts
-export declare const readonlySet: <I, A>(item: Schema<I, A>) => Schema<readonly I[], ReadonlySet<A>>
+) => Schema<Simplify<Pick<I, Keys[number]>>, Simplify<Pick<A, Keys[number]>>>
 ```
 
 Added in v1.0.0
@@ -1043,10 +1222,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const record: <K extends string | symbol, I, A>(
-  key: Schema<K, K>,
-  value: Schema<I, A>
-) => Schema<{ readonly [k in K]: I }, { readonly [k in K]: A }>
+export declare const record: <IK extends string | symbol, AK extends IK, IV, AV>(
+  key: Schema<IK, AK>,
+  value: Schema<IV, AV>
+) => Schema<{ readonly [k in IK]: IV }, { readonly [k in AK]: AV }>
 ```
 
 Added in v1.0.0
@@ -1056,7 +1235,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const required: <I, A>(self: Schema<I, A>) => Schema<Spread<Required<I>>, Spread<Required<A>>>
+export declare const required: <I, A>(self: Schema<I, A>) => Schema<Simplify<Required<I>>, Simplify<Required<A>>>
 ```
 
 Added in v1.0.0
@@ -1082,7 +1261,7 @@ Added in v1.0.0
 ```ts
 export declare const struct: <Fields extends StructFields>(
   fields: Fields
-) => Schema<Spread<FromStruct<Fields>>, Spread<ToStruct<Fields>>>
+) => Schema<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>>
 ```
 
 Added in v1.0.0
@@ -1108,7 +1287,7 @@ export declare const transform: {
 
 Added in v1.0.0
 
-## transformResult
+## transformOrFail
 
 Create a new `Schema` by transforming the input and output of an existing `Schema`
 using the provided decoding functions.
@@ -1116,17 +1295,19 @@ using the provided decoding functions.
 **Signature**
 
 ```ts
-export declare const transformResult: {
+export declare const transformOrFail: {
   <I2, A2, A1>(
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
+    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<A1>,
+    annotations?: AST.Annotated['annotations']
   ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
   <I1, A1, I2, A2>(
     from: Schema<I1, A1>,
     to: Schema<I2, A2>,
-    decode: (a1: A1, options?: ParseOptions) => ParseResult<I2>,
-    encode: (i2: I2, options?: ParseOptions) => ParseResult<A1>
+    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,
+    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<A1>,
+    annotations?: AST.Annotated['annotations']
   ): Schema<I1, A2>
 }
 ```
@@ -1140,7 +1321,10 @@ Added in v1.0.0
 ```ts
 export declare const tuple: <Elements extends readonly Schema<any, any>[]>(
   ...elements: Elements
-) => Schema<{ readonly [K in keyof Elements]: From<Elements[K]> }, { readonly [K in keyof Elements]: To<Elements[K]> }>
+) => Schema<
+  { readonly [K in keyof Elements]: Schema.From<Elements[K]> },
+  { readonly [K in keyof Elements]: Schema.To<Elements[K]> }
+>
 ```
 
 Added in v1.0.0
@@ -1152,12 +1336,317 @@ Added in v1.0.0
 ```ts
 export declare const union: <Members extends readonly Schema<any, any>[]>(
   ...members: Members
-) => Schema<From<Members[number]>, To<Members[number]>>
+) => Schema<Schema.From<Members[number]>, Schema.To<Members[number]>>
 ```
 
 Added in v1.0.0
 
 # constructors
+
+## declare
+
+**Signature**
+
+```ts
+export declare const declare: (
+  typeParameters: ReadonlyArray<Schema<any>>,
+  type: Schema<any>,
+  decode: (
+    isDecoding: boolean,
+    ...typeParameters: ReadonlyArray<Schema<any>>
+  ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<any>,
+  annotations?: AST.Annotated['annotations']
+) => Schema<any>
+```
+
+Added in v1.0.0
+
+## enums
+
+**Signature**
+
+```ts
+export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Schema<A[keyof A], A[keyof A]>
+```
+
+Added in v1.0.0
+
+## fromBrand
+
+**Signature**
+
+```ts
+export declare const fromBrand: <C extends Brand.Brand<string | symbol>>(
+  constructor: Brand.Brand.Constructor<C>,
+  options?: FilterAnnotations<Brand.Brand.Unbranded<C>> | undefined
+) => <I, A extends Brand.Brand.Unbranded<C>>(self: Schema<I, A>) => Schema<I, A & C>
+```
+
+Added in v1.0.0
+
+## instanceOf
+
+**Signature**
+
+```ts
+export declare const instanceOf: <A extends abstract new (...args: any) => any>(
+  constructor: A,
+  options?: FilterAnnotations<object>
+) => Schema<InstanceType<A>, InstanceType<A>>
+```
+
+Added in v1.0.0
+
+## literal
+
+**Signature**
+
+```ts
+export declare const literal: <Literals extends readonly AST.LiteralValue[]>(
+  ...literals: Literals
+) => Schema<Literals[number], Literals[number]>
+```
+
+Added in v1.0.0
+
+## make
+
+**Signature**
+
+```ts
+export declare const make: <I, A>(ast: AST.AST) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## templateLiteral
+
+**Signature**
+
+```ts
+export declare const templateLiteral: <T extends [Schema<any, any>, ...Schema<any, any>[]]>(
+  ...[head, ...tail]: T
+) => Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>, Join<{ [K in keyof T]: Schema.To<T[K]> }>>
+```
+
+Added in v1.0.0
+
+## uniqueSymbol
+
+**Signature**
+
+```ts
+export declare const uniqueSymbol: <S extends symbol>(
+  symbol: S,
+  annotations?: AST.Annotated['annotations']
+) => Schema<S, S>
+```
+
+Added in v1.0.0
+
+# decoding
+
+## decode
+
+**Signature**
+
+```ts
+export declare const decode: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
+```
+
+Added in v1.0.0
+
+## decodeEither
+
+**Signature**
+
+```ts
+export declare const decodeEither: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, A>
+```
+
+Added in v1.0.0
+
+## decodeOption
+
+**Signature**
+
+```ts
+export declare const decodeOption: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => Option.Option<A>
+```
+
+Added in v1.0.0
+
+## decodePromise
+
+**Signature**
+
+```ts
+export declare const decodePromise: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => Promise<A>
+```
+
+Added in v1.0.0
+
+## decodeResult
+
+**Signature**
+
+```ts
+export declare const decodeResult: <I, A>(
+  schema: Schema<I, A>
+) => (i: I, options?: ParseOptions | undefined) => ParseResult.ParseResult<A>
+```
+
+Added in v1.0.0
+
+## decodeSync
+
+**Signature**
+
+```ts
+export declare const decodeSync: <I, A>(schema: Schema<I, A>) => (i: I, options?: ParseOptions | undefined) => A
+```
+
+Added in v1.0.0
+
+# encoding
+
+## encode
+
+**Signature**
+
+```ts
+export declare const encode: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, I>
+```
+
+Added in v1.0.0
+
+## encodeEither
+
+**Signature**
+
+```ts
+export declare const encodeEither: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, I>
+```
+
+Added in v1.0.0
+
+## encodeOption
+
+**Signature**
+
+```ts
+export declare const encodeOption: <I, A>(
+  schema: Schema<I, A>
+) => (input: A, options?: ParseOptions | undefined) => Option.Option<I>
+```
+
+Added in v1.0.0
+
+## encodePromise
+
+**Signature**
+
+```ts
+export declare const encodePromise: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => Promise<I>
+```
+
+Added in v1.0.0
+
+## encodeResult
+
+**Signature**
+
+```ts
+export declare const encodeResult: <I, A>(
+  schema: Schema<I, A>
+) => (a: A, options?: ParseOptions | undefined) => ParseResult.ParseResult<I>
+```
+
+Added in v1.0.0
+
+## encodeSync
+
+**Signature**
+
+```ts
+export declare const encodeSync: <I, A>(schema: Schema<I, A>) => (a: A, options?: ParseOptions | undefined) => I
+```
+
+Added in v1.0.0
+
+# guards
+
+## isSchema
+
+Tests if a value is a `Schema`.
+
+**Signature**
+
+```ts
+export declare const isSchema: (u: unknown) => u is Schema<unknown, unknown>
+```
+
+Added in v1.0.0
+
+# model
+
+## BrandSchema (interface)
+
+**Signature**
+
+```ts
+export interface BrandSchema<From, To extends Brand.Brand<any>> extends Schema<From, To>, Brand.Brand.Constructor<To> {}
+```
+
+Added in v1.0.0
+
+## Schema (interface)
+
+**Signature**
+
+```ts
+export interface Schema<From, To = From> extends Schema.Variance<From, To>, Pipeable {
+  readonly ast: AST.AST
+}
+```
+
+Added in v1.0.0
+
+# number constructors
+
+## Finite
+
+**Signature**
+
+```ts
+export declare const Finite: Schema<number, number>
+```
+
+Added in v1.0.0
+
+## Int
+
+**Signature**
+
+```ts
+export declare const Int: Schema<number, number>
+```
+
+Added in v1.0.0
 
 ## JsonNumber
 
@@ -1186,368 +1675,45 @@ assert.deepStrictEqual(is(Number.NEGATIVE_INFINITY), false)
 
 Added in v1.0.0
 
-## ULID
+## Negative
 
 **Signature**
 
 ```ts
-export declare const ULID: Schema<string, string>
+export declare const Negative: Schema<number, number>
 ```
 
 Added in v1.0.0
 
-## UUID
+## NonNaN
 
 **Signature**
 
 ```ts
-export declare const UUID: Schema<string, string>
+export declare const NonNaN: Schema<number, number>
 ```
 
 Added in v1.0.0
 
-## chunkFromSelf
+## NonNegative
 
 **Signature**
 
 ```ts
-export declare const chunkFromSelf: <I, A>(item: Schema<I, A>) => Schema<Chunk<I>, Chunk<A>>
+export declare const NonNegative: Schema<number, number>
 ```
 
 Added in v1.0.0
 
-## enums
+## NonPositive
 
 **Signature**
 
 ```ts
-export declare const enums: <A extends { [x: string]: string | number }>(enums: A) => Schema<A[keyof A], A[keyof A]>
+export declare const NonPositive: Schema<number, number>
 ```
 
 Added in v1.0.0
-
-## instanceOf
-
-**Signature**
-
-```ts
-export declare const instanceOf: <A extends abstract new (...args: any) => any>(
-  constructor: A,
-  options?: AnnotationOptions<object>
-) => Schema<InstanceType<A>, InstanceType<A>>
-```
-
-Added in v1.0.0
-
-## literal
-
-**Signature**
-
-```ts
-export declare const literal: <Literals extends readonly AST.LiteralValue[]>(
-  ...literals: Literals
-) => Schema<Literals[number], Literals[number]>
-```
-
-Added in v1.0.0
-
-## make
-
-**Signature**
-
-```ts
-export declare const make: <I, A>(ast: AST.AST) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## propertySignature
-
-**Signature**
-
-```ts
-export declare const propertySignature: <I, A>(
-  schema: Schema<I, A>,
-  annotations?: AST.Annotated['annotations']
-) => PropertySignature<I, false, A, false>
-```
-
-Added in v1.0.0
-
-## readonlyMapFromSelf
-
-**Signature**
-
-```ts
-export declare const readonlyMapFromSelf: <IK, K, IV, V>(
-  key: Schema<IK, K>,
-  value: Schema<IV, V>
-) => Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
-```
-
-Added in v1.0.0
-
-## readonlySetFromSelf
-
-**Signature**
-
-```ts
-export declare const readonlySetFromSelf: <I, A>(item: Schema<I, A>) => Schema<ReadonlySet<I>, ReadonlySet<A>>
-```
-
-Added in v1.0.0
-
-## templateLiteral
-
-**Signature**
-
-```ts
-export declare const templateLiteral: <T extends [Schema<any, any>, ...Schema<any, any>[]]>(
-  ...[head, ...tail]: T
-) => Schema<Join<{ [K in keyof T]: To<T[K]> }>, Join<{ [K in keyof T]: To<T[K]> }>>
-```
-
-Added in v1.0.0
-
-## uniqueSymbol
-
-**Signature**
-
-```ts
-export declare const uniqueSymbol: <S extends symbol>(
-  symbol: S,
-  annotations?: AST.Annotated['annotations']
-) => Schema<S, S>
-```
-
-Added in v1.0.0
-
-# decoding
-
-## decode
-
-**Signature**
-
-```ts
-export declare const decode: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
-```
-
-Added in v1.0.0
-
-## decodeEither
-
-**Signature**
-
-```ts
-export declare const decodeEither: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
-```
-
-Added in v1.0.0
-
-## decodeOption
-
-**Signature**
-
-```ts
-export declare const decodeOption: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Option<A>
-```
-
-Added in v1.0.0
-
-## decodePromise
-
-**Signature**
-
-```ts
-export declare const decodePromise: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Promise<A>
-```
-
-Added in v1.0.0
-
-## decodeResult
-
-**Signature**
-
-```ts
-export declare const decodeResult: <I, A>(
-  schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => ParseResult<A>
-```
-
-Added in v1.0.0
-
-## decodeSync
-
-**Signature**
-
-```ts
-export declare const decodeSync: <I, A>(schema: Schema<I, A>) => (i: I, options?: ParseOptions | undefined) => A
-```
-
-Added in v1.0.0
-
-# encoding
-
-## encode
-
-**Signature**
-
-```ts
-export declare const encode: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, I>
-```
-
-Added in v1.0.0
-
-## encodeEither
-
-**Signature**
-
-```ts
-export declare const encodeEither: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Either<PR.ParseError, I>
-```
-
-Added in v1.0.0
-
-## encodeOption
-
-**Signature**
-
-```ts
-export declare const encodeOption: <I, A>(
-  schema: Schema<I, A>
-) => (input: A, options?: ParseOptions | undefined) => Option<I>
-```
-
-Added in v1.0.0
-
-## encodePromise
-
-**Signature**
-
-```ts
-export declare const encodePromise: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Promise<I>
-```
-
-Added in v1.0.0
-
-## encodeResult
-
-**Signature**
-
-```ts
-export declare const encodeResult: <I, A>(
-  schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => ParseResult<I>
-```
-
-Added in v1.0.0
-
-## encodeSync
-
-**Signature**
-
-```ts
-export declare const encodeSync: <I, A>(schema: Schema<I, A>) => (a: A, options?: ParseOptions | undefined) => I
-```
-
-Added in v1.0.0
-
-# guards
-
-## isSchema
-
-Tests if a value is a `Schema`.
-
-**Signature**
-
-```ts
-export declare const isSchema: (input: unknown) => input is Schema<unknown, unknown>
-```
-
-Added in v1.0.0
-
-# model
-
-## AnnotationOptions (type alias)
-
-**Signature**
-
-```ts
-export type AnnotationOptions<A> = {
-  typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
-  message?: AST.MessageAnnotation<A>
-  identifier?: AST.IdentifierAnnotation
-  title?: AST.TitleAnnotation
-  description?: AST.DescriptionAnnotation
-  examples?: AST.ExamplesAnnotation
-  documentation?: AST.DocumentationAnnotation
-  jsonSchema?: AST.JSONSchemaAnnotation
-  arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-}
-```
-
-Added in v1.0.0
-
-## BrandSchema (interface)
-
-**Signature**
-
-```ts
-export interface BrandSchema<From, To extends Brand<any>> extends Schema<From, To>, Brand.Constructor<To> {}
-```
-
-Added in v1.0.0
-
-## From (type alias)
-
-**Signature**
-
-```ts
-export type From<S extends { readonly From: (..._: any) => any }> = Parameters<S['From']>[0]
-```
-
-Added in v1.0.0
-
-## Schema (interface)
-
-**Signature**
-
-```ts
-export interface Schema<From, To = From> extends Pipeable {
-  readonly _id: TypeId
-  readonly From: (_: From) => From
-  readonly To: (_: To) => To
-  readonly ast: AST.AST
-}
-```
-
-Added in v1.0.0
-
-## To (type alias)
-
-**Signature**
-
-```ts
-export type To<S extends { readonly To: (..._: any) => any }> = Parameters<S['To']>[0]
-```
-
-Added in v1.0.0
-
-# number
 
 ## NumberFromString
 
@@ -1565,6 +1731,18 @@ export declare const NumberFromString: Schema<string, number>
 
 Added in v1.0.0
 
+## Positive
+
+**Signature**
+
+```ts
+export declare const Positive: Schema<number, number>
+```
+
+Added in v1.0.0
+
+# number filters
+
 ## between
 
 **Signature**
@@ -1573,20 +1751,8 @@ Added in v1.0.0
 export declare const between: <A extends number>(
   min: number,
   max: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## clamp
-
-Clamps a number between a minimum and a maximum value.
-
-**Signature**
-
-```ts
-export declare const clamp: (min: number, max: number) => <I, A extends number>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1597,7 +1763,7 @@ Added in v1.0.0
 
 ```ts
 export declare const finite: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1610,7 +1776,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThan: <A extends number>(
   min: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1623,7 +1789,7 @@ Added in v1.0.0
 ```ts
 export declare const greaterThanOrEqualTo: <A extends number>(
   min: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1635,7 +1801,7 @@ Added in v1.0.0
 
 ```ts
 export declare const int: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1648,7 +1814,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThan: <A extends number>(
   max: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1661,7 +1827,7 @@ Added in v1.0.0
 ```ts
 export declare const lessThanOrEqualTo: <A extends number>(
   max: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1674,7 +1840,7 @@ Added in v1.0.0
 ```ts
 export declare const multipleOf: <A extends number>(
   divisor: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1686,7 +1852,7 @@ Added in v1.0.0
 
 ```ts
 export declare const negative: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1698,7 +1864,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNaN: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1710,7 +1876,7 @@ Added in v1.0.0
 
 ```ts
 export declare const nonNegative: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1722,8 +1888,34 @@ Added in v1.0.0
 
 ```ts
 export declare const nonPositive: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## positive
+
+**Signature**
+
+```ts
+export declare const positive: <A extends number>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+# number transformations
+
+## clamp
+
+Clamps a number between a minimum and a maximum value.
+
+**Signature**
+
+```ts
+export declare const clamp: (min: number, max: number) => <I, A extends number>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1744,30 +1936,6 @@ export declare const numberFromString: <I, A extends string>(self: Schema<I, A>)
 
 Added in v1.0.0
 
-## positive
-
-**Signature**
-
-```ts
-export declare const positive: <A extends number>(
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-# option
-
-## optionFromNullable
-
-**Signature**
-
-```ts
-export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option<A>>
-```
-
-Added in v1.0.0
-
 # parsing
 
 ## parse
@@ -1777,7 +1945,7 @@ Added in v1.0.0
 ```ts
 export declare const parse: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1789,7 +1957,7 @@ Added in v1.0.0
 ```ts
 export declare const parseEither: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1801,7 +1969,7 @@ Added in v1.0.0
 ```ts
 export declare const parseOption: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Option<A>
+) => (i: unknown, options?: ParseOptions | undefined) => Option.Option<A>
 ```
 
 Added in v1.0.0
@@ -1825,7 +1993,7 @@ Added in v1.0.0
 ```ts
 export declare const parseResult: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+) => (i: unknown, options?: ParseOptions | undefined) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -1852,12 +2020,12 @@ export declare const any: Schema<any, any>
 
 Added in v1.0.0
 
-## bigint
+## bigintFromSelf
 
 **Signature**
 
 ```ts
-export declare const bigint: Schema<bigint, bigint>
+export declare const bigintFromSelf: Schema<bigint, bigint>
 ```
 
 Added in v1.0.0
@@ -1962,7 +2130,17 @@ export declare const void: Schema<void, void>
 
 Added in v1.0.0
 
-# string
+# string constructors
+
+## NonEmpty
+
+**Signature**
+
+```ts
+export declare const NonEmpty: Schema<string, string>
+```
+
+Added in v1.0.0
 
 ## ParseJson
 
@@ -1989,6 +2167,38 @@ export declare const Trim: Schema<string, string>
 
 Added in v1.0.0
 
+## Trimmed
+
+**Signature**
+
+```ts
+export declare const Trimmed: Schema<string, string>
+```
+
+Added in v1.0.0
+
+## ULID
+
+**Signature**
+
+```ts
+export declare const ULID: Schema<string, string>
+```
+
+Added in v1.0.0
+
+## UUID
+
+**Signature**
+
+```ts
+export declare const UUID: Schema<string, string>
+```
+
+Added in v1.0.0
+
+# string filters
+
 ## endsWith
 
 **Signature**
@@ -1996,7 +2206,7 @@ Added in v1.0.0
 ```ts
 export declare const endsWith: <A extends string>(
   endsWith: string,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -2009,7 +2219,7 @@ Added in v1.0.0
 ```ts
 export declare const includes: <A extends string>(
   searchString: string,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -2022,7 +2232,24 @@ Added in v1.0.0
 ```ts
 export declare const length: <A extends string>(
   length: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lowercased
+
+Verifies that a string is lowercased
+
+Note. This combinator does not make any transformations, it only validates.
+If what you were looking for was a combinator to lowercase strings, then check out the `lowercase` combinator.
+
+**Signature**
+
+```ts
+export declare const lowercased: <A extends string>(
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -2035,7 +2262,7 @@ Added in v1.0.0
 ```ts
 export declare const maxLength: <A extends string>(
   maxLength: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -2048,7 +2275,7 @@ Added in v1.0.0
 ```ts
 export declare const minLength: <A extends string>(
   minLength: number,
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -2060,8 +2287,77 @@ Added in v1.0.0
 
 ```ts
 export declare const nonEmpty: <A extends string>(
-  options?: AnnotationOptions<A> | undefined
+  options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## pattern
+
+**Signature**
+
+```ts
+export declare const pattern: <A extends string>(
+  regex: RegExp,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## startsWith
+
+**Signature**
+
+```ts
+export declare const startsWith: <A extends string>(
+  startsWith: string,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## trimmed
+
+Verifies that a string contains no leading or trailing whitespaces.
+
+Note. This combinator does not make any transformations, it only validates.
+If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
+
+**Signature**
+
+```ts
+export declare const trimmed: <A extends string>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+# string transformations
+
+## Lowercase
+
+This combinator converts a string to lowercase
+
+**Signature**
+
+```ts
+export declare const Lowercase: Schema<string, string>
+```
+
+Added in v1.0.0
+
+## lowercase
+
+This combinator converts a string to lowercase
+
+**Signature**
+
+```ts
+export declare const lowercase: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -2086,19 +2382,6 @@ export declare const parseJson: <I, A extends string>(
 
 Added in v1.0.0
 
-## pattern
-
-**Signature**
-
-```ts
-export declare const pattern: <A extends string>(
-  regex: RegExp,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
 ## split
 
 This combinator allows splitting a string into an array of strings.
@@ -2114,19 +2397,6 @@ export declare const split: {
 
 Added in v1.0.0
 
-## startsWith
-
-**Signature**
-
-```ts
-export declare const startsWith: <A extends string>(
-  startsWith: string,
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
 ## trim
 
 This combinator allows removing whitespaces from the beginning and end of a string.
@@ -2135,23 +2405,6 @@ This combinator allows removing whitespaces from the beginning and end of a stri
 
 ```ts
 export declare const trim: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## trimmed
-
-Verifies that a string contains no leading or trailing whitespaces.
-
-Note. This combinator does not make any transformations, it only validates.
-If what you were looking for was a combinator to trim strings, then check out the `trim` combinator.
-
-**Signature**
-
-```ts
-export declare const trimmed: <A extends string>(
-  options?: AnnotationOptions<A> | undefined
-) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -2175,7 +2428,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BetweenBigintTypeId: '@effect/schema/BetweenBigintTypeId'
+export declare const BetweenBigintTypeId: typeof BetweenBigintTypeId
 ```
 
 Added in v1.0.0
@@ -2185,7 +2438,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BetweenTypeId: '@effect/schema/BetweenTypeId'
+export declare const BetweenTypeId: typeof BetweenTypeId
 ```
 
 Added in v1.0.0
@@ -2195,7 +2448,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const BrandTypeId: '@effect/schema/BrandTypeId'
+export declare const BrandTypeId: typeof BrandTypeId
 ```
 
 Added in v1.0.0
@@ -2205,7 +2458,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const EndsWithTypeId: '@effect/schema/EndsWithTypeId'
+export declare const EndsWithTypeId: typeof EndsWithTypeId
 ```
 
 Added in v1.0.0
@@ -2215,7 +2468,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const FiniteTypeId: '@effect/schema/FiniteTypeId'
+export declare const FiniteTypeId: typeof FiniteTypeId
 ```
 
 Added in v1.0.0
@@ -2225,7 +2478,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanBigintTypeId: '@effect/schema/GreaterThanBigintTypeId'
+export declare const GreaterThanBigintTypeId: typeof GreaterThanBigintTypeId
 ```
 
 Added in v1.0.0
@@ -2235,7 +2488,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanOrEqualToBigintTypeId: '@effect/schema/GreaterThanOrEqualToBigintTypeId'
+export declare const GreaterThanOrEqualToBigintTypeId: typeof GreaterThanOrEqualToBigintTypeId
 ```
 
 Added in v1.0.0
@@ -2245,7 +2498,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanOrEqualToTypeId: '@effect/schema/GreaterThanOrEqualToTypeId'
+export declare const GreaterThanOrEqualToTypeId: typeof GreaterThanOrEqualToTypeId
 ```
 
 Added in v1.0.0
@@ -2255,7 +2508,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const GreaterThanTypeId: '@effect/schema/GreaterThanTypeId'
+export declare const GreaterThanTypeId: typeof GreaterThanTypeId
 ```
 
 Added in v1.0.0
@@ -2265,7 +2518,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const IncludesTypeId: '@effect/schema/IncludesTypeId'
+export declare const IncludesTypeId: typeof IncludesTypeId
 ```
 
 Added in v1.0.0
@@ -2275,7 +2528,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const InstanceOfTypeId: '@effect/schema/InstanceOfTypeId'
+export declare const InstanceOfTypeId: typeof InstanceOfTypeId
 ```
 
 Added in v1.0.0
@@ -2285,7 +2538,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const IntTypeId: '@effect/schema/IntTypeId'
+export declare const IntTypeId: typeof IntTypeId
 ```
 
 Added in v1.0.0
@@ -2295,7 +2548,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ItemsCountTypeId: '@effect/schema/ItemsCountTypeId'
+export declare const ItemsCountTypeId: typeof ItemsCountTypeId
 ```
 
 Added in v1.0.0
@@ -2305,7 +2558,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const JsonNumberTypeId: '@effect/schema/JsonNumberTypeId'
+export declare const JsonNumberTypeId: typeof JsonNumberTypeId
+```
+
+Added in v1.0.0
+
+## LengthTypeId
+
+**Signature**
+
+```ts
+export declare const LengthTypeId: typeof LengthTypeId
 ```
 
 Added in v1.0.0
@@ -2315,7 +2578,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanBigintTypeId: '@effect/schema/LessThanBigintTypeId'
+export declare const LessThanBigintTypeId: typeof LessThanBigintTypeId
 ```
 
 Added in v1.0.0
@@ -2325,7 +2588,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanOrEqualToBigintTypeId: '@effect/schema/LessThanOrEqualToBigintTypeId'
+export declare const LessThanOrEqualToBigintTypeId: typeof LessThanOrEqualToBigintTypeId
 ```
 
 Added in v1.0.0
@@ -2335,7 +2598,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanOrEqualToTypeId: '@effect/schema/LessThanOrEqualToTypeId'
+export declare const LessThanOrEqualToTypeId: typeof LessThanOrEqualToTypeId
 ```
 
 Added in v1.0.0
@@ -2345,7 +2608,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const LessThanTypeId: '@effect/schema/LessThanTypeId'
+export declare const LessThanTypeId: typeof LessThanTypeId
+```
+
+Added in v1.0.0
+
+## LowercasedTypeId
+
+**Signature**
+
+```ts
+export declare const LowercasedTypeId: typeof LowercasedTypeId
 ```
 
 Added in v1.0.0
@@ -2355,7 +2628,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MaxItemsTypeId: '@effect/schema/MaxItemsTypeId'
+export declare const MaxItemsTypeId: typeof MaxItemsTypeId
 ```
 
 Added in v1.0.0
@@ -2365,7 +2638,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MaxLengthTypeId: '@effect/schema/MaxLengthTypeId'
+export declare const MaxLengthTypeId: typeof MaxLengthTypeId
 ```
 
 Added in v1.0.0
@@ -2375,7 +2648,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MinItemsTypeId: '@effect/schema/MinItemsTypeId'
+export declare const MinItemsTypeId: typeof MinItemsTypeId
 ```
 
 Added in v1.0.0
@@ -2385,7 +2658,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MinLengthTypeId: '@effect/schema/MinLengthTypeId'
+export declare const MinLengthTypeId: typeof MinLengthTypeId
 ```
 
 Added in v1.0.0
@@ -2395,27 +2668,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const MultipleOfTypeId: '@effect/schema/MultipleOfTypeId'
-```
-
-Added in v1.0.0
-
-## NegativeBigintTypeId
-
-**Signature**
-
-```ts
-export declare const NegativeBigintTypeId: '@effect/schema/NegativeBigintTypeId'
-```
-
-Added in v1.0.0
-
-## NegativeTypeId
-
-**Signature**
-
-```ts
-export declare const NegativeTypeId: '@effect/schema/NegativeTypeId'
+export declare const MultipleOfTypeId: typeof MultipleOfTypeId
 ```
 
 Added in v1.0.0
@@ -2425,47 +2678,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const NonNaNTypeId: '@effect/schema/NonNaNTypeId'
-```
-
-Added in v1.0.0
-
-## NonNegativeBigintTypeId
-
-**Signature**
-
-```ts
-export declare const NonNegativeBigintTypeId: '@effect/schema/NonNegativeBigintTypeId'
-```
-
-Added in v1.0.0
-
-## NonNegativeTypeId
-
-**Signature**
-
-```ts
-export declare const NonNegativeTypeId: '@effect/schema/NonNegativeTypeId'
-```
-
-Added in v1.0.0
-
-## NonPositiveBigintTypeId
-
-**Signature**
-
-```ts
-export declare const NonPositiveBigintTypeId: '@effect/schema/NonPositiveBigintTypeId'
-```
-
-Added in v1.0.0
-
-## NonPositiveTypeId
-
-**Signature**
-
-```ts
-export declare const NonPositiveTypeId: '@effect/schema/NonPositiveTypeId'
+export declare const NonNaNTypeId: typeof NonNaNTypeId
 ```
 
 Added in v1.0.0
@@ -2475,27 +2688,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PatternTypeId: '@effect/schema/PatternTypeId'
-```
-
-Added in v1.0.0
-
-## PositiveBigintTypeId
-
-**Signature**
-
-```ts
-export declare const PositiveBigintTypeId: '@effect/schema/PositiveBigintTypeId'
-```
-
-Added in v1.0.0
-
-## PositiveTypeId
-
-**Signature**
-
-```ts
-export declare const PositiveTypeId: '@effect/schema/PositiveTypeId'
+export declare const PatternTypeId: typeof PatternTypeId
 ```
 
 Added in v1.0.0
@@ -2505,7 +2698,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const StartsWithTypeId: '@effect/schema/StartsWithTypeId'
+export declare const StartsWithTypeId: typeof StartsWithTypeId
 ```
 
 Added in v1.0.0
@@ -2515,7 +2708,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const TrimmedTypeId: '@effect/schema/TrimmedTypeId'
+export declare const TrimmedTypeId: typeof TrimmedTypeId
 ```
 
 Added in v1.0.0
@@ -2525,7 +2718,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ULIDTypeId: '@effect/schema/ULIDTypeId'
+export declare const ULIDTypeId: typeof ULIDTypeId
 ```
 
 Added in v1.0.0
@@ -2535,7 +2728,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const UUIDTypeId: '@effect/schema/UUIDTypeId'
+export declare const UUIDTypeId: typeof UUIDTypeId
 ```
 
 Added in v1.0.0
@@ -2545,12 +2738,67 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ValidDateTypeId: '@effect/schema/ValidDateTypeId'
+export declare const ValidDateTypeId: typeof ValidDateTypeId
 ```
 
 Added in v1.0.0
 
 # utils
+
+## Class (namespace)
+
+Added in v1.0.0
+
+### From (type alias)
+
+**Signature**
+
+```ts
+export type From<A> = A extends Class<infer F, infer _T> ? F : never
+```
+
+Added in v1.0.0
+
+### To (type alias)
+
+**Signature**
+
+```ts
+export type To<A> = A extends Class<infer _F, infer T> ? T : never
+```
+
+Added in v1.0.0
+
+## DocAnnotations (interface)
+
+**Signature**
+
+```ts
+export interface DocAnnotations<A> extends AST.Annotations {
+  readonly identifier?: AST.IdentifierAnnotation
+  readonly title?: AST.TitleAnnotation
+  readonly description?: AST.DescriptionAnnotation
+  readonly examples?: AST.ExamplesAnnotation
+  readonly documentation?: AST.DocumentationAnnotation
+  readonly message?: AST.MessageAnnotation<A>
+}
+```
+
+Added in v1.0.0
+
+## FilterAnnotations (interface)
+
+**Signature**
+
+```ts
+export interface FilterAnnotations<A> extends DocAnnotations<A> {
+  readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  readonly jsonSchema?: AST.JSONSchemaAnnotation
+  readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+}
+```
+
+Added in v1.0.0
 
 ## FromOptionalKeys (type alias)
 
@@ -2574,8 +2822,8 @@ Added in v1.0.0
 
 ```ts
 export type FromStruct<Fields extends StructFields> = {
-  readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: From<Fields[K]>
-} & { readonly [K in FromOptionalKeys<Fields>]?: From<Fields[K]> }
+  readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
+} & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> }
 ```
 
 Added in v1.0.0
@@ -2592,34 +2840,70 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
-## PropertySignature (interface)
+## OptionalPropertySignature (interface)
 
 **Signature**
 
 ```ts
-export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly From: (_: From) => From
-  readonly FromIsOptional: FromIsOptional
-  readonly To: (_: To) => To
-  readonly ToIsOptional: ToIsOptional
-  readonly optional: () => PropertySignature<From, true, To, true>
+export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
+  extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
   readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
-  readonly toOption: () => PropertySignature<From, true, Option<To>, false>
+  readonly toOption: () => PropertySignature<From, true, Option.Option<To>, false>
 }
 ```
 
 Added in v1.0.0
 
-## Spread (type alias)
+## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export type Spread<A> = {
-  [K in keyof A]: A[K]
-} extends infer B
-  ? B
-  : never
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> extends Schema.Variance<From, To> {
+  readonly FromIsOptional: FromIsOptional
+  readonly ToIsOptional: ToIsOptional
+}
+```
+
+Added in v1.0.0
+
+## Schema (namespace)
+
+Added in v1.0.0
+
+### Variance (interface)
+
+**Signature**
+
+```ts
+export interface Variance<From, To> {
+  readonly [TypeId]: {
+    readonly From: (_: From) => From
+    readonly To: (_: To) => To
+  }
+}
+```
+
+Added in v1.0.0
+
+### From (type alias)
+
+**Signature**
+
+```ts
+export type From<S extends { readonly [TypeId]: { readonly From: (..._: any) => any } }> = Parameters<
+  S[TypeId]['From']
+>[0]
+```
+
+Added in v1.0.0
+
+### To (type alias)
+
+**Signature**
+
+```ts
+export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = Parameters<S[TypeId]['To']>[0]
 ```
 
 Added in v1.0.0
@@ -2631,8 +2915,8 @@ Added in v1.0.0
 ```ts
 export type StructFields = Record<
   PropertyKey,
-  | Schema<any>
-  | Schema<never>
+  | Schema<any, any>
+  | Schema<never, never>
   | PropertySignature<any, boolean, any, boolean>
   | PropertySignature<never, boolean, never, boolean>
 >
@@ -2645,7 +2929,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ToAsserts: P.ToAsserts<S>
+export declare const ToAsserts: Parser.ToAsserts<S>
 ```
 
 Added in v1.0.0
@@ -2672,8 +2956,8 @@ Added in v1.0.0
 
 ```ts
 export type ToStruct<Fields extends StructFields> = {
-  readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: To<Fields[K]>
-} & { readonly [K in ToOptionalKeys<Fields>]?: To<Fields[K]> }
+  readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
+} & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> }
 ```
 
 Added in v1.0.0
@@ -2695,8 +2979,21 @@ Added in v1.0.0
 ```ts
 export declare const optional: <I, A>(
   schema: Schema<I, A>,
-  annotations?: AST.Annotated['annotations']
-) => PropertySignature<I, true, A, true>
+  options?: DocAnnotations<A> | undefined
+) => OptionalPropertySignature<I, true, A, true>
+```
+
+Added in v1.0.0
+
+## propertySignature
+
+**Signature**
+
+```ts
+export declare const propertySignature: <I, A>(
+  schema: Schema<I, A>,
+  options: DocAnnotations<A>
+) => PropertySignature<I, false, A, false>
 ```
 
 Added in v1.0.0
@@ -2742,7 +3039,7 @@ Added in v1.0.0
 ```ts
 export declare const validate: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Effect<never, PR.ParseError, A>
+) => (a: unknown, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -2754,7 +3051,7 @@ Added in v1.0.0
 ```ts
 export declare const validateEither: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Either<PR.ParseError, A>
+) => (a: unknown, options?: ParseOptions | undefined) => Either.Either<ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -2766,7 +3063,7 @@ Added in v1.0.0
 ```ts
 export declare const validateOption: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Option<A>
+) => (a: unknown, options?: ParseOptions | undefined) => Option.Option<A>
 ```
 
 Added in v1.0.0
@@ -2790,7 +3087,7 @@ Added in v1.0.0
 ```ts
 export declare const validateResult: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => ParseResult<A>
+) => (a: unknown, options?: ParseOptions | undefined) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0
