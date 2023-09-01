@@ -7,6 +7,7 @@ import * as Brand from "@effect/data/Brand"
 import * as Chunk from "@effect/data/Chunk"
 import * as Data from "@effect/data/Data"
 import * as Either from "@effect/data/Either"
+import * as Encoding from "@effect/data/Encoding"
 import * as Equal from "@effect/data/Equal"
 import type { LazyArg } from "@effect/data/Function"
 import { dual, identity } from "@effect/data/Function"
@@ -2660,6 +2661,116 @@ export {
    */
   _Uint8Array as Uint8Array
 }
+
+// ---------------------------------------------
+// Encoding transformations
+// ---------------------------------------------
+
+/**
+ * Transforms a base64 `string` into a `Uint8Array`.
+ *
+ * @category encoding transformations
+ * @since 1.0.0
+ */
+export const base64 = <I, A extends string>(self: Schema<I, A>): Schema<I, Uint8Array> =>
+  transformOrFail(
+    self,
+    to(Uint8ArrayFromSelf),
+    (s, _, ast) => {
+      const decoded = Encoding.decodeBase64(s)
+      if (Either.isLeft(decoded)) {
+        return ParseResult.failure(ParseResult.type(ast, s, decoded.left.message))
+      }
+
+      return ParseResult.success(decoded.right)
+    },
+    (u8arr) => ParseResult.success(Encoding.encodeBase64(u8arr) as A),
+    {
+      [AST.IdentifierAnnotationId]: "Base64",
+      [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+        `Base64(${Encoding.encodeBase64(u8arr)})`,
+      [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) =>
+        fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64(s)))
+    }
+  )
+
+/**
+ * Transforms a base64url `string` into a `Uint8Array`.
+ *
+ * @category encoding transformations
+ * @since 1.0.0
+ */
+export const base64url = <I, A extends string>(self: Schema<I, A>): Schema<I, Uint8Array> =>
+  transformOrFail(
+    self,
+    to(Uint8ArrayFromSelf),
+    (s, _, ast) => {
+      const decoded = Encoding.decodeBase64Url(s)
+      if (Either.isLeft(decoded)) {
+        return ParseResult.failure(ParseResult.type(ast, s, decoded.left.message))
+      }
+
+      return ParseResult.success(decoded.right)
+    },
+    (u8arr) => ParseResult.success(Encoding.encodeBase64Url(u8arr) as A),
+    {
+      [AST.IdentifierAnnotationId]: "Base64Url",
+      [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+        `Base64Url(${Encoding.encodeBase64Url(u8arr)})`,
+      [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) =>
+        fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64Url(s)))
+    }
+  )
+
+/**
+ * Transforms a hex `string` into a `Uint8Array`.
+ *
+ * @category encoding transformations
+ * @since 1.0.0
+ */
+export const hex = <I, A extends string>(self: Schema<I, A>): Schema<I, Uint8Array> =>
+  transformOrFail(
+    self,
+    to(Uint8ArrayFromSelf),
+    (s, _, ast) => {
+      const decoded = Encoding.decodeHex(s)
+      if (Either.isLeft(decoded)) {
+        return ParseResult.failure(ParseResult.type(ast, s, decoded.left.message))
+      }
+
+      return ParseResult.success(decoded.right)
+    },
+    (u8arr) => ParseResult.success(Encoding.encodeHex(u8arr) as A),
+    {
+      [AST.IdentifierAnnotationId]: "Hex",
+      [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+        `Hex(${Encoding.encodeHex(u8arr)})`,
+      [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) =>
+        fc.hexaString().map((s) => Either.getOrThrow(Encoding.decodeHex(s)))
+    }
+  )
+
+// ---------------------------------------------
+// Encoding constructors
+// ---------------------------------------------
+
+/**
+ * @category encoding constructors
+ * @since 1.0.0
+ */
+export const Base64: Schema<string, Uint8Array> = base64(string)
+
+/**
+ * @category encoding constructors
+ * @since 1.0.0
+ */
+export const Base64Url: Schema<string, Uint8Array> = base64url(string)
+
+/**
+ * @category encoding constructors
+ * @since 1.0.0
+ */
+export const Hex: Schema<string, Uint8Array> = hex(string)
 
 // ---------------------------------------------
 // ReadonlyArray filters
