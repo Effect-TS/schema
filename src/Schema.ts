@@ -2597,7 +2597,6 @@ export const NonNegativeBigint: Schema<string, bigint> = bigint.pipe(
  */
 export const BigintFromNumber: Schema<number, bigint> = bigintFromNumber(number)
 
-
 // ---------------------------------------------
 // Uint8Array constructors
 // ---------------------------------------------
@@ -2611,10 +2610,13 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
   struct({}),
   () => (u, _, ast) =>
     // TODO: Use `Predicate.isUint8Array` when it's available
-    !(u instanceof Uint8Array) ? ParseResult.failure(ParseResult.type(ast, u)) : ParseResult.success(u),
+    !(u instanceof Uint8Array)
+      ? ParseResult.failure(ParseResult.type(ast, u))
+      : ParseResult.success(u),
   {
     [AST.IdentifierAnnotationId]: "Uint8Array",
-    [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) => `new Uint8Array(${JSON.stringify(Array.from(u8arr))})`,
+    [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+      `new Uint8Array(${JSON.stringify(Array.from(u8arr))})`,
     [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) => fc.uint8Array()
   }
 )
@@ -2629,7 +2631,9 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
  * @category Uint8Array transformations
  * @since 1.0.0
  */
-export const uint8ArrayFromNumbers = <I, A extends ReadonlyArray<number>>(self: Schema<I, A>): Schema<I, Uint8Array> =>
+export const uint8ArrayFromNumbers = <I, A extends ReadonlyArray<number>>(
+  self: Schema<I, A>
+): Schema<I, Uint8Array> =>
   transform(
     self,
     Uint8ArrayFromSelf,
@@ -2637,10 +2641,15 @@ export const uint8ArrayFromNumbers = <I, A extends ReadonlyArray<number>>(self: 
     (n) => Array.from(n) as unknown as A
   )
 
-const _Uint8Array: Schema<ReadonlyArray<number>, Uint8Array> = uint8ArrayFromNumbers(array(number.pipe(between(0, 255), annotations({
-  [AST.TitleAnnotationId]: "8-bit unsigned integer",
-  [AST.DescriptionAnnotationId]: "a 8-bit unsigned integer"
-}))))
+const _Uint8Array: Schema<ReadonlyArray<number>, Uint8Array> = uint8ArrayFromNumbers(
+  array(number.pipe(
+    between(0, 255),
+    annotations({
+      [AST.TitleAnnotationId]: "8-bit unsigned integer",
+      [AST.DescriptionAnnotationId]: "a 8-bit unsigned integer"
+    })
+  ))
+)
 
 export {
   /**
