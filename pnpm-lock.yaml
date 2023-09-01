@@ -704,7 +704,7 @@ packages:
     dependencies:
       doctrine: 3.0.0
       fs-extra: 11.1.1
-      glob: 10.3.4
+      glob: 10.3.3
       markdown-toc: github.com/effect-ts/markdown-toc/4bfeb0f140105440ea0d12df2fa23199cc3ec1d5
       prettier: 2.8.8
       rimraf: 5.0.1
@@ -2153,7 +2153,7 @@ packages:
       normalize-path: 3.0.0
       readdirp: 3.6.0
     optionalDependencies:
-      fsevents: 2.3.3
+      fsevents: 2.3.2
     dev: true
     optional: true
 
@@ -2920,7 +2920,7 @@ packages:
       debug: 4.3.4
       enhanced-resolve: 5.15.0
       eslint: 8.46.0
-      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.2.1)(eslint-import-resolver-typescript@3.5.5)(eslint@8.46.0)
+      eslint-module-utils: 2.8.0(@typescript-eslint/parser@6.2.1)(eslint-import-resolver-node@0.3.7)(eslint-import-resolver-typescript@3.5.5)(eslint@8.46.0)
       eslint-plugin-import: 2.28.0(@typescript-eslint/parser@6.2.1)(eslint-import-resolver-typescript@3.5.5)(eslint@8.46.0)
       get-tsconfig: 4.6.2
       globby: 13.2.2
@@ -2959,35 +2959,6 @@ packages:
       debug: 3.2.7
       eslint: 8.46.0
       eslint-import-resolver-node: 0.3.7
-      eslint-import-resolver-typescript: 3.5.5(@typescript-eslint/parser@6.2.1)(eslint-plugin-import@2.28.0)(eslint@8.46.0)
-    transitivePeerDependencies:
-      - supports-color
-    dev: true
-
-  /eslint-module-utils@2.8.0(@typescript-eslint/parser@6.2.1)(eslint-import-resolver-typescript@3.5.5)(eslint@8.46.0):
-    resolution: {integrity: sha512-aWajIYfsqCKRDgUfjEXNN/JlrzauMuSEy5sbd7WXbtW3EH6A6MpwEh42c7qD+MqQo9QMJ6fWLAeIJynx0g6OAw==}
-    engines: {node: '>=4'}
-    peerDependencies:
-      '@typescript-eslint/parser': '*'
-      eslint: '*'
-      eslint-import-resolver-node: '*'
-      eslint-import-resolver-typescript: '*'
-      eslint-import-resolver-webpack: '*'
-    peerDependenciesMeta:
-      '@typescript-eslint/parser':
-        optional: true
-      eslint:
-        optional: true
-      eslint-import-resolver-node:
-        optional: true
-      eslint-import-resolver-typescript:
-        optional: true
-      eslint-import-resolver-webpack:
-        optional: true
-    dependencies:
-      '@typescript-eslint/parser': 6.2.1(eslint@8.46.0)(typescript@5.1.6)
-      debug: 3.2.7
-      eslint: 8.46.0
       eslint-import-resolver-typescript: 3.5.5(@typescript-eslint/parser@6.2.1)(eslint-plugin-import@2.28.0)(eslint@8.46.0)
     transitivePeerDependencies:
       - supports-color
@@ -3489,8 +3460,8 @@ packages:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
     dev: true
 
-  /fsevents@2.3.3:
-    resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
+  /fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
     os: [darwin]
     requiresBuild: true
@@ -3630,18 +3601,6 @@ packages:
       jackspeak: 2.2.2
       minimatch: 9.0.3
       minipass: 7.0.2
-      path-scurry: 1.10.1
-    dev: true
-
-  /glob@10.3.4:
-    resolution: {integrity: sha512-6LFElP3A+i/Q8XQKEvZjkEWEOTgAIALR9AO2rwT8bgPhDd1anmqDJDZ6lLddI4ehxxxR1S5RIqKe1uapMQfYaQ==}
-    engines: {node: '>=16 || 14 >=14.17'}
-    hasBin: true
-    dependencies:
-      foreground-child: 3.1.1
-      jackspeak: 2.3.1
-      minimatch: 9.0.3
-      minipass: 7.0.3
       path-scurry: 1.10.1
     dev: true
 
@@ -4276,15 +4235,6 @@ packages:
       '@pkgjs/parseargs': 0.11.0
     dev: true
 
-  /jackspeak@2.3.1:
-    resolution: {integrity: sha512-4iSY3Bh1Htv+kLhiiZunUhQ+OYXIn0ze3ulq8JeWrFKmhPAJSySV2+kdtRh2pGcCeF0s6oR8Oc+pYZynJj4t8A==}
-    engines: {node: '>=14'}
-    dependencies:
-      '@isaacs/cliui': 8.0.2
-    optionalDependencies:
-      '@pkgjs/parseargs': 0.11.0
-    dev: true
-
   /jest-diff@26.6.2:
     resolution: {integrity: sha512-6m+9Z3Gv9wN0WFVasqjCL/06+EFCMTqDEUl/b87HYK2rAPTyfz4ZIuSlPhY51PIQRWx5TaxeF1qmXKe9gfN3sA==}
     engines: {node: '>= 10.14.2'}
@@ -4776,11 +4726,6 @@ packages:
 
   /minipass@7.0.2:
     resolution: {integrity: sha512-eL79dXrE1q9dBbDCLg7xfn/vl7MS4F1gvJAgjJrQli/jbQWdUttuVawphqpffoIYfRdq78LHx6GP4bU/EQ2ATA==}
-    engines: {node: '>=16 || 14 >=14.17'}
-    dev: true
-
-  /minipass@7.0.3:
-    resolution: {integrity: sha512-LhbbwCfz3vsb12j/WkWQPZfKTsgqIe1Nf/ti1pKjYESGLHIVjWU96G9/ljLH4F9mWNVhlQOm0VySdAWzf05dpg==}
     engines: {node: '>=16 || 14 >=14.17'}
     dev: true
 
@@ -5701,7 +5646,7 @@ packages:
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
-      fsevents: 2.3.3
+      fsevents: 2.3.2
     dev: true
 
   /run-applescript@5.0.0:
@@ -6726,7 +6671,7 @@ packages:
       postcss: 8.4.27
       rollup: 3.27.1
     optionalDependencies:
-      fsevents: 2.3.3
+      fsevents: 2.3.2
     dev: true
 
   /vitest@0.34.1:
