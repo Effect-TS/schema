@@ -2666,32 +2666,46 @@ export {
 // Encoding transformations
 // ---------------------------------------------
 
-/**
- * Transforms a base64 `string` into a `Uint8Array`.
- *
- * @category encoding transformations
- * @since 1.0.0
- */
-export const base64 = <I, A extends string>(self: Schema<I, A>): Schema<I, Uint8Array> =>
+const makeEncodingTransform = <A extends string>(
+  id: string,
+  decode: (s: A) => Either.Either<Encoding.DecodeException, Uint8Array>,
+  encode: (u: Uint8Array) => string,
+  arbitrary: Arbitrary<Uint8Array>
+) =>
+<I, A2 extends A>(
+  self: Schema<I, A2>
+): Schema<I, Uint8Array> =>
   transformOrFail(
     self,
     to(Uint8ArrayFromSelf),
     (s, _, ast) => {
-      const decoded = Encoding.decodeBase64(s)
+      const decoded = decode(s)
       if (Either.isLeft(decoded)) {
         return ParseResult.failure(ParseResult.type(ast, s, decoded.left.message))
       }
 
       return ParseResult.success(decoded.right)
     },
-    (u8arr) => ParseResult.success(Encoding.encodeBase64(u8arr) as A),
+    (u) => ParseResult.success(encode(u) as A2),
     {
-      [AST.IdentifierAnnotationId]: "Base64",
-      [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
-        `Base64(${Encoding.encodeBase64(u8arr)})`,
-      [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) =>
-        fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64(s)))
+      [AST.IdentifierAnnotationId]: id,
+      [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
+      [Internal.ArbitraryHookId]: () => arbitrary
     }
+  )
+
+/**
+ * Transforms a base64 `string` into a `Uint8Array`.
+ *
+ * @category encoding transformations
+ * @since 1.0.0
+ */
+export const base64: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array> =
+  makeEncodingTransform(
+    "Base64",
+    Encoding.decodeBase64,
+    Encoding.encodeBase64,
+    (fc) => fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64(s)))
   )
 
 /**
@@ -2700,26 +2714,12 @@ export const base64 = <I, A extends string>(self: Schema<I, A>): Schema<I, Uint8
  * @category encoding transformations
  * @since 1.0.0
  */
-export const base64url = <I, A extends string>(self: Schema<I, A>): Schema<I, Uint8Array> =>
-  transformOrFail(
-    self,
-    to(Uint8ArrayFromSelf),
-    (s, _, ast) => {
-      const decoded = Encoding.decodeBase64Url(s)
-      if (Either.isLeft(decoded)) {
-        return ParseResult.failure(ParseResult.type(ast, s, decoded.left.message))
-      }
-
-      return ParseResult.success(decoded.right)
-    },
-    (u8arr) => ParseResult.success(Encoding.encodeBase64Url(u8arr) as A),
-    {
-      [AST.IdentifierAnnotationId]: "Base64Url",
-      [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
-        `Base64Url(${Encoding.encodeBase64Url(u8arr)})`,
-      [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) =>
-        fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64Url(s)))
-    }
+export const base64url: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array> =
+  makeEncodingTransform(
+    "Base64Url",
+    Encoding.decodeBase64Url,
+    Encoding.encodeBase64Url,
+    (fc) => fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64Url(s)))
   )
 
 /**
@@ -2728,26 +2728,12 @@ export const base64url = <I, A extends string>(self: Schema<I, A>): Schema<I, Ui
  * @category encoding transformations
  * @since 1.0.0
  */
-export const hex = <I, A extends string>(self: Schema<I, A>): Schema<I, Uint8Array> =>
-  transformOrFail(
-    self,
-    to(Uint8ArrayFromSelf),
-    (s, _, ast) => {
-      const decoded = Encoding.decodeHex(s)
-      if (Either.isLeft(decoded)) {
-        return ParseResult.failure(ParseResult.type(ast, s, decoded.left.message))
-      }
-
-      return ParseResult.success(decoded.right)
-    },
-    (u8arr) => ParseResult.success(Encoding.encodeHex(u8arr) as A),
-    {
-      [AST.IdentifierAnnotationId]: "Hex",
-      [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
-        `Hex(${Encoding.encodeHex(u8arr)})`,
-      [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) =>
-        fc.hexaString().map((s) => Either.getOrThrow(Encoding.decodeHex(s)))
-    }
+export const hex: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array> =
+  makeEncodingTransform(
+    "Hex",
+    Encoding.decodeHex,
+    Encoding.encodeHex,
+    (fc) => fc.hexaString().map((s) => Either.getOrThrow(Encoding.decodeHex(s)))
   )
 
 // ---------------------------------------------
