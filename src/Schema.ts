@@ -1000,7 +1000,7 @@ export const brand = <B extends string | symbol, A>(
         validateEither(input),
         (e) => [{ meta: input, message: TreeFormatter.formatErrors(e.errors) }]
       ),
-    refine: (input: unknown): input is A & Brand.Brand<B> => is(input),
+    is: (input: unknown): input is A & Brand.Brand<B> => is(input),
     pipe() {
       return pipeArguments(this, arguments)
     }

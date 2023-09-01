@@ -74,10 +74,10 @@ describe.concurrent("Schema/brand", () => {
     }]))
   })
 
-  it("refine", () => {
+  it("is", () => {
     const Int = S.string.pipe(S.numberFromString, S.int(), S.brand("Int"))
-    expect(Int.refine(1)).toEqual(true)
-    expect(Int.refine(1.2)).toEqual(false)
+    expect(Int.is(1)).toEqual(true)
+    expect(Int.is(1.2)).toEqual(false)
   })
 
   it("composition", () => {
@@ -88,9 +88,9 @@ describe.concurrent("Schema/brand", () => {
 
     const PositiveInt = S.string.pipe(S.numberFromString, int, positive)
 
-    expect(PositiveInt.refine(1)).toEqual(true)
-    expect(PositiveInt.refine(-1)).toEqual(false)
-    expect(PositiveInt.refine(1.2)).toEqual(false)
+    expect(PositiveInt.is(1)).toEqual(true)
+    expect(PositiveInt.is(-1)).toEqual(false)
+    expect(PositiveInt.is(1.2)).toEqual(false)
   })
 
   describe.concurrent("decoding", () => {
