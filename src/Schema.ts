@@ -17,6 +17,7 @@ import { pipeArguments } from "@effect/data/Pipeable"
 import * as Predicate from "@effect/data/Predicate"
 import * as ReadonlyArray from "@effect/data/ReadonlyArray"
 import * as S from "@effect/data/String"
+import type { Simplify } from "@effect/data/Types"
 import type { Arbitrary } from "@effect/schema/Arbitrary"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as AST from "@effect/schema/AST"
@@ -638,11 +639,6 @@ export const array = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, Readon
 export const nonEmptyArray = <I, A>(
   item: Schema<I, A>
 ): Schema<readonly [I, ...Array<I>], readonly [A, ...Array<A>]> => tuple(item).pipe(rest(item))
-
-// TODO: replace with /data/Types#Simplify
-type Simplify<A> = {
-  [K in keyof A]: A[K]
-} extends infer B ? B : never
 
 /**
  * @since 1.0.0
