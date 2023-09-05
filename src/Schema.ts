@@ -2677,15 +2677,13 @@ const makeEncodingTransform = <A extends string>(
 ): Schema<I, Uint8Array> =>
   transformOrFail(
     self,
-    to(Uint8ArrayFromSelf),
-    (s, _, ast) => {
-      const decoded = decode(s)
-      if (Either.isLeft(decoded)) {
-        return ParseResult.failure(ParseResult.type(ast, s, decoded.left.message))
-      }
-
-      return ParseResult.success(decoded.right)
-    },
+    Uint8ArrayFromSelf,
+    (s, _, ast) =>
+      Either.mapLeft(
+        decode(s),
+        (decodeException) =>
+          ParseResult.parseError([ParseResult.type(ast, s, decodeException.message)])
+      ),
     (u) => ParseResult.success(encode(u) as A2),
     {
       [AST.IdentifierAnnotationId]: id,
