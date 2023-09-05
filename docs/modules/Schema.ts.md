@@ -1129,10 +1129,8 @@ Added in v1.0.0
 
 ```ts
 export declare const compose: {
-  <B, C extends B, D>(bc: Schema<C, D>): <A>(ab: Schema<A, B>) => Schema<A, D>
-  <C, D>(bc: Schema<C, D>): <A, B extends C>(ab: Schema<A, B>) => Schema<A, D>
-  <A, B, C extends B, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
-  <A, B extends C, C, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
+  <C, D>(bc: Schema<C, D>): <A, B>(ab: Schema<A, B>) => Schema<A, D>
+  <A, B, C, D>(ab: Schema<A, B>, cd: Schema<C, D>): Schema<A, D>
 }
 ```
 
@@ -1332,13 +1330,10 @@ using the provided mapping functions.
 
 ```ts
 export declare const transform: {
-  <I2, A2, A1>(to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): <I1>(
-    self: Schema<I1, A1>
-  ) => Schema<I1, A2>
-  <I1, A1, I2, A2>(from: Schema<I1, A1>, to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Schema<
-    I1,
-    A2
-  >
+  <C, D, B>(to: Schema<C, D>, decode: (b: B) => unknown, encode: (c: C) => unknown): <A>(
+    self: Schema<A, B>
+  ) => Schema<A, D>
+  <A, B, C, D>(from: Schema<A, B>, to: Schema<C, D>, decode: (b: B) => unknown, encode: (c: C) => unknown): Schema<A, D>
 }
 ```
 
@@ -1353,19 +1348,19 @@ using the provided decoding functions.
 
 ```ts
 export declare const transformOrFail: {
-  <I2, A2, A1>(
-    to: Schema<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<A1>,
+  <C, D, B>(
+    to: Schema<C, D>,
+    decode: (b: B, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<unknown>,
+    encode: (c: C, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<unknown>,
     annotations?: AST.Annotated['annotations']
-  ): <I1>(self: Schema<I1, A1>) => Schema<I1, A2>
-  <I1, A1, I2, A2>(
-    from: Schema<I1, A1>,
-    to: Schema<I2, A2>,
-    decode: (a1: A1, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<I2>,
-    encode: (i2: I2, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<A1>,
+  ): <A>(self: Schema<A, B>) => Schema<A, D>
+  <A, B, C, D>(
+    from: Schema<A, B>,
+    to: Schema<C, D>,
+    decode: (b: B, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<unknown>,
+    encode: (c: C, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<unknown>,
     annotations?: AST.Annotated['annotations']
-  ): Schema<I1, A2>
+  ): Schema<A, D>
 }
 ```
 
