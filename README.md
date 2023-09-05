@@ -470,7 +470,7 @@ S.string;
 S.number;
 S.bigint; // Schema<string, bigint>
 S.boolean;
-S.symbol;
+S.symbol; // Schema<string, symbol>
 S.object;
 
 // empty types
