@@ -192,7 +192,7 @@ Added in v1.0.0
   - [number](#number)
   - [object](#object)
   - [string](#string)
-  - [symbol](#symbol)
+  - [symbolFromSelf](#symbolfromself)
   - [undefined](#undefined)
   - [unknown](#unknown)
   - [void](#void)
@@ -220,8 +220,12 @@ Added in v1.0.0
   - [parseJson](#parsejson-1)
   - [split](#split)
   - [trim](#trim-1)
-- [symbol](#symbol-1)
+- [symbol](#symbol)
   - [TypeId (type alias)](#typeid-type-alias)
+- [symbol constructors](#symbol-constructors)
+  - [symbol](#symbol-1)
+- [symbol transformations](#symbol-transformations)
+  - [symbolFromString](#symbolfromstring)
 - [type id](#type-id)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
   - [BetweenTypeId](#betweentypeid)
@@ -2213,12 +2217,12 @@ export declare const string: Schema<string, string>
 
 Added in v1.0.0
 
-## symbol
+## symbolFromSelf
 
 **Signature**
 
 ```ts
-export declare const symbol: Schema<symbol, symbol>
+export declare const symbolFromSelf: Schema<symbol, symbol>
 ```
 
 Added in v1.0.0
@@ -2540,6 +2544,34 @@ Added in v1.0.0
 
 ```ts
 export type TypeId = typeof TypeId
+```
+
+Added in v1.0.0
+
+# symbol constructors
+
+## symbol
+
+This schema transforms a `string` into a `symbol`.
+
+**Signature**
+
+```ts
+export declare const symbol: Schema<string, symbol>
+```
+
+Added in v1.0.0
+
+# symbol transformations
+
+## symbolFromString
+
+This combinator transforms a `string` into a `symbol`.
+
+**Signature**
+
+```ts
+export declare const symbolFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, symbol>
 ```
 
 Added in v1.0.0

@@ -2,4 +2,4 @@
 "@effect/schema": minor
 ---
 
-rename `bigint` to `BigintFromSelf` e `BigintFromString` to `bigint`
+rename `bigint` to `bigintFromSelf` and `BigintFromString` to `bigint`
