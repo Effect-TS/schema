@@ -155,7 +155,7 @@ Once you have defined a `Schema`, you can use the `To` type to extract the infer
 For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
 
 ```ts
-interface Person extends S.To<typeof Person> {}
+interface Person extends S.Schema.To<typeof Person> {}
 /*
 interface Person {
   readonly name: string;
@@ -309,8 +309,8 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 import * as S from "@effect/schema/Schema";
 import * as E from "@effect/data/Either";
 
-// Age is a schema that can parse a string to a number and encode a number to a string
-const Age = S.numberFromString(S.string);
+// Age is a schema that can decode a string to a number and encode a number to a string
+const Age = S.NumberFromString;
 
 const Person = S.struct({
   name: S.string,
@@ -636,7 +636,7 @@ import { pipe } from "@effect/data/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserId = S.string.pipe(S.brand("UserId"));
-type UserId = S.To<typeof UserId>; // string & Brand<"UserId">
+type UserId = S.Schema.To<typeof UserId>; // string & Brand<"UserId">
 ```
 
 Note that you can use `unique symbol`s as brands to ensure uniqueness across modules / packages:
@@ -647,7 +647,7 @@ import * as S from "@effect/schema/Schema";
 
 const UserIdBrand = Symbol.for("UserId");
 const UserId = S.string.pipe(S.brand(UserIdBrand));
-type UserId = S.To<typeof UserId>; // string & Brand<typeof UserIdBrand>
+type UserId = S.Schema.To<typeof UserId>; // string & Brand<typeof UserIdBrand>
 ```
 
 ### Reusing an existing branded type
@@ -1263,18 +1263,18 @@ To perform these kinds of transformations, the `@effect/schema` library provides
 ### transform
 
 ```ts
-<I1, A1, I2, A2>(from: Schema<I1, A1>, to: Schema<I2, A2>, decode: (a1: A1) => I2, encode: (i2: I2) => A1): Schema<I1, A2>
+<A, B, C, D>(from: Schema<A, B>, to: Schema<C, D>, decode: (b: B) => unknown, encode: (c: C) => unknown): Schema<A, D>
 ```
 
 ```mermaid
 flowchart TD
-  schema1["from: Schema&lt;I1, A1&gt;"]
-  schema2["to: Schema&lt;I2, A2&gt;"]
-  schema1--decode: A1 -> I2-->schema2
-  schema2--encode: I2 -> A1-->schema1
+  schema1["from: Schema&lt;A, B&gt;"]
+  schema2["to: Schema&lt;C, D&gt;"]
+  schema1--decode: B -> C-->schema2
+  schema2--encode: C -> B-->schema1
 ```
 
-The `transform` combinator takes a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to parse a value, the transformed schema will also fail.
+The `transform` combinator takes a source schema, a target schema, a transformation function from the source type to the target type, and a reverse transformation function from the target type back to the source type. It returns a new schema that applies the transformation function to the output of the original schema before returning it. If the original schema fails to parse a value, the transformed schema will also fail.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -1298,7 +1298,7 @@ In the example above, we defined a schema for the `string` type and a schema for
 The `transformOrFail` combinator works in a similar way, but allows the transformation function to return a `ParseResult` object, which can either be a success or a failure.
 
 ```ts
-import * as PR from "@effect/schema/ParseResult";
+import * as ParseResult from "@effect/schema/ParseResult";
 import * as S from "@effect/schema/Schema";
 
 export const transformedSchema: S.Schema<string, boolean> = S.transformOrFail(
@@ -1307,12 +1307,14 @@ export const transformedSchema: S.Schema<string, boolean> = S.transformOrFail(
   // define a function that converts a string into a boolean
   (s) =>
     s === "true"
-      ? PR.success(true)
+      ? ParseResult.success(true)
       : s === "false"
-      ? PR.success(false)
-      : PR.failure(PR.type(S.literal("true", "false").ast, s)),
+      ? ParseResult.success(false)
+      : ParseResult.failure(
+          ParseResult.type(S.literal("true", "false").ast, s)
+        ),
   // define a function that converts a boolean into a string
-  (b) => PR.success(String(b))
+  (b) => ParseResult.success(String(b))
 );
 ```
 
@@ -1320,9 +1322,9 @@ The transformation may also be async:
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import * as PR from "@effect/schema/ParseResult";
+import * as ParseResult from "@effect/schema/ParseResult";
 import * as Effect from "@effect/io/Effect";
-import * as TF from "@effect/schema/TreeFormatter";
+import * as TreeFormatter from "@effect/schema/TreeFormatter";
 
 const api = (url: string) =>
   Effect.tryPromise({
@@ -1343,15 +1345,16 @@ const PeopleIdFromString = S.transformOrFail(
   PeopleId,
   (s) =>
     Effect.mapBoth(api(`https://swapi.dev/api/people/${s}`), {
-      onFailure: (e) => PR.parseError([PR.type(PeopleId.ast, s, e.message)]),
+      onFailure: (e) =>
+        ParseResult.parseError([ParseResult.type(PeopleId.ast, s, e.message)]),
       onSuccess: () => s
     }),
-  PR.success
+  ParseResult.success
 );
 
 const parse = (id: string) =>
   Effect.mapError(S.parse(PeopleIdFromString)(id), (e) =>
-    TF.formatErrors(e.errors)
+    TreeFormatter.formatErrors(e.errors)
   );
 
 Effect.runPromiseExit(parse("1")).then(console.log);
@@ -1488,9 +1491,25 @@ parse(0); // 0
 parse(3); // 1
 ```
 
+### Symbol transformations
+
+#### symbol
+
+Transforms a `string` into a `symbol` by parsing the string using `Symbol.for`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<string, symbol>
+const schema = S.symbol;
+const parse = S.parseSync(schema);
+
+parse("a"); // Symbol.for("a")
+```
+
 ### Bigint transformations
 
-#### BigintFromString
+#### bigint
 
 Transforms a `string` into a `bigint` by parsing the string using `BigInt`.
 
@@ -1498,7 +1517,7 @@ Transforms a `string` into a `bigint` by parsing the string using `BigInt`.
 import * as S from "@effect/schema/Schema";
 
 // $ExpectType Schema<string, bigint>
-const schema = S.BigintFromString;
+const schema = S.bigint;
 const parse = S.parseSync(schema);
 
 // success cases
@@ -1783,7 +1802,7 @@ Then we can implement the body using the APIs exported by the `@effect/schema/AS
 ```ts
 import * as S from "@effect/schema/Schema";
 import * as AST from "@effect/schema/AST";
-import * as O from "@effect/data/Option";
+import * as Option from "@effect/data/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
   const element = AST.createElement(
@@ -1792,7 +1811,7 @@ const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
   );
   const tuple = AST.createTuple(
     [element, element], // <= elements definitions
-    O.none, // <= rest element
+    Option.none(), // <= rest element
     true // <= is readonly?
   );
   return S.make(tuple); // <= wrap the AST value in a Schema
@@ -1876,13 +1895,13 @@ console.log(schema);
 Annotations can be read using the `getAnnotation` helper, here's an example:
 
 ```ts
-import * as O from "@effect/data/Option";
+import * as Option from "@effect/data/Option";
 import { pipe } from "@effect/data/Function";
 
 const isDeprecated = <A>(schema: S.Schema<A>): boolean =>
   pipe(
     AST.getAnnotation<boolean>(DeprecatedId)(schema.ast),
-    O.getOrElse(() => false)
+    Option.getOrElse(() => false)
   );
 
 console.log(isDeprecated(S.string)); // false
