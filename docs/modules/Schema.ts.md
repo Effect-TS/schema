@@ -260,9 +260,6 @@ Added in v1.0.0
   - [UUIDTypeId](#uuidtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
-  - [Class (namespace)](#class-namespace)
-    - [From (type alias)](#from-type-alias)
-    - [To (type alias)](#to-type-alias)
   - [DocAnnotations (interface)](#docannotations-interface)
   - [FilterAnnotations (interface)](#filterannotations-interface)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
@@ -272,8 +269,8 @@ Added in v1.0.0
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Schema (namespace)](#schema-namespace)
     - [Variance (interface)](#variance-interface)
-    - [From (type alias)](#from-type-alias-1)
-    - [To (type alias)](#to-type-alias-1)
+    - [From (type alias)](#from-type-alias)
+    - [To (type alias)](#to-type-alias)
   - [StructFields (type alias)](#structfields-type-alias)
   - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
@@ -1000,9 +997,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const Class: <Fields extends StructFields>(
-  fields: Fields
-) => Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, {}>
+export declare const Class: <A>() => <Fields extends StructFields>(fields: Fields) => Class<A, Fields, Data.Case>
 ```
 
 Added in v1.0.0
@@ -1012,31 +1007,35 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Class<I, A, Inherited = {}> {
-  new (props: A): A & Data.Case & Omit<Inherited, keyof A>
+export interface Class<A, Fields extends StructFields, Inherited = Data.Case>
+  extends Schema<Simplify<FromStruct<Fields>>, A> {
+  new (props: Simplify<ToStruct<Fields>>): ToStruct<Fields> & Omit<Inherited, keyof Fields>
 
-  schema<T extends new (...args: any) => any>(this: T): Schema<I, InstanceType<T>>
-  schemaStruct(): Schema<I, A>
-  extend<T extends new (...args: any) => any, Fields extends StructFields>(
-    this: T,
-    fields: Fields
-  ): Class<
-    Simplify<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    InstanceType<T>
-  >
-  transform<T extends new (...args: any) => any, Fields extends StructFields>(
-    this: T,
-    fields: Fields,
-    decode: (input: Class.To<T>) => ParseResult.ParseResult<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>,
-    encode: (input: Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>) => ParseResult.ParseResult<Class.To<T>>
-  ): Class<Class.From<T>, Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
-  transformFrom<T extends new (...args: any) => any, Fields extends StructFields>(
-    this: T,
-    fields: Fields,
-    decode: (input: Class.From<T>) => ParseResult.ParseResult<Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>>,
-    encode: (input: Omit<Class.From<T>, keyof Fields> & FromStruct<Fields>) => ParseResult.ParseResult<Class.From<T>>
-  ): Class<Class.From<T>, Simplify<Omit<Class.To<T>, keyof Fields> & ToStruct<Fields>>, InstanceType<T>>
+  readonly struct: Schema<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>>
+
+  readonly extend: <B>() => <FieldsB extends StructFields>(
+    fields: FieldsB
+  ) => Class<B, Omit<Fields, keyof FieldsB> & FieldsB, A>
+
+  readonly transform: <B>() => <FieldsB extends StructFields>(
+    fields: FieldsB,
+    decode: (
+      input: Simplify<ToStruct<Fields>>
+    ) => ParseResult.ParseResult<ToStruct<Omit<Fields, keyof FieldsB> & FieldsB>>,
+    encode: (
+      input: Simplify<ToStruct<Omit<Fields, keyof FieldsB> & FieldsB>>
+    ) => ParseResult.ParseResult<ToStruct<Fields>>
+  ) => Class<B, Omit<Fields, keyof FieldsB> & FieldsB, A>
+
+  readonly transformFrom: <B>() => <FieldsB extends StructFields>(
+    fields: FieldsB,
+    decode: (
+      input: Simplify<FromStruct<Fields>>
+    ) => ParseResult.ParseResult<FromStruct<Omit<Fields, keyof FieldsB> & FieldsB>>,
+    encode: (
+      input: Simplify<FromStruct<Omit<Fields, keyof FieldsB> & FieldsB>>
+    ) => ParseResult.ParseResult<FromStruct<Fields>>
+  ) => Class<B, Omit<Fields, keyof FieldsB> & FieldsB, A>
 }
 ```
 
@@ -2894,30 +2893,6 @@ export declare const ValidDateTypeId: typeof ValidDateTypeId
 Added in v1.0.0
 
 # utils
-
-## Class (namespace)
-
-Added in v1.0.0
-
-### From (type alias)
-
-**Signature**
-
-```ts
-export type From<A> = A extends Class<infer F, infer _T> ? F : never
-```
-
-Added in v1.0.0
-
-### To (type alias)
-
-**Signature**
-
-```ts
-export type To<A> = A extends Class<infer _F, infer T> ? T : never
-```
-
-Added in v1.0.0
 
 ## DocAnnotations (interface)
 
