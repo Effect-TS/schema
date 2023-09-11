@@ -983,8 +983,8 @@ Let's dive into an illustrative example to better understand how classes work:
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// Define your schema by extending `Class` with the desired fields
-class Person extends S.Class({
+// Define your schema by providing the type to `Class` and the desired fields
+class Person extends S.Class<Person>()({
   id: S.number,
   name: S.string.pipe(S.nonEmpty())
 }) {}
@@ -1016,7 +1016,7 @@ For more flexibility, you can also introduce custom getters and methods:
 ```ts
 import * as S from "@effect/schema/Schema";
 
-class Person extends S.Class({
+class Person extends S.Class<Person>()({
   id: S.number,
   name: S.string.pipe(S.nonEmpty())
 }) {
@@ -1032,14 +1032,14 @@ john.upperName; // "JOHN"
 
 ### Accessing Related Schemas
 
-If you need to work with related schemas, you can easily retrieve them using the provided static `schema*` functions:
+The class constructor itself is a Schema, and can be assigned/provided anywhere a Schema is expected. There is also a `.struct` property, which can be used when the class prototype is not required.
 
 ```ts
 // $ExpectType Schema<{ readonly id: number; name: string; }, Person>
-Person.schema();
+S.lazy(() => Person);
 
 // $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
-Person.schemaStruct();
+Person.struct;
 ```
 
 ### Extending existing Classes
@@ -1048,7 +1048,7 @@ In situations where you need to augment your existing class with more fields, th
 
 ```ts
 // Extend an existing schema `Class` using the `extend` utility
-class PersonWithAge extends Person.extend({
+class PersonWithAge extends Person.extend<PersonWithAge>()({
   age: S.number
 }) {
   get isAdult() {
@@ -1074,7 +1074,7 @@ class Person extends S.Class({
 
 function fetchThing(id: number): Effect.Effect<never, Error, string> { ... }
 
-class PersonWithTransform extends Person.transform(
+class PersonWithTransform extends Person.transform<PersonWithTransform>()(
   {
     thing: S.optional(S.string).toOption(),
   },
@@ -1086,7 +1086,7 @@ class PersonWithTransform extends Person.transform(
   PR.success
 ) {}
 
-class PersonWithTransformFrom extends Person.transformFrom(
+class PersonWithTransformFrom extends Person.transformFrom<PersonWithTransformFrom>()(
   {
     thing: S.optional(S.string).toOption(),
   },
