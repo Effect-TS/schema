@@ -34,7 +34,6 @@ Added in v1.0.0
   - [parseResult](#parseresult)
   - [parseSync](#parsesync)
 - [utils](#utils)
-  - [ToAsserts (type alias)](#toasserts-type-alias)
   - [defaultParseOption](#defaultparseoption)
 - [validation](#validation)
   - [asserts](#asserts)
@@ -265,19 +264,6 @@ export declare const parseSync: <_, A>(schema: Schema.Schema<_, A>) => (i: unkno
 Added in v1.0.0
 
 # utils
-
-## ToAsserts (type alias)
-
-**Signature**
-
-```ts
-export type ToAsserts<S extends Schema.Schema<any>> = (
-  input: unknown,
-  options?: AST.ParseOptions
-) => asserts input is Schema.Schema.To<S>
-```
-
-Added in v1.0.0
 
 ## defaultParseOption
 

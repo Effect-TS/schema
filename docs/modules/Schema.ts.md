@@ -271,8 +271,8 @@ Added in v1.0.0
     - [Variance (interface)](#variance-interface)
     - [From (type alias)](#from-type-alias)
     - [To (type alias)](#to-type-alias)
+    - [ToAsserts (type alias)](#toasserts-type-alias)
   - [StructFields (type alias)](#structfields-type-alias)
-  - [ToAsserts](#toasserts)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [ToStruct (type alias)](#tostruct-type-alias)
   - [from](#from)
@@ -3033,6 +3033,19 @@ export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any 
 
 Added in v1.0.0
 
+### ToAsserts (type alias)
+
+**Signature**
+
+```ts
+export type ToAsserts<S extends Schema<any>> = (
+  input: unknown,
+  options?: AST.ParseOptions
+) => asserts input is Schema.To<S>
+```
+
+Added in v1.0.0
+
 ## StructFields (type alias)
 
 **Signature**
@@ -3045,16 +3058,6 @@ export type StructFields = Record<
   | PropertySignature<any, boolean, any, boolean>
   | PropertySignature<never, boolean, never, boolean>
 >
-```
-
-Added in v1.0.0
-
-## ToAsserts
-
-**Signature**
-
-```ts
-export declare const ToAsserts: Parser.ToAsserts<S>
 ```
 
 Added in v1.0.0
