@@ -382,8 +382,8 @@ const Person = S.struct({
   age: S.number
 });
 
-// const assertsPerson: (input: unknown) => asserts input is Person
-const assertsPerson: S.ToAsserts<typeof Person> = S.asserts(Person);
+// const assertsPerson: (input: unknown, options?: ParseOptions) => asserts input is { readonly name: string; readonly age: number; }
+const assertsPerson: S.Schema.ToAsserts<typeof Person> = S.asserts(Person);
 
 try {
   assertsPerson({ name: "Alice", age: "30" });
