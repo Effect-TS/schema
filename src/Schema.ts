@@ -3410,7 +3410,7 @@ const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, bas
 
   const fn = function(this: any, props: unknown) {
     Object.assign(this, validator(props))
-  }
+  } as any
   fn.prototype = Object.create(base)
   fn[TypeId] = variance
   fn.pipe = function pipe() {
@@ -3472,5 +3472,5 @@ const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, bas
     }
   }
 
-  return fn as any
+  return fn
 }
