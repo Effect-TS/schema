@@ -41,14 +41,20 @@ class PersonWithTransform extends Person.transform<PersonWithTransform>()(
 
 class PersonWithTransformFrom extends Person.transformFrom<PersonWithTransformFrom>()(
   {
+    id: S.string,
     thing: S.optional(S.struct({ id: S.number })).toOption()
   },
   (input) =>
     PR.success({
       ...input,
+      id: input.id.toString(),
       thing: { id: 123 }
     }),
-  PR.success
+  (input) =>
+    PR.success({
+      ...input,
+      id: Number(input.id)
+    })
 ) {}
 
 describe("Schema/classes", () => {
@@ -161,7 +167,7 @@ describe("Schema/classes", () => {
       id: 1,
       name: "John"
     })
-    assert(person.id === 1)
+    assert(person.id === "1")
     assert(person.name === "John")
     assert(O.isSome(person.thing) && person.thing.value.id === 123)
     assert(person.upperName === "JOHN")
