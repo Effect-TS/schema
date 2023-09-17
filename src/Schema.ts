@@ -3348,19 +3348,19 @@ export const data = <
  * @category classes
  * @since 1.0.0
  */
-export interface Class<T, I, A, Inherited = Data.Case> extends Schema<I, T> {
+export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self> {
   new(props: A): A & Omit<Inherited, keyof A>
 
   readonly struct: Schema<I, A>
 
-  readonly extend: <B>() => <FieldsB extends StructFields>(fields: FieldsB) => Class<
-    B,
+  readonly extend: <Extended>() => <FieldsB extends StructFields>(fields: FieldsB) => Class<
     Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    T
+    Extended,
+    Self
   >
 
-  readonly transform: <B>() => <
+  readonly transform: <Transformed>() => <
     FieldsB extends StructFields
   >(
     fields: FieldsB,
@@ -3371,13 +3371,13 @@ export interface Class<T, I, A, Inherited = Data.Case> extends Schema<I, T> {
       input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>
     ) => ParseResult.ParseResult<A>
   ) => Class<
-    B,
     I,
     Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    T
+    Transformed,
+    Self
   >
 
-  readonly transformFrom: <B>() => <
+  readonly transformFrom: <Transformed>() => <
     FieldsB extends StructFields
   >(
     fields: FieldsB,
@@ -3388,10 +3388,10 @@ export interface Class<T, I, A, Inherited = Data.Case> extends Schema<I, T> {
       input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>
     ) => ParseResult.ParseResult<I>
   ) => Class<
-    B,
     I,
     Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    T
+    Transformed,
+    Self
   >
 }
 
@@ -3399,10 +3399,10 @@ export interface Class<T, I, A, Inherited = Data.Case> extends Schema<I, T> {
  * @category classes
  * @since 1.0.0
  */
-export const Class = <T>() =>
+export const Class = <Self>() =>
 <Fields extends StructFields>(
   fields: Fields
-): Class<T, Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>> =>
+): Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self> =>
   makeClass(struct(fields), fields, Data.Class.prototype)
 
 const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, base: any) => {

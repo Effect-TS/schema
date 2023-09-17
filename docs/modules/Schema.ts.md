@@ -999,7 +999,7 @@ Added in v1.0.0
 ```ts
 export declare const Class: <T>() => <Fields extends StructFields>(
   fields: Fields
-) => Class<T, Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Data.Case>
+) => Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, T, Data.Case>
 ```
 
 Added in v1.0.0
@@ -1009,31 +1009,31 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Class<T, I, A, Inherited = Data.Case> extends Schema<I, T> {
+export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self> {
   new (props: A): A & Omit<Inherited, keyof A>
 
   readonly struct: Schema<I, A>
 
-  readonly extend: <B>() => <FieldsB extends StructFields>(
+  readonly extend: <Extended>() => <FieldsB extends StructFields>(
     fields: FieldsB
   ) => Class<
-    B,
     Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    T
+    Extended,
+    Self
   >
 
-  readonly transform: <B>() => <FieldsB extends StructFields>(
+  readonly transform: <Transformed>() => <FieldsB extends StructFields>(
     fields: FieldsB,
     decode: (input: A) => ParseResult.ParseResult<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     encode: (input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>) => ParseResult.ParseResult<A>
-  ) => Class<B, I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, T>
+  ) => Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 
-  readonly transformFrom: <B>() => <FieldsB extends StructFields>(
+  readonly transformFrom: <Transformed>() => <FieldsB extends StructFields>(
     fields: FieldsB,
     decode: (input: I) => ParseResult.ParseResult<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     encode: (input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>) => ParseResult.ParseResult<I>
-  ) => Class<B, I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, T>
+  ) => Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 }
 ```
 
