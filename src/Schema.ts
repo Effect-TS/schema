@@ -3353,14 +3353,16 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
 
   readonly struct: Schema<I, A>
 
-  readonly extend: <Extended>() => <FieldsB extends StructFields>(fields: FieldsB) => Class<
+  readonly extend: <Extended = never>() => <FieldsB extends StructFields>(
+    fields: FieldsB
+  ) => Extended extends never ? never : Class<
     Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     Extended,
     Self
   >
 
-  readonly transform: <Transformed>() => <
+  readonly transform: <Transformed = never>() => <
     FieldsB extends StructFields
   >(
     fields: FieldsB,
@@ -3370,14 +3372,14 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     encode: (
       input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>
     ) => ParseResult.ParseResult<A>
-  ) => Class<
+  ) => Transformed extends never ? never : Class<
     I,
     Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     Transformed,
     Self
   >
 
-  readonly transformFrom: <Transformed>() => <
+  readonly transformFrom: <Transformed = never>() => <
     FieldsB extends StructFields
   >(
     fields: FieldsB,
@@ -3387,7 +3389,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     encode: (
       input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>
     ) => ParseResult.ParseResult<I>
-  ) => Class<
+  ) => Transformed extends never ? never : Class<
     I,
     Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     Transformed,
