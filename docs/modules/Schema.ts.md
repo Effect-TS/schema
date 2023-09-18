@@ -997,9 +997,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const Class: <T>() => <Fields extends StructFields>(
+export declare const Class: <Self = never>() => <Fields extends StructFields>(
   fields: Fields
-) => Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, T, Data.Case>
+) => Self extends never ? never : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
 ```
 
 Added in v1.0.0
@@ -1014,26 +1014,32 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
 
   readonly struct: Schema<I, A>
 
-  readonly extend: <Extended>() => <FieldsB extends StructFields>(
+  readonly extend: <Extended = never>() => <FieldsB extends StructFields>(
     fields: FieldsB
-  ) => Class<
-    Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
-    Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    Extended,
-    Self
-  >
+  ) => Extended extends never
+    ? never
+    : Class<
+        Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
+        Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+        Extended,
+        Self
+      >
 
-  readonly transform: <Transformed>() => <FieldsB extends StructFields>(
+  readonly transform: <Transformed = never>() => <FieldsB extends StructFields>(
     fields: FieldsB,
     decode: (input: A) => ParseResult.ParseResult<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     encode: (input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>) => ParseResult.ParseResult<A>
-  ) => Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
+  ) => Transformed extends never
+    ? never
+    : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 
-  readonly transformFrom: <Transformed>() => <FieldsB extends StructFields>(
+  readonly transformFrom: <Transformed = never>() => <FieldsB extends StructFields>(
     fields: FieldsB,
     decode: (input: I) => ParseResult.ParseResult<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     encode: (input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>) => ParseResult.ParseResult<I>
-  ) => Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
+  ) => Transformed extends never
+    ? never
+    : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 }
 ```
 
