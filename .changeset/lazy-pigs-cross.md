@@ -1,5 +1,5 @@
 ---
-"@effect/schema": minor
+"@effect/schema": patch
 ---
 
-Enforce explicit `Schema.Class` type parameters for better developer experience
+Enforce explicit `Schema.Class` type parameters

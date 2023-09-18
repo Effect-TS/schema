@@ -3355,12 +3355,14 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
 
   readonly extend: <Extended = never>() => <FieldsB extends StructFields>(
     fields: FieldsB
-  ) => Extended extends never ? never : Class<
-    Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
-    Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    Extended,
-    Self
-  >
+  ) => [Extended] extends [never]
+    ? "missing Self generic - use `class Self extends Base.extend<Self>()({ ... })`"
+    : Class<
+      Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
+      Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+      Extended,
+      Self
+    >
 
   readonly transform: <Transformed = never>() => <
     FieldsB extends StructFields
@@ -3372,12 +3374,14 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     encode: (
       input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>
     ) => ParseResult.ParseResult<A>
-  ) => Transformed extends never ? never : Class<
-    I,
-    Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    Transformed,
-    Self
-  >
+  ) => [Transformed] extends [never]
+    ? "missing Self generic - use `class Self extends Base.transform<Self>()({ ... })`"
+    : Class<
+      I,
+      Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+      Transformed,
+      Self
+    >
 
   readonly transformFrom: <Transformed = never>() => <
     FieldsB extends StructFields
@@ -3389,12 +3393,14 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     encode: (
       input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>
     ) => ParseResult.ParseResult<I>
-  ) => Transformed extends never ? never : Class<
-    I,
-    Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
-    Transformed,
-    Self
-  >
+  ) => [Transformed] extends [never]
+    ? "missing Self generic - use `class Self extends Base.transformFrom<Self>()({ ... })`"
+    : Class<
+      I,
+      Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+      Transformed,
+      Self
+    >
 }
 
 /**
@@ -3404,7 +3410,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
 export const Class = <Self = never>() =>
 <Fields extends StructFields>(
   fields: Fields
-): Self extends never ? never
+): [Self] extends [never] ? "missing Self generic - use `class Self extends Class<Self>()({ ... })`"
   : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self> =>
   makeClass(struct(fields), fields, Data.Class.prototype)
 

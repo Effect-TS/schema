@@ -999,7 +999,9 @@ Added in v1.0.0
 ```ts
 export declare const Class: <Self = never>() => <Fields extends StructFields>(
   fields: Fields
-) => Self extends never ? never : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
+) => [Self] extends [never]
+  ? 'missing Self generic - use `class Self extends Class<Self>()({ ... })`'
+  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
 ```
 
 Added in v1.0.0
@@ -1016,8 +1018,8 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
 
   readonly extend: <Extended = never>() => <FieldsB extends StructFields>(
     fields: FieldsB
-  ) => Extended extends never
-    ? never
+  ) => [Extended] extends [never]
+    ? 'missing Self generic - use `class Self extends Base.extend<Self>()({ ... })`'
     : Class<
         Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
         Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
@@ -1029,16 +1031,16 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     fields: FieldsB,
     decode: (input: A) => ParseResult.ParseResult<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     encode: (input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>) => ParseResult.ParseResult<A>
-  ) => Transformed extends never
-    ? never
+  ) => [Transformed] extends [never]
+    ? 'missing Self generic - use `class Self extends Base.transform<Self>()({ ... })`'
     : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 
   readonly transformFrom: <Transformed = never>() => <FieldsB extends StructFields>(
     fields: FieldsB,
     decode: (input: I) => ParseResult.ParseResult<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     encode: (input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>) => ParseResult.ParseResult<I>
-  ) => Transformed extends never
-    ? never
+  ) => [Transformed] extends [never]
+    ? 'missing Self generic - use `class Self extends Base.transformFrom<Self>()({ ... })`'
     : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 }
 ```
