@@ -3399,10 +3399,11 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
  * @category classes
  * @since 1.0.0
  */
-export const Class = <Self>() =>
+export const Class = <Self = never>() =>
 <Fields extends StructFields>(
   fields: Fields
-): Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self> =>
+): Self extends never ? never
+  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self> =>
   makeClass(struct(fields), fields, Data.Class.prototype)
 
 const makeClass = <I, A>(selfSchema: Schema<I, A>, selfFields: StructFields, base: any) => {
