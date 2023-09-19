@@ -997,10 +997,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const Class: <Self = never>() => <Fields extends StructFields>(
+export declare const Class: <Self>() => <Fields extends StructFields>(
   fields: Fields
-) => [Self] extends [never]
-  ? 'missing Self generic - use `class Self extends Class<Self>()({ ... })`'
+) => [unknown] extends [Self]
+  ? 'Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`'
   : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
 ```
 
@@ -1016,10 +1016,10 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
 
   readonly struct: Schema<I, A>
 
-  readonly extend: <Extended = never>() => <FieldsB extends StructFields>(
+  readonly extend: <Extended>() => <FieldsB extends StructFields>(
     fields: FieldsB
-  ) => [Extended] extends [never]
-    ? 'missing Self generic - use `class Self extends Base.extend<Self>()({ ... })`'
+  ) => [unknown] extends [Extended]
+    ? MissingSelfGeneric<'Base.extend'>
     : Class<
         Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
         Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
@@ -1027,20 +1027,20 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
         Self
       >
 
-  readonly transform: <Transformed = never>() => <FieldsB extends StructFields>(
+  readonly transform: <Transformed>() => <FieldsB extends StructFields>(
     fields: FieldsB,
     decode: (input: A) => ParseResult.ParseResult<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     encode: (input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>) => ParseResult.ParseResult<A>
-  ) => [Transformed] extends [never]
-    ? 'missing Self generic - use `class Self extends Base.transform<Self>()({ ... })`'
+  ) => [unknown] extends [Transformed]
+    ? MissingSelfGeneric<'Base.transform'>
     : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 
-  readonly transformFrom: <Transformed = never>() => <FieldsB extends StructFields>(
+  readonly transformFrom: <Transformed>() => <FieldsB extends StructFields>(
     fields: FieldsB,
     decode: (input: I) => ParseResult.ParseResult<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     encode: (input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>) => ParseResult.ParseResult<I>
-  ) => [Transformed] extends [never]
-    ? 'missing Self generic - use `class Self extends Base.transformFrom<Self>()({ ... })`'
+  ) => [unknown] extends [Transformed]
+    ? MissingSelfGeneric<'Base.transformFrom'>
     : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 }
 ```
