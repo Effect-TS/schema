@@ -2926,6 +2926,7 @@ export interface FilterAnnotations<A> extends DocAnnotations<A> {
   readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
+  readonly pretty?: (...args: ReadonlyArray<Pretty<any>>) => Pretty<any>
 }
 ```
 
