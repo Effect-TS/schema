@@ -1660,46 +1660,100 @@ console.log(Equal.equals(person1, person2)); // true
 
 ### Parsing from nullable fields
 
-The `option` combinator in `@effect/schema/Schema` allows you to specify that a field in a schema is of type `Option<A>` and can be parsed from a required nullable field `A | undefined | null`. This is particularly useful when working with JSON data that may contain `null` values for optional fields.
+The `optionFromNullable` combinator in `@effect/schema/Schema` allows you to specify that a field in a schema is of type `Option<A>` and can be parsed from a required nullable field `A | null`. This is particularly useful when working with JSON data that may contain `null` values for optional fields.
 
 When parsing a nullable field, the `option` combinator follows these conversion rules:
 
-- `undefined` and `null` parse to `None`
+- `null` parses to `None`
 - `A` parses to `Some<A>`
 
-Here's an example that demonstrates how to use the `option` combinator:
+Here's an example that demonstrates how to use the `optionFromNullable` combinator:
 
 ```ts
-import * as S from "@effect/schema/Schema";
-import * as O from "@effect/data/Option";
+import * as Schema from "@effect/schema/Schema";
+import { Option } from "effect";
 
 /*
-const schema: S.Schema<{
+const schema: Schema<{
     readonly a: string;
     readonly b: number | null;
 }, {
     readonly a: string;
-    readonly b: O.Option<number>;
+    readonly b: Option<number>;
 }>
 */
-const schema = S.struct({
-  a: S.string,
-  b: S.optionFromNullable(S.number)
+const schema = Schema.struct({
+  a: Schema.string,
+  b: Schema.optionFromNullable(Schema.number)
 });
 
 // parsing
-const parse = S.parseSync(schema);
-parse({ a: "hello", b: null }); // { a: "hello", b: none() }
-parse({ a: "hello", b: 1 }); // { a: "hello", b: some(1) }
+const parseOrThrow = Schema.parseSync(schema);
 
-parse({ a: "hello", b: undefined }); // throws
-parse({ a: "hello" }); // throws (key "b" is missing)
+console.log(parseOrThrow({ a: "hello", b: null }));
+/*
+Output:
+{
+  a: "hello",
+  b: {
+    _id: "Option",
+    _tag: "None"
+  }
+}
+*/
+
+console.log(parseOrThrow({ a: "hello", b: 1 }));
+/*
+Output:
+{
+  a: "hello",
+  b: {
+    _id: "Option",
+    _tag: "Some",
+    value: 1
+  }
+}
+*/
+
+parseOrThrow({ a: "hello", b: undefined });
+/*
+throws:
+Error: error(s) found
+└─ ["b"]
+   ├─ union member
+   │  └─ Expected null, actual undefined
+   └─ union member
+      └─ Expected number, actual undefined
+*/
+
+parseOrThrow({ a: "hello" });
+/*
+throws:
+Error: error(s) found
+└─ ["b"]
+   └─ is missing
+*/
 
 // encoding
-const encodeOrThrow = S.encodeSync(schema);
+const encodeOrThrow = Schema.encodeSync(schema);
 
-encodeOrThrow({ a: "hello", b: O.none() }); // { a: 'hello', b: null }
-encodeOrThrow({ a: "hello", b: O.some(1) }); // { a: 'hello', b: 1 }
+console.log(encodeOrThrow({ a: "hello", b: Option.none() }));
+/*
+Output:
+{
+  a: "hello",
+  b: null
+}
+*/
+
+console.log(encodeOrThrow({ a: "hello", b: Option.some(1) }));
+/*
+Output:
+{
+  a: "hello",
+  b: 1
+}
+*/
 ```
 
 ## ReadonlySet
