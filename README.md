@@ -1174,7 +1174,7 @@ S.struct({ a: S.string, b: S.string }).pipe(
 
 ## Compose
 
-Combining and reusing schemas is a common requirement, the `compose` combinator allows you to do just that. It enables you to merge two schemas, `Schema<A, B>` and `Schema<B, C>`, into a single schema `Schema<A, C>`:
+Combining and reusing schemas is a common requirement, the `compose` combinator allows you to do just that. It enables you to combine two schemas, `Schema<A, B>` and `Schema<B, C>`, into a single schema `Schema<A, C>`:
 
 ```ts
 // $ExpectType Schema<string, readonly string[]>
