@@ -32,17 +32,17 @@ devDependencies:
     specifier: ^0.1.4
     version: 0.1.4
   '@effect/data':
-    specifier: ^0.18.5
-    version: 0.18.5
+    specifier: ^0.18.6
+    version: 0.18.6
   '@effect/docgen':
-    specifier: ^0.1.6
-    version: 0.1.6(@types/node@20.4.6)(typescript@5.2.2)
+    specifier: ^0.1.7
+    version: 0.1.7(@types/node@20.4.6)(typescript@5.2.2)
   '@effect/eslint-plugin':
     specifier: ^0.1.2
     version: 0.1.2
   '@effect/io':
-    specifier: ^0.40.1
-    version: 0.40.1(@effect/data@0.18.5)
+    specifier: ^0.41.0
+    version: 0.41.0(@effect/data@0.18.6)
   '@effect/language-service':
     specifier: ^0.0.21
     version: 0.0.21
@@ -691,12 +691,12 @@ packages:
     hasBin: true
     dev: true
 
-  /@effect/data@0.18.5:
-    resolution: {integrity: sha512-VFPJ0prGq3eF6/eZYKVI/1IC1purdGJXEHJC1ggKynPko03upjtmeCeCsEyMiY12DzVIAuME425JndiFb7m2xw==}
+  /@effect/data@0.18.6:
+    resolution: {integrity: sha512-gfjorojxEJ0KKxwluZLoAsPv1kkHi7MV1vQDlibClfdtC9iY9JqkJo+BjWTKsU0zV4mW2inmTZQCF72KKbn2tQ==}
     dev: true
 
-  /@effect/docgen@0.1.6(@types/node@20.4.6)(typescript@5.2.2):
-    resolution: {integrity: sha512-0Kj4qAn1l+zddX7F3+MzBeXsTIygT1L8BrDsYt1g3soGSFE4r9m5NMoSaZj6bZ6zVUM62m9rzp6TldZ1nj6JzA==}
+  /@effect/docgen@0.1.7(@types/node@20.4.6)(typescript@5.2.2):
+    resolution: {integrity: sha512-HFvw3k/B7i4o73GIWELktbHs2SX5xT1JFjxxnXp/k6AcWfc4Bf4RMaRe1huAwCpv3VvZZFQMkhJ48ee4YRGaOQ==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     peerDependencies:
@@ -704,7 +704,7 @@ packages:
     dependencies:
       doctrine: 3.0.0
       fs-extra: 11.1.1
-      glob: 10.3.3
+      glob: 10.3.7
       markdown-toc: github.com/effect-ts/markdown-toc/4bfeb0f140105440ea0d12df2fa23199cc3ec1d5
       prettier: 2.8.8
       rimraf: 5.0.1
@@ -726,12 +726,12 @@ packages:
       diff: 5.1.0
     dev: true
 
-  /@effect/io@0.40.1(@effect/data@0.18.5):
-    resolution: {integrity: sha512-OeMK7JonvW/D6Z377cOsuCSHUbsO9ZkmAIDmzQ1Qffx8+h5yUXRm0htmPwKkxtCHZr2QxyZfSBzxSzrGU7asXQ==}
+  /@effect/io@0.41.0(@effect/data@0.18.6):
+    resolution: {integrity: sha512-gCjntDN3lbUh8wVQnwNoYlugNlWESZWsVkBFPfmOf2439EptHkvdEDNA47vR4OSB3lcqhH+J5jJHi2KWnEbRew==}
     peerDependencies:
       '@effect/data': ^0.18.5
     dependencies:
-      '@effect/data': 0.18.5
+      '@effect/data': 0.18.6
     dev: true
 
   /@effect/language-service@0.0.21:
@@ -2142,6 +2142,11 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
+    dev: true
+
+  /chalk@5.3.0:
+    resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
+    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
     dev: true
 
   /chardet@0.7.0:
@@ -3628,6 +3633,18 @@ packages:
       path-scurry: 1.10.1
     dev: true
 
+  /glob@10.3.7:
+    resolution: {integrity: sha512-wCMbE1m9Nx5yD9LYtgsVWq5VhHlk5WzJirw594qZR6AIvQYuHrdDtIktUVjQItalD53y7dqoedu9xP0u0WaxIQ==}
+    engines: {node: '>=16 || 14 >=14.17'}
+    hasBin: true
+    dependencies:
+      foreground-child: 3.1.1
+      jackspeak: 2.3.4
+      minimatch: 9.0.3
+      minipass: 7.0.3
+      path-scurry: 1.10.1
+    dev: true
+
   /glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
     dependencies:
@@ -4269,6 +4286,16 @@ packages:
       '@pkgjs/parseargs': 0.11.0
     dev: true
 
+  /jackspeak@2.3.4:
+    resolution: {integrity: sha512-W2D3zl/D62WLkJKZgr1vTXmIvLHAOxg4lTKjm3cymILSTEFQbtybC/V34xRtwFd+rNdJlzKuMBkNISa9YlxOBw==}
+    engines: {node: '>=14'}
+    dependencies:
+      '@isaacs/cliui': 8.0.2
+      tshy: 1.1.1
+    optionalDependencies:
+      '@pkgjs/parseargs': 0.11.0
+    dev: true
+
   /jest-diff@26.6.2:
     resolution: {integrity: sha512-6m+9Z3Gv9wN0WFVasqjCL/06+EFCMTqDEUl/b87HYK2rAPTyfz4ZIuSlPhY51PIQRWx5TaxeF1qmXKe9gfN3sA==}
     engines: {node: '>= 10.14.2'}
@@ -4763,6 +4790,11 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     dev: true
 
+  /minipass@7.0.3:
+    resolution: {integrity: sha512-LhbbwCfz3vsb12j/WkWQPZfKTsgqIe1Nf/ti1pKjYESGLHIVjWU96G9/ljLH4F9mWNVhlQOm0VySdAWzf05dpg==}
+    engines: {node: '>=16 || 14 >=14.17'}
+    dev: true
+
   /minizlib@2.1.2:
     resolution: {integrity: sha512-bAxsR8BVfj60DWXHE3u30oHzfl4G7khkSuPW+qvpd7jFRHm7dLxOjUk1EHACJ/hxLY8phGJ0YhYHZo7jil7Qdg==}
     engines: {node: '>= 8'}
@@ -4799,6 +4831,12 @@ packages:
 
   /mkdirp@2.1.6:
     resolution: {integrity: sha512-+hEnITedc8LAtIP9u3HJDFIdcLV2vXP33sqLLIzkv1Db1zO/1OxbvYf0Y1OC/S/Qo5dxHXepofhmxL02PsKe+A==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dev: true
+
+  /mkdirp@3.0.1:
+    resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
     engines: {node: '>=10'}
     hasBin: true
     dev: true
@@ -5618,6 +5656,14 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
+  /resolve-import@1.4.1:
+    resolution: {integrity: sha512-afPxGmDnvJ4Atfg5mc+JFhxI4Rp3VnxFTsAa4WRbblyhDFYg5ZFyhqtrQ/AL29te1TK2ADcbAHX7uKK7Bwcjaw==}
+    engines: {node: '>=16'}
+    dependencies:
+      glob: 10.3.7
+      walk-up-path: 3.0.1
+    dev: true
+
   /resolve-pkg-maps@1.0.0:
     resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
     dev: true
@@ -6167,6 +6213,17 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
+  /sync-content@1.0.2:
+    resolution: {integrity: sha512-znd3rYiiSxU3WteWyS9a6FXkTA/Wjk8WQsOyzHbineeL837dLn3DA4MRhsIX3qGcxDMH6+uuFV4axztssk7wEQ==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dependencies:
+      glob: 10.3.7
+      mkdirp: 3.0.1
+      path-scurry: 1.10.1
+      rimraf: 5.0.1
+    dev: true
+
   /synckit@0.8.5:
     resolution: {integrity: sha512-L1dapNV6vu2s/4Sputv8xGsCdAVlb5nRDMFU/E27D44l5U6cw1g0dGd45uLc+OXjNMmF4ntiMdCimzcjFKQI8Q==}
     engines: {node: ^14.18.0 || >=16.0.0}
@@ -6375,6 +6432,21 @@ packages:
       json5: 1.0.2
       minimist: 1.2.8
       strip-bom: 3.0.0
+    dev: true
+
+  /tshy@1.1.1:
+    resolution: {integrity: sha512-rtsY0MRxSY0wB7NRJNiRMH0BfLyYzTSbb1zbb87qJKbDwQS71nJ9B6BTOZRJoALbzu/KrOTHvRC7uaaPyUm36A==}
+    engines: {node: 16 >=16.17 || 18 >=18.16.0 || >=20.6.1}
+    hasBin: true
+    dependencies:
+      chalk: 5.3.0
+      foreground-child: 3.1.1
+      mkdirp: 3.0.1
+      resolve-import: 1.4.1
+      rimraf: 5.0.1
+      sync-content: 1.0.2
+      typescript: 5.2.2
+      walk-up-path: 3.0.1
     dev: true
 
   /tslib@1.14.1:
@@ -6802,6 +6874,10 @@ packages:
       - sugarss
       - supports-color
       - terser
+    dev: true
+
+  /walk-up-path@3.0.1:
+    resolution: {integrity: sha512-9YlCL/ynK3CTlrSRrDxZvUauLzAswPCrsaCgilqFevUYpeEW0/3ScEjaa3kbW/T0ghhkEr7mv+fpjqn1Y1YuTA==}
     dev: true
 
   /walkdir@0.4.1:
