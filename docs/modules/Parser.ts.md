@@ -17,21 +17,18 @@ Added in v1.0.0
   - [decodeEither](#decodeeither)
   - [decodeOption](#decodeoption)
   - [decodePromise](#decodepromise)
-  - [decodeResult](#decoderesult)
   - [decodeSync](#decodesync)
 - [encoding](#encoding)
   - [encode](#encode)
   - [encodeEither](#encodeeither)
   - [encodeOption](#encodeoption)
   - [encodePromise](#encodepromise)
-  - [encodeResult](#encoderesult)
   - [encodeSync](#encodesync)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEither](#parseeither)
   - [parseOption](#parseoption)
   - [parsePromise](#parsepromise)
-  - [parseResult](#parseresult)
   - [parseSync](#parsesync)
 - [utils](#utils)
   - [defaultParseOption](#defaultparseoption)
@@ -42,7 +39,6 @@ Added in v1.0.0
   - [validateEither](#validateeither)
   - [validateOption](#validateoption)
   - [validatePromise](#validatepromise)
-  - [validateResult](#validateresult)
   - [validateSync](#validatesync)
 
 ---
@@ -93,18 +89,6 @@ Added in v1.0.0
 export declare const decodePromise: <I, A>(
   schema: Schema.Schema<I, A>
 ) => (i: I, options?: AST.ParseOptions) => Promise<A>
-```
-
-Added in v1.0.0
-
-## decodeResult
-
-**Signature**
-
-```ts
-export declare const decodeResult: <I, A>(
-  schema: Schema.Schema<I, A>
-) => (i: I, options?: AST.ParseOptions) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -169,18 +153,6 @@ export declare const encodePromise: <I, A>(
 
 Added in v1.0.0
 
-## encodeResult
-
-**Signature**
-
-```ts
-export declare const encodeResult: <I, A>(
-  schema: Schema.Schema<I, A>
-) => (a: A, options?: AST.ParseOptions) => ParseResult.ParseResult<I>
-```
-
-Added in v1.0.0
-
 ## encodeSync
 
 **Signature**
@@ -237,18 +209,6 @@ Added in v1.0.0
 export declare const parsePromise: <_, A>(
   schema: Schema.Schema<_, A>
 ) => (i: unknown, options?: AST.ParseOptions) => Promise<A>
-```
-
-Added in v1.0.0
-
-## parseResult
-
-**Signature**
-
-```ts
-export declare const parseResult: <_, A>(
-  schema: Schema.Schema<_, A>
-) => (i: unknown, options?: AST.ParseOptions) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0
@@ -343,18 +303,6 @@ Added in v1.0.0
 export declare const validatePromise: <_, A>(
   schema: Schema.Schema<_, A>
 ) => (i: unknown, options?: AST.ParseOptions) => Promise<A>
-```
-
-Added in v1.0.0
-
-## validateResult
-
-**Signature**
-
-```ts
-export declare const validateResult: <_, A>(
-  schema: Schema.Schema<_, A>
-) => (a: unknown, options?: AST.ParseOptions) => ParseResult.ParseResult<A>
 ```
 
 Added in v1.0.0
