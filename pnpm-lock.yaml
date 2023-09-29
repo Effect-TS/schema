@@ -74,8 +74,8 @@ devDependencies:
     specifier: ^8.2.0
     version: 8.2.0
   effect:
-    specifier: 2.0.0-next.38
-    version: 2.0.0-next.38
+    specifier: ^2.0.0-next.39
+    version: 2.0.0-next.39
   eslint:
     specifier: ^8.46.0
     version: 8.46.0
@@ -2741,8 +2741,8 @@ packages:
       safer-buffer: 2.1.2
     dev: true
 
-  /effect@2.0.0-next.38:
-    resolution: {integrity: sha512-J0e0v0l+1SkxrNFkcm6ubLqbocBQ3cHa+vJ8/bTjmbIX2uF0ZIS8CeRnwUNqbAJ+pzbWH+EfI7pjOYcoW3FNNg==}
+  /effect@2.0.0-next.39:
+    resolution: {integrity: sha512-4i6OI4pI55MeDALupg8wOX3Y6nvdwqJcJRGjwYNK7xqAGK3QXy6jbxAi4jf1FBVkIChtJLn2pQ42CbcrjNjewA==}
     dev: true
 
   /electron-to-chromium@1.4.484:
