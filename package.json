@@ -50,6 +50,9 @@
     "test-heap": "vitest run --logHeapUsage"
   },
   "exports": {
+    ".": {
+      "require": "./build/cjs/index.js"
+    },
     "./*": {
       "require": "./build/cjs/*.js"
     }
