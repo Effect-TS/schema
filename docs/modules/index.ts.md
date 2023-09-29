@@ -27,84 +27,84 @@ Added in v1.0.0
 
 ## From "@effect/schema/AST"
 
-Re-exports all named exports from the "@effect/schema/AST" module.
+Re-exports all named exports from the "@effect/schema/AST" module as "AST".
 
 **Signature**
 
 ```ts
-export * from '@effect/schema/AST'
+export * as AST from '@effect/schema/AST'
 ```
 
 Added in v1.0.0
 
 ## From "@effect/schema/Arbitrary"
 
-Re-exports all named exports from the "@effect/schema/Arbitrary" module.
+Re-exports all named exports from the "@effect/schema/Arbitrary" module as "Arbitrary".
 
 **Signature**
 
 ```ts
-export * from '@effect/schema/Arbitrary'
+export * as Arbitrary from '@effect/schema/Arbitrary'
 ```
 
 Added in v1.0.0
 
 ## From "@effect/schema/ParseResult"
 
-Re-exports all named exports from the "@effect/schema/ParseResult" module.
+Re-exports all named exports from the "@effect/schema/ParseResult" module as "ParseResult".
 
 **Signature**
 
 ```ts
-export * from '@effect/schema/ParseResult'
+export * as ParseResult from '@effect/schema/ParseResult'
 ```
 
 Added in v1.0.0
 
 ## From "@effect/schema/Parser"
 
-Re-exports all named exports from the "@effect/schema/Parser" module.
+Re-exports all named exports from the "@effect/schema/Parser" module as "Parser".
 
 **Signature**
 
 ```ts
-export * from '@effect/schema/Parser'
+export * as Parser from '@effect/schema/Parser'
 ```
 
 Added in v1.0.0
 
 ## From "@effect/schema/Pretty"
 
-Re-exports all named exports from the "@effect/schema/Pretty" module.
+Re-exports all named exports from the "@effect/schema/Pretty" module as "Pretty".
 
 **Signature**
 
 ```ts
-export * from '@effect/schema/Pretty'
+export * as Pretty from '@effect/schema/Pretty'
 ```
 
 Added in v1.0.0
 
 ## From "@effect/schema/Schema"
 
-Re-exports all named exports from the "@effect/schema/Schema" module.
+Re-exports all named exports from the "@effect/schema/Schema" module as "Schema".
 
 **Signature**
 
 ```ts
-export * from '@effect/schema/Schema'
+export * as Schema from '@effect/schema/Schema'
 ```
 
 Added in v1.0.0
 
 ## From "@effect/schema/TreeFormatter"
 
-Re-exports all named exports from the "@effect/schema/TreeFormatter" module.
+Re-exports all named exports from the "@effect/schema/TreeFormatter" module as "TreeFormatter".
 
 **Signature**
 
 ```ts
-export * from '@effect/schema/TreeFormatter'
+export * as TreeFormatter from '@effect/schema/TreeFormatter'
 ```
 
 Added in v1.0.0
