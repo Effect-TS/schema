@@ -18,16 +18,44 @@ Modeling the schema of data structures as first-class values
 
 Welcome to the documentation for `@effect/schema`, **a library for defining and using schemas** to validate and transform data in TypeScript.
 
-`@effect/schema` allows you to define a `Schema<I, A>` that describes the structure and data types of a piece of data, and then use that `Schema` to perform various operations such as:
+`@effect/schema` allows you to define a `Schema<I, A>` that provides a blueprint for describing the structure and data types of your data. Once defined, you can leverage this schema to perform a range of operations, including:
 
-- parsing from `unknown`
-- decoding from `I` to `A`
-- encoding from `A` to `I`
-- verifying that a value conforms to a given `Schema`
-- generating fast-check arbitraries
-- pretty printing
+- Parsing from an `unknown` value to an output type `A`.
+- Decoding from an input type `I` to an output type `A`.
+- Encoding from an output type `A` back to an input type `I`.
+- Ensuring that a value conforms to a specified `Schema`.
+- Generating fast-check arbitraries.
+- Facilitating pretty printing.
 
 If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
+
+## Understanding Parsing, Decoding, and Encoding
+
+We'll break down these concepts using an example with a `Schema<string, Date>`. This schema serves as a tool to transform a `string` into a `Date` and vice versa.
+
+**Encoding**
+
+When we talk about "encoding," we are referring to the process of changing a `Date` into a `string`. To put it simply, it's the act of converting data from one format to another.
+
+**Decoding**
+
+Conversely, "decoding" entails transforming a `string` back into a `Date`. It's essentially the reverse operation of encoding, where data is returned to its original form.
+
+**Parsing**
+
+Parsing involves two key steps:
+
+1. **Checking:** Initially, we verify that the input data (which is of the `unknown` type) matches the expected structure. In our specific case, this means ensuring that the input is indeed a `string`.
+
+2. **Decoding:** Following the successful check, we proceed to convert the `string` into a `Date`. This process completes the parsing operation, where the data is both validated and transformed.
+
+As a general rule, schemas should be defined such that encode + decode return the original value.
+
+## The Rule of Schemas: Keeping Encode and Decode in Sync
+
+When working with schemas, there's an important rule to keep in mind: your schemas should be crafted in a way that when you perform both encoding and decoding operations, you should end up with the original value.
+
+In simpler terms, if you encode a value and then immediately decode it, the result should match the original value you started with. This rule ensures that your data remains consistent and reliable throughout the encoding and decoding process.
 
 # Credits
 
@@ -37,7 +65,7 @@ This library was inspired by the following projects:
 - [zod](https://github.com/colinhacks/zod)
 - [zio-schema](https://github.com/zio/zio-schema)
 
-## Requirements
+# Requirements
 
 - TypeScript 5.0 or newer
 - The `strict` flag enabled in your `tsconfig.json` file
@@ -54,7 +82,7 @@ This library was inspired by the following projects:
 }
 ```
 
-### Understanding `exactOptionalPropertyTypes`
+## Understanding `exactOptionalPropertyTypes`
 
 The `@effect/schema` library takes advantage of the `exactOptionalPropertyTypes` option of `tsconfig.json`. This option affects how optional properties are typed (to learn more about this option, you can refer to the official [TypeScript documentation](https://www.typescriptlang.org/tsconfig#exactOptionalPropertyTypes)).
 
@@ -109,7 +137,7 @@ Error: error(s) found
 
 In this case, the type of `myfield` is widened to `string | undefined`, which means the type checker won't catch the invalid value (`undefined`). However, during decoding, you'll encounter an error, indicating that `undefined` is not allowed.
 
-## Getting started
+# Getting started
 
 To install the **alpha** version:
 
@@ -125,7 +153,7 @@ Once you have installed the library, you can import the necessary types and func
 import * as S from "@effect/schema/Schema";
 ```
 
-## Defining a schema
+# Defining a schema
 
 To define a `Schema`, you can use the provided `struct` function to define a new `Schema` that describes an object with a fixed set of properties. Each property of the object is described by a `Schema`, which specifies the data type and validation rules for that property.
 
