@@ -37,7 +37,7 @@
     "autofix": "pnpm lint --fix",
     "tc": "tsc --noEmit",
     "docs": "docgen",
-    "circular": "madge --ts-config ./tsconfig.madge.json --circular --no-color --no-spinner --warning build/esm",
+    "circular": "madge --ts-config ./tsconfig.json --extensions ts --circular --no-color --no-spinner --warning src",
     "test": "vitest",
     "test-all": "npm run circular && npm run lint && npm run dtslint && vitest run",
     "coverage": "vitest run --coverage",
