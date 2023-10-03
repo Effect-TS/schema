@@ -1,7 +1,7 @@
-import * as RA from "@effect/data/ReadonlyArray"
 import type { ParseOptions } from "@effect/schema/AST"
 import * as S from "@effect/schema/Schema"
 import * as Benchmark from "benchmark"
+import * as RA from "effect/ReadonlyArray"
 import { z } from "zod"
 
 /*
