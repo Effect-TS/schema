@@ -198,7 +198,7 @@ To use the `Schema` defined above to parse a value from `unknown`, you can use t
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import * as E from "@effect/data/Either";
+import * as E from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
@@ -335,7 +335,7 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import * as E from "@effect/data/Either";
+import * as E from "effect/Either";
 
 // Age is a schema that can decode a string to a number and encode a number to a string
 const Age = S.NumberFromString;
@@ -360,7 +360,7 @@ To format errors when a parsing or an encoding function fails, you can use the `
 ```ts
 import * as S from "@effect/schema/Schema";
 import { formatErrors } from "@effect/schema/TreeFormatter";
-import * as E from "@effect/data/Either";
+import * as E from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
@@ -435,7 +435,7 @@ assertsPerson({ name: "Alice", age: 30 });
 The `arbitrary` function provided by the `@effect/schema/Arbitrary` module represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
 
 ```ts
-import { pipe } from "@effect/data/Function";
+import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 import * as A from "@effect/schema/Arbitrary";
 import * as fc from "fast-check";
@@ -636,7 +636,7 @@ In the above example, `UserId` and `Username` are both aliases for the same type
 To avoid these kinds of issues, the `@effect` ecosystem provides a way to create custom types with a unique identifier attached to them. These are known as "branded types".
 
 ```ts
-import type * as B from "@effect/data/Brand"
+import type * as B from "effect/Brand"
 
 type UserId = string & B.Brand<"UserId">
 type Username = string
@@ -653,14 +653,14 @@ By defining `UserId` as a branded type, the `getUser` function can accept only v
 There are two ways to define a schema for a branded type, depending on whether you:
 
 - want to define the schema from scratch
-- have already defined a branded type via `@effect/data/Brand` and want to reuse it to define a schema
+- have already defined a branded type via `effect/Brand` and want to reuse it to define a schema
 
 ### Defining a schema from scratch
 
 To define a schema for a branded type from scratch, you can use the `brand` combinator exported by the `@effect/schema/Schema` module. Here's an example:
 
 ```ts
-import { pipe } from "@effect/data/Function";
+import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserId = S.string.pipe(S.brand("UserId"));
@@ -670,7 +670,7 @@ type UserId = S.Schema.To<typeof UserId>; // string & Brand<"UserId">
 Note that you can use `unique symbol`s as brands to ensure uniqueness across modules / packages:
 
 ```ts
-import { pipe } from "@effect/data/Function";
+import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserIdBrand = Symbol.for("UserId");
@@ -680,16 +680,16 @@ type UserId = S.Schema.To<typeof UserId>; // string & Brand<typeof UserIdBrand>
 
 ### Reusing an existing branded type
 
-If you have already defined a branded type using the `@effect/data/Brand` module, you can reuse it to define a schema using the `fromBrand` combinator exported by the `@effect/schema/Schema` module. Here's an example:
+If you have already defined a branded type using the `effect/Brand` module, you can reuse it to define a schema using the `fromBrand` combinator exported by the `@effect/schema/Schema` module. Here's an example:
 
 ```ts
-import * as B from "@effect/data/Brand";
+import * as B from "effect/Brand";
 
 // the existing branded type
 type UserId = string & B.Brand<"UserId">;
 const UserId = B.nominal<UserId>();
 
-import { pipe } from "@effect/data/Function";
+import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 // Define a schema for the branded type
@@ -814,7 +814,7 @@ To achieve this, you can add a special property to each member of the union, whi
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import { pipe } from "@effect/data/Function";
+import { pipe } from "effect/Function";
 
 const Circle = S.struct({
   radius: S.number
@@ -978,7 +978,7 @@ encode({ a: 1 }); // { a: 1 }
 Optional fields can be configured to transform a value of type `A` into `Option<A>`, making the field optional in input and required in output:
 
 ```ts
-import * as O from "@effect/data/Option"
+import * as O from "effect/Option"
 
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
 const schema = S.struct({ a. S.optional(S.number).toOption() });
@@ -1090,9 +1090,9 @@ class PersonWithAge extends Person.extend<PersonWithAge>()({
 You have the option to enhance a class with (effectful) transforms. This becomes valuable when you want to enrich or validate an entity sourced from a data store.
 
 ```ts
-import * as Effect from "@effect/io/Effect";
+import * as Effect from "effect/Effect";
 import * as S from "@effect/schema/Schema";
-import * as O from "@effect/data/Option";
+import * as O from "effect/Option";
 import * as PR from "@effect/schema/ParseResult";
 
 class Person extends S.Class({
@@ -1351,7 +1351,7 @@ The transformation may also be async:
 ```ts
 import * as S from "@effect/schema/Schema";
 import * as ParseResult from "@effect/schema/ParseResult";
-import * as Effect from "@effect/io/Effect";
+import * as Effect from "effect/Effect";
 import * as TreeFormatter from "@effect/schema/TreeFormatter";
 
 const api = (url: string) =>
@@ -1643,13 +1643,13 @@ validate(new Date(0)); // new Date(0)
 validate(new Date("fail")); // throws
 ```
 
-## Interop with `@effect/data/Data`
+## Interop with `effect/Data`
 
-The `@effect/data/Data` module in the Effect ecosystem serves as a utility module that simplifies the process of comparing values for equality without the need for explicit implementations of the `Equal` and `Hash` interfaces. It provides convenient APIs that automatically generate default implementations for equality checks, making it easier for developers to perform equality comparisons in their applications.
+The `effect/Data` module in the Effect ecosystem serves as a utility module that simplifies the process of comparing values for equality without the need for explicit implementations of the `Equal` and `Hash` interfaces. It provides convenient APIs that automatically generate default implementations for equality checks, making it easier for developers to perform equality comparisons in their applications.
 
 ```ts
-import * as Data from "@effect/data/Data";
-import * as Equal from "@effect/data/Equal";
+import * as Data from "effect/Data";
+import * as Equal from "effect/Equal";
 
 const person1 = Data.struct({ name: "Alice", age: 30 });
 const person2 = Data.struct({ name: "Alice", age: 30 });
@@ -1884,7 +1884,7 @@ Then we can implement the body using the APIs exported by the `@effect/schema/AS
 ```ts
 import * as S from "@effect/schema/Schema";
 import * as AST from "@effect/schema/AST";
-import * as Option from "@effect/data/Option";
+import * as Option from "effect/Option";
 
 const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> => {
   const element = AST.createElement(
@@ -1914,7 +1914,7 @@ One of the fundamental requirements in the design of `@effect/schema` is that it
 Let's see some examples:
 
 ```ts
-import { pipe } from "@effect/data/Function";
+import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 const Password =
@@ -1977,8 +1977,8 @@ console.log(schema);
 Annotations can be read using the `getAnnotation` helper, here's an example:
 
 ```ts
-import * as Option from "@effect/data/Option";
-import { pipe } from "@effect/data/Function";
+import * as Option from "effect/Option";
+import { pipe } from "effect/Function";
 
 const isDeprecated = <A>(schema: S.Schema<A>): boolean =>
   pipe(
