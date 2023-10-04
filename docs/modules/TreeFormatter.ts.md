@@ -1,6 +1,6 @@
 ---
 title: TreeFormatter.ts
-nav_order: 8
+nav_order: 9
 parent: Modules
 ---
 
@@ -12,12 +12,12 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [utils](#utils)
+- [formatting](#formatting)
   - [formatErrors](#formaterrors)
 
 ---
 
-# utils
+# formatting
 
 ## formatErrors
 
