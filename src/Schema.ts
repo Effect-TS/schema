@@ -949,7 +949,7 @@ const appendBrandAnnotation = <B extends string | symbol, A>(
  * @param brand - The brand to apply.
  *
  * @example
- * import * as Schema from "./Schema"
+ * import * as Schema from "@effect/schema/Schema"
  *
  * const Int = Schema.number.pipe(Schema.int(), Schema.brand("Int"))
  * type Int = Schema.Schema.To<typeof Int> // number & Brand<"Int">
@@ -1248,7 +1248,7 @@ export const transform: {
  * @param value - The value of the property to add to the schema.
  *
  * @example
- * import * as S from "./Schema"
+ * import * as S from "@effect/schema/Schema"
  * import { pipe } from "effect/Function"
  *
  * const Circle = S.struct({ radius: S.number })
@@ -2209,7 +2209,7 @@ export const JsonNumberTypeId = Symbol.for("@effect/schema/TypeId/JsonNumber")
  * format.
  *
  * @example
- * import * as S from "./Schema"
+ * import * as S from "@effect/schema/Schema"
  *
  * const is = S.is(S.JsonNumber)
  *
