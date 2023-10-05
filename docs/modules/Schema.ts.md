@@ -1331,10 +1331,17 @@ using the provided mapping functions.
 
 ```ts
 export declare const transform: {
-  <C, D, B>(to: Schema<C, D>, decode: (b: B) => unknown, encode: (c: C) => unknown): <A>(
-    self: Schema<A, B>
-  ) => Schema<A, D>
-  <A, B, C, D>(from: Schema<A, B>, to: Schema<C, D>, decode: (b: B) => unknown, encode: (c: C) => unknown): Schema<A, D>
+  <C, D, B>(
+    to: Schema<C, D>,
+    decode: (b: B, options: ParseOptions, ast: AST.AST) => unknown,
+    encode: (c: C, options: ParseOptions, ast: AST.AST) => unknown
+  ): <A>(self: Schema<A, B>) => Schema<A, D>
+  <A, B, C, D>(
+    from: Schema<A, B>,
+    to: Schema<C, D>,
+    decode: (b: B, options: ParseOptions, ast: AST.AST) => unknown,
+    encode: (c: C, options: ParseOptions, ast: AST.AST) => unknown
+  ): Schema<A, D>
 }
 ```
 
