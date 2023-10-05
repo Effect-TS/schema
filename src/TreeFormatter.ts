@@ -2,10 +2,10 @@
  * @since 1.0.0
  */
 
-import * as AST from "@effect/schema/AST"
-import type { ParseErrors, Type } from "@effect/schema/ParseResult"
 import * as Option from "effect/Option"
 import type { NonEmptyReadonlyArray } from "effect/ReadonlyArray"
+import * as AST from "./AST"
+import type { ParseErrors, Type } from "./ParseResult"
 
 interface Forest<A> extends ReadonlyArray<Tree<A>> {}
 
