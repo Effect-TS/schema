@@ -9,11 +9,6 @@ patchedDependencies:
     hash: pjrzkut55ezbyfaebnxnr6ctpe
     path: patches/@preconstruct__cli@2.8.1.patch
 
-dependencies:
-  fast-check:
-    specifier: ^3.13.1
-    version: 3.13.1
-
 devDependencies:
   '@babel/core':
     specifier: ^7.23.0
@@ -99,6 +94,9 @@ devDependencies:
   eslint-plugin-sort-destructure-keys:
     specifier: ^1.5.0
     version: 1.5.0(eslint@8.50.0)
+  fast-check:
+    specifier: ^3.13.1
+    version: 3.13.1
   madge:
     specifier: ^6.1.0
     version: 6.1.0(typescript@5.2.2)
@@ -3363,7 +3361,7 @@ packages:
     engines: {node: '>=8.0.0'}
     dependencies:
       pure-rand: 6.0.4
-    dev: false
+    dev: true
 
   /fast-deep-equal@2.0.1:
     resolution: {integrity: sha512-bCK/2Z4zLidyB4ReuIsvALH6w31YfAQDmXMqMx6FyfHqvBxtjC0eRumeSu4Bs3XtXwpyIywtSTrVT99BxY1f9w==}
@@ -5501,7 +5499,7 @@ packages:
 
   /pure-rand@6.0.4:
     resolution: {integrity: sha512-LA0Y9kxMYv47GIPJy6MI84fqTd2HmYZI83W/kM/SkKfDlajnZYfmXFTxkbY+xSBPkLJxltMa9hIkmdc29eguMA==}
-    dev: false
+    dev: true
 
   /qs@6.5.3:
     resolution: {integrity: sha512-qxXIEh4pCGfHICj1mAJQ2/2XVZkjCDTcEgfoSQxc/fYivUZxTkk7L3bDBJSoNrEzXI17oUO5Dp07ktqE5KzczA==}
