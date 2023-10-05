@@ -7,13 +7,13 @@ tmp/
 build/
 dist/
 .direnv/
-dev
 
 # files
 /dist
 /internal
 /AST
 /Arbitrary
+/ArrayFormatter
 /ParseResult
 /Parser
 /Pretty
