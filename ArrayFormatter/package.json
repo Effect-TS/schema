@@ -1,0 +1,4 @@
+{
+  "main": "dist/effect-schema-ArrayFormatter.cjs.js",
+  "module": "dist/effect-schema-ArrayFormatter.esm.js"
+}
