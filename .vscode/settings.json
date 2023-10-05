@@ -53,6 +53,7 @@
     "internal": true,
     "AST": true,
     "Arbitrary": true,
+    "ArrayFormatter": true,
     "ParseResult": true,
     "Parser": true,
     "Pretty": true,
