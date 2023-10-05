@@ -353,9 +353,15 @@ if (E.isRight(encoded)) {
 
 Note that during encoding, the number value `30` was converted to a string `"30"`.
 
-## Formatting errors
+## Formatting Errors
 
-To format errors when a parsing or an encoding function fails, you can use the `formatErrors` function from the `@effect/schema/TreeFormatter` module.
+When you're working with Effect Schema and encounter errors during parsing, decoding, or encoding functions, you can format these errors in two different ways: using the `TreeFormatter` or the `ArrayFormatter`.
+
+### TreeFormatter (default)
+
+The `TreeFormatter` is the default way to format errors. It arranges errors in a tree structure, making it easy to see the hierarchy of issues.
+
+Here's an example of how it works:
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -377,6 +383,56 @@ Parsing failed:
 error(s) found
 └─ ["name"]
    └─ is missing
+*/
+```
+
+### ArrayFormatter
+
+The `ArrayFormatter` is an alternative way to format errors, presenting them as an array of issues. Each issue contains properties such as `_tag`, `path`, and `message`:
+
+```ts
+interface Issue {
+  readonly _tag: ParseErrors["_tag"];
+  readonly path: ReadonlyArray<PropertyKey>;
+  readonly message: string;
+}
+```
+
+Here's an example of how it works:
+
+```ts
+import * as S from "@effect/schema/Schema";
+import { formatErrors } from "@effect/schema/ArrayFormatter";
+import * as E from "effect/Either";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number
+});
+
+const result = S.parseEither(Person)(
+  { name: 1, foo: 2 },
+  { errors: "all", onExcessProperty: "error" }
+);
+if (E.isLeft(result)) {
+  console.error("Parsing failed:");
+  console.error(formatErrors(result.left.errors));
+}
+/*
+Parsing failed:
+[
+  {
+    _tag: 'Unexpected',
+    path: [ 'foo' ],
+    message: 'Unexpected value 2'
+  },
+  {
+    _tag: 'Type',
+    path: [ 'name' ],
+    message: 'Expected string, actual 1'
+  },
+  { _tag: 'Missing', path: [ 'age' ], message: 'Missing key or index' }
+]
 */
 ```
 
