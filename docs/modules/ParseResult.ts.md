@@ -39,6 +39,7 @@ Added in v1.0.0
   - [flatMap](#flatmap)
   - [map](#map)
   - [mapLeft](#mapleft)
+  - [orElse](#orelse)
 - [utils](#utils)
   - [ParseError (interface)](#parseerror-interface)
   - [ParseResult (interface)](#parseresult-interface)
@@ -299,7 +300,7 @@ Added in v1.0.0
 ```ts
 export declare const bimap: <A, B>(
   self: ParseResult<A>,
-  f: (e1: ParseError) => ParseError,
+  f: (error: ParseError) => ParseError,
   g: (a: A) => B
 ) => ParseResult<B>
 ```
@@ -341,7 +342,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const mapLeft: <A>(self: ParseResult<A>, f: (e1: ParseError) => ParseError) => ParseResult<A>
+export declare const mapLeft: <A>(self: ParseResult<A>, f: (error: ParseError) => ParseError) => ParseResult<A>
+```
+
+Added in v1.0.0
+
+## orElse
+
+**Signature**
+
+```ts
+export declare const orElse: <A>(self: ParseResult<A>, f: (error: ParseError) => ParseResult<A>) => ParseResult<A>
 ```
 
 Added in v1.0.0
