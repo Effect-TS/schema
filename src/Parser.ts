@@ -5,6 +5,7 @@
 import * as Effect from "effect/Effect"
 import * as Either from "effect/Either"
 import { pipe } from "effect/Function"
+import { globalValue } from "effect/GlobalValue"
 import * as Option from "effect/Option"
 import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
@@ -18,7 +19,7 @@ const getEither = (
   ast: AST.AST,
   isDecoding: boolean
 ): (i: unknown, options?: AST.ParseOptions) => Either.Either<ParseResult.ParseError, any> =>
-  go(ast, isDecoding) as any
+  goMemo(ast, isDecoding) as any
 
 const getSync = (ast: AST.AST, isDecoding: boolean) => {
   const parser = getEither(ast, isDecoding)
@@ -38,7 +39,7 @@ const getOption = (ast: AST.AST, isDecoding: boolean) => {
 }
 
 const getEffect = (ast: AST.AST, isDecoding: boolean) => {
-  const parser = go(ast, isDecoding)
+  const parser = goMemo(ast, isDecoding)
   return (input: unknown, options?: AST.ParseOptions) =>
     parser(input, { ...options, isEffectAllowed: true })
 }
@@ -247,6 +248,26 @@ interface Parser<I, A> {
  * @since 1.0.0"
  */
 export const defaultParseOption: AST.ParseOptions = {}
+
+const decodeMemoMap = globalValue(
+  Symbol.for("@effect/schema/Parser/decodeMemoMap"),
+  () => new WeakMap<AST.AST, Parser<any, any>>()
+)
+const encodeMemoMap = globalValue(
+  Symbol.for("@effect/schema/Parser/encodeMemoMap"),
+  () => new WeakMap<AST.AST, Parser<any, any>>()
+)
+
+const goMemo = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
+  const memoMap = isDecoding ? decodeMemoMap : encodeMemoMap
+  const memo = memoMap.get(ast)
+  if (memo) {
+    return memo
+  }
+  const parser = go(ast, isDecoding)
+  memoMap.set(ast, parser)
+  return parser
+}
 
 const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
   switch (ast._tag) {
