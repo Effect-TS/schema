@@ -273,7 +273,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
   switch (ast._tag) {
     case "Refinement": {
       if (isDecoding) {
-        const from = go(ast.from, true)
+        const from = goMemo(ast.from, true)
         return (i, options) =>
           handleForbidden(
             ParseResult.flatMap(
@@ -290,8 +290,8 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
             options
           )
       } else {
-        const from = go(AST.to(ast), true)
-        const to = go(dropRightRefinement(ast.from), false)
+        const from = goMemo(AST.to(ast), true)
+        const to = goMemo(dropRightRefinement(ast.from), false)
         return (
           i,
           options
@@ -300,8 +300,8 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
     }
     case "Transform": {
       const transform = getFinalTransformation(ast.transformation, isDecoding)
-      const from = isDecoding ? go(ast.from, true) : go(ast.to, false)
-      const to = isDecoding ? go(ast.to, true) : go(ast.from, false)
+      const from = isDecoding ? goMemo(ast.from, true) : goMemo(ast.to, false)
+      const to = isDecoding ? goMemo(ast.to, true) : goMemo(ast.from, false)
       return (i1, options) =>
         handleForbidden(
           ParseResult.flatMap(
@@ -351,10 +351,10 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       return fromRefinement(ast, (u): u is any => Predicate.isString(u) && regex.test(u))
     }
     case "Tuple": {
-      const elements = ast.elements.map((e) => go(e.type, isDecoding))
+      const elements = ast.elements.map((e) => goMemo(e.type, isDecoding))
       const rest = pipe(
         ast.rest,
-        Option.map(ReadonlyArray.mapNonEmpty((ast) => go(ast, isDecoding)))
+        Option.map(ReadonlyArray.mapNonEmpty((ast) => goMemo(ast, isDecoding)))
       )
       let requiredLen = ast.elements.filter((e) => !e.isOptional).length
       if (Option.isSome(ast.rest)) {
@@ -583,7 +583,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       const propertySignatures: Array<Parser<any, any>> = []
       const expectedKeys: Record<PropertyKey, null> = {}
       for (const ps of ast.propertySignatures) {
-        propertySignatures.push(go(ps.type, isDecoding))
+        propertySignatures.push(goMemo(ps.type, isDecoding))
         expectedKeys[ps.name] = null
       }
 
@@ -594,8 +594,8 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       } = {}
       for (const is of ast.indexSignatures) {
         indexSignatures.push([
-          go(is.parameter, isDecoding),
-          go(is.type, isDecoding)
+          goMemo(is.parameter, isDecoding),
+          goMemo(is.type, isDecoding)
         ])
         const base = AST.getParameterBase(is.parameter)
         if (AST.isSymbolKeyword(base)) {
@@ -813,7 +813,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       const len = ownKeys.length
       const map = new Map<any, Parser<any, any>>()
       for (let i = 0; i < ast.types.length; i++) {
-        map.set(ast.types[i], go(ast.types[i], isDecoding))
+        map.set(ast.types[i], goMemo(ast.types[i], isDecoding))
       }
       return (input, options) => {
         const es: Array<[number, ParseResult.ParseErrors]> = []
@@ -930,7 +930,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       }
     }
     case "Lazy": {
-      const get = Internal.memoizeThunk(() => go(ast.f(), isDecoding))
+      const get = Internal.memoizeThunk(() => goMemo(ast.f(), isDecoding))
       return (a, options) => get()(a, options)
     }
   }
