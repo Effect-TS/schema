@@ -26,8 +26,8 @@ devDependencies:
     specifier: ^0.0.178
     version: 0.0.178(typescript@5.2.2)
   '@effect/build-utils':
-    specifier: ^0.1.6
-    version: 0.1.6
+    specifier: ^0.1.9
+    version: 0.1.9
   '@effect/docgen':
     specifier: ^0.1.8
     version: 0.1.8(@types/node@20.8.2)(typescript@5.2.2)
@@ -71,8 +71,8 @@ devDependencies:
     specifier: ^2.1.4
     version: 2.1.4
   effect:
-    specifier: 2.0.0-next.47
-    version: 2.0.0-next.47
+    specifier: 2.0.0-next.48
+    version: 2.0.0-next.48
   eslint:
     specifier: ^8.50.0
     version: 8.50.0
@@ -762,8 +762,8 @@ packages:
     resolution: {integrity: sha512-rPwwm/RrFIolz6xHa8Kzpshuwpe+xu/XcEw9iUmRF2tnyIwxxaW7XoFKaQ+GfPju81cKpH4vJeq7/2IizKvyjg==}
     dev: true
 
-  /@effect/build-utils@0.1.6:
-    resolution: {integrity: sha512-WOtpszUuQiTJsO4x+9ek28I99qvCdLsp6em75KWJXt4kRb41/1F3UsljZ+F0BGsCQWlPINw0nDTRSd6LRRWlMw==}
+  /@effect/build-utils@0.1.9:
+    resolution: {integrity: sha512-PmgMZxGgk5lweaYZpR/kC09eZpXOEth9hShr8xn5a5m4S7RiMUu7O1h19Tx/i2ZgpLa/GK1405nkROT5+5z8Sg==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     dev: true
@@ -2858,8 +2858,8 @@ packages:
       safer-buffer: 2.1.2
     dev: true
 
-  /effect@2.0.0-next.47:
-    resolution: {integrity: sha512-H2L1xoaOblZbrTHuUo/ppWVr9R34FyigxXkEn9iD9TMYgCJqSS9RIUOGCTdT4ATyCgVf7dWlJxOtLFSpirVWqA==}
+  /effect@2.0.0-next.48:
+    resolution: {integrity: sha512-vwMIl39m8fMBeXoGIdSwMi2lrg7NltyrGMK0N/liGDl7G9LXvERKOCipNcobSIGO0V7hjaXEWgL6W/KEWEww+g==}
     dev: true
 
   /electron-to-chromium@1.4.541:
