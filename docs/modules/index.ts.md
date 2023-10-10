@@ -28,7 +28,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/AST"
 
-Re-exports all named exports from the "@effect/schema/AST" module as "AST".
+Re-exports all named exports from the "@effect/schema/AST" module as `AST`.
 
 **Signature**
 
@@ -40,7 +40,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/Arbitrary"
 
-Re-exports all named exports from the "@effect/schema/Arbitrary" module as "Arbitrary".
+Re-exports all named exports from the "@effect/schema/Arbitrary" module as `Arbitrary`.
 
 **Signature**
 
@@ -52,7 +52,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/ArrayFormatter"
 
-Re-exports all named exports from the "@effect/schema/ArrayFormatter" module as "ArrayFormatter".
+Re-exports all named exports from the "@effect/schema/ArrayFormatter" module as `ArrayFormatter`.
 
 **Signature**
 
@@ -64,7 +64,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/ParseResult"
 
-Re-exports all named exports from the "@effect/schema/ParseResult" module as "ParseResult".
+Re-exports all named exports from the "@effect/schema/ParseResult" module as `ParseResult`.
 
 **Signature**
 
@@ -76,7 +76,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/Parser"
 
-Re-exports all named exports from the "@effect/schema/Parser" module as "Parser".
+Re-exports all named exports from the "@effect/schema/Parser" module as `Parser`.
 
 **Signature**
 
@@ -88,7 +88,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/Pretty"
 
-Re-exports all named exports from the "@effect/schema/Pretty" module as "Pretty".
+Re-exports all named exports from the "@effect/schema/Pretty" module as `Pretty`.
 
 **Signature**
 
@@ -100,7 +100,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/Schema"
 
-Re-exports all named exports from the "@effect/schema/Schema" module as "Schema".
+Re-exports all named exports from the "@effect/schema/Schema" module as `Schema`.
 
 **Signature**
 
@@ -112,7 +112,7 @@ Added in v1.0.0
 
 ## From "@effect/schema/TreeFormatter"
 
-Re-exports all named exports from the "@effect/schema/TreeFormatter" module as "TreeFormatter".
+Re-exports all named exports from the "@effect/schema/TreeFormatter" module as `TreeFormatter`.
 
 **Signature**
 
