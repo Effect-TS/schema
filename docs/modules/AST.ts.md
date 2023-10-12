@@ -144,6 +144,7 @@ Added in v1.0.0
   - [isParameter](#isparameter)
   - [keyof](#keyof)
   - [mergeAnnotations](#mergeannotations)
+  - [mutable](#mutable)
   - [omit](#omit)
   - [partial](#partial)
   - [pick](#pick)
@@ -1626,6 +1627,18 @@ Adds a group of annotations, potentially overwriting existing annotations.
 
 ```ts
 export declare const mergeAnnotations: (ast: AST, annotations: Annotated['annotations']) => AST
+```
+
+Added in v1.0.0
+
+## mutable
+
+Creates a new AST with shallow mutability applied to its properties.
+
+**Signature**
+
+```ts
+export declare const mutable: (ast: AST) => AST
 ```
 
 Added in v1.0.0
