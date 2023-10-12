@@ -55,6 +55,7 @@ Added in v1.0.0
   - [documentation](#documentation)
   - [examples](#examples)
   - [identifier](#identifier)
+  - [jsonSchema](#jsonschema)
   - [message](#message)
   - [title](#title)
 - [bigint constructors](#bigint-constructors)
@@ -667,6 +668,16 @@ Added in v1.0.0
 
 ```ts
 export declare const identifier: (identifier: AST.IdentifierAnnotation) => <I, A>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## jsonSchema
+
+**Signature**
+
+```ts
+export declare const jsonSchema: (jsonSchema: AST.JSONSchemaAnnotation) => <I, A>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
