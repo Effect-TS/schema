@@ -972,6 +972,15 @@ S.tuple(S.string, S.number).pipe(S.rest(S.boolean));
 S.array(S.number);
 ```
 
+### Mutable Arrays
+
+By default, when you use `S.array`, it generates a type marked as readonly. The `mutable` combinator is a useful function for creating a new schema with a mutable type in a **shallow** manner:
+
+```ts
+// $ExpectType Schema<number[]>
+S.mutable(S.array(S.number));
+```
+
 ### Non empty arrays
 
 ```ts
@@ -984,6 +993,15 @@ S.nonEmptyArray(S.number);
 ```ts
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }>
 S.struct({ a: S.string, b: S.number });
+```
+
+### Mutable Properties
+
+By default, when you use `S.struct`, it generates a type with properties that are marked as readonly. The `mutable` combinator is a useful function for creating a new schema with properties made mutable in a **shallow** manner:
+
+```ts
+// $ExpectType Schema<{ a: string; b: number; }>
+S.mutable(S.struct({ a: S.string, b: S.number }));
 ```
 
 ### Optional fields
@@ -1242,6 +1260,15 @@ S.record(S.symbol, S.string);
 ```ts
 // $ExpectType Schema<{ readonly [x: `a${string}`]: string; }>
 S.record(S.templateLiteral(S.literal("a"), S.string), S.string);
+```
+
+### Mutable Records
+
+By default, when you use `S.record`, it generates a type marked as readonly. The `mutable` combinator is a useful function for creating a new schema with a mutable type in a **shallow** manner:
+
+```ts
+// $ExpectType Schema<{ [x: string]: string; }>
+S.mutable(S.record(S.string, S.string););
 ```
 
 ## Extend

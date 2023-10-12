@@ -99,6 +99,7 @@ Added in v1.0.0
   - [filter](#filter)
   - [keyof](#keyof)
   - [lazy](#lazy)
+  - [mutable](#mutable)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
   - [omit](#omit)
@@ -262,6 +263,7 @@ Added in v1.0.0
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
+  - [Mutable (type alias)](#mutable-type-alias)
   - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Schema (namespace)](#schema-namespace)
@@ -1197,6 +1199,18 @@ Added in v1.0.0
 
 ```ts
 export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotated['annotations']) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## mutable
+
+Creates a new schema with shallow mutability applied to its properties.
+
+**Signature**
+
+```ts
+export declare const mutable: <I, A>(schema: Schema<I, A>) => Schema<Simplify<Mutable<I>>, Simplify<Mutable<A>>>
 ```
 
 Added in v1.0.0
@@ -2935,6 +2949,20 @@ Added in v1.0.0
 export type Join<T> = T extends [infer Head, ...infer Tail]
   ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? '' : Join<Tail>}`
   : never
+```
+
+Added in v1.0.0
+
+## Mutable (type alias)
+
+Make all properties in T mutable
+
+**Signature**
+
+```ts
+export type Mutable<T> = {
+  -readonly [P in keyof T]: T[P]
+}
 ```
 
 Added in v1.0.0
