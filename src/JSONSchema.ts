@@ -93,13 +93,13 @@ export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(A
 /** @internal */
 export const go = (ast: AST.AST): JsonSchema7Type => {
   switch (ast._tag) {
-    case "Declaration":
-      return getJSONSchemaAnnotation(ast).pipe(
-        Option.match({
-          onNone: () => go(ast.type),
-          onSome: (jsonSchema) => ({ ...go(ast.type), ...jsonSchema })
-        })
-      )
+    case "Declaration": {
+      const annotation = getJSONSchemaAnnotation(ast)
+      if (Option.isSome(annotation)) {
+        return annotation.value
+      }
+      throw new Error("cannot build a JSON Schema for Declaration")
+    }
     case "Literal": {
       if (typeof ast.literal === "bigint") {
         throw new Error("cannot convert `bigint` to JSON Schema")
