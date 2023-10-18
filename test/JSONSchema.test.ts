@@ -215,6 +215,15 @@ describe("JSONSchema", () => {
       const schema = S.array(S.number)
       propertyTo(schema)
     })
+
+    it("post rest elements should raise an error", () => {
+      const schema = S.array(S.number).pipe(S.element(S.string))
+      expect(() => JSONSchema.to(schema)).toThrowError(
+        new Error(
+          "Generating a JSON Schema for post-rest elements is not currently supported. You're welcome to contribute by submitting a Pull Request."
+        )
+      )
+    })
   })
 
   describe("struct", () => {
@@ -326,7 +335,9 @@ describe("JSONSchema", () => {
       })
     )
     expect(() => JSONSchema.to(schema)).toThrowError(
-      new Error("cannot build a JSON Schema for Lazy")
+      new Error(
+        "Generating a JSON Schema for lazy schemas is not currently supported. You're welcome to contribute by submitting a Pull Request."
+      )
     )
   })
 

@@ -178,7 +178,12 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
         // ---------------------------------------------
         // handle post rest elements
         // ---------------------------------------------
-        // const tail = RA.tailNonEmpty(rest.value)
+        // TODO
+        if (rest.value.length > 1) {
+          throw new Error(
+            "Generating a JSON Schema for post-rest elements is not currently supported. You're welcome to contribute by submitting a Pull Request."
+          )
+        }
       }
 
       return output
@@ -237,7 +242,9 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
     }
     case "Lazy":
       // TODO
-      throw new Error("cannot build a JSON Schema for Lazy")
+      throw new Error(
+        "Generating a JSON Schema for lazy schemas is not currently supported. You're welcome to contribute by submitting a Pull Request."
+      )
     case "Transform":
       throw new Error("cannot build a JSON Schema for transformations")
   }
