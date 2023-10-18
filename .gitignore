@@ -15,6 +15,7 @@ dist/
 /AST
 /Arbitrary
 /ArrayFormatter
+/JSONSchema
 /ParseResult
 /Parser
 /Pretty
