@@ -1374,7 +1374,12 @@ To perform these kinds of transformations, the `@effect/schema` library provides
 ### transform
 
 ```ts
-<A, B, C, D>(from: Schema<A, B>, to: Schema<C, D>, decode: (b: B) => unknown, encode: (c: C) => unknown): Schema<A, D>
+declare const transform: <A, B, C, D>(
+  from: Schema<A, B>,
+  to: Schema<C, D>,
+  decode: (b: B) => C,
+  encode: (c: C) => B
+) => Schema<A, D>;
 ```
 
 ```mermaid
@@ -1403,6 +1408,22 @@ export const transformedSchema: S.Schema<string, readonly [string]> =
 ```
 
 In the example above, we defined a schema for the `string` type and a schema for the tuple type `[string]`. We also defined the functions `decode` and `encode` that convert a `string` into a tuple and a tuple into a `string`, respectively. Then, we used the `transform` combinator to convert the string schema into a schema for the tuple type `[string]`. The resulting schema can be used to parse values of type `string` into values of type `[string]`.
+
+#### Non-strict option
+
+If you need to be less restrictive in your `decode` and `encode` functions, you can make use of the `{ strict: false }` option:
+
+```ts
+declare const transform: <A, B, C, D>(
+  from: Schema<A, B>,
+  to: Schema<C, D>,
+  decode: (b: B) => unknown, // Less strict constraint
+  encode: (c: C) => unknown, // Less strict constraint
+  options: { strict: false }
+) => Schema<A, D>;
+```
+
+This is useful when you want to relax the type constraints imposed by the `decode` and `encode` functions, making them more permissive.
 
 ### transformOrFail
 
