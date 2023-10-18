@@ -3,6 +3,7 @@
  */
 
 import * as AST from "@effect/schema/AST"
+import * as Parser from "@effect/schema/Parser"
 import type * as Schema from "@effect/schema/Schema"
 import * as Option from "effect/Option"
 import * as ReadonlyArray from "effect/ReadonlyArray"
@@ -230,9 +231,10 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
         })
       )
     }
-    case "TemplateLiteral":
-      // TODO
-      throw new Error("cannot build a JSON Schema for TemplateLiteral")
+    case "TemplateLiteral": {
+      const regex = Parser.getTemplateLiteralRegex(ast)
+      return { pattern: regex.source }
+    }
     case "Lazy":
       // TODO
       throw new Error("cannot build a JSON Schema for Lazy")

@@ -23,7 +23,7 @@ const propertyTo = <I, A>(schema: S.Schema<I, A>) => {
   const is = S.is(schema)
   const validate = new Ajv({ strict: false }).compile(JSONSchema.to(schema))
   const arb = arbitrary(fc)
-  // console.log(fc.sample(arb, 2))
+  // console.log(fc.sample(arb, 10))
   fc.assert(fc.property(arb, (a) => {
     return is(a) && validate(a)
   }))
@@ -311,9 +311,7 @@ describe("JSONSchema", () => {
 
   it("TemplateLiteral should raise an error", () => {
     const schema = S.templateLiteral(S.literal("a"), S.string)
-    expect(() => JSONSchema.to(schema)).toThrowError(
-      new Error("cannot build a JSON Schema for TemplateLiteral")
-    )
+    propertyTo(schema)
   })
 
   it("Lazy should raise an error", () => {
