@@ -26,6 +26,7 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 - Ensuring that a value conforms to a specified `Schema`.
 - Generating fast-check arbitraries.
 - Facilitating pretty printing.
+- Generating JSON Schemas.
 
 If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
 
@@ -523,9 +524,9 @@ console.log(fc.sample(PersonArbitraryFrom, 2));
 
 ## Pretty print
 
-The `pretty` function provided by the `@effect/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
+The `to` function provided by the `@effect/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
 
-You can use the `pretty` function to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
+You can use the `to` function to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -541,6 +542,45 @@ const PersonPretty = P.to(Person);
 // returns a string representation of the object
 console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "age": 30 }`
 ```
+
+## Generating JSON Schemas
+
+The `to` function, which is part of the `@effect/schema/JSONSchema` module, allows you to generate a JSON Schema based on a schema definition:
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as JSONSchema from "@effect/schema/JSONSchema";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number
+});
+
+const jsonSchema = JSONSchema.to(Person);
+
+console.log(JSON.stringify(jsonSchema, null, 2));
+/*
+Output:
+{
+  "type": "object",
+  "required": [
+    "name",
+    "age"
+  ],
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "age": {
+      "type": "number"
+    }
+  },
+  "additionalProperties": false
+}
+*/
+```
+
+In this example, we have created a schema for a "Person" with a name (a string) and an age (a number). We then use the `JSONSchema.to` function to generate the corresponding JSON Schema.
 
 # Basic usage
 
