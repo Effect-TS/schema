@@ -48,7 +48,7 @@ describe("JSONSchema", () => {
 
   describe("declaration", () => {
     it("should raise an error when an annotation doesn't exist", () => {
-      expect(() => JSONSchema.to(S.chunk(S.JsonNumber))).toThrowError(
+      expect(() => JSONSchema.to(S.chunk(S.JsonNumber))).toThrow(
         new Error("cannot build a JSON Schema for Declaration")
       )
     })
@@ -63,37 +63,37 @@ describe("JSONSchema", () => {
   })
 
   it("bigint should raise an error", () => {
-    expect(() => JSONSchema.to(S.bigint)).toThrowError(
+    expect(() => JSONSchema.to(S.bigint)).toThrow(
       new Error("cannot convert `bigint` to JSON Schema")
     )
   })
 
   it("symbol should raise an error", () => {
-    expect(() => JSONSchema.to(S.symbol)).toThrowError(
+    expect(() => JSONSchema.to(S.symbol)).toThrow(
       new Error("cannot convert `symbol` to JSON Schema")
     )
   })
 
   it("a unique symbol should raise an error", () => {
-    expect(() => JSONSchema.to(S.uniqueSymbol(Symbol.for("@effect/schema/test/a")))).toThrowError(
+    expect(() => JSONSchema.to(S.uniqueSymbol(Symbol.for("@effect/schema/test/a")))).toThrow(
       new Error("cannot convert a unique symbol to JSON Schema")
     )
   })
 
   it("undefined should raise an error", () => {
-    expect(() => JSONSchema.to(S.undefined)).toThrowError(
+    expect(() => JSONSchema.to(S.undefined)).toThrow(
       new Error("cannot convert `undefined` to JSON Schema")
     )
   })
 
   it("void should raise an error", () => {
-    expect(() => JSONSchema.to(S.void)).toThrowError(
+    expect(() => JSONSchema.to(S.void)).toThrow(
       new Error("cannot convert `void` to JSON Schema")
     )
   })
 
   it("never should raise an error", () => {
-    expect(() => JSONSchema.to(S.never)).toThrowError(
+    expect(() => JSONSchema.to(S.never)).toThrow(
       new Error("cannot convert `never` to JSON Schema")
     )
   })
@@ -145,7 +145,7 @@ describe("JSONSchema", () => {
     })
 
     it("bigint should raise an error", () => {
-      expect(() => JSONSchema.to(S.literal(1n))).toThrowError(
+      expect(() => JSONSchema.to(S.literal(1n))).toThrow(
         new Error("cannot convert `bigint` to JSON Schema")
       )
     })
@@ -257,7 +257,7 @@ describe("JSONSchema", () => {
 
     it("r + e should raise an error", () => {
       const schema = S.array(S.JsonNumber).pipe(S.element(S.string))
-      expect(() => JSONSchema.to(schema)).toThrowError(
+      expect(() => JSONSchema.to(schema)).toThrow(
         new Error(
           "Generating a JSON Schema for post-rest elements is not currently supported. You're welcome to contribute by submitting a Pull Request."
         )
@@ -409,7 +409,7 @@ describe("JSONSchema", () => {
 
     it("should raise an error if there is a property named with a symbol", () => {
       const a = Symbol.for("@effect/schema/test/a")
-      expect(() => JSONSchema.to(S.struct({ [a]: S.string }))).toThrowError(
+      expect(() => JSONSchema.to(S.struct({ [a]: S.string }))).toThrow(
         new Error("Cannot encode Symbol(@effect/schema/test/a) key to JSON Schema")
       )
     })
@@ -567,7 +567,7 @@ describe("JSONSchema", () => {
         as: S.array(schema)
       })
     )
-    expect(() => JSONSchema.to(schema)).toThrowError(
+    expect(() => JSONSchema.to(schema)).toThrow(
       new Error(
         "Generating a JSON Schema for lazy schemas is not currently supported. You're welcome to contribute by submitting a Pull Request."
       )
@@ -575,7 +575,7 @@ describe("JSONSchema", () => {
   })
 
   it("Transform should raise an error", () => {
-    expect(() => JSONSchema.go(S.NumberFromString.ast)).toThrowError(
+    expect(() => JSONSchema.go(S.NumberFromString.ast)).toThrow(
       new Error("cannot build a JSON Schema for transformations")
     )
   })
