@@ -2016,7 +2016,8 @@ export const int =
     self.pipe(
       filter((a): a is A => Number.isSafeInteger(a), {
         typeId: IntTypeId,
-        description: "integer",
+        title: "integer",
+        description: "an integer",
         jsonSchema: { type: "integer" },
         ...options
       })

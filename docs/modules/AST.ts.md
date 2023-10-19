@@ -34,6 +34,12 @@ Added in v1.0.0
   - [TypeAnnotation (type alias)](#typeannotation-type-alias)
   - [TypeAnnotationId](#typeannotationid)
   - [getAnnotation](#getannotation)
+  - [getDescriptionAnnotation](#getdescriptionannotation)
+  - [getExamplesAnnotation](#getexamplesannotation)
+  - [getIdentifierAnnotation](#getidentifierannotation)
+  - [getJSONSchemaAnnotation](#getjsonschemaannotation)
+  - [getMessageAnnotation](#getmessageannotation)
+  - [getTitleAnnotation](#gettitleannotation)
 - [constructors](#constructors)
   - [anyKeyword](#anykeyword)
   - [bigIntKeyword](#bigintkeyword)
@@ -366,6 +372,66 @@ Added in v1.0.0
 
 ```ts
 export declare const getAnnotation: <A>(key: symbol) => (annotated: Annotated) => Option.Option<A>
+```
+
+Added in v1.0.0
+
+## getDescriptionAnnotation
+
+**Signature**
+
+```ts
+export declare const getDescriptionAnnotation: (annotated: Annotated) => Option.Option<string>
+```
+
+Added in v1.0.0
+
+## getExamplesAnnotation
+
+**Signature**
+
+```ts
+export declare const getExamplesAnnotation: (annotated: Annotated) => Option.Option<ExamplesAnnotation>
+```
+
+Added in v1.0.0
+
+## getIdentifierAnnotation
+
+**Signature**
+
+```ts
+export declare const getIdentifierAnnotation: (annotated: Annotated) => Option.Option<string>
+```
+
+Added in v1.0.0
+
+## getJSONSchemaAnnotation
+
+**Signature**
+
+```ts
+export declare const getJSONSchemaAnnotation: (annotated: Annotated) => Option.Option<object>
+```
+
+Added in v1.0.0
+
+## getMessageAnnotation
+
+**Signature**
+
+```ts
+export declare const getMessageAnnotation: (annotated: Annotated) => Option.Option<MessageAnnotation<unknown>>
+```
+
+Added in v1.0.0
+
+## getTitleAnnotation
+
+**Signature**
+
+```ts
+export declare const getTitleAnnotation: (annotated: Annotated) => Option.Option<string>
 ```
 
 Added in v1.0.0

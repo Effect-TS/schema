@@ -7,6 +7,7 @@ import * as Parser from "@effect/schema/Parser"
 import type * as Schema from "@effect/schema/Schema"
 import * as Option from "effect/Option"
 import * as ReadonlyArray from "effect/ReadonlyArray"
+import * as ReadonlyRecord from "effect/ReadonlyRecord"
 
 type JsonSchema7AnyType = {}
 
@@ -77,13 +78,6 @@ type JsonSchema7Type =
   | JsonSchema7ObjectType
 
 /**
- * @since 1.0.0
- */
-const getJSONSchemaAnnotation = AST.getAnnotation<AST.JSONSchemaAnnotation>(
-  AST.JSONSchemaAnnotationId
-)
-
-/**
  * @category JSON Schema
  * @since 1.0.0
  */
@@ -97,11 +91,14 @@ export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(A
 
 const nonNullable: JsonSchema7Type = { "anyOf": [{ "type": "object" }, { "type": "array" }] }
 
+const decorate = <A, B>(f: (a: A) => B, decorator: (a: A, b: B) => B): (a: A) => B => (a) =>
+  decorator(a, f(a))
+
 /** @internal */
-export const go = (ast: AST.AST): JsonSchema7Type => {
+export const go = decorate((ast: AST.AST): JsonSchema7Type => {
   switch (ast._tag) {
     case "Declaration": {
-      const annotation = getJSONSchemaAnnotation(ast)
+      const annotation = AST.getJSONSchemaAnnotation(ast)
       if (Option.isSome(annotation)) {
         return annotation.value
       }
@@ -182,7 +179,9 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
       if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
         return nonNullable
       }
-      const propertySignatures = ast.propertySignatures.map((ps) => go(ps.type))
+      const propertySignatures = ast.propertySignatures.map((ps) => {
+        return { ...go(ps.type), ...getAnnotations(ps) }
+      })
       const indexSignatures = ast.indexSignatures.map((is) => go(is.type))
       const output: JsonSchema7ObjectType = {
         type: "object",
@@ -222,7 +221,7 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
       return { anyOf: ast.enums.map(([_, value]) => ({ const: value })) }
     case "Refinement": {
       const from = go(ast.from)
-      return getJSONSchemaAnnotation(ast).pipe(
+      return AST.getJSONSchemaAnnotation(ast).pipe(
         Option.match({
           onNone: () => from,
           onSome: (schema) => ({ ...from, ...schema })
@@ -243,4 +242,14 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
     case "Transform":
       throw new Error("cannot build a JSON Schema for transformations")
   }
+}, (ast, jsonSchema) => {
+  return { ...jsonSchema, ...getAnnotations(ast) }
+})
+
+const getAnnotations = (annotated: AST.Annotated) => {
+  return ReadonlyRecord.compact<unknown>({
+    description: AST.getDescriptionAnnotation(annotated),
+    title: AST.getTitleAnnotation(annotated),
+    examples: AST.getExamplesAnnotation(annotated)
+  })
 }

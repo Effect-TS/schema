@@ -192,7 +192,9 @@ describe("JSONSchema", () => {
         "minItems": 0,
         "items": [
           {
-            "type": "number"
+            "type": "number",
+            "title": "JsonNumber",
+            "description": "a JSON number"
           }
         ],
         "additionalItems": false
@@ -213,10 +215,14 @@ describe("JSONSchema", () => {
         "minItems": 1,
         "items": [
           {
-            "type": "string"
+            "type": "string",
+            "title": "string",
+            "description": "a string"
           },
           {
-            "type": "number"
+            "type": "number",
+            "title": "JsonNumber",
+            "description": "a JSON number"
           }
         ],
         "additionalItems": false
@@ -238,11 +244,15 @@ describe("JSONSchema", () => {
         "minItems": 0,
         "items": [
           {
-            "type": "string"
+            "type": "string",
+            "title": "string",
+            "description": "a string"
           }
         ],
         "additionalItems": {
-          "type": "number"
+          "type": "number",
+          "title": "JsonNumber",
+          "description": "a JSON number"
         }
       })
       const validate = new Ajv({ strictTuples: false }).compile(jsonSchema)
@@ -282,7 +292,9 @@ describe("JSONSchema", () => {
       expect(jsonSchema).toStrictEqual({
         "type": "array",
         "items": [{
-          "type": "number"
+          "type": "number",
+          "title": "JsonNumber",
+          "description": "a JSON number"
         }],
         "minItems": 1,
         "additionalItems": false
@@ -301,18 +313,32 @@ describe("JSONSchema", () => {
       expect(jsonSchema).toStrictEqual({
         "type": "array",
         "items": [{
-          "type": "string"
+          "type": "string",
+          "title": "string",
+          "description": "a string"
         }],
         "minItems": 1,
-        "additionalItems": { "type": "number" }
+        "additionalItems": {
+          "type": "number",
+          "title": "JsonNumber",
+          "description": "a JSON number"
+        }
       })
       const validate = new Ajv({ strictTuples: false }).compile({
         "type": "array",
         "items": [
-          { "type": "string" }
+          {
+            "type": "string",
+            "title": "string",
+            "description": "a string"
+          }
         ],
         "minItems": 1,
-        "additionalItems": { "type": "number" }
+        "additionalItems": {
+          "type": "number",
+          "title": "JsonNumber",
+          "description": "a JSON number"
+        }
       })
       expect(validate(["a"])).toEqual(true)
       expect(validate(["a", 1])).toEqual(true)
@@ -329,7 +355,11 @@ describe("JSONSchema", () => {
       const jsonSchema = JSONSchema.to(schema)
       expect(jsonSchema).toStrictEqual({
         "type": "array",
-        "items": { "type": "number" }
+        "items": {
+          "type": "number",
+          "title": "JsonNumber",
+          "description": "a JSON number"
+        }
       })
       const validate = new Ajv().compile(jsonSchema)
       expect(validate([])).toEqual(true)
@@ -364,10 +394,14 @@ describe("JSONSchema", () => {
         "type": "object",
         "properties": {
           "a": {
-            "type": "string"
+            "type": "string",
+            "title": "string",
+            "description": "a string"
           },
           "b": {
-            "type": "number"
+            "type": "number",
+            "title": "JsonNumber",
+            "description": "a JSON number"
           }
         },
         "required": ["a", "b"],
@@ -389,10 +423,14 @@ describe("JSONSchema", () => {
         "type": "object",
         "properties": {
           "a": {
-            "type": "string"
+            "type": "string",
+            "title": "string",
+            "description": "a string"
           },
           "b": {
-            "type": "number"
+            "type": "number",
+            "title": "JsonNumber",
+            "description": "a JSON number"
           }
         },
         "required": ["a"],
@@ -425,7 +463,9 @@ describe("JSONSchema", () => {
         "required": [],
         "additionalProperties": {
           "allOf": [{
-            "type": "number"
+            "type": "number",
+            "title": "JsonNumber",
+            "description": "a JSON number"
           }]
         }
       })
@@ -442,10 +482,14 @@ describe("JSONSchema", () => {
         "type": "object",
         "properties": {
           "a": {
-            "type": "number"
+            "type": "number",
+            "title": "JsonNumber",
+            "description": "a JSON number"
           },
           "b": {
-            "type": "number"
+            "type": "number",
+            "title": "JsonNumber",
+            "description": "a JSON number"
           }
         },
         "required": ["a", "b"],
@@ -467,13 +511,17 @@ describe("JSONSchema", () => {
       ],
       "properties": {
         "a": {
-          "type": "string"
+          "type": "string",
+          "title": "string",
+          "description": "a string"
         }
       },
       "additionalProperties": {
         "allOf": [
           {
-            "type": "string"
+            "type": "string",
+            "title": "string",
+            "description": "a string"
           }
         ]
       }
@@ -492,61 +540,104 @@ describe("JSONSchema", () => {
     it("should return the JSON Schema of the from schema if there is no annotation", () => {
       const schema = S.string.pipe(S.filter(() => true))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toStrictEqual({ "type": "string" })
+      expect(jsonSchema).toStrictEqual({
+        "type": "string",
+        "title": "string",
+        "description": "a string"
+      })
     })
 
     it("minLength", () => {
       const schema = S.string.pipe(S.minLength(1))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ type: "string", minLength: 1 })
+      expect(jsonSchema).toEqual({
+        "type": "string",
+        "title": "string",
+        "description": "a string at least 1 character(s) long",
+        "minLength": 1
+      })
       propertyTo(schema)
     })
 
     it("maxLength", () => {
       const schema = S.string.pipe(S.maxLength(1))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ type: "string", maxLength: 1 })
+      expect(jsonSchema).toEqual({
+        "type": "string",
+        "title": "string",
+        "description": "a string at most 1 character(s) long",
+        "maxLength": 1
+      })
       propertyTo(schema)
     })
 
     it("greaterThan", () => {
       const schema = S.JsonNumber.pipe(S.greaterThan(1))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ type: "number", exclusiveMinimum: 1 })
+      expect(jsonSchema).toEqual({
+        "type": "number",
+        "title": "JsonNumber",
+        "description": "a number greater than 1",
+        "exclusiveMinimum": 1
+      })
       propertyTo(schema)
     })
 
     it("greaterThanOrEqualTo", () => {
       const schema = S.JsonNumber.pipe(S.greaterThanOrEqualTo(1))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ type: "number", minimum: 1 })
+      expect(jsonSchema).toEqual({
+        "type": "number",
+        "title": "JsonNumber",
+        "description": "a number greater than or equal to 1",
+        "minimum": 1
+      })
       propertyTo(schema)
     })
 
     it("lessThan", () => {
       const schema = S.JsonNumber.pipe(S.lessThan(1))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ type: "number", exclusiveMaximum: 1 })
+      expect(jsonSchema).toEqual({
+        "type": "number",
+        "title": "JsonNumber",
+        "description": "a number less than 1",
+        "exclusiveMaximum": 1
+      })
       propertyTo(schema)
     })
 
     it("lessThanOrEqualTo", () => {
       const schema = S.JsonNumber.pipe(S.lessThanOrEqualTo(1))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ type: "number", maximum: 1 })
+      expect(jsonSchema).toEqual({
+        "type": "number",
+        "title": "JsonNumber",
+        "description": "a number less than or equal to 1",
+        "maximum": 1
+      })
       propertyTo(schema)
     })
 
     it("pattern", () => {
       const schema = S.string.pipe(S.pattern(/^abb+$/))
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ "type": "string", "pattern": "^abb+$" })
+      expect(jsonSchema).toEqual({
+        "type": "string",
+        "title": "string",
+        "description": "a string matching the pattern ^abb+$",
+        "pattern": "^abb+$"
+      })
     })
 
     it("integer", () => {
       const schema = S.JsonNumber.pipe(S.int())
       const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({ "type": "integer" })
+      expect(jsonSchema).toEqual({
+        "type": "integer",
+        "title": "integer",
+        "description": "an integer"
+      })
       propertyTo(schema)
     })
   })
@@ -578,5 +669,60 @@ describe("JSONSchema", () => {
     expect(() => JSONSchema.go(S.NumberFromString.ast)).toThrow(
       new Error("cannot build a JSON Schema for transformations")
     )
+  })
+
+  describe("annotations", () => {
+    it("examples support", () => {
+      const schema = S.string.pipe(S.examples(["a", "b"]))
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "type": "string",
+        "title": "string",
+        "description": "a string",
+        "examples": ["a", "b"]
+      })
+    })
+
+    it("struct properties support", () => {
+      const schema = S.struct({
+        foo: S.propertySignature(S.string, {
+          description: "foo description",
+          title: "foo title",
+          examples: ["foo example"]
+        }),
+        bar: S.propertySignature(S.number, {
+          description: "bar description",
+          title: "bar title",
+          examples: ["bar example"]
+        })
+      })
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "type": "object",
+        "required": [
+          "foo",
+          "bar"
+        ],
+        "properties": {
+          "foo": {
+            "type": "string",
+            "description": "foo description",
+            "title": "foo title",
+            "examples": [
+              "foo example"
+            ]
+          },
+          "bar": {
+            "type": "number",
+            "description": "bar description",
+            "title": "bar title",
+            "examples": [
+              "bar example"
+            ]
+          }
+        },
+        "additionalProperties": false
+      })
+    })
   })
 })

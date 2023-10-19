@@ -569,10 +569,14 @@ Output:
   ],
   "properties": {
     "name": {
-      "type": "string"
+      "type": "string",
+      "description": "a string",
+      "title": "string"
     },
     "age": {
-      "type": "number"
+      "type": "number",
+      "description": "a number",
+      "title": "number"
     }
   },
   "additionalProperties": false
