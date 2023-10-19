@@ -1063,7 +1063,7 @@ export const getTemplateLiteralRegex = (ast: AST.TemplateLiteral): RegExp => {
     if (AST.isStringKeyword(span.type)) {
       pattern += ".*"
     } else if (AST.isNumberKeyword(span.type)) {
-      pattern += "-?\\d+(\\.\\d+)?"
+      pattern += "[+-]?\\d*\\.?\\d+(?:[Ee][+-]?\\d+)?"
     }
     pattern += span.literal
   }
