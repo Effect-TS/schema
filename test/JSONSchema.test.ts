@@ -648,7 +648,7 @@ describe("JSONSchema", () => {
     const jsonSchema = JSONSchema.to(schema)
     expect(jsonSchema).toEqual({
       "type": "string",
-      "pattern": "^a-?\\d+(\\.\\d+)?$",
+      "pattern": "^a[+-]?\\d*\\.?\\d+(?:[Ee][+-]?\\d+)?$",
       "description": "a template literal"
     })
     const validate = new Ajv().compile(jsonSchema)
@@ -656,8 +656,7 @@ describe("JSONSchema", () => {
     expect(validate("a12")).toEqual(true)
     expect(validate("a")).toEqual(false)
     expect(validate("aa")).toEqual(false)
-    // TODO
-    // propertyTo(schema)
+    propertyTo(schema)
   })
 
   it("Lazy should raise an error", () => {
