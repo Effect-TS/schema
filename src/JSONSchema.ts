@@ -138,14 +138,7 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
     case "SymbolKeyword":
       throw new Error("cannot convert `symbol` to JSON Schema")
     case "Tuple": {
-      const elements = ast.elements.map((e) => {
-        if (e.isOptional) {
-          throw new Error(
-            "Generating a JSON Schema for an optional element is not currently supported. You're welcome to contribute by submitting a Pull Request."
-          )
-        }
-        return go(e.type)
-      })
+      const elements = ast.elements.map((e) => go(e.type))
       const rest = Option.map(ast.rest, ReadonlyArray.mapNonEmpty(go))
       const output: JsonSchema7ArrayType = { type: "array" }
       // ---------------------------------------------
@@ -153,7 +146,7 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
       // ---------------------------------------------
       const len = elements.length
       if (len > 0) {
-        output.minItems = len
+        output.minItems = len - ast.elements.filter((element) => element.isOptional).length
         output.items = elements
       }
       // ---------------------------------------------

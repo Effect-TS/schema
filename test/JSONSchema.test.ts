@@ -184,31 +184,75 @@ describe("JSONSchema", () => {
   })
 
   describe("tuple", () => {
-    it("e? should raise an error", () => {
+    it("e?", () => {
       const schema = S.tuple().pipe(S.optionalElement(S.JsonNumber))
-      expect(() => JSONSchema.to(schema)).toThrowError(
-        new Error(
-          "Generating a JSON Schema for an optional element is not currently supported. You're welcome to contribute by submitting a Pull Request."
-        )
-      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toStrictEqual({
+        "type": "array",
+        "minItems": 0,
+        "items": [
+          {
+            "type": "number"
+          }
+        ],
+        "additionalItems": false
+      })
+      const validate = new Ajv({ strictTuples: false }).compile(jsonSchema)
+      expect(validate([])).toEqual(true)
+      expect(validate([1])).toEqual(true)
+      expect(validate(["a"])).toEqual(false)
+      expect(validate([1, 2])).toEqual(false)
+      propertyTo(schema)
     })
 
-    it("e + e? should raise an error", () => {
+    it("e + e?", () => {
       const schema = S.tuple(S.string).pipe(S.optionalElement(S.JsonNumber))
-      expect(() => JSONSchema.to(schema)).toThrowError(
-        new Error(
-          "Generating a JSON Schema for an optional element is not currently supported. You're welcome to contribute by submitting a Pull Request."
-        )
-      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toStrictEqual({
+        "type": "array",
+        "minItems": 1,
+        "items": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          }
+        ],
+        "additionalItems": false
+      })
+      const validate = new Ajv({ strictTuples: false }).compile(jsonSchema)
+      expect(validate(["a"])).toEqual(true)
+      expect(validate(["a", 1])).toEqual(true)
+      expect(validate([])).toEqual(false)
+      expect(validate([1])).toEqual(false)
+      expect(validate([1, 2])).toEqual(false)
+      propertyTo(schema)
     })
 
-    it("e? + r should raise an error", () => {
+    it("e? + r", () => {
       const schema = S.tuple().pipe(S.optionalElement(S.string), S.rest(S.JsonNumber))
-      expect(() => JSONSchema.to(schema)).toThrowError(
-        new Error(
-          "Generating a JSON Schema for an optional element is not currently supported. You're welcome to contribute by submitting a Pull Request."
-        )
-      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toStrictEqual({
+        "type": "array",
+        "minItems": 0,
+        "items": [
+          {
+            "type": "string"
+          }
+        ],
+        "additionalItems": {
+          "type": "number"
+        }
+      })
+      const validate = new Ajv({ strictTuples: false }).compile(jsonSchema)
+      expect(validate([])).toEqual(true)
+      expect(validate(["a"])).toEqual(true)
+      expect(validate(["a", 1])).toEqual(true)
+      expect(validate([1])).toEqual(false)
+      expect(validate([1, 2])).toEqual(false)
+      expect(validate(["a", "b", 1])).toEqual(false)
+      propertyTo(schema)
     })
 
     it("r + e should raise an error", () => {
