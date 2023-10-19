@@ -725,4 +725,23 @@ describe("JSONSchema", () => {
       })
     })
   })
+
+  it("should support Classes", () => {
+    class A extends S.Class<A>()({ a: S.string }) {}
+    const jsonSchema = JSONSchema.from(A)
+    expect(jsonSchema).toEqual({
+      "type": "object",
+      "required": [
+        "a"
+      ],
+      "properties": {
+        "a": {
+          "type": "string",
+          "description": "a string",
+          "title": "string"
+        }
+      },
+      "additionalProperties": false
+    })
+  })
 })
