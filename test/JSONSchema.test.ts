@@ -628,6 +628,7 @@ describe("JSONSchema", () => {
         "description": "a string matching the pattern ^abb+$",
         "pattern": "^abb+$"
       })
+      propertyTo(schema)
     })
 
     it("integer", () => {
@@ -642,9 +643,21 @@ describe("JSONSchema", () => {
     })
   })
 
-  it("TemplateLiteral should raise an error", () => {
-    const schema = S.templateLiteral(S.literal("a"), S.string)
-    propertyTo(schema)
+  it("TemplateLiteral", () => {
+    const schema = S.templateLiteral(S.literal("a"), S.number)
+    const jsonSchema = JSONSchema.to(schema)
+    expect(jsonSchema).toEqual({
+      "type": "string",
+      "pattern": "^a-?\\d+(\\.\\d+)?$",
+      "description": "a template literal"
+    })
+    const validate = new Ajv().compile(jsonSchema)
+    expect(validate("a1")).toEqual(true)
+    expect(validate("a12")).toEqual(true)
+    expect(validate("a")).toEqual(false)
+    expect(validate("aa")).toEqual(false)
+    // TODO
+    // propertyTo(schema)
   })
 
   it("Lazy should raise an error", () => {
