@@ -102,7 +102,9 @@ export const go = decorate((ast: AST.AST): JsonSchema7Type => {
       if (Option.isSome(annotation)) {
         return annotation.value
       }
-      throw new Error("cannot build a JSON Schema for Declaration")
+      throw new Error(
+        "cannot build a JSON Schema for declarations without a JSON Schema annotation"
+      )
     }
     case "Literal": {
       if (typeof ast.literal === "bigint") {
@@ -232,6 +234,7 @@ export const go = decorate((ast: AST.AST): JsonSchema7Type => {
       const regex = Parser.getTemplateLiteralRegex(ast)
       return {
         type: "string",
+        description: "a template literal",
         pattern: regex.source
       }
     }

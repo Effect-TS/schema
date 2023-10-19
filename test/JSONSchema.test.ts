@@ -49,7 +49,7 @@ describe("JSONSchema", () => {
   describe("declaration", () => {
     it("should raise an error when an annotation doesn't exist", () => {
       expect(() => JSONSchema.to(S.chunk(S.JsonNumber))).toThrow(
-        new Error("cannot build a JSON Schema for Declaration")
+        new Error("cannot build a JSON Schema for declarations without a JSON Schema annotation")
       )
     })
 
