@@ -373,7 +373,7 @@ describe("JSONSchema", () => {
 
   describe("record", () => {
     it("record(string, number)", () => {
-      const schema = S.record(S.string, S.number)
+      const schema = S.record(S.string, S.JsonNumber)
       const jsonSchema = JSONSchema.to(schema)
       expect(jsonSchema).toStrictEqual({
         "type": "object",
