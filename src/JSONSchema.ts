@@ -89,7 +89,12 @@ export const to = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(AST
  */
 export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(AST.from(schema.ast))
 
-const nonNullable: JsonSchema7Type = { "anyOf": [{ "type": "object" }, { "type": "array" }] }
+const nonNullable: JsonSchema7Type = {
+  "anyOf": [
+    { "type": "object" },
+    { "type": "array" }
+  ]
+}
 
 const decorate = <A, B>(f: (a: A) => B, decorator: (a: A, b: B) => B): (a: A) => B => (a) =>
   decorator(a, f(a))
@@ -223,11 +228,12 @@ export const go = decorate((ast: AST.AST): JsonSchema7Type => {
       return { anyOf: ast.enums.map(([_, value]) => ({ const: value })) }
     case "Refinement": {
       const from = go(ast.from)
-      return AST.getJSONSchemaAnnotation(ast).pipe(
-        Option.match({
-          onNone: () => from,
-          onSome: (schema) => ({ ...from, ...schema })
-        })
+      const annotation = AST.getJSONSchemaAnnotation(ast)
+      if (Option.isSome(annotation)) {
+        return { ...from, ...annotation.value }
+      }
+      throw new Error(
+        "cannot build a JSON Schema for refinements without a JSON Schema annotation"
       )
     }
     case "TemplateLiteral": {

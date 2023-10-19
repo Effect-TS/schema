@@ -48,7 +48,8 @@ describe("JSONSchema", () => {
 
   describe("declaration", () => {
     it("should raise an error when an annotation doesn't exist", () => {
-      expect(() => JSONSchema.to(S.chunk(S.JsonNumber))).toThrow(
+      const schema = S.chunk(S.JsonNumber)
+      expect(() => JSONSchema.to(schema)).toThrow(
         new Error("cannot build a JSON Schema for declarations without a JSON Schema annotation")
       )
     })
@@ -537,14 +538,11 @@ describe("JSONSchema", () => {
   })
 
   describe("refinement", () => {
-    it("should return the JSON Schema of the from schema if there is no annotation", () => {
+    it("should raise an error when an annotation doesn't exist", () => {
       const schema = S.string.pipe(S.filter(() => true))
-      const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toStrictEqual({
-        "type": "string",
-        "title": "string",
-        "description": "a string"
-      })
+      expect(() => JSONSchema.to(schema)).toThrow(
+        new Error("cannot build a JSON Schema for refinements without a JSON Schema annotation")
+      )
     })
 
     it("minLength", () => {
