@@ -95,6 +95,8 @@ export const to = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(AST
  */
 export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(AST.from(schema.ast))
 
+const nonNullable: JsonSchema7Type = { "anyOf": [{ "type": "object" }, { "type": "array" }] }
+
 /** @internal */
 export const go = (ast: AST.AST): JsonSchema7Type => {
   switch (ast._tag) {
@@ -136,59 +138,57 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
     case "SymbolKeyword":
       throw new Error("cannot convert `symbol` to JSON Schema")
     case "Tuple": {
-      const elements = ast.elements.map((e) => go(e.type))
+      const elements = ast.elements.map((e) => {
+        if (e.isOptional) {
+          throw new Error(
+            "Generating a JSON Schema for an optional element is not currently supported. You're welcome to contribute by submitting a Pull Request."
+          )
+        }
+        return go(e.type)
+      })
       const rest = Option.map(ast.rest, ReadonlyArray.mapNonEmpty(go))
       const output: JsonSchema7ArrayType = { type: "array" }
-      let i = 0
       // ---------------------------------------------
       // handle elements
       // ---------------------------------------------
-      for (; i < ast.elements.length; i++) {
-        if (output.minItems === undefined) {
-          output.minItems = 0
-        }
-        if (output.maxItems === undefined) {
-          output.maxItems = 0
-        }
-        // ---------------------------------------------
-        // handle optional elements
-        // ---------------------------------------------
-        if (!ast.elements[i].isOptional) {
-          output.minItems = output.minItems + 1
-          output.maxItems = output.maxItems + 1
-        }
-        if (output.items === undefined) {
-          output.items = []
-        }
-        if (Array.isArray(output.items)) {
-          output.items.push(elements[i])
-        }
+      const len = elements.length
+      if (len > 0) {
+        output.minItems = len
+        output.items = elements
       }
       // ---------------------------------------------
       // handle rest element
       // ---------------------------------------------
       if (Option.isSome(rest)) {
-        const head = ReadonlyArray.headNonEmpty(rest.value)
-        if (output.items !== undefined) {
-          delete output.maxItems
+        const head = rest.value[0]
+        if (len > 0) {
           output.additionalItems = head
         } else {
           output.items = head
         }
+
         // ---------------------------------------------
         // handle post rest elements
         // ---------------------------------------------
-        // TODO
         if (rest.value.length > 1) {
           throw new Error(
             "Generating a JSON Schema for post-rest elements is not currently supported. You're welcome to contribute by submitting a Pull Request."
           )
+        }
+      } else {
+        if (len > 0) {
+          output.additionalItems = false
+        } else {
+          output.maxItems = 0
         }
       }
 
       return output
     }
     case "TypeLiteral": {
+      if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
+        return nonNullable
+      }
       const propertySignatures = ast.propertySignatures.map((ps) => go(ps.type))
       const indexSignatures = ast.indexSignatures.map((is) => go(is.type))
       const output: JsonSchema7ObjectType = {
@@ -238,10 +238,12 @@ export const go = (ast: AST.AST): JsonSchema7Type => {
     }
     case "TemplateLiteral": {
       const regex = Parser.getTemplateLiteralRegex(ast)
-      return { pattern: regex.source }
+      return {
+        type: "string",
+        pattern: regex.source
+      }
     }
     case "Lazy":
-      // TODO
       throw new Error(
         "Generating a JSON Schema for lazy schemas is not currently supported. You're welcome to contribute by submitting a Pull Request."
       )
