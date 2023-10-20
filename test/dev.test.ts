@@ -2,7 +2,7 @@ import * as JSONSchema from "@effect/schema/JSONSchema"
 import * as S from "@effect/schema/Schema"
 
 describe("dev", () => {
-  it("tmp", async () => {
+  it.skip("tmp", async () => {
     interface Category {
       readonly name: string
       readonly categories: ReadonlyArray<Category>

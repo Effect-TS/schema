@@ -108,6 +108,15 @@ describe("JSONSchema", () => {
   })
 
   it("object", () => {
+    const schema = S.object
+    const jsonSchema = JSONSchema.to(schema)
+    const validate = new Ajv().compile(jsonSchema)
+    expect(validate({})).toEqual(true)
+    expect(validate({ a: 1 })).toEqual(true)
+    expect(validate([])).toEqual(true)
+    expect(validate("a")).toEqual(false)
+    expect(validate(1)).toEqual(false)
+    expect(validate(true)).toEqual(false)
     propertyTo(S.object)
   })
 

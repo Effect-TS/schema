@@ -102,7 +102,7 @@ export const to = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Top => goTop(A
 export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Top =>
   goTop(AST.from(schema.ast))
 
-const nonNullable: JsonSchema7 = {
+const emptyObjectJsonSchema: JsonSchema7 = {
   "anyOf": [
     {
       "type": "object",
@@ -112,6 +112,8 @@ const nonNullable: JsonSchema7 = {
     { "type": "array" }
   ]
 }
+
+const anyJsonSchema: JsonSchema7 = {}
 
 const $schema = "http://json-schema.org/draft-07/schema#"
 
@@ -190,8 +192,9 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
       throw new Error("cannot convert `never` to JSON Schema")
     case "UnknownKeyword":
     case "AnyKeyword":
+      return anyJsonSchema
     case "ObjectKeyword":
-      return {}
+      return emptyObjectJsonSchema
     case "StringKeyword":
       return { type: "string" }
     case "NumberKeyword":
@@ -248,7 +251,7 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
     }
     case "TypeLiteral": {
       if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
-        return nonNullable
+        return emptyObjectJsonSchema
       }
       const propertySignatures = ast.propertySignatures.map((ps) => {
         return { ...goWithIdentifier(ps.type, definitions), ...getJsonSchemaAnnotations(ps) }
