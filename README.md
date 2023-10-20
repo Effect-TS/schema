@@ -26,6 +26,7 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 - Ensuring that a value conforms to a specified `Schema`.
 - Generating fast-check arbitraries.
 - Facilitating pretty printing.
+- Generating JSON Schemas.
 
 If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
 
@@ -523,9 +524,9 @@ console.log(fc.sample(PersonArbitraryFrom, 2));
 
 ## Pretty print
 
-The `pretty` function provided by the `@effect/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
+The `to` function provided by the `@effect/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
 
-You can use the `pretty` function to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
+You can use the `to` function to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -541,6 +542,161 @@ const PersonPretty = P.to(Person);
 // returns a string representation of the object
 console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "age": 30 }`
 ```
+
+## Generating JSON Schemas
+
+The `to` function, which is part of the `@effect/schema/JSONSchema` module, allows you to generate a JSON Schema based on a schema definition:
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as JSONSchema from "@effect/schema/JSONSchema";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number
+});
+
+const jsonSchema = JSONSchema.to(Person);
+
+console.log(JSON.stringify(jsonSchema, null, 2));
+/*
+Output:
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "name",
+    "age"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "a string",
+      "title": "string"
+    },
+    "age": {
+      "type": "number",
+      "description": "a number",
+      "title": "number"
+    }
+  },
+  "additionalProperties": false
+}
+*/
+```
+
+In this example, we have created a schema for a "Person" with a name (a string) and an age (a number). We then use the `JSONSchema.to` function to generate the corresponding JSON Schema.
+
+### Identifier Annotations
+
+You can enhance your schemas with identifier annotations. If you do, your schema will be included within a "definitions" object property on the root and referenced from there:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+const Name = S.string.pipe(S.identifier("Name"));
+const Age = S.number.pipe(S.identifier("Age"));
+const Person = S.struct({
+  name: Name,
+  age: Age
+});
+
+const jsonSchema = JSONSchema.to(Person);
+
+console.log(JSON.stringify(jsonSchema, null, 2));
+/*
+Output:
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "name",
+    "age"
+  ],
+  "properties": {
+    "name": {
+      "$ref": "#/definitions/Name"
+    },
+    "age": {
+      "$ref": "#/definitions/Age"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "Name": {
+      "type": "string",
+      "description": "a string",
+      "title": "string"
+    },
+    "Age": {
+      "type": "number",
+      "description": "a number",
+      "title": "number"
+    }
+  }
+}
+*/
+```
+
+This technique helps organize your JSON Schema by creating separate definitions for each identifier annotated schema, making it more readable and maintainable.
+
+### Recursive and Mutually Recursive Schemas
+
+Recursive and mutually recursive schemas are supported, but in these cases, identifier annotations are **required**:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+interface Category {
+  readonly name: string;
+  readonly categories: ReadonlyArray<Category>;
+}
+
+const schema: S.Schema<Category> = S.lazy<Category>(() =>
+  S.struct({
+    name: S.string,
+    categories: S.array(schema)
+  })
+).pipe(S.identifier("Category"));
+
+const jsonSchema = JSONSchema.to(schema);
+
+console.log(JSON.stringify(jsonSchema, null, 2));
+/*
+Output:
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Category",
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "required": [
+        "name",
+        "categories"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "a string",
+          "title": "string"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Category"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
+*/
+```
+
+In the example above, we define a schema for a "Category" that can contain a "name" (a string) and an array of nested "categories." To support recursive definitions, we use the `S.lazy` function and identifier annotations to name our schema.
+
+This ensures that the JSON Schema properly handles the recursive structure and creates distinct definitions for each annotated schema, improving readability and maintainability.
 
 # Basic usage
 

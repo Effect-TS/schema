@@ -16,6 +16,7 @@ Added in v1.0.0
   - [From "@effect/schema/AST"](#from-effectschemaast)
   - [From "@effect/schema/Arbitrary"](#from-effectschemaarbitrary)
   - [From "@effect/schema/ArrayFormatter"](#from-effectschemaarrayformatter)
+  - [From "@effect/schema/JSONSchema"](#from-effectschemajsonschema)
   - [From "@effect/schema/ParseResult"](#from-effectschemaparseresult)
   - [From "@effect/schema/Parser"](#from-effectschemaparser)
   - [From "@effect/schema/Pretty"](#from-effectschemapretty)
@@ -58,6 +59,18 @@ Re-exports all named exports from the "@effect/schema/ArrayFormatter" module as 
 
 ```ts
 export * as ArrayFormatter from '@effect/schema/ArrayFormatter'
+```
+
+Added in v1.0.0
+
+## From "@effect/schema/JSONSchema"
+
+Re-exports all named exports from the "@effect/schema/JSONSchema" module as `JSONSchema`.
+
+**Signature**
+
+```ts
+export * as JSONSchema from '@effect/schema/JSONSchema'
 ```
 
 Added in v1.0.0
