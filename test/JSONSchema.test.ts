@@ -542,6 +542,18 @@ describe("JSONSchema", () => {
   })
 
   describe("record", () => {
+    it("record(symbol, number)", () => {
+      expect(() => JSONSchema.to(S.record(S.symbolFromSelf, S.JsonNumber))).toThrow(
+        new Error("Unsupported index signature parameter SymbolKeyword")
+      )
+    })
+
+    it("record(refinement, number)", () => {
+      expect(() => JSONSchema.to(S.record(S.string.pipe(S.minLength(1)), S.JsonNumber))).toThrow(
+        new Error("Unsupported index signature parameter Refinement")
+      )
+    })
+
     it("record(string, number)", () => {
       const schema = S.record(S.string, S.JsonNumber)
       const jsonSchema = JSONSchema.to(schema)
@@ -551,11 +563,9 @@ describe("JSONSchema", () => {
         "properties": {},
         "required": [],
         "additionalProperties": {
-          "allOf": [{
-            "type": "number",
-            "title": "JsonNumber",
-            "description": "a JSON number"
-          }]
+          "type": "number",
+          "title": "JsonNumber",
+          "description": "a JSON number"
         }
       })
       const validate = new Ajv().compile(jsonSchema)
@@ -587,6 +597,34 @@ describe("JSONSchema", () => {
       })
       propertyTo(schema)
     })
+
+    it("record(${string}-${string}, number)", () => {
+      const schema = S.record(S.templateLiteral(S.string, S.literal("-"), S.string), S.number)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toStrictEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "required": [],
+        "properties": {},
+        "additionalProperties": false,
+        "patternProperties": {
+          "^.*-.*$": {
+            "type": "number",
+            "description": "a number",
+            "title": "number"
+          }
+        }
+      })
+      const validate = new Ajv().compile(jsonSchema)
+      expect(validate({})).toEqual(true)
+      expect(validate({ "-": 1 })).toEqual(true)
+      expect(validate({ "a-": 1 })).toEqual(true)
+      expect(validate({ "-b": 1 })).toEqual(true)
+      expect(validate({ "a-b": 1 })).toEqual(true)
+      expect(validate({ "": 1 })).toEqual(false)
+      expect(validate({ "-": "a" })).toEqual(false)
+      propertyTo(schema)
+    })
   })
 
   it("struct + record", () => {
@@ -608,13 +646,9 @@ describe("JSONSchema", () => {
         }
       },
       "additionalProperties": {
-        "allOf": [
-          {
-            "type": "string",
-            "title": "string",
-            "description": "a string"
-          }
-        ]
+        "type": "string",
+        "title": "string",
+        "description": "a string"
       }
     })
     const validate = new Ajv().compile(jsonSchema)

@@ -72,6 +72,7 @@ interface JsonSchema7Object {
   required: Array<string>
   properties: Record<string, JsonSchema7>
   additionalProperties?: boolean | JsonSchema7
+  patternProperties?: Record<string, JsonSchema7>
 }
 
 type JsonSchema7 =
@@ -257,12 +258,30 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
       if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
         return emptyObjectJsonSchema
       }
+      let additionalProperties: JsonSchema7 | undefined = undefined
+      let patternProperties: Record<string, JsonSchema7> | undefined = undefined
+      for (const is of ast.indexSignatures) {
+        const parameter = is.parameter
+        switch (parameter._tag) {
+          case "StringKeyword":
+            additionalProperties = goWithIdentifier(is.type, definitions)
+            break
+          case "TemplateLiteral":
+            patternProperties = {
+              [Parser.getTemplateLiteralRegex(parameter).source]: goWithIdentifier(
+                is.type,
+                definitions
+              )
+            }
+            break
+          case "SymbolKeyword":
+          case "Refinement":
+            throw new Error(`Unsupported index signature parameter ${parameter._tag}`)
+        }
+      }
       const propertySignatures = ast.propertySignatures.map((ps) => {
         return { ...goWithIdentifier(ps.type, definitions), ...getJsonSchemaAnnotations(ps) }
       })
-      const indexSignatures = ast.indexSignatures.map((is) =>
-        goWithIdentifier(is.type, definitions)
-      )
       const output: JsonSchema7Object = {
         type: "object",
         required: [],
@@ -289,8 +308,11 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
       // ---------------------------------------------
       // handle index signatures
       // ---------------------------------------------
-      if (indexSignatures.length > 0) {
-        output.additionalProperties = { allOf: indexSignatures }
+      if (additionalProperties !== undefined) {
+        output.additionalProperties = additionalProperties
+      }
+      if (patternProperties !== undefined) {
+        output.patternProperties = patternProperties
       }
 
       return output
