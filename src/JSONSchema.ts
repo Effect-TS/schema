@@ -20,6 +20,7 @@ interface JsonSchema7Null {
 interface JsonSchema7String {
   type: "string"
   const?: string
+  enum?: Array<string>
   minLength?: number
   maxLength?: number
   pattern?: string
@@ -29,6 +30,7 @@ interface JsonSchema7String {
 interface JsonSchema7Number {
   type: "number" | "integer"
   const?: number
+  enum?: Array<number>
   minimum?: number
   exclusiveMinimum?: number
   maximum?: number
@@ -53,7 +55,8 @@ interface JsonSchema7Array {
 }
 
 interface JsonSchema7Enum {
-  "enum": Array<string | number>
+  type: ["string", "number"]
+  enum: Array<string | number>
 }
 
 interface JsonSchema7AnyOf {
@@ -181,10 +184,7 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
       } else if (ast.literal === null) {
         return { type: "null" }
       }
-      return {
-        type,
-        const: ast.literal
-      } as any
+      return { type, const: ast.literal } as any
     }
     case "UniqueSymbol":
       throw new Error("cannot convert a unique symbol to JSON Schema")
@@ -297,8 +297,28 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
     }
     case "Union":
       return { "anyOf": ast.types.map((ast) => goWithIdentifier(ast, definitions)) }
-    case "Enums":
-      return { anyOf: ast.enums.map(([_, value]) => ({ const: value })) }
+    case "Enums": {
+      const enums: Array<any> = []
+      const types = {
+        string: false,
+        number: false
+      }
+      for (const [_, value] of ast.enums) {
+        if (typeof value === "string") {
+          types.string = true
+        } else {
+          types.number = true
+        }
+        enums.push(value)
+      }
+      if (types.string && types.number) {
+        return { type: ["string", "number"], enum: enums }
+      } else if (types.string) {
+        return { type: "string", enum: enums }
+      } else {
+        return { type: "number", enum: enums }
+      }
+    }
     case "Refinement": {
       const from = goWithIdentifier(ast.from, definitions)
       const annotation = AST.getJSONSchemaAnnotation(ast)

@@ -23,7 +23,7 @@ const propertyTo = <I, A>(schema: S.Schema<I, A>) => {
   const is = S.is(schema)
   const jsonSchema = JSONSchema.to(schema)
   // console.log(JSON.stringify(jsonSchema, null, 2))
-  const validate = new Ajv({ strictTuples: false }).compile(jsonSchema)
+  const validate = new Ajv({ strictTuples: false, allowUnionTypes: true }).compile(jsonSchema)
   const arb = arbitrary(fc)
   // console.log(fc.sample(arb, 10))
   fc.assert(fc.property(arb, (a) => {
@@ -34,7 +34,9 @@ const propertyTo = <I, A>(schema: S.Schema<I, A>) => {
 const propertyFrom = <I, A>(schema: S.Schema<I, A>) => {
   const arbitrary = A.from(schema)
   const is = S.is(S.from(schema))
-  const validate = new Ajv({ strictTuples: false }).compile(JSONSchema.from(schema))
+  const validate = new Ajv({ strictTuples: false, allowUnionTypes: true }).compile(
+    JSONSchema.from(schema)
+  )
   const arb = arbitrary(fc)
   fc.assert(fc.property(arb, (a) => {
     return is(a) && validate(a)
@@ -188,16 +190,45 @@ describe("JSONSchema", () => {
         Apple,
         Banana
       }
-      propertyTo(S.enums(Fruits))
+      const schema = S.enums(Fruits)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "number",
+        "enum": [0, 1]
+      })
+      propertyTo(schema)
     })
 
     it("String enums", () => {
       enum Fruits {
         Apple = "apple",
+        Banana = "banana"
+      }
+      const schema = S.enums(Fruits)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "string",
+        "enum": ["apple", "banana"]
+      })
+      propertyTo(schema)
+    })
+
+    it("String/Number enums", () => {
+      enum Fruits {
+        Apple = "apple",
         Banana = "banana",
         Cantaloupe = 0
       }
-      propertyTo(S.enums(Fruits))
+      const schema = S.enums(Fruits)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": ["string", "number"],
+        "enum": ["apple", "banana", 0]
+      })
+      propertyTo(schema)
     })
 
     it("Const enums", () => {
@@ -206,7 +237,14 @@ describe("JSONSchema", () => {
         Banana: "banana",
         Cantaloupe: 3
       } as const
-      propertyTo(S.enums(Fruits))
+      const schema = S.enums(Fruits)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": ["string", "number"],
+        "enum": ["apple", "banana", 3]
+      })
+      propertyTo(schema)
     })
   })
 
@@ -816,7 +854,6 @@ describe("JSONSchema", () => {
       ).pipe(S.identifier("Operation"))
 
       const jsonSchema = JSONSchema.to(Operation)
-      console.log(JSON.stringify(jsonSchema, null, 2))
       expect(jsonSchema).toEqual({
         "$schema": "http://json-schema.org/draft-07/schema#",
         "$ref": "#/definitions/Operation",
