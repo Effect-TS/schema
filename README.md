@@ -562,6 +562,7 @@ console.log(JSON.stringify(jsonSchema, null, 2));
 /*
 Output:
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "required": [
     "name",
@@ -585,6 +586,57 @@ Output:
 ```
 
 In this example, we have created a schema for a "Person" with a name (a string) and an age (a number). We then use the `JSONSchema.to` function to generate the corresponding JSON Schema.
+
+### Identifier annotations
+
+You can enhance your schemas with identifier annotations. If you do, your schema will be included within a "definitions" object property on the root and referenced from there:
+
+```ts
+const Name = S.string.pipe(S.identifier("Name"));
+const Age = S.number.pipe(S.identifier("Age"));
+const Person = S.struct({
+  name: Name,
+  age: Age
+});
+
+const jsonSchema = JSONSchema.to(Person);
+
+console.log(JSON.stringify(jsonSchema, null, 2));
+/*
+Output:
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "name",
+    "age"
+  ],
+  "properties": {
+    "name": {
+      "$ref": "#/definitions/Name"
+    },
+    "age": {
+      "$ref": "#/definitions/Age"
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "Name": {
+      "type": "string",
+      "description": "a string",
+      "title": "string"
+    },
+    "Age": {
+      "type": "number",
+      "description": "a number",
+      "title": "number"
+    }
+  }
+}
+*/
+```
+
+This technique helps organize your JSON Schema by creating separate definitions for each identifier annotated schema, making it more readable and maintainable.
 
 # Basic usage
 

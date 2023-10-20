@@ -9,17 +9,17 @@ import * as Option from "effect/Option"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as ReadonlyRecord from "effect/ReadonlyRecord"
 
-interface $Schema {
-  $schema?: string
+interface JsonSchema7Ref {
+  $ref: string
 }
 
-interface JsonSchema7AnyType extends $Schema {}
+interface JsonSchema7Any {}
 
-interface JsonSchema7NullType extends $Schema {
+interface JsonSchema7Null {
   type: "null"
 }
 
-interface JsonSchema7StringType extends $Schema {
+interface JsonSchema7String {
   type: "string"
   minLength?: number
   maxLength?: number
@@ -27,7 +27,7 @@ interface JsonSchema7StringType extends $Schema {
   description?: string
 }
 
-interface JsonSchema7NumberType extends $Schema {
+interface JsonSchema7Number {
   type: "number" | "integer"
   minimum?: number
   exclusiveMinimum?: number
@@ -35,79 +35,101 @@ interface JsonSchema7NumberType extends $Schema {
   exclusiveMaximum?: number
 }
 
-interface JsonSchema7BooleanType extends $Schema {
+interface JsonSchema7Boolean {
   type: "boolean"
 }
 
-interface JsonSchema7ConstType extends $Schema {
+interface JsonSchema7Const {
   const: string | number | boolean
 }
 
-interface JsonSchema7ArrayType extends $Schema {
+interface JsonSchema7Array {
   type: "array"
-  items?: JsonSchema7Type | Array<JsonSchema7Type>
+  items?: JsonSchema7 | Array<JsonSchema7>
   minItems?: number
   maxItems?: number
-  additionalItems?: JsonSchema7Type | boolean
+  additionalItems?: JsonSchema7 | boolean
 }
 
-interface JsonSchema7EnumType extends $Schema {
+interface JsonSchema7Enum {
   "enum": Array<string | number>
 }
 
-interface JsonSchema7AnyOfType extends $Schema {
-  anyOf: ReadonlyArray<JsonSchema7Type>
+interface JsonSchema7AnyOf {
+  anyOf: ReadonlyArray<JsonSchema7>
 }
 
-interface JsonSchema7AllOfType extends $Schema {
-  allOf: Array<JsonSchema7Type>
+interface JsonSchema7AllOf {
+  allOf: Array<JsonSchema7>
 }
 
-interface JsonSchema7ObjectType extends $Schema {
+interface JsonSchema7Object {
   type: "object"
   required: Array<string>
-  properties: Record<string, JsonSchema7Type>
-  additionalProperties?: boolean | JsonSchema7Type
+  properties: Record<string, JsonSchema7>
+  additionalProperties?: boolean | JsonSchema7
 }
 
-type JsonSchema7Type =
-  | JsonSchema7AnyType
-  | JsonSchema7NullType
-  | JsonSchema7StringType
-  | JsonSchema7NumberType
-  | JsonSchema7BooleanType
-  | JsonSchema7ConstType
-  | JsonSchema7ArrayType
-  | JsonSchema7EnumType
-  | JsonSchema7AnyOfType
-  | JsonSchema7AllOfType
-  | JsonSchema7ObjectType
+type JsonSchema7 =
+  | JsonSchema7Ref
+  | JsonSchema7Any
+  | JsonSchema7Null
+  | JsonSchema7String
+  | JsonSchema7Number
+  | JsonSchema7Boolean
+  | JsonSchema7Const
+  | JsonSchema7Array
+  | JsonSchema7Enum
+  | JsonSchema7AnyOf
+  | JsonSchema7AllOf
+  | JsonSchema7Object
+
+type JsonSchema7Top = JsonSchema7 & {
+  $schema?: string
+  definitions?: Record<string, JsonSchema7>
+}
 
 /**
  * @category JSON Schema
  * @since 1.0.0
  */
-export const to = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(AST.to(schema.ast))
+export const to = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Top => goTop(AST.to(schema.ast))
 
 /**
  * @category JSON Schema
  * @since 1.0.0
  */
-export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(AST.from(schema.ast))
+export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Top =>
+  goTop(AST.from(schema.ast))
 
-const nonNullable: JsonSchema7Type = {
+const nonNullable: JsonSchema7 = {
   "anyOf": [
-    { "type": "object", properties: {}, required: [] },
+    {
+      "type": "object",
+      "properties": {},
+      "required": []
+    },
     { "type": "array" }
   ]
 }
 
-const decorate = <A, B>(f: (a: A) => B, decorator: (a: A, b: B) => B): (a: A) => B => (a) =>
-  decorator(a, f(a))
-
 const $schema = "http://json-schema.org/draft-07/schema#"
 
-const getAnnotations = (annotated: AST.Annotated) => {
+/** @internal */
+export const goTop = (ast: AST.AST): JsonSchema7Top => {
+  const definitions = {}
+  const jsonSchema = goWithAnnotations(ast, definitions)
+  const out: JsonSchema7Top = {
+    $schema,
+    ...jsonSchema
+  }
+  if (!ReadonlyRecord.isEmptyRecord(definitions)) {
+    out.definitions = definitions
+  }
+  return out
+}
+
+const getJsonSchemaAnnotations = (annotated: AST.Annotated) => {
   return ReadonlyRecord.compact<unknown>({
     description: AST.getDescriptionAnnotation(annotated),
     title: AST.getTitleAnnotation(annotated),
@@ -115,14 +137,28 @@ const getAnnotations = (annotated: AST.Annotated) => {
   })
 }
 
-const go = (ast: AST.AST): JsonSchema7Type => {
-  const jsonSchema = _go(ast)
-  jsonSchema.$schema = $schema
-  return jsonSchema
+const goWithIdentifier = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7 => {
+  const identifier = AST.getIdentifierAnnotation(ast)
+  return Option.match(identifier, {
+    onNone: () => goWithAnnotations(ast, definitions),
+    onSome: (id) => {
+      if (!ReadonlyRecord.has(definitions, id)) {
+        definitions[id] = goWithAnnotations(ast, definitions)
+      }
+      return { $ref: `#/definitions/${id}` }
+    }
+  })
 }
 
-/** @internal */
-export const _go = decorate((ast: AST.AST): JsonSchema7Type => {
+const goWithAnnotations = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7 => {
+  const jsonSchema = go(ast, definitions)
+  return {
+    ...jsonSchema,
+    ...getJsonSchemaAnnotations(ast)
+  }
+}
+
+const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7 => {
   switch (ast._tag) {
     case "Declaration": {
       const annotation = AST.getJSONSchemaAnnotation(ast)
@@ -164,9 +200,12 @@ export const _go = decorate((ast: AST.AST): JsonSchema7Type => {
     case "SymbolKeyword":
       throw new Error("cannot convert `symbol` to JSON Schema")
     case "Tuple": {
-      const elements = ast.elements.map((e) => _go(e.type))
-      const rest = Option.map(ast.rest, ReadonlyArray.mapNonEmpty(_go))
-      const output: JsonSchema7ArrayType = { type: "array" }
+      const elements = ast.elements.map((e) => goWithIdentifier(e.type, definitions))
+      const rest = Option.map(
+        ast.rest,
+        ReadonlyArray.mapNonEmpty((ast) => goWithIdentifier(ast, definitions))
+      )
+      const output: JsonSchema7Array = { type: "array" }
       // ---------------------------------------------
       // handle elements
       // ---------------------------------------------
@@ -209,10 +248,12 @@ export const _go = decorate((ast: AST.AST): JsonSchema7Type => {
         return nonNullable
       }
       const propertySignatures = ast.propertySignatures.map((ps) => {
-        return { ..._go(ps.type), ...getAnnotations(ps) }
+        return { ...goWithIdentifier(ps.type, definitions), ...getJsonSchemaAnnotations(ps) }
       })
-      const indexSignatures = ast.indexSignatures.map((is) => _go(is.type))
-      const output: JsonSchema7ObjectType = {
+      const indexSignatures = ast.indexSignatures.map((is) =>
+        goWithIdentifier(is.type, definitions)
+      )
+      const output: JsonSchema7Object = {
         type: "object",
         required: [],
         properties: {},
@@ -245,11 +286,11 @@ export const _go = decorate((ast: AST.AST): JsonSchema7Type => {
       return output
     }
     case "Union":
-      return { "anyOf": ast.types.map(_go) }
+      return { "anyOf": ast.types.map((ast) => goWithIdentifier(ast, definitions)) }
     case "Enums":
       return { anyOf: ast.enums.map(([_, value]) => ({ const: value })) }
     case "Refinement": {
-      const from = _go(ast.from)
+      const from = goWithIdentifier(ast.from, definitions)
       const annotation = AST.getJSONSchemaAnnotation(ast)
       if (Option.isSome(annotation)) {
         return { ...from, ...annotation.value }
@@ -273,9 +314,4 @@ export const _go = decorate((ast: AST.AST): JsonSchema7Type => {
     case "Transform":
       throw new Error("cannot build a JSON Schema for transformations")
   }
-}, (ast, jsonSchema) => {
-  return {
-    ...jsonSchema,
-    ...getAnnotations(ast)
-  }
-})
+}

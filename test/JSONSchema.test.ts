@@ -707,7 +707,7 @@ describe("JSONSchema", () => {
   })
 
   it("Transform should raise an error", () => {
-    expect(() => JSONSchema._go(S.NumberFromString.ast)).toThrow(
+    expect(() => JSONSchema.goTop(S.NumberFromString.ast)).toThrow(
       new Error("cannot build a JSON Schema for transformations")
     )
   })
@@ -786,6 +786,61 @@ describe("JSONSchema", () => {
         }
       },
       "additionalProperties": false
+    })
+  })
+
+  describe("identifier annotations support", () => {
+    it("on top level schema", () => {
+      const schema = S.string.pipe(S.identifier("Name"))
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "description": "a string",
+        "title": "string",
+        "type": "string"
+      })
+    })
+
+    it("on nested schemas", () => {
+      const Name = S.string.pipe(S.identifier("Name"), S.description("a name"), S.title("Name"))
+      const schema = S.struct({ a: Name, b: S.struct({ c: Name }) })
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "required": [
+          "a",
+          "b"
+        ],
+        "properties": {
+          "a": {
+            "$ref": "#/definitions/Name"
+          },
+          "b": {
+            "type": "object",
+            "required": [
+              "c"
+            ],
+            "properties": {
+              "c": {
+                "$ref": "#/definitions/Name"
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "definitions": {
+          "Name": {
+            "type": "string",
+            "description": "a name",
+            "title": "Name"
+          }
+        }
+      })
+      const validate = new Ajv().compile(jsonSchema)
+      expect(validate({ a: "name1", b: { c: "name2" } })).toEqual(true)
+      expect(validate({ a: 1 })).toEqual(false)
     })
   })
 })
