@@ -688,22 +688,192 @@ describe("JSONSchema", () => {
     propertyTo(schema)
   })
 
-  it("Lazy should raise an error", () => {
-    interface A {
-      readonly a: string
-      readonly as: ReadonlyArray<A>
-    }
-    const schema: S.Schema<A> = S.lazy<A>(() =>
-      S.struct({
-        a: S.string,
-        as: S.array(schema)
-      })
-    )
-    expect(() => JSONSchema.to(schema)).toThrow(
-      new Error(
-        "Generating a JSON Schema for lazy schemas is not currently supported. You're welcome to contribute by submitting a Pull Request."
+  describe("Lazy", () => {
+    it("should raise an error if there is no identifier annotation", () => {
+      interface A {
+        readonly a: string
+        readonly as: ReadonlyArray<A>
+      }
+      const schema: S.Schema<A> = S.lazy<A>(() =>
+        S.struct({
+          a: S.string,
+          as: S.array(schema)
+        })
       )
-    )
+      expect(() => JSONSchema.to(schema)).toThrow(
+        new Error("Generating a JSON Schema for lazy schemas requires an identifier annotation")
+      )
+    })
+
+    it("should support recursive schemas", () => {
+      interface A {
+        readonly a: string
+        readonly as: ReadonlyArray<A>
+      }
+      const schema: S.Schema<A> = S.lazy<A>(() =>
+        S.struct({
+          a: S.string,
+          as: S.array(schema)
+        })
+      ).pipe(S.identifier("A"))
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$ref": "#/definitions/A",
+        "definitions": {
+          "A": {
+            "type": "object",
+            "required": [
+              "a",
+              "as"
+            ],
+            "properties": {
+              "a": {
+                "type": "string",
+                "description": "a string",
+                "title": "string"
+              },
+              "as": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/A"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      })
+      const validate = new Ajv().compile(jsonSchema)
+      expect(validate({ a: "a1", as: [] })).toEqual(true)
+      expect(validate({ a: "a1", as: [{ a: "a2", as: [] }] })).toEqual(true)
+      expect(validate({ a: "a1", as: [{ a: "a2", as: [] }, { a: "a3", as: [] }] })).toEqual(true)
+      expect(
+        validate({ a: "a1", as: [{ a: "a2", as: [] }, { a: "a3", as: [{ a: "a4", as: [] }] }] })
+      ).toEqual(true)
+      expect(
+        validate({ a: "a1", as: [{ a: "a2", as: [] }, { a: "a3", as: [{ a: "a4", as: [1] }] }] })
+      ).toEqual(false)
+    })
+
+    it("should support mutually recursive schemas", () => {
+      interface Expression {
+        readonly type: "expression"
+        readonly value: number | Operation
+      }
+
+      interface Operation {
+        readonly type: "operation"
+        readonly operator: "+" | "-"
+        readonly left: Expression
+        readonly right: Expression
+      }
+
+      const Expression: S.Schema<Expression> = S.lazy(() =>
+        S.struct({
+          type: S.literal("expression"),
+          value: S.union(S.number, Operation)
+        })
+      ).pipe(S.identifier("Expression"))
+
+      const Operation: S.Schema<Operation> = S.lazy(() =>
+        S.struct({
+          type: S.literal("operation"),
+          operator: S.union(S.literal("+"), S.literal("-")),
+          left: Expression,
+          right: Expression
+        })
+      ).pipe(S.identifier("Operation"))
+
+      const jsonSchema = JSONSchema.to(Operation)
+      console.log(JSON.stringify(jsonSchema, null, 2))
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$ref": "#/definitions/Operation",
+        "definitions": {
+          "Operation": {
+            "type": "object",
+            "required": [
+              "type",
+              "operator",
+              "left",
+              "right"
+            ],
+            "properties": {
+              "type": {
+                "const": "operation"
+              },
+              "operator": {
+                "anyOf": [
+                  {
+                    "const": "+"
+                  },
+                  {
+                    "const": "-"
+                  }
+                ]
+              },
+              "left": {
+                "$ref": "#/definitions/Expression"
+              },
+              "right": {
+                "$ref": "#/definitions/Expression"
+              }
+            },
+            "additionalProperties": false
+          },
+          "Expression": {
+            "type": "object",
+            "required": [
+              "type",
+              "value"
+            ],
+            "properties": {
+              "type": {
+                "const": "expression"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "$ref": "#/definitions/Operation"
+                  },
+                  {
+                    "type": "number",
+                    "description": "a number",
+                    "title": "number"
+                  }
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      })
+      const validate = new Ajv().compile(jsonSchema)
+      expect(validate({
+        type: "operation",
+        operator: "+",
+        left: {
+          type: "expression",
+          value: 1
+        },
+        right: {
+          type: "expression",
+          value: {
+            type: "operation",
+            operator: "-",
+            left: {
+              type: "expression",
+              value: 3
+            },
+            right: {
+              type: "expression",
+              value: 2
+            }
+          }
+        }
+      })).toEqual(true)
+    })
   })
 
   it("Transform should raise an error", () => {

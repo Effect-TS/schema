@@ -143,7 +143,10 @@ const goWithIdentifier = (ast: AST.AST, definitions: Record<string, JsonSchema7>
     onNone: () => goWithAnnotations(ast, definitions),
     onSome: (id) => {
       if (!ReadonlyRecord.has(definitions, id)) {
-        definitions[id] = goWithAnnotations(ast, definitions)
+        const jsonSchema = goWithAnnotations(ast, definitions)
+        if (!ReadonlyRecord.has(definitions, id)) {
+          definitions[id] = jsonSchema
+        }
       }
       return { $ref: `#/definitions/${id}` }
     }
@@ -307,10 +310,21 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
         pattern: regex.source
       }
     }
-    case "Lazy":
-      throw new Error(
-        "Generating a JSON Schema for lazy schemas is not currently supported. You're welcome to contribute by submitting a Pull Request."
-      )
+    case "Lazy": {
+      const identifier = AST.getIdentifierAnnotation(ast)
+      if (Option.isNone(identifier)) {
+        throw new Error(
+          "Generating a JSON Schema for lazy schemas requires an identifier annotation"
+        )
+      }
+      const id = identifier.value
+      if (!ReadonlyRecord.has(definitions, id)) {
+        definitions[id] = {}
+        const jsonSchema = goWithIdentifier(ast.f(), definitions)
+        definitions[id] = jsonSchema
+      }
+      return { $ref: `#/definitions/${id}` }
+    }
     case "Transform":
       throw new Error("cannot build a JSON Schema for transformations")
   }

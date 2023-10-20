@@ -587,11 +587,13 @@ Output:
 
 In this example, we have created a schema for a "Person" with a name (a string) and an age (a number). We then use the `JSONSchema.to` function to generate the corresponding JSON Schema.
 
-### Identifier annotations
+### Identifier Annotations
 
 You can enhance your schemas with identifier annotations. If you do, your schema will be included within a "definitions" object property on the root and referenced from there:
 
 ```ts
+import * as S from "@effect/schema/Schema";
+
 const Name = S.string.pipe(S.identifier("Name"));
 const Age = S.number.pipe(S.identifier("Age"));
 const Person = S.struct({
@@ -637,6 +639,64 @@ Output:
 ```
 
 This technique helps organize your JSON Schema by creating separate definitions for each identifier annotated schema, making it more readable and maintainable.
+
+### Recursive and Mutually Recursive Schemas
+
+Recursive and mutually recursive schemas are supported, but in these cases, identifier annotations are **required**:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+interface Category {
+  readonly name: string;
+  readonly categories: ReadonlyArray<Category>;
+}
+
+const schema: S.Schema<Category> = S.lazy<Category>(() =>
+  S.struct({
+    name: S.string,
+    categories: S.array(schema)
+  })
+).pipe(S.identifier("Category"));
+
+const jsonSchema = JSONSchema.to(schema);
+
+console.log(JSON.stringify(jsonSchema, null, 2));
+/*
+Output:
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Category",
+  "definitions": {
+    "Category": {
+      "type": "object",
+      "required": [
+        "name",
+        "categories"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "a string",
+          "title": "string"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Category"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
+*/
+```
+
+In the example above, we define a schema for a "Category" that can contain a "name" (a string) and an array of nested "categories." To support recursive definitions, we use the `S.lazy` function and identifier annotations to name our schema.
+
+This ensures that the JSON Schema properly handles the recursive structure and creates distinct definitions for each annotated schema, improving readability and maintainability.
 
 # Basic usage
 
