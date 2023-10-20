@@ -182,6 +182,29 @@ describe("JSONSchema", () => {
         new Error("cannot convert `bigint` to JSON Schema")
       )
     })
+
+    it("union of literals should support descriptions", () => {
+      const schema = S.union(
+        S.literal("foo").pipe(S.description("I'm a foo")),
+        S.literal("bar").pipe(S.description("I'm a bar"))
+      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "anyOf": [
+          {
+            "type": "string",
+            "const": "foo",
+            "description": "I'm a foo"
+          },
+          {
+            "type": "string",
+            "const": "bar",
+            "description": "I'm a bar"
+          }
+        ]
+      })
+    })
   })
 
   describe("enums", () => {

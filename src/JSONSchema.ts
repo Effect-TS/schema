@@ -124,7 +124,7 @@ const $schema = "http://json-schema.org/draft-07/schema#"
 /** @internal */
 export const goTop = (ast: AST.AST): JsonSchema7Top => {
   const definitions = {}
-  const jsonSchema = goWithAnnotations(ast, definitions)
+  const jsonSchema = goWithMetaData(ast, definitions)
   const out: JsonSchema7Top = {
     $schema,
     ...jsonSchema
@@ -135,21 +135,13 @@ export const goTop = (ast: AST.AST): JsonSchema7Top => {
   return out
 }
 
-const getJsonSchemaAnnotations = (annotated: AST.Annotated) => {
-  return ReadonlyRecord.compact<unknown>({
-    description: AST.getDescriptionAnnotation(annotated),
-    title: AST.getTitleAnnotation(annotated),
-    examples: AST.getExamplesAnnotation(annotated)
-  })
-}
-
 const goWithIdentifier = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7 => {
   const identifier = AST.getIdentifierAnnotation(ast)
   return Option.match(identifier, {
-    onNone: () => goWithAnnotations(ast, definitions),
+    onNone: () => goWithMetaData(ast, definitions),
     onSome: (id) => {
       if (!ReadonlyRecord.has(definitions, id)) {
-        const jsonSchema = goWithAnnotations(ast, definitions)
+        const jsonSchema = goWithMetaData(ast, definitions)
         if (!ReadonlyRecord.has(definitions, id)) {
           definitions[id] = jsonSchema
         }
@@ -159,11 +151,19 @@ const goWithIdentifier = (ast: AST.AST, definitions: Record<string, JsonSchema7>
   })
 }
 
-const goWithAnnotations = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7 => {
+const getMetaData = (annotated: AST.Annotated) => {
+  return ReadonlyRecord.compact<unknown>({
+    description: AST.getDescriptionAnnotation(annotated),
+    title: AST.getTitleAnnotation(annotated),
+    examples: AST.getExamplesAnnotation(annotated)
+  })
+}
+
+const goWithMetaData = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7 => {
   const jsonSchema = go(ast, definitions)
   return {
     ...jsonSchema,
-    ...getJsonSchemaAnnotations(ast)
+    ...getMetaData(ast)
   }
 }
 
@@ -280,7 +280,7 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
         }
       }
       const propertySignatures = ast.propertySignatures.map((ps) => {
-        return { ...goWithIdentifier(ps.type, definitions), ...getJsonSchemaAnnotations(ps) }
+        return { ...goWithIdentifier(ps.type, definitions), ...getMetaData(ps) }
       })
       const output: JsonSchema7Object = {
         type: "object",
