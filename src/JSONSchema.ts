@@ -9,19 +9,25 @@ import * as Option from "effect/Option"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as ReadonlyRecord from "effect/ReadonlyRecord"
 
-type JsonSchema7AnyType = {}
+interface $Schema {
+  $schema?: string
+}
 
-type JsonSchema7NullType = {
+interface JsonSchema7AnyType extends $Schema {}
+
+interface JsonSchema7NullType extends $Schema {
   type: "null"
 }
 
-type JsonSchema7StringType = {
+interface JsonSchema7StringType extends $Schema {
   type: "string"
   minLength?: number
   maxLength?: number
+  pattern?: string
+  description?: string
 }
 
-type JsonSchema7NumberType = {
+interface JsonSchema7NumberType extends $Schema {
   type: "number" | "integer"
   minimum?: number
   exclusiveMinimum?: number
@@ -29,39 +35,39 @@ type JsonSchema7NumberType = {
   exclusiveMaximum?: number
 }
 
-type JsonSchema7BooleanType = {
+interface JsonSchema7BooleanType extends $Schema {
   type: "boolean"
 }
 
-type JsonSchema7ConstType = {
+interface JsonSchema7ConstType extends $Schema {
   const: string | number | boolean
 }
 
-type JsonSchema7ArrayType = {
+interface JsonSchema7ArrayType extends $Schema {
   type: "array"
   items?: JsonSchema7Type | Array<JsonSchema7Type>
   minItems?: number
   maxItems?: number
-  additionalItems?: JsonSchema7Type
+  additionalItems?: JsonSchema7Type | boolean
 }
 
-type JsonSchema7EnumType = {
+interface JsonSchema7EnumType extends $Schema {
   "enum": Array<string | number>
 }
 
-type JsonSchema7AnyOfType = {
+interface JsonSchema7AnyOfType extends $Schema {
   anyOf: ReadonlyArray<JsonSchema7Type>
 }
 
-type JsonSchema7AllOfType = {
+interface JsonSchema7AllOfType extends $Schema {
   allOf: Array<JsonSchema7Type>
 }
 
-type JsonSchema7ObjectType = {
+interface JsonSchema7ObjectType extends $Schema {
   type: "object"
   required: Array<string>
-  properties: { [x: string]: JsonSchema7Type }
-  additionalProperties: boolean | JsonSchema7Type
+  properties: Record<string, JsonSchema7Type>
+  additionalProperties?: boolean | JsonSchema7Type
 }
 
 type JsonSchema7Type =
@@ -91,7 +97,7 @@ export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Type => go(A
 
 const nonNullable: JsonSchema7Type = {
   "anyOf": [
-    { "type": "object" },
+    { "type": "object", properties: {}, required: [] },
     { "type": "array" }
   ]
 }
@@ -99,8 +105,24 @@ const nonNullable: JsonSchema7Type = {
 const decorate = <A, B>(f: (a: A) => B, decorator: (a: A, b: B) => B): (a: A) => B => (a) =>
   decorator(a, f(a))
 
+const $schema = "http://json-schema.org/draft-07/schema#"
+
+const getAnnotations = (annotated: AST.Annotated) => {
+  return ReadonlyRecord.compact<unknown>({
+    description: AST.getDescriptionAnnotation(annotated),
+    title: AST.getTitleAnnotation(annotated),
+    examples: AST.getExamplesAnnotation(annotated)
+  })
+}
+
+const go = (ast: AST.AST): JsonSchema7Type => {
+  const jsonSchema = _go(ast)
+  jsonSchema.$schema = $schema
+  return jsonSchema
+}
+
 /** @internal */
-export const go = decorate((ast: AST.AST): JsonSchema7Type => {
+export const _go = decorate((ast: AST.AST): JsonSchema7Type => {
   switch (ast._tag) {
     case "Declaration": {
       const annotation = AST.getJSONSchemaAnnotation(ast)
@@ -142,8 +164,8 @@ export const go = decorate((ast: AST.AST): JsonSchema7Type => {
     case "SymbolKeyword":
       throw new Error("cannot convert `symbol` to JSON Schema")
     case "Tuple": {
-      const elements = ast.elements.map((e) => go(e.type))
-      const rest = Option.map(ast.rest, ReadonlyArray.mapNonEmpty(go))
+      const elements = ast.elements.map((e) => _go(e.type))
+      const rest = Option.map(ast.rest, ReadonlyArray.mapNonEmpty(_go))
       const output: JsonSchema7ArrayType = { type: "array" }
       // ---------------------------------------------
       // handle elements
@@ -187,9 +209,9 @@ export const go = decorate((ast: AST.AST): JsonSchema7Type => {
         return nonNullable
       }
       const propertySignatures = ast.propertySignatures.map((ps) => {
-        return { ...go(ps.type), ...getAnnotations(ps) }
+        return { ..._go(ps.type), ...getAnnotations(ps) }
       })
-      const indexSignatures = ast.indexSignatures.map((is) => go(is.type))
+      const indexSignatures = ast.indexSignatures.map((is) => _go(is.type))
       const output: JsonSchema7ObjectType = {
         type: "object",
         required: [],
@@ -223,11 +245,11 @@ export const go = decorate((ast: AST.AST): JsonSchema7Type => {
       return output
     }
     case "Union":
-      return { "anyOf": ast.types.map(go) }
+      return { "anyOf": ast.types.map(_go) }
     case "Enums":
       return { anyOf: ast.enums.map(([_, value]) => ({ const: value })) }
     case "Refinement": {
-      const from = go(ast.from)
+      const from = _go(ast.from)
       const annotation = AST.getJSONSchemaAnnotation(ast)
       if (Option.isSome(annotation)) {
         return { ...from, ...annotation.value }
@@ -252,13 +274,8 @@ export const go = decorate((ast: AST.AST): JsonSchema7Type => {
       throw new Error("cannot build a JSON Schema for transformations")
   }
 }, (ast, jsonSchema) => {
-  return { ...jsonSchema, ...getAnnotations(ast) }
+  return {
+    ...jsonSchema,
+    ...getAnnotations(ast)
+  }
 })
-
-const getAnnotations = (annotated: AST.Annotated) => {
-  return ReadonlyRecord.compact<unknown>({
-    description: AST.getDescriptionAnnotation(annotated),
-    title: AST.getTitleAnnotation(annotated),
-    examples: AST.getExamplesAnnotation(annotated)
-  })
-}
