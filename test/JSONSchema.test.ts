@@ -138,14 +138,35 @@ describe("JSONSchema", () => {
     })
 
     it("string", () => {
-      propertyTo(S.literal("a"))
+      const schema = S.literal("a")
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "string",
+        "const": "a"
+      })
+      propertyTo(schema)
     })
 
     it("number", () => {
-      propertyTo(S.literal(1))
+      const schema = S.literal(1)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "number",
+        "const": 1
+      })
+      propertyTo(schema)
     })
 
     it("boolean", () => {
+      const schema = S.literal(true)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "boolean",
+        "const": true
+      })
       propertyTo(S.literal(true))
       propertyTo(S.literal(false))
     })
@@ -810,14 +831,17 @@ describe("JSONSchema", () => {
             ],
             "properties": {
               "type": {
+                "type": "string",
                 "const": "operation"
               },
               "operator": {
                 "anyOf": [
                   {
+                    "type": "string",
                     "const": "+"
                   },
                   {
+                    "type": "string",
                     "const": "-"
                   }
                 ]
@@ -839,6 +863,7 @@ describe("JSONSchema", () => {
             ],
             "properties": {
               "type": {
+                "type": "string",
                 "const": "expression"
               },
               "value": {

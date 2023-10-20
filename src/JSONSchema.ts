@@ -13,14 +13,13 @@ interface JsonSchema7Ref {
   $ref: string
 }
 
-interface JsonSchema7Any {}
-
 interface JsonSchema7Null {
   type: "null"
 }
 
 interface JsonSchema7String {
   type: "string"
+  const?: string
   minLength?: number
   maxLength?: number
   pattern?: string
@@ -29,6 +28,7 @@ interface JsonSchema7String {
 
 interface JsonSchema7Number {
   type: "number" | "integer"
+  const?: number
   minimum?: number
   exclusiveMinimum?: number
   maximum?: number
@@ -37,6 +37,7 @@ interface JsonSchema7Number {
 
 interface JsonSchema7Boolean {
   type: "boolean"
+  const?: boolean
 }
 
 interface JsonSchema7Const {
@@ -72,7 +73,6 @@ interface JsonSchema7Object {
 
 type JsonSchema7 =
   | JsonSchema7Ref
-  | JsonSchema7Any
   | JsonSchema7Null
   | JsonSchema7String
   | JsonSchema7Number
@@ -113,7 +113,7 @@ const emptyObjectJsonSchema: JsonSchema7 = {
   ]
 }
 
-const anyJsonSchema: JsonSchema7 = {}
+const anyJsonSchema: JsonSchema7 = {} as any
 
 const $schema = "http://json-schema.org/draft-07/schema#"
 
@@ -168,19 +168,23 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
     case "Declaration": {
       const annotation = AST.getJSONSchemaAnnotation(ast)
       if (Option.isSome(annotation)) {
-        return annotation.value
+        return annotation.value as any
       }
       throw new Error(
         "cannot build a JSON Schema for declarations without a JSON Schema annotation"
       )
     }
     case "Literal": {
-      if (typeof ast.literal === "bigint") {
+      const type = typeof ast.literal
+      if (type === "bigint") {
         throw new Error("cannot convert `bigint` to JSON Schema")
       } else if (ast.literal === null) {
         return { type: "null" }
       }
-      return { const: ast.literal }
+      return {
+        type,
+        const: ast.literal
+      } as any
     }
     case "UniqueSymbol":
       throw new Error("cannot convert a unique symbol to JSON Schema")
@@ -322,7 +326,7 @@ const go = (ast: AST.AST, definitions: Record<string, JsonSchema7>): JsonSchema7
       }
       const id = identifier.value
       if (!ReadonlyRecord.has(definitions, id)) {
-        definitions[id] = {}
+        definitions[id] = anyJsonSchema
         const jsonSchema = goWithIdentifier(ast.f(), definitions)
         definitions[id] = jsonSchema
       }
