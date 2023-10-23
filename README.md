@@ -71,17 +71,19 @@ This library was inspired by the following projects:
 - TypeScript 5.0 or newer
 - The `strict` flag enabled in your `tsconfig.json` file
 - The `exactOptionalPropertyTypes` flag enabled in your `tsconfig.json` file
-
-```
-{
-  // ...
-  "compilerOptions": {
+  ```
+  {
     // ...
-    "strict": true,
-    "exactOptionalPropertyTypes": true
+    "compilerOptions": {
+      // ...
+      "strict": true,
+      "exactOptionalPropertyTypes": true
+    }
   }
-}
-```
+  ```
+- Additionally, make sure to install the following packages, as they are peer dependencies. Note that some package managers might not install peer dependencies by default, so you need to install them manually:
+  - `effect` package (peer dependency)
+  - `fast-check` package (peer dependency)
 
 ## Understanding `exactOptionalPropertyTypes`
 
@@ -145,6 +147,11 @@ To install the **alpha** version:
 ```
 npm install @effect/schema
 ```
+
+Additionally, make sure to install the following packages, as they are peer dependencies. Note that some package managers might not install peer dependencies by default, so you need to install them manually:
+
+- `effect` package (peer dependency)
+- `fast-check` package (peer dependency)
 
 **Warning**. This package is primarily published to receive early feedback and for contributors, during this development phase we cannot guarantee the stability of the APIs, consider each release to contain breaking changes.
 
