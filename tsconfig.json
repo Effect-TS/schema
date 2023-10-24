@@ -10,7 +10,6 @@
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "preserveSymlinks": true,
     "moduleResolution": "node",
     "noEmit": false,
     "lib": ["ES2021"],
@@ -40,7 +39,7 @@
       "@effect/schema/test/*": ["./test/*"],
       "@effect/schema/*": ["./src/*"]
     },
-    "types": ["vitest/globals"],
+    "types": [],
     "plugins": [{ "name": "@effect/language-service" }]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
