@@ -289,6 +289,37 @@ describe("Arbitrary/Arbitrary", () => {
       const schema: S.Schema<A> = S.lazy(() => S.record(S.string, schema))
       propertyTo(schema)
     })
+
+    it("should support mutually recursive schemas", () => {
+      interface Expression {
+        readonly type: "expression"
+        readonly value: number | Operation
+      }
+
+      interface Operation {
+        readonly type: "operation"
+        readonly operator: "+" | "-"
+        readonly left: Expression
+        readonly right: Expression
+      }
+
+      const Expression: S.Schema<Expression> = S.lazy(() =>
+        S.struct({
+          type: S.literal("expression"),
+          value: S.union(S.JsonNumber, Operation)
+        })
+      )
+
+      const Operation: S.Schema<Operation> = S.lazy(() =>
+        S.struct({
+          type: S.literal("operation"),
+          operator: S.union(S.literal("+"), S.literal("-")),
+          left: Expression,
+          right: Expression
+        })
+      )
+      propertyTo(Operation, { numRuns: 10 })
+    })
   })
 
   describe("struct", () => {

@@ -308,7 +308,7 @@ export const X3 = S.transform(
 
 const doProperty = true
 
-export const propertyTo = <I, A>(schema: S.Schema<I, A>) => {
+export const propertyTo = <I, A>(schema: S.Schema<I, A>, params?: fc.Parameters<[A]>) => {
   if (!doProperty) {
     return
   }
@@ -316,7 +316,7 @@ export const propertyTo = <I, A>(schema: S.Schema<I, A>) => {
   const arb = arbitrary(fc)
   // console.log(JSON.stringify(fc.sample(arb, 10), null, 2))
   const is = S.is(schema)
-  fc.assert(fc.property(arb, (a) => is(a)))
+  fc.assert(fc.property(arb, (a) => is(a)), params)
 }
 
 export const propertyFrom = <I, A>(schema: S.Schema<I, A>) => {

@@ -42,7 +42,7 @@ export const from = <I, A>(
   schema: Schema.Schema<I, A>
 ): (fc: typeof FastCheck) => FastCheck.Arbitrary<I> => go(AST.from(schema.ast), {})
 
-const depthSize = 3
+const depthSize = 1
 
 const record = <K extends PropertyKey, V>(
   fc: typeof FastCheck,

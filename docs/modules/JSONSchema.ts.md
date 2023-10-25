@@ -25,7 +25,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Type
+export declare const from: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Top
 ```
 
 Added in v1.0.0
@@ -35,7 +35,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Type
+export declare const to: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Top
 ```
 
 Added in v1.0.0

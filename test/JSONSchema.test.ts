@@ -19,7 +19,7 @@ type Json =
   | JsonArray
   | JsonObject
 
-const propertyTo = <I, A>(schema: S.Schema<I, A>) => {
+const propertyTo = <I, A>(schema: S.Schema<I, A>, params?: fc.Parameters<[A]>) => {
   const arbitrary = A.to(schema)
   const is = S.is(schema)
   const jsonSchema = JSONSchema.to(schema)
@@ -27,9 +27,7 @@ const propertyTo = <I, A>(schema: S.Schema<I, A>) => {
   const validate = new Ajv({ strictTuples: false, allowUnionTypes: true }).compile(jsonSchema)
   const arb = arbitrary(fc)
   // console.log(JSON.stringify(fc.sample(arb, 10), null, 2))
-  fc.assert(fc.property(arb, (a) => {
-    return is(a) && validate(a)
-  }))
+  fc.assert(fc.property(arb, (a) => is(a) && validate(a)), params)
 }
 
 const propertyFrom = <I, A>(schema: S.Schema<I, A>) => {
@@ -1002,7 +1000,7 @@ describe("JSONSchema", () => {
           }
         }
       })).toEqual(true)
-      // propertyTo(Operation)
+      propertyTo(Operation, { numRuns: 10 })
     })
   })
 
