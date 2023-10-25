@@ -23,7 +23,7 @@ devDependencies:
     specifier: ^2.26.2
     version: 2.26.2
   '@definitelytyped/dtslint':
-    specifier: ^0.0.178
+    specifier: 0.0.178
     version: 0.0.178(typescript@5.2.2)
   '@effect/build-utils':
     specifier: ^0.1.9
@@ -67,12 +67,6 @@ devDependencies:
   benchmark:
     specifier: ^2.1.4
     version: 2.1.4
-  dtslint:0.0.178:
-    specifier: link:@definitelytyped/dtslint:0.0.178
-    version: link:@definitelytyped/dtslint:0.0.178
-  dtslint:^0.0.178:
-    specifier: link:@definitelytyped/dtslint:^0.0.178
-    version: link:@definitelytyped/dtslint:^0.0.178
   effect:
     specifier: 2.0.0-next.51
     version: 2.0.0-next.51
