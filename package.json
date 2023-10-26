@@ -67,7 +67,7 @@
     "@babel/preset-typescript": "^7.23.2",
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.2",
-    "@definitelytyped/dtslint": "0.0.178",
+    "@definitelytyped/dtslint": "0.0.186",
     "@effect/build-utils": "^0.1.9",
     "@effect/docgen": "^0.2.0",
     "@effect/eslint-plugin": "^0.1.2",
