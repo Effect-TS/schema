@@ -26,7 +26,7 @@ import * as Internal from "./internal/common"
 import * as Parser from "./Parser"
 import * as ParseResult from "./ParseResult"
 import type { Pretty } from "./Pretty"
-import * as TreeFormatter from "./TreeFormatter"
+import * as ArrayFormatter from "./ArrayFormatter"
 
 // ---------------------------------------------
 // model
@@ -976,7 +976,7 @@ export const brand = <B extends string | symbol, A>(
     either: (input: unknown) =>
       Either.mapLeft(
         validateEither(input),
-        (e) => [{ meta: input, message: TreeFormatter.formatErrors(e.errors) }]
+        (e) => ArrayFormatter.formatErrors(e.errors).map(err => ({ meta: err.path, message: err.message }))
       ),
     is: (input: unknown): input is A & Brand.Brand<B> => is(input),
     pipe() {
