@@ -20,13 +20,15 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 
 `@effect/schema` allows you to define a `Schema<I, A>` that provides a blueprint for describing the structure and data types of your data. Once defined, you can leverage this schema to perform a range of operations, including:
 
-- Parsing from an `unknown` value to an output type `A`.
-- Decoding from an input type `I` to an output type `A`.
-- Encoding from an output type `A` back to an input type `I`.
-- Ensuring that a value conforms to a specified `Schema`.
-- Generating fast-check arbitraries.
-- Facilitating pretty printing.
-- Generating JSON Schemas.
+| Operation       | Description                                                                          |
+| --------------- | ------------------------------------------------------------------------------------ |
+| Parsing         | Convert from `unknown` value to output type `A`.                                     |
+| Decoding        | Transforming data from an input type `I`` to an output type `A`.                     |
+| Encoding        | Converting data from an output type `A` back to an input type `I`.                   |
+| Asserting       | Verifying that a value adheres to the schema's output type `A`.                      |
+| Arbitraries     | Generate arbitraries for [fast-check](https://github.com/dubzzz/fast-check) testing. |
+| Pretty printing | Support pretty printing for data structures.                                         |
+| JSON Schemas    | Create JSON Schemas based on defined schemas.                                        |
 
 If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
 
@@ -50,7 +52,8 @@ Parsing involves two key steps:
 
 2. **Decoding:** Following the successful check, we proceed to convert the `string` into a `Date`. This process completes the parsing operation, where the data is both validated and transformed.
 
-As a general rule, schemas should be defined such that encode + decode return the original value.
+> [!NOTE]
+> As a general rule, schemas should be defined such that encode + decode return the original value.
 
 ## The Rule of Schemas: Keeping Encode and Decode in Sync
 
@@ -83,7 +86,7 @@ This library was inspired by the following projects:
   ```
 - Additionally, make sure to install the following packages, as they are peer dependencies. Note that some package managers might not install peer dependencies by default, so you need to install them manually:
   - `effect` package (peer dependency)
-  - `fast-check` package (peer dependency)
+  - [fast-check](https://github.com/dubzzz/fast-check) package (peer dependency)
 
 ## Understanding `exactOptionalPropertyTypes`
 
@@ -151,9 +154,10 @@ npm install @effect/schema
 Additionally, make sure to install the following packages, as they are peer dependencies. Note that some package managers might not install peer dependencies by default, so you need to install them manually:
 
 - `effect` package (peer dependency)
-- `fast-check` package (peer dependency)
+- [fast-check](https://github.com/dubzzz/fast-check) package (peer dependency)
 
-**Warning**. This package is primarily published to receive early feedback and for contributors, during this development phase we cannot guarantee the stability of the APIs, consider each release to contain breaking changes.
+> [!WARNING]
+> This package is primarily published to receive early feedback and for contributors, during this development phase we cannot guarantee the stability of the APIs, consider each release to contain breaking changes.
 
 Once you have installed the library, you can import the necessary types and functions from the `@effect/schema/Schema` module.
 
@@ -184,15 +188,18 @@ const StringOrNumber = S.union(S.string, S.number);
 
 In addition to the provided `struct` and `union` functions, `@effect/schema/Schema` also provides a number of other functions for defining `Schema`s, including functions for defining arrays, tuples, and records.
 
-## Extracting the inferred type
+## Extracting Inferred Types
 
-Once you have defined a `Schema`, you can use the `To` type to extract the inferred type of the data described by the `Schema`.
+After you've defined a `Schema<I, A>`, you can extract the inferred type `A` that represents the data described by the schema using the `Schema.To` type.
 
-For example, given the `Person` `Schema` defined above, you can extract the inferred type of a `Person` object as follows:
+For instance, with the `Person` schema we defined earlier, you can extract the inferred type of a `Person` object as demonstrated below:
 
 ```ts
+import * as S from "@effect/schema/Schema";
+
 interface Person extends S.Schema.To<typeof Person> {}
 /*
+Equivalent to:
 interface Person {
   readonly name: string;
   readonly age: number;
@@ -200,13 +207,15 @@ interface Person {
 */
 ```
 
+In cases where `I` differs from `A`, you can also extract the inferred `I` type using `Schema.From`.
+
 ## Parsing
 
-To use the `Schema` defined above to parse a value from `unknown`, you can use the `parse` function from the `@effect/schema/Schema` module:
+To parse a value from the `unknown` type using the previously defined `Schema`, you can make use of the `parse*` functions provided by the `@effect/schema/Schema` module. Let's explore an example using the `parseEither` function:
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import * as E from "effect/Either";
+import * as Either from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
@@ -218,12 +227,12 @@ const parsePerson = S.parseEither(Person);
 const input: unknown = { name: "Alice", age: 30 };
 
 const result1 = parsePerson(input);
-if (E.isRight(result1)) {
+if (Either.isRight(result1)) {
   console.log(result1.right); // { name: "Alice", age: 30 }
 }
 
 const result2 = parsePerson(null);
-if (E.isLeft(result2)) {
+if (Either.isLeft(result2)) {
   console.log(result2.left);
   /*
   {
@@ -241,10 +250,21 @@ if (E.isLeft(result2)) {
 }
 ```
 
-The `parsePerson` function returns a value of type `ParseResult<A>`, which is a type alias for `Either<NonEmptyReadonlyArray<ParseErrors>, A>`, where `NonEmptyReadonlyArray<ParseErrors>` represents a list of errors that occurred during the parsing process and `A` is the inferred type of the data described by the `Schema`. A successful parse will result in a `Right`, containing the parsed data. A `Right` value indicates that the parse was successful and no errors occurred. In the case of a failed parse, the result will be a `Left` value containing a list of `ParseError`s.
+The `parsePerson` function returns an `Either<ParseError, A>`, where `ParseError` is defined as follows:
 
-The `parseSync` function is used to parse a value and throw an error if the parsing fails.
-It is useful when you want to ensure that the value being parsed is in the correct format, and want to throw an error if it is not.
+```ts
+interface ParseError {
+  readonly _tag: "ParseError";
+  // A non-empty list of errors
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>;
+}
+```
+
+`ParseError` represents a list of errors that may have occurred during the parsing process, and `A` is the inferred data type described by the `Schema`. A successful parse results in a `Right` value, containing the parsed data `A`. In the case of a failed parse, the result will be a `Left` value containing a non-empty list of `ParseErrors`.
+
+Now, let's see another example using the `parseSync` function.
+
+The `parseSync` function is used to parse a value and throw an error if the parsing fails. This is especially useful when you want to ensure that the parsed value adheres to the correct format and are ready to throw an error if it does not.
 
 ```ts
 try {
@@ -261,6 +281,65 @@ Error: error(s) found
    └─ is missing
 */
 ```
+
+In this example, we attempt to parse an empty object, but the `name` property is missing, resulting in an error being thrown.
+
+### Handling Async Transformations
+
+When your schema involves asynchronous transformations, neither the `parseSync` nor the `parseEither` functions will work for you. In such cases, you must turn to the `parse` function, which returns an `Effect`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import { Effect } from "effect";
+
+const PersonId = S.number;
+
+const Person = S.struct({
+  id: PersonId,
+  name: S.string,
+  age: S.number
+});
+
+const asyncSchema = S.transformOrFail(
+  PersonId,
+  Person,
+  // Simulate an async transformation
+  (id) =>
+    Effect.succeed({ id, name: "name", age: 18 }).pipe(
+      Effect.delay("10 millis")
+    ),
+  (person) => Effect.succeed(person.id).pipe(Effect.delay("10 millis"))
+);
+
+const syncParsePersonId = S.parseEither(asyncSchema);
+
+console.log(JSON.stringify(syncParsePersonId(1), null, 2));
+/*
+Output:
+{
+  "_id": "Either",
+  "_tag": "Left",
+  "left": {
+    "_tag": "ParseError",
+    "errors": [
+      {
+        "_tag": "Forbidden"
+      }
+    ]
+  }
+}
+*/
+
+const asyncParsePersonId = S.parse(asyncSchema);
+
+Effect.runPromise(asyncParsePersonId(1)).then(console.log);
+/*
+Output:
+{ id: 1, name: 'name', age: 18 }
+*/
+```
+
+As shown in the code above, the first approach returns a `Forbidden` error, indicating that using `parseEither` with an async transformation is not allowed. However, the second approach works as expected, allowing you to handle async transformations and return the desired result.
 
 ### Excess properties
 
