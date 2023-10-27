@@ -2,4 +2,4 @@
 "@effect/schema": patch
 ---
 
-updated Schema.brand BrandErrors
+Replaced TreeFormatter with ArrayFormatter for BrandErrors when using Schema.brand
