@@ -51,6 +51,7 @@ Added in v1.0.0
   - [uint8ArrayFromNumbers](#uint8arrayfromnumbers)
 - [annotations](#annotations)
   - [annotations](#annotations-1)
+  - [default](#default)
   - [description](#description)
   - [documentation](#documentation)
   - [examples](#examples)
@@ -626,6 +627,16 @@ Added in v1.0.0
 export declare const annotations: (
   annotations: AST.Annotated['annotations']
 ) => <I, A>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## default
+
+**Signature**
+
+```ts
+export declare const default: <A>(value: A) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -2926,6 +2937,7 @@ export interface DocAnnotations<A> extends AST.Annotations {
   readonly title?: AST.TitleAnnotation
   readonly description?: AST.DescriptionAnnotation
   readonly examples?: AST.ExamplesAnnotation
+  readonly default?: AST.DefaultAnnotation
   readonly documentation?: AST.DocumentationAnnotation
   readonly message?: AST.MessageAnnotation<A>
 }
