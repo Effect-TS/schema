@@ -17,6 +17,8 @@ Added in v1.0.0
   - [Annotations (interface)](#annotations-interface)
   - [BrandAnnotation (type alias)](#brandannotation-type-alias)
   - [BrandAnnotationId](#brandannotationid)
+  - [DefaultAnnotation (type alias)](#defaultannotation-type-alias)
+  - [DefaultAnnotationId](#defaultannotationid)
   - [DescriptionAnnotation (type alias)](#descriptionannotation-type-alias)
   - [DescriptionAnnotationId](#descriptionannotationid)
   - [DocumentationAnnotation (type alias)](#documentationannotation-type-alias)
@@ -34,6 +36,7 @@ Added in v1.0.0
   - [TypeAnnotation (type alias)](#typeannotation-type-alias)
   - [TypeAnnotationId](#typeannotationid)
   - [getAnnotation](#getannotation)
+  - [getDefaultAnnotation](#getdefaultannotation)
   - [getDescriptionAnnotation](#getdescriptionannotation)
   - [getExamplesAnnotation](#getexamplesannotation)
   - [getIdentifierAnnotation](#getidentifierannotation)
@@ -202,6 +205,26 @@ Added in v1.0.0
 
 ```ts
 export declare const BrandAnnotationId: typeof BrandAnnotationId
+```
+
+Added in v1.0.0
+
+## DefaultAnnotation (type alias)
+
+**Signature**
+
+```ts
+export type DefaultAnnotation = unknown
+```
+
+Added in v1.0.0
+
+## DefaultAnnotationId
+
+**Signature**
+
+```ts
+export declare const DefaultAnnotationId: typeof DefaultAnnotationId
 ```
 
 Added in v1.0.0
@@ -376,6 +399,16 @@ export declare const getAnnotation: <A>(key: symbol) => (annotated: Annotated) =
 
 Added in v1.0.0
 
+## getDefaultAnnotation
+
+**Signature**
+
+```ts
+export declare const getDefaultAnnotation: (annotated: Annotated) => Option.Option<unknown>
+```
+
+Added in v1.0.0
+
 ## getDescriptionAnnotation
 
 **Signature**
@@ -498,7 +531,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createEnums: (enums: ReadonlyArray<readonly [string, string | number]>) => Enums
+export declare const createEnums: (
+  enums: ReadonlyArray<readonly [string, string | number]>,
+  annotations?: Annotated['annotations']
+) => Enums
 ```
 
 Added in v1.0.0
@@ -544,7 +580,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createLiteral: (literal: LiteralValue) => Literal
+export declare const createLiteral: (literal: LiteralValue, annotations?: Annotated['annotations']) => Literal
 ```
 
 Added in v1.0.0
@@ -584,7 +620,8 @@ Added in v1.0.0
 ```ts
 export declare const createTemplateLiteral: (
   head: string,
-  spans: ReadonlyArray<TemplateLiteralSpan>
+  spans: ReadonlyArray<TemplateLiteralSpan>,
+  annotations?: Annotated['annotations']
 ) => TemplateLiteral | Literal
 ```
 
