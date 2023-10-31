@@ -43,16 +43,16 @@ const is = (ast: AST.AST) => {
 }
 
 const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
+  const hook = getHook(ast)
+  if (Option.isSome(hook)) {
+    return AST.isDeclaration(ast) ? hook.value(...ast.typeParameters.map(go)) : hook.value()
+  }
   switch (ast._tag) {
     case "NeverKeyword":
       throw new Error("cannot build an Equivalence for `never`")
     case "Transform":
       throw new Error("cannot build an Equivalence for transformations")
     case "Declaration":
-      return Option.match(getHook(ast), {
-        onNone: () => Equivalence.strict(),
-        onSome: (handler) => handler(...ast.typeParameters.map(go))
-      })
     case "Literal":
     case "StringKeyword":
     case "TemplateLiteral":
@@ -115,10 +115,6 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
       })
     }
     case "TypeLiteral": {
-      const hook = getHook(ast)
-      if (Option.isSome(hook)) {
-        return hook.value()
-      }
       if (ast.propertySignatures.length === 0 && ast.indexSignatures.length === 0) {
         return Equivalence.strict()
       }
