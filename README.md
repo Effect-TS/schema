@@ -2255,7 +2255,7 @@ const pair = <A>(schema: S.Schema<A>): S.Schema<readonly [A, A]> =>
 
 ## Annotations
 
-One of the fundamental requirements in the design of `@effect/schema` is that it is extensible and customizable. Customizations are achieved through "annotations". Each node contained in the AST of `@effect/schema/AST` contains an `annotations: Record<string | symbol, unknown>` field that can be used to attach additional information to the schema.
+One of the fundamental requirements in the design of `@effect/schema` is that it is extensible and customizable. Customizations are achieved through "annotations". Each node contained in the AST of `@effect/schema/AST` contains an `annotations: Record<symbol, unknown>` field that can be used to attach additional information to the schema.
 
 Let's see some examples:
 
@@ -2299,12 +2299,14 @@ Here's an example of how to add a `deprecated` annotation:
 import * as S from "@effect/schema/Schema";
 import * as AST from "@effect/schema/AST";
 
-const DeprecatedId = "some/unique/identifier/for/the/custom/annotation";
+const DeprecatedId = Symbol.for(
+  "some/unique/identifier/for/the/custom/annotation"
+);
 
-const deprecated = <A>(self: S.Schema<A>): S.Schema<A> =>
+const deprecated = <I, A>(self: S.Schema<I, A>): S.Schema<I, A> =>
   S.make(AST.setAnnotation(self.ast, DeprecatedId, true));
 
-const schema = S.string.pipe(deprecated);
+const schema = deprecated(S.string);
 
 console.log(schema);
 /*
@@ -2312,10 +2314,12 @@ console.log(schema);
   ast: {
     _tag: 'StringKeyword',
     annotations: {
-      '@effect/schema/TitleAnnotationId': 'string',
-      'some/unique/identifier/for/the/custom/annotation': true
+      [Symbol(@effect/schema/annotation/Title)]: 'string',
+      [Symbol(@effect/schema/annotation/Description)]: 'a string',
+      [Symbol(some/unique/identifier/for/the/custom/annotation)]: true
     }
   }
+  ...
 }
 */
 ```
@@ -2324,11 +2328,9 @@ Annotations can be read using the `getAnnotation` helper, here's an example:
 
 ```ts
 import * as Option from "effect/Option";
-import { pipe } from "effect/Function";
 
 const isDeprecated = <A>(schema: S.Schema<A>): boolean =>
-  pipe(
-    AST.getAnnotation<boolean>(DeprecatedId)(schema.ast),
+  AST.getAnnotation<boolean>(DeprecatedId)(schema.ast).pipe(
     Option.getOrElse(() => false)
   );
 
