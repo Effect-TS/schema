@@ -76,7 +76,13 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
       return (a, b) => get()(a, b)
     }
     case "Tuple": {
-      const elements = ast.elements.map((element) => go(element.type))
+      const elements = ast.elements.map((element) => {
+        if (element.isOptional) {
+          // TODO: add support for optional elements
+          throw new Error("cannot build an Equivalence for optional elements")
+        }
+        return go(element.type)
+      })
       const rest = Option.map(ast.rest, ReadonlyArray.map(go))
       return Equivalence.make((a, b) => {
         if (a.length !== b.length) {
@@ -128,15 +134,14 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
         for (let i = 0; i < propertySignatures.length; i++) {
           const ps = ast.propertySignatures[i]
           const name = ps.name
+          const aHas = Object.prototype.hasOwnProperty.call(a, name)
+          const bHas = Object.prototype.hasOwnProperty.call(b, name)
           if (ps.isOptional) {
-            if (
-              Object.prototype.hasOwnProperty.call(a, name) !==
-                Object.prototype.hasOwnProperty.call(b, name)
-            ) {
+            if (aHas !== bHas) {
               return false
             }
           }
-          if (!propertySignatures[i](a[name], b[name])) {
+          if (aHas && bHas && !propertySignatures[i](a[name], b[name])) {
             return false
           }
         }
@@ -151,7 +156,9 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
             return false
           }
           for (const key of aKeys) {
-            if (!indexSignatures[i](a[key], b[key])) {
+            if (
+              !Object.prototype.hasOwnProperty.call(b, key) || !indexSignatures[i](a[key], b[key])
+            ) {
               return false
             }
           }
