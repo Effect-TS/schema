@@ -164,7 +164,9 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
         for (let i = 0; i < members.length; i++) {
           const [equivalence, is] = members[i]
           if (is(a) && is(b)) {
-            return equivalence(a, b)
+            if (equivalence(a, b)) {
+              return true
+            }
           }
         }
         return false

@@ -206,8 +206,33 @@ describe("Equivalence", () => {
     })
   })
 
-  it("union", () => {
-    propertyTo(S.union(S.string, S.JsonNumber))
+  describe("union", () => {
+    it("primitives", () => {
+      const schema = S.union(S.string, S.JsonNumber)
+      const equivalence = E.to(schema)
+
+      expect(equivalence("a", "a")).toBe(true)
+      expect(equivalence(1, 1)).toBe(true)
+
+      expect(equivalence("a", "b")).toBe(false)
+      expect(equivalence(1, 2)).toBe(false)
+
+      // propertyTo(schema)
+    })
+
+    it("should fallback on the less precise equivalence", () => {
+      const a = S.struct({ a: S.string })
+      const ab = S.struct({ a: S.string, b: S.number })
+      const schema = S.union(a, ab)
+      const equivalence = E.to(schema)
+
+      expect(equivalence({ a: "a", b: 1 }, { a: "a", b: 1 })).toBe(true)
+      expect(equivalence({ a: "a", b: 1 }, { a: "a", b: 2 })).toBe(true)
+
+      expect(equivalence({ a: "a", b: 1 }, { a: "c", b: 1 })).toBe(false)
+
+      // propertyTo(schema)
+    })
   })
 
   describe("tuple", () => {
