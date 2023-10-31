@@ -1,23 +1,20 @@
-import * as JSONSchema from "@effect/schema/JSONSchema"
+import * as Equivalence from "@effect/schema/Equivalence"
 import * as S from "@effect/schema/Schema"
 import { describe, it } from "vitest"
 
-describe("dev", () => {
-  it.skip("tmp", async () => {
-    interface Category {
-      readonly name: string
-      readonly categories: ReadonlyArray<Category>
-    }
+describe.skip("dev", () => {
+  it("tmp", async () => {
+    const Person = S.struct({
+      name: S.string,
+      age: S.number
+    })
 
-    const schema: S.Schema<Category> = S.lazy<Category>(() =>
-      S.struct({
-        name: S.string,
-        categories: S.array(schema)
-      })
-    ).pipe(S.identifier("Category"))
+    const PersonEquivalence = Equivalence.to(Person)
 
-    const jsonSchema = JSONSchema.to(schema)
+    const john = { name: "John", age: 23 }
+    const alice = { name: "Alice", age: 30 }
 
-    console.log(JSON.stringify(jsonSchema, null, 2))
+    console.log(PersonEquivalence(john, { name: "John", age: 23 })) // Output: true
+    console.log(PersonEquivalence(john, alice)) // Output: false
   })
 })
