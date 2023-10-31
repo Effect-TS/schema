@@ -8,6 +8,7 @@ import type * as S from "@effect/schema/Schema"
 import * as Either from "effect/Either"
 import * as Equivalence from "effect/Equivalence"
 import * as Option from "effect/Option"
+import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as Internal from "./internal/common"
 
@@ -159,10 +160,29 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
       })
     }
     case "Union": {
-      const members = ast.types.map((type) => [go(type), is(type)] as const)
+      const searchTree = Parser.getSearchTree(ast.types, true)
+      const ownKeys = Internal.ownKeys(searchTree.keys)
+      const len = ownKeys.length
       return Equivalence.make((a, b) => {
-        for (let i = 0; i < members.length; i++) {
-          const [equivalence, is] = members[i]
+        let candidates: Array<AST.AST> = []
+        if (len > 0 && Predicate.isRecord(a)) {
+          for (let i = 0; i < len; i++) {
+            const name = ownKeys[i]
+            const buckets = searchTree.keys[name].buckets
+            if (Object.prototype.hasOwnProperty.call(a, name)) {
+              const literal = String(a[name])
+              if (Object.prototype.hasOwnProperty.call(buckets, literal)) {
+                candidates = candidates.concat(buckets[literal])
+              }
+            }
+          }
+        }
+        if (searchTree.otherwise.length > 0) {
+          candidates = candidates.concat(searchTree.otherwise)
+        }
+        const tuples = candidates.map((ast) => [go(ast), is(ast)] as const)
+        for (let i = 0; i < tuples.length; i++) {
+          const [equivalence, is] = tuples[i]
           if (is(a) && is(b)) {
             if (equivalence(a, b)) {
               return true

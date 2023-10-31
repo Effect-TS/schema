@@ -805,7 +805,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       }
     }
     case "Union": {
-      const searchTree = _getSearchTree(ast.types, isDecoding)
+      const searchTree = getSearchTree(ast.types, isDecoding)
       const ownKeys = Internal.ownKeys(searchTree.keys)
       const len = ownKeys.length
       const map = new Map<any, Parser<any, any>>()
@@ -938,13 +938,13 @@ const fromRefinement =
     refinement(u) ? ParseResult.success(u) : ParseResult.failure(ParseResult.type(ast, u))
 
 /** @internal */
-export const _getLiterals = (
+export const getLiterals = (
   ast: AST.AST,
   isDecoding: boolean
 ): ReadonlyArray<[PropertyKey, AST.Literal]> => {
   switch (ast._tag) {
     case "Declaration":
-      return _getLiterals(ast.type, isDecoding)
+      return getLiterals(ast.type, isDecoding)
     case "TypeLiteral": {
       const out: Array<[PropertyKey, AST.Literal]> = []
       for (let i = 0; i < ast.propertySignatures.length; i++) {
@@ -957,9 +957,9 @@ export const _getLiterals = (
       return out
     }
     case "Refinement":
-      return _getLiterals(ast.from, isDecoding)
+      return getLiterals(ast.from, isDecoding)
     case "Transform":
-      return _getLiterals(isDecoding ? ast.from : ast.to, isDecoding)
+      return getLiterals(isDecoding ? ast.from : ast.to, isDecoding)
   }
   return []
 }
@@ -978,7 +978,7 @@ export const _getLiterals = (
  *
  * @internal
  */
-export const _getSearchTree = (
+export const getSearchTree = (
   members: ReadonlyArray<AST.AST>,
   isDecoding: boolean
 ): {
@@ -999,7 +999,7 @@ export const _getSearchTree = (
   const otherwise: Array<AST.AST> = []
   for (let i = 0; i < members.length; i++) {
     const member = members[i]
-    const tags = _getLiterals(member, isDecoding)
+    const tags = getLiterals(member, isDecoding)
     if (tags.length > 0) {
       for (let j = 0; j < tags.length; j++) {
         const [key, literal] = tags[j]

@@ -233,6 +233,21 @@ describe("Equivalence", () => {
 
       // propertyTo(schema)
     })
+
+    it("discriminated", () => {
+      const schema = S.union(
+        S.struct({ tag: S.literal("a"), a: S.string }),
+        S.struct({ tag: S.literal("b"), b: S.number })
+      )
+      const equivalence = E.to(schema)
+
+      expect(equivalence({ tag: "a", a: "a" }, { tag: "a", a: "a" })).toBe(true)
+      expect(equivalence({ tag: "b", b: 1 }, { tag: "b", b: 1 })).toBe(true)
+
+      expect(equivalence({ tag: "a", a: "a" }, { tag: "a", a: "b" })).toBe(false)
+      expect(equivalence({ tag: "b", b: 1 }, { tag: "b", b: 2 })).toBe(false)
+      expect(equivalence({ tag: "a", a: "a" }, { tag: "b", b: 1 })).toBe(false)
+    })
   })
 
   describe("tuple", () => {
