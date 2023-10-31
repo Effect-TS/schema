@@ -4,7 +4,6 @@
 
 import * as Effect from "effect/Effect"
 import * as Either from "effect/Either"
-import { pipe } from "effect/Function"
 import { globalValue } from "effect/GlobalValue"
 import * as Option from "effect/Option"
 import * as Predicate from "effect/Predicate"
@@ -15,7 +14,8 @@ import * as ParseResult from "./ParseResult"
 import type * as Schema from "./Schema"
 import * as TreeFormatter from "./TreeFormatter"
 
-const getEither = (
+/** @internal */
+export const getEither = (
   ast: AST.AST,
   isDecoding: boolean
 ): (i: unknown, options?: AST.ParseOptions) => Either.Either<ParseResult.ParseError, any> =>
@@ -352,10 +352,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
     }
     case "Tuple": {
       const elements = ast.elements.map((e) => goMemo(e.type, isDecoding))
-      const rest = pipe(
-        ast.rest,
-        Option.map(ReadonlyArray.map((ast) => goMemo(ast, isDecoding)))
-      )
+      const rest = Option.map(ast.rest, ReadonlyArray.map((ast) => goMemo(ast, isDecoding)))
       let requiredLen = ast.elements.filter((e) => !e.isOptional).length
       if (Option.isSome(ast.rest)) {
         requiredLen += ast.rest.value.length - 1

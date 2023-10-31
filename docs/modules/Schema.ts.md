@@ -1,6 +1,6 @@
 ---
 title: Schema.ts
-nav_order: 9
+nav_order: 10
 parent: Modules
 ---
 
@@ -54,6 +54,7 @@ Added in v1.0.0
   - [default](#default)
   - [description](#description)
   - [documentation](#documentation)
+  - [equivalence](#equivalence)
   - [examples](#examples)
   - [identifier](#identifier)
   - [jsonSchema](#jsonschema)
@@ -659,6 +660,18 @@ Added in v1.0.0
 export declare const documentation: (
   documentation: AST.DocumentationAnnotation
 ) => <I, A>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## equivalence
+
+**Signature**
+
+```ts
+export declare const equivalence: <A>(
+  equivalence: Equivalence.Equivalence<A>
+) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1511,7 +1524,7 @@ Added in v1.0.0
 ```ts
 export declare const instanceOf: <A extends abstract new (...args: any) => any>(
   constructor: A,
-  options?: FilterAnnotations<object>
+  options?: FilterAnnotations<InstanceType<A>> | undefined
 ) => Schema<InstanceType<A>, InstanceType<A>>
 ```
 
@@ -2955,6 +2968,7 @@ export interface FilterAnnotations<A> extends DocAnnotations<A> {
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
   readonly pretty?: (...args: ReadonlyArray<Pretty<any>>) => Pretty<any>
+  readonly equivalence?: () => Equivalence.Equivalence<A>
 }
 ```
 
