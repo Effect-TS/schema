@@ -54,6 +54,7 @@
     "AST": true,
     "Arbitrary": true,
     "ArrayFormatter": true,
+    "Equivalence": true,
     "JSONSchema": true,
     "ParseResult": true,
     "Parser": true,
