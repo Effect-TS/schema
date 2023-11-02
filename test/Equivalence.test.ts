@@ -554,7 +554,7 @@ describe("Equivalence", () => {
       const a5: A = { a: "a1", as: [{ a: "a2", as: [] }, { a: "a3", as: [{ a: "a5", as: [] }] }] }
       expect(equivalence(a4, a5)).toBe(false)
 
-      // propertyTo(schema, { numRuns: 10 })
+      // propertyTo(schema, { numRuns: 5 })
     })
 
     it("should support mutually recursive schemas", () => {
@@ -638,7 +638,7 @@ describe("Equivalence", () => {
       }
       expect(equivalence(a1, a2)).toBe(false)
 
-      // propertyTo(Operation, { numRuns: 10 })
+      // propertyTo(Operation, { numRuns: 5 })
     })
   })
 })
