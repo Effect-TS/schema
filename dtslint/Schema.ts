@@ -638,3 +638,6 @@ S.string.pipe(S.transformOrFail(S.number, s => ParseResult.success(s.length), n 
 // should support subtypes of `string`
 // $ExpectType Schema<`a${string}`, readonly string[]>
 S.templateLiteral(S.literal('a'), S.string).pipe(S.split(':'))
+
+// $ExpectType Schema<string, URL>
+S.URL

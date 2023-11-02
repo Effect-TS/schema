@@ -140,6 +140,17 @@ describe("Equivalence", () => {
       // propertyTo(schema)
     })
 
+    it("URL", () => {
+      const schema = S.URLFromSelf
+      const equivalence = E.to(schema)
+      const url = new URL("https://example.com/")
+
+      expect(equivalence(url, url)).toBe(true)
+      expect(equivalence(url, new URL("https://example.com/page"))).toBe(false)
+
+      // propertyTo(schema)
+    })
+
     it("Data", () => {
       const schema = S.dataFromSelf(S.struct({ a: string, b: number }))
       const equivalence = E.to(schema)

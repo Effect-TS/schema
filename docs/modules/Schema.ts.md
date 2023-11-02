@@ -44,6 +44,9 @@ Added in v1.0.0
 - [ReadonlySet transformations](#readonlyset-transformations)
   - [readonlySet](#readonlyset)
   - [readonlySetFromSelf](#readonlysetfromself)
+- [URL constructors](#url-constructors)
+  - [URL](#url)
+  - [urlFromString](#urlfromstring)
 - [Uint8Array constructors](#uint8array-constructors)
   - [Uint8Array](#uint8array)
   - [Uint8ArrayFromSelf](#uint8arrayfromself)
@@ -277,6 +280,7 @@ Added in v1.0.0
   - [StructFields (type alias)](#structfields-type-alias)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [ToStruct (type alias)](#tostruct-type-alias)
+  - [URLFromSelf](#urlfromself)
   - [from](#from)
   - [optional](#optional)
   - [propertySignature](#propertysignature)
@@ -574,6 +578,32 @@ Added in v1.0.0
 
 ```ts
 export declare const readonlySetFromSelf: <I, A>(item: Schema<I, A>) => Schema<ReadonlySet<I>, ReadonlySet<A>>
+```
+
+Added in v1.0.0
+
+# URL constructors
+
+## URL
+
+A combinator that transforms a `string` into a valid `URL`.
+
+**Signature**
+
+```ts
+export declare const URL: Schema<string, URL>
+```
+
+Added in v1.0.0
+
+## urlFromString
+
+A schema that transforms a `string` into a valid `URL`.
+
+**Signature**
+
+```ts
+export declare const urlFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, URL>
 ```
 
 Added in v1.0.0
@@ -3149,6 +3179,16 @@ Added in v1.0.0
 export type ToStruct<Fields extends StructFields> = {
   readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
 } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> }
+```
+
+Added in v1.0.0
+
+## URLFromSelf
+
+**Signature**
+
+```ts
+export declare const URLFromSelf: Schema<URL, URL>
 ```
 
 Added in v1.0.0

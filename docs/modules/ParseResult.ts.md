@@ -21,6 +21,7 @@ Added in v1.0.0
   - [key](#key)
   - [missing](#missing)
   - [success](#success)
+  - [try](#try)
   - [type](#type)
   - [unexpected](#unexpected)
   - [unionMember](#unionmember)
@@ -125,6 +126,16 @@ Added in v1.0.0
 
 ```ts
 export declare const success: <A>(a: A) => ParseResult<A>
+```
+
+Added in v1.0.0
+
+## try
+
+**Signature**
+
+```ts
+export declare const try: <A>(options: { readonly try: LazyArg<A>; readonly catch: (error: unknown) => ParseError; }) => ParseResult<A>
 ```
 
 Added in v1.0.0

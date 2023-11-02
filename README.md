@@ -2013,6 +2013,28 @@ validate(new Date(0)); // new Date(0)
 validate(new Date("fail")); // throws
 ```
 
+### URL transformations
+
+#### URL
+
+Transforms a `string` into a valid `URL`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<string, URL>
+const schema = S.URL;
+const parse = S.parseSync(schema);
+
+parse("https://www.example.com/"); // new URL("https://www.example.com/")
+
+parse("a"); // throws
+
+const validate = S.validateSync(schema);
+
+validate(new URL("https://www.example.com/")); // new URL("https://www.example.com/")
+```
+
 ## Interop with `effect/Data`
 
 The `effect/Data` module in the Effect ecosystem serves as a utility module that simplifies the process of comparing values for equality without the need for explicit implementations of the `Equal` and `Hash` interfaces. It provides convenient APIs that automatically generate default implementations for equality checks, making it easier for developers to perform equality comparisons in their applications.

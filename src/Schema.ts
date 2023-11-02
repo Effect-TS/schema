@@ -3042,6 +3042,65 @@ export {
 }
 
 // ---------------------------------------------
+// URL transformations
+// ---------------------------------------------
+
+const isURL = (input: unknown): input is URL => input instanceof URL
+
+const urlArbitrary = (): Arbitrary<URL> => (fc) => fc.webUrl().map((s) => new URL(s))
+
+const urlPretty = (): Pretty<URL> => (url) => `new URL(${JSON.stringify(url.href)})`
+
+const urlEquivalence = (): Equivalence.Equivalence<URL> => (a, b) => a.href === b.href
+
+/**
+ * @since 1.0.0
+ */
+export const URLFromSelf: Schema<URL> = declare(
+  [],
+  struct({}),
+  () => (u, _, ast) =>
+    !isURL(u) ? ParseResult.failure(ParseResult.type(ast, u)) : ParseResult.success(u),
+  {
+    [AST.IdentifierAnnotationId]: "URL",
+    [Internal.PrettyHookId]: urlPretty,
+    [Internal.ArbitraryHookId]: urlArbitrary,
+    [Internal.EquivalenceHookId]: urlEquivalence
+  }
+)
+
+/**
+ * A schema that transforms a `string` into a valid `URL`.
+ *
+ * @category URL constructors
+ * @since 1.0.0
+ */
+export const urlFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, URL> =>
+  transformOrFail(
+    self,
+    URLFromSelf,
+    (s) =>
+      ParseResult.try({
+        try: () => new URL(s),
+        catch: () => ParseResult.parseError([ParseResult.type(URLFromSelf.ast, s)])
+      }),
+    (url) => ParseResult.success(url.href),
+    { strict: false }
+  )
+
+const _URL: Schema<string, URL> = urlFromString(string)
+
+export {
+  /**
+   * A combinator that transforms a `string` into a valid `URL`.
+   *
+   * @category URL constructors
+   * @since 1.0.0
+   */
+  _URL as URL
+}
+
+// ---------------------------------------------
 // Option transformations
 // ---------------------------------------------
 
