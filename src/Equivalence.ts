@@ -122,6 +122,15 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
       const propertySignatures = ast.propertySignatures.map((ps) => go(ps.type))
       const indexSignatures = ast.indexSignatures.map((is) => go(is.type))
       return Equivalence.make((a, b) => {
+        const aStringKeys = Object.keys(a)
+        const bStringKeys = Object.keys(b)
+        const aSymbolKeys = Object.getOwnPropertySymbols(a)
+        const bSymbolKeys = Object.getOwnPropertySymbols(b)
+        if (
+          (aStringKeys.length !== bStringKeys.length) || (aSymbolKeys.length !== bSymbolKeys.length)
+        ) {
+          return false
+        }
         // ---------------------------------------------
         // handle property signatures
         // ---------------------------------------------
@@ -144,11 +153,9 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
         // ---------------------------------------------
         for (let i = 0; i < indexSignatures.length; i++) {
           const is = ast.indexSignatures[i]
-          const aKeys = Internal.getKeysForIndexSignature(a, is.parameter)
-          const bKeys = Internal.getKeysForIndexSignature(b, is.parameter)
-          if (aKeys.length !== bKeys.length) {
-            return false
-          }
+          const aKeys = AST.isSymbolKeyword(AST.getParameterBase(is.parameter))
+            ? aSymbolKeys
+            : aStringKeys
           for (const key of aKeys) {
             if (
               !Object.prototype.hasOwnProperty.call(b, key) || !indexSignatures[i](a[key], b[key])

@@ -417,6 +417,8 @@ describe("Equivalence", () => {
 
       expect(equivalence({ a: "a", b: 1 }, { a: "c", b: 1 })).toBe(false)
       expect(equivalence({ a: "a", b: 1 }, { a: "a", b: 2 })).toBe(false)
+      const c: { a: string; b: number; c: boolean } = { a: "a", b: 1, c: true }
+      expect(equivalence({ a: "a", b: 1 }, c)).toBe(false)
 
       // propertyTo(schema)
     })
@@ -447,6 +449,7 @@ describe("Equivalence", () => {
       expect(equivalence({ a: "a" }, { a: "a" })).toBe(true)
       expect(equivalence({ a: "a", b: undefined }, { a: "a", b: undefined })).toBe(true)
 
+      expect(equivalence({ a: "a" }, { b: 1 })).toBe(false)
       expect(equivalence({ a: "a", b: 1 }, { a: "a" })).toBe(false)
       expect(equivalence({ a: "a", b: undefined }, { a: "a" })).toBe(false)
       expect(equivalence({ a: "a" }, { a: "a", b: 1 })).toBe(false)
