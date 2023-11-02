@@ -20,15 +20,16 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 
 `@effect/schema` allows you to define a `Schema<I, A>` that provides a blueprint for describing the structure and data types of your data. Once defined, you can leverage this schema to perform a range of operations, including:
 
-| Operation       | Description                                                                          |
-| --------------- | ------------------------------------------------------------------------------------ |
-| Parsing         | Convert from `unknown` value to output type `A`.                                     |
-| Decoding        | Transforming data from an input type `I` to an output type `A`.                     |
-| Encoding        | Converting data from an output type `A` back to an input type `I`.                   |
-| Asserting       | Verifying that a value adheres to the schema's output type `A`.                      |
-| Arbitraries     | Generate arbitraries for [fast-check](https://github.com/dubzzz/fast-check) testing. |
-| Pretty printing | Support pretty printing for data structures.                                         |
-| JSON Schemas    | Create JSON Schemas based on defined schemas.                                        |
+| Operation       | Description                                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| Parsing         | Convert from `unknown` value to output type `A`.                                                                |
+| Decoding        | Transforming data from an input type `I` to an output type `A`.                                                |
+| Encoding        | Converting data from an output type `A` back to an input type `I`.                                              |
+| Asserting       | Verifying that a value adheres to the schema's output type `A`.                                                 |
+| Arbitraries     | Generate arbitraries for [fast-check](https://github.com/dubzzz/fast-check) testing.                            |
+| Pretty printing | Support pretty printing for data structures.                                                                    |
+| JSON Schemas    | Create JSON Schemas based on defined schemas.                                                                   |
+| Equivalence     | Create [Equivalences](https://effect-ts.github.io/effect/modules/Equivalence.ts.html) based on defined schemas. |
 
 If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
 
@@ -783,6 +784,29 @@ Output:
 In the example above, we define a schema for a "Category" that can contain a "name" (a string) and an array of nested "categories." To support recursive definitions, we use the `S.lazy` function and identifier annotations to name our schema.
 
 This ensures that the JSON Schema properly handles the recursive structure and creates distinct definitions for each annotated schema, improving readability and maintainability.
+
+## Generating Equivalences
+
+The `to` function, which is part of the `@effect/schema/Equivalence` module, allows you to generate an [Equivalence](https://effect-ts.github.io/effect/modules/Equivalence.ts.html) based on a schema definition:
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Equivalence from "@effect/schema/Equivalence";
+
+const Person = S.struct({
+  name: S.string,
+  age: S.number
+});
+
+// $ExpectType Equivalence<{ readonly name: string; readonly age: number; }>
+const PersonEquivalence = Equivalence.to(Person);
+
+const john = { name: "John", age: 23 };
+const alice = { name: "Alice", age: 30 };
+
+console.log(PersonEquivalence(john, { name: "John", age: 23 })); // Output: true
+console.log(PersonEquivalence(john, alice)); // Output: false
+```
 
 # Basic usage
 
