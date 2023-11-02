@@ -42,11 +42,27 @@ export const propertyTo = <I, A>(
   fc.assert(transitivity, params)
 }
 
-// Intentionally fragile so that it throws an exception if undefined is passed
-const string = S.string.pipe(S.equivalence((a, b) => a.length === b.length && a === b))
-// Intentionally fragile so that it throws an exception if undefined is passed
+const string = S.string.pipe(S.equivalence((a, b) => {
+  if (typeof a !== "string" || typeof b !== "string") {
+    throw new Error("invalid string provided to `string`")
+  }
+  return a === b
+}))
+
+const number = S.JsonNumber.pipe(S.equivalence((a, b) => {
+  if (typeof a !== "number" || typeof b !== "number") {
+    throw new Error("invalid number provided to `number`")
+  }
+  return a === b
+}))
+
 const symbol = S.symbolFromSelf.pipe(
-  S.equivalence((a, b) => a.description?.length === b.description?.length && a === b)
+  S.equivalence((a, b) => {
+    if (typeof a !== "symbol" || typeof b !== "symbol") {
+      throw new Error("invalid symbol provided to `symbol`")
+    }
+    return a === b
+  })
 )
 
 describe("Equivalence", () => {
@@ -99,7 +115,7 @@ describe("Equivalence", () => {
     })
 
     it("Chunk", () => {
-      const schema = S.chunkFromSelf(S.JsonNumber)
+      const schema = S.chunkFromSelf(number)
       const equivalence = E.to(schema)
 
       expect(equivalence(Chunk.empty(), Chunk.empty())).toBe(true)
@@ -125,7 +141,7 @@ describe("Equivalence", () => {
     })
 
     it("Data", () => {
-      const schema = S.dataFromSelf(S.struct({ a: string, b: S.JsonNumber }))
+      const schema = S.dataFromSelf(S.struct({ a: string, b: number }))
       const equivalence = E.to(schema)
 
       expect(equivalence(Data.struct({ a: "ok", b: 0 }), Data.struct({ a: "ok", b: 0 }))).toBe(true)
@@ -134,7 +150,7 @@ describe("Equivalence", () => {
     })
 
     it("Either", () => {
-      const schema = S.eitherFromSelf(string, S.JsonNumber)
+      const schema = S.eitherFromSelf(string, number)
       const equivalence = E.to(schema)
 
       expect(equivalence(Either.right(1), Either.right(1))).toBe(true)
@@ -147,7 +163,7 @@ describe("Equivalence", () => {
     })
 
     it("Option", () => {
-      const schema = S.optionFromSelf(S.JsonNumber)
+      const schema = S.optionFromSelf(number)
       const equivalence = E.to(schema)
 
       expect(equivalence(Option.none(), Option.none())).toBe(true)
@@ -159,7 +175,7 @@ describe("Equivalence", () => {
     })
 
     it("ReadonlySet", () => {
-      const schema = S.readonlySetFromSelf(S.JsonNumber)
+      const schema = S.readonlySetFromSelf(number)
       const equivalence = E.to(schema)
 
       expect(equivalence(new Set(), new Set())).toBe(true)
@@ -171,7 +187,7 @@ describe("Equivalence", () => {
     })
 
     it("ReadonlyMap", () => {
-      const schema = S.readonlyMapFromSelf(string, S.JsonNumber)
+      const schema = S.readonlyMapFromSelf(string, number)
       const equivalence = E.to(schema)
 
       expect(equivalence(new Map(), new Map())).toBe(true)
@@ -215,7 +231,7 @@ describe("Equivalence", () => {
 
   describe("union", () => {
     it("primitives", () => {
-      const schema = S.union(string, S.JsonNumber)
+      const schema = S.union(string, number)
       const equivalence = E.to(schema)
 
       expect(equivalence("a", "a")).toBe(true)
@@ -266,7 +282,7 @@ describe("Equivalence", () => {
     })
 
     it("e", () => {
-      const schema = S.tuple(string, S.JsonNumber)
+      const schema = S.tuple(string, number)
       const equivalence = E.to(schema)
 
       expect(equivalence(["a", 1], ["a", 1])).toBe(true)
@@ -278,7 +294,7 @@ describe("Equivalence", () => {
     })
 
     it("e + r", () => {
-      const schema = S.tuple(string).pipe(S.rest(S.JsonNumber))
+      const schema = S.tuple(string).pipe(S.rest(number))
       const equivalence = E.to(schema)
 
       expect(equivalence(["a"], ["a"])).toBe(true)
@@ -292,7 +308,7 @@ describe("Equivalence", () => {
     })
 
     it("r", () => {
-      const schema = S.array(S.JsonNumber)
+      const schema = S.array(number)
       const equivalence = E.to(schema)
 
       expect(equivalence([], [])).toBe(true)
@@ -306,7 +322,7 @@ describe("Equivalence", () => {
     })
 
     it("r + e", () => {
-      const schema = S.array(string).pipe(S.element(S.JsonNumber))
+      const schema = S.array(string).pipe(S.element(number))
       const equivalence = E.to(schema)
 
       expect(equivalence([1], [1])).toBe(true)
@@ -320,57 +336,65 @@ describe("Equivalence", () => {
       // propertyTo(schema)
     })
 
-    // TODO: add support for optional elements
     describe("optional element support", () => {
       it("e?", () => {
-        const schema = S.tuple().pipe(S.optionalElement(S.JsonNumber))
-        expect(() => E.to(schema)).toThrow(
-          new Error("cannot build an Equivalence for optional elements")
-        )
-        // const equivalence = E.to(schema)
+        const schema = S.tuple().pipe(S.optionalElement(string))
+        const equivalence = E.to(schema)
 
-        // expect(equivalence([], [])).toBe(true)
-        // expect(equivalence([1], [1])).toBe(true)
+        expect(equivalence([], [])).toBe(true)
+        expect(equivalence(["a"], ["a"])).toBe(true)
 
-        // expect(equivalence([1], [2])).toBe(false)
-        // expect(equivalence([], [1])).toBe(false)
-        // expect(equivalence([1], [])).toBe(false)
+        expect(equivalence(["a"], ["b"])).toBe(false)
+        expect(equivalence([], ["a"])).toBe(false)
+        expect(equivalence(["a"], [])).toBe(false)
+
+        // propertyTo(schema)
+      })
+
+      it("e? + e?", () => {
+        const schema = S.tuple().pipe(S.optionalElement(string), S.optionalElement(number))
+        const equivalence = E.to(schema)
+
+        expect(equivalence([], [])).toBe(true)
+        expect(equivalence(["a"], ["a"])).toBe(true)
+        expect(equivalence(["a"], ["a"])).toBe(true)
+        expect(equivalence(["a", 1], ["a", 1])).toBe(true)
+
+        expect(equivalence(["a"], ["b"])).toBe(false)
+        expect(equivalence(["a", 1], ["a", 2])).toBe(false)
+        expect(equivalence(["a", 1], ["a"])).toBe(false)
+        expect(equivalence([], ["a"])).toBe(false)
+        expect(equivalence(["a"], [])).toBe(false)
 
         // propertyTo(schema)
       })
 
       it("e + e?", () => {
-        const schema = S.tuple(string).pipe(S.optionalElement(S.JsonNumber))
-        expect(() => E.to(schema)).toThrow(
-          new Error("cannot build an Equivalence for optional elements")
-        )
-        // const equivalence = E.to(schema)
+        const schema = S.tuple(string).pipe(S.optionalElement(number))
+        const equivalence = E.to(schema)
 
-        // expect(equivalence(["a"], ["a"])).toBe(true)
-        // expect(equivalence(["a", 1], ["a", 1])).toBe(true)
+        expect(equivalence(["a"], ["a"])).toBe(true)
+        expect(equivalence(["a", 1], ["a", 1])).toBe(true)
 
-        // expect(equivalence(["a", 1], ["a", 2])).toBe(false)
-        // expect(equivalence(["a"], ["a", 1])).toBe(false)
-        // expect(equivalence(["a", 1], ["a"])).toBe(false)
+        expect(equivalence(["a", 1], ["a", 2])).toBe(false)
+        expect(equivalence(["a"], ["a", 1])).toBe(false)
+        expect(equivalence(["a", 1], ["a"])).toBe(false)
 
         // propertyTo(schema)
       })
 
       it("e? + r", () => {
-        const schema = S.tuple().pipe(S.optionalElement(string), S.rest(S.JsonNumber))
-        expect(() => E.to(schema)).toThrow(
-          new Error("cannot build an Equivalence for optional elements")
-        )
-        // const equivalence = E.to(schema)
+        const schema = S.tuple().pipe(S.optionalElement(string), S.rest(number))
+        const equivalence = E.to(schema)
 
-        // expect(equivalence([], [])).toBe(true)
-        // expect(equivalence(["a"], ["a"])).toBe(true)
-        // expect(equivalence(["a", 1], ["a", 1])).toBe(true)
+        expect(equivalence([], [])).toBe(true)
+        expect(equivalence(["a"], ["a"])).toBe(true)
+        expect(equivalence(["a", 1], ["a", 1])).toBe(true)
 
-        // expect(equivalence([], ["a"])).toBe(false)
-        // expect(equivalence(["a"], [])).toBe(false)
-        // expect(equivalence(["a"], ["b"])).toBe(false)
-        // expect(equivalence(["a", 1], ["a", 2])).toBe(false)
+        expect(equivalence([], ["a"])).toBe(false)
+        expect(equivalence(["a"], [])).toBe(false)
+        expect(equivalence(["a"], ["b"])).toBe(false)
+        expect(equivalence(["a", 1], ["a", 2])).toBe(false)
 
         // propertyTo(schema)
       })
@@ -386,7 +410,7 @@ describe("Equivalence", () => {
     })
 
     it("string keys", () => {
-      const schema = S.struct({ a: string, b: S.JsonNumber })
+      const schema = S.struct({ a: string, b: number })
       const equivalence = E.to(schema)
 
       expect(equivalence({ a: "a", b: 1 }, { a: "a", b: 1 })).toBe(true)
@@ -400,7 +424,7 @@ describe("Equivalence", () => {
     it("symbol keys", () => {
       const a = Symbol.for("@effect/schema/test/a")
       const b = Symbol.for("@effect/schema/test/b")
-      const schema = S.struct({ [a]: string, [b]: S.JsonNumber })
+      const schema = S.struct({ [a]: string, [b]: number })
       const equivalence = E.to(schema)
 
       expect(equivalence({ [a]: "a", [b]: 1 }, { [a]: "a", [b]: 1 })).toBe(true)
@@ -414,62 +438,62 @@ describe("Equivalence", () => {
     it("optional property signature", () => {
       const schema = S.struct({
         a: S.optional(string),
-        b: S.optional(S.union(string, S.undefined))
+        b: S.optional(S.union(number, S.undefined))
       })
       const equivalence = E.to(schema)
 
-      expect(equivalence({ a: "a", b: "1" }, { a: "a", b: "1" })).toBe(true)
-      expect(equivalence({ b: "1" }, { b: "1" })).toBe(true)
+      expect(equivalence({ a: "a", b: 1 }, { a: "a", b: 1 })).toBe(true)
+      expect(equivalence({ b: 1 }, { b: 1 })).toBe(true)
       expect(equivalence({ a: "a" }, { a: "a" })).toBe(true)
       expect(equivalence({ a: "a", b: undefined }, { a: "a", b: undefined })).toBe(true)
 
-      expect(equivalence({ a: "a", b: "1" }, { a: "a" })).toBe(false)
+      expect(equivalence({ a: "a", b: 1 }, { a: "a" })).toBe(false)
       expect(equivalence({ a: "a", b: undefined }, { a: "a" })).toBe(false)
-      expect(equivalence({ a: "a" }, { a: "a", b: "1" })).toBe(false)
+      expect(equivalence({ a: "a" }, { a: "a", b: 1 })).toBe(false)
       expect(equivalence({ a: "a" }, { a: "a", b: undefined })).toBe(false)
-      expect(equivalence({ a: "a", b: "1" }, { a: "c", b: "1" })).toBe(false)
-      expect(equivalence({ a: "a", b: "1" }, { a: "a", b: "2" })).toBe(false)
+      expect(equivalence({ a: "a", b: 1 }, { a: "c", b: 1 })).toBe(false)
+      expect(equivalence({ a: "a", b: 1 }, { a: "a", b: 2 })).toBe(false)
 
       // propertyTo(schema)
     })
 
     it("record(never, number)", () => {
-      const schema = S.record(S.never, S.JsonNumber)
+      const schema = S.record(S.never, number)
       const equivalence = E.to(schema)
 
       expect(equivalence({}, {})).toBe(false)
     })
 
     it("record(string, number)", () => {
-      const schema = S.record(string, string)
+      const schema = S.record(string, number)
       const equivalence = E.to(schema)
 
       expect(equivalence({}, {})).toBe(true)
-      expect(equivalence({ a: "1" }, { a: "1" })).toBe(true)
-      expect(equivalence({ a: "1", b: "2" }, { a: "1", b: "2" })).toBe(true)
+      expect(equivalence({ a: 1 }, { a: 1 })).toBe(true)
+      expect(equivalence({ a: 1, b: 2 }, { a: 1, b: 2 })).toBe(true)
 
-      expect(equivalence({ a: "1" }, { a: "2" })).toBe(false)
-      expect(equivalence({ a: "1", b: "2" }, { a: "1" })).toBe(false)
-      expect(equivalence({ a: "1" }, { a: "1", b: "2" })).toBe(false)
-      expect(equivalence({ a: "1" }, { b: "1" })).toBe(false)
+      expect(equivalence({ a: 1 }, { a: 2 })).toBe(false)
+      expect(equivalence({ a: 1, b: 2 }, { a: 1 })).toBe(false)
+      expect(equivalence({ a: 1 }, { a: 1, b: 2 })).toBe(false)
+      expect(equivalence({ a: 1 }, { b: 1 })).toBe(false)
 
       // propertyTo(schema)
     })
 
     it("record(symbol, number)", () => {
-      const schema = S.record(symbol, string)
+      const schema = S.record(symbol, number)
       const equivalence = E.to(schema)
 
       const a = Symbol.for("@effect/schema/test/a")
       const b = Symbol.for("@effect/schema/test/b")
       expect(equivalence({}, {})).toBe(true)
-      expect(equivalence({ [a]: "1" }, { [a]: "1" })).toBe(true)
-      expect(equivalence({ [a]: "1", [b]: "2" }, { [a]: "1", [b]: "2" })).toBe(true)
+      expect(equivalence({ [a]: 1 }, { [a]: 1 })).toBe(true)
+      expect(equivalence({ [a]: 1, [b]: 2 }, { [a]: 1, [b]: 2 })).toBe(true)
 
-      expect(equivalence({ [a]: "1" }, { [a]: "2" })).toBe(false)
-      expect(equivalence({ [a]: "1", [b]: "2" }, { [a]: "1" })).toBe(false)
-      expect(equivalence({ [a]: "1" }, { [a]: "1", [b]: "2" })).toBe(false)
-      expect(equivalence({ [a]: "1" }, { [b]: "1" })).toBe(false)
+      expect(equivalence({ [a]: 1 }, { [a]: 2 })).toBe(false)
+      expect(equivalence({ [a]: 1, [b]: 2 }, { [a]: 1 })).toBe(false)
+      expect(equivalence({ [a]: 1 }, { [a]: 1, [b]: 2 })).toBe(false)
+      expect(equivalence({ [a]: 1 }, { [b]: 1 })).toBe(false)
 
       // propertyTo(schema)
     })
@@ -549,7 +573,7 @@ describe("Equivalence", () => {
       const Expression: S.Schema<Expression> = S.lazy(() =>
         S.struct({
           type: S.literal("expression"),
-          value: S.union(S.JsonNumber, Operation)
+          value: S.union(number, Operation)
         })
       ).pipe(S.identifier("Expression"))
 

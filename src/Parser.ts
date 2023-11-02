@@ -408,8 +408,8 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
         // ---------------------------------------------
         for (; i < elements.length; i++) {
           if (len < i + 1) {
-            // the input element is missing...
             if (ast.elements[i].isOptional) {
+              // the input element is missing
               continue
             }
           } else {
@@ -457,8 +457,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
         // handle rest element
         // ---------------------------------------------
         if (Option.isSome(rest)) {
-          const head = ReadonlyArray.headNonEmpty(rest.value)
-          const tail = ReadonlyArray.tailNonEmpty(rest.value)
+          const [head, ...tail] = rest.value
           for (; i < len - tail.length; i++) {
             const te = head(input[i], options)
             const eu = ParseResult.eitherOrUndefined(te)

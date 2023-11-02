@@ -97,8 +97,7 @@ export const match: AST.Match<Pretty<any>> = {
       // handle rest element
       // ---------------------------------------------
       if (Option.isSome(rest)) {
-        const head = ReadonlyArray.headNonEmpty(rest.value)
-        const tail = ReadonlyArray.tailNonEmpty(rest.value)
+        const [head, ...tail] = rest.value
         for (; i < input.length - tail.length; i++) {
           output.push(head(input[i]))
         }

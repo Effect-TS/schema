@@ -76,23 +76,18 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
       return (a, b) => get()(a, b)
     }
     case "Tuple": {
-      const elements = ast.elements.map((element) => {
-        if (element.isOptional) {
-          // TODO: add support for optional elements
-          throw new Error("cannot build an Equivalence for optional elements")
-        }
-        return go(element.type)
-      })
+      const elements = ast.elements.map((element) => go(element.type))
       const rest = Option.map(ast.rest, ReadonlyArray.map(go))
       return Equivalence.make((a, b) => {
-        if (a.length !== b.length) {
+        const len = a.length
+        if (len !== b.length) {
           return false
         }
         // ---------------------------------------------
         // handle elements
         // ---------------------------------------------
         let i = 0
-        for (; i < ast.elements.length; i++) {
+        for (; i < Math.min(len, ast.elements.length); i++) {
           if (!elements[i](a[i], b[i])) {
             return false
           }
@@ -101,9 +96,8 @@ const go = (ast: AST.AST): Equivalence.Equivalence<any> => {
         // handle rest element
         // ---------------------------------------------
         if (Option.isSome(rest)) {
-          const head = ReadonlyArray.headNonEmpty(rest.value)
-          const tail = ReadonlyArray.tailNonEmpty(rest.value)
-          for (; i < a.length - tail.length; i++) {
+          const [head, ...tail] = rest.value
+          for (; i < len - tail.length; i++) {
             if (!head(a[i], b[i])) {
               return false
             }
