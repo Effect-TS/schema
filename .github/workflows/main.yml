@@ -50,6 +50,8 @@ jobs:
       - run: pnpm run lint
       - run: pnpm run dtslint
       - run: pnpm docgen
+      - name: Check docs state
+        run: git add docs && git diff-index --cached HEAD --exit-code docs
       - name: Create Release Pull Request or Publish
         id: changesets
         uses: changesets/action@v1
