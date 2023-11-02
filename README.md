@@ -23,7 +23,7 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 | Operation       | Description                                                                                                     |
 | --------------- | --------------------------------------------------------------------------------------------------------------- |
 | Parsing         | Convert from `unknown` value to output type `A`.                                                                |
-| Decoding        | Transforming data from an input type `I`` to an output type `A`.                                                |
+| Decoding        | Transforming data from an input type `I` to an output type `A`.                                                |
 | Encoding        | Converting data from an output type `A` back to an input type `I`.                                              |
 | Asserting       | Verifying that a value adheres to the schema's output type `A`.                                                 |
 | Arbitraries     | Generate arbitraries for [fast-check](https://github.com/dubzzz/fast-check) testing.                            |
