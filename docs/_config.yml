@@ -1,13 +1,9 @@
-remote_theme: pmarsceill/just-the-docs
+remote_theme: mikearnaldi/just-the-docs
 
 # Enable or disable the site search
 search_enabled: true
 
 # Aux links for the upper right navigation
 aux_links:
-  "Docs":
-    - "//effect-ts.github.io/schema"
-  "API Reference":
-    - "//effect-ts.github.io/schema/docs/modules"
-  "GitHub":
-    - "//github.com/effect-ts/schema"
+'@effect/schema on GitHub':
+  - 'https://github.com/effect-ts/schema'
