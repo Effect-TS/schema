@@ -2,12 +2,12 @@
  * @since 1.0.0
  */
 
-import * as AST from "./AST.js"
-import * as Parser from "./Parser.js"
-import type * as Schema from "./Schema.js"
 import * as Option from "effect/Option"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as ReadonlyRecord from "effect/ReadonlyRecord"
+import * as AST from "./AST.js"
+import * as Parser from "./Parser.js"
+import type * as Schema from "./Schema.js"
 
 interface JsonSchema7Ref {
   $ref: string

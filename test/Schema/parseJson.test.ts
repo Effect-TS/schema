@@ -18,12 +18,14 @@ describe("Schema/ParseJson", () => {
       "a",
       Util.isBun
         ? `JSON Parse error: Unexpected identifier "a"`
-        : `Unexpected token 'a', \"a\" is not valid JSON`
+        : `Unexpected token 'a', "a" is not valid JSON`
     )
     await Util.expectParseFailure(
       schema,
       "{",
-      Util.isBun ? `JSON Parse error: Expected '}'` : `Expected property name or '}' in JSON at position 1`
+      Util.isBun
+        ? `JSON Parse error: Expected '}'`
+        : `Expected property name or '}' in JSON at position 1`
     )
   })
 
