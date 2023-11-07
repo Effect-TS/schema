@@ -18,8 +18,6 @@
   },
   "homepage": "https://github.com/effect-ts/schema",
   "description": "Modeling the schema of data structures as first-class values",
-  "main": "dist/effect-schema.cjs.js",
-  "module": "dist/effect-schema.esm.js",
   "tags": [
     "typescript",
     "schema",
