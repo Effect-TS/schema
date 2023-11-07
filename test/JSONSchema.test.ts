@@ -3,7 +3,8 @@ import * as AST from "@effect/schema/AST"
 import * as JSONSchema from "@effect/schema/JSONSchema"
 import * as ParseResult from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
-import Ajv from "ajv"
+// @ts-ignore
+import { Ajv } from "ajv"
 import * as fc from "fast-check"
 import { describe, expect, it } from "vitest"
 
