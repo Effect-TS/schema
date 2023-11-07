@@ -39,7 +39,7 @@ Added in v1.0.0
 
 ```ts
 export interface Issue {
-  readonly _tag: ParseErrors['_tag']
+  readonly _tag: ParseErrors["_tag"]
   readonly path: ReadonlyArray<PropertyKey>
   readonly message: string
 }

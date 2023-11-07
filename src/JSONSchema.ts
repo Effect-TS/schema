@@ -2,9 +2,9 @@
  * @since 1.0.0
  */
 
-import * as AST from "@effect/schema/AST"
-import * as Parser from "@effect/schema/Parser"
-import type * as Schema from "@effect/schema/Schema"
+import * as AST from "./AST.js"
+import * as Parser from "./Parser.js"
+import type * as Schema from "./Schema.js"
 import * as Option from "effect/Option"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as ReadonlyRecord from "effect/ReadonlyRecord"

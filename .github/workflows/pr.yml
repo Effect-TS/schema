@@ -47,9 +47,9 @@ jobs:
       - run: pnpm install
       - run: pnpm run build
       - run: pnpm run circular
-      - run: pnpm run test --coverage
+      - run: pnpm run coverage
       - run: pnpm run lint
       - run: pnpm run dtslint
-      - run: pnpm docgen
+      - run: pnpm run docgen
       - name: Check docs state
         run: git add docs && git diff-index --cached HEAD --exit-code docs

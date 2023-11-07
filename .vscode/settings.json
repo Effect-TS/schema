@@ -47,19 +47,5 @@
   "files.watcherExclude": {
     "**/target": true
   },
-  "files.insertFinalNewline": true,
-  "files.exclude": {
-    "dist": true,
-    "internal": true,
-    "AST": true,
-    "Arbitrary": true,
-    "ArrayFormatter": true,
-    "Equivalence": true,
-    "JSONSchema": true,
-    "ParseResult": true,
-    "Parser": true,
-    "Pretty": true,
-    "Schema": true,
-    "TreeFormatter": true
-  }
+  "files.insertFinalNewline": true
 }

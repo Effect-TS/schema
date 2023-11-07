@@ -169,7 +169,7 @@ The `Forbidden` variant of the `ParseError` type represents an error that occurs
 
 ```ts
 export interface Forbidden {
-  readonly _tag: 'Forbidden'
+  readonly _tag: "Forbidden"
 }
 ```
 
@@ -186,7 +186,7 @@ that a specific element in an array did not match the expected type or value.
 
 ```ts
 export interface Index {
-  readonly _tag: 'Index'
+  readonly _tag: "Index"
   readonly index: number
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
@@ -206,7 +206,7 @@ which indicates that an unexpected key was found in the object being decoded.
 
 ```ts
 export interface Key {
-  readonly _tag: 'Key'
+  readonly _tag: "Key"
   readonly key: PropertyKey
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
@@ -222,7 +222,7 @@ Error that occurs when a required key or index is missing.
 
 ```ts
 export interface Missing {
-  readonly _tag: 'Missing'
+  readonly _tag: "Missing"
 }
 ```
 
@@ -252,7 +252,7 @@ is a number, a `Type` decode error would be returned.
 
 ```ts
 export interface Type {
-  readonly _tag: 'Type'
+  readonly _tag: "Type"
   readonly expected: AST.AST
   readonly actual: unknown
   readonly message: Option.Option<string>
@@ -269,7 +269,7 @@ Error that occurs when an unexpected key or index is present.
 
 ```ts
 export interface Unexpected {
-  readonly _tag: 'Unexpected'
+  readonly _tag: "Unexpected"
   readonly actual: unknown
 }
 ```
@@ -284,7 +284,7 @@ Error that occurs when a member in a union has an error.
 
 ```ts
 export interface UnionMember {
-  readonly _tag: 'UnionMember'
+  readonly _tag: "UnionMember"
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 ```
@@ -365,7 +365,7 @@ Added in v1.0.0
 
 ```ts
 export interface ParseError {
-  readonly _tag: 'ParseError'
+  readonly _tag: "ParseError"
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 ```

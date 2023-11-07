@@ -433,7 +433,7 @@ export declare const either: <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
 ) => Schema<
-  { readonly _tag: 'Left'; readonly left: IE } | { readonly _tag: 'Right'; readonly right: IA },
+  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
   Either.Either<E, A>
 >
 ```
@@ -462,7 +462,7 @@ Added in v1.0.0
 ```ts
 export declare const option: <I, A>(
   value: Schema<I, A>
-) => Schema<{ readonly _tag: 'None' } | { readonly _tag: 'Some'; readonly value: I }, Option.Option<A>>
+) => Schema<{ readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I }, Option.Option<A>>
 ```
 
 Added in v1.0.0
@@ -626,7 +626,7 @@ Added in v1.0.0
 
 ```ts
 export declare const annotations: (
-  annotations: AST.Annotated['annotations']
+  annotations: AST.Annotated["annotations"]
 ) => <I, A>(self: Schema<I, A>) => Schema<I, A>
 ```
 
@@ -1033,7 +1033,7 @@ Added in v1.0.0
 export declare const Class: <Self>() => <Fields extends StructFields>(
   fields: Fields
 ) => [unknown] extends [Self]
-  ? 'Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`'
+  ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
   : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
 ```
 
@@ -1052,7 +1052,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
   readonly extend: <Extended>() => <FieldsB extends StructFields>(
     fields: FieldsB
   ) => [unknown] extends [Extended]
-    ? MissingSelfGeneric<'Base.extend'>
+    ? MissingSelfGeneric<"Base.extend">
     : Class<
         Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
         Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
@@ -1065,7 +1065,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     decode: (input: A) => ParseResult.ParseResult<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
     encode: (input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>) => ParseResult.ParseResult<A>
   ) => [unknown] extends [Transformed]
-    ? MissingSelfGeneric<'Base.transform'>
+    ? MissingSelfGeneric<"Base.transform">
     : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 
   readonly transformFrom: <Transformed>() => <FieldsB extends StructFields>(
@@ -1073,7 +1073,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     decode: (input: I) => ParseResult.ParseResult<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
     encode: (input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>) => ParseResult.ParseResult<I>
   ) => [unknown] extends [Transformed]
-    ? MissingSelfGeneric<'Base.transformFrom'>
+    ? MissingSelfGeneric<"Base.transformFrom">
     : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 }
 ```
@@ -1102,32 +1102,34 @@ but rather maps to another schema, for example when you want to add a discrimina
 
 ```ts
 export declare const attachPropertySignature: {
-  <K extends PropertyKey, V extends AST.LiteralValue>(key: K, value: V): <I, A extends object>(
-    schema: Schema<I, A>
-  ) => Schema<I, Simplify<A & { readonly [k in K]: V }>>
-  <I, A, K extends PropertyKey, V extends AST.LiteralValue>(schema: Schema<I, A>, key: K, value: V): Schema<
-    I,
-    Simplify<A & { readonly [k in K]: V }>
-  >
+  <K extends PropertyKey, V extends AST.LiteralValue>(
+    key: K,
+    value: V
+  ): <I, A extends object>(schema: Schema<I, A>) => Schema<I, Simplify<A & { readonly [k in K]: V }>>
+  <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
+    schema: Schema<I, A>,
+    key: K,
+    value: V
+  ): Schema<I, Simplify<A & { readonly [k in K]: V }>>
 }
 ```
 
 **Example**
 
 ```ts
-import * as S from '@effect/schema/Schema'
-import { pipe } from 'effect/Function'
+import * as S from "@effect/schema/Schema"
+import { pipe } from "effect/Function"
 
 const Circle = S.struct({ radius: S.number })
 const Square = S.struct({ sideLength: S.number })
 const Shape = S.union(
-  Circle.pipe(S.attachPropertySignature('kind', 'circle')),
-  Square.pipe(S.attachPropertySignature('kind', 'square'))
+  Circle.pipe(S.attachPropertySignature("kind", "circle")),
+  Square.pipe(S.attachPropertySignature("kind", "square"))
 )
 
 assert.deepStrictEqual(S.decodeSync(Shape)({ radius: 10 }), {
-  kind: 'circle',
-  radius: 10,
+  kind: "circle",
+  radius: 10
 })
 ```
 
@@ -1153,9 +1155,9 @@ export declare const brand: <B extends string | symbol, A>(
 **Example**
 
 ```ts
-import * as Schema from '@effect/schema/Schema'
+import * as Schema from "@effect/schema/Schema"
 
-const Int = Schema.number.pipe(Schema.int(), Schema.brand('Int'))
+const Int = Schema.number.pipe(Schema.int(), Schema.brand("Int"))
 type Int = Schema.Schema.To<typeof Int> // number & Brand<"Int">
 ```
 
@@ -1233,7 +1235,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotated['annotations']) => Schema<I, A>
+export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotated["annotations"]) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -1488,7 +1490,7 @@ export declare const declare: (
     isDecoding: boolean,
     ...typeParameters: ReadonlyArray<Schema<any>>
   ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<any>,
-  annotations?: AST.Annotated['annotations']
+  annotations?: AST.Annotated["annotations"]
 ) => Schema<any>
 ```
 
@@ -1571,7 +1573,7 @@ Added in v1.0.0
 ```ts
 export declare const uniqueSymbol: <S extends symbol>(
   symbol: S,
-  annotations?: AST.Annotated['annotations']
+  annotations?: AST.Annotated["annotations"]
 ) => Schema<S, S>
 ```
 
@@ -1842,7 +1844,7 @@ export declare const JsonNumber: Schema<number, number>
 **Example**
 
 ```ts
-import * as S from '@effect/schema/Schema'
+import * as S from "@effect/schema/Schema"
 
 const is = S.is(S.JsonNumber)
 
@@ -3008,7 +3010,7 @@ Added in v1.0.0
 
 ```ts
 export type Join<T> = T extends [infer Head, ...infer Tail]
-  ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? '' : Join<Tail>}`
+  ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? "" : Join<Tail>}`
   : never
 ```
 
@@ -3080,7 +3082,7 @@ Added in v1.0.0
 
 ```ts
 export type From<S extends { readonly [TypeId]: { readonly From: (..._: any) => any } }> = Parameters<
-  S[TypeId]['From']
+  S[TypeId]["From"]
 >[0]
 ```
 
@@ -3091,7 +3093,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = Parameters<S[TypeId]['To']>[0]
+export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = Parameters<S[TypeId]["To"]>[0]
 ```
 
 Added in v1.0.0

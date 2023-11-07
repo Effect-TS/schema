@@ -8,7 +8,7 @@ import * as Equivalence from "effect/Equivalence"
 import * as Option from "effect/Option"
 import * as fc from "fast-check"
 import { describe, expect, it } from "vitest"
-import * as E from "../src/Equivalence"
+import * as E from "@effect/schema/Equivalence"
 
 /**
  * Tests that the generated Eq is a valid Eq

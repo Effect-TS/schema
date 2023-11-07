@@ -4,8 +4,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module",
-    project: "./tsconfig.eslint.json"
+    sourceType: "module"
   },
   settings: {
     "import/parsers": {

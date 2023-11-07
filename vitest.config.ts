@@ -1,14 +1,10 @@
 /// <reference types="vitest" />
-import path from "path"
+import path from "node:path"
 import { defineConfig } from "vite"
 
 export default defineConfig({
   test: {
     include: ["./test/**/*.test.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-    exclude: [],
-    coverage: {
-      provider: "v8"
-    }
   },
   resolve: {
     alias: {
