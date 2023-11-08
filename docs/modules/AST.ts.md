@@ -519,8 +519,8 @@ Added in v1.0.0
 export declare const createDeclaration: (
   typeParameters: ReadonlyArray<AST>,
   type: AST,
-  decode: Declaration['decode'],
-  annotations?: Annotated['annotations']
+  decode: Declaration["decode"],
+  annotations?: Annotated["annotations"]
 ) => Declaration
 ```
 
@@ -533,7 +533,7 @@ Added in v1.0.0
 ```ts
 export declare const createEnums: (
   enums: ReadonlyArray<readonly [string, string | number]>,
-  annotations?: Annotated['annotations']
+  annotations?: Annotated["annotations"]
 ) => Enums
 ```
 
@@ -545,8 +545,8 @@ Added in v1.0.0
 
 ```ts
 export declare const createFinalPropertySignatureTransformation: (
-  decode: FinalPropertySignatureTransformation['decode'],
-  encode: FinalPropertySignatureTransformation['encode']
+  decode: FinalPropertySignatureTransformation["decode"],
+  encode: FinalPropertySignatureTransformation["encode"]
 ) => FinalPropertySignatureTransformation
 ```
 
@@ -558,8 +558,8 @@ Added in v1.0.0
 
 ```ts
 export declare const createFinalTransformation: (
-  decode: FinalTransformation['decode'],
-  encode: FinalTransformation['encode']
+  decode: FinalTransformation["decode"],
+  encode: FinalTransformation["encode"]
 ) => FinalTransformation
 ```
 
@@ -570,7 +570,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createLazy: (f: () => AST, annotations?: Annotated['annotations']) => Lazy
+export declare const createLazy: (f: () => AST, annotations?: Annotated["annotations"]) => Lazy
 ```
 
 Added in v1.0.0
@@ -580,7 +580,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createLiteral: (literal: LiteralValue, annotations?: Annotated['annotations']) => Literal
+export declare const createLiteral: (literal: LiteralValue, annotations?: Annotated["annotations"]) => Literal
 ```
 
 Added in v1.0.0
@@ -606,8 +606,8 @@ Added in v1.0.0
 ```ts
 export declare const createRefinement: <From extends AST>(
   from: From,
-  filter: Refinement['filter'],
-  annotations?: Annotated['annotations']
+  filter: Refinement["filter"],
+  annotations?: Annotated["annotations"]
 ) => Transform | Refinement<From>
 ```
 
@@ -621,7 +621,7 @@ Added in v1.0.0
 export declare const createTemplateLiteral: (
   head: string,
   spans: ReadonlyArray<TemplateLiteralSpan>,
-  annotations?: Annotated['annotations']
+  annotations?: Annotated["annotations"]
 ) => TemplateLiteral | Literal
 ```
 
@@ -636,7 +636,7 @@ export declare const createTuple: (
   elements: ReadonlyArray<Element>,
   rest: Option.Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>,
   isReadonly: boolean,
-  annotations?: Annotated['annotations']
+  annotations?: Annotated["annotations"]
 ) => Tuple
 ```
 
@@ -650,7 +650,7 @@ Added in v1.0.0
 export declare const createTypeLiteral: (
   propertySignatures: ReadonlyArray<PropertySignature>,
   indexSignatures: ReadonlyArray<IndexSignature>,
-  annotations?: Annotated['annotations']
+  annotations?: Annotated["annotations"]
 ) => TypeLiteral
 ```
 
@@ -662,7 +662,7 @@ Added in v1.0.0
 
 ```ts
 export declare const createTypeLiteralTransformation: (
-  propertySignatureTransformations: TypeLiteralTransformation['propertySignatureTransformations']
+  propertySignatureTransformations: TypeLiteralTransformation["propertySignatureTransformations"]
 ) => TypeLiteralTransformation
 ```
 
@@ -673,7 +673,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createUnion: (candidates: ReadonlyArray<AST>, annotations?: Annotated['annotations']) => AST
+export declare const createUnion: (candidates: ReadonlyArray<AST>, annotations?: Annotated["annotations"]) => AST
 ```
 
 Added in v1.0.0
@@ -683,7 +683,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const createUniqueSymbol: (symbol: symbol, annotations?: Annotated['annotations']) => UniqueSymbol
+export declare const createUniqueSymbol: (symbol: symbol, annotations?: Annotated["annotations"]) => UniqueSymbol
 ```
 
 Added in v1.0.0
@@ -1076,7 +1076,7 @@ Added in v1.0.0
 
 ```ts
 export interface AnyKeyword extends Annotated {
-  readonly _tag: 'AnyKeyword'
+  readonly _tag: "AnyKeyword"
 }
 ```
 
@@ -1088,7 +1088,7 @@ Added in v1.0.0
 
 ```ts
 export interface BigIntKeyword extends Annotated {
-  readonly _tag: 'BigIntKeyword'
+  readonly _tag: "BigIntKeyword"
 }
 ```
 
@@ -1100,7 +1100,7 @@ Added in v1.0.0
 
 ```ts
 export interface BooleanKeyword extends Annotated {
-  readonly _tag: 'BooleanKeyword'
+  readonly _tag: "BooleanKeyword"
 }
 ```
 
@@ -1112,7 +1112,7 @@ Added in v1.0.0
 
 ```ts
 export interface ComposeTransformation {
-  readonly _tag: 'ComposeTransformation'
+  readonly _tag: "ComposeTransformation"
 }
 ```
 
@@ -1124,7 +1124,7 @@ Added in v1.0.0
 
 ```ts
 export interface Declaration extends Annotated {
-  readonly _tag: 'Declaration'
+  readonly _tag: "Declaration"
   readonly typeParameters: ReadonlyArray<AST>
   readonly type: AST
   readonly decode: (
@@ -1142,7 +1142,7 @@ Added in v1.0.0
 
 ```ts
 export interface Enums extends Annotated {
-  readonly _tag: 'Enums'
+  readonly _tag: "Enums"
   readonly enums: ReadonlyArray<readonly [string, string | number]>
 }
 ```
@@ -1167,7 +1167,7 @@ The semantic of `encode` is:
 
 ```ts
 export interface FinalPropertySignatureTransformation {
-  readonly _tag: 'FinalPropertySignatureTransformation'
+  readonly _tag: "FinalPropertySignatureTransformation"
   readonly decode: (o: Option.Option<any>) => Option.Option<any>
   readonly encode: (o: Option.Option<any>) => Option.Option<any>
 }
@@ -1181,7 +1181,7 @@ Added in v1.0.0
 
 ```ts
 export interface FinalTransformation {
-  readonly _tag: 'FinalTransformation'
+  readonly _tag: "FinalTransformation"
   readonly decode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
   readonly encode: (input: any, options: ParseOptions, self: AST) => ParseResult.ParseResult<any>
 }
@@ -1195,7 +1195,7 @@ Added in v1.0.0
 
 ```ts
 export interface Lazy extends Annotated {
-  readonly _tag: 'Lazy'
+  readonly _tag: "Lazy"
   readonly f: () => AST
 }
 ```
@@ -1208,7 +1208,7 @@ Added in v1.0.0
 
 ```ts
 export interface Literal extends Annotated {
-  readonly _tag: 'Literal'
+  readonly _tag: "Literal"
   readonly literal: LiteralValue
 }
 ```
@@ -1231,7 +1231,7 @@ Added in v1.0.0
 
 ```ts
 export interface NeverKeyword extends Annotated {
-  readonly _tag: 'NeverKeyword'
+  readonly _tag: "NeverKeyword"
 }
 ```
 
@@ -1243,7 +1243,7 @@ Added in v1.0.0
 
 ```ts
 export interface NumberKeyword extends Annotated {
-  readonly _tag: 'NumberKeyword'
+  readonly _tag: "NumberKeyword"
 }
 ```
 
@@ -1255,7 +1255,7 @@ Added in v1.0.0
 
 ```ts
 export interface ObjectKeyword extends Annotated {
-  readonly _tag: 'ObjectKeyword'
+  readonly _tag: "ObjectKeyword"
 }
 ```
 
@@ -1268,9 +1268,9 @@ Added in v1.0.0
 ```ts
 export interface ParseOptions {
   /** default "first" */
-  readonly errors?: 'first' | 'all'
+  readonly errors?: "first" | "all"
   /** default "ignore" */
-  readonly onExcessProperty?: 'ignore' | 'error'
+  readonly onExcessProperty?: "ignore" | "error"
 }
 ```
 
@@ -1306,7 +1306,7 @@ Added in v1.0.0
 
 ```ts
 export interface Refinement<From = AST> extends Annotated {
-  readonly _tag: 'Refinement'
+  readonly _tag: "Refinement"
   readonly from: From
   readonly filter: (input: any, options: ParseOptions, self: AST) => Option.Option<ParseResult.ParseError>
 }
@@ -1320,7 +1320,7 @@ Added in v1.0.0
 
 ```ts
 export interface StringKeyword extends Annotated {
-  readonly _tag: 'StringKeyword'
+  readonly _tag: "StringKeyword"
 }
 ```
 
@@ -1332,7 +1332,7 @@ Added in v1.0.0
 
 ```ts
 export interface SymbolKeyword extends Annotated {
-  readonly _tag: 'SymbolKeyword'
+  readonly _tag: "SymbolKeyword"
 }
 ```
 
@@ -1344,7 +1344,7 @@ Added in v1.0.0
 
 ```ts
 export interface TemplateLiteral extends Annotated {
-  readonly _tag: 'TemplateLiteral'
+  readonly _tag: "TemplateLiteral"
   readonly head: string
   readonly spans: ReadonlyArray.NonEmptyReadonlyArray<TemplateLiteralSpan>
 }
@@ -1358,7 +1358,7 @@ Added in v1.0.0
 
 ```ts
 export interface Transform extends Annotated {
-  readonly _tag: 'Transform'
+  readonly _tag: "Transform"
   readonly from: AST
   readonly to: AST
   readonly transformation: Transformation
@@ -1383,7 +1383,7 @@ Added in v1.0.0
 
 ```ts
 export interface Tuple extends Annotated {
-  readonly _tag: 'Tuple'
+  readonly _tag: "Tuple"
   readonly elements: ReadonlyArray<Element>
   readonly rest: Option.Option<ReadonlyArray.NonEmptyReadonlyArray<AST>>
   readonly isReadonly: boolean
@@ -1398,7 +1398,7 @@ Added in v1.0.0
 
 ```ts
 export interface TypeLiteral extends Annotated {
-  readonly _tag: 'TypeLiteral'
+  readonly _tag: "TypeLiteral"
   readonly propertySignatures: ReadonlyArray<PropertySignature>
   readonly indexSignatures: ReadonlyArray<IndexSignature>
 }
@@ -1412,7 +1412,7 @@ Added in v1.0.0
 
 ```ts
 export interface TypeLiteralTransformation {
-  readonly _tag: 'TypeLiteralTransformation'
+  readonly _tag: "TypeLiteralTransformation"
   readonly propertySignatureTransformations: ReadonlyArray<PropertySignatureTransform>
 }
 ```
@@ -1425,7 +1425,7 @@ Added in v1.0.0
 
 ```ts
 export interface UndefinedKeyword extends Annotated {
-  readonly _tag: 'UndefinedKeyword'
+  readonly _tag: "UndefinedKeyword"
 }
 ```
 
@@ -1437,7 +1437,7 @@ Added in v1.0.0
 
 ```ts
 export interface Union extends Annotated {
-  readonly _tag: 'Union'
+  readonly _tag: "Union"
   readonly types: Members<AST>
 }
 ```
@@ -1450,7 +1450,7 @@ Added in v1.0.0
 
 ```ts
 export interface UniqueSymbol extends Annotated {
-  readonly _tag: 'UniqueSymbol'
+  readonly _tag: "UniqueSymbol"
   readonly symbol: symbol
 }
 ```
@@ -1463,7 +1463,7 @@ Added in v1.0.0
 
 ```ts
 export interface UnknownKeyword extends Annotated {
-  readonly _tag: 'UnknownKeyword'
+  readonly _tag: "UnknownKeyword"
 }
 ```
 
@@ -1475,7 +1475,7 @@ Added in v1.0.0
 
 ```ts
 export interface VoidKeyword extends Annotated {
-  readonly _tag: 'VoidKeyword'
+  readonly _tag: "VoidKeyword"
 }
 ```
 
@@ -1490,7 +1490,7 @@ export declare const createTransform: (
   from: AST,
   to: AST,
   transformation: Transformation,
-  annotations?: Annotated['annotations']
+  annotations?: Annotated["annotations"]
 ) => Transform
 ```
 
@@ -1541,7 +1541,7 @@ Added in v1.0.0
 
 ```ts
 export type Match<A> = {
-  [K in AST['_tag']]: (ast: Extract<AST, { _tag: K }>, compile: Compiler<A>) => A
+  [K in AST["_tag"]]: (ast: Extract<AST, { _tag: K }>, compile: Compiler<A>) => A
 }
 ```
 
@@ -1652,7 +1652,7 @@ export declare const createPropertySignature: (
   type: AST,
   isOptional: boolean,
   isReadonly: boolean,
-  annotations?: Annotated['annotations']
+  annotations?: Annotated["annotations"]
 ) => PropertySignature
 ```
 
@@ -1729,7 +1729,7 @@ Adds a group of annotations, potentially overwriting existing annotations.
 **Signature**
 
 ```ts
-export declare const mergeAnnotations: (ast: AST, annotations: Annotated['annotations']) => AST
+export declare const mergeAnnotations: (ast: AST, annotations: Annotated["annotations"]) => AST
 ```
 
 Added in v1.0.0

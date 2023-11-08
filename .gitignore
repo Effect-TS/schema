@@ -1,24 +1,8 @@
 coverage/
 *.tsbuildinfo
 node_modules/
-.ultra.cache.json
 .DS_Store
 tmp/
 build/
 dist/
 .direnv/
-
-# files
-/src/tsconfig.json
-/dist
-/internal
-/AST
-/Arbitrary
-/ArrayFormatter
-/Equivalence
-/JSONSchema
-/ParseResult
-/Parser
-/Pretty
-/Schema
-/TreeFormatter

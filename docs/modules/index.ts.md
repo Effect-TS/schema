@@ -13,137 +13,137 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [exports](#exports)
-  - [From "@effect/schema/AST"](#from-effectschemaast)
-  - [From "@effect/schema/Arbitrary"](#from-effectschemaarbitrary)
-  - [From "@effect/schema/ArrayFormatter"](#from-effectschemaarrayformatter)
-  - [From "@effect/schema/Equivalence"](#from-effectschemaequivalence)
-  - [From "@effect/schema/JSONSchema"](#from-effectschemajsonschema)
-  - [From "@effect/schema/ParseResult"](#from-effectschemaparseresult)
-  - [From "@effect/schema/Parser"](#from-effectschemaparser)
-  - [From "@effect/schema/Pretty"](#from-effectschemapretty)
-  - [From "@effect/schema/Schema"](#from-effectschemaschema)
-  - [From "@effect/schema/TreeFormatter"](#from-effectschematreeformatter)
+  - [From "./AST.js"](#from-astjs)
+  - [From "./Arbitrary.js"](#from-arbitraryjs)
+  - [From "./ArrayFormatter.js"](#from-arrayformatterjs)
+  - [From "./Equivalence.js"](#from-equivalencejs)
+  - [From "./JSONSchema.js"](#from-jsonschemajs)
+  - [From "./ParseResult.js"](#from-parseresultjs)
+  - [From "./Parser.js"](#from-parserjs)
+  - [From "./Pretty.js"](#from-prettyjs)
+  - [From "./Schema.js"](#from-schemajs)
+  - [From "./TreeFormatter.js"](#from-treeformatterjs)
 
 ---
 
 # exports
 
-## From "@effect/schema/AST"
+## From "./AST.js"
 
-Re-exports all named exports from the "@effect/schema/AST" module as `AST`.
+Re-exports all named exports from the "./AST.js" module as `AST`.
 
 **Signature**
 
 ```ts
-export * as AST from '@effect/schema/AST'
+export * as AST from "./AST.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/Arbitrary"
+## From "./Arbitrary.js"
 
-Re-exports all named exports from the "@effect/schema/Arbitrary" module as `Arbitrary`.
+Re-exports all named exports from the "./Arbitrary.js" module as `Arbitrary`.
 
 **Signature**
 
 ```ts
-export * as Arbitrary from '@effect/schema/Arbitrary'
+export * as Arbitrary from "./Arbitrary.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/ArrayFormatter"
+## From "./ArrayFormatter.js"
 
-Re-exports all named exports from the "@effect/schema/ArrayFormatter" module as `ArrayFormatter`.
+Re-exports all named exports from the "./ArrayFormatter.js" module as `ArrayFormatter`.
 
 **Signature**
 
 ```ts
-export * as ArrayFormatter from '@effect/schema/ArrayFormatter'
+export * as ArrayFormatter from "./ArrayFormatter.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/Equivalence"
+## From "./Equivalence.js"
 
-Re-exports all named exports from the "@effect/schema/Equivalence" module as `Equivalence`.
+Re-exports all named exports from the "./Equivalence.js" module as `Equivalence`.
 
 **Signature**
 
 ```ts
-export * as Equivalence from '@effect/schema/Equivalence'
+export * as Equivalence from "./Equivalence.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/JSONSchema"
+## From "./JSONSchema.js"
 
-Re-exports all named exports from the "@effect/schema/JSONSchema" module as `JSONSchema`.
+Re-exports all named exports from the "./JSONSchema.js" module as `JSONSchema`.
 
 **Signature**
 
 ```ts
-export * as JSONSchema from '@effect/schema/JSONSchema'
+export * as JSONSchema from "./JSONSchema.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/ParseResult"
+## From "./ParseResult.js"
 
-Re-exports all named exports from the "@effect/schema/ParseResult" module as `ParseResult`.
+Re-exports all named exports from the "./ParseResult.js" module as `ParseResult`.
 
 **Signature**
 
 ```ts
-export * as ParseResult from '@effect/schema/ParseResult'
+export * as ParseResult from "./ParseResult.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/Parser"
+## From "./Parser.js"
 
-Re-exports all named exports from the "@effect/schema/Parser" module as `Parser`.
+Re-exports all named exports from the "./Parser.js" module as `Parser`.
 
 **Signature**
 
 ```ts
-export * as Parser from '@effect/schema/Parser'
+export * as Parser from "./Parser.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/Pretty"
+## From "./Pretty.js"
 
-Re-exports all named exports from the "@effect/schema/Pretty" module as `Pretty`.
+Re-exports all named exports from the "./Pretty.js" module as `Pretty`.
 
 **Signature**
 
 ```ts
-export * as Pretty from '@effect/schema/Pretty'
+export * as Pretty from "./Pretty.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/Schema"
+## From "./Schema.js"
 
-Re-exports all named exports from the "@effect/schema/Schema" module as `Schema`.
+Re-exports all named exports from the "./Schema.js" module as `Schema`.
 
 **Signature**
 
 ```ts
-export * as Schema from '@effect/schema/Schema'
+export * as Schema from "./Schema.js"
 ```
 
 Added in v1.0.0
 
-## From "@effect/schema/TreeFormatter"
+## From "./TreeFormatter.js"
 
-Re-exports all named exports from the "@effect/schema/TreeFormatter" module as `TreeFormatter`.
+Re-exports all named exports from the "./TreeFormatter.js" module as `TreeFormatter`.
 
 **Signature**
 
 ```ts
-export * as TreeFormatter from '@effect/schema/TreeFormatter'
+export * as TreeFormatter from "./TreeFormatter.js"
 ```
 
 Added in v1.0.0

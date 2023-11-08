@@ -1,11 +1,10 @@
 /* eslint-disable no-undef */
 module.exports = {
-  ignorePatterns: ["build", "dist", "dtslint", "dev", "*.mjs", "docs", "*.md"],
+  ignorePatterns: ["dist", "build", "dtslint", "*.mjs", "docs", "*.md"],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: "module",
-    project: "./tsconfig.eslint.json"
+    sourceType: "module"
   },
   settings: {
     "import/parsers": {
@@ -23,7 +22,13 @@ module.exports = {
     "plugin:@typescript-eslint/recommended",
     "plugin:@effect/recommended"
   ],
-  plugins: ["deprecation", "import", "sort-destructure-keys", "simple-import-sort", "codegen"],
+  plugins: [
+    "deprecation",
+    "import",
+    "sort-destructure-keys",
+    "simple-import-sort",
+    "codegen"
+  ],
   rules: {
     "codegen/codegen": "error",
     "no-fallthrough": "off",
@@ -42,19 +47,24 @@ module.exports = {
     "import/order": "off",
     "simple-import-sort/imports": "off",
     "sort-destructure-keys/sort-destructure-keys": "error",
-    "deprecation/deprecation": "error",
-    "@typescript-eslint/array-type": ["warn", { "default": "generic", "readonly": "generic" }],
-    "@typescript-eslint/prefer-readonly": "warn",
+    "deprecation/deprecation": "off",
+    "@typescript-eslint/array-type": [
+      "warn",
+      { default: "generic", readonly: "generic" }
+    ],
     "@typescript-eslint/member-delimiter-style": 0,
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/ban-types": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/consistent-type-imports": "warn",
-    "@typescript-eslint/no-unused-vars": ["error", {
-      "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^_"
-    }],
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        argsIgnorePattern: "^_",
+        varsIgnorePattern: "^_"
+      }
+    ],
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
@@ -67,12 +77,12 @@ module.exports = {
       "error",
       {
         config: {
-          "indentWidth": 2,
-          "lineWidth": 100,
-          "semiColons": "asi",
-          "quoteStyle": "alwaysDouble",
-          "trailingCommas": "never",
-          "operatorPosition": "maintain",
+          indentWidth: 2,
+          lineWidth: 100,
+          semiColons: "asi",
+          quoteStyle: "alwaysDouble",
+          trailingCommas: "never",
+          operatorPosition: "maintain",
           "arrowFunction.useParentheses": "force"
         }
       }
