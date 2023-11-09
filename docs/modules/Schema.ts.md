@@ -215,12 +215,15 @@ Added in v1.0.0
   - [pattern](#pattern)
   - [startsWith](#startswith)
   - [trimmed](#trimmed-1)
+  - [uppercased](#uppercased)
 - [string transformations](#string-transformations)
   - [Lowercase](#lowercase)
+  - [Uppercase](#uppercase)
   - [lowercase](#lowercase-1)
   - [parseJson](#parsejson-1)
   - [split](#split)
   - [trim](#trim-1)
+  - [uppercase](#uppercase-1)
 - [symbol](#symbol)
   - [TypeId (type alias)](#typeid-type-alias)
 - [symbol constructors](#symbol-constructors)
@@ -259,6 +262,7 @@ Added in v1.0.0
   - [TrimmedTypeId](#trimmedtypeid)
   - [ULIDTypeId](#ulidtypeid)
   - [UUIDTypeId](#uuidtypeid)
+  - [UppercasedTypeId](#uppercasedtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
   - [DocAnnotations (interface)](#docannotations-interface)
@@ -2505,6 +2509,23 @@ export declare const trimmed: <A extends string>(
 
 Added in v1.0.0
 
+## uppercased
+
+Verifies that a string is uppercased
+
+Note. This combinator does not make any transformations, it only validates.
+If what you were looking for was a combinator to uppercase strings, then check out the `uppercase` combinator.
+
+**Signature**
+
+```ts
+export declare const uppercased: <A extends string>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
 # string transformations
 
 ## Lowercase
@@ -2515,6 +2536,18 @@ This combinator converts a string to lowercase
 
 ```ts
 export declare const Lowercase: Schema<string, string>
+```
+
+Added in v1.0.0
+
+## Uppercase
+
+This combinator converts a string to uppercase
+
+**Signature**
+
+```ts
+export declare const Uppercase: Schema<string, string>
 ```
 
 Added in v1.0.0
@@ -2574,6 +2607,18 @@ This combinator allows removing whitespaces from the beginning and end of a stri
 
 ```ts
 export declare const trim: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## uppercase
+
+This combinator converts a string to uppercase
+
+**Signature**
+
+```ts
+export declare const uppercase: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -2926,6 +2971,16 @@ Added in v1.0.0
 
 ```ts
 export declare const UUIDTypeId: typeof UUIDTypeId
+```
+
+Added in v1.0.0
+
+## UppercasedTypeId
+
+**Signature**
+
+```ts
+export declare const UppercasedTypeId: typeof UppercasedTypeId
 ```
 
 Added in v1.0.0
