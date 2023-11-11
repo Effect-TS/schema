@@ -1106,11 +1106,11 @@ but rather maps to another schema, for example when you want to add a discrimina
 
 ```ts
 export declare const attachPropertySignature: {
-  <K extends PropertyKey, V extends AST.LiteralValue>(
+  <K extends PropertyKey, V extends symbol | AST.LiteralValue>(
     key: K,
     value: V
   ): <I, A extends object>(schema: Schema<I, A>) => Schema<I, Simplify<A & { readonly [k in K]: V }>>
-  <I, A, K extends PropertyKey, V extends AST.LiteralValue>(
+  <I, A, K extends PropertyKey, V extends symbol | AST.LiteralValue>(
     schema: Schema<I, A>,
     key: K,
     value: V
