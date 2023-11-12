@@ -23,7 +23,7 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 | Operation       | Description                                                                                                     |
 | --------------- | --------------------------------------------------------------------------------------------------------------- |
 | Parsing         | Convert from `unknown` value to output type `A`.                                                                |
-| Decoding        | Transforming data from an input type `I` to an output type `A`.                                                |
+| Decoding        | Transforming data from an input type `I` to an output type `A`.                                                 |
 | Encoding        | Converting data from an output type `A` back to an input type `I`.                                              |
 | Asserting       | Verifying that a value adheres to the schema's output type `A`.                                                 |
 | Arbitraries     | Generate arbitraries for [fast-check](https://github.com/dubzzz/fast-check) testing.                            |
@@ -108,7 +108,7 @@ const schema: Schema.Schema<{
 }>
 */
 const schema = Schema.struct({
-  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty()))
+  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty())),
 });
 
 Schema.decodeSync(schema)({ myfield: undefined }); // Error: Type 'undefined' is not assignable to type 'string'.ts(2379)
@@ -131,7 +131,7 @@ const schema: Schema.Schema<{
 }>
 */
 const schema = Schema.struct({
-  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty()))
+  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty())),
 });
 
 Schema.decodeSync(schema)({ myfield: undefined }); // No type error, but a decoding failure occurs
@@ -177,7 +177,7 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 ```
 
@@ -220,7 +220,7 @@ import * as Either from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 const parsePerson = S.parseEither(Person);
@@ -298,7 +298,7 @@ const PersonId = S.number;
 const Person = S.struct({
   id: PersonId,
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 const asyncSchema = S.transformOrFail(
@@ -355,14 +355,14 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 console.log(
   S.parseSync(Person)({
     name: "Bob",
     age: 40,
-    email: "bob@example.com"
+    email: "bob@example.com",
   })
 );
 /*
@@ -373,7 +373,7 @@ S.parseSync(Person)(
   {
     name: "Bob",
     age: 40,
-    email: "bob@example.com"
+    email: "bob@example.com",
   },
   { onExcessProperty: "error" }
 );
@@ -396,14 +396,14 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 S.parseSync(Person)(
   {
     name: "Bob",
     age: "abc",
-    email: "bob@example.com"
+    email: "bob@example.com",
   },
   { errors: "all", onExcessProperty: "error" }
 );
@@ -430,7 +430,7 @@ const Age = S.NumberFromString;
 
 const Person = S.struct({
   name: S.string,
-  age: Age
+  age: Age,
 });
 
 const encoded = S.encodeEither(Person)({ name: "Alice", age: 30 });
@@ -458,7 +458,7 @@ import * as E from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 const result = S.parseEither(Person)({});
@@ -495,7 +495,7 @@ import * as E from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 const result = S.parseEither(Person)(
@@ -533,7 +533,7 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 // const isPerson: (u: unknown) => u is Person
@@ -551,7 +551,7 @@ import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 // const assertsPerson: (input: unknown, options?: ParseOptions) => asserts input is { readonly name: string; readonly age: number; }
@@ -586,7 +586,7 @@ import * as fc from "fast-check";
 
 const Person = S.struct({
   name: S.string,
-  age: S.string.pipe(S.numberFromString, S.int())
+  age: S.string.pipe(S.numberFromString, S.int()),
 });
 
 // Arbitrary for the To type
@@ -621,7 +621,7 @@ import * as P from "@effect/schema/Pretty";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 const PersonPretty = P.to(Person);
@@ -640,7 +640,7 @@ import * as JSONSchema from "@effect/schema/JSONSchema";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 const jsonSchema = JSONSchema.to(Person);
@@ -685,7 +685,7 @@ const Name = S.string.pipe(S.identifier("Name"));
 const Age = S.number.pipe(S.identifier("Age"));
 const Person = S.struct({
   name: Name,
-  age: Age
+  age: Age,
 });
 
 const jsonSchema = JSONSchema.to(Person);
@@ -742,7 +742,7 @@ interface Category {
 const schema: S.Schema<Category> = S.lazy<Category>(() =>
   S.struct({
     name: S.string,
-    categories: S.array(schema)
+    categories: S.array(schema),
   })
 ).pipe(S.identifier("Category"));
 
@@ -795,7 +795,7 @@ import * as Equivalence from "@effect/schema/Equivalence";
 
 const Person = S.struct({
   name: S.string,
-  age: S.number
+  age: S.number,
 });
 
 // $ExpectType Equivalence<{ readonly name: string; readonly age: number; }>
@@ -1023,7 +1023,7 @@ const UserIdSchema = S.string.pipe(S.fromBrand(UserId));
 ```ts
 enum Fruits {
   Apple,
-  Banana
+  Banana,
 }
 
 // $ExpectType Schema<Fruits>
@@ -1095,12 +1095,12 @@ import * as S from "@effect/schema/Schema";
 
 const Circle = S.struct({
   kind: S.literal("circle"),
-  radius: S.number
+  radius: S.number,
 });
 
 const Square = S.struct({
   kind: S.literal("square"),
-  sideLength: S.number
+  sideLength: S.number,
 });
 
 const Shape = S.union(Circle, Square);
@@ -1120,11 +1120,11 @@ If you're working on a TypeScript project and you've defined a simple union to r
 import * as S from "@effect/schema/Schema";
 
 const Circle = S.struct({
-  radius: S.number
+  radius: S.number,
 });
 
 const Square = S.struct({
-  sideLength: S.number
+  sideLength: S.number,
 });
 
 const Shape = S.union(Circle, Square);
@@ -1139,11 +1139,11 @@ import * as S from "@effect/schema/Schema";
 import { pipe } from "effect/Function";
 
 const Circle = S.struct({
-  radius: S.number
+  radius: S.number,
 });
 
 const Square = S.struct({
-  sideLength: S.number
+  sideLength: S.number,
 });
 
 const DiscriminatedShape = S.union(
@@ -1165,12 +1165,12 @@ const DiscriminatedShape = S.union(
 
 expect(S.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
-  radius: 10
+  radius: 10,
 });
 
 expect(S.parseSync(DiscriminatedShape)({ sideLength: 10 })).toEqual({
   kind: "square",
-  sideLength: 10
+  sideLength: 10,
 });
 ```
 
@@ -1191,14 +1191,14 @@ const DiscriminatedShape = S.union(
 // parsing
 expect(S.parseSync(DiscriminatedShape)({ radius: 10 })).toEqual({
   kind: "circle",
-  radius: 10
+  radius: 10,
 });
 
 // encoding
 expect(
   S.encodeSync(DiscriminatedShape)({
     kind: "circle",
-    radius: 10
+    radius: 10,
   })
 ).toEqual({ radius: 10 });
 ```
@@ -1282,7 +1282,7 @@ S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean) });
 ```ts
 S.struct({
   // the use of S.optional should be the last step in the pipeline and not preceeded by other combinators like S.nullable
-  c: S.boolean.pipe(S.optional, S.nullable) // type checker error
+  c: S.boolean.pipe(S.optional, S.nullable), // type checker error
 });
 ```
 
@@ -1290,7 +1290,7 @@ and it must be rewritten like this:
 
 ```ts
 S.struct({
-  c: S.boolean.pipe(S.nullable, S.optional) // ok
+  c: S.boolean.pipe(S.nullable, S.optional), // ok
 });
 ```
 
@@ -1334,6 +1334,24 @@ encode({ a: O.none() }) // {}
 encode({ a: O.some(1) }) // { a: 1 }
 ```
 
+### Renaming Properties
+
+To rename one or more properties, you can utilize the `rename` API:
+
+```ts
+import * as Schema from "@effect/schema/Schema";
+
+// Original Schema
+const originalSchema = Schema.struct({ a: Schema.string, b: Schema.number });
+
+// Renaming the "a" property to "c"
+const renamedSchema = Schema.rename(originalSchema, { a: "c" });
+
+Schema.parseSync(renamedSchema)({ a: "a", b: 1 }); // Output: { c: "a", b: 1 }
+```
+
+In the example above, we have an original schema with properties "a" and "b." Using the `rename` API, we create a new schema where we rename the "a" property to "c." The resulting schema, when used with `Schema.parseSync`, transforms the input object by renaming the specified property.
+
 ## Classes
 
 When working with schemas, you have a choice beyond the `S.struct` constructor. You can leverage the power of classes through the `Class` utility, which comes with its own set of advantages tailored to common use cases.
@@ -1354,7 +1372,7 @@ import * as S from "@effect/schema/Schema";
 // Define your schema by providing the type to `Class` and the desired fields
 class Person extends S.Class<Person>()({
   id: S.number,
-  name: S.string.pipe(S.nonEmpty())
+  name: S.string.pipe(S.nonEmpty()),
 }) {}
 ```
 
@@ -1386,7 +1404,7 @@ import * as S from "@effect/schema/Schema";
 
 class Person extends S.Class<Person>()({
   id: S.number,
-  name: S.string.pipe(S.nonEmpty())
+  name: S.string.pipe(S.nonEmpty()),
 }) {
   get upperName() {
     return this.name.toUpperCase();
@@ -1417,7 +1435,7 @@ In situations where you need to augment your existing class with more fields, th
 ```ts
 // Extend an existing schema `Class` using the `extend` utility
 class PersonWithAge extends Person.extend<PersonWithAge>()({
-  age: S.number
+  age: S.number,
 }) {
   get isAdult() {
     return this.age >= 18;
@@ -1594,7 +1612,7 @@ interface Category {
 const Category: S.Schema<Category> = S.lazy(() =>
   S.struct({
     name: S.string,
-    subcategories: S.array(Category)
+    subcategories: S.array(Category),
   })
 );
 ```
@@ -1617,7 +1635,7 @@ interface Operation {
 const Expression: S.Schema<Expression> = S.lazy(() =>
   S.struct({
     type: S.literal("expression"),
-    value: S.union(S.number, Operation)
+    value: S.union(S.number, Operation),
   })
 );
 
@@ -1626,7 +1644,7 @@ const Operation: S.Schema<Operation> = S.lazy(() =>
     type: S.literal("operation"),
     operator: S.union(S.literal("+"), S.literal("-")),
     left: Expression,
-    right: Expression
+    right: Expression,
   })
 );
 ```
@@ -1733,7 +1751,7 @@ const api = (url: string) =>
         }
         throw new Error(String(res.status));
       }),
-    catch: (e) => new Error(String(e))
+    catch: (e) => new Error(String(e)),
   });
 
 const PeopleId = S.string.pipe(S.brand("PeopleId"));
@@ -1745,7 +1763,7 @@ const PeopleIdFromString = S.transformOrFail(
     Effect.mapBoth(api(`https://swapi.dev/api/people/${s}`), {
       onFailure: (e) =>
         ParseResult.parseError([ParseResult.type(PeopleId.ast, s, e.message)]),
-      onSuccess: () => s
+      onSuccess: () => s,
     }),
   ParseResult.success
 );
@@ -2042,7 +2060,7 @@ S.Schema<{
 const schema = S.data(
   S.struct({
     name: S.string,
-    age: S.number
+    age: S.number,
   })
 );
 
@@ -2082,7 +2100,7 @@ const schema: Schema<{
 */
 const schema = Schema.struct({
   a: Schema.string,
-  b: Schema.optionFromNullable(Schema.number)
+  b: Schema.optionFromNullable(Schema.number),
 });
 
 // parsing
@@ -2182,7 +2200,7 @@ const parse = S.parseSync(schema);
 parse([
   [1, "a"],
   [2, "b"],
-  [3, "c"]
+  [3, "c"],
 ]); // new Map([[1, "a"], [2, "b"], [3, "c"]])
 ```
 
@@ -2195,7 +2213,7 @@ import * as S from "@effect/schema/Schema";
 
 const LongString = S.string.pipe(
   S.filter((s) => s.length >= 10, {
-    message: () => "a string at least 10 characters long"
+    message: () => "a string at least 10 characters long",
   })
 );
 
@@ -2215,7 +2233,7 @@ const LongString = S.string.pipe(
     identifier: "LongString",
     jsonSchema: { minLength: 10 },
     description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   })
 );
 ```
