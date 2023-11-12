@@ -2,25 +2,46 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import { describe, it } from "vitest"
 
-describe("Schema/rename", () => {
-  it("string key", async () => {
-    const schema = S.struct({ a: S.string, b: S.number })
-    const renamed = S.rename(schema, { a: "c" })
+describe("Schema > rename", () => {
+  describe("Struct", () => {
+    it("from string key to string key", async () => {
+      const schema = S.struct({ a: S.string, b: S.number })
+      const renamed = S.rename(schema, { a: "c" })
 
-    await Util.expectParseSuccess(renamed, { a: "a", b: 1 }, { c: "a", b: 1 })
-    await Util.expectEncodeSuccess(renamed, { c: "a", b: 1 }, { a: "a", b: 1 })
+      await Util.expectParseSuccess(renamed, { a: "a", b: 1 }, { c: "a", b: 1 })
+      await Util.expectEncodeSuccess(renamed, { c: "a", b: 1 }, { a: "a", b: 1 })
+    })
+
+    it("from string key to symbol key", async () => {
+      const c = Symbol.for("@effect/schema/test/c")
+      const schema = S.struct({ a: S.string, b: S.number })
+      const renamed = S.rename(schema, { a: c })
+
+      await Util.expectParseSuccess(renamed, { a: "a", b: 1 }, { [c]: "a", b: 1 })
+      await Util.expectEncodeSuccess(renamed, { [c]: "a", b: 1 }, { a: "a", b: 1 })
+    })
+
+    it("from symbol key to string key", async () => {
+      const a = Symbol.for("@effect/schema/test/a")
+      const schema = S.struct({ [a]: S.string, b: S.number })
+      const renamed = S.rename(schema, { [a]: "c" })
+
+      await Util.expectParseSuccess(renamed, { [a]: "a", b: 1 }, { c: "a", b: 1 })
+      await Util.expectEncodeSuccess(renamed, { c: "a", b: 1 }, { [a]: "a", b: 1 })
+    })
+
+    it("from symbol key to symbol key", async () => {
+      const a = Symbol.for("@effect/schema/test/a")
+      const c = Symbol.for("@effect/schema/test/c")
+      const schema = S.struct({ [a]: S.string, b: S.number })
+      const renamed = S.rename(schema, { [a]: c })
+
+      await Util.expectParseSuccess(renamed, { [a]: "a", b: 1 }, { [c]: "a", b: 1 })
+      await Util.expectEncodeSuccess(renamed, { [c]: "a", b: 1 }, { [a]: "a", b: 1 })
+    })
   })
 
-  it("symbol key", async () => {
-    const c = Symbol.for("@effect/schema/test/c")
-    const schema = S.struct({ a: S.string, b: S.number })
-    const renamed = S.rename(schema, { a: c })
-
-    await Util.expectParseSuccess(renamed, { a: "a", b: 1 }, { [c]: "a", b: 1 })
-    await Util.expectEncodeSuccess(renamed, { [c]: "a", b: 1 }, { a: "a", b: 1 })
-  })
-
-  it("double renaming", async () => {
+  it("Transform (renaming twice)", async () => {
     const schema = S.struct({ a: S.string, b: S.number })
     const renamed = S.rename(schema, { a: "c" })
     const renamed2 = S.rename(renamed, { c: "d" })
@@ -29,7 +50,7 @@ describe("Schema/rename", () => {
     await Util.expectEncodeSuccess(renamed2, { d: "a", b: 1 }, { a: "a", b: 1 })
   })
 
-  it("lazy", async () => {
+  it("Lazy", async () => {
     interface A {
       readonly a: string
       readonly as: ReadonlyArray<A>

@@ -1715,7 +1715,7 @@ export const rename = (ast: AST, mapping: { readonly [K in PropertyKey]?: Proper
   switch (ast._tag) {
     case "TypeLiteral": {
       const propertySignatureTransforms: Array<PropertySignatureTransform> = []
-      for (const key in mapping) {
+      for (const key of Internal.ownKeys(mapping)) {
         const name = mapping[key]
         if (name !== undefined) {
           propertySignatureTransforms.push(createPropertySignatureTransform(
