@@ -197,6 +197,8 @@ Added in v1.0.0
   - [undefined](#undefined)
   - [unknown](#unknown)
   - [void](#void)
+- [renaming](#renaming)
+  - [rename](#rename)
 - [string constructors](#string-constructors)
   - [NonEmpty](#nonempty)
   - [ParseJson](#parsejson)
@@ -2299,6 +2301,21 @@ Added in v1.0.0
 
 ```ts
 export declare const void: Schema<void, void>
+```
+
+Added in v1.0.0
+
+# renaming
+
+## rename
+
+**Signature**
+
+```ts
+export declare const rename: <I, A, const M extends { readonly [K in keyof A]?: PropertyKey | undefined }>(
+  schema: Schema<I, A>,
+  mapping: M
+) => Schema<I, Simplify<Rename<A, M>>>
 ```
 
 Added in v1.0.0
