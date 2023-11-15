@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  effect: 2.0.0-next.55
-
 devDependencies:
   '@babel/cli':
     specifier: ^7.23.0
@@ -30,8 +27,8 @@ devDependencies:
     specifier: ^0.4.1
     version: 0.4.1
   '@effect/docgen':
-    specifier: ^0.3.2
-    version: 0.3.2(fast-check@3.13.2)(tsx@4.1.2)(typescript@5.2.2)
+    specifier: ^0.3.3
+    version: 0.3.3(tsx@4.1.2)(typescript@5.2.2)
   '@effect/dtslint':
     specifier: ^0.0.3
     version: 0.0.3(typescript@5.2.2)
@@ -650,28 +647,20 @@ packages:
     hasBin: true
     dev: true
 
-  /@effect/docgen@0.3.2(fast-check@3.13.2)(tsx@4.1.2)(typescript@5.2.2):
-    resolution: {integrity: sha512-2Iq0p+Qp+hzHi9BGKZ7dbZ35c+RZwDQJN5YHk85AyHUM8bdj+9ZS2zMthCFJqciW8i4NcugjQ+QYYmWGqBeFYA==}
+  /@effect/docgen@0.3.3(tsx@4.1.2)(typescript@5.2.2):
+    resolution: {integrity: sha512-9UtuKZ2r1ZPfAf9RxkZ7u5H8Lc8HdrzXIROJrs8DXxNDBDeFdZWbMksCfIPqSkFGDgBrCIOEFDUS11JCmk/udA==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     peerDependencies:
       tsx: ^4.1.0
       typescript: ^5.2.2
     dependencies:
-      '@effect/platform-node': 0.29.1(@effect/schema@0.47.3)(effect@2.0.0-next.55)
-      '@effect/schema': 0.47.3(effect@2.0.0-next.55)(fast-check@3.13.2)
-      chalk: 5.3.0
       doctrine: 3.0.0
-      effect: 2.0.0-next.55
       glob: 10.3.10
       markdown-toc: github.com/effect-ts/markdown-toc/4bfeb0f140105440ea0d12df2fa23199cc3ec1d5
       prettier: 3.1.0
-      ts-morph: 20.0.0
-      tsconfck: 3.0.0(typescript@5.2.2)
       tsx: 4.1.2
       typescript: 5.2.2
-    transitivePeerDependencies:
-      - fast-check
     dev: true
 
   /@effect/dtslint@0.0.3(typescript@5.2.2):
@@ -695,41 +684,6 @@ packages:
 
   /@effect/language-service@0.0.21:
     resolution: {integrity: sha512-e8vfKbjnbYiyneBincEFS0tzXluopGK77OkVFbPRtUbNDS5tJfb+jiwOQEiqASDsadcZmd+9J9+Q6v/z7GuN2g==}
-    dev: true
-
-  /@effect/platform-node@0.29.1(@effect/schema@0.47.3)(effect@2.0.0-next.55):
-    resolution: {integrity: sha512-mDmTzM3g3IDfMLZf83i6feU2RaBe85lndSIkRYOWa0j6sZW1N5Op3ThOdhqnk9q8Dkr3UIy/NIJk7bLq2WOE7w==}
-    peerDependencies:
-      effect: 2.0.0-next.55
-    dependencies:
-      '@effect/platform': 0.28.1(@effect/schema@0.47.3)(effect@2.0.0-next.55)
-      busboy: 1.6.0
-      effect: 2.0.0-next.55
-      mime: 3.0.0
-    transitivePeerDependencies:
-      - '@effect/schema'
-    dev: true
-
-  /@effect/platform@0.28.1(@effect/schema@0.47.3)(effect@2.0.0-next.55):
-    resolution: {integrity: sha512-Rl3wsRxfoc4d4LoWN/jOb6EEU+4n57gNNU4r8RnHggw4sMWQuFFalCimAxsnc3RiKOkn/mpGXwEBuly6q0NDgQ==}
-    peerDependencies:
-      '@effect/schema': ^0.47.3
-      effect: 2.0.0-next.55
-    dependencies:
-      '@effect/schema': 0.47.3(effect@2.0.0-next.55)(fast-check@3.13.2)
-      effect: 2.0.0-next.55
-      find-my-way: 7.7.0
-      path-browserify: 1.0.1
-    dev: true
-
-  /@effect/schema@0.47.3(effect@2.0.0-next.55)(fast-check@3.13.2):
-    resolution: {integrity: sha512-n8dYPhKqiP6h11ABCljv7EgzX+QfIBAippvsCHcgxmbvtWpDww3QnZ96RRjCwaHYM22ypqbYPGbvBqgNNWTpXg==}
-    peerDependencies:
-      effect: 2.0.0-next.55
-      fast-check: ^3.13.2
-    dependencies:
-      effect: 2.0.0-next.55
-      fast-check: 3.13.2
     dev: true
 
   /@esbuild/android-arm64@0.18.20:
@@ -1108,15 +1062,6 @@ packages:
 
   /@sinclair/typebox@0.27.8:
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
-    dev: true
-
-  /@ts-morph/common@0.21.0:
-    resolution: {integrity: sha512-ES110Mmne5Vi4ypUKrtVQfXFDtCsDXiUiGxF6ILVlE90dDD4fdpC1LSjydl/ml7xJWKSDZwUYD2zkOePMSrPBA==}
-    dependencies:
-      fast-glob: 3.3.1
-      minimatch: 7.4.6
-      mkdirp: 2.1.6
-      path-browserify: 1.0.1
     dev: true
 
   /@types/benchmark@2.1.5:
@@ -1837,13 +1782,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /busboy@1.6.0:
-    resolution: {integrity: sha512-8SFQbg/0hQ9xy3UNTB0YEnsNBbWfhf7RtnzpL7TkBiTBRfrQ9Fxcnz7VJsleJpyp6rVLvXiuORqjlHi5q+PYuA==}
-    engines: {node: '>=10.16.0'}
-    dependencies:
-      streamsearch: 1.1.0
-    dev: true
-
   /cac@6.7.14:
     resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
     engines: {node: '>=8'}
@@ -1910,11 +1848,6 @@ packages:
       supports-color: 7.2.0
     dev: true
 
-  /chalk@5.3.0:
-    resolution: {integrity: sha512-dLitG79d+GV1Nb/VYcCDFivJeK1hiukt9QjRNVOsUtTy1rR1YJsmpGGTZ3qJos+uw7WmWF4wUwBd9jxjocFC2w==}
-    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-    dev: true
-
   /chardet@0.7.0:
     resolution: {integrity: sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==}
     dev: true
@@ -1979,10 +1912,6 @@ packages:
   /clone@1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
-    dev: true
-
-  /code-block-writer@12.0.0:
-    resolution: {integrity: sha512-q4dMFMlXtKR3XNBHyMHt/3pwYNA69EDk00lloMOaaUMKPUXBw6lpXtbu3MMVG6/uOihGnRDOlkyqsONEUj60+w==}
     dev: true
 
   /color-convert@1.9.3:
@@ -2875,10 +2804,6 @@ packages:
       pure-rand: 6.0.4
     dev: true
 
-  /fast-decode-uri-component@1.0.1:
-    resolution: {integrity: sha512-WKgKWg5eUxvRZGwW8FvfbaH7AXSh2cL+3j5fMGzUMCxWBJ3dV3a7Wz8y2f/uQ0e3B6WmodD3oS54jTQ9HVTIIg==}
-    dev: true
-
   /fast-deep-equal@3.1.3:
     resolution: {integrity: sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q==}
     dev: true
@@ -2900,12 +2825,6 @@ packages:
 
   /fast-levenshtein@2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
-    dev: true
-
-  /fast-querystring@1.1.2:
-    resolution: {integrity: sha512-g6KuKWmFXc0fID8WWH0jit4g0AGBoJhCkJMb1RmbsSEUNvQ+ZC8D6CUZ+GtF8nMzSPXnhiePyyqqipzNNEnHjg==}
-    dependencies:
-      fast-decode-uri-component: 1.0.1
     dev: true
 
   /fastq@1.15.0:
@@ -2960,15 +2879,6 @@ packages:
     requiresBuild: true
     dependencies:
       to-regex-range: 5.0.1
-    dev: true
-
-  /find-my-way@7.7.0:
-    resolution: {integrity: sha512-+SrHpvQ52Q6W9f3wJoJBbAQULJuNEEQwBvlvYwACDhBTLOTMiQ0HYWh4+vC3OivGP2ENcTI1oKlFA2OepJNjhQ==}
-    engines: {node: '>=14'}
-    dependencies:
-      fast-deep-equal: 3.1.3
-      fast-querystring: 1.1.2
-      safe-regex2: 2.0.0
     dev: true
 
   /find-up@4.1.0:
@@ -4081,12 +3991,6 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /mime@3.0.0:
-    resolution: {integrity: sha512-jSCU7/VB1loIWBZe14aEYHU/+1UMEHoaO7qxCOVJOw9GgH72VAWppxNcjU+x9a2k3GSIBXNKxXQFqRvvZ7vr3A==}
-    engines: {node: '>=10.0.0'}
-    hasBin: true
-    dev: true
-
   /mimic-fn@2.1.0:
     resolution: {integrity: sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==}
     engines: {node: '>=6'}
@@ -4101,13 +4005,6 @@ packages:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
     dependencies:
       brace-expansion: 1.1.11
-    dev: true
-
-  /minimatch@7.4.6:
-    resolution: {integrity: sha512-sBz8G/YjVniEz6lKPNpKxXwazJe4c19fEfV2GDMX6AjFz+MX9uDWIZW8XreVhkFW3fkIdTv/gxWr/Kks5FFAVw==}
-    engines: {node: '>=10'}
-    dependencies:
-      brace-expansion: 2.0.1
     dev: true
 
   /minimatch@9.0.3:
@@ -4153,12 +4050,6 @@ packages:
     hasBin: true
     dependencies:
       minimist: 1.2.8
-    dev: true
-
-  /mkdirp@2.1.6:
-    resolution: {integrity: sha512-+hEnITedc8LAtIP9u3HJDFIdcLV2vXP33sqLLIzkv1Db1zO/1OxbvYf0Y1OC/S/Qo5dxHXepofhmxL02PsKe+A==}
-    engines: {node: '>=10'}
-    hasBin: true
     dev: true
 
   /mlly@1.4.2:
@@ -4444,10 +4335,6 @@ packages:
   /parse-ms@2.1.0:
     resolution: {integrity: sha512-kHt7kzLoS9VBZfUsiKjv43mr91ea+U05EyKkEtqp7vNbHxmaVuEqN7XxeEVnGrMtYOAxGrDElSi96K7EgO1zCA==}
     engines: {node: '>=6'}
-    dev: true
-
-  /path-browserify@1.0.1:
-    resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
     dev: true
 
   /path-exists@4.0.0:
@@ -4874,11 +4761,6 @@ packages:
       signal-exit: 3.0.7
     dev: true
 
-  /ret@0.2.2:
-    resolution: {integrity: sha512-M0b3YWQs7R3Z917WRQy1HHA7Ba7D8hvZg6UE5mLykJxQVE2ju0IXbGlaHPPlkY+WN7wFP+wUMXmBFA0aV6vYGQ==}
-    engines: {node: '>=4'}
-    dev: true
-
   /reusify@1.0.4:
     resolution: {integrity: sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
@@ -4937,12 +4819,6 @@ packages:
       call-bind: 1.0.5
       get-intrinsic: 1.2.2
       is-regex: 1.1.4
-    dev: true
-
-  /safe-regex2@2.0.0:
-    resolution: {integrity: sha512-PaUSFsUaNNuKwkBijoAPHAK6/eM6VirvyPWlZ7BAQy4D+hCvh4B6lIG+nPdhbFfIbP+gTGBcrdsOaUs0F+ZBOQ==}
-    dependencies:
-      ret: 0.2.2
     dev: true
 
   /safer-buffer@2.1.2:
@@ -5153,11 +5029,6 @@ packages:
     resolution: {integrity: sha512-9GHUiM5hMiCi6Y03jD2ARC1ettBXkQBoQAe7nJsPknnI0ow10aXjTnew8QtYQmLjzn974BnmWEAJgCY6ZP1DeQ==}
     dependencies:
       mixme: 0.5.9
-    dev: true
-
-  /streamsearch@1.1.0:
-    resolution: {integrity: sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==}
-    engines: {node: '>=10.0.0'}
     dev: true
 
   /string-width@4.2.3:
@@ -5412,26 +5283,6 @@ packages:
   /ts-graphviz@1.8.1:
     resolution: {integrity: sha512-54/fe5iu0Jb6X0pmDmzsA2UHLfyHjUEUwfHtZcEOR0fZ6Myf+dFoO6eNsyL8CBDMJ9u7WWEewduVaiaXlvjSVw==}
     engines: {node: '>=14.16'}
-    dev: true
-
-  /ts-morph@20.0.0:
-    resolution: {integrity: sha512-JVmEJy2Wow5n/84I3igthL9sudQ8qzjh/6i4tmYCm6IqYyKFlNbJZi7oBdjyqcWSWYRu3CtL0xbT6fS03ESZIg==}
-    dependencies:
-      '@ts-morph/common': 0.21.0
-      code-block-writer: 12.0.0
-    dev: true
-
-  /tsconfck@3.0.0(typescript@5.2.2):
-    resolution: {integrity: sha512-w3wnsIrJNi7avf4Zb0VjOoodoO0woEqGgZGQm+LHH9przdUI+XDKsWAXwxHA1DaRTjeuZNcregSzr7RaA8zG9A==}
-    engines: {node: ^18 || >=20}
-    hasBin: true
-    peerDependencies:
-      typescript: ^5.0.0
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-    dependencies:
-      typescript: 5.2.2
     dev: true
 
   /tsconfig-paths@3.14.2:
