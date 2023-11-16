@@ -2315,10 +2315,26 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const rename: <I, A, const M extends { readonly [K in keyof A]?: PropertyKey | undefined }>(
-  schema: Schema<I, A>,
-  mapping: M
-) => Schema<I, Simplify<Rename<A, M>>>
+export declare const rename: {
+  <
+    A,
+    const M extends { readonly [K in keyof A]?: PropertyKey | undefined } & {
+      readonly [K in Exclude<keyof M, keyof A>]: never
+    }
+  >(
+    mapping: M
+  ): <I>(self: Schema<I, A>) => Schema<I, Simplify<Rename<A, M>>>
+  <
+    I,
+    A,
+    const M extends { readonly [K in keyof A]?: PropertyKey | undefined } & {
+      readonly [K in Exclude<keyof M, keyof A>]: never
+    }
+  >(
+    self: Schema<I, A>,
+    mapping: M
+  ): Schema<I, Simplify<Rename<A, M>>>
+}
 ```
 
 Added in v1.0.0
