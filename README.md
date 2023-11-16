@@ -1725,10 +1725,10 @@ export const transformedSchema: S.Schema<string, boolean> = S.transformOrFail(
     s === "true"
       ? ParseResult.success(true)
       : s === "false"
-      ? ParseResult.success(false)
-      : ParseResult.failure(
-          ParseResult.type(S.literal("true", "false").ast, s)
-        ),
+        ? ParseResult.success(false)
+        : ParseResult.failure(
+            ParseResult.type(S.literal("true", "false").ast, s)
+          ),
   // define a function that converts a boolean into a string
   (b) => ParseResult.success(String(b))
 );
@@ -2416,9 +2416,15 @@ We welcome contributions via pull requests! Here are some guidelines to help you
 
 1. Fork the repository and clone it to your local machine.
 2. Create a new branch for your changes: `git checkout -b my-new-feature`
-3. Install dependencies: `pnpm install` (`pnpm@8.x`)
-4. Make your changes and add tests if applicable.
-5. Run the tests: `pnpm test`
+3. Ensure you have the required dependencies installed by running: `pnpm install` (assuming pnpm version `8.x`).
+4. Make your desired changes and, if applicable, include tests to validate your modifications.
+5. Run the following commands to ensure the integrity of your changes:
+   - `pnpm check`: Verify that the code compiles.
+   - `pnpm test`: Execute the tests.
+   - `pnpm circular`: Confirm there are no circular imports.
+   - `pnpm lint`: Check for code style adherence (if you happen to encounter any errors during this process, you can add the `--fix` option to automatically fix some of these style issues).
+   - `pnpm dtslint`: Run type-level tests.
+   - `pnpm docgen`: Update the automatically generated documentation.
 6. Create a changeset for your changes: before committing your changes, create a changeset to document the modifications. This helps in tracking and communicating the changes effectively. To create a changeset, run the following command: `pnpm changeset`.
 7. Commit your changes: after creating the changeset, commit your changes with a descriptive commit message: `git commit -am 'Add some feature'`.
 8. Push your changes to your fork: `git push origin my-new-feature`.
