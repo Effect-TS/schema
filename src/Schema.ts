@@ -1533,17 +1533,31 @@ export const rename: {
   <
     I,
     A,
-    const M extends { readonly [K in keyof A]?: PropertyKey }
+    const M extends
+      & { readonly [K in keyof A]?: PropertyKey }
+      & { readonly [K in Exclude<keyof M, keyof A>]: never }
   >(
     mapping: M
   ): (self: Schema<I, A>) => Schema<I, Simplify<Rename<A, M>>>
-  <I, A, const M extends { readonly [K in keyof A]?: PropertyKey }>(
+  <
+    I,
+    A,
+    const M extends
+      & { readonly [K in keyof A]?: PropertyKey }
+      & { readonly [K in Exclude<keyof M, keyof A>]: never }
+  >(
     self: Schema<I, A>,
     mapping: M
   ): Schema<I, Simplify<Rename<A, M>>>
 } = dual(
   2,
-  <I, A, const M extends { readonly [K in keyof A]?: PropertyKey }>(
+  <
+    I,
+    A,
+    const M extends
+      & { readonly [K in keyof A]?: PropertyKey }
+      & { readonly [K in Exclude<keyof M, keyof A>]: never }
+  >(
     self: Schema<I, A>,
     mapping: M
   ): Schema<I, Simplify<Rename<A, M>>> => {
