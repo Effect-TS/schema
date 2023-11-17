@@ -1428,6 +1428,27 @@ S.lazy(() => Person);
 Person.struct;
 ```
 
+### Tagged Class variants
+
+You can also create classes that extend `TaggedClass` & `TaggedError` from the `effect/Data` module:
+
+```ts
+class TaggedPerson extends S.TaggedClass<TaggedPerson>()("TaggedPerson", {
+  name: S.string,
+}) {}
+
+class HttpError extends S.TaggedError<HttpError>()("HttpError", {
+  status: S.number,
+}) {}
+
+const joe = new TaggedPerson({ name: "Joe" });
+joe._tag; // "TaggedPerson"
+
+const error = new HttpError({ status: 404 });
+error._tag; // "HttpError"
+error.stack; // access the stack trace
+```
+
 ### Extending existing Classes
 
 In situations where you need to augment your existing class with more fields, the built-in `extend` utility comes in handy:
