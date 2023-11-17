@@ -2,7 +2,7 @@ import * as AST from "@effect/schema/AST"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import { Effect, Request } from "effect"
+import { Effect } from "effect"
 import * as Data from "effect/Data"
 import * as Equal from "effect/Equal"
 import * as O from "effect/Option"
@@ -236,26 +236,5 @@ describe("Schema/Class", () => {
     err = S.parseSync(MyError)({ _tag: "MyError", id: 1 })
     expect(err._tag).toEqual("MyError")
     expect(err.id).toEqual(1)
-  })
-
-  it("TaggedRequest", () => {
-    class MyRequest extends S.TaggedRequest<MyRequest>()("MyRequest", S.string, Person, {
-      id: S.number
-    }) {}
-
-    let request = new MyRequest({ id: 1 })
-    request satisfies Request.Request<string, Person>
-
-    expect(request._tag).toEqual("MyRequest")
-    expect(request.id).toEqual(1)
-    expect(Request.RequestTypeId in request).toEqual(true)
-
-    request = S.decodeSync(MyRequest)({ _tag: "MyRequest", id: 1 })
-    expect(request._tag).toEqual("MyRequest")
-    expect(request.id).toEqual(1)
-    expect(Request.RequestTypeId in request).toEqual(true)
-
-    S.decodeSync(MyRequest.Error)("error")
-    S.decodeSync(MyRequest.Success)(new Person({ id: 1, name: "John" }))
   })
 })

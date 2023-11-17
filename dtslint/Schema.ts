@@ -736,26 +736,6 @@ export type MyTaggedClassTo = S.Schema.To<typeof MyTaggedClass>
 MyTaggedClass.struct
 
 
-class MyTaggedRequest extends S.TaggedRequest<MyTaggedRequest>()("MyTaggedRequest", S.never, S.string, {
-  a: S.string
-}) {}
-
-// $ExpectType { readonly _tag: "MyTaggedRequest"; readonly a: string; }
-export type MyTaggedRequestFrom = S.Schema.From<typeof MyTaggedRequest>
-
-// $ExpectType MyTaggedRequest
-export type MyTaggedRequestTo = S.Schema.To<typeof MyTaggedRequest>
-
-// $ExpectType Schema<{ readonly _tag: "MyTaggedRequest"; readonly a: string; }, { readonly _tag: "MyTaggedRequest"; readonly a: string; }>
-MyTaggedRequest.struct
-
-// $ExpectType never
-export type MyTaggedRequestError = Request.Request.Error<MyTaggedRequestTo>
-
-// $ExpectType string
-export type MyTaggedRequestSuccess = Request.Request.Success<MyTaggedRequestTo>
-
-
 class VoidTaggedClass extends S.TaggedClass<VoidTaggedClass>()("VoidTaggedClass", {}) {}
 
 // $ExpectType [props?: void | {}, disableValidation?: boolean | undefined]

@@ -94,7 +94,6 @@ Added in v1.0.0
   - [Class (interface)](#class-interface)
   - [TaggedClass](#taggedclass)
   - [TaggedError](#taggederror)
-  - [TaggedRequest](#taggedrequest)
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
@@ -1156,37 +1155,6 @@ export declare const TaggedError: <Self>() => <Tag extends string, Fields extend
       Self,
       Effect.Effect<never, Self, never> & Error
     >
-```
-
-Added in v1.0.0
-
-## TaggedRequest
-
-**Signature**
-
-```ts
-export declare const TaggedRequest: <Self>() => <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
-  tag: Tag,
-  error: Schema<EI, EA>,
-  success: Schema<AI, AA>,
-  fields: Fields
-) => [unknown] extends [Self]
-  ? 'Missing `Self` generic - use `class Self extends TaggedRequest<Self>()("Tag", ErrorSchema, SuccessSchema, { ... })`'
-  : Class<
-      Simplify<
-        { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
-        } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
-      >,
-      Simplify<
-        { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
-        } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
-      >,
-      Simplify<ToStruct<Fields>>,
-      Self,
-      Request.Request<EA, AA>
-    > & { readonly Error: Schema<EI, EA>; readonly Success: Schema<AI, AA> }
 ```
 
 Added in v1.0.0

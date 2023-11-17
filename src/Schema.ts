@@ -19,7 +19,6 @@ import type { Pipeable } from "effect/Pipeable"
 import { pipeArguments } from "effect/Pipeable"
 import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
-import * as Request from "effect/Request"
 import * as S from "effect/String"
 import type { Equals, Simplify } from "effect/Types"
 import type { Arbitrary } from "./Arbitrary.js"
@@ -3691,55 +3690,6 @@ export const TaggedError = <Self>() =>
     { _tag: tag }
   )
 }
-
-function RequestClass(this: any, props: any) {
-  Object.assign(this, props)
-}
-RequestClass.prototype = {
-  __proto__: Data.Structural.prototype,
-  [Request.RequestTypeId]: {
-    _E: identity,
-    _A: identity
-  }
-}
-
-/**
- * @category classes
- * @since 1.0.0
- */
-export const TaggedRequest =
-  <Self>() =>
-  <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
-    tag: Tag,
-    error: Schema<EI, EA>,
-    success: Schema<AI, AA>,
-    fields: Fields
-  ): [unknown] extends [Self] ?
-    MissingSelfGeneric<"TaggedRequest", `"Tag", ErrorSchema, SuccessSchema, `>
-    :
-      & Class<
-        Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
-        Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
-        Simplify<ToStruct<Fields>>,
-        Self,
-        Request.Request<EA, AA>
-      >
-      & {
-        readonly Error: Schema<EI, EA>
-        readonly Success: Schema<AI, AA>
-      } =>
-  {
-    const fieldsWithTag = { ...fields, _tag: literal(tag) }
-    const schema = makeClass(
-      struct(fieldsWithTag),
-      fieldsWithTag,
-      RequestClass,
-      { _tag: tag }
-    )
-    schema.Error = error
-    schema.Success = success
-    return schema
-  }
 
 const makeClass = <I, A>(
   selfSchema: Schema<I, A>,
