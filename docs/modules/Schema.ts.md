@@ -92,6 +92,9 @@ Added in v1.0.0
 - [classes](#classes)
   - [Class](#class)
   - [Class (interface)](#class-interface)
+  - [TaggedClass](#taggedclass)
+  - [TaggedError](#taggederror)
+  - [TaggedRequest](#taggedrequest)
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
@@ -1051,7 +1054,7 @@ Added in v1.0.0
 
 ```ts
 export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self> {
-  new (props: A): A & Omit<Inherited, keyof A>
+  new (props: A, disableValidation?: boolean): A & Omit<Inherited, keyof A>
 
   readonly struct: Schema<I, A>
 
@@ -1082,6 +1085,63 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     ? MissingSelfGeneric<"Base.transformFrom">
     : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
 }
+```
+
+Added in v1.0.0
+
+## TaggedClass
+
+**Signature**
+
+```ts
+export declare const TaggedClass: <Self>() => <Tag extends string, Fields extends StructFields>(
+  tag: Tag,
+  fields: Fields
+) => [unknown] extends [Self]
+  ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
+  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case & { readonly _tag: Tag }>
+```
+
+Added in v1.0.0
+
+## TaggedError
+
+**Signature**
+
+```ts
+export declare const TaggedError: <Self>() => <Tag extends string, Fields extends StructFields>(
+  tag: Tag,
+  fields: Fields
+) => [unknown] extends [Self]
+  ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
+  : Class<
+      Simplify<FromStruct<Fields>>,
+      Simplify<ToStruct<Fields>>,
+      Self,
+      Effect.Effect<never, Self, never> & Error & { readonly _tag: Tag }
+    >
+```
+
+Added in v1.0.0
+
+## TaggedRequest
+
+**Signature**
+
+```ts
+export declare const TaggedRequest: <Self>() => <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
+  tag: Tag,
+  error: Schema<EI, EA>,
+  success: Schema<AI, AA>,
+  fields: Fields
+) => [unknown] extends [Self]
+  ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
+  : Class<
+      Simplify<FromStruct<Fields>>,
+      Simplify<ToStruct<Fields>>,
+      Self,
+      Request.Request<EA, AA> & { readonly _tag: Tag }
+    > & { readonly Error: Schema<EI, EA>; readonly Success: Schema<AI, AA> }
 ```
 
 Added in v1.0.0
@@ -1594,7 +1654,7 @@ Added in v1.0.0
 ```ts
 export declare const decode: <I, A>(
   schema: Schema<I, A>
-) => (i: I, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
+) => (i: I, options?: ParseOptions | undefined) => Effect.Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -1654,7 +1714,7 @@ Added in v1.0.0
 ```ts
 export declare const encode: <I, A>(
   schema: Schema<I, A>
-) => (a: A, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, I>
+) => (a: A, options?: ParseOptions | undefined) => Effect.Effect<never, ParseResult.ParseError, I>
 ```
 
 Added in v1.0.0
@@ -2135,7 +2195,7 @@ Added in v1.0.0
 ```ts
 export declare const parse: <_, A>(
   schema: Schema<_, A>
-) => (i: unknown, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
+) => (i: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
@@ -3323,7 +3383,7 @@ Added in v1.0.0
 ```ts
 export declare const validate: <_, A>(
   schema: Schema<_, A>
-) => (a: unknown, options?: ParseOptions | undefined) => Effect<never, ParseResult.ParseError, A>
+) => (a: unknown, options?: ParseOptions | undefined) => Effect.Effect<never, ParseResult.ParseError, A>
 ```
 
 Added in v1.0.0
