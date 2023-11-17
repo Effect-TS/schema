@@ -21,7 +21,7 @@ import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as Request from "effect/Request"
 import * as S from "effect/String"
-import type { Simplify } from "effect/Types"
+import type { Equals, Simplify } from "effect/Types"
 import type { Arbitrary } from "./Arbitrary.js"
 import * as ArrayFormatter from "./ArrayFormatter.js"
 import type { ParseOptions } from "./AST.js"
@@ -3573,8 +3573,11 @@ type MissingSelfGeneric<Usage extends string, Params extends string = ""> =
  * @category classes
  * @since 1.0.0
  */
-export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self> {
-  new(props: A, disableValidation?: boolean): A & Omit<Inherited, keyof A>
+export interface Class<I, A, C, Self, Inherited = Data.Case> extends Schema<I, Self> {
+  new(
+    props: Equals<C, {}> extends true ? void | {} : C,
+    disableValidation?: boolean
+  ): A & Omit<Inherited, keyof A>
 
   readonly struct: Schema<I, A>
 
@@ -3584,6 +3587,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     : Class<
       Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
       Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+      Simplify<Omit<C, keyof FieldsB> & ToStruct<FieldsB>>,
       Extended,
       Self
     >
@@ -3602,6 +3606,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     : Class<
       I,
       Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+      Simplify<Omit<C, keyof FieldsB> & ToStruct<FieldsB>>,
       Transformed,
       Self
     >
@@ -3620,6 +3625,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     : Class<
       I,
       Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+      Simplify<Omit<C, keyof FieldsB> & ToStruct<FieldsB>>,
       Transformed,
       Self
     >
@@ -3633,8 +3639,12 @@ export const Class = <Self>() =>
 <Fields extends StructFields>(
   fields: Fields
 ): [unknown] extends [Self] ? MissingSelfGeneric<"Class">
-  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self> =>
-  makeClass(struct(fields), fields, Data.Class)
+  : Class<
+    Simplify<FromStruct<Fields>>,
+    Simplify<ToStruct<Fields>>,
+    Simplify<ToStruct<Fields>>,
+    Self
+  > => makeClass(struct(fields), fields, Data.Class)
 
 /**
  * @category classes
@@ -3646,10 +3656,10 @@ export const TaggedClass = <Self>() =>
   fields: Fields
 ): [unknown] extends [Self] ? MissingSelfGeneric<"TaggedClass", `"Tag", `>
   : Class<
-    Simplify<FromStruct<Fields>>,
+    Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
+    Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
     Simplify<ToStruct<Fields>>,
-    Self,
-    Data.Case & { readonly _tag: Tag }
+    Self
   > =>
 {
   const fieldsWithTag = { ...fields, _tag: literal(tag) }
@@ -3666,10 +3676,11 @@ export const TaggedError = <Self>() =>
   fields: Fields
 ): [unknown] extends [Self] ? MissingSelfGeneric<"TaggedError", `"Tag", `>
   : Class<
-    Simplify<FromStruct<Fields>>,
+    Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
+    Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
     Simplify<ToStruct<Fields>>,
     Self,
-    Effect.Effect<never, Self, never> & globalThis.Error & { readonly _tag: Tag }
+    Effect.Effect<never, Self, never> & globalThis.Error
   > =>
 {
   const fieldsWithTag = { ...fields, _tag: literal(tag) }
@@ -3707,10 +3718,11 @@ export const TaggedRequest =
     MissingSelfGeneric<"TaggedRequest", `"Tag", ErrorSchema, SuccessSchema, `>
     :
       & Class<
-        Simplify<FromStruct<Fields>>,
+        Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
+        Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
         Simplify<ToStruct<Fields>>,
         Self,
-        Request.Request<EA, AA> & { readonly _tag: Tag }
+        Request.Request<EA, AA>
       >
       & {
         readonly Error: Schema<EI, EA>

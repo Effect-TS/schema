@@ -223,6 +223,7 @@ describe("Schema/Class", () => {
     class MyError extends S.TaggedError<MyError>()("MyError", {
       id: S.number
     }) {}
+
     let err = new MyError({ id: 1 })
     expect(err.stack).toContain("Class.test.ts:")
     expect(err._tag).toEqual("MyError")
@@ -249,7 +250,7 @@ describe("Schema/Class", () => {
     expect(request.id).toEqual(1)
     expect(Request.RequestTypeId in request).toEqual(true)
 
-    request = S.parseSync(MyRequest)({ _tag: "MyRequest", id: 1 })
+    request = S.decodeSync(MyRequest)({ _tag: "MyRequest", id: 1 })
     expect(request._tag).toEqual("MyRequest")
     expect(request.id).toEqual(1)
     expect(Request.RequestTypeId in request).toEqual(true)
