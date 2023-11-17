@@ -2,7 +2,6 @@ import * as ParseResult from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Brand from "effect/Brand"
 import { identity, pipe } from "effect/Function"
-import * as Request from "effect/Request"
 
 // ---------------------------------------------
 // From
