@@ -1098,7 +1098,7 @@ export declare const TaggedClass: <Self>() => <Tag extends string, Fields extend
   tag: Tag,
   fields: Fields
 ) => [unknown] extends [Self]
-  ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
+  ? 'Missing `Self` generic - use `class Self extends TaggedClass<Self>()("Tag", { ... })`'
   : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case & { readonly _tag: Tag }>
 ```
 
@@ -1113,7 +1113,7 @@ export declare const TaggedError: <Self>() => <Tag extends string, Fields extend
   tag: Tag,
   fields: Fields
 ) => [unknown] extends [Self]
-  ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
+  ? 'Missing `Self` generic - use `class Self extends TaggedError<Self>()("Tag", { ... })`'
   : Class<
       Simplify<FromStruct<Fields>>,
       Simplify<ToStruct<Fields>>,
@@ -1135,7 +1135,7 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
   success: Schema<AI, AA>,
   fields: Fields
 ) => [unknown] extends [Self]
-  ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
+  ? 'Missing `Self` generic - use `class Self extends TaggedRequest<Self>()("Tag", ErrorSchema, SuccessSchema, { ... })`'
   : Class<
       Simplify<FromStruct<Fields>>,
       Simplify<ToStruct<Fields>>,

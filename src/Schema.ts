@@ -3566,8 +3566,8 @@ export const data = <
 // classes
 // ---------------------------------------------
 
-type MissingSelfGeneric<Usage extends string> =
-  `Missing \`Self\` generic - use \`class Self extends ${Usage}<Self>()({ ... })\``
+type MissingSelfGeneric<Usage extends string, Params extends string = ""> =
+  `Missing \`Self\` generic - use \`class Self extends ${Usage}<Self>()(${Params}{ ... })\``
 
 /**
  * @category classes
@@ -3644,7 +3644,7 @@ export const TaggedClass = <Self>() =>
 <Tag extends string, Fields extends StructFields>(
   tag: Tag,
   fields: Fields
-): [unknown] extends [Self] ? MissingSelfGeneric<"Class">
+): [unknown] extends [Self] ? MissingSelfGeneric<"TaggedClass", `"Tag", `>
   : Class<
     Simplify<FromStruct<Fields>>,
     Simplify<ToStruct<Fields>>,
@@ -3664,7 +3664,7 @@ export const TaggedError = <Self>() =>
 <Tag extends string, Fields extends StructFields>(
   tag: Tag,
   fields: Fields
-): [unknown] extends [Self] ? MissingSelfGeneric<"Class">
+): [unknown] extends [Self] ? MissingSelfGeneric<"TaggedError", `"Tag", `>
   : Class<
     Simplify<FromStruct<Fields>>,
     Simplify<ToStruct<Fields>>,
@@ -3703,7 +3703,8 @@ export const TaggedRequest =
     error: Schema<EI, EA>,
     success: Schema<AI, AA>,
     fields: Fields
-  ): [unknown] extends [Self] ? MissingSelfGeneric<"Class">
+  ): [unknown] extends [Self] ?
+    MissingSelfGeneric<"TaggedRequest", `"Tag", ErrorSchema, SuccessSchema, `>
     :
       & Class<
         Simplify<FromStruct<Fields>>,
