@@ -1043,7 +1043,7 @@ export declare const Class: <Self>() => <Fields extends StructFields>(
   fields: Fields
 ) => [unknown] extends [Self]
   ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
-  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
+  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
 ```
 
 Added in v1.0.0
@@ -1053,8 +1053,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self> {
-  new (props: A, disableValidation?: boolean): A & Omit<Inherited, keyof A>
+export interface Class<I, A, C, Self, Inherited = Data.Case> extends Schema<I, Self> {
+  new (props: Equals<C, {}> extends true ? void | {} : C, disableValidation?: boolean): A & Omit<Inherited, keyof A>
 
   readonly struct: Schema<I, A>
 
@@ -1065,6 +1065,7 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     : Class<
         Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>,
         Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+        Simplify<Omit<C, keyof FieldsB> & ToStruct<FieldsB>>,
         Extended,
         Self
       >
@@ -1075,7 +1076,13 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     encode: (input: Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>) => ParseResult.ParseResult<A>
   ) => [unknown] extends [Transformed]
     ? MissingSelfGeneric<"Base.transform">
-    : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
+    : Class<
+        I,
+        Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+        Simplify<Omit<C, keyof FieldsB> & ToStruct<FieldsB>>,
+        Transformed,
+        Self
+      >
 
   readonly transformFrom: <Transformed>() => <FieldsB extends StructFields>(
     fields: FieldsB,
@@ -1083,7 +1090,13 @@ export interface Class<I, A, Self, Inherited = Data.Case> extends Schema<I, Self
     encode: (input: Simplify<Omit<I, keyof FieldsB> & FromStruct<FieldsB>>) => ParseResult.ParseResult<I>
   ) => [unknown] extends [Transformed]
     ? MissingSelfGeneric<"Base.transformFrom">
-    : Class<I, Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>, Transformed, Self>
+    : Class<
+        I,
+        Simplify<Omit<A, keyof FieldsB> & ToStruct<FieldsB>>,
+        Simplify<Omit<C, keyof FieldsB> & ToStruct<FieldsB>>,
+        Transformed,
+        Self
+      >
 }
 ```
 
@@ -1099,7 +1112,21 @@ export declare const TaggedClass: <Self>() => <Tag extends string, Fields extend
   fields: Fields
 ) => [unknown] extends [Self]
   ? 'Missing `Self` generic - use `class Self extends TaggedClass<Self>()("Tag", { ... })`'
-  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case & { readonly _tag: Tag }>
+  : Class<
+      Simplify<
+        { readonly _tag: Tag } & {
+          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
+        } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+      >,
+      Simplify<
+        { readonly _tag: Tag } & {
+          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
+        } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
+      >,
+      Simplify<ToStruct<Fields>>,
+      Self,
+      Data.Case
+    >
 ```
 
 Added in v1.0.0
@@ -1115,10 +1142,19 @@ export declare const TaggedError: <Self>() => <Tag extends string, Fields extend
 ) => [unknown] extends [Self]
   ? 'Missing `Self` generic - use `class Self extends TaggedError<Self>()("Tag", { ... })`'
   : Class<
-      Simplify<FromStruct<Fields>>,
+      Simplify<
+        { readonly _tag: Tag } & {
+          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
+        } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+      >,
+      Simplify<
+        { readonly _tag: Tag } & {
+          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
+        } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
+      >,
       Simplify<ToStruct<Fields>>,
       Self,
-      Effect.Effect<never, Self, never> & Error & { readonly _tag: Tag }
+      Effect.Effect<never, Self, never> & Error
     >
 ```
 
@@ -1137,10 +1173,19 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
 ) => [unknown] extends [Self]
   ? 'Missing `Self` generic - use `class Self extends TaggedRequest<Self>()("Tag", ErrorSchema, SuccessSchema, { ... })`'
   : Class<
-      Simplify<FromStruct<Fields>>,
+      Simplify<
+        { readonly _tag: Tag } & {
+          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
+        } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+      >,
+      Simplify<
+        { readonly _tag: Tag } & {
+          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
+        } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
+      >,
       Simplify<ToStruct<Fields>>,
       Self,
-      Request.Request<EA, AA> & { readonly _tag: Tag }
+      Request.Request<EA, AA>
     > & { readonly Error: Schema<EI, EA>; readonly Success: Schema<AI, AA> }
 ```
 
