@@ -723,6 +723,9 @@ class MyTaggedClass extends S.TaggedClass<MyTaggedClass>()("MyTaggedClass", {
   a: S.string
 }) {}
 
+// $ExpectType [props: { readonly a: string; }, disableValidation?: boolean | undefined]
+export type MyTaggedClassParams = ConstructorParameters<typeof MyTaggedClass>
+
 // $ExpectType { readonly _tag: "MyTaggedClass"; readonly a: string; }
 export type MyTaggedClassFrom = S.Schema.From<typeof MyTaggedClass>
 
@@ -751,3 +754,9 @@ export type MyTaggedRequestError = Request.Request.Error<MyTaggedRequestTo>
 
 // $ExpectType string
 export type MyTaggedRequestSuccess = Request.Request.Success<MyTaggedRequestTo>
+
+
+class VoidTaggedClass extends S.TaggedClass<VoidTaggedClass>()("VoidTaggedClass", {}) {}
+
+// $ExpectType [props?: void | {}, disableValidation?: boolean | undefined]
+export type VoidTaggedClassParams = ConstructorParameters<typeof VoidTaggedClass>
