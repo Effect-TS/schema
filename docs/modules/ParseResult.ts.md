@@ -365,7 +365,6 @@ Added in v1.0.0
 
 ```ts
 export interface ParseError {
-  readonly _tag: "ParseError"
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 }
 ```
