@@ -19,6 +19,7 @@ import type { Pipeable } from "effect/Pipeable"
 import { pipeArguments } from "effect/Pipeable"
 import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
+import * as Request from "effect/Request"
 import * as S from "effect/String"
 import type { Equals, Simplify } from "effect/Types"
 import type { Arbitrary } from "./Arbitrary.js"
@@ -3690,6 +3691,77 @@ export const TaggedError = <Self>() =>
     { _tag: tag }
   )
 }
+
+function RequestClass(this: any, props: any) {
+  if (props) {
+    Object.assign(this, props)
+  }
+}
+RequestClass.prototype = {
+  __proto__: Data.Structural.prototype,
+  [Request.RequestTypeId]: {
+    _E: identity,
+    _A: identity
+  }
+}
+
+/**
+ * @category classes
+ * @since 1.0.0
+ */
+export declare namespace TaggedRequest {
+  /**
+   * @category classes
+   * @since 1.0.0
+   */
+  export interface Base<EI, EA, AI, AA, I, Req extends Request.Request<EA, AA>>
+    extends Schema<I, Req>, TaggedRequest.Result<EI, EA, AI, AA>
+  {}
+
+  /**
+   * @category classes
+   * @since 1.0.0
+   */
+  export interface Result<EI, EA, AI, AA> {
+    readonly Failure: Schema<EI, EA>
+    readonly Success: Schema<AI, AA>
+  }
+}
+
+/**
+ * @category classes
+ * @since 1.0.0
+ */
+export const TaggedRequest =
+  <Self>() =>
+  <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
+    tag: Tag,
+    failure: Schema<EI, EA>,
+    success: Schema<AI, AA>,
+    fields: Fields
+  ): [unknown] extends [Self] ?
+    MissingSelfGeneric<"TaggedRequest", `"Tag", SuccessSchema, FailureSchema, `>
+    :
+      & Class<
+        Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
+        Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
+        Simplify<ToStruct<Fields>>,
+        Self,
+        Request.Request<EA, AA>
+      >
+      & TaggedRequest.Result<EI, EA, AI, AA> =>
+  {
+    const fieldsWithTag = { ...fields, _tag: literal(tag) }
+    const Base = makeClass(
+      struct(fieldsWithTag),
+      fieldsWithTag,
+      RequestClass,
+      { _tag: tag }
+    )
+    Base.Failure = failure
+    Base.Success = success
+    return Base
+  }
 
 const makeClass = <I, A>(
   selfSchema: Schema<I, A>,
