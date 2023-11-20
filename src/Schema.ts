@@ -2869,32 +2869,19 @@ export const durationFromHrTime = <I, A extends readonly [seconds: number, nanos
     { strict: false }
   )
 
-const hrTime: Schema<readonly [nanos: number, seconds: number]> = make(
-  AST.createTuple(
-    [
-      AST.createElement(
-        NonNegative.pipe(annotations({
-          [AST.TitleAnnotationId]: "seconds",
-          [AST.DescriptionAnnotationId]: "seconds"
-        })).ast,
-        false
-      ),
-      AST.createElement(
-        NonNegative.pipe(annotations({
-          [AST.TitleAnnotationId]: "nanos",
-          [AST.DescriptionAnnotationId]: "nanos"
-        })).ast,
-        false
-      )
-    ],
-    Option.none(),
-    true,
-    {
-      [AST.TitleAnnotationId]: "a high resolution time tuple",
-      [AST.DescriptionAnnotationId]: "a high resolution time tuple"
-    }
-  )
-)
+const hrTime: Schema<readonly [nanos: number, seconds: number]> = tuple(
+  NonNegative.pipe(annotations({
+    [AST.TitleAnnotationId]: "seconds",
+    [AST.DescriptionAnnotationId]: "seconds"
+  })),
+  NonNegative.pipe(annotations({
+    [AST.TitleAnnotationId]: "nanos",
+    [AST.DescriptionAnnotationId]: "nanos"
+  }))
+).pipe(annotations({
+  [AST.TitleAnnotationId]: "a high resolution time tuple",
+  [AST.DescriptionAnnotationId]: "a high resolution time tuple"
+}))
 
 const _Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration> =
   durationFromHrTime(hrTime)
