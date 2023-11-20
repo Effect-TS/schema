@@ -2844,7 +2844,7 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
         fc.maxSafeNat().map((_) => Duration.days(_)),
         fc.maxSafeNat().map((_) => Duration.weeks(_))
       ),
-    [Internal.EquivalenceHookId]: () => ReadonlyArray.getEquivalence(Equivalence.strict())
+    [Internal.EquivalenceHookId]: () => Duration.Equivalence
   }
 )
 
@@ -2869,19 +2869,35 @@ export const durationFromHrTime = <I, A extends readonly [seconds: number, nanos
     { strict: false }
   )
 
-const _Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration> =
-  durationFromHrTime(
-    tuple(
-      number.pipe(annotations({
-        [AST.TitleAnnotationId]: "seconds",
-        [AST.DescriptionAnnotationId]: "seconds"
-      })),
-      number.pipe(annotations({
-        [AST.TitleAnnotationId]: "nanos",
-        [AST.DescriptionAnnotationId]: "nanos"
-      }))
-    )
+const hrTime: Schema<readonly [nanos: number, seconds: number]> = make(
+  AST.createTuple(
+    [
+      AST.createElement(
+        NonNegative.pipe(annotations({
+          [AST.TitleAnnotationId]: "seconds",
+          [AST.DescriptionAnnotationId]: "seconds"
+        })).ast,
+        false
+      ),
+      AST.createElement(
+        NonNegative.pipe(annotations({
+          [AST.TitleAnnotationId]: "nanos",
+          [AST.DescriptionAnnotationId]: "nanos"
+        })).ast,
+        false
+      )
+    ],
+    Option.none(),
+    true,
+    {
+      [AST.TitleAnnotationId]: "a high resolution time tuple",
+      [AST.DescriptionAnnotationId]: "a high resolution time tuple"
+    }
   )
+)
+
+const _Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration> =
+  durationFromHrTime(hrTime)
 
 export {
   /**
