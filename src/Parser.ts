@@ -359,7 +359,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       }
       return (input: unknown, options) => {
         if (!Array.isArray(input)) {
-          return ParseResult.failure(ParseResult.type(ast, input))
+          return ParseResult.failure(ParseResult.type(unknownArray, input))
         }
         const allErrors = options?.errors === "all"
         const es: Array<[number, ParseResult.ParseErrors]> = []
@@ -1038,6 +1038,10 @@ const handleForbidden = <A>(
     ? conditional
     : ParseResult.failure(ParseResult.forbidden)
 }
+
+const unknownArray = AST.createTuple([], Option.some([AST.unknownKeyword]), true, {
+  [AST.DescriptionAnnotationId]: "a generic array"
+})
 
 const unknownRecord = AST.createTypeLiteral([], [
   AST.createIndexSignature(AST.stringKeyword, AST.unknownKeyword, true),

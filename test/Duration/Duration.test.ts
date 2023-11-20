@@ -14,12 +14,8 @@ describe("Schema/Duration", () => {
     await Util.expectParseSuccess(schema, [555, 123456789], Duration.nanos(555123456789n))
     await Util.expectParseFailure(schema, [-500, 0], "/0 Expected seconds, actual -500")
     await Util.expectParseFailure(schema, [0, -123], "/1 Expected nanos, actual -123")
-    await Util.expectParseFailure(schema, 123, "Expected a high resolution time tuple, actual 123")
-    await Util.expectParseFailure(
-      schema,
-      123n,
-      "Expected a high resolution time tuple, actual 123n"
-    )
+    await Util.expectParseFailure(schema, 123, "Expected a generic array, actual 123")
+    await Util.expectParseFailure(schema, 123n, "Expected a generic array, actual 123n")
   })
 
   it("encoding", async () => {
