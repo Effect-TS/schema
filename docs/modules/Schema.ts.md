@@ -27,6 +27,11 @@ Added in v1.0.0
   - [validDate](#validdate-1)
 - [Date transformations](#date-transformations)
   - [dateFromString](#datefromstring)
+- [Duration constructors](#duration-constructors)
+  - [Duration](#duration)
+  - [DurationFromSelf](#durationfromself)
+- [Duration transformations](#duration-transformations)
+  - [durationFromHrTime](#durationfromhrtime)
 - [Either transformations](#either-transformations)
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
@@ -426,6 +431,46 @@ A combinator that transforms a `string` into a valid `Date`.
 
 ```ts
 export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
+```
+
+Added in v1.0.0
+
+# Duration constructors
+
+## Duration
+
+A schema that transforms a `[number, number]` tuple into a `Duration`.
+
+**Signature**
+
+```ts
+export declare const Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration>
+```
+
+Added in v1.0.0
+
+## DurationFromSelf
+
+**Signature**
+
+```ts
+export declare const DurationFromSelf: Schema<Duration.Duration, Duration.Duration>
+```
+
+Added in v1.0.0
+
+# Duration transformations
+
+## durationFromHrTime
+
+A combinator that transforms a `[number, number]` tuple into a `Duration`.
+
+**Signature**
+
+```ts
+export declare const durationFromHrTime: <I, A extends readonly [seconds: number, nanos: number]>(
+  self: Schema<I, A>
+) => Schema<I, Duration.Duration>
 ```
 
 Added in v1.0.0
