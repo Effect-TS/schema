@@ -27,8 +27,8 @@ devDependencies:
     specifier: ^0.5.0
     version: 0.5.0
   '@effect/docgen':
-    specifier: ^0.3.3
-    version: 0.3.3(tsx@4.1.2)(typescript@5.2.2)
+    specifier: ^0.3.5
+    version: 0.3.5(tsx@4.1.2)(typescript@5.2.2)
   '@effect/dtslint':
     specifier: ^0.0.3
     version: 0.0.3(typescript@5.2.2)
@@ -63,8 +63,8 @@ devDependencies:
     specifier: ^2.1.4
     version: 2.1.4
   effect:
-    specifier: 2.0.0-next.55
-    version: 2.0.0-next.55
+    specifier: 2.0.0-next.56
+    version: 2.0.0-next.56
   eslint:
     specifier: ^8.53.0
     version: 8.53.0
@@ -647,8 +647,8 @@ packages:
     hasBin: true
     dev: true
 
-  /@effect/docgen@0.3.3(tsx@4.1.2)(typescript@5.2.2):
-    resolution: {integrity: sha512-9UtuKZ2r1ZPfAf9RxkZ7u5H8Lc8HdrzXIROJrs8DXxNDBDeFdZWbMksCfIPqSkFGDgBrCIOEFDUS11JCmk/udA==}
+  /@effect/docgen@0.3.5(tsx@4.1.2)(typescript@5.2.2):
+    resolution: {integrity: sha512-si/ciZ8lyKOFwMeZmlTx9SeoqKqJWouespHnU0omSfSfyrVHhzY0TbZV1kmUZ6H++RPeNFk5JGZ8wkn2Ia9udw==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     peerDependencies:
@@ -2333,8 +2333,8 @@ packages:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: true
 
-  /effect@2.0.0-next.55:
-    resolution: {integrity: sha512-kNOB/HaDSdaFSDVXK2gyf4XcTKbKKlllyoS871uDyoJskcc+024sSOHnNioXZPgkqaz55a3mad4DFfLUIETwYQ==}
+  /effect@2.0.0-next.56:
+    resolution: {integrity: sha512-Z6L9rf78OveZorl4pC82hUM/kNhQ8epChuCBVNIjVsookbb6iqTuP9goi3qi6CR7xUZE+HnOKF2bzMIdOOP+Vw==}
     dev: true
 
   /electron-to-chromium@1.4.583:
@@ -3856,11 +3856,9 @@ packages:
       get-func-name: 2.0.2
     dev: true
 
-  /lru-cache@10.0.2:
-    resolution: {integrity: sha512-Yj9mA8fPiVgOUpByoTZO5pNrcl5Yk37FcSHsUINpAsaBIEZIuqcCclDZJCVxqQShDsmYX8QG63svJiTbOATZwg==}
+  /lru-cache@10.0.3:
+    resolution: {integrity: sha512-B7gr+F6MkqB3uzINHXNctGieGsRTMwIBgxkp0yq/5BwcuDzD4A8wQpHQW6vDAm1uKSLQghmRdD9sKqf2vJ1cEg==}
     engines: {node: 14 || >=16.14}
-    dependencies:
-      semver: 7.5.4
     dev: true
 
   /lru-cache@4.1.5:
@@ -4360,7 +4358,7 @@ packages:
     resolution: {integrity: sha512-MkhCqzzBEpPvxxQ71Md0b1Kk51W01lrYvlMzSUaIzNsODdd7mqhiimSZlr+VegAz5Z6Vzt9Xg2ttE//XBhH3EQ==}
     engines: {node: '>=16 || 14 >=14.17'}
     dependencies:
-      lru-cache: 10.0.2
+      lru-cache: 10.0.3
       minipass: 7.0.4
     dev: true
 
