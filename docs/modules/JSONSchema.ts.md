@@ -12,13 +12,13 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [JSON Schema](#json-schema)
+- [encoding](#encoding)
   - [from](#from)
   - [to](#to)
 
 ---
 
-# JSON Schema
+# encoding
 
 ## from
 
