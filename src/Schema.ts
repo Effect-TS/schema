@@ -3692,19 +3692,6 @@ export const TaggedError = <Self>() =>
   )
 }
 
-function RequestClass(this: any, props: any) {
-  if (props) {
-    Object.assign(this, props)
-  }
-}
-RequestClass.prototype = {
-  __proto__: Data.Structural.prototype,
-  [Request.RequestTypeId]: {
-    _E: identity,
-    _A: identity
-  }
-}
-
 /**
  * @category classes
  * @since 1.0.0
@@ -3755,7 +3742,7 @@ export const TaggedRequest =
     const Base = makeClass(
       struct(fieldsWithTag),
       fieldsWithTag,
-      RequestClass,
+      Request.Class,
       { _tag: tag }
     )
     Base.Failure = failure
