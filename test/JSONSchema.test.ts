@@ -194,35 +194,10 @@ describe("JSONSchema", () => {
       propertyTo(S.literal(false))
     })
 
-    it("literals", () => {
-      propertyTo(S.literal(1, "a"))
-    })
-
     it("bigint should raise an error", () => {
       expect(() => JSONSchema.to(S.literal(1n))).toThrow(
         new Error("cannot convert `bigint` to JSON Schema")
       )
-    })
-
-    it("union of literals should support descriptions", () => {
-      const schema = S.union(
-        S.literal("foo").pipe(S.description("I'm a foo")),
-        S.literal("bar").pipe(S.description("I'm a bar"))
-      )
-      const jsonSchema = JSONSchema.to(schema)
-      expect(jsonSchema).toEqual({
-        "$schema": "http://json-schema.org/draft-07/schema#",
-        "anyOf": [
-          {
-            "const": "foo",
-            "description": "I'm a foo"
-          },
-          {
-            "const": "bar",
-            "description": "I'm a bar"
-          }
-        ]
-      })
     })
   })
 
@@ -334,8 +309,148 @@ describe("JSONSchema", () => {
     })
   })
 
-  it("union", () => {
-    propertyTo(S.union(S.string, JsonNumber))
+  describe("unions", () => {
+    it("string | number", () => {
+      const schema = S.union(S.string, JsonNumber)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "anyOf": [
+          {
+            "type": "number",
+            "description": "a number",
+            "title": "number"
+          },
+          {
+            "type": "string",
+            "description": "a string",
+            "title": "string"
+          }
+        ]
+      })
+      propertyTo(schema)
+    })
+
+    it(`1 | "a"`, () => {
+      const schema = S.literal(1, 2)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "enum": [1, 2]
+      })
+      propertyTo(schema)
+    })
+
+    it(`1 | true | string`, () => {
+      const schema = S.union(S.literal(1, true), S.string)
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "anyOf": [
+          {
+            "type": "string",
+            "description": "a string",
+            "title": "string"
+          },
+          { "enum": [1, true] }
+        ]
+      })
+      propertyTo(schema)
+    })
+
+    it(`1 | true(with description) | string`, () => {
+      const schema = S.union(
+        S.literal(1),
+        S.literal(true).pipe(S.description("description")),
+        S.string
+      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "anyOf": [
+          { "const": true, "description": "description" },
+          {
+            "type": "string",
+            "description": "a string",
+            "title": "string"
+          },
+          { "const": 1 }
+        ]
+      })
+      propertyTo(schema)
+    })
+
+    it(`1 | 2 | true(with description) | string`, () => {
+      const schema = S.union(
+        S.literal(1, 2),
+        S.literal(true).pipe(S.description("description")),
+        S.string
+      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "anyOf": [
+          { "const": true, "description": "description" },
+          {
+            "type": "string",
+            "description": "a string",
+            "title": "string"
+          },
+          { "enum": [1, 2] }
+        ]
+      })
+      propertyTo(schema)
+    })
+
+    it("union of literals with descriptions", () => {
+      const schema = S.union(
+        S.literal("foo").pipe(S.description("I'm a foo")),
+        S.literal("bar").pipe(S.description("I'm a bar"))
+      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "anyOf": [
+          {
+            "const": "foo",
+            "description": "I'm a foo"
+          },
+          {
+            "const": "bar",
+            "description": "I'm a bar"
+          }
+        ]
+      })
+    })
+
+    it("union of literals with identifier", () => {
+      const schema = S.union(
+        S.literal("foo").pipe(S.description("I'm a foo"), S.identifier("foo")),
+        S.literal("bar").pipe(S.description("I'm a bar"), S.identifier("bar"))
+      )
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "$defs": {
+          "bar": {
+            "const": "bar",
+            "description": "I'm a bar"
+          },
+          "foo": {
+            "const": "foo",
+            "description": "I'm a foo"
+          }
+        },
+        "anyOf": [
+          {
+            "$ref": "#/$defs/foo"
+          },
+          {
+            "$ref": "#/$defs/bar"
+          }
+        ]
+      })
+    })
   })
 
   describe("tuple", () => {
@@ -1018,14 +1133,7 @@ describe("JSONSchema", () => {
                 "const": "operation"
               },
               "operator": {
-                "anyOf": [
-                  {
-                    "const": "+"
-                  },
-                  {
-                    "const": "-"
-                  }
-                ]
+                "enum": ["+", "-"]
               },
               "left": {
                 "$ref": "#/$defs/Expression"

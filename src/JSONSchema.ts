@@ -81,6 +81,10 @@ interface JsonSchema7OneOf {
   oneOf: Array<JsonSchema7>
 }
 
+interface JsonSchema7Enum {
+  enum: Array<AST.LiteralValue>
+}
+
 interface JsonSchema7Enums {
   $comment: "/schemas/enums"
   oneOf: Array<{
@@ -114,6 +118,7 @@ type JsonSchema7 =
   | JsonSchema7Boolean
   | JsonSchema7Array
   | JsonSchema7OneOf
+  | JsonSchema7Enum
   | JsonSchema7Enums
   | JsonSchema7AnyOf
   | JsonSchema7Object
@@ -379,8 +384,36 @@ const go = (ast: AST.AST, $defs: Record<string, JsonSchema7>): JsonSchema7 => {
 
       return output
     }
-    case "Union":
-      return { anyOf: ast.types.map((ast) => goWithIdentifier(ast, $defs)) }
+    case "Union": {
+      const enums: Array<AST.LiteralValue> = []
+      const anyOf: Array<JsonSchema7> = []
+      for (const type of ast.types) {
+        const schema = goWithIdentifier(type, $defs)
+        if ("const" in schema) {
+          if (Object.keys(schema).length > 1) {
+            anyOf.push(schema)
+          } else {
+            enums.push(schema.const)
+          }
+        } else {
+          anyOf.push(schema)
+        }
+      }
+      if (anyOf.length === 0) {
+        if (enums.length === 1) {
+          return { const: enums[0] }
+        } else {
+          return { enum: enums }
+        }
+      } else {
+        if (enums.length === 1) {
+          anyOf.push({ const: enums[0] })
+        } else if (enums.length > 1) {
+          anyOf.push({ enum: enums })
+        }
+        return { anyOf }
+      }
+    }
     case "Enums": {
       return {
         $comment: "/schemas/enums",
@@ -510,6 +543,8 @@ const decodeAST = (schema: JsonSchema7, $defs: JsonSchema7Top["$defs"]): AST.AST
       }
       return AST.createTypeLiteral(propertySignatures, indexSignatures)
     }
+  } else if ("enum" in schema) {
+    return AST.createUnion(schema.enum.map((literal) => AST.createLiteral(literal)))
   } else if ("anyOf" in schema) {
     return AST.createUnion(schema.anyOf.map((s) => decodeAST(s, $defs)))
   } else if ("oneOf" in schema) {

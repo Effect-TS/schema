@@ -8,4 +8,5 @@ improve JSON Schema output:
 - remove `"type"` from const schemas
 - use `"oneOf"` for enums and add `"title"`s
 - add support for `record(pattern, number)`
-- add `"$comment"` properties
+- add `"$id"` and `"$comment"` properties
+- literals should be converted to `enum` instead of `anyOf`, closes #579
