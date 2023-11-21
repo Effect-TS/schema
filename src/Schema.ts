@@ -3702,14 +3702,14 @@ export declare namespace TaggedRequest {
    * @since 1.0.0
    */
   export interface Base<EI, EA, AI, AA, I, Req extends Request.Request<EA, AA>>
-    extends Schema<I, Req>, TaggedRequest.Result<EI, EA, AI, AA>
+    extends Schema<I, Req>, TaggedRequest.ResultSchemas<EI, EA, AI, AA>
   {}
 
   /**
    * @category classes
    * @since 1.0.0
    */
-  export interface Result<EI, EA, AI, AA> {
+  export interface ResultSchemas<EI, EA, AI, AA> {
     readonly Failure: Schema<EI, EA>
     readonly Success: Schema<AI, AA>
   }
@@ -3736,7 +3736,7 @@ export const TaggedRequest =
         Self,
         Request.Request<EA, AA>
       >
-      & TaggedRequest.Result<EI, EA, AI, AA> =>
+      & TaggedRequest.ResultSchemas<EI, EA, AI, AA> =>
   {
     const fieldsWithTag = { ...fields, _tag: literal(tag) }
     const Base = makeClass(

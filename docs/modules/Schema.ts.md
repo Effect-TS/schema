@@ -97,7 +97,7 @@ Added in v1.0.0
   - [TaggedRequest](#taggedrequest)
   - [TaggedRequest (namespace)](#taggedrequest-namespace)
     - [Base (interface)](#base-interface)
-    - [Result (interface)](#result-interface)
+    - [ResultSchemas (interface)](#resultschemas-interface)
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
@@ -1190,7 +1190,7 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
       Self,
       Request.Request<EA, AA>
     > &
-      TaggedRequest.Result<EI, EA, AI, AA>
+      TaggedRequest.ResultSchemas<EI, EA, AI, AA>
 ```
 
 Added in v1.0.0
@@ -1206,17 +1206,17 @@ Added in v1.0.0
 ```ts
 export interface Base<EI, EA, AI, AA, I, Req extends Request.Request<EA, AA>>
   extends Schema<I, Req>,
-    TaggedRequest.Result<EI, EA, AI, AA> {}
+    TaggedRequest.ResultSchemas<EI, EA, AI, AA> {}
 ```
 
 Added in v1.0.0
 
-### Result (interface)
+### ResultSchemas (interface)
 
 **Signature**
 
 ```ts
-export interface Result<EI, EA, AI, AA> {
+export interface ResultSchemas<EI, EA, AI, AA> {
   readonly Failure: Schema<EI, EA>
   readonly Success: Schema<AI, AA>
 }
