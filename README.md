@@ -1471,40 +1471,88 @@ You have the option to enhance a class with (effectful) transforms. This becomes
 ```ts
 import * as Effect from "effect/Effect";
 import * as S from "@effect/schema/Schema";
-import * as O from "effect/Option";
 import * as PR from "@effect/schema/ParseResult";
+import * as Option from "effect/Option";
 
-class Person extends S.Class({
+export class Person extends S.Class<Person>()({
   id: S.number,
-  name: S.string
-})
+  name: S.string,
+}) {}
 
-function fetchThing(id: number): Effect.Effect<never, Error, string> { ... }
+console.log(S.parseSync(Person)({ id: 1, name: "name" }));
+/*
+Output:
+Person { id: 1, name: 'name' }
+*/
 
-class PersonWithTransform extends Person.transform<PersonWithTransform>()(
+function getAge(id: number): Effect.Effect<never, Error, number> {
+  return Effect.succeed(id + 2);
+}
+
+export class PersonWithTransform extends Person.transform<PersonWithTransform>()(
   {
-    thing: S.optional(S.string).toOption(),
+    age: S.optional(S.number).toOption(),
   },
   (input) =>
-    Effect.mapBoth(fetchThing(input.id), {
-      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
-      onSuccess: (thing) => ({ ...input, thing: O.some(thing) })
+    Effect.mapBoth(getAge(input.id), {
+      onFailure: (e) =>
+        PR.parseError([PR.type(S.string.ast, input.id, e.message)]),
+      // must return { age: Option<number> }
+      onSuccess: (age) => ({ ...input, age: Option.some(age) }),
     }),
   PR.success
 ) {}
 
-class PersonWithTransformFrom extends Person.transformFrom<PersonWithTransformFrom>()(
+S.parsePromise(PersonWithTransform)({ id: 1, name: "name" }).then(console.log);
+/*
+Output:
+PersonWithTransform {
+  id: 1,
+  name: 'name',
+  age: { _id: 'Option', _tag: 'Some', value: 3 }
+}
+*/
+
+export class PersonWithTransformFrom extends Person.transformFrom<PersonWithTransformFrom>()(
   {
-    thing: S.optional(S.string).toOption(),
+    age: S.optional(S.number).toOption(),
   },
   (input) =>
-    Effect.mapBoth(fetchThing(input.id), {
-      onFailure: (e) => PR.parseError([PR.type(S.string, input, e.message)]),
-      onSuccess: (thing) => ({ ...input, thing })
+    Effect.mapBoth(getAge(input.id), {
+      onFailure: (e) =>
+        PR.parseError([PR.type(S.string.ast, input, e.message)]),
+      // must return { age?: number }
+      onSuccess: (age) => (age > 18 ? { ...input, age } : { ...input }),
     }),
   PR.success
 ) {}
+
+S.parsePromise(PersonWithTransformFrom)({ id: 1, name: "name" }).then(
+  console.log
+);
+/*
+Output:
+PersonWithTransformFrom {
+  id: 1,
+  name: 'name',
+  age: { _id: 'Option', _tag: 'None' }
+}
+*/
 ```
+
+The decision of which API to use, either `transform` or `transformFrom`, depends on when you wish to execute the transformation:
+
+1. Using `transform`:
+
+   - The transformation occurs at the end of the process.
+   - It expects you to provide a value of type `{ age: Option<number> }`.
+   - After processing the initial input, the new transformation comes into play, and you need to ensure the final output adheres to the specified structure.
+
+2. Using `transformFrom`:
+   - The new transformation starts as soon as the initial input is handled.
+   - You should provide a value `{ age?: number }`.
+   - Based on this fresh input, the subsequent transformation `{ age: S.optional(S.number).toOption() }` is executed.
+   - This approach allows for immediate handling of the input, potentially influencing the subsequent transformations.
 
 ## Pick
 
