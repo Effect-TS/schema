@@ -1249,7 +1249,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface Base<EI, EA, AI, AA, I, Req extends Request.Request<EA, AA>>
+export interface Base<EI, EA, AI, AA, I, Req extends Request.Request<EA, AA> & { readonly _tag: string }>
   extends Schema<I, Req>,
     TaggedRequest.ResultSchemas<EI, EA, AI, AA> {}
 ```
