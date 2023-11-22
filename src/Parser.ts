@@ -282,7 +282,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
                 Option.match(
                   ast.filter(a, options ?? defaultParseOption, ast),
                   {
-                    onNone: () => ParseResult.success(a),
+                    onNone: () => ParseResult.succeed(a),
                     onSome: ParseResult.fail
                   }
                 )
@@ -331,7 +331,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
       return fromRefinement(ast, Predicate.isNever)
     case "UnknownKeyword":
     case "AnyKeyword":
-      return ParseResult.success
+      return ParseResult.succeed
     case "StringKeyword":
       return fromRefinement(ast, Predicate.isString)
     case "NumberKeyword":
@@ -554,7 +554,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
         const computeResult = ({ es, output }: State) =>
           ReadonlyArray.isNonEmptyArray(es) ?
             ParseResult.fail(sortByIndex(es)) :
-            ParseResult.success(sortByIndex(output))
+            ParseResult.succeed(sortByIndex(output))
         if (queue && queue.length > 0) {
           const cqueue = queue
           return Effect.suspend(() => {
@@ -767,7 +767,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
         const computeResult = ({ es, output }: State) =>
           ReadonlyArray.isNonEmptyArray(es) ?
             ParseResult.fail(sortByIndex(es)) :
-            ParseResult.success(output)
+            ParseResult.succeed(output)
         if (queue && queue.length > 0) {
           const cqueue = queue
           return Effect.suspend(() => {
@@ -850,7 +850,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
           const eu = !queue || queue.length === 0 ? ParseResult.eitherOrUndefined(pr) : undefined
           if (eu) {
             if (Either.isRight(eu)) {
-              return ParseResult.success(eu.right)
+              return ParseResult.succeed(eu.right)
             } else {
               es.push([stepKey++, ParseResult.unionMember(eu.left.errors)])
             }
@@ -867,7 +867,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
                   } else {
                     return Effect.flatMap(Effect.either(pr), (t) => {
                       if (Either.isRight(t)) {
-                        state.finalResult = ParseResult.success(t.right)
+                        state.finalResult = ParseResult.succeed(t.right)
                       } else {
                         state.es.push([nk, ParseResult.unionMember(t.left.errors)])
                       }
@@ -918,7 +918,7 @@ const go = (ast: AST.AST, isDecoding: boolean): Parser<any, any> => {
 
 const fromRefinement =
   <A>(ast: AST.AST, refinement: (u: unknown) => u is A): Parser<unknown, A> => (u) =>
-    refinement(u) ? ParseResult.success(u) : ParseResult.fail(ParseResult.type(ast, u))
+    refinement(u) ? ParseResult.succeed(u) : ParseResult.fail(ParseResult.type(ast, u))
 
 /** @internal */
 export const getLiterals = (
@@ -1074,7 +1074,7 @@ export const getFinalTransformation = (
     case "FinalTransformation":
       return isDecoding ? transformation.decode : transformation.encode
     case "ComposeTransformation":
-      return ParseResult.success
+      return ParseResult.succeed
     case "TypeLiteralTransformation":
       return (input) => {
         let out: ParseResult.ParseResult<any> = Either.right(input)

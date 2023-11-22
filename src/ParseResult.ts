@@ -216,7 +216,7 @@ export const unionMember = (
  * @category constructors
  * @since 1.0.0
  */
-export const success: <A>(a: A) => ParseResult<A> = Either.right
+export const succeed: <A>(a: A) => ParseResult<A> = Either.right
 
 const _try = <A>(options: {
   try: LazyArg<A>

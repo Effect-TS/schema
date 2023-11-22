@@ -14,12 +14,11 @@ Added in v1.0.0
 
 - [constructors](#constructors)
   - [fail](#fail)
-  - [failures](#failures)
   - [forbidden](#forbidden)
   - [index](#index)
   - [key](#key)
   - [missing](#missing)
-  - [success](#success)
+  - [succeed](#succeed)
   - [try](#try)
   - [type](#type)
   - [unexpected](#unexpected)
@@ -57,16 +56,6 @@ Added in v1.0.0
 export declare const fail: (
   error: ParseError | ParseErrors | ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
 ) => ParseResult<never>
-```
-
-Added in v1.0.0
-
-## failures
-
-**Signature**
-
-```ts
-export declare const failures: (es: readonly [ParseErrors, ...ParseErrors[]]) => ParseResult<never>
 ```
 
 Added in v1.0.0
@@ -111,12 +100,12 @@ export declare const missing: Missing
 
 Added in v1.0.0
 
-## success
+## succeed
 
 **Signature**
 
 ```ts
-export declare const success: <A>(a: A) => ParseResult<A>
+export declare const succeed: <A>(a: A) => ParseResult<A>
 ```
 
 Added in v1.0.0

@@ -39,7 +39,7 @@ describe("ArrayFormatter", () => {
       S.transformOrFail(
         S.string,
         (s, _, ast) => ParseResult.fail(ParseResult.type(ast, s, "my custom message")),
-        ParseResult.success
+        ParseResult.succeed
       )
     )
     expectIssues(schema, "", [{
