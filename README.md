@@ -1833,9 +1833,7 @@ export const transformedSchema: S.Schema<string, boolean> = S.transformOrFail(
       ? ParseResult.success(true)
       : s === "false"
         ? ParseResult.success(false)
-        : ParseResult.failure(
-            ParseResult.type(S.literal("true", "false").ast, s)
-          ),
+        : ParseResult.fail(ParseResult.type(S.literal("true", "false").ast, s)),
   // define a function that converts a boolean into a string
   (b) => ParseResult.success(String(b))
 );

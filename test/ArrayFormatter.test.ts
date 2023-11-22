@@ -38,7 +38,7 @@ describe("ArrayFormatter", () => {
     const schema = S.string.pipe(
       S.transformOrFail(
         S.string,
-        (s, _, ast) => ParseResult.failure(ParseResult.type(ast, s, "my custom message")),
+        (s, _, ast) => ParseResult.fail(ParseResult.type(ast, s, "my custom message")),
         ParseResult.success
       )
     )

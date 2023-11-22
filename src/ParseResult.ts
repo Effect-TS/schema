@@ -218,12 +218,6 @@ export const unionMember = (
  */
 export const success: <A>(a: A) => ParseResult<A> = Either.right
 
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const fail: (error: ParseError) => ParseResult<never> = Either.left
-
 const _try = <A>(options: {
   try: LazyArg<A>
   catch: (e: unknown) => ParseError
@@ -241,15 +235,15 @@ export {
  * @category constructors
  * @since 1.0.0
  */
-export const failure = (e: ParseErrors): ParseResult<never> => fail(parseError([e]))
-
-/**
- * @category constructors
- * @since 1.0.0
- */
-export const failures = (
-  es: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
-): ParseResult<never> => Either.left(parseError(es))
+export const fail = (
+  error: ParseError | ParseErrors | ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+): ParseResult<never> => {
+  const e: any = error
+  if ("_tag" in e) {
+    return e._tag === "ParseError" ? Either.left(e) : Either.left(parseError([e]))
+  }
+  return Either.left(parseError(e))
+}
 
 /**
  * @category optimisation

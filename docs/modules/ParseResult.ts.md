@@ -14,7 +14,6 @@ Added in v1.0.0
 
 - [constructors](#constructors)
   - [fail](#fail)
-  - [failure](#failure)
   - [failures](#failures)
   - [forbidden](#forbidden)
   - [index](#index)
@@ -55,17 +54,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const fail: (error: ParseError) => ParseResult<never>
-```
-
-Added in v1.0.0
-
-## failure
-
-**Signature**
-
-```ts
-export declare const failure: (e: ParseErrors) => ParseResult<never>
+export declare const fail: (
+  error: ParseError | ParseErrors | ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+) => ParseResult<never>
 ```
 
 Added in v1.0.0
