@@ -351,6 +351,9 @@ Added in v1.0.0
 
 ## BigDecimalFromNumber
 
+A schema that transforms a `number` into a `BigDecimal`.
+When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
+
 **Signature**
 
 ```ts
@@ -372,6 +375,7 @@ Added in v1.0.0
 ## bigDecimalFromNumber
 
 A schema that transforms a `number` into a `BigDecimal`.
+When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
 
 **Signature**
 
