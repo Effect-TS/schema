@@ -1996,6 +1996,72 @@ parse(0); // 0
 parse(3); // 1
 ```
 
+### BigDecimal transformations
+
+#### BigDecimal
+
+Transforms a `string` into a `BigDecimal`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<string, BigDecimal>
+const schema = S.BigDecimal;
+const parse = S.parseSync(schema);
+
+parse(".124"); // BigDecimal(.124)
+```
+
+#### BigDecimalFromNumber
+
+Transforms a `number` into a `BigDecimal`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<number, BigDecimal>
+const schema = S.BigDecimalFromNumber;
+const parse = S.parseSync(schema);
+
+parse(0.111); // BigDecimal(.111)
+```
+
+#### clampBigDecimal
+
+Clamps a `BigDecimal` between a minimum and a maximum value.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as BigDecimal from "effect/BigDecimal";
+
+// $ExpectType Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
+const schema = S.BigDecimal.pipe(
+	S.clampBigDecimal(BigDecimal.fromNumber(-1), BigDecimal.fromNumber(1))
+);
+
+const parse = S.parseSync(schema);
+parse("-2"); // BigDecimal(-1)
+parse("0"); // BigDecimal(0)
+parse("3"); // BigDecimal(1)
+```
+
+#### negateBigDecimal
+
+Negates a `BigDecimal`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as BigDecimal from "effect/BigDecimal";
+
+// $ExpectType Schema<BigDecimal.BigDecimal, bigint>
+const schema = S.BigDecimal.pipe(S.negateBigDecimal);
+
+const parse = S.parseSync(schema);
+parse("-2"); // BigDecimal(2)
+parse("0"); // BigDecimal(0)
+parse("3"); // BigDecimal(-3)
+```
+
 ### Symbol transformations
 
 #### symbol
