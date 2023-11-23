@@ -928,6 +928,26 @@ S.bigint.pipe(S.negativeBigint()); // < 0n
 S.bigint.pipe(S.nonPositiveBigint()); // <= 0n
 ```
 
+### BigDecimal filters
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as BigDecimal from "effect/BigDecimal";
+
+S.BigDecimal.pipe(S.greaterThanBigDecimal(BigDecimal.fromNumber(5)));
+S.BigDecimal.pipe(S.greaterThanOrEqualToBigDecimal(BigDecimal.fromNumber(5)));
+S.BigDecimal.pipe(S.lessThanBigDecimal(BigDecimal.fromNumber(5)));
+S.BigDecimal.pipe(S.lessThanOrEqualToBigDecimal(BigDecimal.fromNumber(5)));
+S.BigDecimal.pipe(
+	S.betweenBigDecimal(BigDecimal.fromNumber(-2), BigDecimal.fromNumber(2))
+);
+
+S.BigDecimal.pipe(S.positiveBigDecimal());
+S.BigDecimal.pipe(S.nonNegativeBigDecimal());
+S.BigDecimal.pipe(S.negativeBigDecimal());
+S.BigDecimal.pipe(S.nonPositiveBigDecimal());
+```
+
 ### Array filters
 
 ```ts

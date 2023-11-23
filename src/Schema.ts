@@ -3569,7 +3569,7 @@ export const bigDecimalFromNumber = <I, A extends number>(
     self,
     BigDecimalFromSelf,
     (num) => ParseResult.success(BigDecimal.fromNumber(num)),
-    (val) => ParseResult.success(BigDecimal.unsafeToNumber(val)), // TODO: Try to make this safe
+    (val) => ParseResult.success(BigDecimal.unsafeToNumber(val)), // Can this be made safe?
     { strict: false }
   )
 
@@ -3590,7 +3590,7 @@ export const bigDecimalFromString = <I, A extends string>(
         onNone: () => ParseResult.failure(ParseResult.type(BigDecimalFromSelf.ast, num)),
         onSome: ParseResult.success
       })),
-    (val) => ParseResult.success(BigDecimal.toString(val)), // TODO: Try to make this safe
+    (val) => ParseResult.success(BigDecimal.toString(val)),
     { strict: false }
   )
 
