@@ -3,7 +3,7 @@ import * as Util from "@effect/schema/test/util"
 import { BigDecimal } from "effect"
 import { describe, it } from "vitest"
 
-describe("bigint/greaterThanOrEqualToBigDecimal", () => {
+describe("BigDecimal/greaterThanOrEqualToBigDecimal", () => {
   const min = BigDecimal.fromNumber(10)
   const schema = S.BigDecimal.pipe(S.greaterThanOrEqualToBigDecimal(min))
 

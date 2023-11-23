@@ -3,7 +3,7 @@ import * as Util from "@effect/schema/test/util"
 import { BigDecimal } from "effect"
 import { describe, it } from "vitest"
 
-describe("bigint/lessThanBigDecimal", () => {
+describe("BigDecimal/lessThanBigDecimal", () => {
   const max = BigDecimal.fromNumber(5)
   const schema = S.BigDecimal.pipe(S.lessThanBigDecimal(max))
 
