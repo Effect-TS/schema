@@ -2015,6 +2015,8 @@ parse(".124"); // BigDecimal(.124)
 #### BigDecimalFromNumber
 
 Transforms a `number` into a `BigDecimal`.
+> [!WARNING]  
+> Warning: When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
 
 ```ts
 import * as S from "@effect/schema/Schema";

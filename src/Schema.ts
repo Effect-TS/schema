@@ -3561,6 +3561,7 @@ export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
 
 /**
  * A schema that transforms a `number` into a `BigDecimal`.
+ * When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
  *
  * @category BigDecimal constructors
  * @since 1.0.0
@@ -3608,6 +3609,9 @@ export {
 }
 
 /**
+ * A schema that transforms a `number` into a `BigDecimal`.
+ * When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
+ *
  * @category BigDecimal constructors
  * @since 1.0.0
  */
