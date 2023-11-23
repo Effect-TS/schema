@@ -2038,7 +2038,7 @@ import * as BigDecimal from "effect/BigDecimal";
 
 // $ExpectType Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
 const schema = S.BigDecimal.pipe(
-	S.clampBigDecimal(BigDecimal.fromNumber(-1), BigDecimal.fromNumber(1))
+  S.clampBigDecimal(BigDecimal.fromNumber(-1), BigDecimal.fromNumber(1))
 );
 
 const parse = S.parseSync(schema);
