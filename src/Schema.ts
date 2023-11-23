@@ -24,14 +24,14 @@ import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as Request from "effect/Request"
 import * as S from "effect/String"
 import type { Equals, Simplify } from "effect/Types"
-import type { ParseOptions } from "./AST.js"
-import * as AST from "./AST.js"
 import type { Arbitrary } from "./Arbitrary.js"
 import * as ArrayFormatter from "./ArrayFormatter.js"
-import * as ParseResult from "./ParseResult.js"
-import * as Parser from "./Parser.js"
-import type { Pretty } from "./Pretty.js"
+import type { ParseOptions } from "./AST.js"
+import * as AST from "./AST.js"
 import * as Internal from "./internal/common.js"
+import * as Parser from "./Parser.js"
+import * as ParseResult from "./ParseResult.js"
+import type { Pretty } from "./Pretty.js"
 
 // ---------------------------------------------
 // model
@@ -3556,50 +3556,6 @@ export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
   }
 )
 
-const valueScalePair: Schema<readonly [value: bigint, scale: number]> = tuple(
-  bigintFromSelf.pipe(annotations({
-    [AST.TitleAnnotationId]: "value",
-    [AST.DescriptionAnnotationId]: "value"
-  })),
-  number.pipe(annotations({
-    [AST.TitleAnnotationId]: "scale",
-    [AST.DescriptionAnnotationId]: "scale"
-  }))
-).pipe(annotations({
-  [AST.TitleAnnotationId]: "a tuple representing a value and a scale",
-  [AST.DescriptionAnnotationId]: "a tuple representing a value and a scale"
-}))
-
-/**
- * A combinator that transforms a `[value: bigint, scale: number]` tuple into a `BigDecimal`.
- *
- * @category BigDecimal transformations
- * @since 1.0.0
- */
-export const bigDecimalFromValueScalePair = <I, A extends readonly [value: bigint, scale: number]>(
-  self: Schema<I, A>
-): Schema<I, BigDecimal.BigDecimal> =>
-  transform(
-    self,
-    BigDecimalFromSelf,
-    ([value, scale]) => BigDecimal.make(value, scale),
-    (n) => [n.value, n.scale],
-    { strict: false }
-  )
-
-const _BigDecimal: Schema<readonly [value: bigint, scale: number], BigDecimal.BigDecimal> =
-  bigDecimalFromValueScalePair(valueScalePair)
-
-export {
-  /**
-   * A schema that transforms a `[value: bigint, scale: number]` tuple into a `BigDecimal`.
-   *
-   * @category BigDecimal constructors
-   * @since 1.0.0
-   */
-  _BigDecimal as BigDecimal
-}
-
 /**
  * A schema that transforms a `number` into a `BigDecimal`.
  *
@@ -3638,13 +3594,15 @@ export const bigDecimalFromString = <I, A extends string>(
     { strict: false }
   )
 
-/**
- * @category BigDecimal constructors
- * @since 1.0.0
- */
-export const BigDecimalFromString: Schema<string, BigDecimal.BigDecimal> = bigDecimalFromString(
-  string
-)
+const _BigDecimal: Schema<string, BigDecimal.BigDecimal> = bigDecimalFromString(string)
+
+export {
+  /**
+   * @category BigDecimal constructors
+   * @since 1.0.0
+   */
+  _BigDecimal as BigDecimal
+}
 
 /**
  * @category BigDecimal constructors
@@ -3754,7 +3712,7 @@ export const lessThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
  * @category type id
  * @since 1.0.0
  */
-export const PositiveToBigDecimalTypeId = Symbol.for(
+export const PositiveBigDecimalTypeId = Symbol.for(
   "@effect/schema/TypeId/PositiveBigDecimal"
 )
 
@@ -3768,11 +3726,19 @@ export const positiveBigDecimal = <A extends BigDecimal.BigDecimal>(
 <I>(self: Schema<I, A>): Schema<I, A> =>
   self.pipe(
     filter((a): a is A => BigDecimal.isPositive(a), {
-      typeId: { id: LessThanOrEqualToBigDecimalTypeId, params: {} },
+      typeId: { id: PositiveBigDecimalTypeId, params: {} },
       description: `a positive BigDecimal`,
       ...options
     })
   )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const NegativeBigDecimalTypeId = Symbol.for(
+  "@effect/schema/TypeId/NegativeBigDecimal"
+)
 
 /**
  * @category BigDecimal filters
@@ -3784,7 +3750,7 @@ export const negativeBigDecimal = <A extends BigDecimal.BigDecimal>(
 <I>(self: Schema<I, A>): Schema<I, A> =>
   self.pipe(
     filter((a): a is A => BigDecimal.isNegative(a), {
-      typeId: { id: LessThanOrEqualToBigDecimalTypeId, params: {} },
+      typeId: { id: NegativeBigDecimalTypeId, params: {} },
       description: `a negative BigDecimal`,
       ...options
     })

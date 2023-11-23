@@ -11,18 +11,18 @@ describe("BigDecimal/between", () => {
   it("decoding", async () => {
     await Util.expectParseFailure(
       schema,
-      [2n, 0],
+      "2",
       `Expected a BigDecimal between -1 and 1, actual {"_id":"BigDecimal","value":"2","scale":0}`
     )
-    await Util.expectParseSuccess(schema, [0n, 0], BigDecimal.make(0n, 0))
+    await Util.expectParseSuccess(schema, "0", BigDecimal.make(0n, 0))
     await Util.expectParseSuccess(
       schema,
-      [2n, 1],
+      "0.2",
       BigDecimal.make(2n, 1)
     )
   })
 
   it("encoding", async () => {
-    await Util.expectEncodeSuccess(schema, BigDecimal.make(0n, 0), [0n, 0])
+    await Util.expectEncodeSuccess(schema, BigDecimal.make(0n, 0), "0")
   })
 })
