@@ -20,7 +20,7 @@ describe("BigDecimal/BigDecimal", () => {
     await Util.expectParseSuccess(
       schema,
       "",
-      BigDecimal.make(0n, 0)
+      BigDecimal.normalize(BigDecimal.make(0n, 0))
     )
     await Util.expectParseFailure(
       schema,

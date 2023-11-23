@@ -16,7 +16,7 @@ describe("bigint/greaterThanOrEqualToBigDecimal", () => {
     await Util.expectParseSuccess(
       schema,
       "10",
-      BigDecimal.make(10n, 0)
+      BigDecimal.make(1n, -1)
     )
   })
 

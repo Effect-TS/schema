@@ -1,7 +1,8 @@
+import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import { BigDecimal } from "effect"
-import { describe, it } from "vitest"
+import { describe, expect, it } from "vitest"
 
 describe("Schema/DurationFromSelf", () => {
   const schema = S.BigDecimalFromSelf
@@ -28,5 +29,14 @@ describe("Schema/DurationFromSelf", () => {
       BigDecimal.make(-20000000n, 0),
       BigDecimal.make(-20000000n, 0)
     )
+  })
+
+  it("pretty", () => {
+    const schema = S.BigDecimalFromSelf
+    const pretty = Pretty.to(schema)
+
+    expect(pretty(BigDecimal.fromNumber(123))).toEqual("BigDecimal(123)")
+    expect(pretty(BigDecimal.unsafeFromString("123.100"))).toEqual("BigDecimal(123.1)")
+    expect(pretty(BigDecimal.unsafeFromString(""))).toEqual("BigDecimal(0)")
   })
 })

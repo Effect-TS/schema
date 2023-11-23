@@ -3535,7 +3535,7 @@ export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, 
 // ---------------------------------------------
 
 const bigDecimalPretty = (): Pretty<BigDecimal.BigDecimal> => (val) =>
-  `BigDecimal(${BigDecimal.toString(val)})`
+  `BigDecimal(${BigDecimal.toString(BigDecimal.normalize(val))})`
 
 const bigDecimalArbitrary = (): Arbitrary<BigDecimal.BigDecimal> => (fc) =>
   fc.tuple(fc.bigInt(), fc.integer()).map(([value, scale]) => BigDecimal.make(value, scale))
@@ -3591,9 +3591,9 @@ export const bigDecimalFromString = <I, A extends string>(
     (num) =>
       BigDecimal.fromString(num).pipe(Option.match({
         onNone: () => ParseResult.failure(ParseResult.type(BigDecimalFromSelf.ast, num)),
-        onSome: ParseResult.success
+        onSome: (val) => ParseResult.success(BigDecimal.normalize(val))
       })),
-    (val) => ParseResult.success(BigDecimal.toString(val)),
+    (val) => ParseResult.success(BigDecimal.toString(BigDecimal.normalize(val))),
     { strict: false }
   )
 
