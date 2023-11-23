@@ -3647,7 +3647,7 @@ export const GreaterThanOrEqualToBigDecimalTypeId = Symbol.for(
  * @category BigDecimal filters
  * @since 1.0.0
  */
-export const GreaterThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
+export const greaterThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
   min: BigDecimal.BigDecimal,
   options?: FilterAnnotations<A>
 ) =>
@@ -3655,7 +3655,7 @@ export const GreaterThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
   self.pipe(
     filter((a): a is A => BigDecimal.greaterThanOrEqualTo(a, min), {
       typeId: { id: GreaterThanOrEqualToBigDecimalTypeId, params: { min } },
-      description: `a BigDecimal greater than or equal to ${BigDecimal.toString(min)}n`,
+      description: `a BigDecimal greater than or equal to ${BigDecimal.toString(min)}`,
       ...options
     })
   )
@@ -3703,7 +3703,7 @@ export const lessThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
   self.pipe(
     filter((a): a is A => BigDecimal.lessThanOrEqualTo(a, max), {
       typeId: { id: LessThanOrEqualToBigDecimalTypeId, params: { max } },
-      description: `a BigDecimal less than or equal to ${BigDecimal.toString(max)}n`,
+      description: `a BigDecimal less than or equal to ${BigDecimal.toString(max)}`,
       ...options
     })
   )
@@ -3736,6 +3736,30 @@ export const positiveBigDecimal = <A extends BigDecimal.BigDecimal>(
  * @category type id
  * @since 1.0.0
  */
+export const NonNegativeBigDecimalTypeId = Symbol.for(
+  "@effect/schema/TypeId/NonNegativeBigDecimal"
+)
+
+/**
+ * @category BigDecimal filters
+ * @since 1.0.0
+ */
+export const nonNegativeBigDecimal = <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => a.value >= 0n, {
+      typeId: { id: NonNegativeBigDecimalTypeId, params: {} },
+      description: `a non-negative BigDecimal`,
+      ...options
+    })
+  )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
 export const NegativeBigDecimalTypeId = Symbol.for(
   "@effect/schema/TypeId/NegativeBigDecimal"
 )
@@ -3752,6 +3776,30 @@ export const negativeBigDecimal = <A extends BigDecimal.BigDecimal>(
     filter((a): a is A => BigDecimal.isNegative(a), {
       typeId: { id: NegativeBigDecimalTypeId, params: {} },
       description: `a negative BigDecimal`,
+      ...options
+    })
+  )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const NonPositiveBigDecimalTypeId = Symbol.for(
+  "@effect/schema/TypeId/NonPositiveBigDecimal"
+)
+
+/**
+ * @category BigDecimal filters
+ * @since 1.0.0
+ */
+export const nonPositiveBigDecimal = <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => a.value <= 0n, {
+      typeId: { id: NonPositiveBigDecimalTypeId, params: {} },
+      description: `a non-positive BigDecimal`,
       ...options
     })
   )
