@@ -3555,7 +3555,7 @@ export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
     [AST.IdentifierAnnotationId]: "BigDecimal",
     [Internal.PrettyHookId]: bigDecimalPretty,
     [Internal.ArbitraryHookId]: bigDecimalArbitrary,
-    [Internal.EquivalenceHookId]: BigDecimal.Equivalence
+    [Internal.EquivalenceHookId]: () => BigDecimal.Equivalence
   }
 )
 
