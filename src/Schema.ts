@@ -3425,7 +3425,6 @@ const readonlyMapEquivalence = <K, V>(
 }
 
 /**
- * @category ReadonlyMap transformations
  * @since 1.0.0
  */
 export const readonlyMapFromSelf = <IK, K, IV, V>(
@@ -3541,6 +3540,10 @@ const bigDecimalPretty = (): Pretty<BigDecimal.BigDecimal> => (val) =>
 const bigDecimalArbitrary = (): Arbitrary<BigDecimal.BigDecimal> => (fc) =>
   fc.tuple(fc.bigInt(), fc.integer()).map(([value, scale]) => BigDecimal.make(value, scale))
 
+/**
+ * @category BigDecimal constructors
+ * @since 1.0.0
+ */
 export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
   [],
   struct({}),
@@ -3846,6 +3849,23 @@ export const clampBigDecimal =
       identity,
       { strict: false }
     )
+
+/**
+ * Negates a `BigDecimal`.
+ *
+ * @category BigDecimal transformations
+ * @since 1.0.0
+ */
+export const negateBigDecimal = <I, A extends BigDecimal.BigDecimal>(
+  self: Schema<I, A>
+): Schema<I, A> =>
+  transform(
+    self,
+    to(self),
+    (self) => BigDecimal.negate(self),
+    (self) => BigDecimal.negate(self),
+    { strict: false }
+  )
 
 // ---------------------------------------------
 // Chunk transformations
