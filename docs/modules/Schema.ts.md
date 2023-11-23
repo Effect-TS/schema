@@ -12,6 +12,25 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [BigDecimal constructors](#bigdecimal-constructors)
+  - [BigDecimal](#bigdecimal)
+  - [BigDecimalFromNumber](#bigdecimalfromnumber)
+  - [BigDecimalFromSelf](#bigdecimalfromself)
+  - [bigDecimalFromNumber](#bigdecimalfromnumber-1)
+  - [bigDecimalFromString](#bigdecimalfromstring)
+- [BigDecimal filters](#bigdecimal-filters)
+  - [betweenBigDecimal](#betweenbigdecimal)
+  - [greaterThanBigDecimal](#greaterthanbigdecimal)
+  - [greaterThanOrEqualToBigDecimal](#greaterthanorequaltobigdecimal)
+  - [lessThanBigDecimal](#lessthanbigdecimal)
+  - [lessThanOrEqualToBigDecimal](#lessthanorequaltobigdecimal)
+  - [negativeBigDecimal](#negativebigdecimal)
+  - [nonNegativeBigDecimal](#nonnegativebigdecimal)
+  - [nonPositiveBigDecimal](#nonpositivebigdecimal)
+  - [positiveBigDecimal](#positivebigdecimal)
+- [BigDecimal transformations](#bigdecimal-transformations)
+  - [clampBigDecimal](#clampbigdecimal)
+  - [negateBigDecimal](#negatebigdecimal)
 - [Chunk transformations](#chunk-transformations)
   - [chunk](#chunk)
   - [chunkFromSelf](#chunkfromself)
@@ -45,7 +64,6 @@ Added in v1.0.0
   - [minItems](#minitems)
 - [ReadonlyMap transformations](#readonlymap-transformations)
   - [readonlyMap](#readonlymap)
-  - [readonlyMapFromSelf](#readonlymapfromself)
 - [ReadonlySet transformations](#readonlyset-transformations)
   - [readonlySet](#readonlyset)
   - [readonlySetFromSelf](#readonlysetfromself)
@@ -244,12 +262,15 @@ Added in v1.0.0
 - [symbol transformations](#symbol-transformations)
   - [symbolFromString](#symbolfromstring)
 - [type id](#type-id)
+  - [BetweenBigDecimalTypeId](#betweenbigdecimaltypeid)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
   - [BetweenTypeId](#betweentypeid)
   - [BrandTypeId](#brandtypeid)
   - [EndsWithTypeId](#endswithtypeid)
   - [FiniteTypeId](#finitetypeid)
+  - [GreaterThanBigDecimalTypeId](#greaterthanbigdecimaltypeid)
   - [GreaterThanBigintTypeId](#greaterthanbiginttypeid)
+  - [GreaterThanOrEqualToBigDecimalTypeId](#greaterthanorequaltobigdecimaltypeid)
   - [GreaterThanOrEqualToBigintTypeId](#greaterthanorequaltobiginttypeid)
   - [GreaterThanOrEqualToTypeId](#greaterthanorequaltotypeid)
   - [GreaterThanTypeId](#greaterthantypeid)
@@ -259,7 +280,9 @@ Added in v1.0.0
   - [ItemsCountTypeId](#itemscounttypeid)
   - [JsonNumberTypeId](#jsonnumbertypeid)
   - [LengthTypeId](#lengthtypeid)
+  - [LessThanBigDecimalTypeId](#lessthanbigdecimaltypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
+  - [LessThanOrEqualToBigDecimalTypeId](#lessthanorequaltobigdecimaltypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
   - [LessThanTypeId](#lessthantypeid)
@@ -269,8 +292,12 @@ Added in v1.0.0
   - [MinItemsTypeId](#minitemstypeid)
   - [MinLengthTypeId](#minlengthtypeid)
   - [MultipleOfTypeId](#multipleoftypeid)
+  - [NegativeBigDecimalTypeId](#negativebigdecimaltypeid)
   - [NonNaNTypeId](#nonnantypeid)
+  - [NonNegativeBigDecimalTypeId](#nonnegativebigdecimaltypeid)
+  - [NonPositiveBigDecimalTypeId](#nonpositivebigdecimaltypeid)
   - [PatternTypeId](#patterntypeid)
+  - [PositiveBigDecimalTypeId](#positivebigdecimaltypeid)
   - [StartsWithTypeId](#startswithtypeid)
   - [TrimmedTypeId](#trimmedtypeid)
   - [ULIDTypeId](#ulidtypeid)
@@ -297,6 +324,7 @@ Added in v1.0.0
   - [from](#from)
   - [optional](#optional)
   - [propertySignature](#propertysignature)
+  - [readonlyMapFromSelf](#readonlymapfromself)
   - [to](#to)
 - [validation](#validation)
   - [asserts](#asserts)
@@ -308,6 +336,211 @@ Added in v1.0.0
   - [validateSync](#validatesync)
 
 ---
+
+# BigDecimal constructors
+
+## BigDecimal
+
+**Signature**
+
+```ts
+export declare const BigDecimal: Schema<string, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## BigDecimalFromNumber
+
+A schema that transforms a `number` into a `BigDecimal`.
+When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
+
+**Signature**
+
+```ts
+export declare const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## BigDecimalFromSelf
+
+**Signature**
+
+```ts
+export declare const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## bigDecimalFromNumber
+
+A schema that transforms a `number` into a `BigDecimal`.
+When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
+
+**Signature**
+
+```ts
+export declare const bigDecimalFromNumber: <I, A extends number>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## bigDecimalFromString
+
+A schema that transforms a `string` into a `BigDecimal`.
+
+**Signature**
+
+```ts
+export declare const bigDecimalFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+# BigDecimal filters
+
+## betweenBigDecimal
+
+**Signature**
+
+```ts
+export declare const betweenBigDecimal: <A extends BigDecimal.BigDecimal>(
+  minimum: BigDecimal.BigDecimal,
+  maximum: BigDecimal.BigDecimal,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanBigDecimal
+
+**Signature**
+
+```ts
+export declare const greaterThanBigDecimal: <A extends BigDecimal.BigDecimal>(
+  min: BigDecimal.BigDecimal,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanOrEqualToBigDecimal
+
+**Signature**
+
+```ts
+export declare const greaterThanOrEqualToBigDecimal: <A extends BigDecimal.BigDecimal>(
+  min: BigDecimal.BigDecimal,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanBigDecimal
+
+**Signature**
+
+```ts
+export declare const lessThanBigDecimal: <A extends BigDecimal.BigDecimal>(
+  max: BigDecimal.BigDecimal,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanOrEqualToBigDecimal
+
+**Signature**
+
+```ts
+export declare const lessThanOrEqualToBigDecimal: <A extends BigDecimal.BigDecimal>(
+  max: BigDecimal.BigDecimal,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## negativeBigDecimal
+
+**Signature**
+
+```ts
+export declare const negativeBigDecimal: <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## nonNegativeBigDecimal
+
+**Signature**
+
+```ts
+export declare const nonNegativeBigDecimal: <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## nonPositiveBigDecimal
+
+**Signature**
+
+```ts
+export declare const nonPositiveBigDecimal: <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## positiveBigDecimal
+
+**Signature**
+
+```ts
+export declare const positiveBigDecimal: <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+# BigDecimal transformations
+
+## clampBigDecimal
+
+Clamps a `BigDecimal` between a minimum and a maximum value.
+
+**Signature**
+
+```ts
+export declare const clampBigDecimal: (
+  minimum: BigDecimal.BigDecimal,
+  maximum: BigDecimal.BigDecimal
+) => <I, A extends BigDecimal.BigDecimal>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## negateBigDecimal
+
+Negates a `BigDecimal`.
+
+**Signature**
+
+```ts
+export declare const negateBigDecimal: <I, A extends BigDecimal.BigDecimal>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
 
 # Chunk transformations
 
@@ -596,19 +829,6 @@ export declare const readonlyMap: <IK, K, IV, V>(
   key: Schema<IK, K>,
   value: Schema<IV, V>
 ) => Schema<readonly (readonly [IK, IV])[], ReadonlyMap<K, V>>
-```
-
-Added in v1.0.0
-
-## readonlyMapFromSelf
-
-**Signature**
-
-```ts
-export declare const readonlyMapFromSelf: <IK, K, IV, V>(
-  key: Schema<IK, K>,
-  value: Schema<IV, V>
-) => Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
@@ -2884,6 +3104,16 @@ Added in v1.0.0
 
 # type id
 
+## BetweenBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const BetweenBigDecimalTypeId: typeof BetweenBigDecimalTypeId
+```
+
+Added in v1.0.0
+
 ## BetweenBigintTypeId
 
 **Signature**
@@ -2934,12 +3164,32 @@ export declare const FiniteTypeId: typeof FiniteTypeId
 
 Added in v1.0.0
 
+## GreaterThanBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanBigDecimalTypeId: typeof GreaterThanBigDecimalTypeId
+```
+
+Added in v1.0.0
+
 ## GreaterThanBigintTypeId
 
 **Signature**
 
 ```ts
 export declare const GreaterThanBigintTypeId: typeof GreaterThanBigintTypeId
+```
+
+Added in v1.0.0
+
+## GreaterThanOrEqualToBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanOrEqualToBigDecimalTypeId: typeof GreaterThanOrEqualToBigDecimalTypeId
 ```
 
 Added in v1.0.0
@@ -3034,12 +3284,32 @@ export declare const LengthTypeId: typeof LengthTypeId
 
 Added in v1.0.0
 
+## LessThanBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanBigDecimalTypeId: typeof LessThanBigDecimalTypeId
+```
+
+Added in v1.0.0
+
 ## LessThanBigintTypeId
 
 **Signature**
 
 ```ts
 export declare const LessThanBigintTypeId: typeof LessThanBigintTypeId
+```
+
+Added in v1.0.0
+
+## LessThanOrEqualToBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanOrEqualToBigDecimalTypeId: typeof LessThanOrEqualToBigDecimalTypeId
 ```
 
 Added in v1.0.0
@@ -3134,6 +3404,16 @@ export declare const MultipleOfTypeId: typeof MultipleOfTypeId
 
 Added in v1.0.0
 
+## NegativeBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const NegativeBigDecimalTypeId: typeof NegativeBigDecimalTypeId
+```
+
+Added in v1.0.0
+
 ## NonNaNTypeId
 
 **Signature**
@@ -3144,12 +3424,42 @@ export declare const NonNaNTypeId: typeof NonNaNTypeId
 
 Added in v1.0.0
 
+## NonNegativeBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const NonNegativeBigDecimalTypeId: typeof NonNegativeBigDecimalTypeId
+```
+
+Added in v1.0.0
+
+## NonPositiveBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const NonPositiveBigDecimalTypeId: typeof NonPositiveBigDecimalTypeId
+```
+
+Added in v1.0.0
+
 ## PatternTypeId
 
 **Signature**
 
 ```ts
 export declare const PatternTypeId: typeof PatternTypeId
+```
+
+Added in v1.0.0
+
+## PositiveBigDecimalTypeId
+
+**Signature**
+
+```ts
+export declare const PositiveBigDecimalTypeId: typeof PositiveBigDecimalTypeId
 ```
 
 Added in v1.0.0
@@ -3461,6 +3771,19 @@ export declare const propertySignature: <I, A>(
   schema: Schema<I, A>,
   options: DocAnnotations<A>
 ) => PropertySignature<I, false, A, false>
+```
+
+Added in v1.0.0
+
+## readonlyMapFromSelf
+
+**Signature**
+
+```ts
+export declare const readonlyMapFromSelf: <IK, K, IV, V>(
+  key: Schema<IK, K>,
+  value: Schema<IV, V>
+) => Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
