@@ -939,7 +939,7 @@ S.BigDecimal.pipe(S.greaterThanOrEqualToBigDecimal(BigDecimal.fromNumber(5)));
 S.BigDecimal.pipe(S.lessThanBigDecimal(BigDecimal.fromNumber(5)));
 S.BigDecimal.pipe(S.lessThanOrEqualToBigDecimal(BigDecimal.fromNumber(5)));
 S.BigDecimal.pipe(
-	S.betweenBigDecimal(BigDecimal.fromNumber(-2), BigDecimal.fromNumber(2))
+  S.betweenBigDecimal(BigDecimal.fromNumber(-2), BigDecimal.fromNumber(2))
 );
 
 S.BigDecimal.pipe(S.positiveBigDecimal());
