@@ -24,14 +24,14 @@ import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as Request from "effect/Request"
 import * as S from "effect/String"
 import type { Equals, Simplify } from "effect/Types"
-import type { Arbitrary } from "./Arbitrary.js"
-import * as ArrayFormatter from "./ArrayFormatter.js"
 import type { ParseOptions } from "./AST.js"
 import * as AST from "./AST.js"
-import * as Internal from "./internal/common.js"
-import * as Parser from "./Parser.js"
+import type { Arbitrary } from "./Arbitrary.js"
+import * as ArrayFormatter from "./ArrayFormatter.js"
 import * as ParseResult from "./ParseResult.js"
+import * as Parser from "./Parser.js"
 import type { Pretty } from "./Pretty.js"
+import * as Internal from "./internal/common.js"
 
 // ---------------------------------------------
 // model
@@ -3746,6 +3746,46 @@ export const lessThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
     filter((a): a is A => BigDecimal.lessThanOrEqualTo(a, max), {
       typeId: { id: LessThanOrEqualToBigDecimalTypeId, params: { max } },
       description: `a BigDecimal less than or equal to ${BigDecimal.toString(max)}n`,
+      ...options
+    })
+  )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const PositiveToBigDecimalTypeId = Symbol.for(
+  "@effect/schema/TypeId/PositiveBigDecimal"
+)
+
+/**
+ * @category BigDecimal filters
+ * @since 1.0.0
+ */
+export const positiveBigDecimal = <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => BigDecimal.isPositive(a), {
+      typeId: { id: LessThanOrEqualToBigDecimalTypeId, params: {} },
+      description: `a positive BigDecimal`,
+      ...options
+    })
+  )
+
+/**
+ * @category BigDecimal filters
+ * @since 1.0.0
+ */
+export const negativeBigDecimal = <A extends BigDecimal.BigDecimal>(
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => BigDecimal.isNegative(a), {
+      typeId: { id: LessThanOrEqualToBigDecimalTypeId, params: {} },
+      description: `a negative BigDecimal`,
       ...options
     })
   )
