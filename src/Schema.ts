@@ -3573,7 +3573,7 @@ export const bigDecimalFromNumber = <I, A extends number>(
     self,
     BigDecimalFromSelf,
     (num) => ParseResult.success(BigDecimal.fromNumber(num)),
-    (val) => ParseResult.success(BigDecimal.unsafeToNumber(val)), // Can this be made safe?
+    (val) => ParseResult.success(BigDecimal.unsafeToNumber(val)),
     { strict: false }
   )
 
