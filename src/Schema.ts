@@ -3628,9 +3628,9 @@ export const greaterThanBigDecimal = <A extends BigDecimal.BigDecimal>(
 ) =>
 <I>(self: Schema<I, A>): Schema<I, A> =>
   self.pipe(
-    filter((a): a is A => BigDecimal.greaterThan(min, a), {
+    filter((a): a is A => BigDecimal.greaterThan(a, min), {
       typeId: { id: GreaterThanBigDecimalTypeId, params: { min } },
-      description: `a BigDecimal greater than ${min}n`,
+      description: `a BigDecimal greater than ${min}`,
       ...options
     })
   )
@@ -3653,7 +3653,7 @@ export const GreaterThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
 ) =>
 <I>(self: Schema<I, A>): Schema<I, A> =>
   self.pipe(
-    filter((a): a is A => BigDecimal.greaterThanOrEqualTo(min, a), {
+    filter((a): a is A => BigDecimal.greaterThanOrEqualTo(a, min), {
       typeId: { id: GreaterThanOrEqualToBigDecimalTypeId, params: { min } },
       description: `a BigDecimal greater than or equal to ${BigDecimal.toString(min)}n`,
       ...options
@@ -3678,7 +3678,7 @@ export const lessThanBigDecimal = <A extends BigDecimal.BigDecimal>(
   self.pipe(
     filter((a): a is A => BigDecimal.lessThan(a, max), {
       typeId: { id: LessThanBigDecimalTypeId, params: { max } },
-      description: `a BigDecimal less than ${BigDecimal.toString(max)}n`,
+      description: `a BigDecimal less than ${BigDecimal.toString(max)}`,
       ...options
     })
   )
