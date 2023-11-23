@@ -2055,7 +2055,7 @@ Negates a `BigDecimal`.
 import * as S from "@effect/schema/Schema";
 import * as BigDecimal from "effect/BigDecimal";
 
-// $ExpectType Schema<BigDecimal.BigDecimal, bigint>
+// $ExpectType Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
 const schema = S.BigDecimal.pipe(S.negateBigDecimal);
 
 const parse = S.parseSync(schema);
