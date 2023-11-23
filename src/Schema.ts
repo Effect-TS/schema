@@ -3589,9 +3589,9 @@ export const bigDecimalFromString = <I, A extends string>(
   transformOrFail(
     self,
     BigDecimalFromSelf,
-    (num) =>
+    (num, _, ast) =>
       BigDecimal.fromString(num).pipe(Option.match({
-        onNone: () => ParseResult.failure(ParseResult.type(BigDecimalFromSelf.ast, num)),
+        onNone: () => ParseResult.failure(ParseResult.type(ast, num)),
         onSome: (val) => ParseResult.success(BigDecimal.normalize(val))
       })),
     (val) => ParseResult.success(BigDecimal.toString(BigDecimal.normalize(val))),
