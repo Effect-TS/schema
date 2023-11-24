@@ -4,8 +4,7 @@ import { Duration } from "effect"
 import { describe, it } from "vitest"
 
 describe("Schema/greaterThanOrEqualToDuration", () => {
-  const min = Duration.decode("5 seconds")
-  const schema = S.DurationFromSelf.pipe(S.greaterThanOrEqualToDuration(min))
+  const schema = S.DurationFromSelf.pipe(S.greaterThanOrEqualToDuration("5 seconds"))
 
   it("decoding", async () => {
     await Util.expectParseSuccess(
@@ -23,7 +22,7 @@ describe("Schema/greaterThanOrEqualToDuration", () => {
     await Util.expectParseFailure(
       schema,
       Duration.decode("4 seconds"),
-      `Expected a Duration greater than or equal to ${min.toString()}, actual {"_id":"Duration","_tag":"Millis","millis":4000}`
+      `Expected a Duration greater than or equal to 5 seconds, actual {"_id":"Duration","_tag":"Millis","millis":4000}`
     )
   })
 

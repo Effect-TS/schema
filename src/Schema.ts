@@ -2993,7 +2993,7 @@ export const LessThanDurationTypeId = Symbol.for("@effect/schema/TypeId/LessThan
  * @since 1.0.0
  */
 export const lessThanDuration = <A extends Duration.Duration>(
-  max: Duration.Duration,
+  max: Duration.DurationInput,
   options?: FilterAnnotations<A>
 ) =>
 <I>(self: Schema<I, A>): Schema<I, A> =>
@@ -3018,7 +3018,7 @@ export const LessThanOrEqualToDurationTypeId = Symbol.for(
  * @since 1.0.0
  */
 export const lessThanOrEqualToDuration = <A extends Duration.Duration>(
-  max: Duration.Duration,
+  max: Duration.DurationInput,
   options?: FilterAnnotations<A>
 ) =>
 <I>(self: Schema<I, A>): Schema<I, A> =>
@@ -3041,7 +3041,7 @@ export const GreaterThanDurationTypeId = Symbol.for("@effect/schema/TypeId/Great
  * @since 1.0.0
  */
 export const greaterThanDuration = <A extends Duration.Duration>(
-  min: Duration.Duration,
+  min: Duration.DurationInput,
   options?: FilterAnnotations<A>
 ) =>
 <I>(self: Schema<I, A>): Schema<I, A> =>
@@ -3066,7 +3066,7 @@ export const GreaterThanOrEqualToDurationTypeId = Symbol.for(
  * @since 1.0.0
  */
 export const greaterThanOrEqualToDuration = <A extends Duration.Duration>(
-  min: Duration.Duration,
+  min: Duration.DurationInput,
   options?: FilterAnnotations<A>
 ) =>
 <I>(self: Schema<I, A>): Schema<I, A> =>
