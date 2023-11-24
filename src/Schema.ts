@@ -3085,7 +3085,7 @@ export const greaterThanOrEqualToDuration = <A extends Duration.Duration>(
 export const BetweenDurationTypeId = Symbol.for("@effect/schema/TypeId/BetweenDuration")
 
 /**
- * @category BigDecimal filters
+ * @category Duration filters
  * @since 1.0.0
  */
 export const betweenDuration = <A extends Duration.Duration>(
