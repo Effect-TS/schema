@@ -2141,7 +2141,7 @@ const schema = S.DurationFromBigint;
 
 const parse = S.parseSync(schema);
 parse(0n); // 0 seconds
-parse(5000000n); // 5 seconds
+parse(5000000000n); // 5 seconds
 ```
 
 #### clampDuration
