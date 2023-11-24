@@ -36,9 +36,9 @@ describe("BigDecimal/BigDecimalFromSelf", () => {
     const schema = S.BigDecimalFromSelf
     const pretty = Pretty.to(schema)
 
-    expect(pretty(BigDecimal.fromNumber(123))).toEqual("BigDecimal(123)")
-    expect(pretty(BigDecimal.unsafeFromString("123.100"))).toEqual("BigDecimal(123.1)")
-    expect(pretty(BigDecimal.unsafeFromString(""))).toEqual("BigDecimal(0)")
+    expect(pretty(BigDecimal.fromNumber(123))).toEqual("123")
+    expect(pretty(BigDecimal.unsafeFromString("123.100"))).toEqual("123.1")
+    expect(pretty(BigDecimal.unsafeFromString(""))).toEqual("0")
   })
 
   it("equivalence", () => {
