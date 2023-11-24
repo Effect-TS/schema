@@ -44,20 +44,23 @@ const draw = (indentation: string, forest: Forest<string>): string => {
 
 /** @internal */
 export const formatActual = (actual: unknown): string => {
-  if (
-    actual == null || Predicate.isNumber(actual) || Predicate.isSymbol(actual) ||
-    Predicate.isDate(actual)
+  if (Predicate.isString(actual)) {
+    return JSON.stringify(actual)
+  } else if (
+    Predicate.isNumber(actual)
+    || actual == null
+    || Predicate.isBoolean(actual)
+    || Predicate.isSymbol(actual)
+    || Predicate.isDate(actual)
   ) {
     return String(actual)
-  }
-  if (Predicate.isBigInt(actual)) {
+  } else if (Predicate.isBigInt(actual)) {
     return String(actual) + "n"
-  }
-  if (
-    !Array.isArray(actual) &&
-    Predicate.hasProperty(actual, "toString") &&
-    Predicate.isFunction(actual["toString"]) &&
-    actual["toString"] !== Object.prototype.toString
+  } else if (
+    !Array.isArray(actual)
+    && Predicate.hasProperty(actual, "toString")
+    && Predicate.isFunction(actual["toString"])
+    && actual["toString"] !== Object.prototype.toString
   ) {
     return actual["toString"]()
   }
