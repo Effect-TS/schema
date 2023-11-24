@@ -762,7 +762,7 @@ Added in v1.0.0
 
 ```ts
 export declare const greaterThanDuration: <A extends Duration.Duration>(
-  min: Duration.Duration,
+  min: Duration.DurationInput,
   options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
@@ -775,7 +775,7 @@ Added in v1.0.0
 
 ```ts
 export declare const greaterThanOrEqualToDuration: <A extends Duration.Duration>(
-  min: Duration.Duration,
+  min: Duration.DurationInput,
   options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
@@ -788,7 +788,7 @@ Added in v1.0.0
 
 ```ts
 export declare const lessThanDuration: <A extends Duration.Duration>(
-  max: Duration.Duration,
+  max: Duration.DurationInput,
   options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
@@ -801,7 +801,7 @@ Added in v1.0.0
 
 ```ts
 export declare const lessThanOrEqualToDuration: <A extends Duration.Duration>(
-  max: Duration.Duration,
+  max: Duration.DurationInput,
   options?: FilterAnnotations<A> | undefined
 ) => <I>(self: Schema<I, A>) => Schema<I, A>
 ```
