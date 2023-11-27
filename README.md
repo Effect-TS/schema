@@ -1576,29 +1576,47 @@ The decision of which API to use, either `transform` or `transformFrom`, depends
 
 ## Pick
 
+The `pick` operation is used to select specific properties from a schema.
+
 ```ts
+import * as S from "@effect/schema/Schema";
+
 // $ExpectType Schema<{ readonly a: string; }>
-S.struct({ a: S.string, b: S.number }).pipe(S.pick("a"));
+S.struct({ a: S.string, b: S.number, c: S.boolean }).pipe(S.pick("a"));
+
+// $ExpectType Schema<{ readonly a: string; readonly c: boolean; }>
+S.struct({ a: S.string, b: S.number, c: S.boolean }).pipe(S.pick("a", "c"));
 ```
 
 ## Omit
 
+The `omit` operation is employed to exclude certain properties from a schema.
+
 ```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<{ readonly b: number; readonly c: boolean; }>
+S.struct({ a: S.string, b: S.number, c: S.boolean }).pipe(S.omit("a"));
+
 // $ExpectType Schema<{ readonly b: number; }>
-S.struct({ a: S.string, b: S.number }).pipe(S.omit("a"));
+S.struct({ a: S.string, b: S.number, c: S.boolean }).pipe(S.omit("a", "c"));
 ```
 
 ## Partial
 
+The `partial` operation makes all properties within a schema optional.
+
 ```ts
-// $ExpectType Schema<Partial<{ readonly a: string; readonly b: number; }>>
+// $ExpectType Schema<{ readonly a?: string; readonly b?: number; }>
 S.partial(S.struct({ a: S.string, b: S.number }));
 ```
 
 ## Required
 
+The `required` operation ensures that all properties in a schema are mandatory.
+
 ```ts
-// $ExpectType Schema<Required<{ readonly a?: string; readonly b?: number; }>>
+// $ExpectType Schema<{ readonly a: string; readonly b: number; }>
 S.required(S.struct({ a: S.optional(S.string), b: S.optional(S.number) }));
 ```
 
@@ -2015,7 +2033,8 @@ parse(".124"); // BigDecimal(.124)
 #### BigDecimalFromNumber
 
 Transforms a `number` into a `BigDecimal`.
-> [!WARNING]  
+
+> [!WARNING]
 > Warning: When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
 
 ```ts
