@@ -8,7 +8,7 @@ import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as ReadonlyRecord from "effect/ReadonlyRecord"
 import * as AST from "./AST.js"
 import * as Parser from "./Parser.js"
-import * as Schema from "./Schema.js"
+import type * as Schema from "./Schema.js"
 
 interface JsonSchema7Any {
   $id: "/schemas/any"
@@ -105,7 +105,8 @@ interface JsonSchema7Object {
   patternProperties?: Record<string, JsonSchema7>
 }
 
-type JsonSchema7 =
+/** @internal */
+export type JsonSchema7 =
   | JsonSchema7Any
   | JsonSchema7Unknown
   | JsonSchema7object
@@ -123,7 +124,8 @@ type JsonSchema7 =
   | JsonSchema7AnyOf
   | JsonSchema7Object
 
-type JsonSchema7Top = JsonSchema7 & {
+/** @internal */
+export type JsonSchema7Top = JsonSchema7 & {
   $schema?: string
   $defs?: Record<string, JsonSchema7>
 }
@@ -210,7 +212,8 @@ const goWithMetaData = (ast: AST.AST, $defs: Record<string, JsonSchema7>): JsonS
   }
 }
 
-const DEFINITION_PREFIX = "#/$defs/"
+/** @internal */
+export const DEFINITION_PREFIX = "#/$defs/"
 
 const go = (ast: AST.AST, $defs: Record<string, JsonSchema7>): JsonSchema7 => {
   switch (ast._tag) {
@@ -456,110 +459,4 @@ const go = (ast: AST.AST, $defs: Record<string, JsonSchema7>): JsonSchema7 => {
     case "Transform":
       throw new Error("cannot build a JSON Schema for transformations")
   }
-}
-
-/** @internal */
-export const decode = <A>(schema: JsonSchema7Top): Schema.Schema<A> =>
-  Schema.make(decodeAST(schema, schema.$defs))
-
-const emptyTypeLiteralAST = AST.createTypeLiteral([], [])
-
-const decodeAST = (schema: JsonSchema7, $defs: JsonSchema7Top["$defs"]): AST.AST => {
-  if ("$id" in schema) {
-    switch (schema.$id) {
-      case "/schemas/any":
-        return AST.anyKeyword
-      case "/schemas/unknown":
-        return AST.unknownKeyword
-      case "/schemas/object":
-        return AST.objectKeyword
-      case "/schemas/{}":
-        return emptyTypeLiteralAST
-    }
-  } else if ("const" in schema) {
-    return AST.createLiteral(schema.const)
-  } else if ("type" in schema) {
-    const type = schema.type
-    if (type === "string") {
-      return AST.stringKeyword
-    } else if (type === "number") {
-      return AST.numberKeyword
-    } else if (type === "integer") {
-      return AST.numberKeyword
-    } else if (type === "boolean") {
-      return AST.booleanKeyword
-    } else if (type === "array") {
-      if (schema.items) {
-        if (Array.isArray(schema.items)) {
-          const minItems = schema.minItems ?? -1
-          const rest: AST.Tuple["rest"] =
-            schema.additionalItems && !Predicate.isBoolean(schema.additionalItems)
-              ? Option.some([decodeAST(schema.additionalItems, $defs)])
-              : Option.none()
-          return AST.createTuple(
-            schema.items.map((item, i) => AST.createElement(decodeAST(item, $defs), i >= minItems)),
-            rest,
-            true
-          )
-        } else {
-          return AST.createTuple([], Option.some([decodeAST(schema.items, $defs)]), true)
-        }
-      } else {
-        return AST.createTuple([], Option.none(), true)
-      }
-    } else if (type === "object") {
-      const required = schema.required || []
-      const propertySignatures: Array<AST.PropertySignature> = []
-      const indexSignatures: Array<AST.IndexSignature> = []
-      for (const name in schema.properties) {
-        propertySignatures.push(
-          AST.createPropertySignature(
-            name,
-            decodeAST(schema.properties[name], $defs),
-            !required.includes(name),
-            true
-          )
-        )
-      }
-      if (schema.additionalProperties && !Predicate.isBoolean(schema.additionalProperties)) {
-        indexSignatures.push(
-          AST.createIndexSignature(
-            AST.stringKeyword,
-            decodeAST(schema.additionalProperties, $defs),
-            true
-          )
-        )
-      }
-      if (schema.patternProperties) {
-        for (const pattern in schema.patternProperties) {
-          indexSignatures.push(
-            AST.createIndexSignature(
-              Schema.string.pipe(Schema.pattern(new RegExp(pattern))).ast,
-              decodeAST(schema.patternProperties[pattern], $defs),
-              true
-            )
-          )
-        }
-      }
-      return AST.createTypeLiteral(propertySignatures, indexSignatures)
-    }
-  } else if ("enum" in schema) {
-    return AST.createUnion(schema.enum.map((literal) => AST.createLiteral(literal)))
-  } else if ("anyOf" in schema) {
-    return AST.createUnion(schema.anyOf.map((s) => decodeAST(s, $defs)))
-  } else if ("oneOf" in schema) {
-    if ("$comment" in schema && schema.$comment === "/schemas/enums") {
-      return AST.createEnums(schema.oneOf.map((e) => [e.title, e.const]))
-    }
-    return AST.createUnion(schema.oneOf.map((s) => decodeAST(s, $defs)))
-  } else if ("$ref" in schema) {
-    if ($defs) {
-      const id = schema.$ref.substring(DEFINITION_PREFIX.length)
-      if (id in $defs) {
-        return decodeAST($defs[id], $defs)
-      }
-    }
-    throw new Error(`cannot find $ref: ${schema.$ref}`)
-  }
-  throw new Error(`cannot decode: ${JSON.stringify(schema, null, 2)}`)
 }
