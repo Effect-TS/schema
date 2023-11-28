@@ -10,7 +10,11 @@ describe("Schema/betweenDuration", () => {
     await Util.expectParseFailure(
       schema,
       Duration.decode("4 seconds"),
-      `Expected a Duration between 5 seconds and 10 seconds, actual {"_id":"Duration","_tag":"Millis","millis":4000}`
+      `Expected a Duration between 5 seconds and 10 seconds, actual {
+  "_id": "Duration",
+  "_tag": "Millis",
+  "millis": 4000
+}`
     )
 
     await Util.expectParseSuccess(
@@ -22,7 +26,11 @@ describe("Schema/betweenDuration", () => {
     await Util.expectParseFailure(
       schema,
       Duration.decode("11 seconds"),
-      `Expected a Duration between 5 seconds and 10 seconds, actual {"_id":"Duration","_tag":"Millis","millis":11000}`
+      `Expected a Duration between 5 seconds and 10 seconds, actual {
+  "_id": "Duration",
+  "_tag": "Millis",
+  "millis": 11000
+}`
     )
   })
 

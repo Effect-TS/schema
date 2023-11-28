@@ -22,7 +22,11 @@ describe("Schema/greaterThanOrEqualToDuration", () => {
     await Util.expectParseFailure(
       schema,
       Duration.decode("4 seconds"),
-      `Expected a Duration greater than or equal to 5 seconds, actual {"_id":"Duration","_tag":"Millis","millis":4000}`
+      `Expected a Duration greater than or equal to 5 seconds, actual {
+  "_id": "Duration",
+  "_tag": "Millis",
+  "millis": 4000
+}`
     )
   })
 
