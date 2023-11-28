@@ -155,7 +155,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unexpected: (actual: unknown) => Unexpected
+export declare const unexpected: (ast: Option.Option<AST.AST>) => Unexpected
 ```
 
 Added in v1.0.0
@@ -281,7 +281,7 @@ Error that occurs when an unexpected key or index is present.
 ```ts
 export interface Unexpected {
   readonly _tag: "Unexpected"
-  readonly actual: unknown
+  readonly ast: Option.Option<AST.AST>
 }
 ```
 
