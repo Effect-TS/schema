@@ -1883,7 +1883,7 @@ const PeopleIdFromString = S.transformOrFail(
         ParseResult.parseError([ParseResult.type(PeopleId.ast, s, e.message)]),
       onSuccess: () => s,
     }),
-  ParseResult.success
+  ParseResult.succeed
 );
 
 const parse = (id: string) =>

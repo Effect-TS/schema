@@ -2883,11 +2883,11 @@ export const durationFromBigint = <I, A extends bigint>(
   transformOrFail(
     self,
     DurationFromSelf,
-    (nanos) => ParseResult.success(Duration.nanos(nanos)),
+    (nanos) => ParseResult.succeed(Duration.nanos(nanos)),
     (duration, _, ast) =>
       Duration.toNanos(duration).pipe(Option.match({
-        onNone: () => ParseResult.failure(ParseResult.type(ast, duration)),
-        onSome: (val) => ParseResult.success(val)
+        onNone: () => ParseResult.fail(ParseResult.type(ast, duration)),
+        onSome: (val) => ParseResult.succeed(val)
       })),
     { strict: false }
   )
