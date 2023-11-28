@@ -2188,7 +2188,7 @@ parse(false); // true
 
 #### Date
 
-Transforms a `string` into a valid `Date`.
+Transforms a `string` into a **valid** `Date`, ensuring that invalid dates, such as `new Date("Invalid Date")`, are rejected.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -2204,7 +2204,7 @@ parse("a"); // throws
 const validate = S.validateSync(schema);
 
 validate(new Date(0)); // new Date(0)
-validate(new Date("fail")); // throws
+validate(new Date("Invalid Date")); // throws
 ```
 
 ## Interop with `effect/Data`

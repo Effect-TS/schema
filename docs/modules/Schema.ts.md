@@ -40,12 +40,12 @@ Added in v1.0.0
 - [Date constructors](#date-constructors)
   - [Date](#date)
   - [DateFromSelf](#datefromself)
-  - [ValidDate](#validdate)
+  - [DateFromString](#datefromstring)
   - [ValidDateFromSelf](#validdatefromself)
 - [Date filters](#date-filters)
-  - [validDate](#validdate-1)
+  - [validDate](#validdate)
 - [Date transformations](#date-transformations)
-  - [dateFromString](#datefromstring)
+  - [dateFromString](#datefromstring-1)
 - [Duration constructors](#duration-constructors)
   - [Duration](#duration)
   - [DurationFromSelf](#durationfromself)
@@ -600,7 +600,7 @@ Added in v1.0.0
 
 ## Date
 
-A schema that transforms a `string` into a valid `Date`.
+A schema that transforms a `string` into a **valid** `Date`, ensuring that invalid dates, such as `new Date("Invalid Date")`, are rejected.
 
 **Signature**
 
@@ -612,6 +612,8 @@ Added in v1.0.0
 
 ## DateFromSelf
 
+Represents a schema for handling potentially **invalid** `Date` instances (e.g., `new Date("Invalid Date")` is not rejected).
+
 **Signature**
 
 ```ts
@@ -620,21 +622,21 @@ export declare const DateFromSelf: Schema<Date, Date>
 
 Added in v1.0.0
 
-## ValidDate
+## DateFromString
 
-A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
+Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
 
 **Signature**
 
 ```ts
-export declare const ValidDate: Schema<string, Date>
+export declare const DateFromString: Schema<string, Date>
 ```
 
 Added in v1.0.0
 
 ## ValidDateFromSelf
 
-A schema representing valid dates, e.g. `new Date("fail")` is excluded, even though it is an instance of `Date`.
+Represents a schema for handling only **valid** dates. For example, `new Date("Invalid Date")` is rejected, even though it is an instance of `Date`.
 
 **Signature**
 
@@ -648,7 +650,7 @@ Added in v1.0.0
 
 ## validDate
 
-A filter excluding invalid dates (e.g. `new Date("fail")`).
+A filter that **excludes invalid** dates (e.g., `new Date("Invalid Date")` is rejected).
 
 **Signature**
 
@@ -662,7 +664,7 @@ Added in v1.0.0
 
 ## dateFromString
 
-A combinator that transforms a `string` into a valid `Date`.
+A combinator that converts a `string` into a potentially **invalid** `Date` (e.g., `new Date("Invalid Date")` is not rejected).
 
 **Signature**
 
