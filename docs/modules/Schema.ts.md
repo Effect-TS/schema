@@ -1528,7 +1528,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA> extends Serializable.SerializableWithResult {
+export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
+  extends Request.Request<EA, AA>,
+    Serializable.SerializableWithResult {
   readonly _tag: Tag
   readonly [Serializable.symbol]: {
     readonly Self: Schema<I, A>

@@ -4273,7 +4273,7 @@ export const TaggedError = <Self>() =>
  * @since 1.0.0
  */
 export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
-  extends Serializable.SerializableWithResult
+  extends Request.Request<EA, AA>, Serializable.SerializableWithResult
 {
   readonly _tag: Tag
   readonly [Serializable.symbol]: {
