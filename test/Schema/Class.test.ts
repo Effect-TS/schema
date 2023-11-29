@@ -1,6 +1,7 @@
 import * as AST from "@effect/schema/AST"
 import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
+import * as Serializable from "@effect/schema/Serializable"
 import * as Util from "@effect/schema/test/util"
 import { Effect } from "effect"
 import * as Data from "effect/Data"
@@ -258,27 +259,26 @@ describe("Schema/Class", () => {
     expect(req._tag).toEqual("MyRequest")
     expect(req.id).toEqual(1)
     expect(Request.isRequest(req)).toEqual(true)
-
-    S.decodeSync(MyRequest.Success)(123)
-    S.decodeSync(MyRequest.Failure)("fail")
   })
 
-  it("TaggedRequest assignable to TaggedRequest.Base", () => {
+  it("TaggedRequest extends SerializableWithResult", () => {
     class MyRequest extends S.TaggedRequest<MyRequest>()("MyRequest", S.string, S.number, {
       id: S.number
     }) {}
 
-    const makeCache = <
-      EI,
-      EA,
-      AI,
-      AA,
-      I,
-      Req extends Request.Request<EA, AA> & { readonly _tag: string }
-    >(
-      schema: S.TaggedRequest.Base<EI, EA, AI, AA, I, Req>
-    ) => schema
+    const req = new MyRequest({ id: 1 })
+    const selfSchema = Serializable.selfSchema(req)
+    const failureSchema = Serializable.failureSchema(req)
+    const successSchema = Serializable.successSchema(req)
 
-    makeCache(MyRequest)
+    assert(Equal.equals(
+      S.parseSync(selfSchema)({
+        _tag: "MyRequest",
+        id: 1
+      }),
+      req
+    ))
+    assert.strictEqual(S.parseSync(failureSchema)("fail"), "fail")
+    assert.strictEqual(S.parseSync(successSchema)(123), 123)
   })
 })

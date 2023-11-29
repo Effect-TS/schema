@@ -37,6 +37,7 @@ import * as InternalSchema from "./internal/schema.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
 import type { Pretty } from "./Pretty.js"
+import * as Serializable from "./Serializable.js"
 
 // ---------------------------------------------
 // model
@@ -4271,27 +4272,14 @@ export const TaggedError = <Self>() =>
  * @category classes
  * @since 1.0.0
  */
-export declare namespace TaggedRequest {
-  /**
-   * @category classes
-   * @since 1.0.0
-   */
-  export interface Base<
-    EI,
-    EA,
-    AI,
-    AA,
-    I,
-    Req extends Request.Request<EA, AA> & { readonly _tag: string }
-  > extends Schema<I, Req>, TaggedRequest.ResultSchemas<EI, EA, AI, AA> {}
-
-  /**
-   * @category classes
-   * @since 1.0.0
-   */
-  export interface ResultSchemas<EI, EA, AI, AA> {
-    readonly Failure: Schema<EI, EA>
-    readonly Success: Schema<AI, AA>
+export interface TaggedRequest<Self, E, A> extends Serializable.SerializableWithResult {
+  readonly _tag: string
+  readonly [Serializable.symbol]: {
+    readonly Self: Schema<unknown, Self>
+  }
+  readonly [Serializable.symbolResult]: {
+    readonly Failure: Schema<unknown, E>
+    readonly Success: Schema<unknown, A>
   }
 }
 
@@ -4303,31 +4291,35 @@ export const TaggedRequest =
   <Self>() =>
   <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
     tag: Tag,
-    failure: Schema<EI, EA>,
-    success: Schema<AI, AA>,
+    Failure: Schema<EI, EA>,
+    Success: Schema<AI, AA>,
     fields: Fields
   ): [unknown] extends [Self] ?
     MissingSelfGeneric<"TaggedRequest", `"Tag", SuccessSchema, FailureSchema, `>
-    :
-      & Class<
-        Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
-        Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
-        Simplify<ToStruct<Fields>>,
-        Self,
-        Request.Request<EA, AA>
-      >
-      & TaggedRequest.ResultSchemas<EI, EA, AI, AA> =>
+    : Class<
+      Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
+      Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
+      Simplify<ToStruct<Fields>>,
+      Self,
+      TaggedRequest<Self, EA, AA>
+    > =>
   {
+    class SerializableRequest extends Request.Class<any, any, { readonly _tag: string }> {
+      get [Serializable.symbol]() {
+        return { Self: this.constructor }
+      }
+      get [Serializable.symbolResult]() {
+        return { Failure, Success }
+      }
+    }
+
     const fieldsWithTag = { ...fields, _tag: literal(tag) }
-    const Base = makeClass(
+    return makeClass(
       struct(fieldsWithTag),
       fieldsWithTag,
-      Request.Class,
+      SerializableRequest,
       { _tag: tag }
     )
-    Base.Failure = failure
-    Base.Success = success
-    return Base
   }
 
 const makeClass = <I, A>(

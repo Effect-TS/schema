@@ -120,9 +120,7 @@ Added in v1.0.0
   - [TaggedClass](#taggedclass)
   - [TaggedError](#taggederror)
   - [TaggedRequest](#taggedrequest)
-  - [TaggedRequest (namespace)](#taggedrequest-namespace)
-    - [Base (interface)](#base-interface)
-    - [ResultSchemas (interface)](#resultschemas-interface)
+  - [TaggedRequest (interface)](#taggedrequest-interface)
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
@@ -1487,8 +1485,8 @@ Added in v1.0.0
 ```ts
 export declare const TaggedRequest: <Self>() => <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
   tag: Tag,
-  failure: Schema<EI, EA>,
-  success: Schema<AI, AA>,
+  Failure: Schema<EI, EA>,
+  Success: Schema<AI, AA>,
   fields: Fields
 ) => [unknown] extends [Self]
   ? 'Missing `Self` generic - use `class Self extends TaggedRequest<Self>()("Tag", SuccessSchema, FailureSchema, { ... })`'
@@ -1505,37 +1503,26 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
       >,
       Simplify<ToStruct<Fields>>,
       Self,
-      Request.Request<EA, AA>
-    > &
-      TaggedRequest.ResultSchemas<EI, EA, AI, AA>
+      TaggedRequest<Self, EA, AA>
+    >
 ```
 
 Added in v1.0.0
 
-## TaggedRequest (namespace)
-
-Added in v1.0.0
-
-### Base (interface)
+## TaggedRequest (interface)
 
 **Signature**
 
 ```ts
-export interface Base<EI, EA, AI, AA, I, Req extends Request.Request<EA, AA> & { readonly _tag: string }>
-  extends Schema<I, Req>,
-    TaggedRequest.ResultSchemas<EI, EA, AI, AA> {}
-```
-
-Added in v1.0.0
-
-### ResultSchemas (interface)
-
-**Signature**
-
-```ts
-export interface ResultSchemas<EI, EA, AI, AA> {
-  readonly Failure: Schema<EI, EA>
-  readonly Success: Schema<AI, AA>
+export interface TaggedRequest<Self, E, A> extends Serializable.SerializableWithResult {
+  readonly _tag: string
+  readonly [Serializable.symbol]: {
+    readonly Self: Schema<unknown, Self>
+  }
+  readonly [Serializable.symbolResult]: {
+    readonly Failure: Schema<unknown, E>
+    readonly Success: Schema<unknown, A>
+  }
 }
 ```
 
