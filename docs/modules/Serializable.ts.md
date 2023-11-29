@@ -20,11 +20,7 @@ Serializable represents an object that has self-contained Schema(s)
   - [successSchema](#successschema)
 - [model](#model)
   - [Serializable (interface)](#serializable-interface)
-  - [Serializable (namespace)](#serializable-namespace)
-    - [Schemas (interface)](#schemas-interface)
   - [SerializableWithResult (interface)](#serializablewithresult-interface)
-  - [SerializableWithResult (namespace)](#serializablewithresult-namespace)
-    - [Schemas (interface)](#schemas-interface-1)
 - [symbol](#symbol)
   - [symbol](#symbol-1)
   - [symbolResult](#symbolresult)
@@ -71,23 +67,9 @@ Added in v1.0.0
 
 ```ts
 export interface Serializable {
-  readonly [symbol]: Serializable.Schemas
-}
-```
-
-Added in v1.0.0
-
-## Serializable (namespace)
-
-Added in v1.0.0
-
-### Schemas (interface)
-
-**Signature**
-
-```ts
-export interface Schemas {
-  readonly Self: Schema.Schema<unknown, any>
+  readonly [symbol]: {
+    readonly Self: Schema.Schema<unknown, any>
+  }
 }
 ```
 
@@ -99,24 +81,10 @@ Added in v1.0.0
 
 ```ts
 export interface SerializableWithResult extends Serializable {
-  readonly [symbolResult]: SerializableWithResult.Schemas
-}
-```
-
-Added in v1.0.0
-
-## SerializableWithResult (namespace)
-
-Added in v1.0.0
-
-### Schemas (interface)
-
-**Signature**
-
-```ts
-export interface Schemas {
-  readonly Failure: Schema.Schema<unknown, any>
-  readonly Success: Schema.Schema<unknown, any>
+  readonly [symbolResult]: {
+    readonly Failure: Schema.Schema<unknown, any>
+    readonly Success: Schema.Schema<unknown, any>
+  }
 }
 ```
 

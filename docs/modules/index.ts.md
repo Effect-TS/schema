@@ -22,6 +22,7 @@ Added in v1.0.0
   - [From "./Parser.js"](#from-parserjs)
   - [From "./Pretty.js"](#from-prettyjs)
   - [From "./Schema.js"](#from-schemajs)
+  - [From "./Serializable.js"](#from-serializablejs)
   - [From "./TreeFormatter.js"](#from-treeformatterjs)
 
 ---
@@ -135,6 +136,20 @@ export * as Schema from "./Schema.js"
 ```
 
 Added in v1.0.0
+
+## From "./Serializable.js"
+
+Re-exports all named exports from the "./Serializable.js" module as `Serializable`.
+
+**Signature**
+
+```ts
+export * as Serializable from "./Serializable.js"
+```
+
+Added in v1.0.0
+
+Serializable represents an object that has self-contained Schema(s)
 
 ## From "./TreeFormatter.js"
 

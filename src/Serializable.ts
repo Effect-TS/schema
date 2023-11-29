@@ -9,26 +9,14 @@ import type * as Schema from "./Schema.js"
  * @since 1.0.0
  * @category symbol
  */
-export const symbol: unique symbol = Symbol.for("@effect/schema/Serializable")
+export const symbol: unique symbol = Symbol.for("@effect/schema/Serializable/symbol")
 
 /**
  * @since 1.0.0
  * @category model
  */
 export interface Serializable {
-  readonly [symbol]: Serializable.Schemas
-}
-
-/**
- * @since 1.0.0
- * @category model
- */
-export declare namespace Serializable {
-  /**
-   * @since 1.0.0
-   * @category model
-   */
-  export interface Schemas {
+  readonly [symbol]: {
     readonly Self: Schema.Schema<unknown, any>
   }
 }
@@ -45,7 +33,7 @@ export const selfSchema = <A extends Serializable>(self: A): A[typeof symbol]["S
  * @category symbol
  */
 export const symbolResult: unique symbol = Symbol.for(
-  "@effect/schema/Serializable/SerializableResult"
+  "@effect/schema/Serializable/symbolResult"
 )
 
 /**
@@ -53,19 +41,7 @@ export const symbolResult: unique symbol = Symbol.for(
  * @category model
  */
 export interface SerializableWithResult extends Serializable {
-  readonly [symbolResult]: SerializableWithResult.Schemas
-}
-
-/**
- * @since 1.0.0
- * @category model
- */
-export declare namespace SerializableWithResult {
-  /**
-   * @since 1.0.0
-   * @category model
-   */
-  export interface Schemas {
+  readonly [symbolResult]: {
     readonly Failure: Schema.Schema<unknown, any>
     readonly Success: Schema.Schema<unknown, any>
   }
