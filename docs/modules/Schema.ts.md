@@ -1507,12 +1507,12 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
       Self,
       TaggedRequest<
         Tag,
-        Self,
         Simplify<
           { readonly _tag: Tag } & {
             readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
           } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
         >,
+        Self,
         EI,
         EA,
         AI,

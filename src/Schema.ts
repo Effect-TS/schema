@@ -4317,8 +4317,8 @@ export const TaggedRequest =
       Self,
       TaggedRequest<
         Tag,
-        Self,
         Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
+        Self,
         EI,
         EA,
         AI,

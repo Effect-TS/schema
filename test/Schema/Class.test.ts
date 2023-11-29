@@ -267,18 +267,11 @@ describe("Schema/Class", () => {
     }) {}
 
     const req = new MyRequest({ id: 1 })
-    const selfSchema = Serializable.selfSchema(req)
-    const failureSchema = Serializable.failureSchema(req)
-    const successSchema = Serializable.successSchema(req)
-
     assert(Equal.equals(
-      S.parseSync(selfSchema)({
-        _tag: "MyRequest",
-        id: 1
-      }),
+      Serializable.deserialize(req, { _tag: "MyRequest", id: 1 }).pipe(Effect.runSync),
       req
     ))
-    assert.strictEqual(S.parseSync(failureSchema)("fail"), "fail")
-    assert.strictEqual(S.parseSync(successSchema)(123), 123)
+    assert.strictEqual(Serializable.deserializeFailure(req, "fail").pipe(Effect.runSync), "fail")
+    assert.strictEqual(Serializable.deserializeSuccess(req, 123).pipe(Effect.runSync), 123)
   })
 })
