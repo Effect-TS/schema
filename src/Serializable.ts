@@ -17,7 +17,7 @@ export const symbol: unique symbol = Symbol.for("@effect/schema/Serializable/sym
  */
 export interface Serializable {
   readonly [symbol]: {
-    readonly Self: Schema.Schema<unknown, any>
+    readonly Self: Schema.Schema<any, any>
   }
 }
 
@@ -42,8 +42,8 @@ export const symbolResult: unique symbol = Symbol.for(
  */
 export interface SerializableWithResult extends Serializable {
   readonly [symbolResult]: {
-    readonly Failure: Schema.Schema<unknown, any>
-    readonly Success: Schema.Schema<unknown, any>
+    readonly Failure: Schema.Schema<any, any>
+    readonly Success: Schema.Schema<any, any>
   }
 }
 

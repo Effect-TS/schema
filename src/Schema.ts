@@ -4272,15 +4272,29 @@ export const TaggedError = <Self>() =>
  * @category classes
  * @since 1.0.0
  */
-export interface TaggedRequest<Self, E, A> extends Serializable.SerializableWithResult {
-  readonly _tag: string
+export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
+  extends Serializable.SerializableWithResult
+{
+  readonly _tag: Tag
   readonly [Serializable.symbol]: {
-    readonly Self: Schema<unknown, Self>
+    readonly Self: Schema<I, A>
   }
   readonly [Serializable.symbolResult]: {
-    readonly Failure: Schema<unknown, E>
-    readonly Success: Schema<unknown, A>
+    readonly Failure: Schema<EI, EA>
+    readonly Success: Schema<AI, AA>
   }
+}
+
+/**
+ * @category classes
+ * @since 1.0.0
+ */
+export declare namespace TaggedRequest {
+  /**
+   * @category classes
+   * @since 1.0.0
+   */
+  export type Any = TaggedRequest<string, any, any, any, any, any, any>
 }
 
 /**
@@ -4301,7 +4315,15 @@ export const TaggedRequest =
       Simplify<{ readonly _tag: Tag } & ToStruct<Fields>>,
       Simplify<ToStruct<Fields>>,
       Self,
-      TaggedRequest<Self, EA, AA>
+      TaggedRequest<
+        Tag,
+        Self,
+        Simplify<{ readonly _tag: Tag } & FromStruct<Fields>>,
+        EI,
+        EA,
+        AI,
+        AA
+      >
     > =>
   {
     class SerializableRequest extends Request.Class<any, any, { readonly _tag: string }> {

@@ -121,6 +121,8 @@ Added in v1.0.0
   - [TaggedError](#taggederror)
   - [TaggedRequest](#taggedrequest)
   - [TaggedRequest (interface)](#taggedrequest-interface)
+  - [TaggedRequest (namespace)](#taggedrequest-namespace)
+    - [Any (type alias)](#any-type-alias)
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
@@ -1503,7 +1505,19 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
       >,
       Simplify<ToStruct<Fields>>,
       Self,
-      TaggedRequest<Self, EA, AA>
+      TaggedRequest<
+        Tag,
+        Self,
+        Simplify<
+          { readonly _tag: Tag } & {
+            readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
+          } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+        >,
+        EI,
+        EA,
+        AI,
+        AA
+      >
     >
 ```
 
@@ -1514,16 +1528,30 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface TaggedRequest<Self, E, A> extends Serializable.SerializableWithResult {
-  readonly _tag: string
+export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA> extends Serializable.SerializableWithResult {
+  readonly _tag: Tag
   readonly [Serializable.symbol]: {
-    readonly Self: Schema<unknown, Self>
+    readonly Self: Schema<I, A>
   }
   readonly [Serializable.symbolResult]: {
-    readonly Failure: Schema<unknown, E>
-    readonly Success: Schema<unknown, A>
+    readonly Failure: Schema<EI, EA>
+    readonly Success: Schema<AI, AA>
   }
 }
+```
+
+Added in v1.0.0
+
+## TaggedRequest (namespace)
+
+Added in v1.0.0
+
+### Any (type alias)
+
+**Signature**
+
+```ts
+export type Any = TaggedRequest<string, any, any, any, any, any, any>
 ```
 
 Added in v1.0.0
