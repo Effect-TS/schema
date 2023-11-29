@@ -40,7 +40,7 @@ export const symbolResult: unique symbol = Symbol.for(
  * @since 1.0.0
  * @category model
  */
-export interface SerializableWithResult extends Serializable {
+export interface WithResult {
   readonly [symbolResult]: {
     readonly Failure: Schema.Schema<any, any>
     readonly Success: Schema.Schema<any, any>
@@ -51,7 +51,7 @@ export interface SerializableWithResult extends Serializable {
  * @since 1.0.0
  * @category accessor
  */
-export const failureSchema = <A extends SerializableWithResult>(
+export const failureSchema = <A extends WithResult>(
   self: A
 ): A[typeof symbolResult]["Failure"] => self[symbolResult].Failure
 
@@ -59,6 +59,12 @@ export const failureSchema = <A extends SerializableWithResult>(
  * @since 1.0.0
  * @category accessor
  */
-export const successSchema = <A extends SerializableWithResult>(
+export const successSchema = <A extends WithResult>(
   self: A
 ): A[typeof symbolResult]["Success"] => self[symbolResult].Success
+
+/**
+ * @since 1.0.0
+ * @category model
+ */
+export interface SerializableWithResult extends Serializable, WithResult {}

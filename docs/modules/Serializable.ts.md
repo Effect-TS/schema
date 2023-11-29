@@ -21,6 +21,7 @@ Serializable represents an object that has self-contained Schema(s)
 - [model](#model)
   - [Serializable (interface)](#serializable-interface)
   - [SerializableWithResult (interface)](#serializablewithresult-interface)
+  - [WithResult (interface)](#withresult-interface)
 - [symbol](#symbol)
   - [symbol](#symbol-1)
   - [symbolResult](#symbolresult)
@@ -34,7 +35,7 @@ Serializable represents an object that has self-contained Schema(s)
 **Signature**
 
 ```ts
-export declare const failureSchema: <A extends SerializableWithResult>(self: A) => A[typeof symbolResult]["Failure"]
+export declare const failureSchema: <A extends WithResult>(self: A) => A[typeof symbolResult]["Failure"]
 ```
 
 Added in v1.0.0
@@ -54,7 +55,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const successSchema: <A extends SerializableWithResult>(self: A) => A[typeof symbolResult]["Success"]
+export declare const successSchema: <A extends WithResult>(self: A) => A[typeof symbolResult]["Success"]
 ```
 
 Added in v1.0.0
@@ -80,7 +81,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface SerializableWithResult extends Serializable {
+export interface SerializableWithResult extends Serializable, WithResult {}
+```
+
+Added in v1.0.0
+
+## WithResult (interface)
+
+**Signature**
+
+```ts
+export interface WithResult {
   readonly [symbolResult]: {
     readonly Failure: Schema.Schema<any, any>
     readonly Success: Schema.Schema<any, any>
