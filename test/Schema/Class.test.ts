@@ -262,16 +262,24 @@ describe("Schema/Class", () => {
   })
 
   it("TaggedRequest extends SerializableWithResult", () => {
-    class MyRequest extends S.TaggedRequest<MyRequest>()("MyRequest", S.string, S.number, {
-      id: S.number
-    }) {}
+    class MyRequest
+      extends S.TaggedRequest<MyRequest>()("MyRequest", S.string, S.NumberFromString, {
+        id: S.number
+      })
+    {}
 
     const req = new MyRequest({ id: 1 })
+    assert.deepStrictEqual(
+      Serializable.serialize(req).pipe(Effect.runSync),
+      { _tag: "MyRequest", id: 1 }
+    )
     assert(Equal.equals(
       Serializable.deserialize(req, { _tag: "MyRequest", id: 1 }).pipe(Effect.runSync),
       req
     ))
+    assert.strictEqual(Serializable.serializeFailure(req, "fail").pipe(Effect.runSync), "fail")
     assert.strictEqual(Serializable.deserializeFailure(req, "fail").pipe(Effect.runSync), "fail")
-    assert.strictEqual(Serializable.deserializeSuccess(req, 123).pipe(Effect.runSync), 123)
+    assert.strictEqual(Serializable.serializeSuccess(req, 123).pipe(Effect.runSync), "123")
+    assert.strictEqual(Serializable.deserializeSuccess(req, "123").pipe(Effect.runSync), 123)
   })
 })

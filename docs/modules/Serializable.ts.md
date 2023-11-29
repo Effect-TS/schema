@@ -133,15 +133,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const serialize: {
-  <A extends Serializable>(
-    value: Serializable.SelfTo<A>
-  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>>
-  <A extends Serializable>(
-    self: A,
-    value: Serializable.SelfTo<A>
-  ): Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>>
-}
+export declare const serialize: <A extends Serializable>(
+  self: A
+) => Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>>
 ```
 
 Added in v1.0.0

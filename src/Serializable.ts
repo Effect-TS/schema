@@ -123,23 +123,10 @@ export interface SerializableWithResult extends Serializable, WithResult {}
  * @since 1.0.0
  * @category encoding
  */
-export const serialize: {
-  <A extends Serializable>(
-    value: Serializable.SelfTo<A>
-  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>>
-  <A extends Serializable>(
-    self: A,
-    value: Serializable.SelfTo<A>
-  ): Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>>
-} = dual<
-  <A extends Serializable>(
-    value: Serializable.SelfTo<A>
-  ) => (self: A) => Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>>,
-  <A extends Serializable>(
-    self: A,
-    value: Serializable.SelfTo<A>
-  ) => Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>>
->(2, (self, value) => Parser.encode(self[symbol].Self)(value))
+export const serialize = <A extends Serializable>(
+  self: A
+): Effect.Effect<never, ParseResult.ParseError, Serializable.SelfFrom<A>> =>
+  Parser.encode(self[symbol].Self)(self)
 
 /**
  * @since 1.0.0
