@@ -4471,24 +4471,24 @@ const fiberIdPretty = (): Pretty<FiberId.FiberId> => (fiberId) => {
   return "FiberId.none"
 }
 
-const FiberIdInline: Schema<FiberIdFrom, FiberIdFrom> = union(
+const FiberIdFrom: Schema<FiberIdFrom, FiberIdFrom> = union(
   struct({
     _tag: literal("Composite"),
-    left: lazy(() => FiberIdInline),
-    right: lazy(() => FiberIdInline)
+    left: lazy(() => FiberIdFrom),
+    right: lazy(() => FiberIdFrom)
   }),
   struct({
     _tag: literal("None")
   }),
   struct({
     _tag: literal("Runtime"),
-    id: nonNegative()(Int).pipe(annotations({
-      [AST.TitleAnnotationId]: "id",
-      [AST.DescriptionAnnotationId]: "id"
+    id: Int.pipe(nonNegative({
+      title: "id",
+      description: "id"
     })),
-    startTimeMillis: NonNegative.pipe(annotations({
-      [AST.TitleAnnotationId]: "startTimeMillis",
-      [AST.DescriptionAnnotationId]: "startTimeMillis"
+    startTimeMillis: Int.pipe(nonNegative({
+      title: "startTimeMillis",
+      description: "startTimeMillis"
     }))
   })
 )
@@ -4499,7 +4499,7 @@ const FiberIdInline: Schema<FiberIdFrom, FiberIdFrom> = union(
  */
 export const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare(
   [],
-  FiberIdInline,
+  FiberIdFrom,
   () => (input, _, ast) =>
     FiberId.isFiberId(input)
       ? ParseResult.succeed(input)
@@ -4516,7 +4516,7 @@ const _FiberId: Schema<
   FiberIdFrom,
   FiberId.FiberId
 > = transformOrFail(
-  FiberIdInline,
+  FiberIdFrom,
   to(FiberIdFromSelf),
   (input): ParseResult.ParseResult<FiberId.FiberId> => {
     if (input._tag === "Composite") {
