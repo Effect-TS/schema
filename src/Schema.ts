@@ -4517,7 +4517,7 @@ const _FiberId: Schema<
   FiberId.FiberId
 > = transformOrFail(
   FiberIdFrom,
-  to(FiberIdFromSelf),
+  FiberIdFromSelf,
   (input): ParseResult.ParseResult<FiberId.FiberId> => {
     if (input._tag === "Composite") {
       const decode = Parser.decode(_FiberId)
