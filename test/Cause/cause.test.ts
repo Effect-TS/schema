@@ -3,7 +3,7 @@ import * as Util from "@effect/schema/test/util"
 import { Cause, FiberId } from "effect"
 import { assert, describe, test } from "vitest"
 
-describe("Cause", () => {
+describe("Cause/cause", () => {
   test("property tests", () => {
     Util.roundtrip(S.cause(S.string))
   })
