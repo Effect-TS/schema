@@ -4450,14 +4450,14 @@ export type FiberIdFrom = {
 }
 
 const fiberIdArbitrary = (): Arbitrary<FiberId.FiberId> => (fc) =>
-  fc.letrec((tie) => ({
+  fc.letrec<{ fiberId: FiberId.FiberId }>((tie) => ({
     fiberId: fc.oneof(
-      fc.constant(FiberId.none as FiberId.None),
+      fc.constant(FiberId.none),
       fc.tuple(tie("fiberId"), tie("fiberId")).map(([left, right]) =>
-        FiberId.composite(left as any, right as any) as FiberId.Composite
+        FiberId.composite(left, right)
       ),
       fc.tuple(fc.maxSafeNat(), fc.maxSafeNat()).map(([id, startTimeMillis]) =>
-        FiberId.runtime(id, startTimeMillis) as FiberId.Runtime
+        FiberId.runtime(id, startTimeMillis)
       )
     )
   })).fiberId
@@ -4622,18 +4622,14 @@ export type CauseTo<E> = {
 
 const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => (fc) => {
   const fiberId = fiberIdArbitrary()(fc)
-  return fc.letrec((tie) => ({
+  return fc.letrec<{ cause: Cause.Cause<E> }>((tie) => ({
     cause: fc.oneof(
-      error(fc).map((error) => Cause.fail(error) as Cause.Fail<E>),
-      fc.string().map((_) => Cause.die(_) as Cause.Die),
-      fc.constant(Cause.empty as Cause.Empty),
-      fiberId.map((fiberId) => Cause.interrupt(fiberId) as Cause.Interrupt),
-      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) =>
-        Cause.parallel(left as any, right as any) as Cause.Parallel<E>
-      ),
-      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) =>
-        Cause.sequential(left as any, right as any) as Cause.Sequential<E>
-      )
+      error(fc).map((error) => Cause.fail(error)),
+      fc.string().map((_) => Cause.die(_)),
+      fc.constant(Cause.empty),
+      fiberId.map((fiberId) => Cause.interrupt(fiberId)),
+      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) => Cause.parallel(left, right)),
+      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) => Cause.sequential(left, right))
     )
   })).cause
 }
@@ -4798,8 +4794,8 @@ export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.
 const exitArbitrary =
   <E, A>(error: Arbitrary<E>, value: Arbitrary<A>): Arbitrary<Exit.Exit<E, A>> => (fc) =>
     fc.oneof(
-      causeArbitrary(error)(fc).map((cause) => Exit.fail(cause) as any as Exit.Failure<E, A>),
-      value(fc).map((a) => Exit.succeed(a) as any as Exit.Success<E, A>)
+      causeArbitrary(error)(fc).map((cause) => Exit.failCause(cause)),
+      value(fc).map((a) => Exit.succeed(a))
     )
 
 const exitPretty = <E, A>(error: Pretty<E>, value: Pretty<A>): Pretty<Exit.Exit<E, A>> => (exit) =>
