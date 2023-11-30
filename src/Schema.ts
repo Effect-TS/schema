@@ -14,6 +14,7 @@ import * as Either from "effect/Either"
 import * as Encoding from "effect/Encoding"
 import * as Equal from "effect/Equal"
 import * as Equivalence from "effect/Equivalence"
+import * as Exit from "effect/Exit"
 import * as FiberId from "effect/FiberId"
 import type { LazyArg } from "effect/Function"
 import { dual, identity } from "effect/Function"
@@ -4689,7 +4690,7 @@ const causeInline = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseTo
  */
 export const causeFromSelf = <IE, E>(
   error: Schema<IE, E>
-): Schema<Cause.Cause<E>, Cause.Cause<E>> =>
+): Schema<Cause.Cause<IE>, Cause.Cause<E>> =>
   declare(
     [error],
     causeInline(error),
@@ -4770,4 +4771,96 @@ export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.
     to(causeFromSelf(error)),
     causeFromCauseTo,
     causeToCauseTo
+  )
+
+// ---------------------------------------------
+// exit
+// ---------------------------------------------
+
+const exitArbitrary =
+  <E, A>(error: Arbitrary<E>, value: Arbitrary<A>): Arbitrary<Exit.Exit<E, A>> => (fc) =>
+    fc.oneof(
+      causeArbitrary(error)(fc).map((cause) => Exit.fail(cause) as any as Exit.Failure<E, A>),
+      value(fc).map((a) => Exit.succeed(a) as any as Exit.Success<E, A>)
+    )
+
+const exitPretty = <E, A>(error: Pretty<E>, value: Pretty<A>): Pretty<Exit.Exit<E, A>> => (exit) =>
+  exit._tag === "Failure"
+    ? `Exit.failCause(${causePretty(error)(exit.cause)})`
+    : `Exit.succeed(${value(exit.value)})`
+
+const exitInline = <EI, E, AI, A>(
+  error: Schema<EI, E>,
+  value: Schema<AI, A>
+) =>
+  union(
+    struct({
+      _tag: literal("Failure"),
+      cause: cause(error)
+    }),
+    struct({
+      _tag: literal("Success"),
+      value
+    })
+  )
+
+/**
+ * @category Exit
+ * @since 1.0.0
+ */
+export const exitFromSelf = <IE, E, IA, A>(
+  error: Schema<IE, E>,
+  value: Schema<IA, A>
+): Schema<Exit.Exit<IE, IA>, Exit.Exit<E, A>> =>
+  declare(
+    [error, value],
+    exitInline(error, value),
+    (isDecoding, error, value) => {
+      const parseCause = isDecoding
+        ? Parser.parse(causeFromSelf(error))
+        : Parser.encode(causeFromSelf(error))
+      const parseValue = isDecoding ? Parser.parse(value) : Parser.encode(value)
+      return (u, options, ast) =>
+        !Exit.isExit(u) ?
+          ParseResult.fail(ParseResult.type(ast, u)) :
+          Exit.isFailure(u) ?
+          ParseResult.map(parseCause(u.cause, options), Exit.failCause) :
+          ParseResult.map(parseValue(u.value, options), Exit.succeed)
+    },
+    {
+      [AST.IdentifierAnnotationId]: "Exit",
+      [Internal.PrettyHookId]: exitPretty,
+      [Internal.ArbitraryHookId]: exitArbitrary,
+      [Internal.EquivalenceHookId]: () => Equal.equals
+    }
+  )
+
+/**
+ * @category Exit
+ * @since 1.0.0
+ */
+export const exit = <IE, E, IA, A>(
+  error: Schema<IE, E>,
+  value: Schema<IA, A>
+): Schema<
+  {
+    readonly _tag: "Failure"
+    readonly cause: CauseFrom<IE>
+  } | {
+    readonly _tag: "Success"
+    readonly value: IA
+  },
+  Exit.Exit<E, A>
+> =>
+  transform(
+    exitInline(error, value),
+    to(exitFromSelf(error, value)),
+    (input) =>
+      input._tag === "Failure"
+        ? Exit.failCause(input.cause) as unknown as Exit.Exit<E, A>
+        : Exit.succeed(input.value) as unknown as Exit.Exit<E, A>,
+    (exit) =>
+      exit._tag === "Failure"
+        ? { _tag: "Failure", cause: exit.cause } as const
+        : { _tag: "Success", value: exit.value } as const
   )
