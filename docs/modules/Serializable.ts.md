@@ -16,26 +16,37 @@ Serializable represents an object that has self-contained Schema(s)
 
 - [accessor](#accessor)
   - [exitSchema](#exitschema)
+  - [failureSchema](#failureschema)
   - [selfSchema](#selfschema)
+  - [successSchema](#successschema)
 - [decoding](#decoding)
   - [deserialize](#deserialize)
   - [deserializeExit](#deserializeexit)
+  - [deserializeFailure](#deserializefailure)
+  - [deserializeSuccess](#deserializesuccess)
 - [encoding](#encoding)
   - [serialize](#serialize)
   - [serializeExit](#serializeexit)
+  - [serializeFailure](#serializefailure)
+  - [serializeSuccess](#serializesuccess)
 - [model](#model)
   - [Serializable (interface)](#serializable-interface)
   - [Serializable (namespace)](#serializable-namespace)
     - [From (type alias)](#from-type-alias)
     - [To (type alias)](#to-type-alias)
-  - [SerializableWithExit (interface)](#serializablewithexit-interface)
-  - [WithExit (interface)](#withexit-interface)
-  - [WithExit (namespace)](#withexit-namespace)
-    - [From (type alias)](#from-type-alias-1)
-    - [To (type alias)](#to-type-alias-1)
+  - [SerializableWithResult (interface)](#serializablewithresult-interface)
+  - [WithResult (interface)](#withresult-interface)
+  - [WithResult (namespace)](#withresult-namespace)
+    - [ExitFrom (type alias)](#exitfrom-type-alias)
+    - [ExitSchema (type alias)](#exitschema-type-alias)
+    - [ExitTo (type alias)](#exitto-type-alias)
+    - [FailureFrom (type alias)](#failurefrom-type-alias)
+    - [FailureTo (type alias)](#failureto-type-alias)
+    - [SuccessFrom (type alias)](#successfrom-type-alias)
+    - [SuccessTo (type alias)](#successto-type-alias)
 - [symbol](#symbol)
   - [symbol](#symbol-1)
-  - [symbolExit](#symbolexit)
+  - [symbolResult](#symbolresult)
 
 ---
 
@@ -46,7 +57,17 @@ Serializable represents an object that has self-contained Schema(s)
 **Signature**
 
 ```ts
-export declare const exitSchema: <A extends WithExit>(self: A) => A[typeof symbolExit]
+export declare const exitSchema: <A extends WithResult>(self: A) => WithResult.ExitSchema<A>
+```
+
+Added in v1.0.0
+
+## failureSchema
+
+**Signature**
+
+```ts
+export declare const failureSchema: <A extends WithResult>(self: A) => A[typeof symbolResult]["Failure"]
 ```
 
 Added in v1.0.0
@@ -57,6 +78,16 @@ Added in v1.0.0
 
 ```ts
 export declare const selfSchema: <A extends Serializable>(self: A) => A[typeof symbol]
+```
+
+Added in v1.0.0
+
+## successSchema
+
+**Signature**
+
+```ts
+export declare const successSchema: <A extends WithResult>(self: A) => A[typeof symbolResult]["Success"]
 ```
 
 Added in v1.0.0
@@ -84,8 +115,40 @@ Added in v1.0.0
 
 ```ts
 export declare const deserializeExit: {
-  (value: unknown): <A extends WithExit>(self: A) => Effect.Effect<never, ParseResult.ParseError, WithExit.To<A>>
-  <A extends WithExit>(self: A, value: unknown): Effect.Effect<never, ParseResult.ParseError, WithExit.To<A>>
+  (
+    value: unknown
+  ): <A extends WithResult>(self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitTo<A>>
+  <A extends WithResult>(self: A, value: unknown): Effect.Effect<never, ParseResult.ParseError, WithResult.ExitTo<A>>
+}
+```
+
+Added in v1.0.0
+
+## deserializeFailure
+
+**Signature**
+
+```ts
+export declare const deserializeFailure: {
+  (
+    value: unknown
+  ): <A extends WithResult>(self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureTo<A>>
+  <A extends WithResult>(self: A, value: unknown): Effect.Effect<never, ParseResult.ParseError, WithResult.FailureTo<A>>
+}
+```
+
+Added in v1.0.0
+
+## deserializeSuccess
+
+**Signature**
+
+```ts
+export declare const deserializeSuccess: {
+  (
+    value: unknown
+  ): <A extends WithResult>(self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessTo<A>>
+  <A extends WithResult>(self: A, value: unknown): Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessTo<A>>
 }
 ```
 
@@ -111,10 +174,49 @@ Added in v1.0.0
 
 ```ts
 export declare const serializeExit: {
-  <A extends WithExit>(
-    value: WithExit.To<A>
-  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, WithExit.From<A>>
-  <A extends WithExit>(self: A, value: WithExit.To<A>): Effect.Effect<never, ParseResult.ParseError, WithExit.From<A>>
+  <A extends WithResult>(
+    value: WithResult.ExitTo<A>
+  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitFrom<A>>
+  <A extends WithResult>(
+    self: A,
+    value: WithResult.ExitTo<A>
+  ): Effect.Effect<never, ParseResult.ParseError, WithResult.ExitFrom<A>>
+}
+```
+
+Added in v1.0.0
+
+## serializeFailure
+
+**Signature**
+
+```ts
+export declare const serializeFailure: {
+  <A extends WithResult>(
+    value: WithResult.FailureTo<A>
+  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureFrom<A>>
+  <A extends WithResult>(
+    self: A,
+    value: WithResult.FailureTo<A>
+  ): Effect.Effect<never, ParseResult.ParseError, WithResult.FailureFrom<A>>
+}
+```
+
+Added in v1.0.0
+
+## serializeSuccess
+
+**Signature**
+
+```ts
+export declare const serializeSuccess: {
+  <A extends WithResult>(
+    value: WithResult.SuccessTo<A>
+  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessFrom<A>>
+  <A extends WithResult>(
+    self: A,
+    value: WithResult.SuccessTo<A>
+  ): Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessFrom<A>>
 }
 ```
 
@@ -158,48 +260,101 @@ export type To<A extends Serializable> = Schema.Schema.To<A[typeof symbol]>
 
 Added in v1.0.0
 
-## SerializableWithExit (interface)
+## SerializableWithResult (interface)
 
 **Signature**
 
 ```ts
-export interface SerializableWithExit extends Serializable, WithExit {}
+export interface SerializableWithResult extends Serializable, WithResult {}
 ```
 
 Added in v1.0.0
 
-## WithExit (interface)
+## WithResult (interface)
 
 **Signature**
 
 ```ts
-export interface WithExit {
-  readonly [symbolExit]: Schema.Schema<any, Exit.Exit<any, any>>
+export interface WithResult {
+  readonly [symbolResult]: {
+    readonly Failure: Schema.Schema<any, any>
+    readonly Success: Schema.Schema<any, any>
+  }
 }
 ```
 
 Added in v1.0.0
 
-## WithExit (namespace)
+## WithResult (namespace)
 
 Added in v1.0.0
 
-### From (type alias)
+### ExitFrom (type alias)
 
 **Signature**
 
 ```ts
-export type From<A extends WithExit> = Schema.Schema.From<A[typeof symbolExit]>
+export type ExitFrom<A extends WithResult> = Schema.ExitFrom<FailureFrom<A>, SuccessFrom<A>>
 ```
 
 Added in v1.0.0
 
-### To (type alias)
+### ExitSchema (type alias)
 
 **Signature**
 
 ```ts
-export type To<A extends WithExit> = Schema.Schema.To<A[typeof symbolExit]>
+export type ExitSchema<A extends WithResult> = Schema.Schema<ExitFrom<A>, ExitTo<A>>
+```
+
+Added in v1.0.0
+
+### ExitTo (type alias)
+
+**Signature**
+
+```ts
+export type ExitTo<A extends WithResult> = Exit.Exit<FailureTo<A>, SuccessTo<A>>
+```
+
+Added in v1.0.0
+
+### FailureFrom (type alias)
+
+**Signature**
+
+```ts
+export type FailureFrom<A extends WithResult> = Schema.Schema.From<A[typeof symbolResult]["Failure"]>
+```
+
+Added in v1.0.0
+
+### FailureTo (type alias)
+
+**Signature**
+
+```ts
+export type FailureTo<A extends WithResult> = Schema.Schema.To<A[typeof symbolResult]["Failure"]>
+```
+
+Added in v1.0.0
+
+### SuccessFrom (type alias)
+
+**Signature**
+
+```ts
+export type SuccessFrom<A extends WithResult> = Schema.Schema.From<A[typeof symbolResult]["Success"]>
+```
+
+Added in v1.0.0
+
+### SuccessTo (type alias)
+
+**Signature**
+
+```ts
+export type SuccessTo<A extends WithResult> = Schema.Schema.To<A[typeof symbolResult]["Success"]>
 ```
 
 Added in v1.0.0
@@ -216,12 +371,12 @@ export declare const symbol: typeof symbol
 
 Added in v1.0.0
 
-## symbolExit
+## symbolResult
 
 **Signature**
 
 ```ts
-export declare const symbolExit: typeof symbolExit
+export declare const symbolResult: typeof symbolResult
 ```
 
 Added in v1.0.0

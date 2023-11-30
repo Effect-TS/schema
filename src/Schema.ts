@@ -37,10 +37,11 @@ import * as InternalBigInt from "./internal/bigint.js"
 import * as filters from "./internal/filters.js"
 import * as hooks from "./internal/hooks.js"
 import * as InternalSchema from "./internal/schema.js"
+import * as InternalSerializable from "./internal/serializable.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
 import type { Pretty } from "./Pretty.js"
-import * as Serializable from "./Serializable.js"
+import type * as Serializable from "./Serializable.js"
 
 // ---------------------------------------------
 // model
@@ -4276,20 +4277,14 @@ export const TaggedError = <Self>() =>
  * @since 1.0.0
  */
 export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
-  extends Request.Request<EA, AA>, Serializable.SerializableWithExit
+  extends Request.Request<EA, AA>, Serializable.SerializableWithResult
 {
   readonly _tag: Tag
   readonly [Serializable.symbol]: Schema<I, A>
-  readonly [Serializable.symbolExit]: Schema<
-    {
-      readonly _tag: "Failure"
-      readonly cause: CauseFrom<EI>
-    } | {
-      readonly _tag: "Success"
-      readonly value: AI
-    },
-    Exit.Exit<EA, AA>
-  >
+  readonly [Serializable.symbolResult]: {
+    readonly Failure: Schema<EI, EA>
+    readonly Success: Schema<AI, AA>
+  }
 }
 
 /**
@@ -4312,8 +4307,8 @@ export const TaggedRequest =
   <Self>() =>
   <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
     tag: Tag,
-    error: Schema<EI, EA>,
-    success: Schema<AI, AA>,
+    Failure: Schema<EI, EA>,
+    Success: Schema<AI, AA>,
     fields: Fields
   ): [unknown] extends [Self] ?
     MissingSelfGeneric<"TaggedRequest", `"Tag", SuccessSchema, FailureSchema, `>
@@ -4333,13 +4328,12 @@ export const TaggedRequest =
       >
     > =>
   {
-    const exitSchema = exit(error, success)
     class SerializableRequest extends Request.Class<any, any, { readonly _tag: string }> {
-      get [Serializable.symbol]() {
+      get [InternalSerializable.symbol]() {
         return this.constructor
       }
-      get [Serializable.symbolExit]() {
-        return exitSchema
+      get [InternalSerializable.symbolResult]() {
+        return { Failure, Success }
       }
     }
     const fieldsWithTag = { ...fields, _tag: literal(tag) }
@@ -4516,9 +4510,9 @@ export const fiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare
       : ParseResult.fail(ParseResult.type(ast, input)),
   {
     [AST.IdentifierAnnotationId]: "FiberId",
-    [Internal.PrettyHookId]: fiberIdPretty,
-    [Internal.ArbitraryHookId]: fiberIdArbitrary,
-    [Internal.EquivalenceHookId]: () => Equal.equals
+    [hooks.PrettyHookId]: fiberIdPretty,
+    [hooks.ArbitraryHookId]: fiberIdArbitrary,
+    [hooks.EquivalenceHookId]: () => Equal.equals
   }
 )
 
@@ -4719,9 +4713,9 @@ export const causeFromSelf = <IE, E>(
     },
     {
       [AST.IdentifierAnnotationId]: "Cause",
-      [Internal.PrettyHookId]: causePretty,
-      [Internal.ArbitraryHookId]: causeArbitrary,
-      [Internal.EquivalenceHookId]: () => Equal.equals
+      [hooks.PrettyHookId]: causePretty,
+      [hooks.ArbitraryHookId]: causeArbitrary,
+      [hooks.EquivalenceHookId]: () => Equal.equals
     }
   )
 
@@ -4833,11 +4827,23 @@ export const exitFromSelf = <IE, E, IA, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "Exit",
-      [Internal.PrettyHookId]: exitPretty,
-      [Internal.ArbitraryHookId]: exitArbitrary,
-      [Internal.EquivalenceHookId]: () => Equal.equals
+      [hooks.PrettyHookId]: exitPretty,
+      [hooks.ArbitraryHookId]: exitArbitrary,
+      [hooks.EquivalenceHookId]: () => Equal.equals
     }
   )
+
+/**
+ * @category Exit
+ * @since 1.0.0
+ */
+export type ExitFrom<E, A> = {
+  readonly _tag: "Failure"
+  readonly cause: CauseFrom<E>
+} | {
+  readonly _tag: "Success"
+  readonly value: A
+}
 
 /**
  * @category Exit
@@ -4846,16 +4852,7 @@ export const exitFromSelf = <IE, E, IA, A>(
 export const exit = <IE, E, IA, A>(
   error: Schema<IE, E>,
   value: Schema<IA, A>
-): Schema<
-  {
-    readonly _tag: "Failure"
-    readonly cause: CauseFrom<IE>
-  } | {
-    readonly _tag: "Success"
-    readonly value: IA
-  },
-  Exit.Exit<E, A>
-> =>
+): Schema<ExitFrom<IE, IA>, Exit.Exit<E, A>> =>
   transform(
     exitInline(error, value),
     to(exitFromSelf(error, value)),

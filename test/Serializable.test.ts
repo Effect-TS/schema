@@ -14,8 +14,11 @@ class GetPersonById extends S.Class<GetPersonById>()({
   get [Serializable.symbol]() {
     return GetPersonById
   }
-  get [Serializable.symbolExit]() {
-    return S.exit(S.string, Person)
+  get [Serializable.symbolResult]() {
+    return {
+      Success: Person,
+      Failure: S.string
+    } as const
   }
 }
 
@@ -37,6 +40,26 @@ describe("Serializable", () => {
     )
   })
 
+  test("serializeFailure", () => {
+    const req = new GetPersonById({ id: 123 })
+    assert.deepStrictEqual(
+      Effect.runSync(
+        Serializable.serializeFailure(req, "fail")
+      ),
+      "fail"
+    )
+  })
+
+  test("serializeSuccess", () => {
+    const req = new GetPersonById({ id: 123 })
+    assert.deepStrictEqual(
+      Effect.runSync(
+        Serializable.serializeSuccess(req, new Person({ id: 123, name: "foo" }))
+      ),
+      { id: 123, name: "foo" }
+    )
+  })
+
   test("serializeExit", () => {
     const req = new GetPersonById({ id: 123 })
     assert.deepStrictEqual(
@@ -50,6 +73,26 @@ describe("Serializable", () => {
         Serializable.serializeExit(req, Exit.fail("fail"))
       ),
       { _tag: "Failure", cause: { _tag: "Fail", error: "fail" } }
+    )
+  })
+
+  test("deserializeFailure", () => {
+    const req = new GetPersonById({ id: 123 })
+    assert.deepStrictEqual(
+      Effect.runSync(
+        Serializable.deserializeFailure(req, "fail")
+      ),
+      "fail"
+    )
+  })
+
+  test("deserializeSuccess", () => {
+    const req = new GetPersonById({ id: 123 })
+    assert.deepStrictEqual(
+      Effect.runSync(
+        Serializable.deserializeSuccess(req, { id: 123, name: "foo" })
+      ),
+      new Person({ id: 123, name: "foo" })
     )
   })
 

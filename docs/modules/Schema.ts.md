@@ -61,6 +61,7 @@ Added in v1.0.0
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
 - [Exit](#exit)
+  - [ExitFrom (type alias)](#exitfrom-type-alias)
   - [exit](#exit-1)
   - [exitFromSelf](#exitfromself)
 - [Fiber id](#fiber-id)
@@ -886,6 +887,24 @@ Added in v1.0.0
 
 # Exit
 
+## ExitFrom (type alias)
+
+**Signature**
+
+```ts
+export type ExitFrom<E, A> =
+  | {
+      readonly _tag: "Failure"
+      readonly cause: CauseFrom<E>
+    }
+  | {
+      readonly _tag: "Success"
+      readonly value: A
+    }
+```
+
+Added in v1.0.0
+
 ## exit
 
 **Signature**
@@ -894,10 +913,7 @@ Added in v1.0.0
 export declare const exit: <IE, E, IA, A>(
   error: Schema<IE, E>,
   value: Schema<IA, A>
-) => Schema<
-  { readonly _tag: "Failure"; readonly cause: CauseFrom<IE> } | { readonly _tag: "Success"; readonly value: IA },
-  Exit.Exit<E, A>
->
+) => Schema<ExitFrom<IE, IA>, Exit.Exit<E, A>>
 ```
 
 Added in v1.0.0
@@ -1667,8 +1683,8 @@ Added in v1.0.0
 ```ts
 export declare const TaggedRequest: <Self>() => <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
   tag: Tag,
-  error: Schema<EI, EA>,
-  success: Schema<AI, AA>,
+  Failure: Schema<EI, EA>,
+  Success: Schema<AI, AA>,
   fields: Fields
 ) => [unknown] extends [Self]
   ? 'Missing `Self` generic - use `class Self extends TaggedRequest<Self>()("Tag", SuccessSchema, FailureSchema, { ... })`'
@@ -1710,20 +1726,13 @@ Added in v1.0.0
 ```ts
 export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
   extends Request.Request<EA, AA>,
-    Serializable.SerializableWithExit {
+    Serializable.SerializableWithResult {
   readonly _tag: Tag
   readonly [Serializable.symbol]: Schema<I, A>
-  readonly [Serializable.symbolExit]: Schema<
-    | {
-        readonly _tag: "Failure"
-        readonly cause: CauseFrom<EI>
-      }
-    | {
-        readonly _tag: "Success"
-        readonly value: AI
-      },
-    Exit.Exit<EA, AA>
-  >
+  readonly [Serializable.symbolResult]: {
+    readonly Failure: Schema<EI, EA>
+    readonly Success: Schema<AI, AA>
+  }
 }
 ```
 
