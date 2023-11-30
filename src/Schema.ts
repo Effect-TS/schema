@@ -4430,7 +4430,7 @@ const makeClass = <I, A>(
 }
 
 // ---------------------------------------------
-// fiber id
+// Fiber id
 // ---------------------------------------------
 
 /**
@@ -4470,11 +4470,12 @@ const fiberIdPretty = (): Pretty<FiberId.FiberId> => (fiberId) => {
   }
   return "FiberId.none"
 }
-const fiberIdInline: Schema<FiberIdFrom, FiberIdFrom> = union(
+
+const FiberIdInline: Schema<FiberIdFrom, FiberIdFrom> = union(
   struct({
     _tag: literal("Composite"),
-    left: lazy(() => fiberIdInline),
-    right: lazy(() => fiberIdInline)
+    left: lazy(() => FiberIdInline),
+    right: lazy(() => FiberIdInline)
   }),
   struct({
     _tag: literal("None")
@@ -4496,9 +4497,9 @@ const fiberIdInline: Schema<FiberIdFrom, FiberIdFrom> = union(
  * @category Fiber id
  * @since 1.0.0
  */
-export const fiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare(
+export const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare(
   [],
-  fiberIdInline,
+  FiberIdInline,
   () => (input, _, ast) =>
     FiberId.isFiberId(input)
       ? ParseResult.succeed(input)
@@ -4511,19 +4512,15 @@ export const fiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare
   }
 )
 
-/**
- * @category Fiber id
- * @since 1.0.0
- */
-export const fiberId: Schema<
+const _FiberId: Schema<
   FiberIdFrom,
   FiberId.FiberId
 > = transformOrFail(
-  fiberIdInline,
-  to(fiberIdFromSelf),
+  FiberIdInline,
+  to(FiberIdFromSelf),
   (input): ParseResult.ParseResult<FiberId.FiberId> => {
     if (input._tag === "Composite") {
-      const decode = Parser.decode(fiberId)
+      const decode = Parser.decode(_FiberId)
       return ParseResult.flatMap(
         decode(input.left),
         (left) =>
@@ -4540,7 +4537,7 @@ export const fiberId: Schema<
   },
   (id): ParseResult.ParseResult<FiberIdFrom> => {
     if (id._tag === "Composite") {
-      const encode = Parser.encode(fiberId)
+      const encode = Parser.encode(_FiberId)
       return ParseResult.flatMap(
         encode(id.left),
         (left) =>
@@ -4560,6 +4557,14 @@ export const fiberId: Schema<
     }
   }
 )
+
+export {
+  /**
+   * @category Fiber id
+   * @since 1.0.0
+   */
+  _FiberId as FiberId
+}
 
 // ---------------------------------------------
 // cause
@@ -4663,7 +4668,7 @@ const causeInline = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseTo
     }),
     struct({
       _tag: literal("Interrupt"),
-      fiberId
+      fiberId: _FiberId
     }),
     struct({
       _tag: literal("Parallel"),

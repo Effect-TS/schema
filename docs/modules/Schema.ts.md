@@ -65,9 +65,9 @@ Added in v1.0.0
   - [exit](#exit-1)
   - [exitFromSelf](#exitfromself)
 - [Fiber id](#fiber-id)
+  - [FiberId](#fiberid)
   - [FiberIdFrom (type alias)](#fiberidfrom-type-alias)
-  - [fiberId](#fiberid)
-  - [fiberIdFromSelf](#fiberidfromself)
+  - [FiberIdFromSelf](#fiberidfromself)
 - [Option transformations](#option-transformations)
   - [OptionFrom (type alias)](#optionfrom-type-alias)
   - [option](#option)
@@ -933,6 +933,16 @@ Added in v1.0.0
 
 # Fiber id
 
+## FiberId
+
+**Signature**
+
+```ts
+export declare const FiberId: Schema<FiberIdFrom, FiberId.FiberId>
+```
+
+Added in v1.0.0
+
 ## FiberIdFrom (type alias)
 
 **Signature**
@@ -956,22 +966,12 @@ export type FiberIdFrom =
 
 Added in v1.0.0
 
-## fiberId
+## FiberIdFromSelf
 
 **Signature**
 
 ```ts
-export declare const fiberId: Schema<FiberIdFrom, FiberId.FiberId>
-```
-
-Added in v1.0.0
-
-## fiberIdFromSelf
-
-**Signature**
-
-```ts
-export declare const fiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId>
+export declare const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId>
 ```
 
 Added in v1.0.0
