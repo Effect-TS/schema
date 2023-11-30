@@ -5,6 +5,7 @@
 import * as BigDecimal from "effect/BigDecimal"
 import * as BigInt_ from "effect/BigInt"
 import * as Brand from "effect/Brand"
+import * as Cause from "effect/Cause"
 import * as Chunk from "effect/Chunk"
 import * as Data from "effect/Data"
 import * as Duration from "effect/Duration"
@@ -13,6 +14,7 @@ import * as Either from "effect/Either"
 import * as Encoding from "effect/Encoding"
 import * as Equal from "effect/Equal"
 import * as Equivalence from "effect/Equivalence"
+import * as FiberId from "effect/FiberId"
 import type { LazyArg } from "effect/Function"
 import { dual, identity } from "effect/Function"
 import * as N from "effect/Number"
@@ -4432,3 +4434,340 @@ const makeClass = <I, A>(
     }
   }
 }
+
+// ---------------------------------------------
+// fiber id
+// ---------------------------------------------
+
+/**
+ * @category Fiber id
+ * @since 1.0.0
+ */
+export type FiberIdFrom = {
+  readonly _tag: "Composite"
+  readonly left: FiberIdFrom
+  readonly right: FiberIdFrom
+} | {
+  readonly _tag: "None"
+} | {
+  readonly _tag: "Runtime"
+  readonly id: number
+  readonly startTimeMillis: number
+}
+
+const fiberIdArbitrary = (): Arbitrary<FiberId.FiberId> => (fc) =>
+  fc.letrec((tie) => ({
+    fiberId: fc.oneof(
+      fc.constant(FiberId.none as FiberId.None),
+      fc.tuple(tie("fiberId"), tie("fiberId")).map(([left, right]) =>
+        FiberId.composite(left as any, right as any) as FiberId.Composite
+      ),
+      fc.tuple(fc.maxSafeNat(), fc.maxSafeNat()).map(([id, startTimeMillis]) =>
+        FiberId.runtime(id, startTimeMillis) as FiberId.Runtime
+      )
+    )
+  })).fiberId
+
+const fiberIdPretty = (): Pretty<FiberId.FiberId> => (fiberId) => {
+  if (FiberId.isRuntime(fiberId)) {
+    return `FiberId.runtime(${fiberId.id}, ${fiberId.startTimeMillis})`
+  } else if (FiberId.isComposite(fiberId)) {
+    return `FiberId.composite(${fiberIdPretty()(fiberId.right)}, ${fiberIdPretty()(fiberId.left)})`
+  }
+  return "FiberId.none"
+}
+const fiberIdInline: Schema<FiberIdFrom, FiberIdFrom> = union(
+  struct({
+    _tag: literal("Composite"),
+    left: lazy(() => fiberIdInline),
+    right: lazy(() => fiberIdInline)
+  }),
+  struct({
+    _tag: literal("None")
+  }),
+  struct({
+    _tag: literal("Runtime"),
+    id: nonNegative()(Int).pipe(annotations({
+      [AST.TitleAnnotationId]: "id",
+      [AST.DescriptionAnnotationId]: "id"
+    })),
+    startTimeMillis: NonNegative.pipe(annotations({
+      [AST.TitleAnnotationId]: "startTimeMillis",
+      [AST.DescriptionAnnotationId]: "startTimeMillis"
+    }))
+  })
+)
+
+/**
+ * @category Fiber id
+ * @since 1.0.0
+ */
+export const fiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare(
+  [],
+  fiberIdInline,
+  () => (input, _, ast) =>
+    FiberId.isFiberId(input)
+      ? ParseResult.succeed(input)
+      : ParseResult.fail(ParseResult.type(ast, input)),
+  {
+    [AST.IdentifierAnnotationId]: "FiberId",
+    [Internal.PrettyHookId]: fiberIdPretty,
+    [Internal.ArbitraryHookId]: fiberIdArbitrary,
+    [Internal.EquivalenceHookId]: () => Equal.equals
+  }
+)
+
+/**
+ * @category Fiber id
+ * @since 1.0.0
+ */
+export const fiberId: Schema<
+  FiberIdFrom,
+  FiberId.FiberId
+> = transformOrFail(
+  fiberIdInline,
+  to(fiberIdFromSelf),
+  (input): ParseResult.ParseResult<FiberId.FiberId> => {
+    if (input._tag === "Composite") {
+      const decode = Parser.decode(fiberId)
+      return ParseResult.flatMap(
+        decode(input.left),
+        (left) =>
+          ParseResult.map(
+            decode(input.right),
+            (right) => FiberId.composite(left, right)
+          )
+      )
+    } else if (input._tag === "None") {
+      return ParseResult.succeed(FiberId.none)
+    } else {
+      return ParseResult.succeed(FiberId.runtime(input.id, input.startTimeMillis))
+    }
+  },
+  (id): ParseResult.ParseResult<FiberIdFrom> => {
+    if (id._tag === "Composite") {
+      const encode = Parser.encode(fiberId)
+      return ParseResult.flatMap(
+        encode(id.left),
+        (left) =>
+          ParseResult.map(
+            encode(id.right),
+            (right) => ({ _tag: "Composite", left, right })
+          )
+      )
+    } else if (id._tag === "None") {
+      return ParseResult.succeed({ _tag: "None" })
+    } else {
+      return ParseResult.succeed({
+        _tag: "Runtime",
+        id: id.id,
+        startTimeMillis: id.startTimeMillis
+      })
+    }
+  }
+)
+
+// ---------------------------------------------
+// cause
+// ---------------------------------------------
+
+/**
+ * @category Fiber id
+ * @since 1.0.0
+ */
+export type CauseFrom<E> = {
+  readonly _tag: "Die"
+  readonly defect: unknown
+} | {
+  readonly _tag: "Empty"
+} | {
+  readonly _tag: "Fail"
+  readonly error: E
+} | {
+  readonly _tag: "Interrupt"
+  readonly fiberId: FiberIdFrom
+} | {
+  readonly _tag: "Parallel"
+  readonly left: CauseFrom<E>
+  readonly right: CauseFrom<E>
+} | {
+  readonly _tag: "Sequential"
+  readonly left: CauseFrom<E>
+  readonly right: CauseFrom<E>
+}
+
+/**
+ * @category Fiber id
+ * @since 1.0.0
+ */
+export type CauseTo<E> = {
+  readonly _tag: "Die"
+  readonly defect: unknown
+} | {
+  readonly _tag: "Empty"
+} | {
+  readonly _tag: "Fail"
+  readonly error: E
+} | {
+  readonly _tag: "Interrupt"
+  readonly fiberId: FiberId.FiberId
+} | {
+  readonly _tag: "Parallel"
+  readonly left: CauseTo<E>
+  readonly right: CauseTo<E>
+} | {
+  readonly _tag: "Sequential"
+  readonly left: CauseTo<E>
+  readonly right: CauseTo<E>
+}
+
+const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => (fc) => {
+  const fiberId = fiberIdArbitrary()(fc)
+  return fc.letrec((tie) => ({
+    cause: fc.oneof(
+      error(fc).map((error) => Cause.fail(error) as Cause.Fail<E>),
+      fc.string().map((_) => Cause.die(_) as Cause.Die),
+      fc.constant(Cause.empty as Cause.Empty),
+      fiberId.map((fiberId) => Cause.interrupt(fiberId) as Cause.Interrupt),
+      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) =>
+        Cause.parallel(left as any, right as any) as Cause.Parallel<E>
+      ),
+      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) =>
+        Cause.sequential(left as any, right as any) as Cause.Sequential<E>
+      )
+    )
+  })).cause
+}
+
+const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => {
+  if (cause._tag === "Die") {
+    return `Cause.die(${Cause.pretty(cause)})`
+  } else if (cause._tag === "Empty") {
+    return "Cause.empty"
+  } else if (cause._tag === "Fail") {
+    return `Cause.fail(${error(cause.error)})`
+  } else if (cause._tag === "Interrupt") {
+    return `Cause.interrupt(${fiberIdPretty()(cause.fiberId)})`
+  } else if (cause._tag === "Parallel") {
+    return `Cause.parallel(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
+  } else {
+    return `Cause.sequential(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
+  }
+}
+const causeInline = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseTo<E>> =>
+  union(
+    struct({
+      _tag: literal("Die"),
+      defect: unknown
+    }),
+    struct({
+      _tag: literal("Empty")
+    }),
+    struct({
+      _tag: literal("Fail"),
+      error
+    }),
+    struct({
+      _tag: literal("Interrupt"),
+      fiberId
+    }),
+    struct({
+      _tag: literal("Parallel"),
+      left: lazy(() => causeInline(error)),
+      right: lazy(() => causeInline(error))
+    }),
+    struct({
+      _tag: literal("Sequential"),
+      left: lazy(() => causeInline(error)),
+      right: lazy(() => causeInline(error))
+    })
+  )
+
+/**
+ * @category Cause
+ * @since 1.0.0
+ */
+export const causeFromSelf = <IE, E>(
+  error: Schema<IE, E>
+): Schema<Cause.Cause<E>, Cause.Cause<E>> =>
+  declare(
+    [error],
+    causeInline(error),
+    (isDecoding, error) => {
+      const parseError = isDecoding ? Parser.parseEither(error) : Parser.encodeEither(error)
+      return (u, options, ast) => {
+        if (!Cause.isCause(u)) {
+          return ParseResult.fail(ParseResult.type(ast, u))
+        }
+        return ParseResult.try({
+          try: () =>
+            Cause.map(u, (e) => {
+              const result = parseError(e, options)
+              if (result._tag === "Left") {
+                throw result.left
+              }
+              return result.right
+            }),
+          catch: (e) => e as ParseResult.ParseError
+        })
+      }
+    },
+    {
+      [AST.IdentifierAnnotationId]: "Cause",
+      [Internal.PrettyHookId]: causePretty,
+      [Internal.ArbitraryHookId]: causeArbitrary,
+      [Internal.EquivalenceHookId]: () => Equal.equals
+    }
+  )
+
+function causeFromCauseTo<E>(causeTo: CauseTo<E>): Cause.Cause<E> {
+  if (causeTo._tag === "Die") {
+    return Cause.die(causeTo.defect)
+  } else if (causeTo._tag === "Empty") {
+    return Cause.empty
+  } else if (causeTo._tag === "Fail") {
+    return Cause.fail(causeTo.error)
+  } else if (causeTo._tag === "Interrupt") {
+    return Cause.interrupt(causeTo.fiberId)
+  } else if (causeTo._tag === "Parallel") {
+    return Cause.parallel(causeFromCauseTo(causeTo.left), causeFromCauseTo(causeTo.right))
+  } else {
+    return Cause.sequential(causeFromCauseTo(causeTo.left), causeFromCauseTo(causeTo.right))
+  }
+}
+
+function causeToCauseTo<E>(cause: Cause.Cause<E>): CauseTo<E> {
+  if (cause._tag === "Die") {
+    return { _tag: "Die", defect: Cause.pretty(cause) }
+  } else if (cause._tag === "Empty") {
+    return { _tag: "Empty" }
+  } else if (cause._tag === "Fail") {
+    return { _tag: "Fail", error: cause.error }
+  } else if (cause._tag === "Interrupt") {
+    return { _tag: "Interrupt", fiberId: cause.fiberId }
+  } else if (cause._tag === "Parallel") {
+    return {
+      _tag: "Parallel",
+      left: causeToCauseTo(cause.left),
+      right: causeToCauseTo(cause.right)
+    }
+  } else {
+    return {
+      _tag: "Sequential",
+      left: causeToCauseTo(cause.left),
+      right: causeToCauseTo(cause.right)
+    }
+  }
+}
+
+/**
+ * @category Cause
+ * @since 1.0.0
+ */
+export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.Cause<E>> =>
+  transform(
+    causeInline(error),
+    to(causeFromSelf(error)),
+    causeFromCauseTo,
+    causeToCauseTo
+  )
