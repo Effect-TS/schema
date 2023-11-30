@@ -6,6 +6,7 @@
 import type * as Effect from "effect/Effect"
 import type * as Exit from "effect/Exit"
 import { dual } from "effect/Function"
+import { globalValue } from "effect/GlobalValue"
 import * as Internal from "./internal/serializable.js"
 import * as Parser from "./Parser.js"
 import type * as ParseResult from "./ParseResult.js"
@@ -125,13 +126,29 @@ export const successSchema = <A extends WithResult>(
   self: A
 ): A[typeof symbolResult]["Success"] => self[symbolResult].Success
 
+const exitSchemaCache = globalValue(
+  "@effect/schema/Serializabl/exitSchemaCache",
+  () => new WeakMap<object, Schema.Schema<any, any>>()
+)
+
 /**
  * @since 1.0.0
  * @category accessor
  */
 export const exitSchema = <A extends WithResult>(
   self: A
-): WithResult.ExitSchema<A> => Schema.exit(failureSchema(self), successSchema(self))
+): WithResult.ExitSchema<A> => {
+  const proto = Object.getPrototypeOf(self)
+  if (!(symbolResult in proto)) {
+    return Schema.exit(failureSchema(self), successSchema(self))
+  }
+  let schema = exitSchemaCache.get(proto)
+  if (schema === undefined) {
+    schema = Schema.exit(failureSchema(self), successSchema(self))
+    exitSchemaCache.set(proto, schema)
+  }
+  return schema
+}
 
 /**
  * @since 1.0.0

@@ -4682,6 +4682,36 @@ const causeInline = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseTo
     })
   )
 
+const causeTraverse = <E, E2>(
+  cause: Cause.Cause<E>,
+  parseError: (e: E, options: ParseOptions) => ParseResult.ParseResult<E2>,
+  options: ParseOptions
+): ParseResult.ParseResult<Cause.Cause<E2>> => {
+  if (cause._tag === "Fail") {
+    return ParseResult.map(parseError(cause.error, options), Cause.fail)
+  } else if (cause._tag === "Parallel") {
+    return ParseResult.flatMap(
+      causeTraverse(cause.left, parseError, options),
+      (left) =>
+        ParseResult.map(
+          causeTraverse(cause.right, parseError, options),
+          (right) => Cause.parallel(left, right)
+        )
+    )
+  } else if (cause._tag === "Sequential") {
+    return ParseResult.flatMap(
+      causeTraverse(cause.left, parseError, options),
+      (left) =>
+        ParseResult.map(
+          causeTraverse(cause.right, parseError, options),
+          (right) => Cause.sequential(left, right)
+        )
+    )
+  }
+
+  return ParseResult.succeed(cause)
+}
+
 /**
  * @category Cause
  * @since 1.0.0
@@ -4693,22 +4723,12 @@ export const causeFromSelf = <IE, E>(
     [error],
     causeInline(error),
     (isDecoding, error) => {
-      const parseError = isDecoding ? Parser.parseEither(error) : Parser.encodeEither(error)
+      const parseError = isDecoding ? Parser.parse(error) : Parser.encode(error)
       return (u, options, ast) => {
         if (!Cause.isCause(u)) {
           return ParseResult.fail(ParseResult.type(ast, u))
         }
-        return ParseResult.try({
-          try: () =>
-            Cause.map(u, (e) => {
-              const result = parseError(e, options)
-              if (result._tag === "Left") {
-                throw result.left
-              }
-              return result.right
-            }),
-          catch: (e) => e as ParseResult.ParseError
-        })
+        return causeTraverse(u, parseError, options)
       }
     },
     {
