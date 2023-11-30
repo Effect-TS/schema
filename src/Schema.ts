@@ -4512,50 +4512,34 @@ export const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare
   }
 )
 
+const fiberIdDecode = (input: FiberIdFrom): FiberId.FiberId => {
+  if (input._tag === "Composite") {
+    return FiberId.composite(fiberIdDecode(input.left), fiberIdDecode(input.right))
+  } else if (input._tag === "Runtime") {
+    return FiberId.runtime(input.id, input.startTimeMillis)
+  } else {
+    return FiberId.none
+  }
+}
+
+const fiberIdEncode = (input: FiberId.FiberId): FiberIdFrom => {
+  if (input._tag === "Composite") {
+    return { _tag: "Composite", left: fiberIdEncode(input.left), right: fiberIdEncode(input.right) }
+  } else if (input._tag === "Runtime") {
+    return { _tag: "Runtime", id: input.id, startTimeMillis: input.startTimeMillis }
+  } else {
+    return { _tag: "None" }
+  }
+}
+
 const _FiberId: Schema<
   FiberIdFrom,
   FiberId.FiberId
-> = transformOrFail(
+> = transform(
   FiberIdFrom,
   FiberIdFromSelf,
-  (input): ParseResult.ParseResult<FiberId.FiberId> => {
-    if (input._tag === "Composite") {
-      const decode = Parser.decode(_FiberId)
-      return ParseResult.flatMap(
-        decode(input.left),
-        (left) =>
-          ParseResult.map(
-            decode(input.right),
-            (right) => FiberId.composite(left, right)
-          )
-      )
-    } else if (input._tag === "None") {
-      return ParseResult.succeed(FiberId.none)
-    } else {
-      return ParseResult.succeed(FiberId.runtime(input.id, input.startTimeMillis))
-    }
-  },
-  (id): ParseResult.ParseResult<FiberIdFrom> => {
-    if (id._tag === "Composite") {
-      const encode = Parser.encode(_FiberId)
-      return ParseResult.flatMap(
-        encode(id.left),
-        (left) =>
-          ParseResult.map(
-            encode(id.right),
-            (right) => ({ _tag: "Composite", left, right })
-          )
-      )
-    } else if (id._tag === "None") {
-      return ParseResult.succeed({ _tag: "None" })
-    } else {
-      return ParseResult.succeed({
-        _tag: "Runtime",
-        id: id.id,
-        startTimeMillis: id.startTimeMillis
-      })
-    }
-  }
+  fiberIdDecode,
+  fiberIdEncode
 )
 
 export {
@@ -4735,7 +4719,7 @@ export const causeFromSelf = <IE, E>(
     }
   )
 
-function causeFromCauseTo<E>(causeTo: CauseTo<E>): Cause.Cause<E> {
+function causeDecode<E>(causeTo: CauseTo<E>): Cause.Cause<E> {
   if (causeTo._tag === "Die") {
     return Cause.die(causeTo.defect)
   } else if (causeTo._tag === "Empty") {
@@ -4745,13 +4729,13 @@ function causeFromCauseTo<E>(causeTo: CauseTo<E>): Cause.Cause<E> {
   } else if (causeTo._tag === "Interrupt") {
     return Cause.interrupt(causeTo.fiberId)
   } else if (causeTo._tag === "Parallel") {
-    return Cause.parallel(causeFromCauseTo(causeTo.left), causeFromCauseTo(causeTo.right))
+    return Cause.parallel(causeDecode(causeTo.left), causeDecode(causeTo.right))
   } else {
-    return Cause.sequential(causeFromCauseTo(causeTo.left), causeFromCauseTo(causeTo.right))
+    return Cause.sequential(causeDecode(causeTo.left), causeDecode(causeTo.right))
   }
 }
 
-function causeToCauseTo<E>(cause: Cause.Cause<E>): CauseTo<E> {
+function causeEncode<E>(cause: Cause.Cause<E>): CauseTo<E> {
   if (cause._tag === "Die") {
     return { _tag: "Die", defect: Cause.pretty(cause) }
   } else if (cause._tag === "Empty") {
@@ -4763,14 +4747,14 @@ function causeToCauseTo<E>(cause: Cause.Cause<E>): CauseTo<E> {
   } else if (cause._tag === "Parallel") {
     return {
       _tag: "Parallel",
-      left: causeToCauseTo(cause.left),
-      right: causeToCauseTo(cause.right)
+      left: causeEncode(cause.left),
+      right: causeEncode(cause.right)
     }
   } else {
     return {
       _tag: "Sequential",
-      left: causeToCauseTo(cause.left),
-      right: causeToCauseTo(cause.right)
+      left: causeEncode(cause.left),
+      right: causeEncode(cause.right)
     }
   }
 }
@@ -4783,8 +4767,8 @@ export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.
   transform(
     causeInline(error),
     causeFromSelf(to(error)),
-    causeFromCauseTo,
-    causeToCauseTo
+    causeDecode,
+    causeEncode
   )
 
 // ---------------------------------------------
