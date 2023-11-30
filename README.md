@@ -1931,7 +1931,7 @@ The `split` combinator allows splitting a string into an array of strings.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// $ExpectType Schema<string, string>
+// $ExpectType Schema<string, string[]>
 const schema = S.string.pipe(S.split(","));
 const parse = S.parseSync(schema);
 
