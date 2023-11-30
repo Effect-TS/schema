@@ -3,7 +3,7 @@ import * as PR from "@effect/schema/ParseResult"
 import * as S from "@effect/schema/Schema"
 import * as Serializable from "@effect/schema/Serializable"
 import * as Util from "@effect/schema/test/util"
-import { Effect } from "effect"
+import { Effect, Exit } from "effect"
 import * as Data from "effect/Data"
 import * as Equal from "effect/Equal"
 import * as O from "effect/Option"
@@ -261,7 +261,7 @@ describe("Schema/Class", () => {
     expect(Request.isRequest(req)).toEqual(true)
   })
 
-  it("TaggedRequest extends SerializableWithResult", () => {
+  it("TaggedRequest extends SerializableWithExit", () => {
     class MyRequest
       extends S.TaggedRequest<MyRequest>()("MyRequest", S.string, S.NumberFromString, {
         id: S.number
@@ -277,9 +277,22 @@ describe("Schema/Class", () => {
       Serializable.deserialize(req, { _tag: "MyRequest", id: 1 }).pipe(Effect.runSync),
       req
     ))
-    assert.strictEqual(Serializable.serializeFailure(req, "fail").pipe(Effect.runSync), "fail")
-    assert.strictEqual(Serializable.deserializeFailure(req, "fail").pipe(Effect.runSync), "fail")
-    assert.strictEqual(Serializable.serializeSuccess(req, 123).pipe(Effect.runSync), "123")
-    assert.strictEqual(Serializable.deserializeSuccess(req, "123").pipe(Effect.runSync), 123)
+    assert.deepStrictEqual(
+      Serializable.serializeExit(req, Exit.fail("fail")).pipe(Effect.runSync),
+      { _tag: "Failure", cause: { _tag: "Fail", error: "fail" } }
+    )
+    assert.deepStrictEqual(
+      Serializable.deserializeExit(req, { _tag: "Failure", cause: { _tag: "Fail", error: "fail" } })
+        .pipe(Effect.runSync),
+      Exit.fail("fail")
+    )
+    assert.deepStrictEqual(
+      Serializable.serializeExit(req, Exit.succeed(123)).pipe(Effect.runSync),
+      { _tag: "Success", value: "123" }
+    )
+    assert.deepStrictEqual(
+      Serializable.deserializeExit(req, { _tag: "Success", value: "123" }).pipe(Effect.runSync),
+      Exit.succeed(123)
+    )
   })
 })

@@ -31,6 +31,9 @@ Added in v1.0.0
 - [BigDecimal transformations](#bigdecimal-transformations)
   - [clampBigDecimal](#clampbigdecimal)
   - [negateBigDecimal](#negatebigdecimal)
+- [Cause](#cause)
+  - [cause](#cause-1)
+  - [causeFromSelf](#causefromself)
 - [Chunk transformations](#chunk-transformations)
   - [chunk](#chunk)
   - [chunkFromSelf](#chunkfromself)
@@ -55,6 +58,15 @@ Added in v1.0.0
   - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
+- [Exit](#exit)
+  - [exit](#exit-1)
+  - [exitFromSelf](#exitfromself)
+- [Fiber id](#fiber-id)
+  - [CauseFrom (type alias)](#causefrom-type-alias)
+  - [CauseTo (type alias)](#causeto-type-alias)
+  - [FiberIdFrom (type alias)](#fiberidfrom-type-alias)
+  - [fiberId](#fiberid)
+  - [fiberIdFromSelf](#fiberidfromself)
 - [Option transformations](#option-transformations)
   - [OptionFrom (type alias)](#optionfrom-type-alias)
   - [option](#option)
@@ -562,6 +574,28 @@ export declare const negateBigDecimal: <I, A extends BigDecimal.BigDecimal>(self
 
 Added in v1.0.0
 
+# Cause
+
+## cause
+
+**Signature**
+
+```ts
+export declare const cause: <EI, E>(error: Schema<EI, E>) => Schema<CauseFrom<EI>, Cause.Cause<E>>
+```
+
+Added in v1.0.0
+
+## causeFromSelf
+
+**Signature**
+
+```ts
+export declare const causeFromSelf: <IE, E>(error: Schema<IE, E>) => Schema<Cause.Cause<IE>, Cause.Cause<E>>
+```
+
+Added in v1.0.0
+
 # Chunk transformations
 
 ## chunk
@@ -776,6 +810,152 @@ export declare const eitherFromSelf: <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
 ) => Schema<Either.Either<IE, IA>, Either.Either<E, A>>
+```
+
+Added in v1.0.0
+
+# Exit
+
+## exit
+
+**Signature**
+
+```ts
+export declare const exit: <IE, E, IA, A>(
+  error: Schema<IE, E>,
+  value: Schema<IA, A>
+) => Schema<
+  { readonly _tag: "Failure"; readonly cause: CauseFrom<IE> } | { readonly _tag: "Success"; readonly value: IA },
+  Exit.Exit<E, A>
+>
+```
+
+Added in v1.0.0
+
+## exitFromSelf
+
+**Signature**
+
+```ts
+export declare const exitFromSelf: <IE, E, IA, A>(
+  error: Schema<IE, E>,
+  value: Schema<IA, A>
+) => Schema<Exit.Exit<IE, IA>, Exit.Exit<E, A>>
+```
+
+Added in v1.0.0
+
+# Fiber id
+
+## CauseFrom (type alias)
+
+**Signature**
+
+```ts
+export type CauseFrom<E> =
+  | {
+      readonly _tag: "Die"
+      readonly defect: unknown
+    }
+  | {
+      readonly _tag: "Empty"
+    }
+  | {
+      readonly _tag: "Fail"
+      readonly error: E
+    }
+  | {
+      readonly _tag: "Interrupt"
+      readonly fiberId: FiberIdFrom
+    }
+  | {
+      readonly _tag: "Parallel"
+      readonly left: CauseFrom<E>
+      readonly right: CauseFrom<E>
+    }
+  | {
+      readonly _tag: "Sequential"
+      readonly left: CauseFrom<E>
+      readonly right: CauseFrom<E>
+    }
+```
+
+Added in v1.0.0
+
+## CauseTo (type alias)
+
+**Signature**
+
+```ts
+export type CauseTo<E> =
+  | {
+      readonly _tag: "Die"
+      readonly defect: unknown
+    }
+  | {
+      readonly _tag: "Empty"
+    }
+  | {
+      readonly _tag: "Fail"
+      readonly error: E
+    }
+  | {
+      readonly _tag: "Interrupt"
+      readonly fiberId: FiberId.FiberId
+    }
+  | {
+      readonly _tag: "Parallel"
+      readonly left: CauseTo<E>
+      readonly right: CauseTo<E>
+    }
+  | {
+      readonly _tag: "Sequential"
+      readonly left: CauseTo<E>
+      readonly right: CauseTo<E>
+    }
+```
+
+Added in v1.0.0
+
+## FiberIdFrom (type alias)
+
+**Signature**
+
+```ts
+export type FiberIdFrom =
+  | {
+      readonly _tag: "Composite"
+      readonly left: FiberIdFrom
+      readonly right: FiberIdFrom
+    }
+  | {
+      readonly _tag: "None"
+    }
+  | {
+      readonly _tag: "Runtime"
+      readonly id: number
+      readonly startTimeMillis: number
+    }
+```
+
+Added in v1.0.0
+
+## fiberId
+
+**Signature**
+
+```ts
+export declare const fiberId: Schema<FiberIdFrom, FiberId.FiberId>
+```
+
+Added in v1.0.0
+
+## fiberIdFromSelf
+
+**Signature**
+
+```ts
+export declare const fiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId>
 ```
 
 Added in v1.0.0
@@ -1487,8 +1667,8 @@ Added in v1.0.0
 ```ts
 export declare const TaggedRequest: <Self>() => <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
   tag: Tag,
-  Failure: Schema<EI, EA>,
-  Success: Schema<AI, AA>,
+  error: Schema<EI, EA>,
+  success: Schema<AI, AA>,
   fields: Fields
 ) => [unknown] extends [Self]
   ? 'Missing `Self` generic - use `class Self extends TaggedRequest<Self>()("Tag", SuccessSchema, FailureSchema, { ... })`'
@@ -1530,15 +1710,20 @@ Added in v1.0.0
 ```ts
 export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
   extends Request.Request<EA, AA>,
-    Serializable.SerializableWithResult {
+    Serializable.SerializableWithExit {
   readonly _tag: Tag
-  readonly [Serializable.symbol]: {
-    readonly Self: Schema<I, A>
-  }
-  readonly [Serializable.symbolResult]: {
-    readonly Failure: Schema<EI, EA>
-    readonly Success: Schema<AI, AA>
-  }
+  readonly [Serializable.symbol]: Schema<I, A>
+  readonly [Serializable.symbolExit]: Schema<
+    | {
+        readonly _tag: "Failure"
+        readonly cause: CauseFrom<EI>
+      }
+    | {
+        readonly _tag: "Success"
+        readonly value: AI
+      },
+    Exit.Exit<EA, AA>
+  >
 }
 ```
 

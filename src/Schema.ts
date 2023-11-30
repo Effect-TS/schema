@@ -4276,16 +4276,20 @@ export const TaggedError = <Self>() =>
  * @since 1.0.0
  */
 export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
-  extends Request.Request<EA, AA>, Serializable.SerializableWithResult
+  extends Request.Request<EA, AA>, Serializable.SerializableWithExit
 {
   readonly _tag: Tag
-  readonly [Serializable.symbol]: {
-    readonly Self: Schema<I, A>
-  }
-  readonly [Serializable.symbolResult]: {
-    readonly Failure: Schema<EI, EA>
-    readonly Success: Schema<AI, AA>
-  }
+  readonly [Serializable.symbol]: Schema<I, A>
+  readonly [Serializable.symbolExit]: Schema<
+    {
+      readonly _tag: "Failure"
+      readonly cause: CauseFrom<EI>
+    } | {
+      readonly _tag: "Success"
+      readonly value: AI
+    },
+    Exit.Exit<EA, AA>
+  >
 }
 
 /**
@@ -4308,8 +4312,8 @@ export const TaggedRequest =
   <Self>() =>
   <Tag extends string, Fields extends StructFields, EI, EA, AI, AA>(
     tag: Tag,
-    Failure: Schema<EI, EA>,
-    Success: Schema<AI, AA>,
+    error: Schema<EI, EA>,
+    success: Schema<AI, AA>,
     fields: Fields
   ): [unknown] extends [Self] ?
     MissingSelfGeneric<"TaggedRequest", `"Tag", SuccessSchema, FailureSchema, `>
@@ -4329,15 +4333,15 @@ export const TaggedRequest =
       >
     > =>
   {
+    const exitSchema = exit(error, success)
     class SerializableRequest extends Request.Class<any, any, { readonly _tag: string }> {
       get [Serializable.symbol]() {
-        return { Self: this.constructor }
+        return this.constructor
       }
-      get [Serializable.symbolResult]() {
-        return { Failure, Success }
+      get [Serializable.symbolExit]() {
+        return exitSchema
       }
     }
-
     const fieldsWithTag = { ...fields, _tag: literal(tag) }
     return makeClass(
       struct(fieldsWithTag),
