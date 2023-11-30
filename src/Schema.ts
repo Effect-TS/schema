@@ -4782,7 +4782,7 @@ function causeToCauseTo<E>(cause: Cause.Cause<E>): CauseTo<E> {
 export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.Cause<E>> =>
   transform(
     causeInline(error),
-    to(causeFromSelf(error)),
+    causeFromSelf(to(error)),
     causeFromCauseTo,
     causeToCauseTo
   )
@@ -4871,7 +4871,7 @@ export const exit = <IE, E, IA, A>(
 ): Schema<ExitFrom<IE, IA>, Exit.Exit<E, A>> =>
   transform(
     exitInline(error, value),
-    to(exitFromSelf(error, value)),
+    exitFromSelf(to(error), to(value)),
     (input) =>
       input._tag === "Failure"
         ? Exit.failCause(input.cause) as unknown as Exit.Exit<E, A>
