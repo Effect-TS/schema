@@ -32,6 +32,8 @@ Added in v1.0.0
   - [clampBigDecimal](#clampbigdecimal)
   - [negateBigDecimal](#negatebigdecimal)
 - [Cause](#cause)
+  - [CauseFrom (type alias)](#causefrom-type-alias)
+  - [CauseTo (type alias)](#causeto-type-alias)
   - [cause](#cause-1)
   - [causeFromSelf](#causefromself)
 - [Chunk transformations](#chunk-transformations)
@@ -62,8 +64,6 @@ Added in v1.0.0
   - [exit](#exit-1)
   - [exitFromSelf](#exitfromself)
 - [Fiber id](#fiber-id)
-  - [CauseFrom (type alias)](#causefrom-type-alias)
-  - [CauseTo (type alias)](#causeto-type-alias)
   - [FiberIdFrom (type alias)](#fiberidfrom-type-alias)
   - [fiberId](#fiberid)
   - [fiberIdFromSelf](#fiberidfromself)
@@ -576,6 +576,76 @@ Added in v1.0.0
 
 # Cause
 
+## CauseFrom (type alias)
+
+**Signature**
+
+```ts
+export type CauseFrom<E> =
+  | {
+      readonly _tag: "Die"
+      readonly defect: unknown
+    }
+  | {
+      readonly _tag: "Empty"
+    }
+  | {
+      readonly _tag: "Fail"
+      readonly error: E
+    }
+  | {
+      readonly _tag: "Interrupt"
+      readonly fiberId: FiberIdFrom
+    }
+  | {
+      readonly _tag: "Parallel"
+      readonly left: CauseFrom<E>
+      readonly right: CauseFrom<E>
+    }
+  | {
+      readonly _tag: "Sequential"
+      readonly left: CauseFrom<E>
+      readonly right: CauseFrom<E>
+    }
+```
+
+Added in v1.0.0
+
+## CauseTo (type alias)
+
+**Signature**
+
+```ts
+export type CauseTo<E> =
+  | {
+      readonly _tag: "Die"
+      readonly defect: unknown
+    }
+  | {
+      readonly _tag: "Empty"
+    }
+  | {
+      readonly _tag: "Fail"
+      readonly error: E
+    }
+  | {
+      readonly _tag: "Interrupt"
+      readonly fiberId: FiberId.FiberId
+    }
+  | {
+      readonly _tag: "Parallel"
+      readonly left: CauseTo<E>
+      readonly right: CauseTo<E>
+    }
+  | {
+      readonly _tag: "Sequential"
+      readonly left: CauseTo<E>
+      readonly right: CauseTo<E>
+    }
+```
+
+Added in v1.0.0
+
 ## cause
 
 **Signature**
@@ -846,76 +916,6 @@ export declare const exitFromSelf: <IE, E, IA, A>(
 Added in v1.0.0
 
 # Fiber id
-
-## CauseFrom (type alias)
-
-**Signature**
-
-```ts
-export type CauseFrom<E> =
-  | {
-      readonly _tag: "Die"
-      readonly defect: unknown
-    }
-  | {
-      readonly _tag: "Empty"
-    }
-  | {
-      readonly _tag: "Fail"
-      readonly error: E
-    }
-  | {
-      readonly _tag: "Interrupt"
-      readonly fiberId: FiberIdFrom
-    }
-  | {
-      readonly _tag: "Parallel"
-      readonly left: CauseFrom<E>
-      readonly right: CauseFrom<E>
-    }
-  | {
-      readonly _tag: "Sequential"
-      readonly left: CauseFrom<E>
-      readonly right: CauseFrom<E>
-    }
-```
-
-Added in v1.0.0
-
-## CauseTo (type alias)
-
-**Signature**
-
-```ts
-export type CauseTo<E> =
-  | {
-      readonly _tag: "Die"
-      readonly defect: unknown
-    }
-  | {
-      readonly _tag: "Empty"
-    }
-  | {
-      readonly _tag: "Fail"
-      readonly error: E
-    }
-  | {
-      readonly _tag: "Interrupt"
-      readonly fiberId: FiberId.FiberId
-    }
-  | {
-      readonly _tag: "Parallel"
-      readonly left: CauseTo<E>
-      readonly right: CauseTo<E>
-    }
-  | {
-      readonly _tag: "Sequential"
-      readonly left: CauseTo<E>
-      readonly right: CauseTo<E>
-    }
-```
-
-Added in v1.0.0
 
 ## FiberIdFrom (type alias)
 

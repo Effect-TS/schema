@@ -4577,7 +4577,7 @@ export const fiberId: Schema<
 // ---------------------------------------------
 
 /**
- * @category Fiber id
+ * @category Cause
  * @since 1.0.0
  */
 export type CauseFrom<E> = {
@@ -4602,7 +4602,7 @@ export type CauseFrom<E> = {
 }
 
 /**
- * @category Fiber id
+ * @category Cause
  * @since 1.0.0
  */
 export type CauseTo<E> = {
