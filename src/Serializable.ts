@@ -22,31 +22,15 @@ export const symbol: unique symbol = Internal.symbol as any
  * @since 1.0.0
  * @category model
  */
-export interface Serializable {
-  readonly [symbol]: Schema.Schema<any, any>
-}
-
-/**
- * @since 1.0.0
- * @category model
- */
-export declare namespace Serializable {
-  /**
-   * @since 1.0.0
-   */
-  export type From<A extends Serializable> = Schema.Schema.From<A[typeof symbol]>
-
-  /**
-   * @since 1.0.0
-   */
-  export type To<A extends Serializable> = Schema.Schema.To<A[typeof symbol]>
+export interface Serializable<I, A> {
+  readonly [symbol]: Schema.Schema<I, A>
 }
 
 /**
  * @since 1.0.0
  * @category accessor
  */
-export const selfSchema = <A extends Serializable>(self: A): A[typeof symbol] => self[symbol]
+export const selfSchema = <I, A>(self: Serializable<I, A>): Schema.Schema<I, A> => self[symbol]
 
 /**
  * @since 1.0.0
@@ -58,73 +42,28 @@ export const symbolResult: unique symbol = Internal.symbolResult as any
  * @since 1.0.0
  * @category model
  */
-export interface WithResult {
+export interface WithResult<IE, E, IA, A> {
   readonly [symbolResult]: {
-    readonly Failure: Schema.Schema<any, any>
-    readonly Success: Schema.Schema<any, any>
+    readonly Failure: Schema.Schema<IE, E>
+    readonly Success: Schema.Schema<IA, A>
   }
 }
 
 /**
  * @since 1.0.0
- * @category model
+ * @category accessor
  */
-export declare namespace WithResult {
-  /**
-   * @since 1.0.0
-   */
-  export type FailureFrom<A extends WithResult> = Schema.Schema.From<
-    A[typeof symbolResult]["Failure"]
-  >
-
-  /**
-   * @since 1.0.0
-   */
-  export type FailureTo<A extends WithResult> = Schema.Schema.To<A[typeof symbolResult]["Failure"]>
-
-  /**
-   * @since 1.0.0
-   */
-  export type SuccessFrom<A extends WithResult> = Schema.Schema.From<
-    A[typeof symbolResult]["Success"]
-  >
-
-  /**
-   * @since 1.0.0
-   */
-  export type SuccessTo<A extends WithResult> = Schema.Schema.To<A[typeof symbolResult]["Success"]>
-
-  /**
-   * @since 1.0.0
-   */
-  export type ExitFrom<A extends WithResult> = Schema.ExitFrom<FailureFrom<A>, SuccessFrom<A>>
-
-  /**
-   * @since 1.0.0
-   */
-  export type ExitTo<A extends WithResult> = Exit.Exit<FailureTo<A>, SuccessTo<A>>
-
-  /**
-   * @since 1.0.0
-   */
-  export type ExitSchema<A extends WithResult> = Schema.Schema<ExitFrom<A>, ExitTo<A>>
-}
+export const failureSchema = <IE, E, IA, A>(
+  self: WithResult<IE, E, IA, A>
+): Schema.Schema<IE, E> => self[symbolResult].Failure
 
 /**
  * @since 1.0.0
  * @category accessor
  */
-export const failureSchema = <A extends WithResult>(
-  self: A
-): A[typeof symbolResult]["Failure"] => self[symbolResult].Failure
-
-/**
- * @since 1.0.0
- * @category accessor
- */
-export const successSchema = <A extends WithResult>(
-  self: A
-): A[typeof symbolResult]["Success"] => self[symbolResult].Success
+export const successSchema = <IE, E, IA, A>(
+  self: WithResult<IE, E, IA, A>
+): Schema.Schema<IA, A> => self[symbolResult].Success
 
 const exitSchemaCache = globalValue(
   "@effect/schema/Serializabl/exitSchemaCache",
@@ -135,9 +74,9 @@ const exitSchemaCache = globalValue(
  * @since 1.0.0
  * @category accessor
  */
-export const exitSchema = <A extends WithResult>(
-  self: A
-): WithResult.ExitSchema<A> => {
+export const exitSchema = <IE, E, IA, A>(
+  self: WithResult<IE, E, IA, A>
+): Schema.Schema<Schema.ExitFrom<IE, IA>, Exit.Exit<E, A>> => {
   const proto = Object.getPrototypeOf(self)
   if (!(symbolResult in proto)) {
     return Schema.exit(failureSchema(self), successSchema(self))
@@ -154,16 +93,17 @@ export const exitSchema = <A extends WithResult>(
  * @since 1.0.0
  * @category model
  */
-export interface SerializableWithResult extends Serializable, WithResult {}
+export interface SerializableWithResult<IS, S, IE, E, IA, A>
+  extends Serializable<IS, S>, WithResult<IE, E, IA, A>
+{}
 
 /**
  * @since 1.0.0
  * @category encoding
  */
-export const serialize = <A extends Serializable>(
-  self: A
-): Effect.Effect<never, ParseResult.ParseError, Serializable.From<A>> =>
-  Parser.encode(self[symbol])(self)
+export const serialize = <I, A>(
+  self: Serializable<I, A>
+): Effect.Effect<never, ParseResult.ParseError, I> => Parser.encode(self[symbol])(self as A)
 
 /**
  * @since 1.0.0
@@ -172,157 +112,102 @@ export const serialize = <A extends Serializable>(
 export const deserialize: {
   (
     value: unknown
-  ): <A extends Serializable>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, Serializable.To<A>>
-  <A extends Serializable>(
-    self: A,
-    value: unknown
-  ): Effect.Effect<never, ParseResult.ParseError, Serializable.To<A>>
+  ): <I, A>(self: Serializable<I, A>) => Effect.Effect<never, ParseResult.ParseError, A>
+  <I, A>(self: Serializable<I, A>, value: unknown): Effect.Effect<never, ParseResult.ParseError, A>
 } = dual<
-  (value: unknown) => <A extends Serializable>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, Serializable.To<A>>,
-  <A extends Serializable>(
-    self: A,
+  (value: unknown) => <I, A>(
+    self: Serializable<I, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, A>,
+  <I, A>(
+    self: Serializable<I, A>,
     value: unknown
-  ) => Effect.Effect<never, ParseResult.ParseError, Serializable.To<A>>
+  ) => Effect.Effect<never, ParseResult.ParseError, A>
 >(2, (self, value) => Parser.parse(self[symbol])(value))
 
 /**
  * @since 1.0.0
  * @category encoding
  */
-export const serializeFailure: {
-  <A extends WithResult>(
-    value: WithResult.FailureTo<A>
-  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureFrom<A>>
-  <A extends WithResult>(
-    self: A,
-    value: WithResult.FailureTo<A>
-  ): Effect.Effect<never, ParseResult.ParseError, WithResult.FailureFrom<A>>
-} = dual<
-  <A extends WithResult>(
-    value: WithResult.FailureTo<A>
-  ) => (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureFrom<A>>,
-  <A extends WithResult>(
-    self: A,
-    value: WithResult.FailureTo<A>
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureFrom<A>>
+export const serializeFailure = dual<
+  <IE, E, IA, A>(
+    value: E
+  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IE>,
+  <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>,
+    value: E
+  ) => Effect.Effect<never, ParseResult.ParseError, IE>
 >(2, (self, value) => Parser.encode(self[symbolResult].Failure)(value))
 
 /**
  * @since 1.0.0
  * @category decoding
  */
-export const deserializeFailure: {
-  (
+export const deserializeFailure = dual<
+  <IE, E, IA, A>(
     value: unknown
-  ): <A extends WithResult>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureTo<A>>
-  <A extends WithResult>(
-    self: A,
+  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, E>,
+  <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>,
     value: unknown
-  ): Effect.Effect<never, ParseResult.ParseError, WithResult.FailureTo<A>>
-} = dual<
-  (value: unknown) => <A extends WithResult>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureTo<A>>,
-  <A extends WithResult>(
-    self: A,
-    value: unknown
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.FailureTo<A>>
+  ) => Effect.Effect<never, ParseResult.ParseError, E>
 >(2, (self, value) => Parser.parse(self[symbolResult].Failure)(value))
 
 /**
  * @since 1.0.0
  * @category encoding
  */
-export const serializeSuccess: {
-  <A extends WithResult>(
-    value: WithResult.SuccessTo<A>
-  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessFrom<A>>
-  <A extends WithResult>(
-    self: A,
-    value: WithResult.SuccessTo<A>
-  ): Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessFrom<A>>
-} = dual<
-  <A extends WithResult>(
-    value: WithResult.SuccessTo<A>
-  ) => (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessFrom<A>>,
-  <A extends WithResult>(
-    self: A,
-    value: WithResult.SuccessTo<A>
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessFrom<A>>
+export const serializeSuccess = dual<
+  <IE, E, IA, A>(
+    value: A
+  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IA>,
+  <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>,
+    value: A
+  ) => Effect.Effect<never, ParseResult.ParseError, IA>
 >(2, (self, value) => Parser.encode(self[symbolResult].Success)(value))
 
 /**
  * @since 1.0.0
  * @category decoding
  */
-export const deserializeSuccess: {
-  (
+export const deserializeSuccess = dual<
+  <IE, E, IA, A>(
     value: unknown
-  ): <A extends WithResult>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessTo<A>>
-  <A extends WithResult>(
-    self: A,
+  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, A>,
+  <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>,
     value: unknown
-  ): Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessTo<A>>
-} = dual<
-  (value: unknown) => <A extends WithResult>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessTo<A>>,
-  <A extends WithResult>(
-    self: A,
-    value: unknown
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.SuccessTo<A>>
+  ) => Effect.Effect<never, ParseResult.ParseError, A>
 >(2, (self, value) => Parser.parse(self[symbolResult].Success)(value))
 
 /**
  * @since 1.0.0
  * @category encoding
  */
-export const serializeExit: {
-  <A extends WithResult>(
-    value: WithResult.ExitTo<A>
-  ): (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitFrom<A>>
-  <A extends WithResult>(
-    self: A,
-    value: WithResult.ExitTo<A>
-  ): Effect.Effect<never, ParseResult.ParseError, WithResult.ExitFrom<A>>
-} = dual<
-  <A extends WithResult>(
-    value: WithResult.ExitTo<A>
-  ) => (self: A) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitFrom<A>>,
-  <A extends WithResult>(
-    self: A,
-    value: WithResult.ExitTo<A>
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitFrom<A>>
+export const serializeExit = dual<
+  <IE, E, IA, A>(
+    value: Exit.Exit<E, A>
+  ) => (
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, Schema.ExitFrom<IE, IA>>,
+  <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>,
+    value: Exit.Exit<E, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, Schema.ExitFrom<IE, IA>>
 >(2, (self, value) => Parser.encode(exitSchema(self))(value))
 
 /**
  * @since 1.0.0
  * @category decoding
  */
-export const deserializeExit: {
-  (
+export const deserializeExit = dual<
+  <IE, E, IA, A>(
     value: unknown
-  ): <A extends WithResult>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitTo<A>>
-  <A extends WithResult>(
-    self: A,
+  ) => (
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, Exit.Exit<E, A>>,
+  <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>,
     value: unknown
-  ): Effect.Effect<never, ParseResult.ParseError, WithResult.ExitTo<A>>
-} = dual<
-  (value: unknown) => <A extends WithResult>(
-    self: A
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitTo<A>>,
-  <A extends WithResult>(
-    self: A,
-    value: unknown
-  ) => Effect.Effect<never, ParseResult.ParseError, WithResult.ExitTo<A>>
+  ) => Effect.Effect<never, ParseResult.ParseError, Exit.Exit<E, A>>
 >(2, (self, value) => Parser.parse(exitSchema(self))(value))

@@ -1724,15 +1724,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface TaggedRequest<Tag extends string, I, A, EI, EA, AI, AA>
-  extends Request.Request<EA, AA>,
-    Serializable.SerializableWithResult {
+export interface TaggedRequest<Tag extends string, IS, S, IE, E, IA, A>
+  extends Request.Request<A, A>,
+    Serializable.SerializableWithResult<IS, S, IE, E, IA, A> {
   readonly _tag: Tag
-  readonly [Serializable.symbol]: Schema<I, A>
-  readonly [Serializable.symbolResult]: {
-    readonly Failure: Schema<EI, EA>
-    readonly Success: Schema<AI, AA>
-  }
 }
 ```
 
