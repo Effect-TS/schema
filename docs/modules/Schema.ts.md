@@ -153,6 +153,7 @@ Added in v1.0.0
   - [instanceOf](#instanceof)
   - [literal](#literal)
   - [make](#make)
+  - [mapLiterals](#mapliterals)
   - [templateLiteral](#templateliteral)
   - [uniqueSymbol](#uniquesymbol)
 - [decoding](#decoding)
@@ -1961,6 +1962,30 @@ Added in v1.0.0
 
 ```ts
 export declare const make: <I, A>(ast: AST.AST) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## mapLiterals
+
+Creates a new `Schema` which maps between corresponding literal values.
+
+**Signature**
+
+```ts
+export declare const mapLiterals: <const A extends readonly (readonly [AST.LiteralValue, AST.LiteralValue])[]>(
+  ...pairs: A
+) => Schema<A[number][0], A[number][1]>
+```
+
+**Example**
+
+```ts
+import * as S from "@effect/schema/Schema"
+
+const Animal = S.mapLiterals([0, "cat"], [1, "dog"], [2, "cow"])
+
+assert.deepStrictEqual(S.decodeSync(Animal)(1), "dog")
 ```
 
 Added in v1.0.0

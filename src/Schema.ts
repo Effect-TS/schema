@@ -1299,6 +1299,45 @@ export const transform: {
 )
 
 /**
+ * Creates a new `Schema` which maps between corresponding literal values.
+ *
+ * @example
+ * import * as S from "@effect/schema/Schema"
+ *
+ * const Animal = S.mapLiterals(
+ *   [0, "cat"],
+ *   [1, "dog"],
+ *   [2, "cow"]
+ * )
+ *
+ * assert.deepStrictEqual(S.decodeSync(Animal)(1), "dog")
+ * @category constructors
+ * @since 1.0.0
+ */
+export const mapLiterals = <
+  const A extends ReadonlyArray<readonly [AST.LiteralValue, AST.LiteralValue]>
+>(
+  ...pairs: A
+): Schema<A[number][0], A[number][1]> => {
+  const from = literal(...pairs.map((_) => _[0]))
+  const to = literal(...pairs.map((_) => _[1]))
+  return transformOrFail(
+    from,
+    to,
+    (v) =>
+      ReadonlyArray.findFirst(pairs, (_) => _[0] === v).pipe(
+        Option.map((_) => _[1]),
+        Either.fromOption(() => ParseResult.parseError([ParseResult.type(from.ast, v)]))
+      ),
+    (v) =>
+      ReadonlyArray.findFirst(pairs, (_) => _[1] === v).pipe(
+        Option.map((_) => _[0]),
+        Either.fromOption(() => ParseResult.parseError([ParseResult.type(to.ast, v)]))
+      )
+  )
+}
+
+/**
  * Attaches a property signature with the specified key and value to the schema.
  * This API is useful when you want to add a property to your schema which doesn't describe the shape of the input,
  * but rather maps to another schema, for example when you want to add a discriminant to a simple union.
