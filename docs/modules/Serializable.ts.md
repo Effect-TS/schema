@@ -104,9 +104,9 @@ Added in v1.0.0
 
 ```ts
 export declare const deserializeExit: {
-  <IE, E, IA, A>(
+  (
     value: unknown
-  ): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, Exit.Exit<E, A>>
+  ): <IE, E, IA, A>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, Exit.Exit<E, A>>
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: unknown
@@ -122,7 +122,7 @@ Added in v1.0.0
 
 ```ts
 export declare const deserializeFailure: {
-  <IE, E, IA, A>(value: unknown): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, E>
+  (value: unknown): <IE, E, IA, A>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, E>
   <IE, E, IA, A>(self: WithResult<IE, E, IA, A>, value: unknown): Effect.Effect<never, ParseResult.ParseError, E>
 }
 ```
@@ -135,7 +135,7 @@ Added in v1.0.0
 
 ```ts
 export declare const deserializeSuccess: {
-  <IE, E, IA, A>(value: unknown): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, A>
+  (value: unknown): <IE, E, IA, A>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, A>
   <IE, E, IA, A>(self: WithResult<IE, E, IA, A>, value: unknown): Effect.Effect<never, ParseResult.ParseError, A>
 }
 ```
@@ -160,9 +160,9 @@ Added in v1.0.0
 
 ```ts
 export declare const serializeExit: {
-  <IE, E, IA, A>(
+  <E, A>(
     value: Exit.Exit<E, A>
-  ): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, Schema.ExitFrom<IE, IA>>
+  ): <IE, IA>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, Schema.ExitFrom<IE, IA>>
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: Exit.Exit<E, A>
@@ -178,7 +178,7 @@ Added in v1.0.0
 
 ```ts
 export declare const serializeFailure: {
-  <IE, E, IA, A>(value: E): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IE>
+  <E>(value: E): <IE, IA, A>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IE>
   <IE, E, IA, A>(self: WithResult<IE, E, IA, A>, value: E): Effect.Effect<never, ParseResult.ParseError, IE>
 }
 ```
@@ -191,7 +191,7 @@ Added in v1.0.0
 
 ```ts
 export declare const serializeSuccess: {
-  <IE, E, IA, A>(value: A): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IA>
+  <A>(value: A): <IE, E, IA>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IA>
   <IE, E, IA, A>(self: WithResult<IE, E, IA, A>, value: A): Effect.Effect<never, ParseResult.ParseError, IA>
 }
 ```

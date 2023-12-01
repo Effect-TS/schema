@@ -129,17 +129,17 @@ export const deserialize: {
  * @category encoding
  */
 export const serializeFailure: {
-  <IE, E, IA, A>(
+  <E>(
     value: E
-  ): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IE>
+  ): <IE, IA, A>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IE>
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: E
   ): Effect.Effect<never, ParseResult.ParseError, IE>
 } = dual<
-  <IE, E, IA, A>(
-    value: E
-  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IE>,
+  <E>(value: E) => <IE, IA, A>(
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, IE>,
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: E
@@ -151,17 +151,17 @@ export const serializeFailure: {
  * @category decoding
  */
 export const deserializeFailure: {
-  <IE, E, IA, A>(
-    value: unknown
-  ): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, E>
+  (value: unknown): <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, E>
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: unknown
   ): Effect.Effect<never, ParseResult.ParseError, E>
 } = dual<
-  <IE, E, IA, A>(
-    value: unknown
-  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, E>,
+  (value: unknown) => <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, E>,
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: unknown
@@ -173,17 +173,17 @@ export const deserializeFailure: {
  * @category encoding
  */
 export const serializeSuccess: {
-  <IE, E, IA, A>(
+  <A>(
     value: A
-  ): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IA>
+  ): <IE, E, IA>(self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IA>
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: A
   ): Effect.Effect<never, ParseResult.ParseError, IA>
 } = dual<
-  <IE, E, IA, A>(
-    value: A
-  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, IA>,
+  <A>(value: A) => <IE, E, IA>(
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, IA>,
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: A
@@ -195,17 +195,19 @@ export const serializeSuccess: {
  * @category decoding
  */
 export const deserializeSuccess: {
-  <IE, E, IA, A>(
+  (
     value: unknown
-  ): (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, A>
+  ): <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, A>
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: unknown
   ): Effect.Effect<never, ParseResult.ParseError, A>
 } = dual<
-  <IE, E, IA, A>(
-    value: unknown
-  ) => (self: WithResult<IE, E, IA, A>) => Effect.Effect<never, ParseResult.ParseError, A>,
+  (value: unknown) => <IE, E, IA, A>(
+    self: WithResult<IE, E, IA, A>
+  ) => Effect.Effect<never, ParseResult.ParseError, A>,
   <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>,
     value: unknown
@@ -217,9 +219,9 @@ export const deserializeSuccess: {
  * @category encoding
  */
 export const serializeExit: {
-  <IE, E, IA, A>(
+  <E, A>(
     value: Exit.Exit<E, A>
-  ): (
+  ): <IE, IA>(
     self: WithResult<IE, E, IA, A>
   ) => Effect.Effect<never, ParseResult.ParseError, Schema.ExitFrom<IE, IA>>
   <IE, E, IA, A>(
@@ -227,9 +229,7 @@ export const serializeExit: {
     value: Exit.Exit<E, A>
   ): Effect.Effect<never, ParseResult.ParseError, Schema.ExitFrom<IE, IA>>
 } = dual<
-  <IE, E, IA, A>(
-    value: Exit.Exit<E, A>
-  ) => (
+  <E, A>(value: Exit.Exit<E, A>) => <IE, IA>(
     self: WithResult<IE, E, IA, A>
   ) => Effect.Effect<never, ParseResult.ParseError, Schema.ExitFrom<IE, IA>>,
   <IE, E, IA, A>(
@@ -243,9 +243,7 @@ export const serializeExit: {
  * @category decoding
  */
 export const deserializeExit: {
-  <IE, E, IA, A>(
-    value: unknown
-  ): (
+  (value: unknown): <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>
   ) => Effect.Effect<never, ParseResult.ParseError, Exit.Exit<E, A>>
   <IE, E, IA, A>(
@@ -253,9 +251,7 @@ export const deserializeExit: {
     value: unknown
   ): Effect.Effect<never, ParseResult.ParseError, Exit.Exit<E, A>>
 } = dual<
-  <IE, E, IA, A>(
-    value: unknown
-  ) => (
+  (value: unknown) => <IE, E, IA, A>(
     self: WithResult<IE, E, IA, A>
   ) => Effect.Effect<never, ParseResult.ParseError, Exit.Exit<E, A>>,
   <IE, E, IA, A>(
