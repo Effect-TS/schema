@@ -2964,6 +2964,7 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
     [hooks.PrettyHookId]: (): Pretty<Duration.Duration> => (duration) => String(duration),
     [hooks.ArbitraryHookId]: (): Arbitrary<Duration.Duration> => (fc) =>
       fc.oneof(
+        fc.constant(Duration.infinity),
         fc.bigUint().map((_) => Duration.nanos(_)),
         fc.bigUint().map((_) => Duration.micros(_)),
         fc.maxSafeNat().map((_) => Duration.millis(_)),
@@ -3063,14 +3064,20 @@ export const DurationFromNumber: Schema<
 > = durationFromNumber(number)
 
 const hrTime: Schema<readonly [seconds: number, nanos: number]> = tuple(
-  NonNegative.pipe(annotations({
-    [AST.TitleAnnotationId]: "seconds",
-    [AST.DescriptionAnnotationId]: "seconds"
-  })),
-  NonNegative.pipe(annotations({
-    [AST.TitleAnnotationId]: "nanos",
-    [AST.DescriptionAnnotationId]: "nanos"
-  }))
+  NonNegative.pipe(
+    annotations({
+      [AST.TitleAnnotationId]: "seconds",
+      [AST.DescriptionAnnotationId]: "seconds"
+    }),
+    finite()
+  ),
+  NonNegative.pipe(
+    annotations({
+      [AST.TitleAnnotationId]: "nanos",
+      [AST.DescriptionAnnotationId]: "nanos"
+    }),
+    finite()
+  )
 ).pipe(annotations({
   [AST.TitleAnnotationId]: "a high resolution time tuple",
   [AST.DescriptionAnnotationId]: "a high resolution time tuple"
