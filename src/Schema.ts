@@ -3372,7 +3372,7 @@ const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> =>
   const placeholder = lazy<A>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => value
   }))
-  const arb = arbitrary.to(optionFrom(placeholder))
+  const arb = arbitrary.unsafeTo(optionFrom(placeholder))
   return (fc) => arb(fc).map(optionDecode)
 }
 
@@ -3480,7 +3480,7 @@ const eitherArbitrary = <E, A>(
   const placeholderRight = lazy<A>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => right
   }))
-  const arb = arbitrary.to(eitherFrom(placeholderLeft, placeholderRight))
+  const arb = arbitrary.unsafeTo(eitherFrom(placeholderLeft, placeholderRight))
   return (fc) => arb(fc).map(eitherDecode)
 }
 
