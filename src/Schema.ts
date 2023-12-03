@@ -3427,8 +3427,8 @@ export const option = <I, A>(
     optionFromSelf(to(value)),
     optionDecode,
     Option.match({
-      onNone: () => ({ _tag: "None" as const }),
-      onSome: (value) => ({ _tag: "Some" as const, value })
+      onNone: () => ({ _tag: "None" }) as const,
+      onSome: (value) => ({ _tag: "Some", value }) as const
     })
   )
 
@@ -3538,8 +3538,8 @@ export const either = <IE, E, IA, A>(
     eitherFromSelf(to(left), to(right)),
     eitherDecode,
     Either.match({
-      onLeft: (left) => ({ _tag: "Left" as const, left }),
-      onRight: (right) => ({ _tag: "Right" as const, right })
+      onLeft: (left) => ({ _tag: "Left", left }) as const,
+      onRight: (right) => ({ _tag: "Right", right }) as const
     })
   )
 
@@ -4571,32 +4571,7 @@ export type CauseFrom<E> = {
   readonly right: CauseFrom<E>
 }
 
-/**
- * @category Cause
- * @since 1.0.0
- */
-export type CauseTo<E> = {
-  readonly _tag: "Die"
-  readonly defect: unknown
-} | {
-  readonly _tag: "Empty"
-} | {
-  readonly _tag: "Fail"
-  readonly error: E
-} | {
-  readonly _tag: "Interrupt"
-  readonly fiberId: FiberId.FiberId
-} | {
-  readonly _tag: "Parallel"
-  readonly left: CauseTo<E>
-  readonly right: CauseTo<E>
-} | {
-  readonly _tag: "Sequential"
-  readonly left: CauseTo<E>
-  readonly right: CauseTo<E>
-}
-
-const causeInline = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseTo<E>> =>
+const causeFrom = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseFrom<E>> =>
   union(
     struct({
       _tag: literal("Die"),
@@ -4611,17 +4586,17 @@ const causeInline = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseTo
     }),
     struct({
       _tag: literal("Interrupt"),
-      fiberId: _FiberId
+      fiberId: FiberIdFrom
     }),
     struct({
       _tag: literal("Parallel"),
-      left: lazy(() => causeInline(error)),
-      right: lazy(() => causeInline(error))
+      left: lazy(() => causeFrom(error)),
+      right: lazy(() => causeFrom(error))
     }),
     struct({
       _tag: literal("Sequential"),
-      left: lazy(() => causeInline(error)),
-      right: lazy(() => causeInline(error))
+      left: lazy(() => causeFrom(error)),
+      right: lazy(() => causeFrom(error))
     })
   )
 
@@ -4659,8 +4634,7 @@ const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => {
   const placeholder = lazy<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => error
   }))
-  // TODO: replace with unsafeTo
-  const arb = arbitrary.to(causeInline(placeholder))
+  const arb = arbitrary.unsafeTo(causeFrom(placeholder))
   return (fc) => arb(fc).map(causeDecode)
 }
 
@@ -4689,7 +4663,7 @@ export const causeFromSelf = <IE, E>(
 ): Schema<Cause.Cause<IE>, Cause.Cause<E>> =>
   declare(
     [error],
-    causeInline(error),
+    causeFrom(error),
     (isDecoding, error) => {
       const parseError = isDecoding ? Parser.parse(error) : Parser.encode(error)
       return (u, options, ast) => {
@@ -4707,23 +4681,23 @@ export const causeFromSelf = <IE, E>(
     }
   )
 
-function causeDecode<E>(causeTo: CauseTo<E>): Cause.Cause<E> {
-  if (causeTo._tag === "Die") {
-    return Cause.die(causeTo.defect)
-  } else if (causeTo._tag === "Empty") {
+function causeDecode<E>(causeFrom: CauseFrom<E>): Cause.Cause<E> {
+  if (causeFrom._tag === "Die") {
+    return Cause.die(causeFrom.defect)
+  } else if (causeFrom._tag === "Empty") {
     return Cause.empty
-  } else if (causeTo._tag === "Fail") {
-    return Cause.fail(causeTo.error)
-  } else if (causeTo._tag === "Interrupt") {
-    return Cause.interrupt(causeTo.fiberId)
-  } else if (causeTo._tag === "Parallel") {
-    return Cause.parallel(causeDecode(causeTo.left), causeDecode(causeTo.right))
+  } else if (causeFrom._tag === "Fail") {
+    return Cause.fail(causeFrom.error)
+  } else if (causeFrom._tag === "Interrupt") {
+    return Cause.interrupt(fiberIdDecode(causeFrom.fiberId))
+  } else if (causeFrom._tag === "Parallel") {
+    return Cause.parallel(causeDecode(causeFrom.left), causeDecode(causeFrom.right))
   } else {
-    return Cause.sequential(causeDecode(causeTo.left), causeDecode(causeTo.right))
+    return Cause.sequential(causeDecode(causeFrom.left), causeDecode(causeFrom.right))
   }
 }
 
-function causeEncode<E>(cause: Cause.Cause<E>): CauseTo<E> {
+function causeEncode<E>(cause: Cause.Cause<E>): CauseFrom<E> {
   if (cause._tag === "Die") {
     return { _tag: "Die", defect: Cause.pretty(cause) }
   } else if (cause._tag === "Empty") {
@@ -4753,7 +4727,7 @@ function causeEncode<E>(cause: Cause.Cause<E>): CauseTo<E> {
  */
 export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.Cause<E>> =>
   transform(
-    causeInline(error),
+    causeFrom(error),
     causeFromSelf(to(error)),
     causeDecode,
     causeEncode
@@ -4763,32 +4737,60 @@ export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.
 // exit
 // ---------------------------------------------
 
-const exitArbitrary =
-  <E, A>(error: Arbitrary<E>, value: Arbitrary<A>): Arbitrary<Exit.Exit<E, A>> => (fc) =>
-    fc.oneof(
-      causeArbitrary(error)(fc).map((cause) => Exit.failCause(cause)),
-      value(fc).map((a) => Exit.succeed(a))
-    )
+/**
+ * @category Exit
+ * @since 1.0.0
+ */
+export type ExitFrom<E, A> = {
+  readonly _tag: "Failure"
+  readonly cause: CauseFrom<E>
+} | {
+  readonly _tag: "Success"
+  readonly value: A
+}
 
-const exitPretty = <E, A>(error: Pretty<E>, value: Pretty<A>): Pretty<Exit.Exit<E, A>> => (exit) =>
-  exit._tag === "Failure"
-    ? `Exit.failCause(${causePretty(error)(exit.cause)})`
-    : `Exit.succeed(${value(exit.value)})`
-
-const exitInline = <EI, E, AI, A>(
+const exitFrom = <EI, E, AI, A>(
   error: Schema<EI, E>,
   value: Schema<AI, A>
-) =>
+): Schema<ExitFrom<EI, AI>, ExitFrom<E, A>> =>
   union(
     struct({
       _tag: literal("Failure"),
-      cause: cause(error)
+      cause: causeFrom(error)
     }),
     struct({
       _tag: literal("Success"),
       value
     })
   )
+
+const exitDecode = <E, A>(input: ExitFrom<E, A>): Exit.Exit<E, A> => {
+  switch (input._tag) {
+    case "Failure":
+      return Exit.failCause(causeDecode(input.cause))
+    case "Success":
+      return Exit.succeed(input.value)
+  }
+}
+
+const exitArbitrary = <E, A>(
+  error: Arbitrary<E>,
+  value: Arbitrary<A>
+): Arbitrary<Exit.Exit<E, A>> => {
+  const placeholderError = lazy<E>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => error
+  }))
+  const placeholderValue = lazy<A>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => value
+  }))
+  const arb = arbitrary.unsafeTo(exitFrom(placeholderError, placeholderValue))
+  return (fc) => arb(fc).map(exitDecode)
+}
+
+const exitPretty = <E, A>(error: Pretty<E>, value: Pretty<A>): Pretty<Exit.Exit<E, A>> => (exit) =>
+  exit._tag === "Failure"
+    ? `Exit.failCause(${causePretty(error)(exit.cause)})`
+    : `Exit.succeed(${value(exit.value)})`
 
 /**
  * @category Exit
@@ -4800,7 +4802,7 @@ export const exitFromSelf = <IE, E, IA, A>(
 ): Schema<Exit.Exit<IE, IA>, Exit.Exit<E, A>> =>
   declare(
     [error, value],
-    exitInline(error, value),
+    exitFrom(error, value),
     (isDecoding, error, value) => {
       const parseCause = isDecoding
         ? Parser.parse(causeFromSelf(error))
@@ -4825,29 +4827,14 @@ export const exitFromSelf = <IE, E, IA, A>(
  * @category Exit
  * @since 1.0.0
  */
-export type ExitFrom<E, A> = {
-  readonly _tag: "Failure"
-  readonly cause: CauseFrom<E>
-} | {
-  readonly _tag: "Success"
-  readonly value: A
-}
-
-/**
- * @category Exit
- * @since 1.0.0
- */
 export const exit = <IE, E, IA, A>(
   error: Schema<IE, E>,
   value: Schema<IA, A>
 ): Schema<ExitFrom<IE, IA>, Exit.Exit<E, A>> =>
   transform(
-    exitInline(error, value),
+    exitFrom(error, value),
     exitFromSelf(to(error), to(value)),
-    (input) =>
-      input._tag === "Failure"
-        ? Exit.failCause(input.cause) as unknown as Exit.Exit<E, A>
-        : Exit.succeed(input.value) as unknown as Exit.Exit<E, A>,
+    exitDecode,
     (exit) =>
       exit._tag === "Failure"
         ? { _tag: "Failure", cause: exit.cause } as const
