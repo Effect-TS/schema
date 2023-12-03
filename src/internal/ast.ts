@@ -4,10 +4,6 @@
 
 import type * as AST from "../AST.js"
 
-// ---------------------------------------------
-// Schema APIs
-// ---------------------------------------------
-
 /** @internal */
 export const getKeysForIndexSignature = (
   input: { readonly [x: PropertyKey]: unknown },
@@ -23,10 +19,6 @@ export const getKeysForIndexSignature = (
       return getKeysForIndexSignature(input, parameter.from)
   }
 }
-
-// ---------------------------------------------
-// general helpers
-// ---------------------------------------------
 
 /** @internal */
 export const ownKeys = (o: object): Array<PropertyKey> =>
