@@ -3440,18 +3440,6 @@ export const optionFromNullable = <I, A>(
 // Either transformations
 // ---------------------------------------------
 
-const eitherArbitrary = <E, A>(
-  left: Arbitrary<E>,
-  right: Arbitrary<A>
-): Arbitrary<Either.Either<E, A>> =>
-(fc) => fc.oneof(left(fc).map(Either.left), right(fc).map(Either.right))
-
-const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either.Either<E, A>> =>
-  Either.match({
-    onLeft: (e) => `left(${left(e)})`,
-    onRight: (a) => `right(${right(a)})`
-  })
-
 /**
  * @category Either transformations
  * @since 1.0.0
@@ -3464,7 +3452,7 @@ export type EitherFrom<IE, IA> = {
   readonly right: IA
 }
 
-const eitherInline = <IE, E, IA, A>(
+const eitherFrom = <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
 ): Schema<EitherFrom<IE, IA>, EitherFrom<E, A>> =>
@@ -3479,6 +3467,29 @@ const eitherInline = <IE, E, IA, A>(
     })
   )
 
+const eitherDecode = <E, A>(e: EitherFrom<E, A>): Either.Either<E, A> =>
+  e._tag === "Left" ? Either.left(e.left) : Either.right(e.right)
+
+const eitherArbitrary = <E, A>(
+  left: Arbitrary<E>,
+  right: Arbitrary<A>
+): Arbitrary<Either.Either<E, A>> => {
+  const placeholderLeft = lazy<E>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => left
+  }))
+  const placeholderRight = lazy<A>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => right
+  }))
+  const arb = arbitrary.to(eitherFrom(placeholderLeft, placeholderRight))
+  return (fc) => arb(fc).map(eitherDecode)
+}
+
+const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either.Either<E, A>> =>
+  Either.match({
+    onLeft: (e) => `left(${left(e)})`,
+    onRight: (a) => `right(${right(a)})`
+  })
+
 /**
  * @category Either transformations
  * @since 1.0.0
@@ -3489,7 +3500,7 @@ export const eitherFromSelf = <IE, E, IA, A>(
 ): Schema<Either.Either<IE, IA>, Either.Either<E, A>> => {
   return declare(
     [left, right],
-    eitherInline(left, right),
+    eitherFrom(left, right),
     (isDecoding, left, right) => {
       const parseLeft = isDecoding ? Parser.parse(left) : Parser.encode(left)
       const parseRight = isDecoding ? Parser.parse(right) : Parser.encode(right)
@@ -3518,9 +3529,9 @@ export const either = <IE, E, IA, A>(
   right: Schema<IA, A>
 ): Schema<EitherFrom<IE, IA>, Either.Either<E, A>> =>
   transform(
-    eitherInline(left, right),
+    eitherFrom(left, right),
     eitherFromSelf(to(left), to(right)),
-    (a) => a._tag === "Left" ? Either.left(a.left) : Either.right(a.right),
+    eitherDecode,
     Either.match({
       onLeft: (left) => ({ _tag: "Left" as const, left }),
       onRight: (right) => ({ _tag: "Right" as const, right })
