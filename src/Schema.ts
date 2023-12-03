@@ -3352,12 +3352,14 @@ export {
  * @category Option transformations
  * @since 1.0.0
  */
-export type OptionFrom<I> = {
-  readonly _tag: "None"
-} | {
-  readonly _tag: "Some"
-  readonly value: I
-}
+export type OptionFrom<I> =
+  | {
+    readonly _tag: "None"
+  }
+  | {
+    readonly _tag: "Some"
+    readonly value: I
+  }
 
 const optionFrom = <I, A>(value: Schema<I, A>): Schema<OptionFrom<I>, OptionFrom<A>> =>
   union(
@@ -3449,13 +3451,15 @@ export const optionFromNullable = <I, A>(
  * @category Either transformations
  * @since 1.0.0
  */
-export type EitherFrom<IE, IA> = {
-  readonly _tag: "Left"
-  readonly left: IE
-} | {
-  readonly _tag: "Right"
-  readonly right: IA
-}
+export type EitherFrom<IE, IA> =
+  | {
+    readonly _tag: "Left"
+    readonly left: IE
+  }
+  | {
+    readonly _tag: "Right"
+    readonly right: IA
+  }
 
 const eitherFrom = <IE, E, IA, A>(
   left: Schema<IE, E>,
@@ -4430,24 +4434,27 @@ const makeClass = <I, A>(
 }
 
 // ---------------------------------------------
-// Fiber id
+// FiberId
 // ---------------------------------------------
 
 /**
- * @category Fiber id
+ * @category FiberId
  * @since 1.0.0
  */
-export type FiberIdFrom = {
-  readonly _tag: "Composite"
-  readonly left: FiberIdFrom
-  readonly right: FiberIdFrom
-} | {
-  readonly _tag: "None"
-} | {
-  readonly _tag: "Runtime"
-  readonly id: number
-  readonly startTimeMillis: number
-}
+export type FiberIdFrom =
+  | {
+    readonly _tag: "Composite"
+    readonly left: FiberIdFrom
+    readonly right: FiberIdFrom
+  }
+  | {
+    readonly _tag: "None"
+  }
+  | {
+    readonly _tag: "Runtime"
+    readonly id: number
+    readonly startTimeMillis: number
+  }
 
 const FiberIdFrom: Schema<FiberIdFrom, FiberIdFrom> = union(
   struct({
@@ -4476,17 +4483,19 @@ const fiberIdFromArbitrary = arbitrary.unsafeTo(FiberIdFrom)
 const fiberIdArbitrary: Arbitrary<FiberId.FiberId> = (fc) =>
   fiberIdFromArbitrary(fc).map(fiberIdDecode)
 
-const fiberIdPretty = (): Pretty<FiberId.FiberId> => (fiberId) => {
-  if (FiberId.isRuntime(fiberId)) {
-    return `FiberId.runtime(${fiberId.id}, ${fiberId.startTimeMillis})`
-  } else if (FiberId.isComposite(fiberId)) {
-    return `FiberId.composite(${fiberIdPretty()(fiberId.right)}, ${fiberIdPretty()(fiberId.left)})`
+const fiberIdPretty: Pretty<FiberId.FiberId> = (fiberId) => {
+  switch (fiberId._tag) {
+    case "None":
+      return "FiberId.none"
+    case "Runtime":
+      return `FiberId.runtime(${fiberId.id}, ${fiberId.startTimeMillis})`
+    case "Composite":
+      return `FiberId.composite(${fiberIdPretty(fiberId.right)}, ${fiberIdPretty(fiberId.left)})`
   }
-  return "FiberId.none"
 }
 
 /**
- * @category Fiber id
+ * @category FiberId
  * @since 1.0.0
  */
 export const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare(
@@ -4498,36 +4507,39 @@ export const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare
       : ParseResult.fail(ParseResult.type(ast, input)),
   {
     [AST.IdentifierAnnotationId]: "FiberId",
-    [hooks.PrettyHookId]: fiberIdPretty,
+    [hooks.PrettyHookId]: () => fiberIdPretty,
     [hooks.ArbitraryHookId]: () => fiberIdArbitrary,
     [hooks.EquivalenceHookId]: () => Equal.equals
   }
 )
 
 const fiberIdDecode = (input: FiberIdFrom): FiberId.FiberId => {
-  if (input._tag === "Composite") {
-    return FiberId.composite(fiberIdDecode(input.left), fiberIdDecode(input.right))
-  } else if (input._tag === "Runtime") {
-    return FiberId.runtime(input.id, input.startTimeMillis)
-  } else {
-    return FiberId.none
+  switch (input._tag) {
+    case "Composite":
+      return FiberId.composite(fiberIdDecode(input.left), fiberIdDecode(input.right))
+    case "None":
+      return FiberId.none
+    case "Runtime":
+      return FiberId.runtime(input.id, input.startTimeMillis)
   }
 }
 
 const fiberIdEncode = (input: FiberId.FiberId): FiberIdFrom => {
-  if (input._tag === "Composite") {
-    return { _tag: "Composite", left: fiberIdEncode(input.left), right: fiberIdEncode(input.right) }
-  } else if (input._tag === "Runtime") {
-    return { _tag: "Runtime", id: input.id, startTimeMillis: input.startTimeMillis }
-  } else {
-    return { _tag: "None" }
+  switch (input._tag) {
+    case "None":
+      return { _tag: "None" }
+    case "Runtime":
+      return { _tag: "Runtime", id: input.id, startTimeMillis: input.startTimeMillis }
+    case "Composite":
+      return {
+        _tag: "Composite",
+        left: fiberIdEncode(input.left),
+        right: fiberIdEncode(input.right)
+      }
   }
 }
 
-const _FiberId: Schema<
-  FiberIdFrom,
-  FiberId.FiberId
-> = transform(
+const _FiberId: Schema<FiberIdFrom, FiberId.FiberId> = transform(
   FiberIdFrom,
   FiberIdFromSelf,
   fiberIdDecode,
@@ -4536,40 +4548,46 @@ const _FiberId: Schema<
 
 export {
   /**
-   * @category Fiber id
+   * @category FiberId
    * @since 1.0.0
    */
   _FiberId as FiberId
 }
 
 // ---------------------------------------------
-// cause
+// Cause
 // ---------------------------------------------
 
 /**
  * @category Cause
  * @since 1.0.0
  */
-export type CauseFrom<E> = {
-  readonly _tag: "Die"
-  readonly defect: unknown
-} | {
-  readonly _tag: "Empty"
-} | {
-  readonly _tag: "Fail"
-  readonly error: E
-} | {
-  readonly _tag: "Interrupt"
-  readonly fiberId: FiberIdFrom
-} | {
-  readonly _tag: "Parallel"
-  readonly left: CauseFrom<E>
-  readonly right: CauseFrom<E>
-} | {
-  readonly _tag: "Sequential"
-  readonly left: CauseFrom<E>
-  readonly right: CauseFrom<E>
-}
+export type CauseFrom<E> =
+  | {
+    readonly _tag: "Die"
+    readonly defect: unknown
+  }
+  | {
+    readonly _tag: "Empty"
+  }
+  | {
+    readonly _tag: "Fail"
+    readonly error: E
+  }
+  | {
+    readonly _tag: "Interrupt"
+    readonly fiberId: FiberIdFrom
+  }
+  | {
+    readonly _tag: "Parallel"
+    readonly left: CauseFrom<E>
+    readonly right: CauseFrom<E>
+  }
+  | {
+    readonly _tag: "Sequential"
+    readonly left: CauseFrom<E>
+    readonly right: CauseFrom<E>
+  }
 
 const causeFrom = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseFrom<E>> =>
   union(
@@ -4639,19 +4657,23 @@ const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => {
 }
 
 const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => {
-  if (cause._tag === "Die") {
-    return `Cause.die(${Cause.pretty(cause)})`
-  } else if (cause._tag === "Empty") {
-    return "Cause.empty"
-  } else if (cause._tag === "Fail") {
-    return `Cause.fail(${error(cause.error)})`
-  } else if (cause._tag === "Interrupt") {
-    return `Cause.interrupt(${fiberIdPretty()(cause.fiberId)})`
-  } else if (cause._tag === "Parallel") {
-    return `Cause.parallel(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
-  } else {
-    return `Cause.sequential(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
+  const f = (cause: Cause.Cause<E>): string => {
+    switch (cause._tag) {
+      case "Empty":
+        return "Cause.empty"
+      case "Die":
+        return `Cause.die(${Cause.pretty(cause)})`
+      case "Interrupt":
+        return `Cause.interrupt(${fiberIdPretty(cause.fiberId)})`
+      case "Fail":
+        return `Cause.fail(${error(cause.error)})`
+      case "Sequential":
+        return `Cause.sequential(${f(cause.left)}, ${f(cause.right)})`
+      case "Parallel":
+        return `Cause.parallel(${f(cause.left)}, ${f(cause.right)})`
+    }
   }
+  return f(cause)
 }
 
 /**
@@ -4681,43 +4703,45 @@ export const causeFromSelf = <IE, E>(
     }
   )
 
-function causeDecode<E>(causeFrom: CauseFrom<E>): Cause.Cause<E> {
-  if (causeFrom._tag === "Die") {
-    return Cause.die(causeFrom.defect)
-  } else if (causeFrom._tag === "Empty") {
-    return Cause.empty
-  } else if (causeFrom._tag === "Fail") {
-    return Cause.fail(causeFrom.error)
-  } else if (causeFrom._tag === "Interrupt") {
-    return Cause.interrupt(fiberIdDecode(causeFrom.fiberId))
-  } else if (causeFrom._tag === "Parallel") {
-    return Cause.parallel(causeDecode(causeFrom.left), causeDecode(causeFrom.right))
-  } else {
-    return Cause.sequential(causeDecode(causeFrom.left), causeDecode(causeFrom.right))
+function causeDecode<E>(cause: CauseFrom<E>): Cause.Cause<E> {
+  switch (cause._tag) {
+    case "Die":
+      return Cause.die(cause.defect)
+    case "Empty":
+      return Cause.empty
+    case "Interrupt":
+      return Cause.interrupt(fiberIdDecode(cause.fiberId))
+    case "Fail":
+      return Cause.fail(cause.error)
+    case "Parallel":
+      return Cause.parallel(causeDecode(cause.left), causeDecode(cause.right))
+    case "Sequential":
+      return Cause.sequential(causeDecode(cause.left), causeDecode(cause.right))
   }
 }
 
 function causeEncode<E>(cause: Cause.Cause<E>): CauseFrom<E> {
-  if (cause._tag === "Die") {
-    return { _tag: "Die", defect: Cause.pretty(cause) }
-  } else if (cause._tag === "Empty") {
-    return { _tag: "Empty" }
-  } else if (cause._tag === "Fail") {
-    return { _tag: "Fail", error: cause.error }
-  } else if (cause._tag === "Interrupt") {
-    return { _tag: "Interrupt", fiberId: cause.fiberId }
-  } else if (cause._tag === "Parallel") {
-    return {
-      _tag: "Parallel",
-      left: causeEncode(cause.left),
-      right: causeEncode(cause.right)
-    }
-  } else {
-    return {
-      _tag: "Sequential",
-      left: causeEncode(cause.left),
-      right: causeEncode(cause.right)
-    }
+  switch (cause._tag) {
+    case "Empty":
+      return { _tag: "Empty" }
+    case "Die":
+      return { _tag: "Die", defect: Cause.pretty(cause) }
+    case "Interrupt":
+      return { _tag: "Interrupt", fiberId: cause.fiberId }
+    case "Fail":
+      return { _tag: "Fail", error: cause.error }
+    case "Sequential":
+      return {
+        _tag: "Sequential",
+        left: causeEncode(cause.left),
+        right: causeEncode(cause.right)
+      }
+    case "Parallel":
+      return {
+        _tag: "Parallel",
+        left: causeEncode(cause.left),
+        right: causeEncode(cause.right)
+      }
   }
 }
 
@@ -4734,20 +4758,22 @@ export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.
   )
 
 // ---------------------------------------------
-// exit
+// Exit
 // ---------------------------------------------
 
 /**
  * @category Exit
  * @since 1.0.0
  */
-export type ExitFrom<E, A> = {
-  readonly _tag: "Failure"
-  readonly cause: CauseFrom<E>
-} | {
-  readonly _tag: "Success"
-  readonly value: A
-}
+export type ExitFrom<E, A> =
+  | {
+    readonly _tag: "Failure"
+    readonly cause: CauseFrom<E>
+  }
+  | {
+    readonly _tag: "Success"
+    readonly value: A
+  }
 
 const exitFrom = <EI, E, AI, A>(
   error: Schema<EI, E>,

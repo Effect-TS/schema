@@ -12,12 +12,12 @@ describe("Exit/exit", () => {
     const schema = S.exit(S.string, S.number)
     await Util.expectParseSuccess(
       schema,
-      JSON.parse(JSON.stringify({ _tag: "Failure", cause: { _tag: "Fail", error: "error" } })),
+      { _tag: "Failure", cause: { _tag: "Fail", error: "error" } },
       Exit.fail("error")
     )
     await Util.expectParseSuccess(
       schema,
-      JSON.parse(JSON.stringify({ _tag: "Success", value: 123 })),
+      { _tag: "Success", value: 123 },
       Exit.succeed(123)
     )
   })

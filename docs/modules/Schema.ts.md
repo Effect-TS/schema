@@ -63,8 +63,8 @@ Added in v1.0.0
   - [ExitFrom (type alias)](#exitfrom-type-alias)
   - [exit](#exit-1)
   - [exitFromSelf](#exitfromself)
-- [Fiber id](#fiber-id)
-  - [FiberId](#fiberid)
+- [FiberId](#fiberid)
+  - [FiberId](#fiberid-1)
   - [FiberIdFrom (type alias)](#fiberidfrom-type-alias)
   - [FiberIdFromSelf](#fiberidfromself)
 - [Option transformations](#option-transformations)
@@ -895,7 +895,7 @@ export declare const exitFromSelf: <IE, E, IA, A>(
 
 Added in v1.0.0
 
-# Fiber id
+# FiberId
 
 ## FiberId
 
