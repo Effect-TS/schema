@@ -2,4 +2,4 @@
 "@effect/schema": patch
 ---
 
-add Schema.mapLiterals
+add Schema.transformLiterals

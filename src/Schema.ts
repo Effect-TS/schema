@@ -1298,44 +1298,34 @@ export const transform: {
     )
 )
 
+const transformLiteral = <From extends AST.LiteralValue, To extends AST.LiteralValue>(
+  from: From,
+  to: To
+): Schema<From, To> => transform(literal(from), literal(to), () => to, () => from)
+
 /**
  * Creates a new `Schema` which maps between corresponding literal values.
  *
  * @example
  * import * as S from "@effect/schema/Schema"
  *
- * const Animal = S.mapLiterals(
+ * const Animal = S.transformLiterals(
  *   [0, "cat"],
  *   [1, "dog"],
  *   [2, "cow"]
  * )
  *
  * assert.deepStrictEqual(S.decodeSync(Animal)(1), "dog")
+ *
  * @category constructors
  * @since 1.0.0
  */
-export const mapLiterals = <
-  const A extends ReadonlyArray<readonly [AST.LiteralValue, AST.LiteralValue]>
+export const transformLiterals = <
+  const A extends ReadonlyArray<readonly [from: AST.LiteralValue, to: AST.LiteralValue]>
 >(
   ...pairs: A
-): Schema<A[number][0], A[number][1]> => {
-  const from = literal(...pairs.map((_) => _[0]))
-  const to = literal(...pairs.map((_) => _[1]))
-  return transformOrFail(
-    from,
-    to,
-    (v) =>
-      ReadonlyArray.findFirst(pairs, (_) => _[0] === v).pipe(
-        Option.map((_) => _[1]),
-        Either.fromOption(() => ParseResult.parseError([ParseResult.type(from.ast, v)]))
-      ),
-    (v) =>
-      ReadonlyArray.findFirst(pairs, (_) => _[1] === v).pipe(
-        Option.map((_) => _[0]),
-        Either.fromOption(() => ParseResult.parseError([ParseResult.type(to.ast, v)]))
-      )
-  )
-}
+): Schema<A[number][0], A[number][1]> =>
+  union(...pairs.map(([from, to]) => transformLiteral(from, to)))
 
 /**
  * Attaches a property signature with the specified key and value to the schema.

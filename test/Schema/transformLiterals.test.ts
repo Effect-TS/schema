@@ -2,10 +2,10 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import { describe, it } from "vitest"
 
-describe("Schema > mapLiterals", () => {
+describe("Schema > transformLiterals", () => {
   describe("Struct", () => {
     it("simple", async () => {
-      const schema = S.mapLiterals(
+      const schema = S.transformLiterals(
         [0, "a"],
         [1, "b"],
         [2, "c"]
@@ -16,7 +16,7 @@ describe("Schema > mapLiterals", () => {
     })
 
     it("mixed types", async () => {
-      const schema = S.mapLiterals(
+      const schema = S.transformLiterals(
         [0, BigInt(0)],
         ["a", true],
         [null, false]

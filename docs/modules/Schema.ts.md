@@ -153,8 +153,8 @@ Added in v1.0.0
   - [instanceOf](#instanceof)
   - [literal](#literal)
   - [make](#make)
-  - [mapLiterals](#mapliterals)
   - [templateLiteral](#templateliteral)
+  - [transformLiterals](#transformliterals)
   - [uniqueSymbol](#uniquesymbol)
 - [decoding](#decoding)
   - [decode](#decode)
@@ -1966,14 +1966,28 @@ export declare const make: <I, A>(ast: AST.AST) => Schema<I, A>
 
 Added in v1.0.0
 
-## mapLiterals
+## templateLiteral
+
+**Signature**
+
+```ts
+export declare const templateLiteral: <T extends [Schema<any, any>, ...Schema<any, any>[]]>(
+  ...[head, ...tail]: T
+) => Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>, Join<{ [K in keyof T]: Schema.To<T[K]> }>>
+```
+
+Added in v1.0.0
+
+## transformLiterals
 
 Creates a new `Schema` which maps between corresponding literal values.
 
 **Signature**
 
 ```ts
-export declare const mapLiterals: <const A extends readonly (readonly [AST.LiteralValue, AST.LiteralValue])[]>(
+export declare const transformLiterals: <
+  const A extends readonly (readonly [from: AST.LiteralValue, to: AST.LiteralValue])[]
+>(
   ...pairs: A
 ) => Schema<A[number][0], A[number][1]>
 ```
@@ -1983,21 +1997,9 @@ export declare const mapLiterals: <const A extends readonly (readonly [AST.Liter
 ```ts
 import * as S from "@effect/schema/Schema"
 
-const Animal = S.mapLiterals([0, "cat"], [1, "dog"], [2, "cow"])
+const Animal = S.transformLiterals([0, "cat"], [1, "dog"], [2, "cow"])
 
 assert.deepStrictEqual(S.decodeSync(Animal)(1), "dog")
-```
-
-Added in v1.0.0
-
-## templateLiteral
-
-**Signature**
-
-```ts
-export declare const templateLiteral: <T extends [Schema<any, any>, ...Schema<any, any>[]]>(
-  ...[head, ...tail]: T
-) => Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>, Join<{ [K in keyof T]: Schema.To<T[K]> }>>
 ```
 
 Added in v1.0.0

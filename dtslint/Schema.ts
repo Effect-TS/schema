@@ -693,11 +693,11 @@ S.string.pipe(
 )
 
 // ---------------------------------------------
-// mapLiterals
+// transformLiterals
 // ---------------------------------------------
 
 // $ExpectType Schema<0 | 1, "a" | "b">
-S.mapLiterals([0, "a"], [1, "b"])
+S.transformLiterals([0, "a"], [1, "b"])
 
 // ---------------------------------------------
 // split
