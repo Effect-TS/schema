@@ -4449,28 +4449,6 @@ export type FiberIdFrom = {
   readonly startTimeMillis: number
 }
 
-const fiberIdArbitrary = (): Arbitrary<FiberId.FiberId> => (fc) =>
-  fc.letrec<{ fiberId: FiberId.FiberId }>((tie) => ({
-    fiberId: fc.oneof(
-      fc.constant(FiberId.none),
-      fc.tuple(tie("fiberId"), tie("fiberId")).map(([left, right]) =>
-        FiberId.composite(left, right)
-      ),
-      fc.tuple(fc.maxSafeNat(), fc.maxSafeNat()).map(([id, startTimeMillis]) =>
-        FiberId.runtime(id, startTimeMillis)
-      )
-    )
-  })).fiberId
-
-const fiberIdPretty = (): Pretty<FiberId.FiberId> => (fiberId) => {
-  if (FiberId.isRuntime(fiberId)) {
-    return `FiberId.runtime(${fiberId.id}, ${fiberId.startTimeMillis})`
-  } else if (FiberId.isComposite(fiberId)) {
-    return `FiberId.composite(${fiberIdPretty()(fiberId.right)}, ${fiberIdPretty()(fiberId.left)})`
-  }
-  return "FiberId.none"
-}
-
 const FiberIdFrom: Schema<FiberIdFrom, FiberIdFrom> = union(
   struct({
     _tag: literal("Composite"),
@@ -4493,6 +4471,20 @@ const FiberIdFrom: Schema<FiberIdFrom, FiberIdFrom> = union(
   })
 )
 
+const fiberIdFromArbitrary = arbitrary.unsafeTo(FiberIdFrom)
+
+const fiberIdArbitrary: Arbitrary<FiberId.FiberId> = (fc) =>
+  fiberIdFromArbitrary(fc).map(fiberIdDecode)
+
+const fiberIdPretty = (): Pretty<FiberId.FiberId> => (fiberId) => {
+  if (FiberId.isRuntime(fiberId)) {
+    return `FiberId.runtime(${fiberId.id}, ${fiberId.startTimeMillis})`
+  } else if (FiberId.isComposite(fiberId)) {
+    return `FiberId.composite(${fiberIdPretty()(fiberId.right)}, ${fiberIdPretty()(fiberId.left)})`
+  }
+  return "FiberId.none"
+}
+
 /**
  * @category Fiber id
  * @since 1.0.0
@@ -4507,7 +4499,7 @@ export const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare
   {
     [AST.IdentifierAnnotationId]: "FiberId",
     [hooks.PrettyHookId]: fiberIdPretty,
-    [hooks.ArbitraryHookId]: fiberIdArbitrary,
+    [hooks.ArbitraryHookId]: () => fiberIdArbitrary,
     [hooks.EquivalenceHookId]: () => Equal.equals
   }
 )
@@ -4605,7 +4597,7 @@ export type CauseTo<E> = {
 }
 
 const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => (fc) => {
-  const fiberId = fiberIdArbitrary()(fc)
+  const fiberId = fiberIdArbitrary(fc)
   return fc.letrec<{ cause: Cause.Cause<E> }>((tie) => ({
     cause: fc.oneof(
       error(fc).map((error) => Cause.fail(error)),

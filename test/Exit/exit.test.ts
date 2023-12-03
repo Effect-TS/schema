@@ -1,14 +1,14 @@
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import { Exit } from "effect"
-import { describe, test } from "vitest"
+import { describe, it } from "vitest"
 
 describe("Exit/exit", () => {
-  test("property tests", () => {
+  it("property tests", () => {
     Util.roundtrip(S.exit(S.string, S.number))
   })
 
-  test("decoding", async () => {
+  it("decoding", async () => {
     const schema = S.exit(S.string, S.number)
     await Util.expectParseSuccess(
       schema,
@@ -22,7 +22,7 @@ describe("Exit/exit", () => {
     )
   })
 
-  test("encoding", async () => {
+  it("encoding", async () => {
     const schema = S.exit(S.string, S.number)
     await Util.expectEncodeSuccess(schema, Exit.fail("error"), {
       _tag: "Failure",

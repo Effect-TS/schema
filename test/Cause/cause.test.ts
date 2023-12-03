@@ -1,14 +1,14 @@
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import { Cause, FiberId } from "effect"
-import { assert, describe, test } from "vitest"
+import { assert, describe, it } from "vitest"
 
 describe("Cause/cause", () => {
-  test("property tests", () => {
+  it("property tests", () => {
     Util.roundtrip(S.cause(S.string))
   })
 
-  test("decoding", async () => {
+  it("decoding", async () => {
     const schema = S.cause(S.string)
     await Util.expectParseSuccess(
       schema,
@@ -74,7 +74,7 @@ describe("Cause/cause", () => {
     )
   })
 
-  test("encoding", async () => {
+  it("encoding", async () => {
     const schema = S.cause(S.string)
     await Util.expectEncodeSuccess(schema, Cause.fail("error"), { _tag: "Fail", error: "error" })
     await Util.expectEncodeSuccess(schema, Cause.empty, { _tag: "Empty" })

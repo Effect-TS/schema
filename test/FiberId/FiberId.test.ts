@@ -1,9 +1,13 @@
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
-import { describe, test } from "vitest"
+import { describe, it } from "vitest"
 
 describe("FiberId", () => {
-  test("property tests", () => {
+  it("property tests", () => {
     Util.roundtrip(S.FiberId)
+  })
+
+  it("tmp", () => {
+    Util.sample(S.FiberId, 10)
   })
 })
