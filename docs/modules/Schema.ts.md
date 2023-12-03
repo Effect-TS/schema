@@ -256,6 +256,7 @@ Added in v1.0.0
   - [trim](#trim-1)
   - [uppercase](#uppercase-1)
 - [symbol](#symbol)
+  - [TypeId](#typeid)
   - [TypeId (type alias)](#typeid-type-alias)
 - [symbol constructors](#symbol-constructors)
   - [symbol](#symbol-1)
@@ -3082,6 +3083,16 @@ export declare const uppercase: <I, A extends string>(self: Schema<I, A>) => Sch
 Added in v1.0.0
 
 # symbol
+
+## TypeId
+
+**Signature**
+
+```ts
+export declare const TypeId: typeof TypeId
+```
+
+Added in v1.0.0
 
 ## TypeId (type alias)
 

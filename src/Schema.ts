@@ -32,6 +32,7 @@ import * as Internal from "./internal/ast.js"
 import * as InternalBigInt from "./internal/bigint.js"
 import * as filters from "./internal/filters.js"
 import * as hooks from "./internal/hooks.js"
+import * as InternalSchema from "./internal/schema.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
 import type { Pretty } from "./Pretty.js"
@@ -40,7 +41,11 @@ import type { Pretty } from "./Pretty.js"
 // model
 // ---------------------------------------------
 
-const TypeId: unique symbol = Symbol.for("@effect/schema/Schema") as TypeId
+/**
+ * @since 1.0.0
+ * @category symbol
+ */
+export const TypeId: unique symbol = InternalSchema.TypeId
 
 /**
  * @since 1.0.0
