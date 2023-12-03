@@ -25,6 +25,7 @@ import * as Request from "effect/Request"
 import * as S from "effect/String"
 import type { Equals, Simplify } from "effect/Types"
 import type { Arbitrary } from "./Arbitrary.js"
+import * as arbitrary from "./Arbitrary.js"
 import * as ArrayFormatter from "./ArrayFormatter.js"
 import type { ParseOptions } from "./AST.js"
 import * as AST from "./AST.js"
@@ -3342,15 +3343,6 @@ export {
 // Option transformations
 // ---------------------------------------------
 
-const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> => (fc) =>
-  fc.oneof(fc.constant(Option.none()), value(fc).map(Option.some))
-
-const optionPretty = <A>(value: Pretty<A>): Pretty<Option.Option<A>> =>
-  Option.match({
-    onNone: () => "none()",
-    onSome: (a) => `some(${value(a)})`
-  })
-
 /**
  * @category Option transformations
  * @since 1.0.0
@@ -3362,7 +3354,7 @@ export type OptionFrom<I> = {
   readonly value: I
 }
 
-const optionInline = <I, A>(value: Schema<I, A>): Schema<OptionFrom<I>, OptionFrom<A>> =>
+const optionFrom = <I, A>(value: Schema<I, A>): Schema<OptionFrom<I>, OptionFrom<A>> =>
   union(
     struct({
       _tag: literal("None")
@@ -3373,6 +3365,23 @@ const optionInline = <I, A>(value: Schema<I, A>): Schema<OptionFrom<I>, OptionFr
     })
   )
 
+const optionDecode = <A>(o: OptionFrom<A>): Option.Option<A> =>
+  o._tag === "None" ? Option.none() : Option.some(o.value)
+
+const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> => {
+  const placeholder = lazy<A>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => value
+  }))
+  const arb = arbitrary.to(optionFrom(placeholder))
+  return (fc) => arb(fc).map(optionDecode)
+}
+
+const optionPretty = <A>(value: Pretty<A>): Pretty<Option.Option<A>> =>
+  Option.match({
+    onNone: () => "none()",
+    onSome: (a) => `some(${value(a)})`
+  })
+
 /**
  * @category Option transformations
  * @since 1.0.0
@@ -3382,7 +3391,7 @@ export const optionFromSelf = <I, A>(
 ): Schema<Option.Option<I>, Option.Option<A>> => {
   return declare(
     [value],
-    optionInline(value),
+    optionFrom(value),
     (isDecoding, value) => {
       const parse = isDecoding ? Parser.parse(value) : Parser.encode(value)
       return (u, options, ast) =>
@@ -3409,9 +3418,9 @@ export const option = <I, A>(
   value: Schema<I, A>
 ): Schema<OptionFrom<I>, Option.Option<A>> =>
   transform(
-    optionInline(value),
+    optionFrom(value),
     optionFromSelf(to(value)),
-    (a) => a._tag === "None" ? Option.none() : Option.some(a.value),
+    optionDecode,
     Option.match({
       onNone: () => ({ _tag: "None" as const }),
       onSome: (value) => ({ _tag: "Some" as const, value })
