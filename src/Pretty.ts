@@ -5,6 +5,7 @@ import * as Option from "effect/Option"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as AST from "./AST.js"
 import * as Internal from "./internal/common.js"
+import * as hooks from "./internal/hooks.js"
 import * as Parser from "./Parser.js"
 import * as Schema from "./Schema.js"
 import * as TreeFormatter from "./TreeFormatter.js"
@@ -21,7 +22,13 @@ export interface Pretty<To> {
  * @category hooks
  * @since 1.0.0
  */
-export const PrettyHookId = Internal.PrettyHookId
+export const PrettyHookId: unique symbol = hooks.PrettyHookId
+
+/**
+ * @category hooks
+ * @since 1.0.0
+ */
+export type PrettyHookId = typeof PrettyHookId
 
 /**
  * @category prettify

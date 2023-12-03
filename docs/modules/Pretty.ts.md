@@ -14,6 +14,7 @@ Added in v1.0.0
 
 - [hooks](#hooks)
   - [PrettyHookId](#prettyhookid)
+  - [PrettyHookId (type alias)](#prettyhookid-type-alias)
 - [model](#model)
   - [Pretty (interface)](#pretty-interface)
 - [prettify](#prettify)
@@ -31,7 +32,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const PrettyHookId: symbol
+export declare const PrettyHookId: typeof PrettyHookId
+```
+
+Added in v1.0.0
+
+## PrettyHookId (type alias)
+
+**Signature**
+
+```ts
+export type PrettyHookId = typeof PrettyHookId
 ```
 
 Added in v1.0.0

@@ -9,6 +9,7 @@ import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
 import * as AST from "./AST.js"
 import * as Internal from "./internal/common.js"
+import * as hooks from "./internal/hooks.js"
 import * as Parser from "./Parser.js"
 import type * as S from "./Schema.js"
 
@@ -16,7 +17,13 @@ import type * as S from "./Schema.js"
  * @category hooks
  * @since 1.0.0
  */
-export const EquivalenceHookId = Internal.EquivalenceHookId
+export const EquivalenceHookId: unique symbol = hooks.EquivalenceHookId
+
+/**
+ * @category hooks
+ * @since 1.0.0
+ */
+export type EquivalenceHookId = typeof EquivalenceHookId
 
 /**
  * @category Equivalence

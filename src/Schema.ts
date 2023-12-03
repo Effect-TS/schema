@@ -29,6 +29,7 @@ import * as ArrayFormatter from "./ArrayFormatter.js"
 import type { ParseOptions } from "./AST.js"
 import * as AST from "./AST.js"
 import * as Internal from "./internal/common.js"
+import * as hooks from "./internal/hooks.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
 import type { Pretty } from "./Pretty.js"
@@ -1404,9 +1405,9 @@ const toAnnotations = <A>(
   move("default", AST.DefaultAnnotationId)
   move("documentation", AST.DocumentationAnnotationId)
   move("jsonSchema", AST.JSONSchemaAnnotationId)
-  move("arbitrary", Internal.ArbitraryHookId)
-  move("pretty", Internal.PrettyHookId)
-  move("equivalence", Internal.EquivalenceHookId)
+  move("arbitrary", hooks.ArbitraryHookId)
+  move("pretty", hooks.PrettyHookId)
+  move("equivalence", hooks.EquivalenceHookId)
 
   return out
 }
@@ -1515,7 +1516,7 @@ export const jsonSchema =
  */
 export const equivalence =
   <A>(equivalence: Equivalence.Equivalence<A>) => <I>(self: Schema<I, A>): Schema<I, A> =>
-    make(AST.setAnnotation(self.ast, Internal.EquivalenceHookId, () => equivalence))
+    make(AST.setAnnotation(self.ast, hooks.EquivalenceHookId, () => equivalence))
 
 // ---------------------------------------------
 // property signature renaming
@@ -2829,12 +2830,12 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
       : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "Duration",
-    [Internal.PrettyHookId]: (): Pretty<Duration.Duration> =>
+    [hooks.PrettyHookId]: (): Pretty<Duration.Duration> =>
       Duration.match({
         onMillis: (_) => `Duration.millis(${_})`,
         onNanos: (_) => `Duration.nanos(${_})`
       }),
-    [Internal.ArbitraryHookId]: (): Arbitrary<Duration.Duration> => (fc) =>
+    [hooks.ArbitraryHookId]: (): Arbitrary<Duration.Duration> => (fc) =>
       fc.oneof(
         fc.bigUint().map((_) => Duration.nanos(_)),
         fc.bigUint().map((_) => Duration.micros(_)),
@@ -2845,7 +2846,7 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
         fc.maxSafeNat().map((_) => Duration.days(_)),
         fc.maxSafeNat().map((_) => Duration.weeks(_))
       ),
-    [Internal.EquivalenceHookId]: () => Duration.Equivalence
+    [hooks.EquivalenceHookId]: () => Duration.Equivalence
   }
 )
 
@@ -2914,10 +2915,10 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
       : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "Uint8Array",
-    [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
       `new Uint8Array(${JSON.stringify(Array.from(u8arr))})`,
-    [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) => fc.uint8Array(),
-    [Internal.EquivalenceHookId]: () => ReadonlyArray.getEquivalence(Equivalence.strict())
+    [hooks.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) => fc.uint8Array(),
+    [hooks.EquivalenceHookId]: () => ReadonlyArray.getEquivalence(Equivalence.strict())
   }
 )
 
@@ -2987,8 +2988,8 @@ const makeEncodingTransform = <A extends string>(
     { strict: false }
   ).pipe(annotations({
     [AST.IdentifierAnnotationId]: id,
-    [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
-    [Internal.ArbitraryHookId]: () => arbitrary
+    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
+    [hooks.ArbitraryHookId]: () => arbitrary
   }))
 
 /**
@@ -3178,9 +3179,9 @@ export const DateFromSelf: Schema<Date> = declare(
     !Predicate.isDate(u) ? ParseResult.fail(ParseResult.type(ast, u)) : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "Date",
-    [Internal.PrettyHookId]: datePretty,
-    [Internal.ArbitraryHookId]: dateArbitrary,
-    [Internal.EquivalenceHookId]: () => Equivalence.Date
+    [hooks.PrettyHookId]: datePretty,
+    [hooks.ArbitraryHookId]: dateArbitrary,
+    [hooks.EquivalenceHookId]: () => Equivalence.Date
   }
 )
 
@@ -3276,9 +3277,9 @@ export const optionFromSelf = <I, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "Option",
-      [Internal.PrettyHookId]: optionPretty,
-      [Internal.ArbitraryHookId]: optionArbitrary,
-      [Internal.EquivalenceHookId]: Option.getEquivalence
+      [hooks.PrettyHookId]: optionPretty,
+      [hooks.ArbitraryHookId]: optionArbitrary,
+      [hooks.EquivalenceHookId]: Option.getEquivalence
     }
   )
 }
@@ -3363,9 +3364,9 @@ export const eitherFromSelf = <IE, E, IA, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "Either",
-      [Internal.PrettyHookId]: eitherPretty,
-      [Internal.ArbitraryHookId]: eitherArbitrary,
-      [Internal.EquivalenceHookId]: Either.getEquivalence
+      [hooks.PrettyHookId]: eitherPretty,
+      [hooks.ArbitraryHookId]: eitherArbitrary,
+      [hooks.EquivalenceHookId]: Either.getEquivalence
     }
   )
 }
@@ -3449,9 +3450,9 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
-      [Internal.PrettyHookId]: readonlyMapPretty,
-      [Internal.ArbitraryHookId]: readonlyMapArbitrary,
-      [Internal.EquivalenceHookId]: readonlyMapEquivalence
+      [hooks.PrettyHookId]: readonlyMapPretty,
+      [hooks.ArbitraryHookId]: readonlyMapArbitrary,
+      [hooks.EquivalenceHookId]: readonlyMapEquivalence
     }
   )
 }
@@ -3513,9 +3514,9 @@ export const readonlySetFromSelf = <I, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
-      [Internal.PrettyHookId]: readonlySetPretty,
-      [Internal.ArbitraryHookId]: readonlySetArbitrary,
-      [Internal.EquivalenceHookId]: readonlySetEquivalence
+      [hooks.PrettyHookId]: readonlySetPretty,
+      [hooks.ArbitraryHookId]: readonlySetArbitrary,
+      [hooks.EquivalenceHookId]: readonlySetEquivalence
     }
   )
 }
@@ -3555,9 +3556,9 @@ export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
       : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "BigDecimal",
-    [Internal.PrettyHookId]: bigDecimalPretty,
-    [Internal.ArbitraryHookId]: bigDecimalArbitrary,
-    [Internal.EquivalenceHookId]: () => BigDecimal.Equivalence
+    [hooks.PrettyHookId]: bigDecimalPretty,
+    [hooks.ArbitraryHookId]: bigDecimalArbitrary,
+    [hooks.EquivalenceHookId]: () => BigDecimal.Equivalence
   }
 )
 
@@ -3907,9 +3908,9 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk.Chunk<I>, 
     },
     {
       [AST.IdentifierAnnotationId]: "Chunk",
-      [Internal.PrettyHookId]: chunkPretty,
-      [Internal.ArbitraryHookId]: chunkArbitrary,
-      [Internal.EquivalenceHookId]: Chunk.getEquivalence
+      [hooks.PrettyHookId]: chunkPretty,
+      [hooks.ArbitraryHookId]: chunkArbitrary,
+      [hooks.EquivalenceHookId]: Chunk.getEquivalence
     }
   )
 }
@@ -3965,9 +3966,9 @@ export const dataFromSelf = <
     },
     {
       [AST.IdentifierAnnotationId]: "Data",
-      [Internal.PrettyHookId]: dataPretty,
-      [Internal.ArbitraryHookId]: dataArbitrary,
-      [Internal.EquivalenceHookId]: () => Equal.equals
+      [hooks.PrettyHookId]: dataPretty,
+      [hooks.ArbitraryHookId]: dataArbitrary,
+      [hooks.EquivalenceHookId]: () => Equal.equals
     }
   )
 }
@@ -4214,7 +4215,7 @@ const makeClass = <I, A>(
             ? ParseResult.succeed(input)
             : ParseResult.fail(ParseResult.type(ast, input)), {
           [AST.DescriptionAnnotationId]: `an instance of ${this.name}`,
-          [Internal.ArbitraryHookId]: (struct: any) => (fc: any) =>
+          [hooks.ArbitraryHookId]: (struct: any) => (fc: any) =>
             struct(fc).map((props: any) => new this(props))
         }),
         (input) => new this(input, true),

@@ -9,6 +9,7 @@ import * as ReadonlyArray from "effect/ReadonlyArray"
 import type * as FastCheck from "fast-check"
 import * as AST from "./AST.js"
 import * as Internal from "./internal/common.js"
+import * as hooks from "./internal/hooks.js"
 import * as Parser from "./Parser.js"
 import * as Schema from "./Schema.js"
 
@@ -24,7 +25,13 @@ export interface Arbitrary<A> {
  * @category hooks
  * @since 1.0.0
  */
-export const ArbitraryHookId = Internal.ArbitraryHookId
+export const ArbitraryHookId: unique symbol = hooks.ArbitraryHookId
+
+/**
+ * @category hooks
+ * @since 1.0.0
+ */
+export type ArbitraryHookId = typeof ArbitraryHookId
 
 /**
  * @category arbitrary

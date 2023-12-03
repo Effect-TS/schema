@@ -17,6 +17,7 @@ Added in v1.0.0
   - [to](#to)
 - [hooks](#hooks)
   - [EquivalenceHookId](#equivalencehookid)
+  - [EquivalenceHookId (type alias)](#equivalencehookid-type-alias)
 
 ---
 
@@ -49,7 +50,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const EquivalenceHookId: symbol
+export declare const EquivalenceHookId: typeof EquivalenceHookId
+```
+
+Added in v1.0.0
+
+## EquivalenceHookId (type alias)
+
+**Signature**
+
+```ts
+export type EquivalenceHookId = typeof EquivalenceHookId
 ```
 
 Added in v1.0.0
