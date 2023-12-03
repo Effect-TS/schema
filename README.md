@@ -2006,6 +2006,15 @@ const schema = S.ParseJson.pipe(S.compose(S.struct({ a: S.number })));
 
 In this example, we've composed the `ParseJson` schema with a struct schema to ensure that the result will have a specific shape, including an object with a numeric property "a".
 
+Alternatively, you can achieve the same result by using the equivalent built-in combinator `fromJson`:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+// $ExpectType Schema<string, { readonly a: number; }>
+const schema = S.fromJson(S.struct({ a: S.number }));
+```
+
 ### Number transformations
 
 #### NumberFromString

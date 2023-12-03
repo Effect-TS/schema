@@ -254,6 +254,7 @@ Added in v1.0.0
 - [string transformations](#string-transformations)
   - [Lowercase](#lowercase)
   - [Uppercase](#uppercase)
+  - [fromJson](#fromjson)
   - [lowercase](#lowercase-1)
   - [parseJson](#parsejson-1)
   - [split](#split)
@@ -332,6 +333,7 @@ Added in v1.0.0
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
+  - [JsonOptions (type alias)](#jsonoptions-type-alias)
   - [Mutable (type alias)](#mutable-type-alias)
   - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
@@ -3096,6 +3098,19 @@ export declare const Uppercase: Schema<string, string>
 
 Added in v1.0.0
 
+## fromJson
+
+The `fromJson` combinator offers a method to convert JSON strings into the `A` type using the underlying
+functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+
+**Signature**
+
+```ts
+export declare const fromJson: <I, A>(schema: Schema<I, A>, options?: JsonOptions) => Schema<string, A>
+```
+
+Added in v1.0.0
+
 ## lowercase
 
 This combinator converts a string to lowercase
@@ -3116,14 +3131,7 @@ functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
 **Signature**
 
 ```ts
-export declare const parseJson: <I, A extends string>(
-  self: Schema<I, A>,
-  options?: {
-    reviver?: Parameters<typeof JSON.parse>[1]
-    replacer?: Parameters<typeof JSON.stringify>[1]
-    space?: Parameters<typeof JSON.stringify>[2]
-  }
-) => Schema<I, unknown>
+export declare const parseJson: <I, A extends string>(self: Schema<I, A>, options?: JsonOptions) => Schema<I, unknown>
 ```
 
 Added in v1.0.0
@@ -3881,6 +3889,20 @@ Added in v1.0.0
 export type Join<T> = T extends [infer Head, ...infer Tail]
   ? `${Head & (string | number | bigint | boolean | null | undefined)}${Tail extends [] ? "" : Join<Tail>}`
   : never
+```
+
+Added in v1.0.0
+
+## JsonOptions (type alias)
+
+**Signature**
+
+```ts
+export type JsonOptions = {
+  readonly reviver?: Parameters<typeof JSON.parse>[1]
+  readonly replacer?: Parameters<typeof JSON.stringify>[1]
+  readonly space?: Parameters<typeof JSON.stringify>[2]
+}
 ```
 
 Added in v1.0.0
