@@ -264,33 +264,50 @@ Added in v1.0.0
 - [type id](#type-id)
   - [BetweenBigDecimalTypeId](#betweenbigdecimaltypeid)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
+  - [BetweenBigintTypeId (type alias)](#betweenbiginttypeid-type-alias)
   - [BetweenTypeId](#betweentypeid)
+  - [BetweenTypeId (type alias)](#betweentypeid-type-alias)
   - [BrandTypeId](#brandtypeid)
   - [EndsWithTypeId](#endswithtypeid)
   - [FiniteTypeId](#finitetypeid)
   - [GreaterThanBigDecimalTypeId](#greaterthanbigdecimaltypeid)
   - [GreaterThanBigintTypeId](#greaterthanbiginttypeid)
+  - [GreaterThanBigintTypeId (type alias)](#greaterthanbiginttypeid-type-alias)
   - [GreaterThanOrEqualToBigDecimalTypeId](#greaterthanorequaltobigdecimaltypeid)
   - [GreaterThanOrEqualToBigintTypeId](#greaterthanorequaltobiginttypeid)
+  - [GreaterThanOrEqualToBigintTypeId (type alias)](#greaterthanorequaltobiginttypeid-type-alias)
   - [GreaterThanOrEqualToTypeId](#greaterthanorequaltotypeid)
+  - [GreaterThanOrEqualToTypeId (type alias)](#greaterthanorequaltotypeid-type-alias)
   - [GreaterThanTypeId](#greaterthantypeid)
+  - [GreaterThanTypeId (type alias)](#greaterthantypeid-type-alias)
   - [IncludesTypeId](#includestypeid)
   - [InstanceOfTypeId](#instanceoftypeid)
   - [IntTypeId](#inttypeid)
+  - [IntTypeId (type alias)](#inttypeid-type-alias)
   - [ItemsCountTypeId](#itemscounttypeid)
+  - [ItemsCountTypeId (type alias)](#itemscounttypeid-type-alias)
   - [JsonNumberTypeId](#jsonnumbertypeid)
   - [LengthTypeId](#lengthtypeid)
+  - [LengthTypeId (type alias)](#lengthtypeid-type-alias)
   - [LessThanBigDecimalTypeId](#lessthanbigdecimaltypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
+  - [LessThanBigintTypeId (type alias)](#lessthanbiginttypeid-type-alias)
   - [LessThanOrEqualToBigDecimalTypeId](#lessthanorequaltobigdecimaltypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
+  - [LessThanOrEqualToBigintTypeId (type alias)](#lessthanorequaltobiginttypeid-type-alias)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
+  - [LessThanOrEqualToTypeId (type alias)](#lessthanorequaltotypeid-type-alias)
   - [LessThanTypeId](#lessthantypeid)
+  - [LessThanTypeId (type alias)](#lessthantypeid-type-alias)
   - [LowercasedTypeId](#lowercasedtypeid)
   - [MaxItemsTypeId](#maxitemstypeid)
+  - [MaxItemsTypeId (type alias)](#maxitemstypeid-type-alias)
   - [MaxLengthTypeId](#maxlengthtypeid)
+  - [MaxLengthTypeId (type alias)](#maxlengthtypeid-type-alias)
   - [MinItemsTypeId](#minitemstypeid)
+  - [MinItemsTypeId (type alias)](#minitemstypeid-type-alias)
   - [MinLengthTypeId](#minlengthtypeid)
+  - [MinLengthTypeId (type alias)](#minlengthtypeid-type-alias)
   - [MultipleOfTypeId](#multipleoftypeid)
   - [NegativeBigDecimalTypeId](#negativebigdecimaltypeid)
   - [NonNaNTypeId](#nonnantypeid)
@@ -3126,12 +3143,32 @@ export declare const BetweenBigintTypeId: typeof BetweenBigintTypeId
 
 Added in v1.0.0
 
+## BetweenBigintTypeId (type alias)
+
+**Signature**
+
+```ts
+export type BetweenBigintTypeId = typeof BetweenBigintTypeId
+```
+
+Added in v1.0.0
+
 ## BetweenTypeId
 
 **Signature**
 
 ```ts
 export declare const BetweenTypeId: typeof BetweenTypeId
+```
+
+Added in v1.0.0
+
+## BetweenTypeId (type alias)
+
+**Signature**
+
+```ts
+export type BetweenTypeId = typeof BetweenTypeId
 ```
 
 Added in v1.0.0
@@ -3186,6 +3223,16 @@ export declare const GreaterThanBigintTypeId: typeof GreaterThanBigintTypeId
 
 Added in v1.0.0
 
+## GreaterThanBigintTypeId (type alias)
+
+**Signature**
+
+```ts
+export type GreaterThanBigintTypeId = typeof GreaterThanBigintTypeId
+```
+
+Added in v1.0.0
+
 ## GreaterThanOrEqualToBigDecimalTypeId
 
 **Signature**
@@ -3206,6 +3253,16 @@ export declare const GreaterThanOrEqualToBigintTypeId: typeof GreaterThanOrEqual
 
 Added in v1.0.0
 
+## GreaterThanOrEqualToBigintTypeId (type alias)
+
+**Signature**
+
+```ts
+export type GreaterThanOrEqualToBigintTypeId = typeof GreaterThanOrEqualToBigintTypeId
+```
+
+Added in v1.0.0
+
 ## GreaterThanOrEqualToTypeId
 
 **Signature**
@@ -3216,12 +3273,32 @@ export declare const GreaterThanOrEqualToTypeId: typeof GreaterThanOrEqualToType
 
 Added in v1.0.0
 
+## GreaterThanOrEqualToTypeId (type alias)
+
+**Signature**
+
+```ts
+export type GreaterThanOrEqualToTypeId = typeof GreaterThanOrEqualToTypeId
+```
+
+Added in v1.0.0
+
 ## GreaterThanTypeId
 
 **Signature**
 
 ```ts
 export declare const GreaterThanTypeId: typeof GreaterThanTypeId
+```
+
+Added in v1.0.0
+
+## GreaterThanTypeId (type alias)
+
+**Signature**
+
+```ts
+export type GreaterThanTypeId = typeof GreaterThanTypeId
 ```
 
 Added in v1.0.0
@@ -3256,12 +3333,32 @@ export declare const IntTypeId: typeof IntTypeId
 
 Added in v1.0.0
 
+## IntTypeId (type alias)
+
+**Signature**
+
+```ts
+export type IntTypeId = typeof IntTypeId
+```
+
+Added in v1.0.0
+
 ## ItemsCountTypeId
 
 **Signature**
 
 ```ts
 export declare const ItemsCountTypeId: typeof ItemsCountTypeId
+```
+
+Added in v1.0.0
+
+## ItemsCountTypeId (type alias)
+
+**Signature**
+
+```ts
+export type ItemsCountTypeId = typeof ItemsCountTypeId
 ```
 
 Added in v1.0.0
@@ -3286,6 +3383,16 @@ export declare const LengthTypeId: typeof LengthTypeId
 
 Added in v1.0.0
 
+## LengthTypeId (type alias)
+
+**Signature**
+
+```ts
+export type LengthTypeId = typeof LengthTypeId
+```
+
+Added in v1.0.0
+
 ## LessThanBigDecimalTypeId
 
 **Signature**
@@ -3302,6 +3409,16 @@ Added in v1.0.0
 
 ```ts
 export declare const LessThanBigintTypeId: typeof LessThanBigintTypeId
+```
+
+Added in v1.0.0
+
+## LessThanBigintTypeId (type alias)
+
+**Signature**
+
+```ts
+export type LessThanBigintTypeId = typeof LessThanBigintTypeId
 ```
 
 Added in v1.0.0
@@ -3326,6 +3443,16 @@ export declare const LessThanOrEqualToBigintTypeId: typeof LessThanOrEqualToBigi
 
 Added in v1.0.0
 
+## LessThanOrEqualToBigintTypeId (type alias)
+
+**Signature**
+
+```ts
+export type LessThanOrEqualToBigintTypeId = typeof LessThanOrEqualToBigintTypeId
+```
+
+Added in v1.0.0
+
 ## LessThanOrEqualToTypeId
 
 **Signature**
@@ -3336,12 +3463,32 @@ export declare const LessThanOrEqualToTypeId: typeof LessThanOrEqualToTypeId
 
 Added in v1.0.0
 
+## LessThanOrEqualToTypeId (type alias)
+
+**Signature**
+
+```ts
+export type LessThanOrEqualToTypeId = typeof LessThanOrEqualToTypeId
+```
+
+Added in v1.0.0
+
 ## LessThanTypeId
 
 **Signature**
 
 ```ts
 export declare const LessThanTypeId: typeof LessThanTypeId
+```
+
+Added in v1.0.0
+
+## LessThanTypeId (type alias)
+
+**Signature**
+
+```ts
+export type LessThanTypeId = typeof LessThanTypeId
 ```
 
 Added in v1.0.0
@@ -3366,12 +3513,32 @@ export declare const MaxItemsTypeId: typeof MaxItemsTypeId
 
 Added in v1.0.0
 
+## MaxItemsTypeId (type alias)
+
+**Signature**
+
+```ts
+export type MaxItemsTypeId = typeof MaxItemsTypeId
+```
+
+Added in v1.0.0
+
 ## MaxLengthTypeId
 
 **Signature**
 
 ```ts
 export declare const MaxLengthTypeId: typeof MaxLengthTypeId
+```
+
+Added in v1.0.0
+
+## MaxLengthTypeId (type alias)
+
+**Signature**
+
+```ts
+export type MaxLengthTypeId = typeof MaxLengthTypeId
 ```
 
 Added in v1.0.0
@@ -3386,12 +3553,32 @@ export declare const MinItemsTypeId: typeof MinItemsTypeId
 
 Added in v1.0.0
 
+## MinItemsTypeId (type alias)
+
+**Signature**
+
+```ts
+export type MinItemsTypeId = typeof MinItemsTypeId
+```
+
+Added in v1.0.0
+
 ## MinLengthTypeId
 
 **Signature**
 
 ```ts
 export declare const MinLengthTypeId: typeof MinLengthTypeId
+```
+
+Added in v1.0.0
+
+## MinLengthTypeId (type alias)
+
+**Signature**
+
+```ts
+export type MinLengthTypeId = typeof MinLengthTypeId
 ```
 
 Added in v1.0.0

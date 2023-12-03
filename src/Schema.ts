@@ -30,6 +30,7 @@ import type { ParseOptions } from "./AST.js"
 import * as AST from "./AST.js"
 import * as Internal from "./internal/ast.js"
 import * as InternalBigInt from "./internal/bigint.js"
+import * as filters from "./internal/filters.js"
 import * as hooks from "./internal/hooks.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
@@ -1603,7 +1604,13 @@ export const trimmed =
  * @category type id
  * @since 1.0.0
  */
-export const MaxLengthTypeId = Symbol.for("@effect/schema/TypeId/MaxLength")
+export const MaxLengthTypeId: unique symbol = filters.MaxLengthTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MaxLengthTypeId = typeof MaxLengthTypeId
 
 /**
  * @category string filters
@@ -1630,7 +1637,13 @@ export const maxLength = <A extends string>(
  * @category type id
  * @since 1.0.0
  */
-export const MinLengthTypeId = Symbol.for("@effect/schema/TypeId/MinLength")
+export const MinLengthTypeId: unique symbol = filters.MinLengthTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MinLengthTypeId = typeof MinLengthTypeId
 
 /**
  * @category string filters
@@ -1822,7 +1835,13 @@ export const uppercased =
  * @category type id
  * @since 1.0.0
  */
-export const LengthTypeId = Symbol.for("@effect/schema/TypeId/Length")
+export const LengthTypeId: unique symbol = filters.LengthTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LengthTypeId = typeof LengthTypeId
 
 /**
  * @category string filters
@@ -2072,7 +2091,13 @@ export const finite =
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanTypeId = Symbol.for("@effect/schema/TypeId/GreaterThan")
+export const GreaterThanTypeId: unique symbol = filters.GreaterThanTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanTypeId = typeof GreaterThanTypeId
 
 /**
  * @category number filters
@@ -2096,7 +2121,13 @@ export const greaterThan = <A extends number>(
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanOrEqualToTypeId = Symbol.for("@effect/schema/TypeId/GreaterThanOrEqualTo")
+export const GreaterThanOrEqualToTypeId: unique symbol = filters.GreaterThanOrEqualToTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanOrEqualToTypeId = typeof GreaterThanOrEqualToTypeId
 
 /**
  * @category number filters
@@ -2144,7 +2175,13 @@ export const multipleOf = <A extends number>(
  * @category type id
  * @since 1.0.0
  */
-export const IntTypeId = Symbol.for("@effect/schema/TypeId/Int")
+export const IntTypeId: unique symbol = filters.IntTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type IntTypeId = typeof IntTypeId
 
 /**
  * @category number filters
@@ -2166,7 +2203,13 @@ export const int =
  * @category type id
  * @since 1.0.0
  */
-export const LessThanTypeId = Symbol.for("@effect/schema/TypeId/LessThan")
+export const LessThanTypeId: unique symbol = filters.LessThanTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanTypeId = typeof LessThanTypeId
 
 /**
  * @category number filters
@@ -2188,7 +2231,13 @@ export const lessThan =
  * @category type id
  * @since 1.0.0
  */
-export const LessThanOrEqualToTypeId = Symbol.for("@effect/schema/TypeId/LessThanOrEqualTo")
+export const LessThanOrEqualToTypeId: unique symbol = filters.LessThanOrEqualToTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanOrEqualToTypeId = typeof LessThanOrEqualToTypeId
 
 /**
  * @category number filters
@@ -2212,7 +2261,13 @@ export const lessThanOrEqualTo = <A extends number>(
  * @category type id
  * @since 1.0.0
  */
-export const BetweenTypeId = Symbol.for("@effect/schema/TypeId/Between")
+export const BetweenTypeId: unique symbol = filters.BetweenTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type BetweenTypeId = typeof BetweenTypeId
 
 /**
  * @category number filters
@@ -2505,7 +2560,13 @@ export const symbol: Schema<string, symbol> = symbolFromString(string)
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanBigintTypeId = Symbol.for("@effect/schema/TypeId/GreaterThanBigint")
+export const GreaterThanBigintTypeId: unique symbol = filters.GreaterThanBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanBigintTypeId = typeof GreaterThanBigintTypeId
 
 /**
  * @category bigint filters
@@ -2528,9 +2589,14 @@ export const greaterThanBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanOrEqualToBigintTypeId = Symbol.for(
-  "@effect/schema/TypeId/GreaterThanOrEqualToBigint"
-)
+export const GreaterThanOrEqualToBigintTypeId: unique symbol =
+  filters.GreaterThanOrEqualToBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanOrEqualToBigintTypeId = typeof GreaterThanOrEqualToBigintTypeId
 
 /**
  * @category bigint filters
@@ -2555,7 +2621,13 @@ export const greaterThanOrEqualToBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const LessThanBigintTypeId = Symbol.for("@effect/schema/TypeId/LessThanBigint")
+export const LessThanBigintTypeId: unique symbol = filters.LessThanBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanBigintTypeId = typeof LessThanBigintTypeId
 
 /**
  * @category bigint filters
@@ -2578,9 +2650,13 @@ export const lessThanBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const LessThanOrEqualToBigintTypeId = Symbol.for(
-  "@effect/schema/TypeId/LessThanOrEqualToBigint"
-)
+export const LessThanOrEqualToBigintTypeId: unique symbol = filters.LessThanOrEqualToBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanOrEqualToBigintTypeId = typeof LessThanOrEqualToBigintTypeId
 
 /**
  * @category bigint filters
@@ -2603,7 +2679,13 @@ export const lessThanOrEqualToBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const BetweenBigintTypeId = Symbol.for("@effect/schema/TypeId/BetweenBigint")
+export const BetweenBigintTypeId: unique symbol = filters.BetweenBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type BetweenBigintTypeId = typeof BetweenBigintTypeId
 
 /**
  * @category bigint filters
@@ -3065,7 +3147,13 @@ export const Hex: Schema<string, Uint8Array> = hex(string)
  * @category type id
  * @since 1.0.0
  */
-export const MinItemsTypeId = Symbol.for("@effect/schema/TypeId/MinItems")
+export const MinItemsTypeId: unique symbol = filters.MinItemsTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MinItemsTypeId = typeof MinItemsTypeId
 
 /**
  * @category ReadonlyArray filters
@@ -3089,7 +3177,13 @@ export const minItems = <A>(
  * @category type id
  * @since 1.0.0
  */
-export const MaxItemsTypeId = Symbol.for("@effect/schema/TypeId/MaxItems")
+export const MaxItemsTypeId: unique symbol = filters.MaxItemsTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MaxItemsTypeId = typeof MaxItemsTypeId
 
 /**
  * @category ReadonlyArray filters
@@ -3113,7 +3207,13 @@ export const maxItems = <A>(
  * @category type id
  * @since 1.0.0
  */
-export const ItemsCountTypeId = Symbol.for("@effect/schema/TypeId/ItemsCount")
+export const ItemsCountTypeId: unique symbol = filters.ItemsCountTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type ItemsCountTypeId = typeof ItemsCountTypeId
 
 /**
  * @category ReadonlyArray filters
