@@ -1689,7 +1689,7 @@ Added in v1.0.0
 
 ```ts
 export interface TaggedRequest<Tag extends string, IS, S, IE, E, IA, A>
-  extends Request.Request<A, A>,
+  extends Request.Request<E, A>,
     Serializable.SerializableWithResult<IS, S, IE, E, IA, A> {
   readonly _tag: Tag
 }
