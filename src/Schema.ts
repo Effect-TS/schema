@@ -25,10 +25,15 @@ import * as Request from "effect/Request"
 import * as S from "effect/String"
 import type { Equals, Simplify } from "effect/Types"
 import type { Arbitrary } from "./Arbitrary.js"
+import * as arbitrary from "./Arbitrary.js"
 import * as ArrayFormatter from "./ArrayFormatter.js"
 import type { ParseOptions } from "./AST.js"
 import * as AST from "./AST.js"
-import * as Internal from "./internal/common.js"
+import * as Internal from "./internal/ast.js"
+import * as InternalBigInt from "./internal/bigint.js"
+import * as filters from "./internal/filters.js"
+import * as hooks from "./internal/hooks.js"
+import * as InternalSchema from "./internal/schema.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
 import type { Pretty } from "./Pretty.js"
@@ -37,7 +42,11 @@ import type { Pretty } from "./Pretty.js"
 // model
 // ---------------------------------------------
 
-const TypeId: unique symbol = Symbol.for("@effect/schema/Schema") as TypeId
+/**
+ * @since 1.0.0
+ * @category symbol
+ */
+export const TypeId: unique symbol = InternalSchema.TypeId
 
 /**
  * @since 1.0.0
@@ -1299,6 +1308,48 @@ export const transform: {
 )
 
 /**
+ * Creates a new `Schema` which transforms literal values.
+ *
+ * @example
+ * import * as S from "@effect/schema/Schema"
+ *
+ * const schema = S.transformLiteral(0, "a")
+ *
+ * assert.deepStrictEqual(S.decodeSync(schema)(0), "a")
+ *
+ * @category constructors
+ * @since 1.0.0
+ */
+export const transformLiteral = <From extends AST.LiteralValue, To extends AST.LiteralValue>(
+  from: From,
+  to: To
+): Schema<From, To> => transform(literal(from), literal(to), () => to, () => from)
+
+/**
+ * Creates a new `Schema` which maps between corresponding literal values.
+ *
+ * @example
+ * import * as S from "@effect/schema/Schema"
+ *
+ * const Animal = S.transformLiterals(
+ *   [0, "cat"],
+ *   [1, "dog"],
+ *   [2, "cow"]
+ * )
+ *
+ * assert.deepStrictEqual(S.decodeSync(Animal)(1), "dog")
+ *
+ * @category constructors
+ * @since 1.0.0
+ */
+export const transformLiterals = <
+  const A extends ReadonlyArray<readonly [from: AST.LiteralValue, to: AST.LiteralValue]>
+>(
+  ...pairs: A
+): Schema<A[number][0], A[number][1]> =>
+  union(...pairs.map(([from, to]) => transformLiteral(from, to)))
+
+/**
  * Attaches a property signature with the specified key and value to the schema.
  * This API is useful when you want to add a property to your schema which doesn't describe the shape of the input,
  * but rather maps to another schema, for example when you want to add a discriminant to a simple union.
@@ -1404,9 +1455,9 @@ const toAnnotations = <A>(
   move("default", AST.DefaultAnnotationId)
   move("documentation", AST.DocumentationAnnotationId)
   move("jsonSchema", AST.JSONSchemaAnnotationId)
-  move("arbitrary", Internal.ArbitraryHookId)
-  move("pretty", Internal.PrettyHookId)
-  move("equivalence", Internal.EquivalenceHookId)
+  move("arbitrary", hooks.ArbitraryHookId)
+  move("pretty", hooks.PrettyHookId)
+  move("equivalence", hooks.EquivalenceHookId)
 
   return out
 }
@@ -1515,7 +1566,7 @@ export const jsonSchema =
  */
 export const equivalence =
   <A>(equivalence: Equivalence.Equivalence<A>) => <I>(self: Schema<I, A>): Schema<I, A> =>
-    make(AST.setAnnotation(self.ast, Internal.EquivalenceHookId, () => equivalence))
+    make(AST.setAnnotation(self.ast, hooks.EquivalenceHookId, () => equivalence))
 
 // ---------------------------------------------
 // property signature renaming
@@ -1601,7 +1652,13 @@ export const trimmed =
  * @category type id
  * @since 1.0.0
  */
-export const MaxLengthTypeId = Symbol.for("@effect/schema/TypeId/MaxLength")
+export const MaxLengthTypeId: unique symbol = filters.MaxLengthTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MaxLengthTypeId = typeof MaxLengthTypeId
 
 /**
  * @category string filters
@@ -1628,7 +1685,13 @@ export const maxLength = <A extends string>(
  * @category type id
  * @since 1.0.0
  */
-export const MinLengthTypeId = Symbol.for("@effect/schema/TypeId/MinLength")
+export const MinLengthTypeId: unique symbol = filters.MinLengthTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MinLengthTypeId = typeof MinLengthTypeId
 
 /**
  * @category string filters
@@ -1820,7 +1883,13 @@ export const uppercased =
  * @category type id
  * @since 1.0.0
  */
-export const LengthTypeId = Symbol.for("@effect/schema/TypeId/Length")
+export const LengthTypeId: unique symbol = filters.LengthTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LengthTypeId = typeof LengthTypeId
 
 /**
  * @category string filters
@@ -2070,7 +2139,13 @@ export const finite =
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanTypeId = Symbol.for("@effect/schema/TypeId/GreaterThan")
+export const GreaterThanTypeId: unique symbol = filters.GreaterThanTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanTypeId = typeof GreaterThanTypeId
 
 /**
  * @category number filters
@@ -2094,7 +2169,13 @@ export const greaterThan = <A extends number>(
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanOrEqualToTypeId = Symbol.for("@effect/schema/TypeId/GreaterThanOrEqualTo")
+export const GreaterThanOrEqualToTypeId: unique symbol = filters.GreaterThanOrEqualToTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanOrEqualToTypeId = typeof GreaterThanOrEqualToTypeId
 
 /**
  * @category number filters
@@ -2142,7 +2223,13 @@ export const multipleOf = <A extends number>(
  * @category type id
  * @since 1.0.0
  */
-export const IntTypeId = Symbol.for("@effect/schema/TypeId/Int")
+export const IntTypeId: unique symbol = filters.IntTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type IntTypeId = typeof IntTypeId
 
 /**
  * @category number filters
@@ -2164,7 +2251,13 @@ export const int =
  * @category type id
  * @since 1.0.0
  */
-export const LessThanTypeId = Symbol.for("@effect/schema/TypeId/LessThan")
+export const LessThanTypeId: unique symbol = filters.LessThanTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanTypeId = typeof LessThanTypeId
 
 /**
  * @category number filters
@@ -2186,7 +2279,13 @@ export const lessThan =
  * @category type id
  * @since 1.0.0
  */
-export const LessThanOrEqualToTypeId = Symbol.for("@effect/schema/TypeId/LessThanOrEqualTo")
+export const LessThanOrEqualToTypeId: unique symbol = filters.LessThanOrEqualToTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanOrEqualToTypeId = typeof LessThanOrEqualToTypeId
 
 /**
  * @category number filters
@@ -2210,7 +2309,13 @@ export const lessThanOrEqualTo = <A extends number>(
  * @category type id
  * @since 1.0.0
  */
-export const BetweenTypeId = Symbol.for("@effect/schema/TypeId/Between")
+export const BetweenTypeId: unique symbol = filters.BetweenTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type BetweenTypeId = typeof BetweenTypeId
 
 /**
  * @category number filters
@@ -2503,7 +2608,13 @@ export const symbol: Schema<string, symbol> = symbolFromString(string)
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanBigintTypeId = Symbol.for("@effect/schema/TypeId/GreaterThanBigint")
+export const GreaterThanBigintTypeId: unique symbol = filters.GreaterThanBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanBigintTypeId = typeof GreaterThanBigintTypeId
 
 /**
  * @category bigint filters
@@ -2526,9 +2637,14 @@ export const greaterThanBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const GreaterThanOrEqualToBigintTypeId = Symbol.for(
-  "@effect/schema/TypeId/GreaterThanOrEqualToBigint"
-)
+export const GreaterThanOrEqualToBigintTypeId: unique symbol =
+  filters.GreaterThanOrEqualToBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type GreaterThanOrEqualToBigintTypeId = typeof GreaterThanOrEqualToBigintTypeId
 
 /**
  * @category bigint filters
@@ -2553,7 +2669,13 @@ export const greaterThanOrEqualToBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const LessThanBigintTypeId = Symbol.for("@effect/schema/TypeId/LessThanBigint")
+export const LessThanBigintTypeId: unique symbol = filters.LessThanBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanBigintTypeId = typeof LessThanBigintTypeId
 
 /**
  * @category bigint filters
@@ -2576,9 +2698,13 @@ export const lessThanBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const LessThanOrEqualToBigintTypeId = Symbol.for(
-  "@effect/schema/TypeId/LessThanOrEqualToBigint"
-)
+export const LessThanOrEqualToBigintTypeId: unique symbol = filters.LessThanOrEqualToBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type LessThanOrEqualToBigintTypeId = typeof LessThanOrEqualToBigintTypeId
 
 /**
  * @category bigint filters
@@ -2601,7 +2727,13 @@ export const lessThanOrEqualToBigint = <A extends bigint>(
  * @category type id
  * @since 1.0.0
  */
-export const BetweenBigintTypeId = Symbol.for("@effect/schema/TypeId/BetweenBigint")
+export const BetweenBigintTypeId: unique symbol = filters.BetweenBigintTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type BetweenBigintTypeId = typeof BetweenBigintTypeId
 
 /**
  * @category bigint filters
@@ -2722,7 +2854,7 @@ export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schem
         catch: () => ParseResult.parseError([ParseResult.type(ast, n)])
       }),
     (b, _, ast) => {
-      if (b > Internal.maxSafeInteger || b < Internal.minSafeInteger) {
+      if (b > InternalBigInt.maxSafeInteger || b < InternalBigInt.minSafeInteger) {
         return ParseResult.fail(ParseResult.type(ast, b))
       }
 
@@ -2829,12 +2961,12 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
       : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "Duration",
-    [Internal.PrettyHookId]: (): Pretty<Duration.Duration> =>
+    [hooks.PrettyHookId]: (): Pretty<Duration.Duration> =>
       Duration.match({
         onMillis: (_) => `Duration.millis(${_})`,
         onNanos: (_) => `Duration.nanos(${_})`
       }),
-    [Internal.ArbitraryHookId]: (): Arbitrary<Duration.Duration> => (fc) =>
+    [hooks.ArbitraryHookId]: (): Arbitrary<Duration.Duration> => (fc) =>
       fc.oneof(
         fc.bigUint().map((_) => Duration.nanos(_)),
         fc.bigUint().map((_) => Duration.micros(_)),
@@ -2845,7 +2977,7 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
         fc.maxSafeNat().map((_) => Duration.days(_)),
         fc.maxSafeNat().map((_) => Duration.weeks(_))
       ),
-    [Internal.EquivalenceHookId]: () => Duration.Equivalence
+    [hooks.EquivalenceHookId]: () => Duration.Equivalence
   }
 )
 
@@ -3119,10 +3251,10 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
       : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "Uint8Array",
-    [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
       `new Uint8Array(${JSON.stringify(Array.from(u8arr))})`,
-    [Internal.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) => fc.uint8Array(),
-    [Internal.EquivalenceHookId]: () => ReadonlyArray.getEquivalence(Equivalence.strict())
+    [hooks.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) => fc.uint8Array(),
+    [hooks.EquivalenceHookId]: () => ReadonlyArray.getEquivalence(Equivalence.strict())
   }
 )
 
@@ -3192,8 +3324,8 @@ const makeEncodingTransform = <A extends string>(
     { strict: false }
   ).pipe(annotations({
     [AST.IdentifierAnnotationId]: id,
-    [Internal.PrettyHookId]: (): Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
-    [Internal.ArbitraryHookId]: () => arbitrary
+    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
+    [hooks.ArbitraryHookId]: () => arbitrary
   }))
 
 /**
@@ -3268,7 +3400,13 @@ export const Hex: Schema<string, Uint8Array> = hex(string)
  * @category type id
  * @since 1.0.0
  */
-export const MinItemsTypeId = Symbol.for("@effect/schema/TypeId/MinItems")
+export const MinItemsTypeId: unique symbol = filters.MinItemsTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MinItemsTypeId = typeof MinItemsTypeId
 
 /**
  * @category ReadonlyArray filters
@@ -3292,7 +3430,13 @@ export const minItems = <A>(
  * @category type id
  * @since 1.0.0
  */
-export const MaxItemsTypeId = Symbol.for("@effect/schema/TypeId/MaxItems")
+export const MaxItemsTypeId: unique symbol = filters.MaxItemsTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type MaxItemsTypeId = typeof MaxItemsTypeId
 
 /**
  * @category ReadonlyArray filters
@@ -3316,7 +3460,13 @@ export const maxItems = <A>(
  * @category type id
  * @since 1.0.0
  */
-export const ItemsCountTypeId = Symbol.for("@effect/schema/TypeId/ItemsCount")
+export const ItemsCountTypeId: unique symbol = filters.ItemsCountTypeId
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export type ItemsCountTypeId = typeof ItemsCountTypeId
 
 /**
  * @category ReadonlyArray filters
@@ -3383,9 +3533,9 @@ export const DateFromSelf: Schema<Date> = declare(
     !Predicate.isDate(u) ? ParseResult.fail(ParseResult.type(ast, u)) : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "Date",
-    [Internal.PrettyHookId]: datePretty,
-    [Internal.ArbitraryHookId]: dateArbitrary,
-    [Internal.EquivalenceHookId]: () => Equivalence.Date
+    [hooks.PrettyHookId]: datePretty,
+    [hooks.ArbitraryHookId]: dateArbitrary,
+    [hooks.EquivalenceHookId]: () => Equivalence.Date
   }
 )
 
@@ -3440,16 +3590,18 @@ export {
 // Option transformations
 // ---------------------------------------------
 
-const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> => (fc) =>
-  fc.oneof(fc.constant(Option.none()), value(fc).map(Option.some))
+/**
+ * @category Option transformations
+ * @since 1.0.0
+ */
+export type OptionFrom<I> = {
+  readonly _tag: "None"
+} | {
+  readonly _tag: "Some"
+  readonly value: I
+}
 
-const optionPretty = <A>(value: Pretty<A>): Pretty<Option.Option<A>> =>
-  Option.match({
-    onNone: () => "none()",
-    onSome: (a) => `some(${value(a)})`
-  })
-
-const optionInline = <I, A>(value: Schema<I, A>) =>
+const optionFrom = <I, A>(value: Schema<I, A>): Schema<OptionFrom<I>, OptionFrom<A>> =>
   union(
     struct({
       _tag: literal("None")
@@ -3460,6 +3612,23 @@ const optionInline = <I, A>(value: Schema<I, A>) =>
     })
   )
 
+const optionDecode = <A>(o: OptionFrom<A>): Option.Option<A> =>
+  o._tag === "None" ? Option.none() : Option.some(o.value)
+
+const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> => {
+  const placeholder = lazy<A>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => value
+  }))
+  const arb = arbitrary.unsafeTo(optionFrom(placeholder))
+  return (fc) => arb(fc).map(optionDecode)
+}
+
+const optionPretty = <A>(value: Pretty<A>): Pretty<Option.Option<A>> =>
+  Option.match({
+    onNone: () => "none()",
+    onSome: (a) => `some(${value(a)})`
+  })
+
 /**
  * @category Option transformations
  * @since 1.0.0
@@ -3469,7 +3638,7 @@ export const optionFromSelf = <I, A>(
 ): Schema<Option.Option<I>, Option.Option<A>> => {
   return declare(
     [value],
-    optionInline(value),
+    optionFrom(value),
     (isDecoding, value) => {
       const parse = isDecoding ? Parser.parse(value) : Parser.encode(value)
       return (u, options, ast) =>
@@ -3481,9 +3650,9 @@ export const optionFromSelf = <I, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "Option",
-      [Internal.PrettyHookId]: optionPretty,
-      [Internal.ArbitraryHookId]: optionArbitrary,
-      [Internal.EquivalenceHookId]: Option.getEquivalence
+      [hooks.PrettyHookId]: optionPretty,
+      [hooks.ArbitraryHookId]: optionArbitrary,
+      [hooks.EquivalenceHookId]: Option.getEquivalence
     }
   )
 }
@@ -3494,14 +3663,11 @@ export const optionFromSelf = <I, A>(
  */
 export const option = <I, A>(
   value: Schema<I, A>
-): Schema<
-  { readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I },
-  Option.Option<A>
-> =>
+): Schema<OptionFrom<I>, Option.Option<A>> =>
   transform(
-    optionInline(value),
-    to(optionFromSelf(value)),
-    (a) => a._tag === "None" ? Option.none() : Option.some(a.value),
+    optionFrom(value),
+    optionFromSelf(to(value)),
+    optionDecode,
     Option.match({
       onNone: () => ({ _tag: "None" as const }),
       onSome: (value) => ({ _tag: "Some" as const, value })
@@ -3515,25 +3681,28 @@ export const option = <I, A>(
 export const optionFromNullable = <I, A>(
   value: Schema<I, A>
 ): Schema<I | null, Option.Option<A>> =>
-  transform(nullable(value), to(optionFromSelf(value)), Option.fromNullable, Option.getOrNull)
+  transform(nullable(value), optionFromSelf(to(value)), Option.fromNullable, Option.getOrNull)
 
 // ---------------------------------------------
 // Either transformations
 // ---------------------------------------------
 
-const eitherArbitrary = <E, A>(
-  left: Arbitrary<E>,
-  right: Arbitrary<A>
-): Arbitrary<Either.Either<E, A>> =>
-(fc) => fc.oneof(left(fc).map(Either.left), right(fc).map(Either.right))
+/**
+ * @category Either transformations
+ * @since 1.0.0
+ */
+export type EitherFrom<IE, IA> = {
+  readonly _tag: "Left"
+  readonly left: IE
+} | {
+  readonly _tag: "Right"
+  readonly right: IA
+}
 
-const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either.Either<E, A>> =>
-  Either.match({
-    onLeft: (e) => `left(${left(e)})`,
-    onRight: (a) => `right(${right(a)})`
-  })
-
-const eitherInline = <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) =>
+const eitherFrom = <IE, E, IA, A>(
+  left: Schema<IE, E>,
+  right: Schema<IA, A>
+): Schema<EitherFrom<IE, IA>, EitherFrom<E, A>> =>
   union(
     struct({
       _tag: literal("Left"),
@@ -3545,6 +3714,29 @@ const eitherInline = <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) =
     })
   )
 
+const eitherDecode = <E, A>(e: EitherFrom<E, A>): Either.Either<E, A> =>
+  e._tag === "Left" ? Either.left(e.left) : Either.right(e.right)
+
+const eitherArbitrary = <E, A>(
+  left: Arbitrary<E>,
+  right: Arbitrary<A>
+): Arbitrary<Either.Either<E, A>> => {
+  const placeholderLeft = lazy<E>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => left
+  }))
+  const placeholderRight = lazy<A>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => right
+  }))
+  const arb = arbitrary.unsafeTo(eitherFrom(placeholderLeft, placeholderRight))
+  return (fc) => arb(fc).map(eitherDecode)
+}
+
+const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either.Either<E, A>> =>
+  Either.match({
+    onLeft: (e) => `left(${left(e)})`,
+    onRight: (a) => `right(${right(a)})`
+  })
+
 /**
  * @category Either transformations
  * @since 1.0.0
@@ -3555,7 +3747,7 @@ export const eitherFromSelf = <IE, E, IA, A>(
 ): Schema<Either.Either<IE, IA>, Either.Either<E, A>> => {
   return declare(
     [left, right],
-    eitherInline(left, right),
+    eitherFrom(left, right),
     (isDecoding, left, right) => {
       const parseLeft = isDecoding ? Parser.parse(left) : Parser.encode(left)
       const parseRight = isDecoding ? Parser.parse(right) : Parser.encode(right)
@@ -3568,9 +3760,9 @@ export const eitherFromSelf = <IE, E, IA, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "Either",
-      [Internal.PrettyHookId]: eitherPretty,
-      [Internal.ArbitraryHookId]: eitherArbitrary,
-      [Internal.EquivalenceHookId]: Either.getEquivalence
+      [hooks.PrettyHookId]: eitherPretty,
+      [hooks.ArbitraryHookId]: eitherArbitrary,
+      [hooks.EquivalenceHookId]: Either.getEquivalence
     }
   )
 }
@@ -3582,14 +3774,11 @@ export const eitherFromSelf = <IE, E, IA, A>(
 export const either = <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
-): Schema<
-  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
-  Either.Either<E, A>
-> =>
+): Schema<EitherFrom<IE, IA>, Either.Either<E, A>> =>
   transform(
-    eitherInline(left, right),
-    to(eitherFromSelf(left, right)),
-    (a) => a._tag === "Left" ? Either.left(a.left) : Either.right(a.right),
+    eitherFrom(left, right),
+    eitherFromSelf(to(left), to(right)),
+    eitherDecode,
     Either.match({
       onLeft: (left) => ({ _tag: "Left" as const, left }),
       onRight: (right) => ({ _tag: "Right" as const, right })
@@ -3654,9 +3843,9 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlyMap",
-      [Internal.PrettyHookId]: readonlyMapPretty,
-      [Internal.ArbitraryHookId]: readonlyMapArbitrary,
-      [Internal.EquivalenceHookId]: readonlyMapEquivalence
+      [hooks.PrettyHookId]: readonlyMapPretty,
+      [hooks.ArbitraryHookId]: readonlyMapArbitrary,
+      [hooks.EquivalenceHookId]: readonlyMapEquivalence
     }
   )
 }
@@ -3671,7 +3860,7 @@ export const readonlyMap = <IK, K, IV, V>(
 ): Schema<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
   transform(
     array(tuple(key, value)),
-    to(readonlyMapFromSelf(key, value)),
+    readonlyMapFromSelf(to(key), to(value)),
     (as) => new Map(as),
     (map) => Array.from(map.entries())
   )
@@ -3718,9 +3907,9 @@ export const readonlySetFromSelf = <I, A>(
     },
     {
       [AST.IdentifierAnnotationId]: "ReadonlySet",
-      [Internal.PrettyHookId]: readonlySetPretty,
-      [Internal.ArbitraryHookId]: readonlySetArbitrary,
-      [Internal.EquivalenceHookId]: readonlySetEquivalence
+      [hooks.PrettyHookId]: readonlySetPretty,
+      [hooks.ArbitraryHookId]: readonlySetArbitrary,
+      [hooks.EquivalenceHookId]: readonlySetEquivalence
     }
   )
 }
@@ -3732,7 +3921,7 @@ export const readonlySetFromSelf = <I, A>(
 export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, ReadonlySet<A>> =>
   transform(
     array(item),
-    to(readonlySetFromSelf(item)),
+    readonlySetFromSelf(to(item)),
     (as) => new Set(as),
     (set) => Array.from(set)
   )
@@ -3742,7 +3931,7 @@ export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, 
 // ---------------------------------------------
 
 const bigDecimalPretty = (): Pretty<BigDecimal.BigDecimal> => (val) =>
-  `BigDecimal(${BigDecimal.toString(BigDecimal.normalize(val))})`
+  `BigDecimal(${BigDecimal.format(BigDecimal.normalize(val))})`
 
 const bigDecimalArbitrary = (): Arbitrary<BigDecimal.BigDecimal> => (fc) =>
   fc.tuple(fc.bigInt(), fc.integer()).map(([value, scale]) => BigDecimal.make(value, scale))
@@ -3760,9 +3949,9 @@ export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
       : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "BigDecimal",
-    [Internal.PrettyHookId]: bigDecimalPretty,
-    [Internal.ArbitraryHookId]: bigDecimalArbitrary,
-    [Internal.EquivalenceHookId]: () => BigDecimal.Equivalence
+    [hooks.PrettyHookId]: bigDecimalPretty,
+    [hooks.ArbitraryHookId]: bigDecimalArbitrary,
+    [hooks.EquivalenceHookId]: () => BigDecimal.Equivalence
   }
 )
 
@@ -3801,7 +3990,7 @@ export const bigDecimalFromString = <I, A extends string>(
         onNone: () => ParseResult.fail(ParseResult.type(ast, num)),
         onSome: (val) => ParseResult.succeed(BigDecimal.normalize(val))
       })),
-    (val) => ParseResult.succeed(BigDecimal.toString(BigDecimal.normalize(val))),
+    (val) => ParseResult.succeed(BigDecimal.format(BigDecimal.normalize(val))),
     { strict: false }
   )
 
@@ -3869,7 +4058,7 @@ export const greaterThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
   self.pipe(
     filter((a): a is A => BigDecimal.greaterThanOrEqualTo(a, min), {
       typeId: { id: GreaterThanOrEqualToBigDecimalTypeId, params: { min } },
-      description: `a BigDecimal greater than or equal to ${BigDecimal.toString(min)}`,
+      description: `a BigDecimal greater than or equal to ${BigDecimal.format(min)}`,
       ...options
     })
   )
@@ -3892,7 +4081,7 @@ export const lessThanBigDecimal = <A extends BigDecimal.BigDecimal>(
   self.pipe(
     filter((a): a is A => BigDecimal.lessThan(a, max), {
       typeId: { id: LessThanBigDecimalTypeId, params: { max } },
-      description: `a BigDecimal less than ${BigDecimal.toString(max)}`,
+      description: `a BigDecimal less than ${BigDecimal.format(max)}`,
       ...options
     })
   )
@@ -3917,7 +4106,7 @@ export const lessThanOrEqualToBigDecimal = <A extends BigDecimal.BigDecimal>(
   self.pipe(
     filter((a): a is A => BigDecimal.lessThanOrEqualTo(a, max), {
       typeId: { id: LessThanOrEqualToBigDecimalTypeId, params: { max } },
-      description: `a BigDecimal less than or equal to ${BigDecimal.toString(max)}`,
+      description: `a BigDecimal less than or equal to ${BigDecimal.format(max)}`,
       ...options
     })
   )
@@ -4037,8 +4226,8 @@ export const betweenBigDecimal = <A extends BigDecimal.BigDecimal>(
   self.pipe(
     filter((a): a is A => BigDecimal.between(a, { minimum, maximum }), {
       typeId: { id: BetweenBigDecimalTypeId, params: { maximum, minimum } },
-      description: `a BigDecimal between ${BigDecimal.toString(minimum)} and ${
-        BigDecimal.toString(maximum)
+      description: `a BigDecimal between ${BigDecimal.format(minimum)} and ${
+        BigDecimal.format(maximum)
       }`,
       ...options
     })
@@ -4112,9 +4301,9 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk.Chunk<I>, 
     },
     {
       [AST.IdentifierAnnotationId]: "Chunk",
-      [Internal.PrettyHookId]: chunkPretty,
-      [Internal.ArbitraryHookId]: chunkArbitrary,
-      [Internal.EquivalenceHookId]: Chunk.getEquivalence
+      [hooks.PrettyHookId]: chunkPretty,
+      [hooks.ArbitraryHookId]: chunkArbitrary,
+      [hooks.EquivalenceHookId]: Chunk.getEquivalence
     }
   )
 }
@@ -4126,7 +4315,7 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk.Chunk<I>, 
 export const chunk = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, Chunk.Chunk<A>> =>
   transform(
     array(item),
-    to(chunkFromSelf(item)),
+    chunkFromSelf(to(item)),
     (as) => as.length === 0 ? Chunk.empty() : Chunk.fromIterable(as),
     Chunk.toReadonlyArray
   )
@@ -4170,9 +4359,9 @@ export const dataFromSelf = <
     },
     {
       [AST.IdentifierAnnotationId]: "Data",
-      [Internal.PrettyHookId]: dataPretty,
-      [Internal.ArbitraryHookId]: dataArbitrary,
-      [Internal.EquivalenceHookId]: () => Equal.equals
+      [hooks.PrettyHookId]: dataPretty,
+      [hooks.ArbitraryHookId]: dataArbitrary,
+      [hooks.EquivalenceHookId]: () => Equal.equals
     }
   )
 }
@@ -4189,7 +4378,7 @@ export const data = <
 ): Schema<I, Data.Data<A>> =>
   transform(
     item,
-    to(dataFromSelf(item)),
+    dataFromSelf(to(item)),
     toData,
     (a) => Array.isArray(a) ? Array.from(a) : Object.assign({}, a),
     { strict: false }
@@ -4419,7 +4608,7 @@ const makeClass = <I, A>(
             ? ParseResult.succeed(input)
             : ParseResult.fail(ParseResult.type(ast, input)), {
           [AST.DescriptionAnnotationId]: `an instance of ${this.name}`,
-          [Internal.ArbitraryHookId]: (struct: any) => (fc: any) =>
+          [hooks.ArbitraryHookId]: (struct: any) => (fc: any) =>
             struct(fc).map((props: any) => new this(props))
         }),
         (input) => new this(input, true),

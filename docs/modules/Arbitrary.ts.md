@@ -17,6 +17,7 @@ Added in v1.0.0
   - [to](#to)
 - [hooks](#hooks)
   - [ArbitraryHookId](#arbitraryhookid)
+  - [ArbitraryHookId (type alias)](#arbitraryhookid-type-alias)
 - [model](#model)
   - [Arbitrary (interface)](#arbitrary-interface)
 
@@ -51,7 +52,17 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const ArbitraryHookId: symbol
+export declare const ArbitraryHookId: typeof ArbitraryHookId
+```
+
+Added in v1.0.0
+
+## ArbitraryHookId (type alias)
+
+**Signature**
+
+```ts
+export type ArbitraryHookId = typeof ArbitraryHookId
 ```
 
 Added in v1.0.0

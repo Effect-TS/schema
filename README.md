@@ -229,23 +229,21 @@ const input: unknown = { name: "Alice", age: 30 };
 
 const result1 = parsePerson(input);
 if (Either.isRight(result1)) {
-  console.log(result1.right); // { name: "Alice", age: 30 }
+  console.log(result1.right);
+  /*
+  Output:
+  { name: "Alice", age: 30 }
+  */
 }
 
 const result2 = parsePerson(null);
 if (Either.isLeft(result2)) {
   console.log(result2.left);
   /*
+  Output:
   {
-  _tag: 'ParseError',
-    errors: [
-      {
-        _tag: 'Type',
-        expected: [Object],
-        actual: null,
-        message: [Object]
-      }
-    ]
+    _id: 'ParseError',
+    message: 'error(s) found\n└─ Expected <anonymous type literal schema>, actual null'
   }
   */
 }
@@ -280,6 +278,7 @@ Parsing failed:
 Error: error(s) found
 └─ ["name"]
    └─ is missing
+  ...stack...
 */
 ```
 
@@ -321,12 +320,8 @@ Output:
   "_id": "Either",
   "_tag": "Left",
   "left": {
-    "_tag": "ParseError",
-    "errors": [
-      {
-        "_tag": "Forbidden"
-      }
-    ]
+    "_id": "ParseError",
+    "message": "error(s) found\n└─ is forbidden"
   }
 }
 */
@@ -366,6 +361,7 @@ console.log(
   })
 );
 /*
+Output:
 { name: 'Bob', age: 40 }
 */
 
@@ -381,7 +377,7 @@ S.parseSync(Person)(
 throws
 Error: error(s) found
 └─ ["email"]
-   └─ is unexpected
+   └─ is unexpected, expected "name" or "age"
 */
 ```
 
@@ -411,7 +407,7 @@ S.parseSync(Person)(
 throws
 Error: error(s) found
 ├─ ["email"]
-│  └─ is unexpected
+│  └─ is unexpected, expected "name" or "age"
 └─ ["age"]
    └─ Expected number, actual "abc"
 */
@@ -423,7 +419,7 @@ To use the `Schema` defined above to encode a value to `unknown`, you can use th
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import * as E from "effect/Either";
+import * as Either from "effect/Either";
 
 // Age is a schema that can decode a string to a number and encode a number to a string
 const Age = S.NumberFromString;
@@ -434,8 +430,12 @@ const Person = S.struct({
 });
 
 const encoded = S.encodeEither(Person)({ name: "Alice", age: 30 });
-if (E.isRight(encoded)) {
-  console.log(encoded.right); // { name: "Alice", age: "30" }
+if (Either.isRight(encoded)) {
+  console.log(encoded.right);
+  /*
+  Output:
+  { name: "Alice", age: "30" }
+  */
 }
 ```
 
@@ -454,7 +454,7 @@ Here's an example of how it works:
 ```ts
 import * as S from "@effect/schema/Schema";
 import { formatErrors } from "@effect/schema/TreeFormatter";
-import * as E from "effect/Either";
+import * as Either from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
@@ -462,7 +462,7 @@ const Person = S.struct({
 });
 
 const result = S.parseEither(Person)({});
-if (E.isLeft(result)) {
+if (Either.isLeft(result)) {
   console.error("Parsing failed:");
   console.error(formatErrors(result.left.errors));
 }
@@ -489,9 +489,9 @@ interface Issue {
 Here's an example of how it works:
 
 ```ts
-import * as S from "@effect/schema/Schema";
 import { formatErrors } from "@effect/schema/ArrayFormatter";
-import * as E from "effect/Either";
+import * as S from "@effect/schema/Schema";
+import * as Either from "effect/Either";
 
 const Person = S.struct({
   name: S.string,
@@ -502,7 +502,7 @@ const result = S.parseEither(Person)(
   { name: 1, foo: 2 },
   { errors: "all", onExcessProperty: "error" }
 );
-if (E.isLeft(result)) {
+if (Either.isLeft(result)) {
   console.error("Parsing failed:");
   console.error(formatErrors(result.left.errors));
 }
@@ -512,7 +512,7 @@ Parsing failed:
   {
     _tag: 'Unexpected',
     path: [ 'foo' ],
-    message: 'Unexpected value 2'
+    message: 'Unexpected, expected "name" or "age"'
   },
   {
     _tag: 'Type',
@@ -579,9 +579,8 @@ assertsPerson({ name: "Alice", age: 30 });
 The `arbitrary` function provided by the `@effect/schema/Arbitrary` module represents a way of generating random values that conform to a given `Schema`. This can be useful for testing purposes, as it allows you to generate random test data that is guaranteed to be valid according to the `Schema`.
 
 ```ts
-import { pipe } from "effect/Function";
+import * as Arbitrary from "@effect/schema/Arbitrary";
 import * as S from "@effect/schema/Schema";
-import * as A from "@effect/schema/Arbitrary";
 import * as fc from "fast-check";
 
 const Person = S.struct({
@@ -590,22 +589,21 @@ const Person = S.struct({
 });
 
 // Arbitrary for the To type
-const PersonArbitraryTo = A.to(Person)(fc);
+const PersonArbitraryTo = Arbitrary.to(Person)(fc);
 
 console.log(fc.sample(PersonArbitraryTo, 2));
 /*
-[
-  { name: 'WJh;`Jz', age: 3.4028216409684243e+38 },
-  { name: 'x&~', age: 139480325657985020 }
-]
+Output:
+[ { name: 'iP=!', age: -6 }, { name: '', age: 14 } ]
 */
 
 // Arbitrary for the From type
-const PersonArbitraryFrom = A.from(Person)(fc);
+const PersonArbitraryFrom = Arbitrary.from(Person)(fc);
 
 console.log(fc.sample(PersonArbitraryFrom, 2));
 /*
-[ { name: 'Q}"H@aT', age: ']P$8w' }, { name: '|', age: '"' } ]
+Output:
+[ { name: '{F', age: '$"{|' }, { name: 'nB}@BK', age: '^V+|W!Z' } ]
 */
 ```
 
@@ -616,18 +614,22 @@ The `to` function provided by the `@effect/schema/Pretty` module represents a wa
 You can use the `to` function to create a human-readable string representation of a value that conforms to a `Schema`. This can be useful for debugging or logging purposes, as it allows you to easily inspect the structure and data types of the value.
 
 ```ts
+import * as Pretty from "@effect/schema/Pretty";
 import * as S from "@effect/schema/Schema";
-import * as P from "@effect/schema/Pretty";
 
 const Person = S.struct({
   name: S.string,
   age: S.number,
 });
 
-const PersonPretty = P.to(Person);
+const PersonPretty = Pretty.to(Person);
 
 // returns a string representation of the object
-console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "age": 30 }`
+console.log(PersonPretty({ name: "Alice", age: 30 }));
+/*
+Output:
+{ "name": "Alice", "age": 30 }
+*/
 ```
 
 ## Generating JSON Schemas
@@ -635,8 +637,8 @@ console.log(PersonPretty({ name: "Alice", age: 30 })); // `{ "name": "Alice", "a
 The `to` function, which is part of the `@effect/schema/JSONSchema` module, allows you to generate a JSON Schema based on a schema definition:
 
 ```ts
-import * as S from "@effect/schema/Schema";
 import * as JSONSchema from "@effect/schema/JSONSchema";
+import * as S from "@effect/schema/Schema";
 
 const Person = S.struct({
   name: S.string,
@@ -679,6 +681,7 @@ In this example, we have created a schema for a "Person" with a name (a string) 
 You can enhance your schemas with identifier annotations. If you do, your schema will be included within a "definitions" object property on the root and referenced from there:
 
 ```ts
+import * as JSONSchema from "@effect/schema/JSONSchema";
 import * as S from "@effect/schema/Schema";
 
 const Name = S.string.pipe(S.identifier("Name"));
@@ -702,14 +705,14 @@ Output:
   ],
   "properties": {
     "name": {
-      "$ref": "#/definitions/Name"
+      "$ref": "#/$defs/Name"
     },
     "age": {
-      "$ref": "#/definitions/Age"
+      "$ref": "#/$defs/Age"
     }
   },
   "additionalProperties": false,
-  "definitions": {
+  "$defs": {
     "Name": {
       "type": "string",
       "description": "a string",
@@ -732,6 +735,7 @@ This technique helps organize your JSON Schema by creating separate definitions 
 Recursive and mutually recursive schemas are supported, but in these cases, identifier annotations are **required**:
 
 ```ts
+import * as JSONSchema from "@effect/schema/JSONSchema";
 import * as S from "@effect/schema/Schema";
 
 interface Category {
@@ -753,8 +757,8 @@ console.log(JSON.stringify(jsonSchema, null, 2));
 Output:
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$ref": "#/definitions/Category",
-  "definitions": {
+  "$ref": "#/$defs/Category",
+  "$defs": {
     "Category": {
       "type": "object",
       "required": [
@@ -770,7 +774,7 @@ Output:
         "categories": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Category"
+            "$ref": "#/$defs/Category"
           }
         }
       },
@@ -1169,7 +1173,6 @@ To achieve this, you can add a special property to each member of the union, whi
 
 ```ts
 import * as S from "@effect/schema/Schema";
-import { pipe } from "effect/Function";
 
 const Circle = S.struct({
   radius: S.number,
@@ -1424,7 +1427,7 @@ new Person({ id: 1, name: "" });
 /* throws
 error(s) found
 └─ ["name"]
-   └─ Expected a string at least 1 character(s) long, actual ""
+   └─ Expected a non empty string, actual ""
 */
 ```
 
@@ -1446,7 +1449,7 @@ class Person extends S.Class<Person>()({
 
 const john = new Person({ id: 1, name: "John" });
 
-john.upperName; // "JOHN"
+console.log(john.upperName); // "JOHN"
 ```
 
 ### Accessing Related Schemas
@@ -1466,6 +1469,8 @@ Person.struct;
 You can also create classes that extend `TaggedClass` & `TaggedError` from the `effect/Data` module:
 
 ```ts
+import * as S from "@effect/schema/Schema";
+
 class TaggedPerson extends S.TaggedClass<TaggedPerson>()("TaggedPerson", {
   name: S.string,
 }) {}
@@ -1475,11 +1480,11 @@ class HttpError extends S.TaggedError<HttpError>()("HttpError", {
 }) {}
 
 const joe = new TaggedPerson({ name: "Joe" });
-joe._tag; // "TaggedPerson"
+console.log(joe._tag); // "TaggedPerson"
 
 const error = new HttpError({ status: 404 });
-error._tag; // "HttpError"
-error.stack; // access the stack trace
+console.log(error._tag); // "HttpError"
+console.log(error.stack); // access the stack trace
 ```
 
 ### Extending existing Classes
@@ -1487,7 +1492,17 @@ error.stack; // access the stack trace
 In situations where you need to augment your existing class with more fields, the built-in `extend` utility comes in handy:
 
 ```ts
-// Extend an existing schema `Class` using the `extend` utility
+import * as S from "@effect/schema/Schema";
+
+class Person extends S.Class<Person>()({
+  id: S.number,
+  name: S.string.pipe(S.nonEmpty()),
+}) {
+  get upperName() {
+    return this.name.toUpperCase();
+  }
+}
+
 class PersonWithAge extends Person.extend<PersonWithAge>()({
   age: S.number,
 }) {
@@ -1502,9 +1517,9 @@ class PersonWithAge extends Person.extend<PersonWithAge>()({
 You have the option to enhance a class with (effectful) transforms. This becomes valuable when you want to enrich or validate an entity sourced from a data store.
 
 ```ts
-import * as Effect from "effect/Effect";
+import * as ParseResult from "@effect/schema/ParseResult";
 import * as S from "@effect/schema/Schema";
-import * as PR from "@effect/schema/ParseResult";
+import * as Effect from "effect/Effect";
 import * as Option from "effect/Option";
 
 export class Person extends S.Class<Person>()({
@@ -1529,11 +1544,13 @@ export class PersonWithTransform extends Person.transform<PersonWithTransform>()
   (input) =>
     Effect.mapBoth(getAge(input.id), {
       onFailure: (e) =>
-        PR.parseError([PR.type(S.string.ast, input.id, e.message)]),
+        ParseResult.parseError([
+          ParseResult.type(S.string.ast, input.id, e.message),
+        ]),
       // must return { age: Option<number> }
       onSuccess: (age) => ({ ...input, age: Option.some(age) }),
     }),
-  PR.success
+  ParseResult.succeed
 ) {}
 
 S.parsePromise(PersonWithTransform)({ id: 1, name: "name" }).then(console.log);
@@ -1553,11 +1570,13 @@ export class PersonWithTransformFrom extends Person.transformFrom<PersonWithTran
   (input) =>
     Effect.mapBoth(getAge(input.id), {
       onFailure: (e) =>
-        PR.parseError([PR.type(S.string.ast, input, e.message)]),
+        ParseResult.parseError([
+          ParseResult.type(S.string.ast, input, e.message),
+        ]),
       // must return { age?: number }
       onSuccess: (age) => (age > 18 ? { ...input, age } : { ...input }),
     }),
-  PR.success
+  ParseResult.succeed
 ) {}
 
 S.parsePromise(PersonWithTransformFrom)({ id: 1, name: "name" }).then(
@@ -1680,7 +1699,7 @@ S.mutable(S.record(S.string, S.string););
 The `extend` combinator allows you to add additional fields or index signatures to an existing `Schema`.
 
 ```ts
-// $ExpectType Schema<{ [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
+// $ExpectType Schema<{ readonly [x: string]: string; readonly a: string; readonly b: string; readonly c: string; }>
 S.struct({ a: S.string, b: S.string }).pipe(
   S.extend(S.struct({ c: S.string })), // <= you can add more fields
   S.extend(S.record(S.string, S.string)) // <= you can add index signatures
@@ -1724,6 +1743,8 @@ S.instanceOf(Test);
 The `lazy` combinator is useful when you need to define a `Schema` that depends on itself, like in the case of recursive data structures. In this example, the `Category` schema depends on itself because it has a field `subcategories` that is an array of `Category` objects.
 
 ```ts
+import * as S from "@effect/schema/Schema";
+
 interface Category {
   readonly name: string;
   readonly subcategories: ReadonlyArray<Category>;
@@ -1740,6 +1761,8 @@ const Category: S.Schema<Category> = S.lazy(() =>
 Here's an example of two mutually recursive schemas, `Expression` and `Operation`, that represent a simple arithmetic expression tree.
 
 ```ts
+import * as S from "@effect/schema/Schema";
+
 interface Expression {
   readonly type: "expression";
   readonly value: number | Operation;
@@ -1855,10 +1878,10 @@ export const transformedSchema: S.Schema<string, boolean> = S.transformOrFail(
 The transformation may also be async:
 
 ```ts
-import * as S from "@effect/schema/Schema";
 import * as ParseResult from "@effect/schema/ParseResult";
-import * as Effect from "effect/Effect";
+import * as S from "@effect/schema/Schema";
 import * as TreeFormatter from "@effect/schema/TreeFormatter";
+import * as Effect from "effect/Effect";
 
 const api = (url: string) =>
   Effect.tryPromise({
@@ -1877,10 +1900,10 @@ const PeopleId = S.string.pipe(S.brand("PeopleId"));
 const PeopleIdFromString = S.transformOrFail(
   S.string,
   PeopleId,
-  (s) =>
+  (s, _, ast) =>
     Effect.mapBoth(api(`https://swapi.dev/api/people/${s}`), {
       onFailure: (e) =>
-        ParseResult.parseError([ParseResult.type(PeopleId.ast, s, e.message)]),
+        ParseResult.parseError([ParseResult.type(ast, s, e.message)]),
       onSuccess: () => s,
     }),
   ParseResult.succeed
@@ -1892,10 +1915,24 @@ const parse = (id: string) =>
   );
 
 Effect.runPromiseExit(parse("1")).then(console.log);
-// Exit.Success(1)
+/*
+Output:
+{ _id: 'Exit', _tag: 'Success', value: '1' }
+*/
 
 Effect.runPromiseExit(parse("fail")).then(console.log);
-// Exit.Failure('error(s) found\n└─ Error: 404')
+/*
+Output:
+{
+  _id: 'Exit',
+  _tag: 'Failure',
+  cause: {
+    _id: 'Cause',
+    _tag: 'Fail',
+    failure: 'error(s) found\n└─ Error: 404'
+  }
+}
+*/
 ```
 
 ### String transformations
@@ -1907,7 +1944,7 @@ The `split` combinator allows splitting a string into an array of strings.
 ```ts
 import * as S from "@effect/schema/Schema";
 
-// $ExpectType Schema<string, string>
+// $ExpectType Schema<string, string[]>
 const schema = S.string.pipe(S.split(","));
 const parse = S.parseSync(schema);
 
@@ -2475,8 +2512,9 @@ const LongString = S.string.pipe(
 
 console.log(S.parseSync(LongString)("a"));
 /*
+throws:
 error(s) found
-└─ Expected a string at least 10 characters long, actual "a"
+└─ a string at least 10 characters long
 */
 ```
 
@@ -2558,7 +2596,6 @@ One of the fundamental requirements in the design of `@effect/schema` is that it
 Let's see some examples:
 
 ```ts
-import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 const Password =
@@ -2594,8 +2631,8 @@ The example shows some built-in combinators to add meta information, but users c
 Here's an example of how to add a `deprecated` annotation:
 
 ```ts
-import * as S from "@effect/schema/Schema";
 import * as AST from "@effect/schema/AST";
+import * as S from "@effect/schema/Schema";
 
 const DeprecatedId = Symbol.for(
   "some/unique/identifier/for/the/custom/annotation"
@@ -2608,6 +2645,7 @@ const schema = deprecated(S.string);
 
 console.log(schema);
 /*
+Output:
 {
   ast: {
     _tag: 'StringKeyword',

@@ -8,8 +8,8 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@effect/schema/test": path.resolve(__dirname, "/test"),
-      "@effect/schema": path.resolve(__dirname, "/src")
+      "@effect/schema/test": path.join(__dirname, "test"),
+      "@effect/schema": path.join(__dirname, "src")
     }
   }
 })
