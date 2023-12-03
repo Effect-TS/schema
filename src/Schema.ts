@@ -1298,7 +1298,20 @@ export const transform: {
     )
 )
 
-const transformLiteral = <From extends AST.LiteralValue, To extends AST.LiteralValue>(
+/**
+ * Creates a new `Schema` which transforms literal values.
+ *
+ * @example
+ * import * as S from "@effect/schema/Schema"
+ *
+ * const schema = S.transformLiteral(0, "a")
+ *
+ * assert.deepStrictEqual(S.decodeSync(schema)(0), "a")
+ *
+ * @category constructors
+ * @since 1.0.0
+ */
+export const transformLiteral = <From extends AST.LiteralValue, To extends AST.LiteralValue>(
   from: From,
   to: To
 ): Schema<From, To> => transform(literal(from), literal(to), () => to, () => from)

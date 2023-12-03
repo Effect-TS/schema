@@ -2,6 +2,17 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import { describe, it } from "vitest"
 
+describe("Schema > transformLiteral", () => {
+  describe("Struct", () => {
+    it("simple", async () => {
+      const schema = S.transformLiteral(0, "a")
+
+      await Util.expectParseSuccess(schema, 0, "a")
+      await Util.expectEncodeSuccess(schema, "a", 0)
+    })
+  })
+})
+
 describe("Schema > transformLiterals", () => {
   describe("Struct", () => {
     it("simple", async () => {

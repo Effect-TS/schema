@@ -154,6 +154,7 @@ Added in v1.0.0
   - [literal](#literal)
   - [make](#make)
   - [templateLiteral](#templateliteral)
+  - [transformLiteral](#transformliteral)
   - [transformLiterals](#transformliterals)
   - [uniqueSymbol](#uniquesymbol)
 - [decoding](#decoding)
@@ -1974,6 +1975,31 @@ Added in v1.0.0
 export declare const templateLiteral: <T extends [Schema<any, any>, ...Schema<any, any>[]]>(
   ...[head, ...tail]: T
 ) => Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>, Join<{ [K in keyof T]: Schema.To<T[K]> }>>
+```
+
+Added in v1.0.0
+
+## transformLiteral
+
+Creates a new `Schema` which transforms literal values.
+
+**Signature**
+
+```ts
+export declare const transformLiteral: <From extends AST.LiteralValue, To extends AST.LiteralValue>(
+  from: From,
+  to: To
+) => Schema<From, To>
+```
+
+**Example**
+
+```ts
+import * as S from "@effect/schema/Schema"
+
+const schema = S.transformLiteral(0, "a")
+
+assert.deepStrictEqual(S.decodeSync(schema)(0), "a")
 ```
 
 Added in v1.0.0
