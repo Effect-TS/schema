@@ -3372,8 +3372,8 @@ const optionFrom = <I, A>(value: Schema<I, A>): Schema<OptionFrom<I>, OptionFrom
     })
   )
 
-const optionDecode = <A>(o: OptionFrom<A>): Option.Option<A> =>
-  o._tag === "None" ? Option.none() : Option.some(o.value)
+const optionDecode = <A>(input: OptionFrom<A>): Option.Option<A> =>
+  input._tag === "None" ? Option.none() : Option.some(input.value)
 
 const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> => {
   const placeholder = lazy<A>(() => any).pipe(annotations({
@@ -3476,8 +3476,8 @@ const eitherFrom = <IE, E, IA, A>(
     })
   )
 
-const eitherDecode = <E, A>(e: EitherFrom<E, A>): Either.Either<E, A> =>
-  e._tag === "Left" ? Either.left(e.left) : Either.right(e.right)
+const eitherDecode = <E, A>(input: EitherFrom<E, A>): Either.Either<E, A> =>
+  input._tag === "Left" ? Either.left(input.left) : Either.right(input.right)
 
 const eitherArbitrary = <E, A>(
   left: Arbitrary<E>,
@@ -4618,36 +4618,6 @@ const causeFrom = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseFrom
     })
   )
 
-const causeTraverse = <E, E2>(
-  cause: Cause.Cause<E>,
-  parseError: (e: E, options: ParseOptions) => ParseResult.ParseResult<E2>,
-  options: ParseOptions
-): ParseResult.ParseResult<Cause.Cause<E2>> => {
-  if (cause._tag === "Fail") {
-    return ParseResult.map(parseError(cause.error, options), Cause.fail)
-  } else if (cause._tag === "Parallel") {
-    return ParseResult.flatMap(
-      causeTraverse(cause.left, parseError, options),
-      (left) =>
-        ParseResult.map(
-          causeTraverse(cause.right, parseError, options),
-          (right) => Cause.parallel(left, right)
-        )
-    )
-  } else if (cause._tag === "Sequential") {
-    return ParseResult.flatMap(
-      causeTraverse(cause.left, parseError, options),
-      (left) =>
-        ParseResult.map(
-          causeTraverse(cause.right, parseError, options),
-          (right) => Cause.sequential(left, right)
-        )
-    )
-  }
-
-  return ParseResult.succeed(cause)
-}
-
 const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => {
   const placeholder = lazy<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => error
@@ -4682,17 +4652,17 @@ const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => 
  */
 export const causeFromSelf = <IE, E>(
   error: Schema<IE, E>
-): Schema<Cause.Cause<IE>, Cause.Cause<E>> =>
-  declare(
+): Schema<Cause.Cause<IE>, Cause.Cause<E>> => {
+  return declare(
     [error],
     causeFrom(error),
     (isDecoding, error) => {
-      const parseError = isDecoding ? Parser.parse(error) : Parser.encode(error)
+      const parse = isDecoding ? Parser.parse(causeFrom(error)) : Parser.encode(causeFrom(error))
       return (u, options, ast) => {
-        if (!Cause.isCause(u)) {
-          return ParseResult.fail(ParseResult.type(ast, u))
+        if (Cause.isCause(u)) {
+          return ParseResult.map(parse(causeEncode(u), options), causeDecode)
         }
-        return causeTraverse(u, parseError, options)
+        return ParseResult.fail(ParseResult.type(ast, u))
       }
     },
     {
@@ -4702,6 +4672,7 @@ export const causeFromSelf = <IE, E>(
       [hooks.EquivalenceHookId]: () => Equal.equals
     }
   )
+}
 
 function causeDecode<E>(cause: CauseFrom<E>): Cause.Cause<E> {
   switch (cause._tag) {
@@ -4725,7 +4696,7 @@ function causeEncode<E>(cause: Cause.Cause<E>): CauseFrom<E> {
     case "Empty":
       return { _tag: "Empty" }
     case "Die":
-      return { _tag: "Die", defect: Cause.pretty(cause) }
+      return { _tag: "Die", defect: cause.defect }
     case "Interrupt":
       return { _tag: "Interrupt", fiberId: cause.fiberId }
     case "Fail":

@@ -64,6 +64,22 @@ describe("Cause/cause", () => {
       },
       Cause.interrupt(FiberId.composite(FiberId.runtime(1, 1000), FiberId.none))
     )
+
+    await Util.expectParseFailure(
+      schema,
+      null,
+      `Expected <anonymous type literal schema>, actual null`
+    )
+    await Util.expectParseFailure(
+      schema,
+      {},
+      `/_tag is missing`
+    )
+    await Util.expectParseFailure(
+      schema,
+      { _tag: "Parallel", left: { _tag: "Fail" }, right: { _tag: "Interrupt" } },
+      `union member: /left union member: /error is missing`
+    )
   })
 
   it("encoding", async () => {
@@ -82,7 +98,7 @@ describe("Cause/cause", () => {
     })
     await Util.expectEncodeSuccess(schema, Cause.die("fail"), {
       _tag: "Die",
-      defect: "Error: fail"
+      defect: "fail"
     })
     await Util.expectEncodeSuccess(
       schema,
@@ -105,7 +121,7 @@ describe("Cause/cause", () => {
 
     const failWithStack = S.encodeSync(schema)(Cause.die(new Error("fail")))
     assert(failWithStack._tag === "Die")
-    assert.include(failWithStack.defect, "Error: fail")
-    assert.include(failWithStack.defect, "cause.test.ts")
+    assert.include(String(failWithStack.defect), "Error: fail")
+    assert.include(String((failWithStack.defect as any).stack), "cause.test.ts")
   })
 })

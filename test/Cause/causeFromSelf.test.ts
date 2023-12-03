@@ -16,6 +16,16 @@ describe("Cause/causeFromSelf", () => {
     await Util.expectParseSuccess(schema, Cause.fail("1"), Cause.fail(1))
 
     await Util.expectParseFailure(schema, null, `Expected Cause, actual null`)
+    await Util.expectParseFailure(
+      schema,
+      Cause.fail("a"),
+      `union member: /error Expected string <-> number, actual "a"`
+    )
+    await Util.expectParseFailure(
+      schema,
+      Cause.parallel(Cause.die("error"), Cause.fail("a")),
+      `union member: /right union member: /error Expected string <-> number, actual "a"`
+    )
   })
 
   it("encoding", async () => {
