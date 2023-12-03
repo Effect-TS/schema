@@ -3410,7 +3410,7 @@ export const option = <I, A>(
 ): Schema<OptionFrom<I>, Option.Option<A>> =>
   transform(
     optionInline(value),
-    to(optionFromSelf(value)),
+    optionFromSelf(to(value)),
     (a) => a._tag === "None" ? Option.none() : Option.some(a.value),
     Option.match({
       onNone: () => ({ _tag: "None" as const }),
@@ -3425,7 +3425,7 @@ export const option = <I, A>(
 export const optionFromNullable = <I, A>(
   value: Schema<I, A>
 ): Schema<I | null, Option.Option<A>> =>
-  transform(nullable(value), to(optionFromSelf(value)), Option.fromNullable, Option.getOrNull)
+  transform(nullable(value), optionFromSelf(to(value)), Option.fromNullable, Option.getOrNull)
 
 // ---------------------------------------------
 // Either transformations
@@ -3510,7 +3510,7 @@ export const either = <IE, E, IA, A>(
 ): Schema<EitherFrom<IE, IA>, Either.Either<E, A>> =>
   transform(
     eitherInline(left, right),
-    to(eitherFromSelf(left, right)),
+    eitherFromSelf(to(left), to(right)),
     (a) => a._tag === "Left" ? Either.left(a.left) : Either.right(a.right),
     Either.match({
       onLeft: (left) => ({ _tag: "Left" as const, left }),
@@ -3593,7 +3593,7 @@ export const readonlyMap = <IK, K, IV, V>(
 ): Schema<ReadonlyArray<readonly [IK, IV]>, ReadonlyMap<K, V>> =>
   transform(
     array(tuple(key, value)),
-    to(readonlyMapFromSelf(key, value)),
+    readonlyMapFromSelf(to(key), to(value)),
     (as) => new Map(as),
     (map) => Array.from(map.entries())
   )
@@ -3654,7 +3654,7 @@ export const readonlySetFromSelf = <I, A>(
 export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, ReadonlySet<A>> =>
   transform(
     array(item),
-    to(readonlySetFromSelf(item)),
+    readonlySetFromSelf(to(item)),
     (as) => new Set(as),
     (set) => Array.from(set)
   )
@@ -4048,7 +4048,7 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk.Chunk<I>, 
 export const chunk = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, Chunk.Chunk<A>> =>
   transform(
     array(item),
-    to(chunkFromSelf(item)),
+    chunkFromSelf(to(item)),
     (as) => as.length === 0 ? Chunk.empty() : Chunk.fromIterable(as),
     Chunk.toReadonlyArray
   )
@@ -4111,7 +4111,7 @@ export const data = <
 ): Schema<I, Data.Data<A>> =>
   transform(
     item,
-    to(dataFromSelf(item)),
+    dataFromSelf(to(item)),
     toData,
     (a) => Array.isArray(a) ? Array.from(a) : Object.assign({}, a),
     { strict: false }
