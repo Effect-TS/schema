@@ -28,6 +28,7 @@ import type { Arbitrary } from "./Arbitrary.js"
 import * as ArrayFormatter from "./ArrayFormatter.js"
 import type { ParseOptions } from "./AST.js"
 import * as AST from "./AST.js"
+import * as InternalBigInt from "./internal/bigint.js"
 import * as Internal from "./internal/common.js"
 import * as hooks from "./internal/hooks.js"
 import * as Parser from "./Parser.js"
@@ -2723,7 +2724,7 @@ export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schem
         catch: () => ParseResult.parseError([ParseResult.type(ast, n)])
       }),
     (b, _, ast) => {
-      if (b > Internal.maxSafeInteger || b < Internal.minSafeInteger) {
+      if (b > InternalBigInt.maxSafeInteger || b < InternalBigInt.minSafeInteger) {
         return ParseResult.fail(ParseResult.type(ast, b))
       }
 
