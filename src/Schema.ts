@@ -2961,11 +2961,7 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
       : ParseResult.succeed(u),
   {
     [AST.IdentifierAnnotationId]: "Duration",
-    [hooks.PrettyHookId]: (): Pretty<Duration.Duration> =>
-      Duration.match({
-        onMillis: (_) => `Duration.millis(${_})`,
-        onNanos: (_) => `Duration.nanos(${_})`
-      }),
+    [hooks.PrettyHookId]: (): Pretty<Duration.Duration> => (duration) => String(duration),
     [hooks.ArbitraryHookId]: (): Arbitrary<Duration.Duration> => (fc) =>
       fc.oneof(
         fc.bigUint().map((_) => Duration.nanos(_)),
