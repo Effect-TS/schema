@@ -4596,35 +4596,6 @@ export type CauseTo<E> = {
   readonly right: CauseTo<E>
 }
 
-const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => (fc) => {
-  const fiberId = fiberIdArbitrary(fc)
-  return fc.letrec<{ cause: Cause.Cause<E> }>((tie) => ({
-    cause: fc.oneof(
-      error(fc).map((error) => Cause.fail(error)),
-      fc.string().map((_) => Cause.die(_)),
-      fc.constant(Cause.empty),
-      fiberId.map((fiberId) => Cause.interrupt(fiberId)),
-      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) => Cause.parallel(left, right)),
-      fc.tuple(tie("cause"), tie("cause")).map(([left, right]) => Cause.sequential(left, right))
-    )
-  })).cause
-}
-
-const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => {
-  if (cause._tag === "Die") {
-    return `Cause.die(${Cause.pretty(cause)})`
-  } else if (cause._tag === "Empty") {
-    return "Cause.empty"
-  } else if (cause._tag === "Fail") {
-    return `Cause.fail(${error(cause.error)})`
-  } else if (cause._tag === "Interrupt") {
-    return `Cause.interrupt(${fiberIdPretty()(cause.fiberId)})`
-  } else if (cause._tag === "Parallel") {
-    return `Cause.parallel(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
-  } else {
-    return `Cause.sequential(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
-  }
-}
 const causeInline = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseTo<E>> =>
   union(
     struct({
@@ -4682,6 +4653,31 @@ const causeTraverse = <E, E2>(
   }
 
   return ParseResult.succeed(cause)
+}
+
+const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => {
+  const placeholder = lazy<E>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => error
+  }))
+  // TODO: replace with unsafeTo
+  const arb = arbitrary.to(causeInline(placeholder))
+  return (fc) => arb(fc).map(causeDecode)
+}
+
+const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => {
+  if (cause._tag === "Die") {
+    return `Cause.die(${Cause.pretty(cause)})`
+  } else if (cause._tag === "Empty") {
+    return "Cause.empty"
+  } else if (cause._tag === "Fail") {
+    return `Cause.fail(${error(cause.error)})`
+  } else if (cause._tag === "Interrupt") {
+    return `Cause.interrupt(${fiberIdPretty()(cause.fiberId)})`
+  } else if (cause._tag === "Parallel") {
+    return `Cause.parallel(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
+  } else {
+    return `Cause.sequential(${causePretty(error)(cause.left)}, ${causePretty(error)(cause.right)})`
+  }
 }
 
 /**
