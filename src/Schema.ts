@@ -3132,7 +3132,7 @@ export const lessThanDuration = <A extends Duration.Duration>(
   self.pipe(
     filter((a): a is A => Duration.lessThan(a, max), {
       typeId: { id: LessThanDurationTypeId, params: { max } },
-      description: `a Duration less than ${max.toString()}`,
+      description: `a Duration less than ${Duration.decode(max)}`,
       ...options
     })
   )
@@ -3157,7 +3157,7 @@ export const lessThanOrEqualToDuration = <A extends Duration.Duration>(
   self.pipe(
     filter((a): a is A => Duration.lessThanOrEqualTo(a, max), {
       typeId: { id: LessThanDurationTypeId, params: { max } },
-      description: `a Duration less than or equal to ${max.toString()}`,
+      description: `a Duration less than or equal to ${Duration.decode(max)}`,
       ...options
     })
   )
@@ -3180,7 +3180,7 @@ export const greaterThanDuration = <A extends Duration.Duration>(
   self.pipe(
     filter((a): a is A => Duration.greaterThan(a, min), {
       typeId: { id: GreaterThanDurationTypeId, params: { min } },
-      description: `a Duration greater than ${min.toString()}`,
+      description: `a Duration greater than ${Duration.decode(min)}`,
       ...options
     })
   )
@@ -3205,7 +3205,7 @@ export const greaterThanOrEqualToDuration = <A extends Duration.Duration>(
   self.pipe(
     filter((a): a is A => Duration.greaterThanOrEqualTo(a, min), {
       typeId: { id: GreaterThanOrEqualToDurationTypeId, params: { min } },
-      description: `a Duration greater than or equal to ${min.toString()}`,
+      description: `a Duration greater than or equal to ${Duration.decode(min)}`,
       ...options
     })
   )
@@ -3229,7 +3229,7 @@ export const betweenDuration = <A extends Duration.Duration>(
   self.pipe(
     filter((a): a is A => Duration.between(a, { minimum, maximum }), {
       typeId: { id: BetweenDurationTypeId, params: { maximum, minimum } },
-      description: `a Duration between ${minimum.toString()} and ${maximum.toString()}`,
+      description: `a Duration between ${Duration.decode(minimum)} and ${Duration.decode(maximum)}`,
       ...options
     })
   )
