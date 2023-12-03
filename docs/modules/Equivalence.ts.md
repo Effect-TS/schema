@@ -28,7 +28,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: S.Schema<I, A>) => Equivalence.Equivalence<I>
+export declare const from: <I, A>(schema: Schema.Schema<I, A>) => Equivalence.Equivalence<I>
 ```
 
 Added in v1.0.0
@@ -38,7 +38,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(schema: S.Schema<I, A>) => Equivalence.Equivalence<A>
+export declare const to: <I, A>(schema: Schema.Schema<I, A>) => Equivalence.Equivalence<A>
 ```
 
 Added in v1.0.0

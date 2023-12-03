@@ -55,6 +55,7 @@ Added in v1.0.0
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
 - [Option transformations](#option-transformations)
+  - [OptionFrom (type alias)](#optionfrom-type-alias)
   - [option](#option)
   - [optionFromNullable](#optionfromnullable)
   - [optionFromSelf](#optionfromself)
@@ -765,14 +766,29 @@ Added in v1.0.0
 
 # Option transformations
 
+## OptionFrom (type alias)
+
+**Signature**
+
+```ts
+export type OptionFrom<I> =
+  | {
+      readonly _tag: "None"
+    }
+  | {
+      readonly _tag: "Some"
+      readonly value: I
+    }
+```
+
+Added in v1.0.0
+
 ## option
 
 **Signature**
 
 ```ts
-export declare const option: <I, A>(
-  value: Schema<I, A>
-) => Schema<{ readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I }, Option.Option<A>>
+export declare const option: <I, A>(value: Schema<I, A>) => Schema<OptionFrom<I>, Option.Option<A>>
 ```
 
 Added in v1.0.0

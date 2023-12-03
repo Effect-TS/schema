@@ -3351,7 +3351,18 @@ const optionPretty = <A>(value: Pretty<A>): Pretty<Option.Option<A>> =>
     onSome: (a) => `some(${value(a)})`
   })
 
-const optionInline = <I, A>(value: Schema<I, A>) =>
+/**
+ * @category Option transformations
+ * @since 1.0.0
+ */
+export type OptionFrom<I> = {
+  readonly _tag: "None"
+} | {
+  readonly _tag: "Some"
+  readonly value: I
+}
+
+const optionInline = <I, A>(value: Schema<I, A>): Schema<OptionFrom<I>, OptionFrom<A>> =>
   union(
     struct({
       _tag: literal("None")
@@ -3396,10 +3407,7 @@ export const optionFromSelf = <I, A>(
  */
 export const option = <I, A>(
   value: Schema<I, A>
-): Schema<
-  { readonly _tag: "None" } | { readonly _tag: "Some"; readonly value: I },
-  Option.Option<A>
-> =>
+): Schema<OptionFrom<I>, Option.Option<A>> =>
   transform(
     optionInline(value),
     to(optionFromSelf(value)),
