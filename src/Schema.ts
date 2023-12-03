@@ -3443,7 +3443,22 @@ const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either.Ei
     onRight: (a) => `right(${right(a)})`
   })
 
-const eitherInline = <IE, E, IA, A>(left: Schema<IE, E>, right: Schema<IA, A>) =>
+/**
+ * @category Either transformations
+ * @since 1.0.0
+ */
+export type EitherFrom<IE, IA> = {
+  readonly _tag: "Left"
+  readonly left: IE
+} | {
+  readonly _tag: "Right"
+  readonly right: IA
+}
+
+const eitherInline = <IE, E, IA, A>(
+  left: Schema<IE, E>,
+  right: Schema<IA, A>
+): Schema<EitherFrom<IE, IA>, EitherFrom<E, A>> =>
   union(
     struct({
       _tag: literal("Left"),
@@ -3492,10 +3507,7 @@ export const eitherFromSelf = <IE, E, IA, A>(
 export const either = <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
-): Schema<
-  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
-  Either.Either<E, A>
-> =>
+): Schema<EitherFrom<IE, IA>, Either.Either<E, A>> =>
   transform(
     eitherInline(left, right),
     to(eitherFromSelf(left, right)),

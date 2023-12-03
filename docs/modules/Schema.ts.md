@@ -52,6 +52,7 @@ Added in v1.0.0
 - [Duration transformations](#duration-transformations)
   - [durationFromHrTime](#durationfromhrtime)
 - [Either transformations](#either-transformations)
+  - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
 - [Option transformations](#option-transformations)
@@ -735,6 +736,24 @@ Added in v1.0.0
 
 # Either transformations
 
+## EitherFrom (type alias)
+
+**Signature**
+
+```ts
+export type EitherFrom<IE, IA> =
+  | {
+      readonly _tag: "Left"
+      readonly left: IE
+    }
+  | {
+      readonly _tag: "Right"
+      readonly right: IA
+    }
+```
+
+Added in v1.0.0
+
 ## either
 
 **Signature**
@@ -743,10 +762,7 @@ Added in v1.0.0
 export declare const either: <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
-) => Schema<
-  { readonly _tag: "Left"; readonly left: IE } | { readonly _tag: "Right"; readonly right: IA },
-  Either.Either<E, A>
->
+) => Schema<EitherFrom<IE, IA>, Either.Either<E, A>>
 ```
 
 Added in v1.0.0
