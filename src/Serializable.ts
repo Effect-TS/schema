@@ -66,7 +66,7 @@ export const successSchema = <IE, E, IA, A>(
 ): Schema.Schema<IA, A> => self[symbolResult].Success
 
 const exitSchemaCache = globalValue(
-  "@effect/schema/Serializabl/exitSchemaCache",
+  "@effect/schema/Serializable/exitSchemaCache",
   () => new WeakMap<object, Schema.Schema<any, any>>()
 )
 
