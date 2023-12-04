@@ -4589,11 +4589,14 @@ export type CauseFrom<E> =
     readonly right: CauseFrom<E>
   }
 
-const causeFrom = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseFrom<E>> =>
+const causeFrom = <EI, E>(
+  error: Schema<EI, E>,
+  defect: Schema<unknown, unknown>
+): Schema<CauseFrom<EI>, CauseFrom<E>> =>
   union(
     struct({
       _tag: literal("Die"),
-      defect: unknown
+      defect
     }),
     struct({
       _tag: literal("Empty")
@@ -4608,21 +4611,21 @@ const causeFrom = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, CauseFrom
     }),
     struct({
       _tag: literal("Parallel"),
-      left: lazy(() => causeFrom(error)),
-      right: lazy(() => causeFrom(error))
+      left: lazy(() => causeFrom(error, defect)),
+      right: lazy(() => causeFrom(error, defect))
     }),
     struct({
       _tag: literal("Sequential"),
-      left: lazy(() => causeFrom(error)),
-      right: lazy(() => causeFrom(error))
+      left: lazy(() => causeFrom(error, defect)),
+      right: lazy(() => causeFrom(error, defect))
     })
   )
 
 const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => {
-  const placeholder = lazy<E>(() => any).pipe(annotations({
+  const placeholderError = lazy<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => error
   }))
-  const arb = arbitrary.unsafeTo(causeFrom(placeholder))
+  const arb = arbitrary.unsafeTo(causeFrom(placeholderError, unknown))
   return (fc) => arb(fc).map(causeDecode)
 }
 
@@ -4651,13 +4654,16 @@ const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => 
  * @since 1.0.0
  */
 export const causeFromSelf = <IE, E>(
-  error: Schema<IE, E>
+  error: Schema<IE, E>,
+  defect: Schema<unknown, unknown> = unknown
 ): Schema<Cause.Cause<IE>, Cause.Cause<E>> => {
   return declare(
     [error],
-    causeFrom(error),
+    causeFrom(error, defect),
     (isDecoding, error) => {
-      const parse = isDecoding ? Parser.parse(causeFrom(error)) : Parser.encode(causeFrom(error))
+      const parse = isDecoding
+        ? Parser.parse(causeFrom(error, defect))
+        : Parser.encode(causeFrom(error, defect))
       return (u, options, ast) => {
         if (Cause.isCause(u)) {
           return ParseResult.map(parse(causeEncode(u), options), causeDecode)
@@ -4716,14 +4722,29 @@ function causeEncode<E>(cause: Cause.Cause<E>): CauseFrom<E> {
   }
 }
 
+const causeDefectPretty: Schema<unknown, unknown> = transform(
+  unknown,
+  unknown,
+  identity,
+  (defect) => {
+    if (Predicate.isObject(defect)) {
+      return Cause.pretty(Cause.die(defect))
+    }
+    return String(defect)
+  }
+)
+
 /**
  * @category Cause
  * @since 1.0.0
  */
-export const cause = <EI, E>(error: Schema<EI, E>): Schema<CauseFrom<EI>, Cause.Cause<E>> =>
+export const cause = <EI, E>(
+  error: Schema<EI, E>,
+  defect: Schema<unknown, unknown> = causeDefectPretty
+): Schema<CauseFrom<EI>, Cause.Cause<E>> =>
   transform(
-    causeFrom(error),
-    causeFromSelf(to(error)),
+    causeFrom(error, defect),
+    causeFromSelf(to(error), defect),
     causeDecode,
     causeEncode
   )
@@ -4748,12 +4769,13 @@ export type ExitFrom<E, A> =
 
 const exitFrom = <EI, E, AI, A>(
   error: Schema<EI, E>,
-  value: Schema<AI, A>
+  value: Schema<AI, A>,
+  defect: Schema<unknown, unknown>
 ): Schema<ExitFrom<EI, AI>, ExitFrom<E, A>> =>
   union(
     struct({
       _tag: literal("Failure"),
-      cause: causeFrom(error)
+      cause: causeFrom(error, defect)
     }),
     struct({
       _tag: literal("Success"),
@@ -4780,7 +4802,7 @@ const exitArbitrary = <E, A>(
   const placeholderValue = lazy<A>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => value
   }))
-  const arb = arbitrary.unsafeTo(exitFrom(placeholderError, placeholderValue))
+  const arb = arbitrary.unsafeTo(exitFrom(placeholderError, placeholderValue, unknown))
   return (fc) => arb(fc).map(exitDecode)
 }
 
@@ -4795,15 +4817,16 @@ const exitPretty = <E, A>(error: Pretty<E>, value: Pretty<A>): Pretty<Exit.Exit<
  */
 export const exitFromSelf = <IE, E, IA, A>(
   error: Schema<IE, E>,
-  value: Schema<IA, A>
+  value: Schema<IA, A>,
+  defect: Schema<unknown, unknown> = unknown
 ): Schema<Exit.Exit<IE, IA>, Exit.Exit<E, A>> =>
   declare(
     [error, value],
-    exitFrom(error, value),
+    exitFrom(error, value, defect),
     (isDecoding, error, value) => {
       const parseCause = isDecoding
-        ? Parser.parse(causeFromSelf(error))
-        : Parser.encode(causeFromSelf(error))
+        ? Parser.parse(causeFromSelf(error, defect))
+        : Parser.encode(causeFromSelf(error, defect))
       const parseValue = isDecoding ? Parser.parse(value) : Parser.encode(value)
       return (u, options, ast) =>
         !Exit.isExit(u) ?
@@ -4826,11 +4849,12 @@ export const exitFromSelf = <IE, E, IA, A>(
  */
 export const exit = <IE, E, IA, A>(
   error: Schema<IE, E>,
-  value: Schema<IA, A>
+  value: Schema<IA, A>,
+  defect: Schema<unknown, unknown> = causeDefectPretty
 ): Schema<ExitFrom<IE, IA>, Exit.Exit<E, A>> =>
   transform(
-    exitFrom(error, value),
-    exitFromSelf(to(error), to(value)),
+    exitFrom(error, value, defect),
+    exitFromSelf(to(error), to(value), defect),
     exitDecode,
     (exit) =>
       exit._tag === "Failure"

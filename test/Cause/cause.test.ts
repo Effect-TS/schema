@@ -5,7 +5,7 @@ import { assert, describe, it } from "vitest"
 
 describe("Cause/cause", () => {
   it("property tests", () => {
-    Util.roundtrip(S.cause(S.NumberFromString))
+    Util.roundtrip(S.cause(S.NumberFromString, S.unknown))
   })
 
   it("decoding", async () => {
@@ -84,6 +84,8 @@ describe("Cause/cause", () => {
 
   it("encoding", async () => {
     const schema = S.cause(S.NumberFromString)
+    const schemaUnknown = S.cause(S.NumberFromString, S.unknown)
+
     await Util.expectEncodeSuccess(schema, Cause.fail(1), { _tag: "Fail", error: "1" })
     await Util.expectEncodeSuccess(schema, Cause.empty, { _tag: "Empty" })
     await Util.expectEncodeSuccess(schema, Cause.parallel(Cause.fail(1), Cause.empty), {
@@ -119,9 +121,14 @@ describe("Cause/cause", () => {
       }
     )
 
-    const failWithStack = S.encodeSync(schema)(Cause.die(new Error("fail")))
+    let failWithStack = S.encodeSync(schema)(Cause.die(new Error("fail")))
     assert(failWithStack._tag === "Die")
-    assert.include(String(failWithStack.defect), "Error: fail")
-    assert.include(String((failWithStack.defect as any).stack), "cause.test.ts")
+    assert.include(failWithStack.defect, "Error: fail")
+    assert.include(failWithStack.defect, "cause.test.ts")
+
+    failWithStack = S.encodeSync(schemaUnknown)(Cause.die(new Error("fail")))
+    assert(failWithStack._tag === "Die")
+    assert.strictEqual((failWithStack.defect as any).message, "fail")
+    assert.include((failWithStack.defect as any).stack, "cause.test.ts")
   })
 })
