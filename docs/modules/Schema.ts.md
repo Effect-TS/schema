@@ -616,7 +616,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const cause: <EI, E>(error: Schema<EI, E>) => Schema<CauseFrom<EI>, Cause.Cause<E>>
+export declare const cause: <EI, E>(
+  error: Schema<EI, E>,
+  defect?: Schema<unknown, unknown>
+) => Schema<CauseFrom<EI>, Cause.Cause<E>>
 ```
 
 Added in v1.0.0
@@ -626,7 +629,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const causeFromSelf: <IE, E>(error: Schema<IE, E>) => Schema<Cause.Cause<IE>, Cause.Cause<E>>
+export declare const causeFromSelf: <IE, E>(
+  error: Schema<IE, E>,
+  defect?: Schema<unknown, unknown>
+) => Schema<Cause.Cause<IE>, Cause.Cause<E>>
 ```
 
 Added in v1.0.0
@@ -876,7 +882,8 @@ Added in v1.0.0
 ```ts
 export declare const exit: <IE, E, IA, A>(
   error: Schema<IE, E>,
-  value: Schema<IA, A>
+  value: Schema<IA, A>,
+  defect?: Schema<unknown, unknown>
 ) => Schema<ExitFrom<IE, IA>, Exit.Exit<E, A>>
 ```
 
@@ -889,7 +896,8 @@ Added in v1.0.0
 ```ts
 export declare const exitFromSelf: <IE, E, IA, A>(
   error: Schema<IE, E>,
-  value: Schema<IA, A>
+  value: Schema<IA, A>,
+  defect?: Schema<unknown, unknown>
 ) => Schema<Exit.Exit<IE, IA>, Exit.Exit<E, A>>
 ```
 
