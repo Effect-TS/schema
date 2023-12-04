@@ -198,6 +198,11 @@ For instance, with the `Person` schema we defined earlier, you can extract the i
 ```ts
 import * as S from "@effect/schema/Schema";
 
+const Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
+
 interface Person extends S.Schema.To<typeof Person> {}
 /*
 Equivalent to:
@@ -208,7 +213,33 @@ interface Person {
 */
 ```
 
+In this example, we use `interface` instead of `type`:
+
+```ts
+type Person = S.Schema.To<typeof Person>;
+```
+
+to create an opaque type.
+
 In cases where `I` differs from `A`, you can also extract the inferred `I` type using `Schema.From`.
+
+To create a schema with an opaque type, you can use the following technique that re-declares the schema:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+const _Person = S.struct({
+  name: S.string,
+  age: S.number,
+});
+
+interface Person extends S.Schema.To<typeof Person> {}
+
+// Re-declare the schema to create a schema with an opaque type
+const Person: Schema.Schema<Person> = Person_;
+```
+
+Alternatively, you can use `Schema.Class` (see the [Class](#classes) section below for more details).
 
 ## Parsing
 
