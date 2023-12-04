@@ -4621,11 +4621,17 @@ const causeFrom = <EI, E>(
     })
   )
 
-const causeArbitrary = <E>(error: Arbitrary<E>): Arbitrary<Cause.Cause<E>> => {
+const causeArbitrary = <E>(
+  error: Arbitrary<E>,
+  defect: Arbitrary<unknown>
+): Arbitrary<Cause.Cause<E>> => {
   const placeholderError = lazy<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => error
   }))
-  const arb = arbitrary.unsafeTo(causeFrom(placeholderError, unknown))
+  const placeholderDefect = lazy<unknown>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => defect
+  }))
+  const arb = arbitrary.unsafeTo(causeFrom(placeholderError, placeholderDefect))
   return (fc) => arb(fc).map(causeDecode)
 }
 
@@ -4658,7 +4664,7 @@ export const causeFromSelf = <IE, E>(
   defect: Schema<unknown, unknown> = unknown
 ): Schema<Cause.Cause<IE>, Cause.Cause<E>> => {
   return declare(
-    [error],
+    [error, defect],
     causeFrom(error, defect),
     (isDecoding, error) => {
       const parse = isDecoding
@@ -4744,7 +4750,7 @@ export const cause = <EI, E>(
 ): Schema<CauseFrom<EI>, Cause.Cause<E>> =>
   transform(
     causeFrom(error, defect),
-    causeFromSelf(to(error), defect),
+    causeFromSelf(to(error), to(defect)),
     causeDecode,
     causeEncode
   )
@@ -4794,7 +4800,8 @@ const exitDecode = <E, A>(input: ExitFrom<E, A>): Exit.Exit<E, A> => {
 
 const exitArbitrary = <E, A>(
   error: Arbitrary<E>,
-  value: Arbitrary<A>
+  value: Arbitrary<A>,
+  defect: Arbitrary<unknown>
 ): Arbitrary<Exit.Exit<E, A>> => {
   const placeholderError = lazy<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => error
@@ -4802,7 +4809,10 @@ const exitArbitrary = <E, A>(
   const placeholderValue = lazy<A>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => value
   }))
-  const arb = arbitrary.unsafeTo(exitFrom(placeholderError, placeholderValue, unknown))
+  const placeholderDefect = lazy<unknown>(() => any).pipe(annotations({
+    [hooks.ArbitraryHookId]: () => defect
+  }))
+  const arb = arbitrary.unsafeTo(exitFrom(placeholderError, placeholderValue, placeholderDefect))
   return (fc) => arb(fc).map(exitDecode)
 }
 
@@ -4821,7 +4831,7 @@ export const exitFromSelf = <IE, E, IA, A>(
   defect: Schema<unknown, unknown> = unknown
 ): Schema<Exit.Exit<IE, IA>, Exit.Exit<E, A>> =>
   declare(
-    [error, value],
+    [error, value, defect],
     exitFrom(error, value, defect),
     (isDecoding, error, value) => {
       const parseCause = isDecoding
@@ -4854,7 +4864,7 @@ export const exit = <IE, E, IA, A>(
 ): Schema<ExitFrom<IE, IA>, Exit.Exit<E, A>> =>
   transform(
     exitFrom(error, value, defect),
-    exitFromSelf(to(error), to(value), defect),
+    exitFromSelf(to(error), to(value), to(defect)),
     exitDecode,
     (exit) =>
       exit._tag === "Failure"
