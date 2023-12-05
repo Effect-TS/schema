@@ -905,7 +905,43 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 
 ## Filters
 
-**Note**. Please note that the use of filters do not alter the type of the `Schema`. They only serve to add additional constraints to the parsing process.
+`@effect/schema/Schema` lets you provide custom validation logic via _filters_.
+
+You can define a custom validation check on any schema with `filter`:
+
+```ts
+import * as S from "@effect/schema/Schema";
+
+const LongString = S.string.pipe(
+  S.filter((s) => s.length >= 10, {
+    message: () => "a string at least 10 characters long",
+  })
+);
+
+console.log(S.parseSync(LongString)("a"));
+/*
+throws:
+error(s) found
+└─ a string at least 10 characters long
+*/
+```
+
+It is good practice to add as much metadata as possible so that it can be used later by introspecting the schema.
+
+```ts
+const LongString = S.string.pipe(
+  S.filter((s) => s.length >= 10, {
+    message: () => "a string at least 10 characters long",
+    identifier: "LongString",
+    jsonSchema: { minLength: 10 },
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+  })
+);
+```
+
+> [!WARNING]
+> Please note that the use of filters do not alter the type of the `Schema`. They only serve to add additional constraints to the parsing process.
 
 ### String filters
 
@@ -2453,41 +2489,6 @@ parse([
   [2, "b"],
   [3, "c"],
 ]); // new Map([[1, "a"], [2, "b"], [3, "c"]])
-```
-
-# Adding new data types
-
-The easiest way to define a new data type is through the `filter` combinator.
-
-```ts
-import * as S from "@effect/schema/Schema";
-
-const LongString = S.string.pipe(
-  S.filter((s) => s.length >= 10, {
-    message: () => "a string at least 10 characters long",
-  })
-);
-
-console.log(S.parseSync(LongString)("a"));
-/*
-throws:
-error(s) found
-└─ a string at least 10 characters long
-*/
-```
-
-It is good practice to add as much metadata as possible so that it can be used later by introspecting the schema.
-
-```ts
-const LongString = S.string.pipe(
-  S.filter((s) => s.length >= 10, {
-    message: () => "a string at least 10 characters long",
-    identifier: "LongString",
-    jsonSchema: { minLength: 10 },
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
-  })
-);
 ```
 
 # Technical overview
