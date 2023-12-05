@@ -1673,6 +1673,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
+export declare function filter<A>(
+  f: (a: A, options: ParseOptions, self: AST.AST) => Option.Option<ParseResult.ParseError>,
+  options?: FilterAnnotations<A>
+): <I>(self: Schema<I, A>) => Schema<I, A>
 export declare function filter<C extends A, B extends A, A = C>(
   refinement: Predicate.Refinement<A, B>,
   options?: FilterAnnotations<A>
