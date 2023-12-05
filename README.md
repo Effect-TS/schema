@@ -905,9 +905,9 @@ S.templateLiteral(S.union(EmailLocaleIDs, FooterLocaleIDs), S.literal("_id"));
 
 ## Filters
 
-`@effect/schema/Schema` lets you provide custom validation logic via _filters_.
+In the `@effect/schema/Schema` library, you can apply custom validation logic using _filters_.
 
-You can define a custom validation check on any schema with `filter`:
+You can define a custom validation check on any schema using the `filter` function. Here's a simple example:
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -926,7 +926,7 @@ error(s) found
 */
 ```
 
-It is good practice to add as much metadata as possible so that it can be used later by introspecting the schema.
+It's recommended to include as much metadata as possible for later introspection of the schema, such as an identifier, JSON schema representation, and a description:
 
 ```ts
 const LongString = S.string.pipe(
@@ -938,6 +938,39 @@ const LongString = S.string.pipe(
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
   })
 );
+```
+
+For more complex scenarios, you can return an `Option<ParseError>` type instead of a boolean. In this context, `None` indicates success, and `Some(error)` rejects the input with a specific error. Here's an example:
+
+```ts
+import * as ParseResult from "@effect/schema/ParseResult";
+import * as S from "@effect/schema/Schema";
+
+const schema = S.struct({ a: S.string, b: S.string }).pipe(
+  S.filter((o) =>
+    o.b === o.a
+      ? Option.none()
+      : Option.some(
+          ParseResult.parseError([
+            ParseResult.key("b", [
+              ParseResult.type(
+                S.literal(o.a).ast,
+                o.b,
+                `should be equal to a's value ("${o.a}")`
+              ),
+            ]),
+          ])
+        )
+  )
+);
+
+console.log(S.parseSync(schema)({ a: "a", b: "b" }));
+/*
+throws:
+error(s) found
+└─ ["b"]
+   └─ should be equal to a's value ("a")
+*/
 ```
 
 > [!WARNING]
