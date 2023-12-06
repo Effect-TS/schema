@@ -774,12 +774,10 @@ interface Category {
   readonly categories: ReadonlyArray<Category>;
 }
 
-const schema: S.Schema<Category> = S.lazy<Category>(() =>
-  S.struct({
-    name: S.string,
-    categories: S.array(schema),
-  })
-).pipe(S.identifier("Category"));
+const schema: S.Schema<Category> = S.struct({
+  name: S.string,
+  categories: S.array(S.suspend(() => schema).pipe(S.identifier("Category"))),
+});
 
 const jsonSchema = JSONSchema.to(schema);
 
@@ -816,7 +814,7 @@ Output:
 */
 ```
 
-In the example above, we define a schema for a "Category" that can contain a "name" (a string) and an array of nested "categories." To support recursive definitions, we use the `S.lazy` function and identifier annotations to name our schema.
+In the example above, we define a schema for a "Category" that can contain a "name" (a string) and an array of nested "categories." To support recursive definitions, we use the `S.suspend` function and identifier annotations to name our schema.
 
 This ensures that the JSON Schema properly handles the recursive structure and creates distinct definitions for each annotated schema, improving readability and maintainability.
 
@@ -1545,7 +1543,7 @@ The class constructor itself is a Schema, and can be assigned/provided anywhere 
 
 ```ts
 // $ExpectType Schema<{ readonly id: number; name: string; }, Person>
-S.lazy(() => Person);
+S.suspend(() => Person);
 
 // $ExpectType Schema<{ readonly id: number; name: string; }, { readonly id: number; name: string; }>
 Person.struct;
@@ -1827,7 +1825,7 @@ S.instanceOf(Test);
 
 ## Recursive types
 
-The `lazy` combinator is useful when you need to define a `Schema` that depends on itself, like in the case of recursive data structures. In this example, the `Category` schema depends on itself because it has a field `subcategories` that is an array of `Category` objects.
+The `suspend` combinator is useful when you need to define a `Schema` that depends on itself, like in the case of recursive data structures. In this example, the `Category` schema depends on itself because it has a field `subcategories` that is an array of `Category` objects.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -1837,12 +1835,10 @@ interface Category {
   readonly subcategories: ReadonlyArray<Category>;
 }
 
-const Category: S.Schema<Category> = S.lazy(() =>
-  S.struct({
-    name: S.string,
-    subcategories: S.array(Category),
-  })
-);
+const Category: S.Schema<Category> = S.struct({
+  name: S.string,
+  subcategories: S.array(S.suspend(() => Category)),
+});
 ```
 
 Here's an example of two mutually recursive schemas, `Expression` and `Operation`, that represent a simple arithmetic expression tree.
@@ -1862,21 +1858,20 @@ interface Operation {
   readonly right: Expression;
 }
 
-const Expression: S.Schema<Expression> = S.lazy(() =>
-  S.struct({
-    type: S.literal("expression"),
-    value: S.union(S.number, Operation),
-  })
-);
+const Expression: S.Schema<Expression> = S.struct({
+  type: S.literal("expression"),
+  value: S.union(
+    S.number,
+    S.suspend(() => Operation)
+  ),
+});
 
-const Operation: S.Schema<Operation> = S.lazy(() =>
-  S.struct({
-    type: S.literal("operation"),
-    operator: S.union(S.literal("+"), S.literal("-")),
-    left: Expression,
-    right: Expression,
-  })
-);
+const Operation: S.Schema<Operation> = S.struct({
+  type: S.literal("operation"),
+  operator: S.union(S.literal("+"), S.literal("-")),
+  left: S.suspend(() => Expression),
+  right: S.suspend(() => Expression),
+});
 ```
 
 ## Transformations
