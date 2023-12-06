@@ -1869,8 +1869,8 @@ const Expression: S.Schema<Expression> = S.struct({
 const Operation: S.Schema<Operation> = S.struct({
   type: S.literal("operation"),
   operator: S.union(S.literal("+"), S.literal("-")),
-  left: S.suspend(() => Expression),
-  right: S.suspend(() => Expression),
+  left: Expression,
+  right: Expression,
 });
 ```
 

@@ -9,12 +9,10 @@ describe("Schema/suspend", () => {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: S.Schema<A> = S.suspend(() =>
-        S.struct({
-          a: S.string,
-          as: S.array(schema)
-        })
-      )
+      const schema: S.Schema<A> = S.struct({
+        a: S.string,
+        as: S.array(S.suspend(() => schema))
+      })
 
       await Util.expectParseSuccess(schema, { a: "a1", as: [] })
       await Util.expectParseSuccess(schema, { a: "a1", as: [{ a: "a2", as: [] }] })
@@ -49,21 +47,17 @@ describe("Schema/suspend", () => {
         readonly right: Expression
       }
 
-      const Expression: S.Schema<Expression> = S.suspend(() =>
-        S.struct({
-          type: S.literal("expression"),
-          value: S.union(S.number, Operation)
-        })
-      )
+      const Expression: S.Schema<Expression> = S.struct({
+        type: S.literal("expression"),
+        value: S.union(S.number, S.suspend(() => Operation))
+      })
 
-      const Operation: S.Schema<Operation> = S.suspend(() =>
-        S.struct({
-          type: S.literal("operation"),
-          operator: S.union(S.literal("+"), S.literal("-")),
-          left: Expression,
-          right: Expression
-        })
-      )
+      const Operation: S.Schema<Operation> = S.struct({
+        type: S.literal("operation"),
+        operator: S.union(S.literal("+"), S.literal("-")),
+        left: Expression,
+        right: Expression
+      })
 
       const input = {
         type: "operation",
@@ -106,12 +100,10 @@ describe("Schema/suspend", () => {
         readonly a: string
         readonly as: ReadonlyArray<FromA>
       }
-      const schema: S.Schema<FromA, A> = S.suspend<FromA, A>(() =>
-        S.struct({
-          a: NumberFromChar,
-          as: S.array(schema)
-        })
-      )
+      const schema: S.Schema<FromA, A> = S.struct({
+        a: NumberFromChar,
+        as: S.array(S.suspend(() => schema))
+      })
       await Util.expectEncodeSuccess(schema, { a: 1, as: [] }, { a: "1", as: [] })
       await Util.expectEncodeSuccess(schema, { a: 1, as: [{ a: 2, as: [] }] }, {
         a: "1",

@@ -1044,12 +1044,10 @@ describe("JSONSchema", () => {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: Schema.Schema<A> = Schema.suspend<A>(() =>
-        Schema.struct({
-          a: Schema.string,
-          as: Schema.array(schema)
-        })
-      )
+      const schema: Schema.Schema<A> = Schema.struct({
+        a: Schema.string,
+        as: Schema.array(Schema.suspend(() => schema))
+      })
       expect(() => JSONSchema.to(schema)).toThrow(
         new Error(
           "Generating a JSON Schema for suspended schemas requires an identifier annotation"
@@ -1062,7 +1060,7 @@ describe("JSONSchema", () => {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: Schema.Schema<A> = Schema.suspend<A>(() =>
+      const schema: Schema.Schema<A> = Schema.suspend(() =>
         Schema.struct({
           a: Schema.string,
           as: Schema.array(schema)

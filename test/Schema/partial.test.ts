@@ -89,10 +89,11 @@ describe("Schema/partial", () => {
     interface A {
       readonly a?: null | A
     }
-    const schema: S.Schema<A> = S.partial(S.suspend(() =>
-      S.struct({
-        a: S.union(S.null, schema)
-      })
+    const schema: S.Schema<A> = S.partial(S.suspend( // intended outer suspend
+      () =>
+        S.struct({
+          a: S.union(S.null, schema)
+        })
     ))
     await Util.expectParseSuccess(schema, {})
     await Util.expectParseSuccess(schema, { a: null })

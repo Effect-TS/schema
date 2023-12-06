@@ -34,10 +34,11 @@ describe("Schema/to", () => {
     interface A {
       prop: A | number
     }
-    const schema: S.Schema<I, A> = S.suspend(() =>
-      S.struct({
-        prop: S.union(S.NumberFromString, schema)
-      })
+    const schema: S.Schema<I, A> = S.suspend( // intended outer suspend
+      () =>
+        S.struct({
+          prop: S.union(S.NumberFromString, schema)
+        })
     )
     const to = S.to(schema)
     await Util.expectParseSuccess(to, { prop: 1 })

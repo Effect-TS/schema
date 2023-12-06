@@ -564,12 +564,11 @@ describe("Equivalence", () => {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: S.Schema<A> = S.suspend<A>(() =>
-        S.struct({
-          a: string,
-          as: S.array(schema)
-        })
-      ).pipe(S.identifier("A"))
+      const schema: S.Schema<A> = S.struct({
+        a: string,
+        as: S.array(S.suspend(() => schema))
+      })
+
       const equivalence = E.to(schema)
 
       const a1: A = { a: "a1", as: [] }
@@ -599,21 +598,17 @@ describe("Equivalence", () => {
         readonly right: Expression
       }
 
-      const Expression: S.Schema<Expression> = S.suspend(() =>
-        S.struct({
-          type: S.literal("expression"),
-          value: S.union(number, Operation)
-        })
-      ).pipe(S.identifier("Expression"))
+      const Expression: S.Schema<Expression> = S.struct({
+        type: S.literal("expression"),
+        value: S.union(number, S.suspend(() => Operation))
+      })
 
-      const Operation: S.Schema<Operation> = S.suspend(() =>
-        S.struct({
-          type: S.literal("operation"),
-          operator: S.union(S.literal("+"), S.literal("-")),
-          left: Expression,
-          right: Expression
-        })
-      ).pipe(S.identifier("Operation"))
+      const Operation: S.Schema<Operation> = S.struct({
+        type: S.literal("operation"),
+        operator: S.union(S.literal("+"), S.literal("-")),
+        left: Expression,
+        right: Expression
+      })
 
       const equivalence = E.to(Operation)
 

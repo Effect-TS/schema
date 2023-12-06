@@ -51,8 +51,10 @@ describe("Schema/mutable", () => {
   })
 
   it("suspend", () => {
-    const schema = S.mutable(S.suspend(() => S.array(S.string)))
-    if (AST.isLazy(schema.ast)) {
+    const schema = S.mutable(S.suspend( // intended outer suspend
+      () => S.array(S.string)
+    ))
+    if (AST.isSuspend(schema.ast)) {
       expect(schema.ast.f()).toEqual(
         AST.createTuple([], Option.some([S.string.ast]), false)
       )

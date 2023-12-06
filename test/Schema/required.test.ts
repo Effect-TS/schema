@@ -95,10 +95,11 @@ describe("Schema/required", () => {
     interface A {
       readonly a: null | A
     }
-    const schema: S.Schema<A> = S.required(S.suspend(() =>
-      S.struct({
-        a: S.optional(S.union(S.null, schema))
-      })
+    const schema: S.Schema<A> = S.required(S.suspend( // intended outer suspend
+      () =>
+        S.struct({
+          a: S.optional(S.union(S.null, schema))
+        })
     ))
     await Util.expectParseSuccess(schema, { a: null })
     await Util.expectParseSuccess(schema, { a: { a: null } })

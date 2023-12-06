@@ -10,14 +10,22 @@ describe("Schema/from", () => {
     interface A {
       prop: A | number
     }
-    const schema: S.Schema<I, A> = S.suspend(() =>
-      S.struct({
-        prop: S.union(S.NumberFromString, schema)
-      })
+    const schema1: S.Schema<I, A> = S.struct({
+      prop: S.union(S.NumberFromString, S.suspend(() => schema1))
+    })
+    const from1 = S.from(schema1)
+    await Util.expectParseSuccess(from1, { prop: "a" })
+    await Util.expectParseSuccess(from1, { prop: { prop: "a" } })
+
+    const schema2: S.Schema<I, A> = S.suspend( // intended outer suspend
+      () =>
+        S.struct({
+          prop: S.union(S.NumberFromString, schema1)
+        })
     )
-    const from = S.from(schema)
-    await Util.expectParseSuccess(from, { prop: "a" })
-    await Util.expectParseSuccess(from, { prop: { prop: "a" } })
+    const from2 = S.from(schema2)
+    await Util.expectParseSuccess(from2, { prop: "a" })
+    await Util.expectParseSuccess(from2, { prop: { prop: "a" } })
   })
 
   it("decoding", async () => {

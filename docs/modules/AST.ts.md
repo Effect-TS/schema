@@ -81,13 +81,13 @@ Added in v1.0.0
   - [isBooleanKeyword](#isbooleankeyword)
   - [isDeclaration](#isdeclaration)
   - [isEnums](#isenums)
-  - [isLazy](#islazy)
   - [isLiteral](#isliteral)
   - [isNeverKeyword](#isneverkeyword)
   - [isNumberKeyword](#isnumberkeyword)
   - [isObjectKeyword](#isobjectkeyword)
   - [isRefinement](#isrefinement)
   - [isStringKeyword](#isstringkeyword)
+  - [isSuspend](#issuspend)
   - [isSymbolKeyword](#issymbolkeyword)
   - [isTemplateLiteral](#istemplateliteral)
   - [isTransform](#istransform)
@@ -864,16 +864,6 @@ export declare const isEnums: (ast: AST) => ast is Enums
 
 Added in v1.0.0
 
-## isLazy
-
-**Signature**
-
-```ts
-export declare const isLazy: (ast: AST) => ast is Suspend
-```
-
-Added in v1.0.0
-
 ## isLiteral
 
 **Signature**
@@ -930,6 +920,16 @@ Added in v1.0.0
 
 ```ts
 export declare const isStringKeyword: (ast: AST) => ast is StringKeyword
+```
+
+Added in v1.0.0
+
+## isSuspend
+
+**Signature**
+
+```ts
+export declare const isSuspend: (ast: AST) => ast is Suspend
 ```
 
 Added in v1.0.0

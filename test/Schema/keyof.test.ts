@@ -47,11 +47,12 @@ describe("Schema/keyof", () => {
       readonly name: string
       readonly categories: ReadonlyArray<Category>
     }
-    const schema: S.Schema<Category> = S.suspend<Category>(() =>
-      S.struct({
-        name: S.string,
-        categories: S.array(schema)
-      })
+    const schema: S.Schema<Category> = S.suspend( // intended outer suspend
+      () =>
+        S.struct({
+          name: S.string,
+          categories: S.array(schema)
+        })
     )
     expect(AST.keyof(schema.ast)).toEqual(S.literal("name", "categories").ast)
   })

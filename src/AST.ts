@@ -924,7 +924,7 @@ export const createSuspend = (
  * @category guards
  * @since 1.0.0
  */
-export const isLazy = (ast: AST): ast is Suspend => ast._tag === "Suspend"
+export const isSuspend = (ast: AST): ast is Suspend => ast._tag === "Suspend"
 
 /**
  * @category model

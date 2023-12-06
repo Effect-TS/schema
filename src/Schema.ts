@@ -4667,8 +4667,8 @@ export type CauseFrom<E> =
 const causeFrom = <EI, E>(
   error: Schema<EI, E>,
   defect: Schema<unknown, unknown>
-): Schema<CauseFrom<EI>, CauseFrom<E>> =>
-  union(
+): Schema<CauseFrom<EI>, CauseFrom<E>> => {
+  const out: Schema<CauseFrom<EI>, CauseFrom<E>> = union(
     struct({
       _tag: literal("Die"),
       defect
@@ -4686,15 +4686,17 @@ const causeFrom = <EI, E>(
     }),
     struct({
       _tag: literal("Parallel"),
-      left: suspend(() => causeFrom(error, defect)),
-      right: suspend(() => causeFrom(error, defect))
+      left: suspend(() => out),
+      right: suspend(() => out)
     }),
     struct({
       _tag: literal("Sequential"),
-      left: suspend(() => causeFrom(error, defect)),
-      right: suspend(() => causeFrom(error, defect))
+      left: suspend(() => out),
+      right: suspend(() => out)
     })
   )
+  return out
+}
 
 const causeArbitrary = <E>(
   error: Arbitrary<E>,

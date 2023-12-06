@@ -472,12 +472,10 @@ describe("Schema/is", () => {
         readonly name: string
         readonly categories: ReadonlyArray<Category>
       }
-      const schema: S.Schema<Category> = S.suspend<Category>(() =>
-        S.struct({
-          name: S.string,
-          categories: S.array(schema)
-        })
-      )
+      const schema: S.Schema<Category> = S.struct({
+        name: S.string,
+        categories: S.array(S.suspend(() => schema))
+      })
       const is = P.is(schema)
       expect(is({ name: "a", categories: [] })).toEqual(true)
       expect(
@@ -501,18 +499,14 @@ describe("Schema/is", () => {
         readonly b: number
         readonly as: ReadonlyArray<A>
       }
-      const schemaA: S.Schema<A> = S.suspend<A>(() =>
-        S.struct({
-          a: S.string,
-          bs: S.array(schemaB)
-        })
-      )
-      const schemaB: S.Schema<B> = S.suspend<B>(() =>
-        S.struct({
-          b: S.number,
-          as: S.array(schemaA)
-        })
-      )
+      const schemaA: S.Schema<A> = S.struct({
+        a: S.string,
+        bs: S.array(S.suspend(() => schemaB))
+      })
+      const schemaB: S.Schema<B> = S.struct({
+        b: S.number,
+        as: S.array(S.suspend(() => schemaA))
+      })
       const isA = P.is(schemaA)
       expect(isA({ a: "a1", bs: [] })).toEqual(true)
       expect(isA({ a: "a1", bs: [{ b: 1, as: [] }] })).toEqual(true)
