@@ -218,7 +218,7 @@ describe("Arbitrary/Arbitrary", () => {
     propertyTo(schema)
   })
 
-  describe("lazy", () => {
+  describe("suspend", () => {
     it("should support an arbitrary annotation", () => {
       interface A {
         readonly a: string
@@ -234,7 +234,7 @@ describe("Arbitrary/Arbitrary", () => {
           )
         })
       })).root
-      const schema: S.Schema<A> = S.lazy<A>(() =>
+      const schema: S.Schema<A> = S.suspend<A>(() =>
         S.struct({
           a: S.string,
           as: S.array(schema)
@@ -249,7 +249,7 @@ describe("Arbitrary/Arbitrary", () => {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: S.Schema<A> = S.lazy(() =>
+      const schema: S.Schema<A> = S.suspend(() =>
         S.struct({
           a: S.string,
           as: S.array(schema)
@@ -266,7 +266,7 @@ describe("Arbitrary/Arbitrary", () => {
       interface A {
         readonly a: number | A
       }
-      const schema: S.Schema<I, A> = S.lazy(() =>
+      const schema: S.Schema<I, A> = S.suspend(() =>
         S.struct({
           a: S.union(NumberFromString, schema)
         })
@@ -276,7 +276,7 @@ describe("Arbitrary/Arbitrary", () => {
 
     it("tuple", () => {
       type A = readonly [number, A | null]
-      const schema: S.Schema<A> = S.lazy<A>(
+      const schema: S.Schema<A> = S.suspend<A>(
         () => S.tuple(S.number, S.union(schema, S.literal(null)))
       )
       propertyTo(schema)
@@ -286,7 +286,7 @@ describe("Arbitrary/Arbitrary", () => {
       type A = {
         [_: string]: A
       }
-      const schema: S.Schema<A> = S.lazy(() => S.record(S.string, schema))
+      const schema: S.Schema<A> = S.suspend(() => S.record(S.string, schema))
       propertyTo(schema)
     })
 
@@ -303,14 +303,14 @@ describe("Arbitrary/Arbitrary", () => {
         readonly right: Expression
       }
 
-      const Expression: S.Schema<Expression> = S.lazy(() =>
+      const Expression: S.Schema<Expression> = S.suspend(() =>
         S.struct({
           type: S.literal("expression"),
           value: S.union(S.JsonNumber, Operation)
         })
       )
 
-      const Operation: S.Schema<Operation> = S.lazy(() =>
+      const Operation: S.Schema<Operation> = S.suspend(() =>
         S.struct({
           type: S.literal("operation"),
           operator: S.union(S.literal("+"), S.literal("-")),

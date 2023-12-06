@@ -50,12 +50,12 @@ describe("Schema > rename", () => {
     await Util.expectEncodeSuccess(renamed2, { d: "a", b: 1 }, { a: "a", b: 1 })
   })
 
-  it("Lazy", async () => {
+  it("Suspend", async () => {
     interface A {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const schema: S.Schema<A> = S.lazy<A>(() =>
+    const schema: S.Schema<A> = S.suspend<A>(() =>
       S.struct({
         a: S.string,
         as: S.array(schema)

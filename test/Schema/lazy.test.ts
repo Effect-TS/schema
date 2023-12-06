@@ -2,14 +2,14 @@ import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import { describe, it } from "vitest"
 
-describe("Schema/lazy", () => {
+describe("Schema/suspend", () => {
   describe("decoding", () => {
     it("baseline", async () => {
       interface A {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: S.Schema<A> = S.lazy(() =>
+      const schema: S.Schema<A> = S.suspend(() =>
         S.struct({
           a: S.string,
           as: S.array(schema)
@@ -49,14 +49,14 @@ describe("Schema/lazy", () => {
         readonly right: Expression
       }
 
-      const Expression: S.Schema<Expression> = S.lazy(() =>
+      const Expression: S.Schema<Expression> = S.suspend(() =>
         S.struct({
           type: S.literal("expression"),
           value: S.union(S.number, Operation)
         })
       )
 
-      const Operation: S.Schema<Operation> = S.lazy(() =>
+      const Operation: S.Schema<Operation> = S.suspend(() =>
         S.struct({
           type: S.literal("operation"),
           operator: S.union(S.literal("+"), S.literal("-")),
@@ -97,7 +97,7 @@ describe("Schema/lazy", () => {
     // raises an error while encoding from a number if the string is not a char
     const NumberFromChar = S.string.pipe(S.length(1), S.numberFromString)
 
-    it("lazy", async () => {
+    it("suspend", async () => {
       interface A {
         readonly a: number
         readonly as: ReadonlyArray<A>
@@ -106,7 +106,7 @@ describe("Schema/lazy", () => {
         readonly a: string
         readonly as: ReadonlyArray<FromA>
       }
-      const schema: S.Schema<FromA, A> = S.lazy<FromA, A>(() =>
+      const schema: S.Schema<FromA, A> = S.suspend<FromA, A>(() =>
         S.struct({
           a: NumberFromChar,
           as: S.array(schema)

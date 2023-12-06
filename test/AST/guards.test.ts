@@ -15,7 +15,7 @@ describe("AST/guards", () => {
 
   it("isLazy", () => {
     type A = readonly [number, A | null]
-    const schema: S.Schema<A> = S.lazy<A>(
+    const schema: S.Schema<A> = S.suspend<A>(
       () => S.tuple(S.number, S.union(schema, S.literal(null)))
     )
     expect(AST.isLazy(schema.ast)).toEqual(true)

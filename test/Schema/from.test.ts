@@ -3,14 +3,14 @@ import * as Util from "@effect/schema/test/util"
 import { describe, it } from "vitest"
 
 describe("Schema/from", () => {
-  it("lazy", async () => {
+  it("suspend", async () => {
     interface I {
       prop: I | string
     }
     interface A {
       prop: A | number
     }
-    const schema: S.Schema<I, A> = S.lazy(() =>
+    const schema: S.Schema<I, A> = S.suspend(() =>
       S.struct({
         prop: S.union(S.NumberFromString, schema)
       })

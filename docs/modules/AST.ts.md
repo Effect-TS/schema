@@ -52,10 +52,10 @@ Added in v1.0.0
   - [createEnums](#createenums)
   - [createFinalPropertySignatureTransformation](#createfinalpropertysignaturetransformation)
   - [createFinalTransformation](#createfinaltransformation)
-  - [createLazy](#createlazy)
   - [createLiteral](#createliteral)
   - [createPropertySignatureTransform](#createpropertysignaturetransform)
   - [createRefinement](#createrefinement)
+  - [createSuspend](#createsuspend)
   - [createTemplateLiteral](#createtemplateliteral)
   - [createTuple](#createtuple)
   - [createTypeLiteral](#createtypeliteral)
@@ -108,7 +108,6 @@ Added in v1.0.0
   - [Enums (interface)](#enums-interface)
   - [FinalPropertySignatureTransformation (interface)](#finalpropertysignaturetransformation-interface)
   - [FinalTransformation (interface)](#finaltransformation-interface)
-  - [Lazy (interface)](#lazy-interface)
   - [Literal (interface)](#literal-interface)
   - [LiteralValue (type alias)](#literalvalue-type-alias)
   - [NeverKeyword (interface)](#neverkeyword-interface)
@@ -119,6 +118,7 @@ Added in v1.0.0
   - [PropertySignatureTransformation (type alias)](#propertysignaturetransformation-type-alias)
   - [Refinement (interface)](#refinement-interface)
   - [StringKeyword (interface)](#stringkeyword-interface)
+  - [Suspend (interface)](#suspend-interface)
   - [SymbolKeyword (interface)](#symbolkeyword-interface)
   - [TemplateLiteral (interface)](#templateliteral-interface)
   - [Transform (interface)](#transform-interface)
@@ -565,16 +565,6 @@ export declare const createFinalTransformation: (
 
 Added in v1.0.0
 
-## createLazy
-
-**Signature**
-
-```ts
-export declare const createLazy: (f: () => AST, annotations?: Annotated["annotations"]) => Lazy
-```
-
-Added in v1.0.0
-
 ## createLiteral
 
 **Signature**
@@ -609,6 +599,16 @@ export declare const createRefinement: <From extends AST>(
   filter: Refinement["filter"],
   annotations?: Annotated["annotations"]
 ) => Transform | Refinement<From>
+```
+
+Added in v1.0.0
+
+## createSuspend
+
+**Signature**
+
+```ts
+export declare const createSuspend: (f: () => AST, annotations?: Annotated["annotations"]) => Suspend
 ```
 
 Added in v1.0.0
@@ -869,7 +869,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isLazy: (ast: AST) => ast is Lazy
+export declare const isLazy: (ast: AST) => ast is Suspend
 ```
 
 Added in v1.0.0
@@ -1063,7 +1063,7 @@ export type AST =
   | Tuple
   | TypeLiteral
   | Union
-  | Lazy
+  | Suspend
   // transformations
   | Transform
 ```
@@ -1189,19 +1189,6 @@ export interface FinalTransformation {
 
 Added in v1.0.0
 
-## Lazy (interface)
-
-**Signature**
-
-```ts
-export interface Lazy extends Annotated {
-  readonly _tag: "Lazy"
-  readonly f: () => AST
-}
-```
-
-Added in v1.0.0
-
 ## Literal (interface)
 
 **Signature**
@@ -1321,6 +1308,19 @@ Added in v1.0.0
 ```ts
 export interface StringKeyword extends Annotated {
   readonly _tag: "StringKeyword"
+}
+```
+
+Added in v1.0.0
+
+## Suspend (interface)
+
+**Signature**
+
+```ts
+export interface Suspend extends Annotated {
+  readonly _tag: "Suspend"
+  readonly f: () => AST
 }
 ```
 

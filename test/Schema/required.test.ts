@@ -91,11 +91,11 @@ describe("Schema/required", () => {
     )
   })
 
-  it("lazy", async () => {
+  it("suspend", async () => {
     interface A {
       readonly a: null | A
     }
-    const schema: S.Schema<A> = S.required(S.lazy(() =>
+    const schema: S.Schema<A> = S.required(S.suspend(() =>
       S.struct({
         a: S.optional(S.union(S.null, schema))
       })

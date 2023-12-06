@@ -1038,20 +1038,22 @@ describe("JSONSchema", () => {
     expect(validate("aa")).toEqual(false)
   })
 
-  describe("Lazy", () => {
+  describe("Suspend", () => {
     it("should raise an error if there is no identifier annotation", () => {
       interface A {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: Schema.Schema<A> = Schema.lazy<A>(() =>
+      const schema: Schema.Schema<A> = Schema.suspend<A>(() =>
         Schema.struct({
           a: Schema.string,
           as: Schema.array(schema)
         })
       )
       expect(() => JSONSchema.to(schema)).toThrow(
-        new Error("Generating a JSON Schema for lazy schemas requires an identifier annotation")
+        new Error(
+          "Generating a JSON Schema for suspended schemas requires an identifier annotation"
+        )
       )
     })
 
@@ -1060,7 +1062,7 @@ describe("JSONSchema", () => {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: Schema.Schema<A> = Schema.lazy<A>(() =>
+      const schema: Schema.Schema<A> = Schema.suspend<A>(() =>
         Schema.struct({
           a: Schema.string,
           as: Schema.array(schema)
@@ -1120,14 +1122,14 @@ describe("JSONSchema", () => {
         readonly right: Expression
       }
 
-      const Expression: Schema.Schema<Expression> = Schema.lazy(() =>
+      const Expression: Schema.Schema<Expression> = Schema.suspend(() =>
         Schema.struct({
           type: Schema.literal("expression"),
           value: Schema.union(JsonNumber, Operation)
         })
       ).pipe(Schema.identifier("Expression"))
 
-      const Operation: Schema.Schema<Operation> = Schema.lazy(() =>
+      const Operation: Schema.Schema<Operation> = Schema.suspend(() =>
         Schema.struct({
           type: Schema.literal("operation"),
           operator: Schema.union(Schema.literal("+"), Schema.literal("-")),

@@ -9,7 +9,7 @@ describe("AST/createLazy", () => {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const schema: S.Schema<A> = S.lazy(() => {
+    const schema: S.Schema<A> = S.suspend(() => {
       log++
       return S.struct({
         a: S.string,

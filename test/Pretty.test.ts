@@ -365,12 +365,12 @@ describe("Pretty", () => {
     )
   })
 
-  it("lazy", () => {
+  it("suspend", () => {
     interface A {
       readonly a: string
       readonly as: ReadonlyArray<A>
     }
-    const A: S.Schema<A> = S.lazy<A>(() =>
+    const A: S.Schema<A> = S.suspend<A>(() =>
       S.struct({
         a: S.string,
         as: S.array(A)

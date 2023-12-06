@@ -558,13 +558,13 @@ describe("Equivalence", () => {
     })
   })
 
-  describe("Lazy", () => {
+  describe("Suspend", () => {
     it("should support recursive schemas", () => {
       interface A {
         readonly a: string
         readonly as: ReadonlyArray<A>
       }
-      const schema: S.Schema<A> = S.lazy<A>(() =>
+      const schema: S.Schema<A> = S.suspend<A>(() =>
         S.struct({
           a: string,
           as: S.array(schema)
@@ -599,14 +599,14 @@ describe("Equivalence", () => {
         readonly right: Expression
       }
 
-      const Expression: S.Schema<Expression> = S.lazy(() =>
+      const Expression: S.Schema<Expression> = S.suspend(() =>
         S.struct({
           type: S.literal("expression"),
           value: S.union(number, Operation)
         })
       ).pipe(S.identifier("Expression"))
 
-      const Operation: S.Schema<Operation> = S.lazy(() =>
+      const Operation: S.Schema<Operation> = S.suspend(() =>
         S.struct({
           type: S.literal("operation"),
           operator: S.union(S.literal("+"), S.literal("-")),

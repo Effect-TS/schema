@@ -85,11 +85,11 @@ describe("Schema/partial", () => {
     await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
   })
 
-  it("lazy", async () => {
+  it("suspend", async () => {
     interface A {
       readonly a?: null | A
     }
-    const schema: S.Schema<A> = S.partial(S.lazy(() =>
+    const schema: S.Schema<A> = S.partial(S.suspend(() =>
       S.struct({
         a: S.union(S.null, schema)
       })

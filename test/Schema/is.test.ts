@@ -466,13 +466,13 @@ describe("Schema/is", () => {
     expect(is("a")).toEqual(true)
   })
 
-  describe("lazy", () => {
+  describe("suspend", () => {
     it("baseline", () => {
       interface Category {
         readonly name: string
         readonly categories: ReadonlyArray<Category>
       }
-      const schema: S.Schema<Category> = S.lazy<Category>(() =>
+      const schema: S.Schema<Category> = S.suspend<Category>(() =>
         S.struct({
           name: S.string,
           categories: S.array(schema)
@@ -501,13 +501,13 @@ describe("Schema/is", () => {
         readonly b: number
         readonly as: ReadonlyArray<A>
       }
-      const schemaA: S.Schema<A> = S.lazy<A>(() =>
+      const schemaA: S.Schema<A> = S.suspend<A>(() =>
         S.struct({
           a: S.string,
           bs: S.array(schemaB)
         })
       )
-      const schemaB: S.Schema<B> = S.lazy<B>(() =>
+      const schemaB: S.Schema<B> = S.suspend<B>(() =>
         S.struct({
           b: S.number,
           as: S.array(schemaA)

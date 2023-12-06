@@ -1186,10 +1186,10 @@ export const compose: {
  * @category combinators
  * @since 1.0.0
  */
-export const lazy = <I, A = I>(
+export const suspend = <I, A = I>(
   f: () => Schema<I, A>,
   annotations?: AST.Annotated["annotations"]
-): Schema<I, A> => make(AST.createLazy(() => f().ast, annotations))
+): Schema<I, A> => make(AST.createSuspend(() => f().ast, annotations))
 
 /**
  * @category combinators
@@ -3451,7 +3451,7 @@ const optionDecode = <A>(input: OptionFrom<A>): Option.Option<A> =>
   input._tag === "None" ? Option.none() : Option.some(input.value)
 
 const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> => {
-  const placeholder = lazy<A>(() => any).pipe(annotations({
+  const placeholder = suspend<A>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => value
   }))
   const arb = arbitrary.unsafeTo(optionFrom(placeholder))
@@ -3558,10 +3558,10 @@ const eitherArbitrary = <E, A>(
   left: Arbitrary<E>,
   right: Arbitrary<A>
 ): Arbitrary<Either.Either<E, A>> => {
-  const placeholderLeft = lazy<E>(() => any).pipe(annotations({
+  const placeholderLeft = suspend<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => left
   }))
-  const placeholderRight = lazy<A>(() => any).pipe(annotations({
+  const placeholderRight = suspend<A>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => right
   }))
   const arb = arbitrary.unsafeTo(eitherFrom(placeholderLeft, placeholderRight))
@@ -4534,8 +4534,8 @@ export type FiberIdFrom =
 const FiberIdFrom: Schema<FiberIdFrom, FiberIdFrom> = union(
   struct({
     _tag: literal("Composite"),
-    left: lazy(() => FiberIdFrom),
-    right: lazy(() => FiberIdFrom)
+    left: suspend(() => FiberIdFrom),
+    right: suspend(() => FiberIdFrom)
   }),
   struct({
     _tag: literal("None")
@@ -4686,13 +4686,13 @@ const causeFrom = <EI, E>(
     }),
     struct({
       _tag: literal("Parallel"),
-      left: lazy(() => causeFrom(error, defect)),
-      right: lazy(() => causeFrom(error, defect))
+      left: suspend(() => causeFrom(error, defect)),
+      right: suspend(() => causeFrom(error, defect))
     }),
     struct({
       _tag: literal("Sequential"),
-      left: lazy(() => causeFrom(error, defect)),
-      right: lazy(() => causeFrom(error, defect))
+      left: suspend(() => causeFrom(error, defect)),
+      right: suspend(() => causeFrom(error, defect))
     })
   )
 
@@ -4700,10 +4700,10 @@ const causeArbitrary = <E>(
   error: Arbitrary<E>,
   defect: Arbitrary<unknown>
 ): Arbitrary<Cause.Cause<E>> => {
-  const placeholderError = lazy<E>(() => any).pipe(annotations({
+  const placeholderError = suspend<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => error
   }))
-  const placeholderDefect = lazy<unknown>(() => any).pipe(annotations({
+  const placeholderDefect = suspend<unknown>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => defect
   }))
   const arb = arbitrary.unsafeTo(causeFrom(placeholderError, placeholderDefect))
@@ -4876,13 +4876,13 @@ const exitArbitrary = <E, A>(
   value: Arbitrary<A>,
   defect: Arbitrary<unknown>
 ): Arbitrary<Exit.Exit<E, A>> => {
-  const placeholderError = lazy<E>(() => any).pipe(annotations({
+  const placeholderError = suspend<E>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => error
   }))
-  const placeholderValue = lazy<A>(() => any).pipe(annotations({
+  const placeholderValue = suspend<A>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => value
   }))
-  const placeholderDefect = lazy<unknown>(() => any).pipe(annotations({
+  const placeholderDefect = suspend<unknown>(() => any).pipe(annotations({
     [hooks.ArbitraryHookId]: () => defect
   }))
   const arb = arbitrary.unsafeTo(exitFrom(placeholderError, placeholderValue, placeholderDefect))
