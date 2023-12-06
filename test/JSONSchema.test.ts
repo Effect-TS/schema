@@ -1055,7 +1055,7 @@ describe("JSONSchema", () => {
       )
     })
 
-    it("should support recursive schemas", () => {
+    it("should support outer suspended schemas", () => {
       interface A {
         readonly a: string
         readonly as: ReadonlyArray<A>
@@ -1107,7 +1107,75 @@ describe("JSONSchema", () => {
       propertyTo(schema)
     })
 
-    it("should support mutually recursive schemas", () => {
+    it("should support inner suspended schemas", () => {
+      interface A {
+        readonly a: string
+        readonly as: ReadonlyArray<A>
+      }
+      const schema: Schema.Schema<A> = Schema.struct({
+        a: Schema.string,
+        as: Schema.array(Schema.suspend(() => schema).pipe(Schema.identifier("A")))
+      })
+      const jsonSchema = JSONSchema.to(schema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "required": [
+          "a",
+          "as"
+        ],
+        "properties": {
+          "a": {
+            "type": "string",
+            "description": "a string",
+            "title": "string"
+          },
+          "as": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/A"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "A": {
+            "type": "object",
+            "required": [
+              "a",
+              "as"
+            ],
+            "properties": {
+              "a": {
+                "type": "string",
+                "description": "a string",
+                "title": "string"
+              },
+              "as": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/A"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      })
+      const validate = new Ajv().compile(jsonSchema)
+      expect(validate({ a: "a1", as: [] })).toEqual(true)
+      expect(validate({ a: "a1", as: [{ a: "a2", as: [] }] })).toEqual(true)
+      expect(validate({ a: "a1", as: [{ a: "a2", as: [] }, { a: "a3", as: [] }] })).toEqual(true)
+      expect(
+        validate({ a: "a1", as: [{ a: "a2", as: [] }, { a: "a3", as: [{ a: "a4", as: [] }] }] })
+      ).toEqual(true)
+      expect(
+        validate({ a: "a1", as: [{ a: "a2", as: [] }, { a: "a3", as: [{ a: "a4", as: [1] }] }] })
+      ).toEqual(false)
+      propertyTo(schema)
+    })
+
+    it("should support mutually suspended schemas", () => {
       interface Expression {
         readonly type: "expression"
         readonly value: number | Operation

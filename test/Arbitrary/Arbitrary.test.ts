@@ -287,7 +287,7 @@ describe("Arbitrary/Arbitrary", () => {
       propertyTo(schema)
     })
 
-    it("should support mutually recursive schemas", () => {
+    it("should support mutually suspended schemas", () => {
       interface Expression {
         readonly type: "expression"
         readonly value: number | Operation

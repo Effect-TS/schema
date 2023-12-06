@@ -490,7 +490,7 @@ describe("Schema/is", () => {
       expect(is({ name: "a", categories: [1] })).toEqual(false)
     })
 
-    it("mutually recursive", () => {
+    it("mutually suspended", () => {
       interface A {
         readonly a: string
         readonly bs: ReadonlyArray<B>

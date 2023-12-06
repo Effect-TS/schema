@@ -559,7 +559,7 @@ describe("Equivalence", () => {
   })
 
   describe("Suspend", () => {
-    it("should support recursive schemas", () => {
+    it("should support suspended schemas", () => {
       interface A {
         readonly a: string
         readonly as: ReadonlyArray<A>
@@ -585,7 +585,7 @@ describe("Equivalence", () => {
       // propertyTo(schema, { numRuns: 5 })
     })
 
-    it("should support mutually recursive schemas", () => {
+    it("should support mutually suspended schemas", () => {
       interface Expression {
         readonly type: "expression"
         readonly value: number | Operation

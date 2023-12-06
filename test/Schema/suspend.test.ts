@@ -34,7 +34,7 @@ describe("Schema/suspend", () => {
       )
     })
 
-    it("mutually recursive", async () => {
+    it("mutually suspended", async () => {
       interface Expression {
         readonly type: "expression"
         readonly value: number | Operation
