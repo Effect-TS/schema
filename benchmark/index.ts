@@ -1,19 +1,23 @@
-import type { ParseOptions } from "@effect/schema/AST"
-import * as P from "@effect/schema/Parser"
-import * as t from "@effect/schema/Schema"
-import * as Benchmark from "benchmark"
+import { Bench } from "tinybench"
 import { z } from "zod"
+import type { ParseOptions } from "../src/AST.js"
+import * as P from "../src/Parser.js"
+import * as t from "../src/Schema.js"
 
 /*
-parseEither (good) x 283,841 ops/sec ±0.55% (86 runs sampled)
-zod (good) x 176,785 ops/sec ±6.98% (81 runs sampled)
-parseEither (bad) x 231,839 ops/sec ±3.18% (83 runs sampled)
-zod (bad) x 55,584 ops/sec ±4.29% (83 runs sampled)
-parseEither (bad2) x 220,214 ops/sec ±9.78% (78 runs sampled)
-zod (bad2) x 185,401 ops/sec ±0.85% (85 runs sampled)
+┌─────────┬──────────────────────┬───────────┬───────────────────┬───────────┬─────────┐
+│ (index) │      Task Name       │  ops/sec  │ Average Time (ns) │  Margin   │ Samples │
+├─────────┼──────────────────────┼───────────┼───────────────────┼───────────┼─────────┤
+│    0    │ 'parseEither (good)' │ '150,586' │ 6640.714005254174 │ '±0.73%'  │ 150587  │
+│    1    │     'zod (good)'     │ '212,371' │ 4708.722572530713 │ '±0.57%'  │ 212372  │
+│    2    │ 'parseEither (bad)'  │ '130,028' │ 7690.645276174016 │ '±0.57%'  │ 130029  │
+│    3    │     'zod (bad)'      │ '56,463'  │ 17710.45249230275 │ '±10.43%' │  56465  │
+│    4    │ 'parseEither (bad2)' │ '152,362' │  6563.3090290069  │ '±0.55%'  │ 152363  │
+│    5    │     'zod (bad2)'     │ '211,165' │ 4735.626160980493 │ '±0.59%'  │ 211166  │
+└─────────┴──────────────────────┴───────────┴───────────────────┴───────────┴─────────┘
 */
 
-const suite = new Benchmark.Suite()
+const bench = new Bench({ time: 1000 })
 
 const Vector = t.tuple(t.number, t.number, t.number)
 const VectorZod = z.tuple([z.number(), z.number(), z.number()])
@@ -158,7 +162,7 @@ const bad2 = {
 // console.log(parseEither(good))
 // console.log(parseEither(bad))
 
-suite
+bench
   .add("parseEither (good)", function() {
     parseEither(good, options)
   })
@@ -177,10 +181,7 @@ suite
   .add("zod (bad2)", function() {
     schemaZod.safeParse(bad2)
   })
-  .on("cycle", function(event: any) {
-    console.log(String(event.target))
-  })
-  .on("complete", function(this: any) {
-    console.log("Fastest is " + this.filter("fastest").map("name"))
-  })
-  .run({ async: true })
+
+await bench.run()
+
+console.table(bench.table())
