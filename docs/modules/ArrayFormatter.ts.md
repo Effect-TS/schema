@@ -26,7 +26,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const formatErrors: (errors: readonly [ParseErrors, ...ParseErrors[]]) => Array<Issue>
+export declare const formatErrors: (errors: readonly [ParseIssue, ...ParseIssue[]]) => Array<Issue>
 ```
 
 Added in v1.0.0
@@ -39,7 +39,7 @@ Added in v1.0.0
 
 ```ts
 export interface Issue {
-  readonly _tag: ParseErrors["_tag"]
+  readonly _tag: ParseIssue["_tag"]
   readonly path: ReadonlyArray<PropertyKey>
   readonly message: string
 }
