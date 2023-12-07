@@ -30,8 +30,8 @@ Added in v1.0.0
   - [JsonSchema7Object (interface)](#jsonschema7object-interface)
   - [JsonSchema7OneOf (interface)](#jsonschema7oneof-interface)
   - [JsonSchema7Ref (interface)](#jsonschema7ref-interface)
+  - [JsonSchema7Root (type alias)](#jsonschema7root-type-alias)
   - [JsonSchema7String (interface)](#jsonschema7string-interface)
-  - [JsonSchema7Top (type alias)](#jsonschema7top-type-alias)
   - [JsonSchema7Unknown (interface)](#jsonschema7unknown-interface)
   - [JsonSchema7empty (interface)](#jsonschema7empty-interface)
   - [JsonSchema7object (interface)](#jsonschema7object-interface-1)
@@ -45,7 +45,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const from: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Top
+export declare const from: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Root
 ```
 
 Added in v1.0.0
@@ -55,7 +55,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const to: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Top
+export declare const to: <I, A>(schema: Schema.Schema<I, A>) => JsonSchema7Root
 ```
 
 Added in v1.0.0
@@ -259,6 +259,19 @@ export interface JsonSchema7Ref {
 
 Added in v1.0.0
 
+## JsonSchema7Root (type alias)
+
+**Signature**
+
+```ts
+export type JsonSchema7Root = JsonSchema7 & {
+  $schema?: string
+  $defs?: Record<string, JsonSchema7>
+}
+```
+
+Added in v1.0.0
+
 ## JsonSchema7String (interface)
 
 **Signature**
@@ -270,19 +283,6 @@ export interface JsonSchema7String {
   maxLength?: number
   pattern?: string
   description?: string
-}
-```
-
-Added in v1.0.0
-
-## JsonSchema7Top (type alias)
-
-**Signature**
-
-```ts
-export type JsonSchema7Top = JsonSchema7 & {
-  $schema?: string
-  $defs?: Record<string, JsonSchema7>
 }
 ```
 
