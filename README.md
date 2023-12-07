@@ -286,11 +286,11 @@ The `parsePerson` function returns an `Either<ParseError, A>`, where `ParseError
 interface ParseError {
   readonly _tag: "ParseError";
   // A non-empty list of errors
-  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>;
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>;
 }
 ```
 
-`ParseError` represents a list of errors that may have occurred during the parsing process, and `A` is the inferred data type described by the `Schema`. A successful parse results in a `Right` value, containing the parsed data `A`. In the case of a failed parse, the result will be a `Left` value containing a non-empty list of `ParseErrors`.
+`ParseError` represents a list of errors that may have occurred during the parsing process, and `A` is the inferred data type described by the `Schema`. A successful parse results in a `Right` value, containing the parsed data `A`. In the case of a failed parse, the result will be a `Left` value containing a non-empty list of `ParseIssue`.
 
 Now, let's see another example using the `parseSync` function.
 

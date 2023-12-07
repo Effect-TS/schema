@@ -28,7 +28,7 @@ Added in v1.0.0
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
   - [Missing (interface)](#missing-interface)
-  - [ParseErrors (type alias)](#parseerrors-type-alias)
+  - [ParseIssue (type alias)](#parseissue-type-alias)
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
   - [UnionMember (interface)](#unionmember-interface)
@@ -54,7 +54,7 @@ Added in v1.0.0
 
 ```ts
 export declare const fail: (
-  error: ParseError | ParseErrors | ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+  error: ParseError | ParseIssue | ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
 ) => ParseResult<never>
 ```
 
@@ -75,7 +75,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const index: (index: number, errors: readonly [ParseErrors, ...ParseErrors[]]) => Index
+export declare const index: (index: number, errors: readonly [ParseIssue, ...ParseIssue[]]) => Index
 ```
 
 Added in v1.0.0
@@ -85,7 +85,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const key: (key: PropertyKey, errors: readonly [ParseErrors, ...ParseErrors[]]) => Key
+export declare const key: (key: PropertyKey, errors: readonly [ParseIssue, ...ParseIssue[]]) => Key
 ```
 
 Added in v1.0.0
@@ -145,7 +145,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const unionMember: (errors: readonly [ParseErrors, ...ParseErrors[]]) => UnionMember
+export declare const unionMember: (errors: readonly [ParseIssue, ...ParseIssue[]]) => UnionMember
 ```
 
 Added in v1.0.0
@@ -154,7 +154,7 @@ Added in v1.0.0
 
 ## Forbidden (interface)
 
-The `Forbidden` variant of the `ParseError` type represents an error that occurs when an Effect is encounter but disallowed from execution.
+The `Forbidden` variant of the `ParseIssue` type represents an error that occurs when an Effect is encounter but disallowed from execution.
 
 **Signature**
 
@@ -179,7 +179,7 @@ that a specific element in an array did not match the expected type or value.
 export interface Index {
   readonly _tag: "Index"
   readonly index: number
-  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
 }
 ```
 
@@ -187,7 +187,7 @@ Added in v1.0.0
 
 ## Key (interface)
 
-The `Key` variant of the `ParseError` type represents an error that occurs when a key in an object is invalid.
+The `Key` variant of the `ParseIssue` type represents an error that occurs when a key in an object is invalid.
 This error typically occurs when the `actual` value is not a valid key type (e.g. a string or number)
 or when the key is not present in the object being decoded. In either case, the `key` field of the error will contain
 the invalid key value. This error is typically used in combination with the `Unexpected` error,
@@ -199,7 +199,7 @@ which indicates that an unexpected key was found in the object being decoded.
 export interface Key {
   readonly _tag: "Key"
   readonly key: PropertyKey
-  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
 }
 ```
 
@@ -219,21 +219,21 @@ export interface Missing {
 
 Added in v1.0.0
 
-## ParseErrors (type alias)
+## ParseIssue (type alias)
 
 `ParseErrors` is a type that represents the different types of errors that can occur when decoding a value.
 
 **Signature**
 
 ```ts
-export type ParseErrors = Type | Index | Key | Missing | Unexpected | UnionMember | Forbidden
+export type ParseIssue = Type | Index | Key | Missing | Unexpected | UnionMember | Forbidden
 ```
 
 Added in v1.0.0
 
 ## Type (interface)
 
-The `Type` variant of the `ParseError` type represents an error that occurs when the `actual` value is not of the expected type.
+The `Type` variant of the `ParseIssue` type represents an error that occurs when the `actual` value is not of the expected type.
 The `expected` field specifies the expected type, and the `actual` field contains the value that caused the error.
 This error can occur when trying to decode a value using a schema that is only able to decode values of a specific type,
 and the actual value is not of that type. For example, if you are using a schema to decode a string value and the actual value
@@ -276,7 +276,7 @@ Error that occurs when a member in a union has an error.
 ```ts
 export interface UnionMember {
   readonly _tag: "UnionMember"
-  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
 }
 ```
 
@@ -357,7 +357,7 @@ Added in v1.0.0
 ```ts
 export interface ParseError {
   readonly _tag: "ParseError"
-  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseErrors>
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
 }
 ```
 
@@ -378,7 +378,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const parseError: (errors: readonly [ParseErrors, ...ParseErrors[]]) => ParseError
+export declare const parseError: (errors: readonly [ParseIssue, ...ParseIssue[]]) => ParseError
 ```
 
 Added in v1.0.0
