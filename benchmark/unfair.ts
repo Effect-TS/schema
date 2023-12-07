@@ -1,17 +1,21 @@
-import type { ParseOptions } from "@effect/schema/AST"
-import * as P from "@effect/schema/Parser"
-import * as t from "@effect/schema/Schema"
-import * as Benchmark from "benchmark"
+import { Bench } from "tinybench"
 import { z } from "zod"
+import type { ParseOptions } from "../src/AST.js"
+import * as P from "../src/Parser.js"
+import * as t from "../src/Schema.js"
 
 /*
-parseEither (good) x 276,758 ops/sec ±0.56% (89 runs sampled)
-zod (good) x 32,104 ops/sec ±6.04% (81 runs sampled)
-parseEither (bad) x 805,793 ops/sec ±6.90% (81 runs sampled)
-zod (bad) x 9,543 ops/sec ±4.28% (81 runs sampled)
+┌─────────┬──────────────────────┬───────────┬───────────────────┬──────────┬─────────┐
+│ (index) │      Task Name       │  ops/sec  │ Average Time (ns) │  Margin  │ Samples │
+├─────────┼──────────────────────┼───────────┼───────────────────┼──────────┼─────────┤
+│    0    │ 'parseEither (good)' │ '138,746' │ 7207.384160841943 │ '±0.77%' │ 138747  │
+│    1    │     'zod (good)'     │ '38,164'  │ 26202.45955897146 │ '±2.14%' │  38165  │
+│    2    │ 'parseEither (bad)'  │ '528,860' │ 1890.858355466343 │ '±0.72%' │ 528861  │
+│    3    │     'zod (bad)'      │ '10,251'  │ 97544.71922125429 │ '±3.71%' │  10252  │
+└─────────┴──────────────────────┴───────────┴───────────────────┴──────────┴─────────┘
 */
 
-const suite = new Benchmark.Suite()
+const bench = new Bench({ time: 1000 })
 
 const Vector = t.tuple(t.number, t.number, t.number)
 const VectorZod = z.tuple([z.number(), z.number(), z.number()])
@@ -131,7 +135,7 @@ const bad = {
   ]
 }
 
-suite
+bench
   .add("parseEither (good)", function() {
     parseEither(good, options)
   })
@@ -144,10 +148,7 @@ suite
   .add("zod (bad)", function() {
     schemaZod.safeParse(bad)
   })
-  .on("cycle", function(event: any) {
-    console.log(String(event.target))
-  })
-  .on("complete", function(this: any) {
-    console.log("Fastest is " + this.filter("fastest").map("name"))
-  })
-  .run({ async: true })
+
+await bench.run()
+
+console.table(bench.table())

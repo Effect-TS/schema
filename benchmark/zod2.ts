@@ -1,16 +1,20 @@
-import type { ParseOptions } from "@effect/schema/AST"
-import * as Schema from "@effect/schema/Schema"
-import * as Benchmark from "benchmark"
+import { Bench } from "tinybench"
 import { z } from "zod"
+import type { ParseOptions } from "../src/AST.js"
+import * as Schema from "../src/Schema.js"
 
 /*
-schema (good) x 2,055,273 ops/sec ±4.37% (84 runs sampled)
-zod (good) x 1,339,354 ops/sec ±6.95% (77 runs sampled)
-schema (bad) x 1,593,588 ops/sec ±3.22% (82 runs sampled)
-zod (bad) x 132,012 ops/sec ±4.79% (83 runs sampled)
+┌─────────┬─────────────────┬─────────────┬───────────────────┬───────────┬─────────┐
+│ (index) │    Task Name    │   ops/sec   │ Average Time (ns) │  Margin   │ Samples │
+├─────────┼─────────────────┼─────────────┼───────────────────┼───────────┼─────────┤
+│    0    │ 'schema (good)' │  '751,419'  │ 1330.814624035134 │ '±11.99%' │ 751420  │
+│    1    │  'zod (good)'   │ '1,534,425' │ 651.7096710372143 │ '±0.61%'  │ 1534426 │
+│    2    │ 'schema (bad)'  │  '751,849'  │ 1330.053814391217 │ '±0.58%'  │ 751850  │
+│    3    │   'zod (bad)'   │  '142,749'  │ 7005.278872942548 │ '±5.70%'  │ 142750  │
+└─────────┴─────────────────┴─────────────┴───────────────────┴───────────┴─────────┘
 */
 
-const suite = new Benchmark.Suite()
+const bench = new Bench({ time: 1000 })
 
 const UserZod = z.object({
   name: z.string().min(3).max(20),
@@ -41,7 +45,7 @@ const options: ParseOptions = { errors: "all" }
 // console.log(JSON.stringify(UserZod.safeParse(bad), null, 2))
 // console.log(JSON.stringify(parseEither(bad), null, 2))
 
-suite
+bench
   .add("schema (good)", function() {
     parseEither(good, options)
   })
@@ -54,10 +58,7 @@ suite
   .add("zod (bad)", function() {
     UserZod.safeParse(bad)
   })
-  .on("cycle", function(event: any) {
-    console.log(String(event.target))
-  })
-  .on("complete", function(this: any) {
-    console.log("Fastest is " + this.filter("fastest").map("name"))
-  })
-  .run({ async: true })
+
+await bench.run()
+
+console.table(bench.table())

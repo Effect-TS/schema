@@ -1,18 +1,22 @@
-import type { ParseOptions } from "@effect/schema/AST"
-import * as S from "@effect/schema/Schema"
-import * as Benchmark from "benchmark"
 import * as RA from "effect/ReadonlyArray"
+import { Bench } from "tinybench"
 import { z } from "zod"
+import type { ParseOptions } from "../src/AST.js"
+import * as S from "../src/Schema.js"
 
 /*
 n = 100
-parseEither (good) x 1,777,205 ops/sec ±0.49% (89 runs sampled)
-zod (good) x 797,123 ops/sec ±7.51% (80 runs sampled)
-parseEither (bad) x 1,103,955 ops/sec ±5.06% (80 runs sampled)
-zod (bad) x 929,104 ops/sec ±2.03% (88 runs sampled)
+┌─────────┬──────────────────────┬─────────────┬────────────────────┬──────────┬─────────┐
+│ (index) │      Task Name       │   ops/sec   │ Average Time (ns)  │  Margin  │ Samples │
+├─────────┼──────────────────────┼─────────────┼────────────────────┼──────────┼─────────┤
+│    0    │ 'parseEither (good)' │  '769,686'  │ 1299.2299910120141 │ '±0.72%' │ 769789  │
+│    1    │     'zod (good)'     │ '1,032,295' │ 968.7144246894364  │ '±0.61%' │ 1032296 │
+│    2    │ 'parseEither (bad)'  │  '463,348'  │  2158.20458744785  │ '±0.55%' │ 463349  │
+│    3    │     'zod (bad)'      │ '1,010,359' │ 989.7469520908651  │ '±0.62%' │ 1010360 │
+└─────────┴──────────────────────┴─────────────┴────────────────────┴──────────┴─────────┘
 */
 
-const suite = new Benchmark.Suite()
+const bench = new Bench({ time: 1000 })
 
 const n = 100
 const members = RA.makeBy(n, (i) =>
@@ -54,7 +58,7 @@ const bad = {
 // console.log(parseEither(good))
 // console.log(parseEither(bad))
 
-suite
+bench
   .add("parseEither (good)", function() {
     parseEither(good, options)
   })
@@ -67,10 +71,7 @@ suite
   .add("zod (bad)", function() {
     schemaZod.safeParse(good)
   })
-  .on("cycle", function(event: any) {
-    console.log(String(event.target))
-  })
-  .on("complete", function(this: any) {
-    console.log("Fastest is " + this.filter("fastest").map("name"))
-  })
-  .run({ async: true })
+
+await bench.run()
+
+console.table(bench.table())

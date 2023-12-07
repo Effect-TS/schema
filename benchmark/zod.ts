@@ -1,16 +1,20 @@
-import type { ParseOptions } from "@effect/schema/AST"
-import * as Schema from "@effect/schema/Schema"
-import * as Benchmark from "benchmark"
+import { Bench } from "tinybench"
 import { z } from "zod"
+import type { ParseOptions } from "../src/AST.js"
+import * as Schema from "../src/Schema.js"
 
 /*
-schema (good) x 580,995 ops/sec ±1.10% (89 runs sampled)
-zod (good) x 423,724 ops/sec ±6.53% (78 runs sampled)
-schema (bad) x 493,920 ops/sec ±2.51% (81 runs sampled)
-zod (bad) x 98,215 ops/sec ±4.96% (82 runs sampled)
+┌─────────┬─────────────────┬───────────┬────────────────────┬──────────┬─────────┐
+│ (index) │    Task Name    │  ops/sec  │ Average Time (ns)  │  Margin  │ Samples │
+├─────────┼─────────────────┼───────────┼────────────────────┼──────────┼─────────┤
+│    0    │ 'schema (good)' │ '340,533' │ 2936.5716941698306 │ '±0.76%' │ 340534  │
+│    1    │  'zod (good)'   │ '558,944' │ 1789.0862294446451 │ '±0.24%' │ 558945  │
+│    2    │ 'schema (bad)'  │ '309,645' │ 3229.500939833211  │ '±0.52%' │ 309646  │
+│    3    │   'zod (bad)'   │ '108,605' │ 9207.643553834967  │ '±7.81%' │ 108606  │
+└─────────┴─────────────────┴───────────┴────────────────────┴──────────┴─────────┘
 */
 
-const suite = new Benchmark.Suite()
+const bench = new Bench({ time: 1000 })
 
 const UserZod = z.object({
   name: z.string().min(3).max(20),
@@ -68,7 +72,7 @@ const options: ParseOptions = { errors: "all" }
 // console.log(JSON.stringify(UserZod.safeParse(bad), null, 2))
 // console.log(JSON.stringify(parseEither(bad), null, 2))
 
-suite
+bench
   .add("schema (good)", function() {
     parseEither(good, options)
   })
@@ -81,10 +85,7 @@ suite
   .add("zod (bad)", function() {
     UserZod.safeParse(bad)
   })
-  .on("cycle", function(event: any) {
-    console.log(String(event.target))
-  })
-  .on("complete", function(this: any) {
-    console.log("Fastest is " + this.filter("fastest").map("name"))
-  })
-  .run({ async: true })
+
+await bench.run()
+
+console.table(bench.table())
