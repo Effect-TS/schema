@@ -144,7 +144,6 @@ Added in v1.0.0
   - [extend](#extend)
   - [filter](#filter)
   - [keyof](#keyof)
-  - [lazy](#lazy)
   - [mutable](#mutable)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
@@ -156,6 +155,7 @@ Added in v1.0.0
   - [required](#required)
   - [rest](#rest)
   - [struct](#struct)
+  - [suspend](#suspend)
   - [transform](#transform)
   - [transformOrFail](#transformorfail)
   - [tuple](#tuple)
@@ -1877,16 +1877,6 @@ export declare const keyof: <I, A>(schema: Schema<I, A>) => Schema<keyof A, keyo
 
 Added in v1.0.0
 
-## lazy
-
-**Signature**
-
-```ts
-export declare const lazy: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotated["annotations"]) => Schema<I, A>
-```
-
-Added in v1.0.0
-
 ## mutable
 
 Creates a new schema with shallow mutability applied to its properties.
@@ -2016,6 +2006,19 @@ Added in v1.0.0
 export declare const struct: <Fields extends StructFields>(
   fields: Fields
 ) => Schema<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>>
+```
+
+Added in v1.0.0
+
+## suspend
+
+**Signature**
+
+```ts
+export declare const suspend: <I, A = I>(
+  f: () => Schema<I, A>,
+  annotations?: AST.Annotated["annotations"]
+) => Schema<I, A>
 ```
 
 Added in v1.0.0
