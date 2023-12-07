@@ -27,8 +27,8 @@ devDependencies:
     specifier: ^0.5.1
     version: 0.5.1
   '@effect/docgen':
-    specifier: ^0.3.6
-    version: 0.3.6(tsx@4.6.1)(typescript@5.3.2)
+    specifier: ^0.3.8
+    version: 0.3.8(tsx@4.6.1)(typescript@5.3.2)
   '@effect/dtslint':
     specifier: ^0.0.4
     version: 0.0.4(typescript@5.3.2)
@@ -144,14 +144,6 @@ packages:
     optionalDependencies:
       '@nicolo-ribaudo/chokidar-2': 2.1.8-no-fsevents.3
       chokidar: 3.5.3
-    dev: true
-
-  /@babel/code-frame@7.22.13:
-    resolution: {integrity: sha512-XktuhWlJ5g+3TJXc5upd9Ks1HutSArik6jf2eAjYFyIOf4ej3RN+184cZbzDvbPnuTJIUhPKKJE3cIsYTiAT3w==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/highlight': 7.22.20
-      chalk: 2.4.2
     dev: true
 
   /@babel/code-frame@7.23.5:
@@ -308,15 +300,6 @@ packages:
       '@babel/types': 7.23.5
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /@babel/highlight@7.22.20:
-    resolution: {integrity: sha512-dkdMCN3py0+ksCgYmGG8jKeGA/8Tk+gJwSYYlFGxG5lmhfKNoAy004YpLxpS1W2J8m/EK2Ew+yOs9pVRwO89mg==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/helper-validator-identifier': 7.22.20
-      chalk: 2.4.2
-      js-tokens: 4.0.0
     dev: true
 
   /@babel/highlight@7.23.4:
@@ -656,8 +639,8 @@ packages:
     hasBin: true
     dev: true
 
-  /@effect/docgen@0.3.6(tsx@4.6.1)(typescript@5.3.2):
-    resolution: {integrity: sha512-GjEL+DWb/ttzPNvJ1GplOh5hCVVukqpTuZVVImaWkWMcYEphMKyPgw3HcXcEv7Jl/lLWzrjfuz9ClXN2+Zgxiw==}
+  /@effect/docgen@0.3.8(tsx@4.6.1)(typescript@5.3.2):
+    resolution: {integrity: sha512-yg777LXbKjgpHS+PC2dXS5tHTWRXQoCgcWJtM7CsNkZ2mefvmO7aufiRCaWYDnCF58otv10Tijuyanii4b2cxQ==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     peerDependencies:
@@ -5768,7 +5751,7 @@ packages:
     peerDependencies:
       typescript: '>=2.3.0-dev || >=2.4.0-dev || >=2.5.0-dev || >=2.6.0-dev || >=2.7.0-dev || >=2.8.0-dev || >=2.9.0-dev || >=3.0.0-dev || >= 3.1.0-dev || >= 3.2.0-dev || >= 4.0.0-dev'
     dependencies:
-      '@babel/code-frame': 7.22.13
+      '@babel/code-frame': 7.23.5
       builtin-modules: 1.1.1
       chalk: 2.4.2
       commander: 2.20.3
