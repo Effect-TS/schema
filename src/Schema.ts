@@ -40,7 +40,7 @@ import * as InternalSchema from "./internal/schema.js"
 import * as InternalSerializable from "./internal/serializable.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
-import type { Pretty } from "./Pretty.js"
+import * as Pretty from "./Pretty.js"
 import type * as Serializable from "./Serializable.js"
 
 // ---------------------------------------------
@@ -1503,7 +1503,7 @@ export interface FilterAnnotations<A> extends DocAnnotations<A> {
    */
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-  readonly pretty?: (...args: ReadonlyArray<Pretty<any>>) => Pretty<any>
+  readonly pretty?: (...args: ReadonlyArray<Pretty.Pretty<any>>) => Pretty.Pretty<any>
   readonly equivalence?: () => Equivalence.Equivalence<A>
 }
 
@@ -3010,7 +3010,7 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
       : ParseResult.fail(ParseResult.type(ast, u)),
   {
     [AST.IdentifierAnnotationId]: "Duration",
-    [hooks.PrettyHookId]: (): Pretty<Duration.Duration> =>
+    [hooks.PrettyHookId]: (): Pretty.Pretty<Duration.Duration> =>
       Duration.match({
         onMillis: (_) => `Duration.millis(${_})`,
         onNanos: (_) => `Duration.nanos(${_})`
@@ -3095,7 +3095,7 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
       : ParseResult.fail(ParseResult.type(ast, u)),
   {
     [AST.IdentifierAnnotationId]: "Uint8Array",
-    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+    [hooks.PrettyHookId]: (): Pretty.Pretty<Uint8Array> => (u8arr) =>
       `new Uint8Array(${JSON.stringify(Array.from(u8arr))})`,
     [hooks.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) => fc.uint8Array(),
     [hooks.EquivalenceHookId]: () => ReadonlyArray.getEquivalence(Equivalence.strict())
@@ -3168,7 +3168,7 @@ const makeEncodingTransform = <A extends string>(
     { strict: false }
   ).pipe(annotations({
     [AST.IdentifierAnnotationId]: id,
-    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
+    [hooks.PrettyHookId]: (): Pretty.Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
     [hooks.ArbitraryHookId]: () => arbitrary
   }))
 
@@ -3362,7 +3362,7 @@ export const validDate =
 
 const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date({ noInvalidDate: false })
 
-const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
+const datePretty = (): Pretty.Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
 
 /**
  * Represents a schema for handling potentially **invalid** `Date` instances (e.g., `new Date("Invalid Date")` is not rejected).
@@ -3468,7 +3468,7 @@ const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> =>
   return (fc) => arb(fc).map(optionDecode)
 }
 
-const optionPretty = <A>(value: Pretty<A>): Pretty<Option.Option<A>> =>
+const optionPretty = <A>(value: Pretty.Pretty<A>): Pretty.Pretty<Option.Option<A>> =>
   Option.match({
     onNone: () => "none()",
     onSome: (a) => `some(${value(a)})`
@@ -3572,7 +3572,10 @@ const eitherArbitrary = <E, A>(
   return (fc) => arb(fc).map(eitherDecode)
 }
 
-const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either.Either<E, A>> =>
+const eitherPretty = <E, A>(
+  left: Pretty.Pretty<E>,
+  right: Pretty.Pretty<A>
+): Pretty.Pretty<Either.Either<E, A>> =>
   Either.match({
     onLeft: (e) => `left(${left(e)})`,
     onRight: (a) => `right(${right(a)})`
@@ -3639,9 +3642,9 @@ const readonlyMapArbitrary = <K, V>(
 (fc) => fc.array(fc.tuple(key(fc), value(fc))).map((as) => new Map(as))
 
 const readonlyMapPretty = <K, V>(
-  key: Pretty<K>,
-  value: Pretty<V>
-): Pretty<ReadonlyMap<K, V>> =>
+  key: Pretty.Pretty<K>,
+  value: Pretty.Pretty<V>
+): Pretty.Pretty<ReadonlyMap<K, V>> =>
 (map) =>
   `new Map([${
     Array.from(map.entries())
@@ -3714,7 +3717,7 @@ const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> => (fc) =>
   fc.array(item(fc)).map((as) => new Set(as))
 
-const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> => (set) =>
+const readonlySetPretty = <A>(item: Pretty.Pretty<A>): Pretty.Pretty<ReadonlySet<A>> => (set) =>
   `new Set([${Array.from(set.values()).map((a) => item(a)).join(", ")}])`
 
 const readonlySetEquivalence = <A>(
@@ -3771,7 +3774,7 @@ export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, 
 // BigDecimal transformations
 // ---------------------------------------------
 
-const bigDecimalPretty = (): Pretty<BigDecimal.BigDecimal> => (val) =>
+const bigDecimalPretty = (): Pretty.Pretty<BigDecimal.BigDecimal> => (val) =>
   `BigDecimal(${BigDecimal.format(BigDecimal.normalize(val))})`
 
 const bigDecimalArbitrary = (): Arbitrary<BigDecimal.BigDecimal> => (fc) =>
@@ -4115,7 +4118,7 @@ export const negateBigDecimal = <I, A extends BigDecimal.BigDecimal>(
 const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk.Chunk<A>> => (fc) =>
   fc.array(item(fc)).map(Chunk.fromIterable)
 
-const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk.Chunk<A>> => (c) =>
+const chunkPretty = <A>(item: Pretty.Pretty<A>): Pretty.Pretty<Chunk.Chunk<A>> => (c) =>
   `Chunk(${Chunk.toReadonlyArray(c).map(item).join(", ")})`
 
 /**
@@ -4174,8 +4177,8 @@ const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<a
 (fc) => item(fc).map(toData)
 
 const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: Pretty<A>
-): Pretty<Data.Data<A>> =>
+  item: Pretty.Pretty<A>
+): Pretty.Pretty<Data.Data<A>> =>
 (d) => `Data(${item(d)})`
 
 /**
@@ -4430,6 +4433,7 @@ const makeClass = <I, A>(
   additionalProps?: any
 ): any => {
   const validator = Parser.validateSync(selfSchema)
+  const pretty = Pretty.to(selfSchema)
 
   return class extends Base {
     constructor(props: any = {}, disableValidation = false) {
@@ -4440,6 +4444,10 @@ const makeClass = <I, A>(
     }
 
     static [TypeId] = variance
+
+    toString() {
+      return pretty(this as any)
+    }
 
     static pipe() {
       return pipeArguments(this, arguments)
@@ -4562,7 +4570,7 @@ const fiberIdFromArbitrary = arbitrary.unsafe(FiberIdFrom)
 const fiberIdArbitrary: Arbitrary<FiberId.FiberId> = (fc) =>
   fiberIdFromArbitrary(fc).map(fiberIdDecode)
 
-const fiberIdPretty: Pretty<FiberId.FiberId> = (fiberId) => {
+const fiberIdPretty: Pretty.Pretty<FiberId.FiberId> = (fiberId) => {
   switch (fiberId._tag) {
     case "None":
       return "FiberId.none"
@@ -4710,7 +4718,7 @@ const causeArbitrary = <E>(
   return (fc) => arb(fc).map(causeDecode)
 }
 
-const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => {
+const causePretty = <E>(error: Pretty.Pretty<E>): Pretty.Pretty<Cause.Cause<E>> => (cause) => {
   const f = (cause: Cause.Cause<E>): string => {
     switch (cause._tag) {
       case "Empty":
@@ -4882,10 +4890,12 @@ const exitArbitrary = <E, A>(
   return (fc) => arb(fc).map(exitDecode)
 }
 
-const exitPretty = <E, A>(error: Pretty<E>, value: Pretty<A>): Pretty<Exit.Exit<E, A>> => (exit) =>
-  exit._tag === "Failure"
-    ? `Exit.failCause(${causePretty(error)(exit.cause)})`
-    : `Exit.succeed(${value(exit.value)})`
+const exitPretty =
+  <E, A>(error: Pretty.Pretty<E>, value: Pretty.Pretty<A>): Pretty.Pretty<Exit.Exit<E, A>> =>
+  (exit) =>
+    exit._tag === "Failure"
+      ? `Exit.failCause(${causePretty(error)(exit.cause)})`
+      : `Exit.succeed(${value(exit.value)})`
 
 /**
  * @category Exit
