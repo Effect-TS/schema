@@ -774,7 +774,7 @@ S.BigDecimalFromNumber
 S.bigDecimalFromString(S.string)
 
 // ---------------------------------------------
-// BigDecimal
+// Duration
 // ---------------------------------------------
 
 // $ExpectType Schema<readonly [seconds: number, nanos: number], Duration>
