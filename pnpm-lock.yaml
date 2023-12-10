@@ -24,8 +24,8 @@ devDependencies:
     specifier: ^2.27.1
     version: 2.27.1
   '@effect/build-utils':
-    specifier: ^0.5.1
-    version: 0.5.1
+    specifier: ^0.7.0
+    version: 0.7.0
   '@effect/docgen':
     specifier: ^0.3.8
     version: 0.3.8(tsx@4.6.1)(typescript@5.3.2)
@@ -36,8 +36,8 @@ devDependencies:
     specifier: ^0.1.2
     version: 0.1.2
   '@effect/language-service':
-    specifier: ^0.0.21
-    version: 0.0.21
+    specifier: ^0.1.0
+    version: 0.1.0
   '@types/node':
     specifier: ^20.10.1
     version: 20.10.1
@@ -57,8 +57,8 @@ devDependencies:
     specifier: ^0.4.0
     version: 0.4.0(@babel/core@7.23.5)
   effect:
-    specifier: 2.0.0-next.59
-    version: 2.0.0-next.59
+    specifier: 2.0.0-next.60
+    version: 2.0.0-next.60
   eslint:
     specifier: ^8.54.0
     version: 8.54.0
@@ -633,8 +633,8 @@ packages:
     resolution: {integrity: sha512-rPwwm/RrFIolz6xHa8Kzpshuwpe+xu/XcEw9iUmRF2tnyIwxxaW7XoFKaQ+GfPju81cKpH4vJeq7/2IizKvyjg==}
     dev: true
 
-  /@effect/build-utils@0.5.1:
-    resolution: {integrity: sha512-OZRkW8KLZyimwd+nFFPMA3dNTFmowBOlwUtudsb0gRezBlXNnyfD2dyLtbASuBT0l+javcLQCDvgfZKMcUDT+w==}
+  /@effect/build-utils@0.7.0:
+    resolution: {integrity: sha512-yYM6txQ0QgiQ1keUJwfuAWjoejiq0rB7H+pWyEnWDXNhfK8ZUn24G53jQDOB4btD7kbo4mfgdDBndm/DOIDZNA==}
     engines: {node: '>=16.17.1'}
     hasBin: true
     dev: true
@@ -674,8 +674,8 @@ packages:
       diff: 5.1.0
     dev: true
 
-  /@effect/language-service@0.0.21:
-    resolution: {integrity: sha512-e8vfKbjnbYiyneBincEFS0tzXluopGK77OkVFbPRtUbNDS5tJfb+jiwOQEiqASDsadcZmd+9J9+Q6v/z7GuN2g==}
+  /@effect/language-service@0.1.0:
+    resolution: {integrity: sha512-BnlM8LlaqCAYgdRfxlbR7gXGh/FD1scL1fPgNVJEPoOM08od1jtJz+iKhwfaud8TPnnhZR+TED2h5ynjanLeCQ==}
     dev: true
 
   /@esbuild/android-arm64@0.18.20:
@@ -2677,8 +2677,8 @@ packages:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
     dev: true
 
-  /effect@2.0.0-next.59:
-    resolution: {integrity: sha512-EE87vFl0/zIN5lKDtFccU3YCnbPqjxg9rY72obNN65/GE4JOJsXciyX8XC4pIDr3lE6KeJ0le8IXf+A7d92ntQ==}
+  /effect@2.0.0-next.60:
+    resolution: {integrity: sha512-23KhlVACgrg5UPFu9i4szybSU4cCU4T/7CX4pe0jV84QBZX0zm96WzwCtg6dqOnmUzBL7hm6S+iiPW2Rab13Uw==}
     dev: true
 
   /electron-to-chromium@1.4.598:
@@ -4276,8 +4276,8 @@ packages:
       get-func-name: 2.0.2
     dev: true
 
-  /lru-cache@10.0.3:
-    resolution: {integrity: sha512-B7gr+F6MkqB3uzINHXNctGieGsRTMwIBgxkp0yq/5BwcuDzD4A8wQpHQW6vDAm1uKSLQghmRdD9sKqf2vJ1cEg==}
+  /lru-cache@10.1.0:
+    resolution: {integrity: sha512-/1clY/ui8CzjKFyjdvwPWJUYKiFVXG2I2cY0ssG7h4+hwk+XOIX7ZSG9Q7TW8TW3Kp3BUSqgFWBLgL4PJ+Blag==}
     engines: {node: 14 || >=16.14}
     dev: true
 
@@ -4814,7 +4814,7 @@ packages:
     resolution: {integrity: sha512-MkhCqzzBEpPvxxQ71Md0b1Kk51W01lrYvlMzSUaIzNsODdd7mqhiimSZlr+VegAz5Z6Vzt9Xg2ttE//XBhH3EQ==}
     engines: {node: '>=16 || 14 >=14.17'}
     dependencies:
-      lru-cache: 10.0.3
+      lru-cache: 10.1.0
       minipass: 7.0.4
     dev: true
 
