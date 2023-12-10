@@ -172,6 +172,8 @@ describe("Schema/Class", () => {
     const personAge = new PersonWithAge({ id: 1, name: "John", age: 30 })
 
     expect(String(person)).toEqual(`Person({ "id": 1, "name": "John" })`)
+    expect(String(personAge)).toEqual(`PersonWithAge({ "id": 1, "age": 30, "name": "John" })`)
+
     expect(person instanceof Data.Class).toEqual(true)
     expect(personAge instanceof Data.Class).toEqual(true)
 
