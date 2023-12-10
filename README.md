@@ -108,7 +108,7 @@ const schema: Schema.Schema<{
 }>
 */
 const schema = Schema.struct({
-  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty())),
+  myfield: Schema.optionalExact(Schema.string.pipe(Schema.nonEmpty())),
 });
 
 Schema.decodeSync(schema)({ myfield: undefined }); // Error: Type 'undefined' is not assignable to type 'string'.ts(2379)
@@ -131,7 +131,7 @@ const schema: Schema.Schema<{
 }>
 */
 const schema = Schema.struct({
-  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty())),
+  myfield: Schema.optionalExact(Schema.string.pipe(Schema.nonEmpty())),
 });
 
 Schema.decodeSync(schema)({ myfield: undefined }); // No type error, but a decoding failure occurs
@@ -899,7 +899,7 @@ console.log(PersonEquivalence(john, alice)); // Output: false
 | `"a"`, `1`, `true`                           | type literals                            | `S.literal("a")`, `S.literal(1)`, `S.literal(true)`       |
 | `a${string}`                                 | template literals                        | `S.templateLiteral(S.literal("a"), S.string)`             |
 | `{ readonly a: string, readonly b: number }` | structs                                  | `S.struct({ a: S.string, b: S.number })`                  |
-| `{ readonly a?: string }`                    | optional fields                          | `S.struct({ a: S.optional(S.string) })`                   |
+| `{ readonly a?: string }`                    | optional fields                          | `S.struct({ a: S.optionalExact(S.string) })`              |
 | `Record<A, B>`                               | records                                  | `S.record(A, B)`                                          |
 | `readonly [string, number]`                  | tuples                                   | `S.tuple(S.string, S.number)`                             |
 | `ReadonlyArray<string>`                      | arrays                                   | `S.array(S.string)`                                       |
@@ -1463,15 +1463,15 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 
 ```ts
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }>
-S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean) });
+S.struct({ a: S.string, b: S.number, c: S.optionalExact(S.boolean) });
 ```
 
-**Note**. The `optional` constructor only exists to be used in combination with the `struct` API to signal an optional field and does not have a broader meaning. This means that it is only allowed to use it as an outer wrapper of a `Schema` and **it cannot be followed by other combinators**, for example this type of operation is prohibited:
+**Note**. The `optionalExact` combinator only exists to be used in combination with the `struct` API to signal an optional field and does not have a broader meaning. This means that it is only allowed to use it as an outer wrapper of a `Schema` and **it cannot be followed by other combinators**, for example this type of operation is prohibited:
 
 ```ts
 S.struct({
   // the use of S.optional should be the last step in the pipeline and not preceeded by other combinators like S.nullable
-  c: S.boolean.pipe(S.optional, S.nullable), // type checker error
+  c: S.boolean.pipe(S.optionalExact, S.nullable), // type checker error
 });
 ```
 
@@ -1479,7 +1479,7 @@ and it must be rewritten like this:
 
 ```ts
 S.struct({
-  c: S.boolean.pipe(S.nullable, S.optional), // ok
+  c: S.boolean.pipe(S.nullable, S.optionalExact), // ok
 });
 ```
 
@@ -1489,7 +1489,7 @@ Optional fields can be configured to accept a default value, making the field op
 
 ```ts
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
-const schema = S.struct({ a: S.optional(S.number).withDefault(() => 0) });
+const schema = S.struct({ a: S.optionalExactWithDefault(S.number, () => 0) });
 
 const parse = S.parseSync(schema);
 
@@ -1510,7 +1510,7 @@ Optional fields can be configured to transform a value of type `A` into `Option<
 import * as O from "effect/Option"
 
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
-const schema = S.struct({ a. S.optional(S.number).toOption() });
+const schema = S.struct({ a. S.optionalExactToOption(S.number) });
 
 const parse = S.parseSync(schema)
 
@@ -1692,7 +1692,7 @@ function getAge(id: number): Effect.Effect<never, Error, number> {
 
 export class PersonWithTransform extends Person.transform<PersonWithTransform>()(
   {
-    age: S.optional(S.number).toOption(),
+    age: S.optionalExact(S.number).toOption(),
   },
   (input) =>
     Effect.mapBoth(getAge(input.id), {
@@ -1718,7 +1718,7 @@ PersonWithTransform {
 
 export class PersonWithTransformFrom extends Person.transformFrom<PersonWithTransformFrom>()(
   {
-    age: S.optional(S.number).toOption(),
+    age: S.optionalExact(S.number).toOption(),
   },
   (input) =>
     Effect.mapBoth(getAge(input.id), {
@@ -1756,7 +1756,7 @@ The decision of which API to use, either `transform` or `transformFrom`, depends
 2. Using `transformFrom`:
    - The new transformation starts as soon as the initial input is handled.
    - You should provide a value `{ age?: number }`.
-   - Based on this fresh input, the subsequent transformation `{ age: S.optional(S.number).toOption() }` is executed.
+   - Based on this fresh input, the subsequent transformation `{ age: S.optionalExact(S.number).toOption() }` is executed.
    - This approach allows for immediate handling of the input, potentially influencing the subsequent transformations.
 
 ## Pick
@@ -1802,7 +1802,9 @@ The `required` operation ensures that all properties in a schema are mandatory.
 
 ```ts
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }>
-S.required(S.struct({ a: S.optional(S.string), b: S.optional(S.number) }));
+S.required(
+  S.struct({ a: S.optionalExact(S.string), b: S.optionalExact(S.number) })
+);
 ```
 
 ## Records

@@ -455,8 +455,8 @@ describe("Equivalence", () => {
 
     it("optional property signature", () => {
       const schema = S.struct({
-        a: S.optional(string),
-        b: S.optional(S.union(number, S.undefined))
+        a: S.optionalExact(string),
+        b: S.optionalExact(S.union(number, S.undefined))
       })
       const equivalence = E.to(schema)
 

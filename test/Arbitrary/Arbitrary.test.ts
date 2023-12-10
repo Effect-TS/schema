@@ -327,12 +327,12 @@ describe("Arbitrary/Arbitrary", () => {
     })
 
     it("optional property signature", () => {
-      const schema = S.struct({ a: S.optional(S.number) })
+      const schema = S.struct({ a: S.optionalExact(S.number) })
       propertyTo(schema)
     })
 
     it("optional property signature with undefined", () => {
-      const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
+      const schema = S.struct({ a: S.optionalExact(S.union(S.number, S.undefined)) })
       propertyTo(schema)
     })
 

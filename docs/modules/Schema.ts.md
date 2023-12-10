@@ -223,6 +223,14 @@ Added in v1.0.0
 - [number transformations](#number-transformations)
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring-1)
+- [optional](#optional)
+  - [optional](#optional-1)
+  - [optionalExact](#optionalexact)
+  - [optionalExactToOption](#optionalexacttooption)
+  - [optionalExactToRequired](#optionalexacttorequired)
+  - [optionalExactWithDefault](#optionalexactwithdefault)
+  - [optionalToOption](#optionaltooption)
+  - [optionalWithDefault](#optionalwithdefault)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEither](#parseeither)
@@ -347,7 +355,6 @@ Added in v1.0.0
   - [Join (type alias)](#join-type-alias)
   - [JsonOptions (type alias)](#jsonoptions-type-alias)
   - [Mutable (type alias)](#mutable-type-alias)
-  - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Schema (namespace)](#schema-namespace)
     - [Variance (interface)](#variance-interface)
@@ -358,7 +365,6 @@ Added in v1.0.0
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [ToStruct (type alias)](#tostruct-type-alias)
   - [from](#from)
-  - [optional](#optional)
   - [propertySignature](#propertysignature)
   - [readonlyMapFromSelf](#readonlymapfromself)
   - [to](#to)
@@ -2825,6 +2831,104 @@ export declare const numberFromString: <I, A extends string>(self: Schema<I, A>)
 
 Added in v1.0.0
 
+# optional
+
+## optional
+
+**Signature**
+
+```ts
+export declare const optional: <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A | undefined> | undefined
+) => PropertySignature<I | undefined, true, A | undefined, true>
+```
+
+Added in v1.0.0
+
+## optionalExact
+
+**Signature**
+
+```ts
+export declare const optionalExact: <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A> | undefined
+) => PropertySignature<I, true, A, true>
+```
+
+Added in v1.0.0
+
+## optionalExactToOption
+
+**Signature**
+
+```ts
+export declare const optionalExactToOption: <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A> | undefined
+) => PropertySignature<I, true, Option.Option<A>, false>
+```
+
+Added in v1.0.0
+
+## optionalExactToRequired
+
+**Signature**
+
+```ts
+export declare const optionalExactToRequired: <I, A, B>(
+  from: Schema<I, A>,
+  to: Schema<B, B>,
+  decode: (o: Option.Option<A>) => B,
+  encode: (b: B) => Option.Option<A>,
+  options?: DocAnnotations<A> | undefined
+) => PropertySignature<I, true, B, false>
+```
+
+Added in v1.0.0
+
+## optionalExactWithDefault
+
+**Signature**
+
+```ts
+export declare const optionalExactWithDefault: <I, A>(
+  schema: Schema<I, A>,
+  value: () => A,
+  options?: DocAnnotations<A> | undefined
+) => PropertySignature<I, true, A, false>
+```
+
+Added in v1.0.0
+
+## optionalToOption
+
+**Signature**
+
+```ts
+export declare const optionalToOption: <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A | undefined> | undefined
+) => PropertySignature<I | undefined, true, Option.Option<A>, false>
+```
+
+Added in v1.0.0
+
+## optionalWithDefault
+
+**Signature**
+
+```ts
+export declare const optionalWithDefault: <I, A>(
+  schema: Schema<I, A>,
+  value: () => A,
+  options?: DocAnnotations<A | undefined> | undefined
+) => PropertySignature<I | undefined, true, A, false>
+```
+
+Added in v1.0.0
+
 # parsing
 
 ## parse
@@ -4115,20 +4219,6 @@ export type Mutable<T> = {
 
 Added in v1.0.0
 
-## OptionalPropertySignature (interface)
-
-**Signature**
-
-```ts
-export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
-  readonly toOption: () => PropertySignature<From, true, Option.Option<To>, false>
-}
-```
-
-Added in v1.0.0
-
 ## PropertySignature (interface)
 
 **Signature**
@@ -4246,19 +4336,6 @@ Added in v1.0.0
 
 ```ts
 export declare const from: <I, A>(schema: Schema<I, A>) => Schema<I, I>
-```
-
-Added in v1.0.0
-
-## optional
-
-**Signature**
-
-```ts
-export declare const optional: <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations<A> | undefined
-) => OptionalPropertySignature<I, true, A, true>
 ```
 
 Added in v1.0.0

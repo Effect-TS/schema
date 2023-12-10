@@ -15,8 +15,8 @@ describe("Schema/onExcess", () => {
 
   describe("union should choose the output with more info", () => {
     it("structs", async () => {
-      const a = S.struct({ a: S.optional(S.number) })
-      const b = S.struct({ a: S.optional(S.number), b: S.optional(S.string) })
+      const a = S.struct({ a: S.optionalExact(S.number) })
+      const b = S.struct({ a: S.optionalExact(S.number), b: S.optionalExact(S.string) })
       const schema = S.union(a, b)
       await Util.expectParseSuccess(
         schema,

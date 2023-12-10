@@ -24,9 +24,10 @@ describe("Schema/omit", () => {
   })
 
   it("struct with optionals", async () => {
-    const schema = S.struct({ a: S.optional(S.string), b: S.NumberFromString, c: S.boolean }).pipe(
-      S.omit("c")
-    )
+    const schema = S.struct({ a: S.optionalExact(S.string), b: S.NumberFromString, c: S.boolean })
+      .pipe(
+        S.omit("c")
+      )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
     await Util.expectParseSuccess(schema, { b: "1" }, { b: 1 })
 
@@ -59,7 +60,7 @@ describe("Schema/omit", () => {
 
   it("struct with property signature transformations", async () => {
     const schema = S.struct({
-      a: S.optional(S.string).withDefault(() => ""),
+      a: S.optionalExactWithDefault(S.string, () => ""),
       b: S.NumberFromString,
       c: S.boolean
     }).pipe(

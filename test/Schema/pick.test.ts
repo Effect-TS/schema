@@ -24,9 +24,10 @@ describe("Schema/pick", () => {
   })
 
   it("struct with optionals", async () => {
-    const schema = S.struct({ a: S.optional(S.string), b: S.NumberFromString, c: S.boolean }).pipe(
-      S.pick("a", "b")
-    )
+    const schema = S.struct({ a: S.optionalExact(S.string), b: S.NumberFromString, c: S.boolean })
+      .pipe(
+        S.pick("a", "b")
+      )
     await Util.expectParseSuccess(schema, { a: "a", b: "1" }, { a: "a", b: 1 })
     await Util.expectParseSuccess(schema, { b: "1" }, { b: 1 })
 
@@ -59,7 +60,7 @@ describe("Schema/pick", () => {
 
   it("struct with property signature transformations", async () => {
     const schema = S.struct({
-      a: S.optional(S.string).withDefault(() => ""),
+      a: S.optionalExactWithDefault(S.string, () => ""),
       b: S.NumberFromString,
       c: S.boolean
     }).pipe(

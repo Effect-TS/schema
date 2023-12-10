@@ -289,7 +289,7 @@ describe("Schema/is", () => {
     })
 
     it("optional property signature", () => {
-      const schema = S.struct({ a: S.optional(S.number) })
+      const schema = S.struct({ a: S.optionalExact(S.number) })
       const is = P.is(schema)
       expect(is({})).toEqual(true)
       expect(is({ a: 1 })).toEqual(true)
@@ -301,7 +301,7 @@ describe("Schema/is", () => {
     })
 
     it("optional property signature with undefined", () => {
-      const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
+      const schema = S.struct({ a: S.optionalExact(S.union(S.number, S.undefined)) })
       const is = P.is(schema)
       expect(is({})).toEqual(true)
       expect(is({ a: 1 })).toEqual(true)

@@ -16,7 +16,6 @@ import * as Equal from "effect/Equal"
 import * as Equivalence from "effect/Equivalence"
 import * as Exit from "effect/Exit"
 import * as FiberId from "effect/FiberId"
-import type { LazyArg } from "effect/Function"
 import { dual, identity } from "effect/Function"
 import * as N from "effect/Number"
 import * as Option from "effect/Option"
@@ -651,67 +650,38 @@ export interface PropertySignature<From, FromIsOptional, To, ToIsOptional>
   readonly ToIsOptional: ToIsOptional
 }
 
-/**
- * @since 1.0.0
- */
-export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends PropertySignature<From, FromIsOptional, To, ToIsOptional>
-{
-  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
-  readonly toOption: () => PropertySignature<From, true, Option.Option<To>, false>
-}
-
 type PropertySignatureConfig =
   | {
     readonly _tag: "PropertySignature"
-    readonly ast: AST.AST
+    readonly from: AST.AST
     readonly annotations: AST.Annotated["annotations"]
   }
   | {
     readonly _tag: "Optional"
-    readonly ast: AST.AST
+    readonly from: AST.AST
     readonly annotations: AST.Annotated["annotations"] | undefined
   }
   | {
-    readonly _tag: "Default"
-    readonly ast: AST.AST
-    readonly value: LazyArg<any>
-    readonly annotations: AST.Annotated["annotations"] | undefined
-  }
-  | {
-    readonly _tag: "Option"
-    readonly ast: AST.AST
+    readonly _tag: "Transformation"
+    readonly from: AST.AST
+    readonly to: AST.AST
+    readonly decode: AST.FinalPropertySignatureTransformation["decode"]
+    readonly encode: AST.FinalPropertySignatureTransformation["encode"]
     readonly annotations: AST.Annotated["annotations"] | undefined
   }
 
 /** @internal */
 export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
-  readonly [TypeId] = variance
+  readonly [TypeId]: {
+    readonly From: (_: From) => From
+    readonly To: (_: To) => To
+  } = variance
   readonly FromIsOptional!: FromIsOptional
   readonly ToIsOptional!: ToIsOptional
 
   constructor(
     readonly config: PropertySignatureConfig
   ) {}
-
-  withDefault(value: () => To): PropertySignature<From, true, To, false> {
-    return new PropertySignatureImpl(
-      {
-        _tag: "Default",
-        ast: this.config.ast,
-        value,
-        annotations: this.config.annotations
-      }
-    )
-  }
-
-  toOption(): PropertySignature<From, true, Option.Option<To>, false> {
-    return new PropertySignatureImpl({
-      _tag: "Option",
-      ast: this.config.ast,
-      annotations: this.config.annotations
-    })
-  }
 }
 
 /**
@@ -723,22 +693,119 @@ export const propertySignature = <I, A>(
 ): PropertySignature<I, false, A, false> =>
   new PropertySignatureImpl({
     _tag: "PropertySignature",
-    ast: schema.ast,
+    from: schema.ast,
     annotations: toAnnotations(options)
   })
 
 /**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalExact = <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A>
+): PropertySignature<I, true, A, true> =>
+  new PropertySignatureImpl({
+    _tag: "Optional",
+    from: schema.ast,
+    annotations: toAnnotations(options)
+  })
+
+/**
+ * @category optional
  * @since 1.0.0
  */
 export const optional = <I, A>(
   schema: Schema<I, A>,
+  options?: DocAnnotations<A | undefined>
+): PropertySignature<I | undefined, true, A | undefined, true> =>
+  optionalExact(union(_undefined, schema), options)
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalExactToRequired = <I, A, B>(
+  from: Schema<I, A>,
+  to: Schema<B>,
+  decode: (o: Option.Option<A>) => B, // `none` here means: the value is missing in the input
+  encode: (b: B) => Option.Option<A>, // `none` here means: the value will be missing in the output
   options?: DocAnnotations<A>
-): OptionalPropertySignature<I, true, A, true> =>
+): PropertySignature<I, true, B, false> =>
   new PropertySignatureImpl({
-    _tag: "Optional",
-    ast: schema.ast,
+    _tag: "Transformation",
+    from: from.ast,
+    to: to.ast,
+    decode: (o) => Option.some(decode(o)),
+    encode: Option.flatMap(encode),
     annotations: toAnnotations(options)
   })
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalExactToOption = <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A>
+): PropertySignature<I, true, Option.Option<A>, false> =>
+  optionalExactToRequired(
+    schema,
+    optionFromSelf(to(schema)),
+    Option.filter(Predicate.isNotUndefined),
+    identity,
+    options
+  )
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalToOption = <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A | undefined>
+): PropertySignature<I | undefined, true, Option.Option<A>, false> =>
+  optionalExactToRequired(
+    union(_undefined, schema),
+    optionFromSelf(to(schema)),
+    Option.filter(Predicate.isNotUndefined),
+    identity,
+    options
+  )
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalExactWithDefault = <I, A>(
+  schema: Schema<I, A>,
+  value: () => A,
+  options?: DocAnnotations<A>
+): PropertySignature<I, true, A, false> =>
+  optionalExactToRequired(
+    schema,
+    to(schema),
+    Option.match({ onNone: value, onSome: identity }),
+    Option.some,
+    options
+  )
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalWithDefault = <I, A>(
+  schema: Schema<I, A>,
+  value: () => A,
+  options?: DocAnnotations<A | undefined>
+): PropertySignature<I | undefined, true, A, false> =>
+  optionalExactToRequired(
+    union(_undefined, schema),
+    to(schema),
+    Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
+    Option.some,
+    options
+  )
 
 /**
  * @since 1.0.0
@@ -807,44 +874,30 @@ export const struct = <
     const field = fields[key] as any
     if ("config" in field) {
       const config: PropertySignatureConfig = field.config
-      const from = config.ast
-      const to = AST.to(from)
+      const from = config.from
       const annotations = config.annotations
       switch (config._tag) {
         case "PropertySignature":
           pss.push(AST.createPropertySignature(key, from, false, true, annotations))
           froms.push(AST.createPropertySignature(key, from, false, true))
-          tos.push(AST.createPropertySignature(key, to, false, true, annotations))
+          tos.push(AST.createPropertySignature(key, AST.to(from), false, true, annotations))
           break
         case "Optional":
           pss.push(AST.createPropertySignature(key, from, true, true, annotations))
           froms.push(AST.createPropertySignature(key, from, true, true))
-          tos.push(AST.createPropertySignature(key, to, true, true, annotations))
+          tos.push(AST.createPropertySignature(key, AST.to(from), true, true, annotations))
           break
-        case "Default":
+        case "Transformation":
           froms.push(AST.createPropertySignature(key, from, true, true))
-          tos.push(AST.createPropertySignature(key, to, false, true, annotations))
+          tos.push(AST.createPropertySignature(key, config.to, false, true, annotations))
           propertySignatureTransformations.push(
             AST.createPropertySignatureTransform(
               key,
               key,
               AST.createFinalPropertySignatureTransformation(
-                Option.orElse(() => Option.some(config.value())),
-                identity
+                config.decode,
+                config.encode
               )
-            )
-          )
-          break
-        case "Option":
-          froms.push(AST.createPropertySignature(key, from, true, true))
-          tos.push(
-            AST.createPropertySignature(key, optionFromSelf(make(to)).ast, false, true, annotations)
-          )
-          propertySignatureTransformations.push(
-            AST.createPropertySignatureTransform(
-              key,
-              key,
-              AST.createFinalPropertySignatureTransformation(Option.some, Option.flatten)
             )
           )
           break

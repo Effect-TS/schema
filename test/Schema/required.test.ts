@@ -12,7 +12,7 @@ describe("Schema/required", () => {
 
   it("struct", async () => {
     const schema = S.required(S.struct({
-      a: S.optional(NumberFromString.pipe(S.greaterThan(0)))
+      a: S.optionalExact(NumberFromString.pipe(S.greaterThan(0)))
     }))
 
     await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
@@ -79,8 +79,8 @@ describe("Schema/required", () => {
 
   it("union", async () => {
     const schema = S.required(S.union(
-      S.struct({ a: S.optional(S.string) }),
-      S.struct({ b: S.optional(S.number) })
+      S.struct({ a: S.optionalExact(S.string) }),
+      S.struct({ b: S.optionalExact(S.number) })
     ))
     await Util.expectParseSuccess(schema, { a: "a" })
     await Util.expectParseSuccess(schema, { b: 1 })
@@ -98,7 +98,7 @@ describe("Schema/required", () => {
     const schema: S.Schema<A> = S.required(S.suspend( // intended outer suspend
       () =>
         S.struct({
-          a: S.optional(S.union(S.null, schema))
+          a: S.optionalExact(S.union(S.null, schema))
         })
     ))
     await Util.expectParseSuccess(schema, { a: null })

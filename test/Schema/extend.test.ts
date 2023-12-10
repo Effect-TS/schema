@@ -10,49 +10,51 @@ describe("Schema/extend", () => {
     })
 
     it(`struct with defaults extend struct`, async () => {
-      const schema = S.struct({ a: S.optional(S.string).withDefault(() => ""), b: S.string }).pipe(
-        S.extend(S.struct({ c: S.number }))
-      )
+      const schema = S.struct({ a: S.optionalExactWithDefault(S.string, () => ""), b: S.string })
+        .pipe(
+          S.extend(S.struct({ c: S.number }))
+        )
       await Util.expectParseSuccess(schema, { b: "b", c: 1 }, { a: "", b: "b", c: 1 })
     })
 
     it(`struct extend struct with defaults`, async () => {
       const schema = S.struct({ a: S.number }).pipe(
         S.extend(
-          S.struct({ b: S.string, c: S.optional(S.string).withDefault(() => "") })
+          S.struct({ b: S.string, c: S.optionalExactWithDefault(S.string, () => "") })
         )
       )
       await Util.expectParseSuccess(schema, { a: 1, b: "b" }, { a: 1, b: "b", c: "" })
     })
 
     it(`struct with defaults extend struct with defaults `, async () => {
-      const schema = S.struct({ a: S.optional(S.string).withDefault(() => ""), b: S.string }).pipe(
-        S.extend(
-          S.struct({ c: S.optional(S.number).withDefault(() => 0), d: S.boolean })
+      const schema = S.struct({ a: S.optionalExactWithDefault(S.string, () => ""), b: S.string })
+        .pipe(
+          S.extend(
+            S.struct({ c: S.optionalExactWithDefault(S.number, () => 0), d: S.boolean })
+          )
         )
-      )
       await Util.expectParseSuccess(schema, { b: "b", d: true }, { a: "", b: "b", c: 0, d: true })
     })
 
     it(`union with defaults extend union with defaults `, async () => {
       const schema = S.union(
         S.struct({
-          a: S.optional(S.string).withDefault(() => "a"),
+          a: S.optionalExactWithDefault(S.string, () => "a"),
           b: S.string
         }),
         S.struct({
-          c: S.optional(S.string).withDefault(() => "c"),
+          c: S.optionalExactWithDefault(S.string, () => "c"),
           d: S.string
         })
       ).pipe(
         S.extend(
           S.union(
             S.struct({
-              e: S.optional(S.string).withDefault(() => "e"),
+              e: S.optionalExactWithDefault(S.string, () => "e"),
               f: S.string
             }),
             S.struct({
-              g: S.optional(S.string).withDefault(() => "g"),
+              g: S.optionalExactWithDefault(S.string, () => "g"),
               h: S.string
             })
           )
@@ -227,7 +229,7 @@ describe("Schema/extend", () => {
 
       it("optional, transformation", async () => {
         const schema = S.struct({
-          a: S.optional(S.boolean).withDefault(() => true)
+          a: S.optionalExactWithDefault(S.boolean, () => true)
         }).pipe(
           S.extend(
             S.struct({
@@ -247,7 +249,7 @@ describe("Schema/extend", () => {
         }).pipe(
           S.extend(
             S.struct({
-              a: S.optional(S.boolean).withDefault(() => true)
+              a: S.optionalExactWithDefault(S.boolean, () => true)
             })
           )
         )

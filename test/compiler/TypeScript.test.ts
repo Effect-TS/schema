@@ -704,7 +704,7 @@ describe("TypeScript", () => {
     })
 
     it("optional property signature", () => {
-      const schema = S.struct({ a: S.optional(S.number) })
+      const schema = S.struct({ a: S.optionalExact(S.number) })
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly a?: number;
@@ -712,7 +712,7 @@ describe("TypeScript", () => {
     })
 
     it("optional property signature with undefined", () => {
-      const schema = S.struct({ a: S.optional(S.union(S.number, S.undefined)) })
+      const schema = S.struct({ a: S.optionalExact(S.union(S.number, S.undefined)) })
       const ts = typeScriptFor(schema)
       expect(printNodes(ts.nodes)).toEqual([`{
     readonly a?: number | undefined;

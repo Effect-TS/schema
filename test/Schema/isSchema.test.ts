@@ -5,7 +5,7 @@ describe("isSchema", () => {
   it("Schema", () => {
     expect(S.isSchema(S.string)).toBe(true)
     expect(S.isSchema(S.propertySignature(S.string, {}))).toBe(false)
-    expect(S.isSchema(S.optional(S.string))).toBe(false)
+    expect(S.isSchema(S.optionalExact(S.string))).toBe(false)
   })
 
   it("BrandSchema", () => {
