@@ -1,5 +1,6 @@
 import * as AST from "@effect/schema/AST"
 import * as PR from "@effect/schema/ParseResult"
+import * as Pretty from "@effect/schema/Pretty"
 import * as S from "@effect/schema/Schema"
 import * as Serializable from "@effect/schema/Serializable"
 import * as Util from "@effect/schema/test/util"
@@ -182,6 +183,13 @@ describe("Schema/Class", () => {
 
     const person3 = new Person({ id: 2, name: "John" })
     expect(!Equal.equals(person, person3)).toEqual(true)
+  })
+
+  it("Pretty/to", () => {
+    const pretty = Pretty.to(Person)
+    expect(pretty(new Person({ id: 1, name: "John" }))).toEqual(
+      `Person({ "id": 1, "name": "John" })`
+    )
   })
 
   it("transform", () => {
