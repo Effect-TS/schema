@@ -4446,7 +4446,7 @@ const makeClass = <I, A>(
     static [TypeId] = variance
 
     toString() {
-      return pretty(this as any)
+      return `${this.constructor.name}(${pretty(this as any)})`
     }
 
     static pipe() {

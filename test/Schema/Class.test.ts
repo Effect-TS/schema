@@ -171,7 +171,7 @@ describe("Schema/Class", () => {
     const person = new Person({ id: 1, name: "John" })
     const personAge = new PersonWithAge({ id: 1, name: "John", age: 30 })
 
-    expect(String(person)).toEqual(`{ "id": 1, "name": "John" }`)
+    expect(String(person)).toEqual(`Person({ "id": 1, "name": "John" })`)
     expect(person instanceof Data.Class).toEqual(true)
     expect(personAge instanceof Data.Class).toEqual(true)
 
@@ -211,7 +211,9 @@ describe("Schema/Class", () => {
   it("TaggedClass", () => {
     let person = new TaggedPersonWithAge({ id: 1, name: "John", age: 30 })
 
-    expect(String(person)).toEqual(`{ "_tag": "TaggedPerson", "id": 1, "age": 30, "name": "John" }`)
+    expect(String(person)).toEqual(
+      `TaggedPersonWithAge({ "_tag": "TaggedPerson", "id": 1, "age": 30, "name": "John" })`
+    )
     expect(person._tag).toEqual("TaggedPerson")
     expect(person.upperName).toEqual("JOHN")
 
@@ -237,7 +239,7 @@ describe("Schema/Class", () => {
 
     let err = new MyError({ id: 1 })
 
-    expect(String(err)).toEqual(`{ "_tag": "MyError", "id": 1 }`)
+    expect(String(err)).toEqual(`MyError({ "_tag": "MyError", "id": 1 })`)
     expect(err.stack).toContain("Class.test.ts:")
     expect(err._tag).toEqual("MyError")
     expect(err.id).toEqual(1)
@@ -258,7 +260,7 @@ describe("Schema/Class", () => {
 
     let req = new MyRequest({ id: 1 })
 
-    expect(String(req)).toEqual(`{ "_tag": "MyRequest", "id": 1 }`)
+    expect(String(req)).toEqual(`MyRequest({ "_tag": "MyRequest", "id": 1 })`)
     expect(req._tag).toEqual("MyRequest")
     expect(req.id).toEqual(1)
     expect(Request.isRequest(req)).toEqual(true)
