@@ -1199,6 +1199,10 @@ Added in v1.0.0
 
 ## jsonSchema
 
+Attaches a JSON Schema annotation to a schema that represents a refinement.
+
+If the schema is composed of more than one refinement, the corresponding annotations will be merged.
+
 **Signature**
 
 ```ts
@@ -4029,6 +4033,11 @@ Added in v1.0.0
 ```ts
 export interface FilterAnnotations<A> extends DocAnnotations<A> {
   readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
+  /**
+   * Attaches a JSON Schema annotation to this refinement.
+   *
+   * If the schema is composed of more than one refinement, the corresponding annotations will be merged.
+   */
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
   readonly pretty?: (...args: ReadonlyArray<Pretty<any>>) => Pretty<any>

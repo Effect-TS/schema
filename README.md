@@ -665,7 +665,7 @@ Output:
 
 ## Generating JSON Schemas
 
-The `to` function, which is part of the `@effect/schema/JSONSchema` module, allows you to generate a JSON Schema based on a schema definition:
+The `to` / `from` functions, which are part of the `@effect/schema/JSONSchema` module, allow you to generate a JSON Schema based on a schema definition:
 
 ```ts
 import * as JSONSchema from "@effect/schema/JSONSchema";
@@ -817,6 +817,43 @@ Output:
 In the example above, we define a schema for a "Category" that can contain a "name" (a string) and an array of nested "categories." To support recursive definitions, we use the `S.suspend` function and identifier annotations to name our schema.
 
 This ensures that the JSON Schema properly handles the recursive structure and creates distinct definitions for each annotated schema, improving readability and maintainability.
+
+### JSON Schema Annotations
+
+When defining a **refinement** (e.g., through the `filter` function), you can attach a JSON Schema annotation to your schema containing a JSON Schema "fragment" related to this particular refinement. This fragment will be used to generate the corresponding JSON Schema. Note that if the schema consists of more than one refinement, the corresponding annotations will be merged.
+
+```ts
+import * as JSONSchema from "@effect/schema/JSONSchema";
+import * as Schema from "@effect/schema/Schema";
+
+// Simulate one or more refinements
+const Positive = Schema.number.pipe(
+  Schema.filter((n) => n > 0, {
+    jsonSchema: { minimum: 0 },
+  })
+);
+
+const schema = Positive.pipe(
+  Schema.filter((n) => n <= 10, {
+    jsonSchema: { maximum: 10 },
+  })
+);
+
+console.log(JSONSchema.to(schema));
+/*
+Output:
+{
+  '$schema': 'http://json-schema.org/draft-07/schema#',
+  type: 'number',
+  description: 'a number',
+  title: 'number',
+  minimum: 0,
+  maximum: 10
+}
+*/
+```
+
+As seen in the example, the JSON Schema annotations are merged with the base JSON Schema from `Schema.number`. This approach helps handle multiple refinements while maintaining clarity in your code.
 
 ## Generating Equivalences
 
