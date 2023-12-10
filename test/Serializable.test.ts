@@ -23,6 +23,16 @@ class GetPersonById extends S.Class<GetPersonById>()({
 }
 
 describe("Serializable", () => {
+  test("serializable", () => {
+    const base = S.struct({ id: S.number })
+    const withSerializable = Serializable.serializable(base)
+
+    assert.deepStrictEqual(Effect.runSync(S.decode(withSerializable)({ id: 123 })), {
+      id: 123,
+      [Serializable.symbol]: base
+    })
+  })
+
   test("serialize", () => {
     const req = new GetPersonById({ id: 123 })
     assert.deepStrictEqual(Effect.runSync(Serializable.serialize(req)), {

@@ -9,7 +9,7 @@ import { dual } from "effect/Function"
 import { globalValue } from "effect/GlobalValue"
 import * as Internal from "./internal/serializable.js"
 import * as Parser from "./Parser.js"
-import type * as ParseResult from "./ParseResult.js"
+import * as ParseResult from "./ParseResult.js"
 import * as Schema from "./Schema.js"
 
 /**
@@ -25,6 +25,40 @@ export const symbol: unique symbol = Internal.symbol as any
 export interface Serializable<I, A> {
   readonly [symbol]: Schema.Schema<I, A>
 }
+
+/**
+ * @category schema
+ * @since 1.0.0
+ */
+const serializableFromSelf = <I, A extends object>(
+  self: Schema.Schema<I, A>
+): Schema.Schema<I & Serializable<I, A>, A & Serializable<I, A>> =>
+  Schema.declare(
+    [],
+    self,
+    (isDecoding) => {
+      const parse = isDecoding ? Parser.parse(self) : Parser.encode(self)
+      return (u, options, ast) => {
+        return u !== null && typeof u === "object" && symbol in u ?
+          parse(u, options)
+          : ParseResult.fail(ParseResult.type(ast, u))
+      }
+    }
+  )
+
+/**
+ * @category schema
+ * @since 1.0.0
+ */
+export const serializable = <I, A extends object>(
+  self: Schema.Schema<I, A>
+): Schema.Schema<I, A & Serializable<I, A>> =>
+  Schema.transform(
+    self,
+    Schema.to(serializableFromSelf(self)),
+    (i) => Object.assign(i, { [symbol]: self }),
+    (i) => i
+  )
 
 /**
  * @since 1.0.0
