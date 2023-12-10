@@ -31,7 +31,7 @@ Welcome to the documentation for `@effect/schema`, **a library for defining and 
 | JSON Schemas    | Create JSON Schemas based on defined schemas.                                                                   |
 | Equivalence     | Create [Equivalences](https://effect-ts.github.io/effect/modules/Equivalence.ts.html) based on defined schemas. |
 
-If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](https://github.com/effect-ts/schema#basic-usage) section!
+If you're eager to learn how to define your first schema, jump straight to the [**Basic usage**](#basic-usage) section!
 
 ## Understanding Parsing, Decoding, and Encoding
 
@@ -879,6 +879,37 @@ console.log(PersonEquivalence(john, alice)); // Output: false
 ```
 
 # Basic usage
+
+## Cheatsheet
+
+| Typescript Type                              | Description / Notes                      | Schema / Combinator                                       |
+| -------------------------------------------- | ---------------------------------------- | --------------------------------------------------------- |
+| `null`                                       |                                          | `S.null`                                                  |
+| `undefined`                                  |                                          | `S.undefined`                                             |
+| `string`                                     |                                          | `S.string`                                                |
+| `number`                                     |                                          | `S.number`                                                |
+| `boolean`                                    |                                          | `S.boolean`                                               |
+| `symbol`                                     |                                          | `S.symbolFromSelf` / `S.symbol`                           |
+| `bigint`                                     |                                          | `S.bigintFromSelf` / `S.bigint`                           |
+| `unknown`                                    |                                          | `S.unknown`                                               |
+| `any`                                        |                                          | `S.any`                                                   |
+| `never`                                      |                                          | `S.never`                                                 |
+| `object`                                     |                                          | `S.object`                                                |
+| `unique symbol`                              |                                          | `S.uniqueSymbol`                                          |
+| `"a"`, `1`, `true`                           | type literals                            | `S.literal("a")`, `S.literal(1)`, `S.literal(true)`       |
+| `a${string}`                                 | template literals                        | `S.templateLiteral(S.literal("a"), S.string)`             |
+| `{ readonly a: string, readonly b: number }` | structs                                  | `S.struct({ a: S.string, b: S.number })`                  |
+| `{ readonly a?: string }`                    | optional fields                          | `S.struct({ a: S.optional(S.string) })`                   |
+| `Record<A, B>`                               | records                                  | `S.record(A, B)`                                          |
+| `readonly [string, number]`                  | tuples                                   | `S.tuple(S.string, S.number)`                             |
+| `ReadonlyArray<string>`                      | arrays                                   | `S.array(S.string)`                                       |
+| `A \| B`                                     | unions                                   | `S.union(A, B)`                                           |
+| `A & B`                                      | intersections of non-overlapping structs | `S.extend(A, B)`                                          |
+| `Record<A, B> & Record<C, D>`                | intersections of non-overlapping records | `S.extend(S.record(A, B), S.record(C, D))`                |
+| `type A = { readonly a: A \| null }`         | recursive types                          | `S.struct({ a: S.union(S.null, S.suspend(() => self)) })` |
+| `keyof A`                                    |                                          | `S.keyof(A)`                                              |
+| `Partial<A>`                                 |                                          | `S.partial(A)`                                            |
+| `Required<A>`                                |                                          | `S.required(A)`                                           |
 
 ## Primitives
 
@@ -1797,7 +1828,7 @@ S.record(S.string.pipe(S.minLength(2)), S.string);
 
 ```ts
 // $ExpectType Schema<{ readonly [x: symbol]: string; }>
-S.record(S.symbol, S.string);
+S.record(S.symbolFromSelf, S.string);
 ```
 
 ### Template literal keys
