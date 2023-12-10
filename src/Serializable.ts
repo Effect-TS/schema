@@ -30,7 +30,7 @@ export interface Serializable<I, A> {
  * @category schema
  * @since 1.0.0
  */
-const serializableFromSelf = <I, A extends object>(
+const serializableFromSelf = <I, A>(
   self: Schema.Schema<I, A>
 ): Schema.Schema<I & Serializable<I, A>, A & Serializable<I, A>> =>
   Schema.declare(
@@ -40,7 +40,8 @@ const serializableFromSelf = <I, A extends object>(
       const parse = isDecoding ? Parser.parse(self) : Parser.encode(self)
       return (u, options, ast) => {
         return u !== null && typeof u === "object" && symbol in u ?
-          parse(u, options)
+          ParseResult.map(parse(u, options) as any, (value) =>
+            Object.assign(value as any, { [symbol]: self }))
           : ParseResult.fail(ParseResult.type(ast, u))
       }
     }

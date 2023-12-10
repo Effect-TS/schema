@@ -23,7 +23,7 @@ class GetPersonById extends S.Class<GetPersonById>()({
 }
 
 describe("Serializable", () => {
-  test("serializable", () => {
+  test("serializable - decode", () => {
     const base = S.struct({ id: S.number })
     const withSerializable = Serializable.serializable(base)
 
@@ -31,6 +31,18 @@ describe("Serializable", () => {
       id: 123,
       [Serializable.symbol]: base
     })
+  })
+
+  test("serializable - encode", () => {
+    const base = S.struct({ id: S.number })
+    const withSerializable = Serializable.serializable(base)
+
+    assert.deepStrictEqual(
+      Effect.runSync(S.encode(withSerializable)({ id: 123, [Serializable.symbol]: base })),
+      {
+        id: 123
+      }
+    )
   })
 
   test("serialize", () => {
