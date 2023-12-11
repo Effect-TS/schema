@@ -4241,7 +4241,7 @@ export interface FilterAnnotations<A> extends DocAnnotations<A> {
    */
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-  readonly pretty?: (...args: ReadonlyArray<Pretty<any>>) => Pretty<any>
+  readonly pretty?: (...args: ReadonlyArray<Pretty.Pretty<any>>) => Pretty.Pretty<any>
   readonly equivalence?: () => Equivalence.Equivalence<A>
 }
 ```
