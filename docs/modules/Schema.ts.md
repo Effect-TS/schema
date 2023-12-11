@@ -52,9 +52,20 @@ Added in v1.0.0
   - [dateFromString](#datefromstring-1)
 - [Duration constructors](#duration-constructors)
   - [Duration](#duration)
+  - [DurationFromMillis](#durationfrommillis)
+  - [DurationFromNanos](#durationfromnanos)
   - [DurationFromSelf](#durationfromself)
+- [Duration filters](#duration-filters)
+  - [betweenDuration](#betweenduration)
+  - [greaterThanDuration](#greaterthanduration)
+  - [greaterThanOrEqualToDuration](#greaterthanorequaltoduration)
+  - [lessThanDuration](#lessthanduration)
+  - [lessThanOrEqualToDuration](#lessthanorequaltoduration)
 - [Duration transformations](#duration-transformations)
+  - [clampDuration](#clampduration)
   - [durationFromHrTime](#durationfromhrtime)
+  - [durationFromMillis](#durationfrommillis-1)
+  - [durationFromNanos](#durationfromnanos-1)
 - [Either transformations](#either-transformations)
   - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
@@ -283,6 +294,7 @@ Added in v1.0.0
   - [BetweenBigDecimalTypeId](#betweenbigdecimaltypeid)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
   - [BetweenBigintTypeId (type alias)](#betweenbiginttypeid-type-alias)
+  - [BetweenDurationTypeId](#betweendurationtypeid)
   - [BetweenTypeId](#betweentypeid)
   - [BetweenTypeId (type alias)](#betweentypeid-type-alias)
   - [BrandTypeId](#brandtypeid)
@@ -291,9 +303,11 @@ Added in v1.0.0
   - [GreaterThanBigDecimalTypeId](#greaterthanbigdecimaltypeid)
   - [GreaterThanBigintTypeId](#greaterthanbiginttypeid)
   - [GreaterThanBigintTypeId (type alias)](#greaterthanbiginttypeid-type-alias)
+  - [GreaterThanDurationTypeId](#greaterthandurationtypeid)
   - [GreaterThanOrEqualToBigDecimalTypeId](#greaterthanorequaltobigdecimaltypeid)
   - [GreaterThanOrEqualToBigintTypeId](#greaterthanorequaltobiginttypeid)
   - [GreaterThanOrEqualToBigintTypeId (type alias)](#greaterthanorequaltobiginttypeid-type-alias)
+  - [GreaterThanOrEqualToDurationTypeId](#greaterthanorequaltodurationtypeid)
   - [GreaterThanOrEqualToTypeId](#greaterthanorequaltotypeid)
   - [GreaterThanOrEqualToTypeId (type alias)](#greaterthanorequaltotypeid-type-alias)
   - [GreaterThanTypeId](#greaterthantypeid)
@@ -310,9 +324,11 @@ Added in v1.0.0
   - [LessThanBigDecimalTypeId](#lessthanbigdecimaltypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
   - [LessThanBigintTypeId (type alias)](#lessthanbiginttypeid-type-alias)
+  - [LessThanDurationTypeId](#lessthandurationtypeid)
   - [LessThanOrEqualToBigDecimalTypeId](#lessthanorequaltobigdecimaltypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
   - [LessThanOrEqualToBigintTypeId (type alias)](#lessthanorequaltobiginttypeid-type-alias)
+  - [LessThanOrEqualToDurationTypeId](#lessthanorequaltodurationtypeid)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
   - [LessThanOrEqualToTypeId (type alias)](#lessthanorequaltotypeid-type-alias)
   - [LessThanTypeId](#lessthantypeid)
@@ -787,6 +803,32 @@ export declare const Duration: Schema<readonly [seconds: number, nanos: number],
 
 Added in v1.0.0
 
+## DurationFromMillis
+
+A schema that transforms a `number` tuple into a `Duration`.
+Treats the value as the number of milliseconds.
+
+**Signature**
+
+```ts
+export declare const DurationFromMillis: Schema<number, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## DurationFromNanos
+
+A schema that transforms a `bigint` tuple into a `Duration`.
+Treats the value as the number of nanoseconds.
+
+**Signature**
+
+```ts
+export declare const DurationFromNanos: Schema<bigint, Duration.Duration>
+```
+
+Added in v1.0.0
+
 ## DurationFromSelf
 
 **Signature**
@@ -797,7 +839,90 @@ export declare const DurationFromSelf: Schema<Duration.Duration, Duration.Durati
 
 Added in v1.0.0
 
+# Duration filters
+
+## betweenDuration
+
+**Signature**
+
+```ts
+export declare const betweenDuration: <A extends Duration.Duration>(
+  minimum: Duration.DurationInput,
+  maximum: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanDuration
+
+**Signature**
+
+```ts
+export declare const greaterThanDuration: <A extends Duration.Duration>(
+  min: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanOrEqualToDuration
+
+**Signature**
+
+```ts
+export declare const greaterThanOrEqualToDuration: <A extends Duration.Duration>(
+  min: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanDuration
+
+**Signature**
+
+```ts
+export declare const lessThanDuration: <A extends Duration.Duration>(
+  max: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanOrEqualToDuration
+
+**Signature**
+
+```ts
+export declare const lessThanOrEqualToDuration: <A extends Duration.Duration>(
+  max: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
 # Duration transformations
+
+## clampDuration
+
+Clamps a `Duration` between a minimum and a maximum value.
+
+**Signature**
+
+```ts
+export declare const clampDuration: (
+  minimum: Duration.DurationInput,
+  maximum: Duration.DurationInput
+) => <I, A extends Duration.Duration>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
 
 ## durationFromHrTime
 
@@ -809,6 +934,32 @@ A combinator that transforms a `[number, number]` tuple into a `Duration`.
 export declare const durationFromHrTime: <I, A extends readonly [seconds: number, nanos: number]>(
   self: Schema<I, A>
 ) => Schema<I, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## durationFromMillis
+
+A combinator that transforms a `number` into a `Duration`.
+Treats the value as the number of milliseconds.
+
+**Signature**
+
+```ts
+export declare const durationFromMillis: <I, A extends number>(self: Schema<I, A>) => Schema<I, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## durationFromNanos
+
+A combinator that transforms a `bigint` into a `Duration`.
+Treats the value as the number of nanoseconds.
+
+**Signature**
+
+```ts
+export declare const durationFromNanos: <I, A extends bigint>(self: Schema<I, A>) => Schema<I, Duration.Duration>
 ```
 
 Added in v1.0.0
@@ -3446,6 +3597,16 @@ export type BetweenBigintTypeId = typeof BetweenBigintTypeId
 
 Added in v1.0.0
 
+## BetweenDurationTypeId
+
+**Signature**
+
+```ts
+export declare const BetweenDurationTypeId: typeof BetweenDurationTypeId
+```
+
+Added in v1.0.0
+
 ## BetweenTypeId
 
 **Signature**
@@ -3526,6 +3687,16 @@ export type GreaterThanBigintTypeId = typeof GreaterThanBigintTypeId
 
 Added in v1.0.0
 
+## GreaterThanDurationTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanDurationTypeId: typeof GreaterThanDurationTypeId
+```
+
+Added in v1.0.0
+
 ## GreaterThanOrEqualToBigDecimalTypeId
 
 **Signature**
@@ -3552,6 +3723,16 @@ Added in v1.0.0
 
 ```ts
 export type GreaterThanOrEqualToBigintTypeId = typeof GreaterThanOrEqualToBigintTypeId
+```
+
+Added in v1.0.0
+
+## GreaterThanOrEqualToDurationTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanOrEqualToDurationTypeId: typeof GreaterThanOrEqualToDurationTypeId
 ```
 
 Added in v1.0.0
@@ -3716,6 +3897,16 @@ export type LessThanBigintTypeId = typeof LessThanBigintTypeId
 
 Added in v1.0.0
 
+## LessThanDurationTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanDurationTypeId: typeof LessThanDurationTypeId
+```
+
+Added in v1.0.0
+
 ## LessThanOrEqualToBigDecimalTypeId
 
 **Signature**
@@ -3742,6 +3933,16 @@ Added in v1.0.0
 
 ```ts
 export type LessThanOrEqualToBigintTypeId = typeof LessThanOrEqualToBigintTypeId
+```
+
+Added in v1.0.0
+
+## LessThanOrEqualToDurationTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanOrEqualToDurationTypeId: typeof LessThanOrEqualToDurationTypeId
 ```
 
 Added in v1.0.0
