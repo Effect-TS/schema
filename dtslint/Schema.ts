@@ -784,13 +784,13 @@ S.Duration
 S.DurationFromSelf
 
 // $ExpectType Schema<number, Duration>
-S.durationFromNumber(S.number)
+S.durationFromMillis(S.number)
 
 // $ExpectType Schema<number, Duration>
-S.DurationFromNumber
+S.DurationFromMillis
 
 // $ExpectType Schema<bigint, Duration>
-S.durationFromBigint(S.bigintFromSelf)
+S.durationFromNanos(S.bigintFromSelf)
 
 // $ExpectType Schema<bigint, Duration>
-S.DurationFromBigint
+S.DurationFromNanos
