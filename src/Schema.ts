@@ -242,7 +242,7 @@ export {
  * @since 1.0.0
  */
 export const isSchema = (u: unknown): u is Schema<unknown, unknown> =>
-  Predicate.isObject(u) && TypeId in u && "ast" in u && "pipe" in u
+  Predicate.isObject(u) && TypeId in u && "ast" in u
 
 // ---------------------------------------------
 // constructors
@@ -650,19 +650,15 @@ export interface PropertySignature<From, FromIsOptional, To, ToIsOptional>
   readonly ToIsOptional: ToIsOptional
 }
 
-type PropertySignatureConfig =
+type PropertySignatureAST =
   | {
-    readonly _tag: "PropertySignature"
+    readonly _tag: "Declaration"
     readonly from: AST.AST
+    readonly isOptional: boolean
     readonly annotations: AST.Annotated["annotations"]
   }
   | {
-    readonly _tag: "Optional"
-    readonly from: AST.AST
-    readonly annotations: AST.Annotated["annotations"] | undefined
-  }
-  | {
-    readonly _tag: "Transformation"
+    readonly _tag: "OptionalToRequired"
     readonly from: AST.AST
     readonly to: AST.AST
     readonly decode: AST.FinalPropertySignatureTransformation["decode"]
@@ -680,7 +676,7 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
   readonly ToIsOptional!: ToIsOptional
 
   constructor(
-    readonly config: PropertySignatureConfig
+    readonly propertySignatureAST: PropertySignatureAST
   ) {}
 }
 
@@ -692,8 +688,9 @@ export const propertySignature = <I, A>(
   options: DocAnnotations<A>
 ): PropertySignature<I, false, A, false> =>
   new PropertySignatureImpl({
-    _tag: "PropertySignature",
+    _tag: "Declaration",
     from: schema.ast,
+    isOptional: false,
     annotations: toAnnotations(options)
   })
 
@@ -706,8 +703,9 @@ export const optionalExact = <I, A>(
   options?: DocAnnotations<A>
 ): PropertySignature<I, true, A, true> =>
   new PropertySignatureImpl({
-    _tag: "Optional",
+    _tag: "Declaration",
     from: schema.ast,
+    isOptional: true,
     annotations: toAnnotations(options)
   })
 
@@ -733,7 +731,7 @@ export const optionalExactToRequired = <I, A, B>(
   options?: DocAnnotations<A>
 ): PropertySignature<I, true, B, false> =>
   new PropertySignatureImpl({
-    _tag: "Transformation",
+    _tag: "OptionalToRequired",
     from: from.ast,
     to: to.ast,
     decode: (o) => Option.some(decode(o)),
@@ -856,65 +854,54 @@ export type ToStruct<Fields extends StructFields> =
  * @category combinators
  * @since 1.0.0
  */
-export const struct = <
-  Fields extends StructFields
->(
+export const struct = <Fields extends StructFields>(
   fields: Fields
-): Schema<
-  Simplify<FromStruct<Fields>>,
-  Simplify<ToStruct<Fields>>
-> => {
+): Schema<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>> => {
   const ownKeys = Internal.ownKeys(fields)
   const pss: Array<AST.PropertySignature> = []
-  const froms: Array<AST.PropertySignature> = []
-  const tos: Array<AST.PropertySignature> = []
-  const propertySignatureTransformations: Array<AST.PropertySignatureTransform> = []
+  const pssFrom: Array<AST.PropertySignature> = []
+  const pssTo: Array<AST.PropertySignature> = []
+  const psTransformations: Array<AST.PropertySignatureTransform> = []
   for (let i = 0; i < ownKeys.length; i++) {
     const key = ownKeys[i]
     const field = fields[key] as any
-    if ("config" in field) {
-      const config: PropertySignatureConfig = field.config
-      const from = config.from
-      const annotations = config.annotations
-      switch (config._tag) {
-        case "PropertySignature":
-          pss.push(AST.createPropertySignature(key, from, false, true, annotations))
-          froms.push(AST.createPropertySignature(key, from, false, true))
-          tos.push(AST.createPropertySignature(key, AST.to(from), false, true, annotations))
+    if ("propertySignatureAST" in field) {
+      const psAst: PropertySignatureAST = field.propertySignatureAST
+      const from = psAst.from
+      const annotations = psAst.annotations
+      switch (psAst._tag) {
+        case "Declaration":
+          pss.push(AST.createPropertySignature(key, from, psAst.isOptional, true, annotations))
+          pssFrom.push(AST.createPropertySignature(key, from, psAst.isOptional, true))
+          pssTo.push(
+            AST.createPropertySignature(key, AST.to(from), psAst.isOptional, true, annotations)
+          )
           break
-        case "Optional":
-          pss.push(AST.createPropertySignature(key, from, true, true, annotations))
-          froms.push(AST.createPropertySignature(key, from, true, true))
-          tos.push(AST.createPropertySignature(key, AST.to(from), true, true, annotations))
-          break
-        case "Transformation":
-          froms.push(AST.createPropertySignature(key, from, true, true))
-          tos.push(AST.createPropertySignature(key, config.to, false, true, annotations))
-          propertySignatureTransformations.push(
+        case "OptionalToRequired":
+          pssFrom.push(AST.createPropertySignature(key, from, true, true))
+          pssTo.push(AST.createPropertySignature(key, psAst.to, false, true, annotations))
+          psTransformations.push(
             AST.createPropertySignatureTransform(
               key,
               key,
-              AST.createFinalPropertySignatureTransformation(
-                config.decode,
-                config.encode
-              )
+              AST.createFinalPropertySignatureTransformation(psAst.decode, psAst.encode)
             )
           )
           break
       }
     } else {
       pss.push(AST.createPropertySignature(key, field.ast, false, true))
-      froms.push(AST.createPropertySignature(key, field.ast, false, true))
-      tos.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
+      pssFrom.push(AST.createPropertySignature(key, field.ast, false, true))
+      pssTo.push(AST.createPropertySignature(key, AST.to(field.ast), false, true))
     }
   }
-  if (ReadonlyArray.isNonEmptyReadonlyArray(propertySignatureTransformations)) {
+  if (ReadonlyArray.isNonEmptyReadonlyArray(psTransformations)) {
     return make(
       AST.createTransform(
-        AST.createTypeLiteral(froms, []),
-        AST.createTypeLiteral(tos, []),
+        AST.createTypeLiteral(pssFrom, []),
+        AST.createTypeLiteral(pssTo, []),
         AST.createTypeLiteralTransformation(
-          propertySignatureTransformations
+          psTransformations
         )
       )
     )
