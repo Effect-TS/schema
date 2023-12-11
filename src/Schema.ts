@@ -3006,7 +3006,7 @@ export const durationFromHrTime = <I, A extends readonly [seconds: number, nanos
  * @category Duration transformations
  * @since 1.0.0
  */
-export const durationFromBigint = <I, A extends bigint>(
+export const durationFromNanos = <I, A extends bigint>(
   self: Schema<I, A>
 ): Schema<I, Duration.Duration> =>
   transformOrFail(
@@ -3028,10 +3028,10 @@ export const durationFromBigint = <I, A extends bigint>(
  * @category Duration constructors
  * @since 1.0.0
  */
-export const DurationFromBigint: Schema<
+export const DurationFromNanos: Schema<
   bigint,
   Duration.Duration
-> = durationFromBigint(bigintFromSelf)
+> = durationFromNanos(bigintFromSelf)
 
 /**
  * A combinator that transforms a `number` into a `Duration`.
@@ -3040,7 +3040,7 @@ export const DurationFromBigint: Schema<
  * @category Duration transformations
  * @since 1.0.0
  */
-export const durationFromNumber = <I, A extends number>(
+export const durationFromMillis = <I, A extends number>(
   self: Schema<I, A>
 ): Schema<I, Duration.Duration> =>
   transform(
@@ -3058,10 +3058,10 @@ export const durationFromNumber = <I, A extends number>(
  * @category Duration constructors
  * @since 1.0.0
  */
-export const DurationFromNumber: Schema<
+export const DurationFromMillis: Schema<
   number,
   Duration.Duration
-> = durationFromNumber(number)
+> = durationFromMillis(number)
 
 const hrTime: Schema<readonly [seconds: number, nanos: number]> = tuple(
   NonNegative.pipe(

@@ -48,8 +48,8 @@ Added in v1.0.0
   - [dateFromString](#datefromstring-1)
 - [Duration constructors](#duration-constructors)
   - [Duration](#duration)
-  - [DurationFromBigint](#durationfrombigint)
-  - [DurationFromNumber](#durationfromnumber)
+  - [DurationFromMillis](#durationfrommillis)
+  - [DurationFromNanos](#durationfromnanos)
   - [DurationFromSelf](#durationfromself)
 - [Duration filters](#duration-filters)
   - [betweenDuration](#betweenduration)
@@ -59,9 +59,9 @@ Added in v1.0.0
   - [lessThanOrEqualToDuration](#lessthanorequaltoduration)
 - [Duration transformations](#duration-transformations)
   - [clampDuration](#clampduration)
-  - [durationFromBigint](#durationfrombigint-1)
   - [durationFromHrTime](#durationfromhrtime)
-  - [durationFromNumber](#durationfromnumber-1)
+  - [durationFromMillis](#durationfrommillis-1)
+  - [durationFromNanos](#durationfromnanos-1)
 - [Either transformations](#either-transformations)
   - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
@@ -726,20 +726,7 @@ export declare const Duration: Schema<readonly [seconds: number, nanos: number],
 
 Added in v1.0.0
 
-## DurationFromBigint
-
-A schema that transforms a `bigint` tuple into a `Duration`.
-Treats the value as the number of nanoseconds.
-
-**Signature**
-
-```ts
-export declare const DurationFromBigint: Schema<bigint, Duration.Duration>
-```
-
-Added in v1.0.0
-
-## DurationFromNumber
+## DurationFromMillis
 
 A schema that transforms a `number` tuple into a `Duration`.
 Treats the value as the number of milliseconds.
@@ -747,7 +734,20 @@ Treats the value as the number of milliseconds.
 **Signature**
 
 ```ts
-export declare const DurationFromNumber: Schema<number, Duration.Duration>
+export declare const DurationFromMillis: Schema<number, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## DurationFromNanos
+
+A schema that transforms a `bigint` tuple into a `Duration`.
+Treats the value as the number of nanoseconds.
+
+**Signature**
+
+```ts
+export declare const DurationFromNanos: Schema<bigint, Duration.Duration>
 ```
 
 Added in v1.0.0
@@ -847,19 +847,6 @@ export declare const clampDuration: (
 
 Added in v1.0.0
 
-## durationFromBigint
-
-A combinator that transforms a `bigint` into a `Duration`.
-Treats the value as the number of nanoseconds.
-
-**Signature**
-
-```ts
-export declare const durationFromBigint: <I, A extends bigint>(self: Schema<I, A>) => Schema<I, Duration.Duration>
-```
-
-Added in v1.0.0
-
 ## durationFromHrTime
 
 A combinator that transforms a `[number, number]` tuple into a `Duration`.
@@ -874,7 +861,7 @@ export declare const durationFromHrTime: <I, A extends readonly [seconds: number
 
 Added in v1.0.0
 
-## durationFromNumber
+## durationFromMillis
 
 A combinator that transforms a `number` into a `Duration`.
 Treats the value as the number of milliseconds.
@@ -882,7 +869,20 @@ Treats the value as the number of milliseconds.
 **Signature**
 
 ```ts
-export declare const durationFromNumber: <I, A extends number>(self: Schema<I, A>) => Schema<I, Duration.Duration>
+export declare const durationFromMillis: <I, A extends number>(self: Schema<I, A>) => Schema<I, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## durationFromNanos
+
+A combinator that transforms a `bigint` into a `Duration`.
+Treats the value as the number of nanoseconds.
+
+**Signature**
+
+```ts
+export declare const durationFromNanos: <I, A extends bigint>(self: Schema<I, A>) => Schema<I, Duration.Duration>
 ```
 
 Added in v1.0.0

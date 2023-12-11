@@ -4,7 +4,7 @@ import { Duration } from "effect"
 import { describe, it } from "vitest"
 
 describe("Schema/DurationFromBigint", () => {
-  const schema = S.DurationFromBigint
+  const schema = S.DurationFromNanos
 
   it("property tests", () => {
     Util.roundtrip(schema)
