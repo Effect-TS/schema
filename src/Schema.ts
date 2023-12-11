@@ -4462,7 +4462,8 @@ const makeClass = <I, A>(
             ParseResult.succeed(input)
             : ParseResult.fail(ParseResult.type(ast, input)), {
           [AST.DescriptionAnnotationId]: `an instance of ${this.name}`,
-          [hooks.PrettyHookId]: () => (props: any) => new this(props).toString(),
+          [hooks.PrettyHookId]: (struct: any) => (self: any) =>
+            `${self.constructor.name}(${struct(self)})`,
           [hooks.ArbitraryHookId]: (struct: any) => (fc: any) =>
             struct(fc).map((props: any) => new this(props))
         }),
