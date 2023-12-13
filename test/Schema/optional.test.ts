@@ -5,20 +5,9 @@ import { describe, expect, it } from "vitest"
 
 describe("optional APIs", () => {
   describe("optionalExact", () => {
-    it("should add annotations", () => {
-      const schema = S.struct({
-        a: S.optionalExact(S.string, {
-          [Symbol.for("custom-annotation")]: "custom-annotation-value"
-        })
-      })
-      expect((schema.ast as any).propertySignatures[0].annotations).toEqual({
-        [Symbol.for("custom-annotation")]: "custom-annotation-value"
-      })
-    })
-
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalExact(S.NumberFromString)
+        a: S.optional(S.NumberFromString, { exact: true })
       })
       await Util.expectParseSuccess(schema, {}, {})
       await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
@@ -33,7 +22,7 @@ describe("optional APIs", () => {
     })
 
     it("never", async () => {
-      const schema = S.struct({ a: S.optionalExact(S.never), b: S.number })
+      const schema = S.struct({ a: S.optional(S.never, { exact: true }), b: S.number })
       await Util.expectParseSuccess(schema, { b: 1 })
       await Util.expectParseFailure(schema, { a: "a", b: 1 }, `/a Expected never, actual "a"`)
     })

@@ -899,7 +899,7 @@ console.log(PersonEquivalence(john, alice)); // Output: false
 | `"a"`, `1`, `true`                           | type literals                            | `S.literal("a")`, `S.literal(1)`, `S.literal(true)`       |
 | `a${string}`                                 | template literals                        | `S.templateLiteral(S.literal("a"), S.string)`             |
 | `{ readonly a: string, readonly b: number }` | structs                                  | `S.struct({ a: S.string, b: S.number })`                  |
-| `{ readonly a?: string }`                    | optional fields                          | `S.struct({ a: S.optionalExact(S.string) })`              |
+| `{ readonly a?: string }`                    | optional fields                          | `S.struct({ a: S.optional(S.string, { exact: true }) })`  |
 | `Record<A, B>`                               | records                                  | `S.record(A, B)`                                          |
 | `readonly [string, number]`                  | tuples                                   | `S.tuple(S.string, S.number)`                             |
 | `ReadonlyArray<string>`                      | arrays                                   | `S.array(S.string)`                                       |
@@ -1550,23 +1550,6 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `Option.none()` -> `<missing value>`
   - `Option.some(a)` -> `i`
 
-**Note**. These combinators only exists to be used in combination with the `struct` API to signal an optional field and does not have a broader meaning. This means that it is only allowed to use it as an outer wrapper of a `Schema` and **it cannot be followed by other combinators**, for example this type of operation is prohibited:
-
-```ts
-S.struct({
-  // the use of S.optional should be the last step in the pipeline and not preceeded by other combinators like S.nullable
-  c: S.boolean.pipe(S.optionalExact, S.nullable), // type checker error
-});
-```
-
-and it must be rewritten like this:
-
-```ts
-S.struct({
-  c: S.boolean.pipe(S.nullable, S.optionalExact), // ok
-});
-```
-
 ### Default values
 
 | Combinator                         | From                      | To                                                          |
@@ -1781,7 +1764,7 @@ function getAge(id: number): Effect.Effect<never, Error, number> {
 
 export class PersonWithTransform extends Person.transform<PersonWithTransform>()(
   {
-    age: S.optionalExact(S.number).toOption(),
+    age: S.optional(S.number).toOption(),
   },
   (input) =>
     Effect.mapBoth(getAge(input.id), {
@@ -1807,7 +1790,7 @@ PersonWithTransform {
 
 export class PersonWithTransformFrom extends Person.transformFrom<PersonWithTransformFrom>()(
   {
-    age: S.optionalExact(S.number).toOption(),
+    age: S.optional(S.number, { exact: true }).toOption(),
   },
   (input) =>
     Effect.mapBoth(getAge(input.id), {
@@ -1845,7 +1828,7 @@ The decision of which API to use, either `transform` or `transformFrom`, depends
 2. Using `transformFrom`:
    - The new transformation starts as soon as the initial input is handled.
    - You should provide a value `{ age?: number }`.
-   - Based on this fresh input, the subsequent transformation `{ age: S.optionalExact(S.number).toOption() }` is executed.
+   - Based on this fresh input, the subsequent transformation `{ age: S.optionalExactToOption(S.number) }` is executed.
    - This approach allows for immediate handling of the input, potentially influencing the subsequent transformations.
 
 ## Pick
@@ -1892,7 +1875,10 @@ The `required` operation ensures that all properties in a schema are mandatory.
 ```ts
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }>
 S.required(
-  S.struct({ a: S.optionalExact(S.string), b: S.optionalExact(S.number) })
+  S.struct({
+    a: S.optional(S.string, { exact: true }),
+    b: S.optional(S.number, { exact: true }),
+  })
 );
 ```
 

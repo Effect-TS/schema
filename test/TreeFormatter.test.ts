@@ -49,11 +49,12 @@ describe("formatErrors", () => {
   it("should collapse trees that have a branching factor of 1", async () => {
     const schema = S.struct({
       a: S.struct({ b: S.struct({ c: S.array(S.struct({ d: S.string })) }) }),
-      e: S.optionalExact(
+      e: S.optional(
         S.union(
           S.struct({ type: S.literal("f"), f: S.string }),
           S.struct({ type: S.literal("g"), g: S.number })
-        )
+        ),
+        { exact: true }
       )
     })
     await Util.expectParseFailureTree(

@@ -237,8 +237,6 @@ Added in v1.0.0
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring-1)
 - [optional](#optional)
-  - [optional](#optional-1)
-  - [optionalExact](#optionalexact)
   - [optionalExactNullableToOption](#optionalexactnullabletooption)
   - [optionalExactNullableWithDefault](#optionalexactnullablewithdefault)
   - [optionalExactToOption](#optionalexacttooption)
@@ -387,6 +385,7 @@ Added in v1.0.0
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [ToStruct (type alias)](#tostruct-type-alias)
   - [from](#from)
+  - [optional](#optional-1)
   - [propertySignature](#propertysignature)
   - [readonlyMapFromSelf](#readonlymapfromself)
   - [to](#to)
@@ -3017,32 +3016,6 @@ Added in v1.0.0
 
 # optional
 
-## optional
-
-**Signature**
-
-```ts
-export declare const optional: <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-) => PropertySignature<I | undefined, true, A | undefined, true>
-```
-
-Added in v1.0.0
-
-## optionalExact
-
-**Signature**
-
-```ts
-export declare const optionalExact: <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-) => PropertySignature<I, true, A, true>
-```
-
-Added in v1.0.0
-
 ## optionalExactNullableToOption
 
 **Signature**
@@ -4512,7 +4485,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> extends Schema.Variance<From, To> {
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> extends Schema.Variance<From, To>, Pipeable {
   readonly FromIsOptional: FromIsOptional
   readonly ToIsOptional: ToIsOptional
 }
@@ -4624,6 +4597,19 @@ Added in v1.0.0
 
 ```ts
 export declare const from: <I, A>(schema: Schema<I, A>) => Schema<I, I>
+```
+
+Added in v1.0.0
+
+## optional
+
+**Signature**
+
+```ts
+export declare const optional: {
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
+  <I, A>(schema: Schema<I, A>, options: { readonly exact: true }): PropertySignature<I, true, A, true>
+}
 ```
 
 Added in v1.0.0

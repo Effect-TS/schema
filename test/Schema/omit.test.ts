@@ -24,7 +24,11 @@ describe("Schema/omit", () => {
   })
 
   it("struct with optionals", async () => {
-    const schema = S.struct({ a: S.optionalExact(S.string), b: S.NumberFromString, c: S.boolean })
+    const schema = S.struct({
+      a: S.optional(S.string, { exact: true }),
+      b: S.NumberFromString,
+      c: S.boolean
+    })
       .pipe(
         S.omit("c")
       )

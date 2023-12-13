@@ -652,7 +652,7 @@ export const nonEmptyArray = <I, A>(
  * @since 1.0.0
  */
 export interface PropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends Schema.Variance<From, To>
+  extends Schema.Variance<From, To>, Pipeable
 {
   readonly FromIsOptional: FromIsOptional
   readonly ToIsOptional: ToIsOptional
@@ -663,7 +663,7 @@ type PropertySignatureAST =
     readonly _tag: "Declaration"
     readonly from: AST.AST
     readonly isOptional: boolean
-    readonly annotations: AST.Annotated["annotations"]
+    readonly annotations?: AST.Annotated["annotations"] | undefined
   }
   | {
     readonly _tag: "OptionalToRequired"
@@ -671,7 +671,7 @@ type PropertySignatureAST =
     readonly to: AST.AST
     readonly decode: AST.FinalPropertySignatureTransformation["decode"]
     readonly encode: AST.FinalPropertySignatureTransformation["encode"]
-    readonly annotations: AST.Annotated["annotations"] | undefined
+    readonly annotations?: AST.Annotated["annotations"] | undefined
   }
 
 /** @internal */
@@ -686,6 +686,31 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
   constructor(
     readonly propertySignatureAST: PropertySignatureAST
   ) {}
+
+  pipe() {
+    return pipeArguments(this, arguments)
+  }
+}
+
+/**
+ * @since 1.0.0
+ */
+export const optional: {
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true }
+  ): PropertySignature<I, true, A, true>
+} = <I, A>(
+  schema: Schema<I, A>,
+  options?: { readonly exact?: boolean }
+): PropertySignature<I | undefined, true, A | undefined, true> => {
+  const exact = options?.exact
+  return new PropertySignatureImpl({
+    _tag: "Declaration",
+    from: exact ? schema.ast : union(_undefined, schema).ast,
+    isOptional: true
+  })
 }
 
 /**
@@ -701,31 +726,6 @@ export const propertySignature = <I, A>(
     isOptional: false,
     annotations: toAnnotations(options)
   })
-
-/**
- * @category optional
- * @since 1.0.0
- */
-export const optionalExact = <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-): PropertySignature<I, true, A, true> =>
-  new PropertySignatureImpl({
-    _tag: "Declaration",
-    from: schema.ast,
-    isOptional: true,
-    annotations: toAnnotations(options)
-  })
-
-/**
- * @category optional
- * @since 1.0.0
- */
-export const optional = <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-): PropertySignature<I | undefined, true, A | undefined, true> =>
-  optionalExact(union(_undefined, schema), options)
 
 /**
  * @category optional

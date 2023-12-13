@@ -698,7 +698,10 @@ describe("JSONSchema", () => {
     })
 
     it("optional property signature", () => {
-      const schema = Schema.struct({ a: Schema.string, b: Schema.optionalExact(JsonNumber) })
+      const schema = Schema.struct({
+        a: Schema.string,
+        b: Schema.optional(JsonNumber, { exact: true })
+      })
       const jsonSchema = JSONSchema.to(schema)
       expect(jsonSchema).toStrictEqual({
         "$schema": "http://json-schema.org/draft-07/schema#",

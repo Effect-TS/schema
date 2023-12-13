@@ -13,6 +13,6 @@ describe("isSchema", () => {
 
   it("PropertySignature", () => {
     expect(S.isSchema(S.propertySignature(S.string, {}))).toBe(false)
-    expect(S.isSchema(S.optionalExact(S.string))).toBe(false)
+    expect(S.isSchema(S.optional(S.string, { exact: true }))).toBe(false)
   })
 })
