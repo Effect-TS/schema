@@ -1556,10 +1556,11 @@ S.struct({
 
 #### Default values
 
-| Combinator                 | From                      | To                                                  |
-| -------------------------- | ------------------------- | --------------------------------------------------- |
-| `optionalWithDefault`      | `Schema<I, A>`, `() => A` | `PropertySignature<I \| undefined, true, A, false>` |
-| `optionalExactWithDefault` | `Schema<I, A>`, `() => A` | `PropertySignature<I, true, A, false>`              |
+| Combinator                    | From                      | To                                                          |
+| ----------------------------- | ------------------------- | ----------------------------------------------------------- |
+| `optionalWithDefault`         | `Schema<I, A>`, `() => A` | `PropertySignature<I \| undefined, true, A, false>`         |
+| `optionalExactWithDefault`    | `Schema<I, A>`, `() => A` | `PropertySignature<I, true, A, false>`                      |
+| `optionalNullableWithDefault` | `Schema<I, A>`, `() => A` | `PropertySignature<I \| null \| undefined, true, A, false>` |
 
 #### optionalWithDefault(schema, default)
 
@@ -1574,6 +1575,16 @@ S.struct({
 
 - decoding
   - `<missing value>` -> `<default value>`
+  - `i` -> `a`
+- encoding
+  - `a` -> `i`
+
+#### optionalNullableWithDefault(schema, default)
+
+- decoding
+  - `<missing value>` -> `<default value>`
+  - `undefined` -> `<default value>`
+  - `null` -> `<default value>`
   - `i` -> `a`
 - encoding
   - `a` -> `i`

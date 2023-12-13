@@ -846,6 +846,23 @@ export const optionalWithDefault = <I, A>(
   )
 
 /**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalNullableWithDefault = <I, A>(
+  schema: Schema<I, A>,
+  value: () => A,
+  options?: DocAnnotations<A | null | undefined>
+): PropertySignature<I | null | undefined, true, A, false> =>
+  optionalExactToRequired(
+    nullish(schema),
+    to(schema),
+    Option.match({ onNone: value, onSome: (a) => (a == null ? value() : a) }),
+    Option.some,
+    options
+  )
+
+/**
  * @since 1.0.0
  */
 export type FromOptionalKeys<Fields> = {
