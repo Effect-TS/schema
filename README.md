@@ -1118,6 +1118,19 @@ S.BigDecimal.pipe(S.negativeBigDecimal());
 S.BigDecimal.pipe(S.nonPositiveBigDecimal());
 ```
 
+### Duration filters
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Duration from "effect/BigDecimal";
+
+S.Duration.pipe(S.greaterThanDuration("5 seconds"));
+S.Duration.pipe(S.greaterThanOrEqualToDuration("5 seconds"));
+S.Duration.pipe(S.lessThanDuration("5 seconds"));
+S.Duration.pipe(S.lessThanOrEqualToDuration("5 seconds"));
+S.Duration.pipe(S.betweenDuration("5 seconds", "10 seconds"));
+```
+
 ### Array filters
 
 ```ts
@@ -2366,6 +2379,75 @@ const parse = S.parseSync(schema);
 parse("-2"); // BigDecimal(2)
 parse("0"); // BigDecimal(0)
 parse("3"); // BigDecimal(-3)
+```
+
+### Duration transformations
+
+#### Duration
+
+Converts an hrtime(i.e. `[seconds: number, nanos: number]`) into a `Duration`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Duration from "effect/Duration";
+
+// $ExpectType Schema<number, Duration>
+const schema = S.Duration;
+
+const parse = S.parseSync(schema);
+parse([0, 0]); // 0 seconds
+parse([5000, 0]); // 5 seconds
+```
+
+#### DurationFromNumber
+
+Converts a `number` into a `Duration` where the number represents the number of milliseconds.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Duration from "effect/Duration";
+
+// $ExpectType Schema<number, Duration>
+const schema = S.DurationFromNumber;
+
+const parse = S.parseSync(schema);
+parse(0); // 0 seconds
+parse(5000); // 5 seconds
+```
+
+#### DurationFromBigint
+
+Converts a `bigint` into a `Duration` where the number represents the number of nanoseconds.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Duration from "effect/Duration";
+
+// $ExpectType Schema<bigint, Duration>
+const schema = S.DurationFromBigint;
+
+const parse = S.parseSync(schema);
+parse(0n); // 0 seconds
+parse(5000000000n); // 5 seconds
+```
+
+#### clampDuration
+
+Clamps a `Duration` between a minimum and a maximum value.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Duration from "effect/Duration";
+
+// $ExpectType Schema<Duration.Duration, Duration.Duration>
+const schema = S.DurationFromSelf.pipe(
+  S.clampDuration("5 seconds", "10 seconds")
+);
+
+const parse = S.parseSync(schema);
+parse(Duration.decode("2 seconds")); // 5 seconds
+parse(Duration.decode("6 seconds")); // 6 seconds
+parse(Duration.decode("11 seconds")); // 10 seconds
 ```
 
 ### Symbol transformations

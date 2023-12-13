@@ -52,9 +52,20 @@ Added in v1.0.0
   - [dateFromString](#datefromstring-1)
 - [Duration constructors](#duration-constructors)
   - [Duration](#duration)
+  - [DurationFromMillis](#durationfrommillis)
+  - [DurationFromNanos](#durationfromnanos)
   - [DurationFromSelf](#durationfromself)
+- [Duration filters](#duration-filters)
+  - [betweenDuration](#betweenduration)
+  - [greaterThanDuration](#greaterthanduration)
+  - [greaterThanOrEqualToDuration](#greaterthanorequaltoduration)
+  - [lessThanDuration](#lessthanduration)
+  - [lessThanOrEqualToDuration](#lessthanorequaltoduration)
 - [Duration transformations](#duration-transformations)
+  - [clampDuration](#clampduration)
   - [durationFromHrTime](#durationfromhrtime)
+  - [durationFromMillis](#durationfrommillis-1)
+  - [durationFromNanos](#durationfromnanos-1)
 - [Either transformations](#either-transformations)
   - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
@@ -297,6 +308,7 @@ Added in v1.0.0
   - [BetweenBigDecimalTypeId](#betweenbigdecimaltypeid)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
   - [BetweenBigintTypeId (type alias)](#betweenbiginttypeid-type-alias)
+  - [BetweenDurationTypeId](#betweendurationtypeid)
   - [BetweenTypeId](#betweentypeid)
   - [BetweenTypeId (type alias)](#betweentypeid-type-alias)
   - [BrandTypeId](#brandtypeid)
@@ -305,9 +317,11 @@ Added in v1.0.0
   - [GreaterThanBigDecimalTypeId](#greaterthanbigdecimaltypeid)
   - [GreaterThanBigintTypeId](#greaterthanbiginttypeid)
   - [GreaterThanBigintTypeId (type alias)](#greaterthanbiginttypeid-type-alias)
+  - [GreaterThanDurationTypeId](#greaterthandurationtypeid)
   - [GreaterThanOrEqualToBigDecimalTypeId](#greaterthanorequaltobigdecimaltypeid)
   - [GreaterThanOrEqualToBigintTypeId](#greaterthanorequaltobiginttypeid)
   - [GreaterThanOrEqualToBigintTypeId (type alias)](#greaterthanorequaltobiginttypeid-type-alias)
+  - [GreaterThanOrEqualToDurationTypeId](#greaterthanorequaltodurationtypeid)
   - [GreaterThanOrEqualToTypeId](#greaterthanorequaltotypeid)
   - [GreaterThanOrEqualToTypeId (type alias)](#greaterthanorequaltotypeid-type-alias)
   - [GreaterThanTypeId](#greaterthantypeid)
@@ -324,9 +338,11 @@ Added in v1.0.0
   - [LessThanBigDecimalTypeId](#lessthanbigdecimaltypeid)
   - [LessThanBigintTypeId](#lessthanbiginttypeid)
   - [LessThanBigintTypeId (type alias)](#lessthanbiginttypeid-type-alias)
+  - [LessThanDurationTypeId](#lessthandurationtypeid)
   - [LessThanOrEqualToBigDecimalTypeId](#lessthanorequaltobigdecimaltypeid)
   - [LessThanOrEqualToBigintTypeId](#lessthanorequaltobiginttypeid)
   - [LessThanOrEqualToBigintTypeId (type alias)](#lessthanorequaltobiginttypeid-type-alias)
+  - [LessThanOrEqualToDurationTypeId](#lessthanorequaltodurationtypeid)
   - [LessThanOrEqualToTypeId](#lessthanorequaltotypeid)
   - [LessThanOrEqualToTypeId (type alias)](#lessthanorequaltotypeid-type-alias)
   - [LessThanTypeId](#lessthantypeid)
@@ -799,6 +815,32 @@ export declare const Duration: Schema<readonly [seconds: number, nanos: number],
 
 Added in v1.0.0
 
+## DurationFromMillis
+
+A schema that transforms a `number` tuple into a `Duration`.
+Treats the value as the number of milliseconds.
+
+**Signature**
+
+```ts
+export declare const DurationFromMillis: Schema<number, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## DurationFromNanos
+
+A schema that transforms a `bigint` tuple into a `Duration`.
+Treats the value as the number of nanoseconds.
+
+**Signature**
+
+```ts
+export declare const DurationFromNanos: Schema<bigint, Duration.Duration>
+```
+
+Added in v1.0.0
+
 ## DurationFromSelf
 
 **Signature**
@@ -809,7 +851,90 @@ export declare const DurationFromSelf: Schema<Duration.Duration, Duration.Durati
 
 Added in v1.0.0
 
+# Duration filters
+
+## betweenDuration
+
+**Signature**
+
+```ts
+export declare const betweenDuration: <A extends Duration.Duration>(
+  minimum: Duration.DurationInput,
+  maximum: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanDuration
+
+**Signature**
+
+```ts
+export declare const greaterThanDuration: <A extends Duration.Duration>(
+  min: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## greaterThanOrEqualToDuration
+
+**Signature**
+
+```ts
+export declare const greaterThanOrEqualToDuration: <A extends Duration.Duration>(
+  min: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanDuration
+
+**Signature**
+
+```ts
+export declare const lessThanDuration: <A extends Duration.Duration>(
+  max: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
+## lessThanOrEqualToDuration
+
+**Signature**
+
+```ts
+export declare const lessThanOrEqualToDuration: <A extends Duration.Duration>(
+  max: Duration.DurationInput,
+  options?: FilterAnnotations<A> | undefined
+) => <I>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
+
 # Duration transformations
+
+## clampDuration
+
+Clamps a `Duration` between a minimum and a maximum value.
+
+**Signature**
+
+```ts
+export declare const clampDuration: (
+  minimum: Duration.DurationInput,
+  maximum: Duration.DurationInput
+) => <I, A extends Duration.Duration>(self: Schema<I, A>) => Schema<I, A>
+```
+
+Added in v1.0.0
 
 ## durationFromHrTime
 
@@ -821,6 +946,32 @@ A combinator that transforms a `[number, number]` tuple into a `Duration`.
 export declare const durationFromHrTime: <I, A extends readonly [seconds: number, nanos: number]>(
   self: Schema<I, A>
 ) => Schema<I, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## durationFromMillis
+
+A combinator that transforms a `number` into a `Duration`.
+Treats the value as the number of milliseconds.
+
+**Signature**
+
+```ts
+export declare const durationFromMillis: <I, A extends number>(self: Schema<I, A>) => Schema<I, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## durationFromNanos
+
+A combinator that transforms a `bigint` into a `Duration`.
+Treats the value as the number of nanoseconds.
+
+**Signature**
+
+```ts
+export declare const durationFromNanos: <I, A extends bigint>(self: Schema<I, A>) => Schema<I, Duration.Duration>
 ```
 
 Added in v1.0.0
@@ -1747,7 +1898,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type Any = TaggedRequest<string, any, any, any, any, any, any>
+export type Any =
+  | TaggedRequest<string, any, any, any, any, any, any>
+  | TaggedRequest<string, any, any, never, never, any, any>
 ```
 
 Added in v1.0.0
@@ -1820,7 +1973,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 ```ts
 export declare const brand: <B extends string | symbol, A>(
   brand: B,
-  options?: DocAnnotations<A> | undefined
+  options?: DocAnnotations
 ) => <I>(self: Schema<I, A>) => BrandSchema<I, A & Brand.Brand<B>>
 ```
 
@@ -2871,7 +3024,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | undefined> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I | undefined, true, A | undefined, true>
 ```
 
@@ -2884,7 +3037,7 @@ Added in v1.0.0
 ```ts
 export declare const optionalExact: <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I, true, A, true>
 ```
 
@@ -2897,7 +3050,7 @@ Added in v1.0.0
 ```ts
 export declare const optionalExactNullableToOption: <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | null> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I | null, true, Option.Option<A>, false>
 ```
 
@@ -2911,7 +3064,7 @@ Added in v1.0.0
 export declare const optionalExactNullableWithDefault: <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A | null> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I | null, true, A, false>
 ```
 
@@ -2924,7 +3077,7 @@ Added in v1.0.0
 ```ts
 export declare const optionalExactToOption: <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I, true, Option.Option<A>, false>
 ```
 
@@ -2940,7 +3093,7 @@ export declare const optionalExactToRequired: <I, A, B>(
   to: Schema<B, B>,
   decode: (o: Option.Option<A>) => B,
   encode: (b: B) => Option.Option<A>,
-  options?: DocAnnotations<A> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I, true, B, false>
 ```
 
@@ -2954,7 +3107,7 @@ Added in v1.0.0
 export declare const optionalExactWithDefault: <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I, true, A, false>
 ```
 
@@ -2967,7 +3120,7 @@ Added in v1.0.0
 ```ts
 export declare const optionalNullableToOption: <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | null | undefined> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I | null | undefined, true, Option.Option<A>, false>
 ```
 
@@ -2981,7 +3134,7 @@ Added in v1.0.0
 export declare const optionalNullableWithDefault: <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A | null | undefined> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I | null | undefined, true, A, false>
 ```
 
@@ -2994,7 +3147,7 @@ Added in v1.0.0
 ```ts
 export declare const optionalToOption: <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | undefined> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I | undefined, true, Option.Option<A>, false>
 ```
 
@@ -3008,7 +3161,7 @@ Added in v1.0.0
 export declare const optionalWithDefault: <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A | undefined> | undefined
+  options?: DocAnnotations
 ) => PropertySignature<I | undefined, true, A, false>
 ```
 
@@ -3635,6 +3788,16 @@ export type BetweenBigintTypeId = typeof BetweenBigintTypeId
 
 Added in v1.0.0
 
+## BetweenDurationTypeId
+
+**Signature**
+
+```ts
+export declare const BetweenDurationTypeId: typeof BetweenDurationTypeId
+```
+
+Added in v1.0.0
+
 ## BetweenTypeId
 
 **Signature**
@@ -3715,6 +3878,16 @@ export type GreaterThanBigintTypeId = typeof GreaterThanBigintTypeId
 
 Added in v1.0.0
 
+## GreaterThanDurationTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanDurationTypeId: typeof GreaterThanDurationTypeId
+```
+
+Added in v1.0.0
+
 ## GreaterThanOrEqualToBigDecimalTypeId
 
 **Signature**
@@ -3741,6 +3914,16 @@ Added in v1.0.0
 
 ```ts
 export type GreaterThanOrEqualToBigintTypeId = typeof GreaterThanOrEqualToBigintTypeId
+```
+
+Added in v1.0.0
+
+## GreaterThanOrEqualToDurationTypeId
+
+**Signature**
+
+```ts
+export declare const GreaterThanOrEqualToDurationTypeId: typeof GreaterThanOrEqualToDurationTypeId
 ```
 
 Added in v1.0.0
@@ -3905,6 +4088,16 @@ export type LessThanBigintTypeId = typeof LessThanBigintTypeId
 
 Added in v1.0.0
 
+## LessThanDurationTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanDurationTypeId: typeof LessThanDurationTypeId
+```
+
+Added in v1.0.0
+
 ## LessThanOrEqualToBigDecimalTypeId
 
 **Signature**
@@ -3931,6 +4124,16 @@ Added in v1.0.0
 
 ```ts
 export type LessThanOrEqualToBigintTypeId = typeof LessThanOrEqualToBigintTypeId
+```
+
+Added in v1.0.0
+
+## LessThanOrEqualToDurationTypeId
+
+**Signature**
+
+```ts
+export declare const LessThanOrEqualToDurationTypeId: typeof LessThanOrEqualToDurationTypeId
 ```
 
 Added in v1.0.0
@@ -4202,14 +4405,13 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface DocAnnotations<A> extends AST.Annotations {
+export interface DocAnnotations extends AST.Annotations {
   readonly identifier?: AST.IdentifierAnnotation
   readonly title?: AST.TitleAnnotation
   readonly description?: AST.DescriptionAnnotation
   readonly examples?: AST.ExamplesAnnotation
   readonly default?: AST.DefaultAnnotation
   readonly documentation?: AST.DocumentationAnnotation
-  readonly message?: AST.MessageAnnotation<A>
 }
 ```
 
@@ -4220,7 +4422,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface FilterAnnotations<A> extends DocAnnotations<A> {
+export interface FilterAnnotations<A> extends DocAnnotations {
+  readonly message?: AST.MessageAnnotation<A>
   readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
   /**
    * Attaches a JSON Schema annotation to this refinement.
@@ -4229,7 +4432,7 @@ export interface FilterAnnotations<A> extends DocAnnotations<A> {
    */
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-  readonly pretty?: (...args: ReadonlyArray<Pretty<any>>) => Pretty<any>
+  readonly pretty?: (...args: ReadonlyArray<Pretty.Pretty<any>>) => Pretty.Pretty<any>
   readonly equivalence?: () => Equivalence.Equivalence<A>
 }
 ```
@@ -4432,7 +4635,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <I, A>(
   schema: Schema<I, A>,
-  options: DocAnnotations<A>
+  options: DocAnnotations
 ) => PropertySignature<I, false, A, false>
 ```
 

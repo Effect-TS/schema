@@ -39,7 +39,7 @@ import * as InternalSchema from "./internal/schema.js"
 import * as InternalSerializable from "./internal/serializable.js"
 import * as Parser from "./Parser.js"
 import * as ParseResult from "./ParseResult.js"
-import type { Pretty } from "./Pretty.js"
+import * as Pretty from "./Pretty.js"
 import type * as Serializable from "./Serializable.js"
 
 // ---------------------------------------------
@@ -693,7 +693,7 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
  */
 export const propertySignature = <I, A>(
   schema: Schema<I, A>,
-  options: DocAnnotations<A>
+  options: DocAnnotations
 ): PropertySignature<I, false, A, false> =>
   new PropertySignatureImpl({
     _tag: "Declaration",
@@ -708,7 +708,7 @@ export const propertySignature = <I, A>(
  */
 export const optionalExact = <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A>
+  options?: DocAnnotations
 ): PropertySignature<I, true, A, true> =>
   new PropertySignatureImpl({
     _tag: "Declaration",
@@ -723,7 +723,7 @@ export const optionalExact = <I, A>(
  */
 export const optional = <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | undefined>
+  options?: DocAnnotations
 ): PropertySignature<I | undefined, true, A | undefined, true> =>
   optionalExact(union(_undefined, schema), options)
 
@@ -736,7 +736,7 @@ export const optionalExactToRequired = <I, A, B>(
   to: Schema<B>,
   decode: (o: Option.Option<A>) => B, // `none` here means: the value is missing in the input
   encode: (b: B) => Option.Option<A>, // `none` here means: the value will be missing in the output
-  options?: DocAnnotations<A>
+  options?: DocAnnotations
 ): PropertySignature<I, true, B, false> =>
   new PropertySignatureImpl({
     _tag: "OptionalToRequired",
@@ -753,7 +753,7 @@ export const optionalExactToRequired = <I, A, B>(
  */
 export const optionalExactToOption = <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A>
+  options?: DocAnnotations
 ): PropertySignature<I, true, Option.Option<A>, false> =>
   optionalExactToRequired(
     schema,
@@ -769,7 +769,7 @@ export const optionalExactToOption = <I, A>(
  */
 export const optionalExactNullableToOption = <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | null>
+  options?: DocAnnotations
 ): PropertySignature<I | null, true, Option.Option<A>, false> =>
   optionalExactToRequired(
     nullable(schema),
@@ -785,7 +785,7 @@ export const optionalExactNullableToOption = <I, A>(
  */
 export const optionalToOption = <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | undefined>
+  options?: DocAnnotations
 ): PropertySignature<I | undefined, true, Option.Option<A>, false> =>
   optionalExactToRequired(
     union(_undefined, schema),
@@ -801,7 +801,7 @@ export const optionalToOption = <I, A>(
  */
 export const optionalNullableToOption = <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A | undefined | null>
+  options?: DocAnnotations
 ): PropertySignature<I | undefined | null, true, Option.Option<A>, false> =>
   optionalExactToRequired(
     nullish(schema),
@@ -818,7 +818,7 @@ export const optionalNullableToOption = <I, A>(
 export const optionalExactWithDefault = <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A>
+  options?: DocAnnotations
 ): PropertySignature<I, true, A, false> =>
   optionalExactToRequired(
     schema,
@@ -835,7 +835,7 @@ export const optionalExactWithDefault = <I, A>(
 export const optionalExactNullableWithDefault = <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A | null>
+  options?: DocAnnotations
 ): PropertySignature<I | null, true, A, false> =>
   optionalExactToRequired(
     nullable(schema),
@@ -852,7 +852,7 @@ export const optionalExactNullableWithDefault = <I, A>(
 export const optionalWithDefault = <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A | undefined>
+  options?: DocAnnotations
 ): PropertySignature<I | undefined, true, A, false> =>
   optionalExactToRequired(
     union(_undefined, schema),
@@ -869,7 +869,7 @@ export const optionalWithDefault = <I, A>(
 export const optionalNullableWithDefault = <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations<A | null | undefined>
+  options?: DocAnnotations
 ): PropertySignature<I | null | undefined, true, A, false> =>
   optionalExactToRequired(
     nullish(schema),
@@ -1053,10 +1053,10 @@ export interface BrandSchema<From, To extends Brand.Brand<any>>
   extends Schema<From, To>, Brand.Brand.Constructor<To>
 {}
 
-const appendBrandAnnotation = <B extends string | symbol, A>(
+const appendBrandAnnotation = <B extends string | symbol>(
   ast: AST.AST,
   brand: B,
-  options?: DocAnnotations<A>
+  options?: DocAnnotations
 ): AST.AST => {
   if (AST.isTransform(ast)) {
     return AST.createTransform(
@@ -1092,7 +1092,7 @@ const appendBrandAnnotation = <B extends string | symbol, A>(
  */
 export const brand = <B extends string | symbol, A>(
   brand: B,
-  options?: DocAnnotations<A>
+  options?: DocAnnotations
 ) =>
 <I>(self: Schema<I, A>): BrandSchema<I, A & Brand.Brand<B>> => {
   const ast = appendBrandAnnotation(self.ast, brand, options)
@@ -1595,20 +1595,20 @@ const toAnnotations = <A>(
 /**
  * @since 1.0.0
  */
-export interface DocAnnotations<A> extends AST.Annotations {
+export interface DocAnnotations extends AST.Annotations {
   readonly identifier?: AST.IdentifierAnnotation
   readonly title?: AST.TitleAnnotation
   readonly description?: AST.DescriptionAnnotation
   readonly examples?: AST.ExamplesAnnotation
   readonly default?: AST.DefaultAnnotation
   readonly documentation?: AST.DocumentationAnnotation
-  readonly message?: AST.MessageAnnotation<A>
 }
 
 /**
  * @since 1.0.0
  */
-export interface FilterAnnotations<A> extends DocAnnotations<A> {
+export interface FilterAnnotations<A> extends DocAnnotations {
+  readonly message?: AST.MessageAnnotation<A>
   readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
   /**
    * Attaches a JSON Schema annotation to this refinement.
@@ -1617,7 +1617,7 @@ export interface FilterAnnotations<A> extends DocAnnotations<A> {
    */
   readonly jsonSchema?: AST.JSONSchemaAnnotation
   readonly arbitrary?: (...args: ReadonlyArray<Arbitrary<any>>) => Arbitrary<any>
-  readonly pretty?: (...args: ReadonlyArray<Pretty<any>>) => Pretty<any>
+  readonly pretty?: (...args: ReadonlyArray<Pretty.Pretty<any>>) => Pretty.Pretty<any>
   readonly equivalence?: () => Equivalence.Equivalence<A>
 }
 
@@ -3124,13 +3124,10 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
       : ParseResult.fail(ParseResult.type(ast, u)),
   {
     [AST.IdentifierAnnotationId]: "Duration",
-    [hooks.PrettyHookId]: (): Pretty<Duration.Duration> =>
-      Duration.match({
-        onMillis: (_) => `Duration.millis(${_})`,
-        onNanos: (_) => `Duration.nanos(${_})`
-      }),
+    [hooks.PrettyHookId]: (): Pretty.Pretty<Duration.Duration> => (duration) => String(duration),
     [hooks.ArbitraryHookId]: (): Arbitrary<Duration.Duration> => (fc) =>
       fc.oneof(
+        fc.constant(Duration.infinity),
         fc.bigUint().map((_) => Duration.nanos(_)),
         fc.bigUint().map((_) => Duration.micros(_)),
         fc.maxSafeNat().map((_) => Duration.millis(_)),
@@ -3165,15 +3162,85 @@ export const durationFromHrTime = <I, A extends readonly [seconds: number, nanos
     { strict: false }
   )
 
+/**
+ * A combinator that transforms a `bigint` into a `Duration`.
+ * Treats the value as the number of nanoseconds.
+ *
+ * @category Duration transformations
+ * @since 1.0.0
+ */
+export const durationFromNanos = <I, A extends bigint>(
+  self: Schema<I, A>
+): Schema<I, Duration.Duration> =>
+  transformOrFail(
+    self,
+    DurationFromSelf,
+    (nanos) => ParseResult.succeed(Duration.nanos(nanos)),
+    (duration, _, ast) =>
+      Duration.toNanos(duration).pipe(Option.match({
+        onNone: () => ParseResult.fail(ParseResult.type(ast, duration)),
+        onSome: (val) => ParseResult.succeed(val)
+      })),
+    { strict: false }
+  )
+
+/**
+ * A schema that transforms a `bigint` tuple into a `Duration`.
+ * Treats the value as the number of nanoseconds.
+ *
+ * @category Duration constructors
+ * @since 1.0.0
+ */
+export const DurationFromNanos: Schema<
+  bigint,
+  Duration.Duration
+> = durationFromNanos(bigintFromSelf)
+
+/**
+ * A combinator that transforms a `number` into a `Duration`.
+ * Treats the value as the number of milliseconds.
+ *
+ * @category Duration transformations
+ * @since 1.0.0
+ */
+export const durationFromMillis = <I, A extends number>(
+  self: Schema<I, A>
+): Schema<I, Duration.Duration> =>
+  transform(
+    self,
+    DurationFromSelf,
+    (ms) => Duration.millis(ms),
+    (n) => Duration.toMillis(n),
+    { strict: false }
+  )
+
+/**
+ * A schema that transforms a `number` tuple into a `Duration`.
+ * Treats the value as the number of milliseconds.
+ *
+ * @category Duration constructors
+ * @since 1.0.0
+ */
+export const DurationFromMillis: Schema<
+  number,
+  Duration.Duration
+> = durationFromMillis(number)
+
 const hrTime: Schema<readonly [seconds: number, nanos: number]> = tuple(
-  NonNegative.pipe(annotations({
-    [AST.TitleAnnotationId]: "seconds",
-    [AST.DescriptionAnnotationId]: "seconds"
-  })),
-  NonNegative.pipe(annotations({
-    [AST.TitleAnnotationId]: "nanos",
-    [AST.DescriptionAnnotationId]: "nanos"
-  }))
+  NonNegative.pipe(
+    annotations({
+      [AST.TitleAnnotationId]: "seconds",
+      [AST.DescriptionAnnotationId]: "seconds"
+    }),
+    finite()
+  ),
+  NonNegative.pipe(
+    annotations({
+      [AST.TitleAnnotationId]: "nanos",
+      [AST.DescriptionAnnotationId]: "nanos"
+    }),
+    finite()
+  )
 ).pipe(annotations({
   [AST.TitleAnnotationId]: "a high resolution time tuple",
   [AST.DescriptionAnnotationId]: "a high resolution time tuple"
@@ -3192,6 +3259,147 @@ export {
   _Duration as Duration
 }
 
+/**
+ * Clamps a `Duration` between a minimum and a maximum value.
+ *
+ * @category Duration transformations
+ * @since 1.0.0
+ */
+export const clampDuration =
+  (minimum: Duration.DurationInput, maximum: Duration.DurationInput) =>
+  <I, A extends Duration.Duration>(self: Schema<I, A>): Schema<I, A> =>
+    transform(
+      self,
+      self.pipe(to, betweenDuration(minimum, maximum)),
+      (self) => Duration.clamp(self, { minimum, maximum }),
+      identity,
+      { strict: false }
+    )
+
+// ---------------------------------------------
+// Duration filters
+// ---------------------------------------------
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const LessThanDurationTypeId = Symbol.for("@effect/schema/TypeId/LessThanDuration")
+
+/**
+ * @category Duration filters
+ * @since 1.0.0
+ */
+export const lessThanDuration = <A extends Duration.Duration>(
+  max: Duration.DurationInput,
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => Duration.lessThan(a, max), {
+      typeId: { id: LessThanDurationTypeId, params: { max } },
+      description: `a Duration less than ${Duration.decode(max)}`,
+      ...options
+    })
+  )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const LessThanOrEqualToDurationTypeId = Symbol.for(
+  "@effect/schema/TypeId/LessThanOrEqualToDuration"
+)
+
+/**
+ * @category Duration filters
+ * @since 1.0.0
+ */
+export const lessThanOrEqualToDuration = <A extends Duration.Duration>(
+  max: Duration.DurationInput,
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => Duration.lessThanOrEqualTo(a, max), {
+      typeId: { id: LessThanDurationTypeId, params: { max } },
+      description: `a Duration less than or equal to ${Duration.decode(max)}`,
+      ...options
+    })
+  )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const GreaterThanDurationTypeId = Symbol.for("@effect/schema/TypeId/GreaterThanDuration")
+
+/**
+ * @category Duration filters
+ * @since 1.0.0
+ */
+export const greaterThanDuration = <A extends Duration.Duration>(
+  min: Duration.DurationInput,
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => Duration.greaterThan(a, min), {
+      typeId: { id: GreaterThanDurationTypeId, params: { min } },
+      description: `a Duration greater than ${Duration.decode(min)}`,
+      ...options
+    })
+  )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const GreaterThanOrEqualToDurationTypeId = Symbol.for(
+  "@effect/schema/TypeId/GreaterThanOrEqualToDuration"
+)
+
+/**
+ * @category Duration filters
+ * @since 1.0.0
+ */
+export const greaterThanOrEqualToDuration = <A extends Duration.Duration>(
+  min: Duration.DurationInput,
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => Duration.greaterThanOrEqualTo(a, min), {
+      typeId: { id: GreaterThanOrEqualToDurationTypeId, params: { min } },
+      description: `a Duration greater than or equal to ${Duration.decode(min)}`,
+      ...options
+    })
+  )
+
+/**
+ * @category type id
+ * @since 1.0.0
+ */
+export const BetweenDurationTypeId = Symbol.for("@effect/schema/TypeId/BetweenDuration")
+
+/**
+ * @category Duration filters
+ * @since 1.0.0
+ */
+export const betweenDuration = <A extends Duration.Duration>(
+  minimum: Duration.DurationInput,
+  maximum: Duration.DurationInput,
+  options?: FilterAnnotations<A>
+) =>
+<I>(self: Schema<I, A>): Schema<I, A> =>
+  self.pipe(
+    filter((a): a is A => Duration.between(a, { minimum, maximum }), {
+      typeId: { id: BetweenDurationTypeId, params: { maximum, minimum } },
+      description: `a Duration between ${Duration.decode(minimum)} and ${Duration.decode(maximum)}`,
+      ...options
+    })
+  )
+
 // ---------------------------------------------
 // Uint8Array constructors
 // ---------------------------------------------
@@ -3209,7 +3417,7 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
       : ParseResult.fail(ParseResult.type(ast, u)),
   {
     [AST.IdentifierAnnotationId]: "Uint8Array",
-    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u8arr) =>
+    [hooks.PrettyHookId]: (): Pretty.Pretty<Uint8Array> => (u8arr) =>
       `new Uint8Array(${JSON.stringify(Array.from(u8arr))})`,
     [hooks.ArbitraryHookId]: (): Arbitrary<Uint8Array> => (fc) => fc.uint8Array(),
     [hooks.EquivalenceHookId]: () => ReadonlyArray.getEquivalence(Equivalence.strict())
@@ -3282,7 +3490,7 @@ const makeEncodingTransform = <A extends string>(
     { strict: false }
   ).pipe(annotations({
     [AST.IdentifierAnnotationId]: id,
-    [hooks.PrettyHookId]: (): Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
+    [hooks.PrettyHookId]: (): Pretty.Pretty<Uint8Array> => (u) => `${id}(${encode(u)})`,
     [hooks.ArbitraryHookId]: () => arbitrary
   }))
 
@@ -3476,7 +3684,7 @@ export const validDate =
 
 const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date({ noInvalidDate: false })
 
-const datePretty = (): Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
+const datePretty = (): Pretty.Pretty<Date> => (date) => `new Date(${JSON.stringify(date)})`
 
 /**
  * Represents a schema for handling potentially **invalid** `Date` instances (e.g., `new Date("Invalid Date")` is not rejected).
@@ -3582,7 +3790,7 @@ const optionArbitrary = <A>(value: Arbitrary<A>): Arbitrary<Option.Option<A>> =>
   return (fc) => arb(fc).map(optionDecode)
 }
 
-const optionPretty = <A>(value: Pretty<A>): Pretty<Option.Option<A>> =>
+const optionPretty = <A>(value: Pretty.Pretty<A>): Pretty.Pretty<Option.Option<A>> =>
   Option.match({
     onNone: () => "none()",
     onSome: (a) => `some(${value(a)})`
@@ -3701,7 +3909,10 @@ const eitherArbitrary = <E, A>(
   return (fc) => arb(fc).map(eitherDecode)
 }
 
-const eitherPretty = <E, A>(left: Pretty<E>, right: Pretty<A>): Pretty<Either.Either<E, A>> =>
+const eitherPretty = <E, A>(
+  left: Pretty.Pretty<E>,
+  right: Pretty.Pretty<A>
+): Pretty.Pretty<Either.Either<E, A>> =>
   Either.match({
     onLeft: (e) => `left(${left(e)})`,
     onRight: (a) => `right(${right(a)})`
@@ -3768,9 +3979,9 @@ const readonlyMapArbitrary = <K, V>(
 (fc) => fc.array(fc.tuple(key(fc), value(fc))).map((as) => new Map(as))
 
 const readonlyMapPretty = <K, V>(
-  key: Pretty<K>,
-  value: Pretty<V>
-): Pretty<ReadonlyMap<K, V>> =>
+  key: Pretty.Pretty<K>,
+  value: Pretty.Pretty<V>
+): Pretty.Pretty<ReadonlyMap<K, V>> =>
 (map) =>
   `new Map([${
     Array.from(map.entries())
@@ -3843,7 +4054,7 @@ const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 const readonlySetArbitrary = <A>(item: Arbitrary<A>): Arbitrary<ReadonlySet<A>> => (fc) =>
   fc.array(item(fc)).map((as) => new Set(as))
 
-const readonlySetPretty = <A>(item: Pretty<A>): Pretty<ReadonlySet<A>> => (set) =>
+const readonlySetPretty = <A>(item: Pretty.Pretty<A>): Pretty.Pretty<ReadonlySet<A>> => (set) =>
   `new Set([${Array.from(set.values()).map((a) => item(a)).join(", ")}])`
 
 const readonlySetEquivalence = <A>(
@@ -3900,7 +4111,7 @@ export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, 
 // BigDecimal transformations
 // ---------------------------------------------
 
-const bigDecimalPretty = (): Pretty<BigDecimal.BigDecimal> => (val) =>
+const bigDecimalPretty = (): Pretty.Pretty<BigDecimal.BigDecimal> => (val) =>
   `BigDecimal(${BigDecimal.format(BigDecimal.normalize(val))})`
 
 const bigDecimalArbitrary = (): Arbitrary<BigDecimal.BigDecimal> => (fc) =>
@@ -4244,7 +4455,7 @@ export const negateBigDecimal = <I, A extends BigDecimal.BigDecimal>(
 const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk.Chunk<A>> => (fc) =>
   fc.array(item(fc)).map(Chunk.fromIterable)
 
-const chunkPretty = <A>(item: Pretty<A>): Pretty<Chunk.Chunk<A>> => (c) =>
+const chunkPretty = <A>(item: Pretty.Pretty<A>): Pretty.Pretty<Chunk.Chunk<A>> => (c) =>
   `Chunk(${Chunk.toReadonlyArray(c).map(item).join(", ")})`
 
 /**
@@ -4303,8 +4514,8 @@ const dataArbitrary = <A extends Readonly<Record<string, any>> | ReadonlyArray<a
 (fc) => item(fc).map(toData)
 
 const dataPretty = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(
-  item: Pretty<A>
-): Pretty<Data.Data<A>> =>
+  item: Pretty.Pretty<A>
+): Pretty.Pretty<Data.Data<A>> =>
 (d) => `Data(${item(d)})`
 
 /**
@@ -4503,7 +4714,9 @@ export declare namespace TaggedRequest {
    * @category classes
    * @since 1.0.0
    */
-  export type Any = TaggedRequest<string, any, any, any, any, any, any>
+  export type Any =
+    | TaggedRequest<string, any, any, any, any, any, any>
+    | TaggedRequest<string, any, any, never, never, any, any>
 }
 
 /**
@@ -4570,6 +4783,10 @@ const makeClass = <I, A>(
 
     static [TypeId] = variance
 
+    toString() {
+      return Pretty.to(this.constructor as any)(this)
+    }
+
     static pipe() {
       return pipeArguments(this, arguments)
     }
@@ -4583,6 +4800,8 @@ const makeClass = <I, A>(
             ParseResult.succeed(input)
             : ParseResult.fail(ParseResult.type(ast, input)), {
           [AST.DescriptionAnnotationId]: `an instance of ${this.name}`,
+          [hooks.PrettyHookId]: (struct: any) => (self: any) =>
+            `${self.constructor.name}(${struct(self)})`,
           [hooks.ArbitraryHookId]: (struct: any) => (fc: any) =>
             struct(fc).map((props: any) => new this(props))
         }),
@@ -4691,7 +4910,7 @@ const fiberIdFromArbitrary = arbitrary.unsafe(FiberIdFrom)
 const fiberIdArbitrary: Arbitrary<FiberId.FiberId> = (fc) =>
   fiberIdFromArbitrary(fc).map(fiberIdDecode)
 
-const fiberIdPretty: Pretty<FiberId.FiberId> = (fiberId) => {
+const fiberIdPretty: Pretty.Pretty<FiberId.FiberId> = (fiberId) => {
   switch (fiberId._tag) {
     case "None":
       return "FiberId.none"
@@ -4839,7 +5058,7 @@ const causeArbitrary = <E>(
   return (fc) => arb(fc).map(causeDecode)
 }
 
-const causePretty = <E>(error: Pretty<E>): Pretty<Cause.Cause<E>> => (cause) => {
+const causePretty = <E>(error: Pretty.Pretty<E>): Pretty.Pretty<Cause.Cause<E>> => (cause) => {
   const f = (cause: Cause.Cause<E>): string => {
     switch (cause._tag) {
       case "Empty":
@@ -5011,10 +5230,12 @@ const exitArbitrary = <E, A>(
   return (fc) => arb(fc).map(exitDecode)
 }
 
-const exitPretty = <E, A>(error: Pretty<E>, value: Pretty<A>): Pretty<Exit.Exit<E, A>> => (exit) =>
-  exit._tag === "Failure"
-    ? `Exit.failCause(${causePretty(error)(exit.cause)})`
-    : `Exit.succeed(${value(exit.value)})`
+const exitPretty =
+  <E, A>(error: Pretty.Pretty<E>, value: Pretty.Pretty<A>): Pretty.Pretty<Exit.Exit<E, A>> =>
+  (exit) =>
+    exit._tag === "Failure"
+      ? `Exit.failCause(${causePretty(error)(exit.cause)})`
+      : `Exit.succeed(${value(exit.value)})`
 
 /**
  * @category Exit
