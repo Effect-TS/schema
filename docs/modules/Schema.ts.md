@@ -1948,7 +1948,7 @@ Schema<A> + B -> Schema<A & Brand<B>>
 ```ts
 export declare const brand: <B extends string | symbol, A>(
   brand: B,
-  options?: DocAnnotations<A> | undefined
+  options?: DocAnnotations
 ) => <I>(self: Schema<I, A>) => BrandSchema<I, A & Brand.Brand<B>>
 ```
 
@@ -4216,14 +4216,13 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface DocAnnotations<A> extends AST.Annotations {
+export interface DocAnnotations extends AST.Annotations {
   readonly identifier?: AST.IdentifierAnnotation
   readonly title?: AST.TitleAnnotation
   readonly description?: AST.DescriptionAnnotation
   readonly examples?: AST.ExamplesAnnotation
   readonly default?: AST.DefaultAnnotation
   readonly documentation?: AST.DocumentationAnnotation
-  readonly message?: AST.MessageAnnotation<A>
 }
 ```
 
@@ -4234,7 +4233,8 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export interface FilterAnnotations<A> extends DocAnnotations<A> {
+export interface FilterAnnotations<A> extends DocAnnotations {
+  readonly message?: AST.MessageAnnotation<A>
   readonly typeId?: AST.TypeAnnotation | { id: AST.TypeAnnotation; params: unknown }
   /**
    * Attaches a JSON Schema annotation to this refinement.
@@ -4460,7 +4460,7 @@ Added in v1.0.0
 ```ts
 export declare const optional: <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations<A> | undefined
+  options?: DocAnnotations
 ) => OptionalPropertySignature<I, true, A, true>
 ```
 
@@ -4473,7 +4473,7 @@ Added in v1.0.0
 ```ts
 export declare const propertySignature: <I, A>(
   schema: Schema<I, A>,
-  options: DocAnnotations<A>
+  options: DocAnnotations
 ) => PropertySignature<I, false, A, false>
 ```
 
