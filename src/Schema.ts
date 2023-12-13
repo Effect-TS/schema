@@ -832,6 +832,23 @@ export const optionalExactWithDefault = <I, A>(
  * @category optional
  * @since 1.0.0
  */
+export const optionalExactNullableWithDefault = <I, A>(
+  schema: Schema<I, A>,
+  value: () => A,
+  options?: DocAnnotations<A | null>
+): PropertySignature<I | null, true, A, false> =>
+  optionalExactToRequired(
+    nullable(schema),
+    to(schema),
+    Option.match({ onNone: value, onSome: (a) => a === null ? value() : a }),
+    Option.some,
+    options
+  )
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
 export const optionalWithDefault = <I, A>(
   schema: Schema<I, A>,
   value: () => A,
