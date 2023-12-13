@@ -85,14 +85,14 @@ export declare module Schema {
    * @since 1.0.0
    */
   export type From<S extends { readonly [TypeId]: { readonly From: (..._: any) => any } }> =
-    Parameters<S[TypeId]["From"]>[0]
+    ReturnType<S[TypeId]["From"]>
 
   /**
    * @since 1.0.0
    */
-  export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = Parameters<
+  export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = ReturnType<
     S[TypeId]["To"]
-  >[0]
+  >
 
   /**
    * @since 1.0.0

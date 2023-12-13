@@ -1762,13 +1762,13 @@ export declare const TaggedClass: <Self>() => <Tag extends string, Fields extend
   : Class<
       Simplify<
         { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
-        } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: ReturnType<Fields[K][typeof TypeId]["From"]>
+        } & { readonly [K in FromOptionalKeys<Fields>]?: ReturnType<Fields[K][typeof TypeId]["From"]> | undefined }
       >,
       Simplify<
         { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
-        } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
+          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: ReturnType<Fields[K][typeof TypeId]["To"]>
+        } & { readonly [K in ToOptionalKeys<Fields>]?: ReturnType<Fields[K][typeof TypeId]["To"]> | undefined }
       >,
       Simplify<ToStruct<Fields>>,
       Self,
@@ -1791,13 +1791,13 @@ export declare const TaggedError: <Self>() => <Tag extends string, Fields extend
   : Class<
       Simplify<
         { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
-        } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: ReturnType<Fields[K][typeof TypeId]["From"]>
+        } & { readonly [K in FromOptionalKeys<Fields>]?: ReturnType<Fields[K][typeof TypeId]["From"]> | undefined }
       >,
       Simplify<
         { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
-        } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
+          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: ReturnType<Fields[K][typeof TypeId]["To"]>
+        } & { readonly [K in ToOptionalKeys<Fields>]?: ReturnType<Fields[K][typeof TypeId]["To"]> | undefined }
       >,
       Simplify<ToStruct<Fields>>,
       Self,
@@ -1822,13 +1822,13 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
   : Class<
       Simplify<
         { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
-        } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+          readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: ReturnType<Fields[K][typeof TypeId]["From"]>
+        } & { readonly [K in FromOptionalKeys<Fields>]?: ReturnType<Fields[K][typeof TypeId]["From"]> | undefined }
       >,
       Simplify<
         { readonly _tag: Tag } & {
-          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
-        } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
+          readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: ReturnType<Fields[K][typeof TypeId]["To"]>
+        } & { readonly [K in ToOptionalKeys<Fields>]?: ReturnType<Fields[K][typeof TypeId]["To"]> | undefined }
       >,
       Simplify<ToStruct<Fields>>,
       Self,
@@ -1836,8 +1836,10 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
         Tag,
         Simplify<
           { readonly _tag: Tag } & {
-            readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: Schema.From<Fields[K]>
-          } & { readonly [K in FromOptionalKeys<Fields>]?: Schema.From<Fields[K]> | undefined }
+            readonly [K in Exclude<keyof Fields, FromOptionalKeys<Fields>>]: ReturnType<
+              Fields[K][typeof TypeId]["From"]
+            >
+          } & { readonly [K in FromOptionalKeys<Fields>]?: ReturnType<Fields[K][typeof TypeId]["From"]> | undefined }
         >,
         Self,
         EI,
@@ -2264,8 +2266,8 @@ Added in v1.0.0
 export declare const tuple: <Elements extends readonly Schema<any, any>[]>(
   ...elements: Elements
 ) => Schema<
-  { readonly [K in keyof Elements]: Schema.From<Elements[K]> },
-  { readonly [K in keyof Elements]: Schema.To<Elements[K]> }
+  { readonly [K in keyof Elements]: ReturnType<Elements[K][typeof TypeId]["From"]> },
+  { readonly [K in keyof Elements]: ReturnType<Elements[K][typeof TypeId]["To"]> }
 >
 ```
 
@@ -2278,7 +2280,7 @@ Added in v1.0.0
 ```ts
 export declare const union: <Members extends readonly Schema<any, any>[]>(
   ...members: Members
-) => Schema<Schema.From<Members[number]>, Schema.To<Members[number]>>
+) => Schema<ReturnType<Members[number][typeof TypeId]["From"]>, ReturnType<Members[number][typeof TypeId]["To"]>>
 ```
 
 Added in v1.0.0
@@ -2368,7 +2370,10 @@ Added in v1.0.0
 ```ts
 export declare const templateLiteral: <T extends [Schema<any, any>, ...Schema<any, any>[]]>(
   ...[head, ...tail]: T
-) => Schema<Join<{ [K in keyof T]: Schema.To<T[K]> }>, Join<{ [K in keyof T]: Schema.To<T[K]> }>>
+) => Schema<
+  Join<{ [K in keyof T]: ReturnType<T[K][typeof TypeId]["To"]> }>,
+  Join<{ [K in keyof T]: ReturnType<T[K][typeof TypeId]["To"]> }>
+>
 ```
 
 Added in v1.0.0
@@ -4369,9 +4374,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type From<S extends { readonly [TypeId]: { readonly From: (..._: any) => any } }> = Parameters<
-  S[TypeId]["From"]
->[0]
+export type From<S extends { readonly [TypeId]: { readonly From: (..._: any) => any } }> = ReturnType<S[TypeId]["From"]>
 ```
 
 Added in v1.0.0
@@ -4381,7 +4384,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = Parameters<S[TypeId]["To"]>[0]
+export type To<S extends { readonly [TypeId]: { readonly To: (..._: any) => any } }> = ReturnType<S[TypeId]["To"]>
 ```
 
 Added in v1.0.0

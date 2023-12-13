@@ -17,6 +17,10 @@ export type FromNever = S.Schema.From<typeof S.never>
 // $ExpectType never
 export type ToNever = S.Schema.To<typeof S.never>
 
+// $ExpectType "a" | "b" | "c"
+export type ToABC = S.Schema.To<ReturnType<typeof S.literal<["a", "b", "c"]>>>
+
+
 // ---------------------------------------------
 // Primitives
 // ---------------------------------------------
