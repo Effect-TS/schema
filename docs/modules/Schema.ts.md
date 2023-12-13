@@ -237,8 +237,6 @@ Added in v1.0.0
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring-1)
 - [optional](#optional)
-  - [optionalExactNullableWithDefault](#optionalexactnullablewithdefault)
-  - [optionalExactWithDefault](#optionalexactwithdefault)
   - [optionalNullableToOption](#optionalnullabletooption)
   - [optionalNullableWithDefault](#optionalnullablewithdefault)
   - [optionalToOption](#optionaltooption)
@@ -3014,34 +3012,6 @@ Added in v1.0.0
 
 # optional
 
-## optionalExactNullableWithDefault
-
-**Signature**
-
-```ts
-export declare const optionalExactNullableWithDefault: <I, A>(
-  schema: Schema<I, A>,
-  value: () => A,
-  options?: DocAnnotations
-) => PropertySignature<I | null, true, A, false>
-```
-
-Added in v1.0.0
-
-## optionalExactWithDefault
-
-**Signature**
-
-```ts
-export declare const optionalExactWithDefault: <I, A>(
-  schema: Schema<I, A>,
-  value: () => A,
-  options?: DocAnnotations
-) => PropertySignature<I, true, A, false>
-```
-
-Added in v1.0.0
-
 ## optionalNullableToOption
 
 **Signature**
@@ -3063,11 +3033,14 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionalNullableWithDefault: <I, A>(
-  schema: Schema<I, A>,
-  value: () => A,
-  options?: DocAnnotations
-) => PropertySignature<I | null | undefined, true, A, false>
+export declare const optionalNullableWithDefault: {
+  <I, A>(
+    schema: Schema<I, A>,
+    value: () => A,
+    options: { readonly exact: true }
+  ): PropertySignature<I | null, true, A, false>
+  <I, A>(schema: Schema<I, A>, value: () => A): PropertySignature<I | null | undefined, true, A, false>
+}
 ```
 
 Added in v1.0.0
@@ -3106,11 +3079,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionalWithDefault: <I, A>(
-  schema: Schema<I, A>,
-  value: () => A,
-  options?: DocAnnotations
-) => PropertySignature<I | undefined, true, A, false>
+export declare const optionalWithDefault: {
+  <I, A>(schema: Schema<I, A>, value: () => A, options: { readonly exact: true }): PropertySignature<I, true, A, false>
+  <I, A>(schema: Schema<I, A>, value: () => A): PropertySignature<I | undefined, true, A, false>
+}
 ```
 
 Added in v1.0.0

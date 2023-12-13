@@ -1,7 +1,7 @@
 import * as S from "@effect/schema/Schema"
 import * as Util from "@effect/schema/test/util"
 import * as O from "effect/Option"
-import { describe, expect, it } from "vitest"
+import { describe, it } from "vitest"
 
 describe("optional APIs", () => {
   describe("optionalExact", () => {
@@ -122,21 +122,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalExactWithDefault", () => {
-    it("should add annotations", () => {
-      const schema = S.struct({
-        a: S.optionalExactWithDefault(S.string, () => "", {
-          [Symbol.for("custom-annotation")]: "custom-annotation-value"
-        })
-      })
-      expect((schema.ast as any).to.propertySignatures[0].annotations).toEqual({
-        [Symbol.for("custom-annotation")]: "custom-annotation-value"
-      })
-    })
-
+  describe("optionalWithDefault > { exact: true }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalExactWithDefault(S.NumberFromString, () => 0)
+        a: S.optionalWithDefault(S.NumberFromString, () => 0, { exact: true })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
@@ -190,10 +179,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalExactNullableWithDefault", () => {
+  describe("optionalNullableWithDefault > { exact: true }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalExactNullableWithDefault(S.NumberFromString, () => 0)
+        a: S.optionalNullableWithDefault(S.NumberFromString, () => 0, { exact: true })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: null }, { a: 0 })

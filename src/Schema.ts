@@ -819,69 +819,71 @@ export const optionalNullableToOption: {
  * @category optional
  * @since 1.0.0
  */
-export const optionalExactWithDefault = <I, A>(
+export const optionalWithDefault: {
+  <I, A>(
+    schema: Schema<I, A>,
+    value: () => A,
+    options: { readonly exact: true }
+  ): PropertySignature<I, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    value: () => A
+  ): PropertySignature<I | undefined, true, A, false>
+} = <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations
-): PropertySignature<I, true, A, false> =>
-  optionalToRequired(
-    schema,
-    to(schema),
-    Option.match({ onNone: value, onSome: identity }),
-    Option.some,
-    options
-  )
+  options?: { readonly exact?: true }
+): PropertySignature<any, true, A, false> => {
+  const exact = options?.exact
+  return exact ?
+    optionalToRequired(
+      schema,
+      to(schema),
+      Option.match({ onNone: value, onSome: identity }),
+      Option.some
+    ) :
+    optionalToRequired(
+      union(_undefined, schema),
+      to(schema),
+      Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
+      Option.some
+    )
+}
 
 /**
  * @category optional
  * @since 1.0.0
  */
-export const optionalExactNullableWithDefault = <I, A>(
+export const optionalNullableWithDefault: {
+  <I, A>(
+    schema: Schema<I, A>,
+    value: () => A,
+    options: { readonly exact: true }
+  ): PropertySignature<I | null, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    value: () => A
+  ): PropertySignature<I | null | undefined, true, A, false>
+} = <I, A>(
   schema: Schema<I, A>,
   value: () => A,
-  options?: DocAnnotations
-): PropertySignature<I | null, true, A, false> =>
-  optionalToRequired(
-    nullable(schema),
-    to(schema),
-    Option.match({ onNone: value, onSome: (a) => a === null ? value() : a }),
-    Option.some,
-    options
-  )
-
-/**
- * @category optional
- * @since 1.0.0
- */
-export const optionalWithDefault = <I, A>(
-  schema: Schema<I, A>,
-  value: () => A,
-  options?: DocAnnotations
-): PropertySignature<I | undefined, true, A, false> =>
-  optionalToRequired(
-    union(_undefined, schema),
-    to(schema),
-    Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
-    Option.some,
-    options
-  )
-
-/**
- * @category optional
- * @since 1.0.0
- */
-export const optionalNullableWithDefault = <I, A>(
-  schema: Schema<I, A>,
-  value: () => A,
-  options?: DocAnnotations
-): PropertySignature<I | null | undefined, true, A, false> =>
-  optionalToRequired(
-    nullish(schema),
-    to(schema),
-    Option.match({ onNone: value, onSome: (a) => (a == null ? value() : a) }),
-    Option.some,
-    options
-  )
+  options?: { readonly exact?: true }
+): PropertySignature<any, true, A, false> => {
+  const exact = options?.exact
+  return exact ?
+    optionalToRequired(
+      nullable(schema),
+      to(schema),
+      Option.match({ onNone: value, onSome: (a) => a === null ? value() : a }),
+      Option.some
+    ) :
+    optionalToRequired(
+      nullish(schema),
+      to(schema),
+      Option.match({ onNone: value, onSome: (a) => (a == null ? value() : a) }),
+      Option.some
+    )
+}
 
 /**
  * @since 1.0.0

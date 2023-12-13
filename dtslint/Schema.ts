@@ -265,14 +265,14 @@ S.struct({ a: S.string, b: S.number, c: S.optional(S.NumberFromString) })
 S.struct({ a: S.optional(S.never) })
 
 // ---------------------------------------------
-// optionalExactWithDefault
+// optionalWithDefault { exact: true }
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: boolean; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalExactWithDefault(S.boolean, () => false) })
+S.struct({ a: S.string, b: S.number, c: S.optionalWithDefault(S.boolean, () => false, { exact: true }) })
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalExactWithDefault(S.NumberFromString, () => 0) })
+S.struct({ a: S.string, b: S.number, c: S.optionalWithDefault(S.NumberFromString, () => 0, { exact: true }) })
 
 // ---------------------------------------------
 // optionalWithDefault
@@ -326,7 +326,7 @@ pipe(S.struct({ a: S.optional(S.string, { exact: true }), b: S.NumberFromString,
 
 // $ExpectType Schema<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
 pipe(
-  S.struct({ a: S.optionalExactWithDefault(S.string, () => ""), b: S.NumberFromString, c: S.boolean }),
+  S.struct({ a: S.optionalWithDefault(S.string, () => "", { exact: true }), b: S.NumberFromString, c: S.boolean }),
   S.pick("a", "b")
 )
 
@@ -352,7 +352,7 @@ pipe(S.struct({ a: S.optional(S.string, { exact: true }), b: S.NumberFromString,
 
 // $ExpectType Schema<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
 pipe(
-  S.struct({ a: S.optionalExactWithDefault(S.string, () => ""), b: S.NumberFromString, c: S.boolean }),
+  S.struct({ a: S.optionalWithDefault(S.string, () => "", { exact: true }), b: S.NumberFromString, c: S.boolean }),
   S.omit("c")
 )
 

@@ -64,7 +64,7 @@ describe("Schema/omit", () => {
 
   it("struct with property signature transformations", async () => {
     const schema = S.struct({
-      a: S.optionalExactWithDefault(S.string, () => ""),
+      a: S.optionalWithDefault(S.string, () => "", { exact: true }),
       b: S.NumberFromString,
       c: S.boolean
     }).pipe(
