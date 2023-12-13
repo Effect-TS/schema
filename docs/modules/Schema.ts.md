@@ -1873,7 +1873,9 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type Any = TaggedRequest<string, any, any, any, any, any, any>
+export type Any =
+  | TaggedRequest<string, any, any, any, any, any, any>
+  | TaggedRequest<string, any, any, never, never, any, any>
 ```
 
 Added in v1.0.0
