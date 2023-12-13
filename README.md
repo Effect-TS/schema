@@ -1476,10 +1476,10 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 
 **Cheatsheet**
 
-| Combinator      | From           | To                                                              |
-| --------------- | -------------- | --------------------------------------------------------------- |
-| `optional`      | `Schema<I, A>` | `PropertySignature<I \| undefined, true, A \| undefined, true>` |
-| `optionalExact` | `Schema<I, A>` | `PropertySignature<I, true, A, true>`                           |
+| Combinator | From                              | To                                                              |
+| ---------- | --------------------------------- | --------------------------------------------------------------- |
+| `optional` | `Schema<I, A>`                    | `PropertySignature<I \| undefined, true, A \| undefined, true>` |
+| `optional` | `Schema<I, A>`, `{ exact: true }` | `PropertySignature<I, true, A, true>`                           |
 
 #### optional(schema)
 
@@ -1503,12 +1503,12 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 
 ### Optional fields as `Option`s
 
-| Combinator                      | From           | To                                                                  |
-| ------------------------------- | -------------- | ------------------------------------------------------------------- |
-| `optionalToOption`              | `Schema<I, A>` | `PropertySignature<I \| undefined, true, Option<A>, false>`         |
-| `optionalExactToOption`         | `Schema<I, A>` | `PropertySignature<I, true, Option<A>, false>`                      |
-| `optionalNullableToOption`      | `Schema<I, A>` | `PropertySignature<I \| undefined \| null, true, Option<A>, false>` |
-| `optionalExactNullableToOption` | `Schema<I, A>` | `PropertySignature<I \| null, true, Option<A>, false>`              |
+| Combinator                      | From                              | To                                                                  |
+| ------------------------------- | --------------------------------- | ------------------------------------------------------------------- |
+| `optionalToOption`              | `Schema<I, A>`                    | `PropertySignature<I \| undefined, true, Option<A>, false>`         |
+| `optionalToOption`              | `Schema<I, A>`, `{ exact: true }` | `PropertySignature<I, true, Option<A>, false>`                      |
+| `optionalNullableToOption`      | `Schema<I, A>`                    | `PropertySignature<I \| undefined \| null, true, Option<A>, false>` |
+| `optionalExactNullableToOption` | `Schema<I, A>`                    | `PropertySignature<I \| null, true, Option<A>, false>`              |
 
 #### optionalToOption(schema)
 

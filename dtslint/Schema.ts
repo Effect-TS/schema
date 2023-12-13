@@ -289,10 +289,10 @@ S.struct({ a: S.string, b: S.number, c: S.optionalWithDefault(S.NumberFromString
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: Option<boolean>; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalExactToOption(S.boolean) })
+S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.boolean, { exact: true }) })
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: Option<number>; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalExactToOption(S.NumberFromString) })
+S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.NumberFromString, { exact: true }) })
 
 // ---------------------------------------------
 // optionalToOption

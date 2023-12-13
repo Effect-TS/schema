@@ -239,12 +239,11 @@ Added in v1.0.0
 - [optional](#optional)
   - [optionalExactNullableToOption](#optionalexactnullabletooption)
   - [optionalExactNullableWithDefault](#optionalexactnullablewithdefault)
-  - [optionalExactToOption](#optionalexacttooption)
-  - [optionalExactToRequired](#optionalexacttorequired)
   - [optionalExactWithDefault](#optionalexactwithdefault)
   - [optionalNullableToOption](#optionalnullabletooption)
   - [optionalNullableWithDefault](#optionalnullablewithdefault)
   - [optionalToOption](#optionaltooption)
+  - [optionalToRequired](#optionaltorequired)
   - [optionalWithDefault](#optionalwithdefault)
 - [parsing](#parsing)
   - [parse](#parse)
@@ -3043,35 +3042,6 @@ export declare const optionalExactNullableWithDefault: <I, A>(
 
 Added in v1.0.0
 
-## optionalExactToOption
-
-**Signature**
-
-```ts
-export declare const optionalExactToOption: <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-) => PropertySignature<I, true, Option.Option<A>, false>
-```
-
-Added in v1.0.0
-
-## optionalExactToRequired
-
-**Signature**
-
-```ts
-export declare const optionalExactToRequired: <I, A, B>(
-  from: Schema<I, A>,
-  to: Schema<B, B>,
-  decode: (o: Option.Option<A>) => B,
-  encode: (b: B) => Option.Option<A>,
-  options?: DocAnnotations
-) => PropertySignature<I, true, B, false>
-```
-
-Added in v1.0.0
-
 ## optionalExactWithDefault
 
 **Signature**
@@ -3118,10 +3088,26 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionalToOption: <I, A>(
-  schema: Schema<I, A>,
+export declare const optionalToOption: {
+  <I, A>(schema: Schema<I, A>, options: { exact: true }): PropertySignature<I, true, Option.Option<A>, false>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, Option.Option<A>, false>
+}
+```
+
+Added in v1.0.0
+
+## optionalToRequired
+
+**Signature**
+
+```ts
+export declare const optionalToRequired: <I, A, B>(
+  from: Schema<I, A>,
+  to: Schema<B, B>,
+  decode: (o: Option.Option<A>) => B,
+  encode: (b: B) => Option.Option<A>,
   options?: DocAnnotations
-) => PropertySignature<I | undefined, true, Option.Option<A>, false>
+) => PropertySignature<I, true, B, false>
 ```
 
 Added in v1.0.0
@@ -4607,8 +4593,8 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: {
-  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
   <I, A>(schema: Schema<I, A>, options: { readonly exact: true }): PropertySignature<I, true, A, true>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
 }
 ```
 

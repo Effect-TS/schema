@@ -48,20 +48,9 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalExactToOption", () => {
-    it("should add annotations", () => {
-      const schema = S.struct({
-        a: S.optionalExactToOption(S.string, {
-          [Symbol.for("custom-annotation")]: "custom-annotation-value"
-        })
-      })
-      expect((schema.ast as any).to.propertySignatures[0].annotations).toEqual({
-        [Symbol.for("custom-annotation")]: "custom-annotation-value"
-      })
-    })
-
+  describe("optionalToOption > { exact: true }", () => {
     it("decoding / encoding", async () => {
-      const schema = S.struct({ a: S.optionalExactToOption(S.NumberFromString) })
+      const schema = S.struct({ a: S.optionalToOption(S.NumberFromString, { exact: true }) })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: "1" }, { a: O.some(1) })
       await Util.expectParseFailure(schema, {
