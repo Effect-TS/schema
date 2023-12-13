@@ -1488,7 +1488,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `<missing value>` -> `<missing value>`
   - `a` -> `i`
 
-#### Optional fields as `Option`s
+### Optional fields as `Option`s
 
 | Combinator                      | From           | To                                                                  |
 | ------------------------------- | -------------- | ------------------------------------------------------------------- |
@@ -1554,7 +1554,7 @@ S.struct({
 });
 ```
 
-#### Default values
+### Default values
 
 | Combinator                         | From                      | To                                                          |
 | ---------------------------------- | ------------------------- | ----------------------------------------------------------- |
