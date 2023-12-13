@@ -71,6 +71,7 @@ Added in v1.0.0
   - [OptionFrom (type alias)](#optionfrom-type-alias)
   - [option](#option)
   - [optionFromNullable](#optionfromnullable)
+  - [optionFromNullish](#optionfromnullish)
   - [optionFromSelf](#optionfromself)
 - [ReadonlyArray filters](#readonlyarray-filters)
   - [itemsCount](#itemscount)
@@ -147,6 +148,7 @@ Added in v1.0.0
   - [mutable](#mutable)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
+  - [nullish](#nullish)
   - [omit](#omit)
   - [optionalElement](#optionalelement)
   - [partial](#partial)
@@ -993,6 +995,19 @@ Added in v1.0.0
 
 ```ts
 export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option.Option<A>>
+```
+
+Added in v1.0.0
+
+## optionFromNullish
+
+**Signature**
+
+```ts
+export declare const optionFromNullish: <I, A>(
+  value: Schema<I, A>,
+  onNoneEncoding: null | undefined
+) => Schema<I | null | undefined, Option.Option<A>>
 ```
 
 Added in v1.0.0
@@ -1915,6 +1930,18 @@ Added in v1.0.0
 
 ```ts
 export declare const nullable: <From, To>(self: Schema<From, To>) => Schema<From | null, To | null>
+```
+
+Added in v1.0.0
+
+## nullish
+
+**Signature**
+
+```ts
+export declare const nullish: <From, To>(
+  self: Schema<From, To>
+) => Schema<From | null | undefined, To | null | undefined>
 ```
 
 Added in v1.0.0

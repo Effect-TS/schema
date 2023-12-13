@@ -560,6 +560,14 @@ export const nullable = <From, To>(self: Schema<From, To>): Schema<From | null, 
  * @category combinators
  * @since 1.0.0
  */
+export const nullish = <From, To>(
+  self: Schema<From, To>
+): Schema<From | null | undefined, To | null | undefined> => union(_null, _undefined, self)
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
 export const keyof = <I, A>(schema: Schema<I, A>): Schema<keyof A> => make(AST.keyof(schema.ast))
 
 /**
@@ -3567,6 +3575,21 @@ export const optionFromNullable = <I, A>(
   value: Schema<I, A>
 ): Schema<I | null, Option.Option<A>> =>
   transform(nullable(value), optionFromSelf(to(value)), Option.fromNullable, Option.getOrNull)
+
+/**
+ * @category Option transformations
+ * @since 1.0.0
+ */
+export const optionFromNullish = <I, A>(
+  value: Schema<I, A>,
+  onNoneEncoding: null | undefined
+): Schema<I | null | undefined, Option.Option<A>> =>
+  transform(
+    nullish(value),
+    optionFromSelf(to(value)),
+    Option.fromNullable,
+    onNoneEncoding === null ? Option.getOrNull : Option.getOrUndefined
+  )
 
 // ---------------------------------------------
 // Either transformations

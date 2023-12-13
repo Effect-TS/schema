@@ -1461,12 +1461,60 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 
 ### Optional fields
 
-```ts
-// $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalExact(S.boolean) });
-```
+**Cheatsheet**
 
-**Note**. The `optionalExact` combinator only exists to be used in combination with the `struct` API to signal an optional field and does not have a broader meaning. This means that it is only allowed to use it as an outer wrapper of a `Schema` and **it cannot be followed by other combinators**, for example this type of operation is prohibited:
+| Combinator      | From           | To                                                              |
+| --------------- | -------------- | --------------------------------------------------------------- |
+| `optional`      | `Schema<I, A>` | `PropertySignature<I \| undefined, true, A \| undefined, true>` |
+| `optionalExact` | `Schema<I, A>` | `PropertySignature<I, true, A, true>`                           |
+
+#### optional(schema)
+
+- decoding
+  - `<missing value>` -> `<missing value>`
+  - `undefined` -> `undefined`
+  - `i` -> `a`
+- encoding
+  - `<missing value>` -> `<missing value>`
+  - `undefined` -> `undefined`
+  - `a` -> `i`
+
+#### optionalExact(schema)
+
+- decoding
+  - `<missing value>` -> `<missing value>`
+  - `i` -> `a`
+- encoding
+  - `<missing value>` -> `<missing value>`
+  - `a` -> `i`
+
+#### Optional fields as `Option`s
+
+| Combinator              | From           | To                                                          |
+| ----------------------- | -------------- | ----------------------------------------------------------- |
+| `optionalToOption`      | `Schema<I, A>` | `PropertySignature<I \| undefined, true, Option<A>, false>` |
+| `optionalExactToOption` | `Schema<I, A>` | `PropertySignature<I, true, Option<A>, false>`              |
+
+#### optionalToOption(schema)
+
+- decoding
+  - `<missing value>` -> `Option.none()`
+  - `undefined` -> `Option.none()`
+  - `i` -> `Option.some(a)`
+- encoding
+  - `Option.none()` -> `<missing value>`
+  - `Option.some(a)` -> `i`
+
+#### optionalExactToOption(schema)
+
+- decoding
+  - `<missing value>` -> `Option.none()`
+  - `i` -> `Option.some(a)`
+- encoding
+  - `Option.none()` -> `<missing value>`
+  - `Option.some(a)` -> `i`
+
+**Note**. These combinators only exists to be used in combination with the `struct` API to signal an optional field and does not have a broader meaning. This means that it is only allowed to use it as an outer wrapper of a `Schema` and **it cannot be followed by other combinators**, for example this type of operation is prohibited:
 
 ```ts
 S.struct({
@@ -1485,43 +1533,27 @@ S.struct({
 
 #### Default values
 
-Optional fields can be configured to accept a default value, making the field optional in input and required in output:
+| Combinator                 | From                      | To                                                  |
+| -------------------------- | ------------------------- | --------------------------------------------------- |
+| `optionalWithDefault`      | `Schema<I, A>`, `() => A` | `PropertySignature<I \| undefined, true, A, false>` |
+| `optionalExactWithDefault` | `Schema<I, A>`, `() => A` | `PropertySignature<I, true, A, false>`              |
 
-```ts
-// $ExpectType Schema<{ readonly a?: number; }, { readonly a: number; }>
-const schema = S.struct({ a: S.optionalExactWithDefault(S.number, () => 0) });
+#### optionalWithDefault(schema, default)
 
-const parse = S.parseSync(schema);
+- decoding
+  - `<missing value>` -> `<default value>`
+  - `undefined` -> `<default value>`
+  - `i` -> `a`
+- encoding
+  - `a` -> `i`
 
-parse({}); // { a: 0 }
-parse({ a: 1 }); // { a: 1 }
+#### optionalExactWithDefault(schema, default)
 
-const encode = S.encodeSync(schema);
-
-encode({ a: 0 }); // { a: 0 }
-encode({ a: 1 }); // { a: 1 }
-```
-
-#### Optional fields as `Option`s
-
-Optional fields can be configured to transform a value of type `A` into `Option<A>`, making the field optional in input and required in output:
-
-```ts
-import * as O from "effect/Option"
-
-// $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
-const schema = S.struct({ a. S.optionalExactToOption(S.number) });
-
-const parse = S.parseSync(schema)
-
-parse({}) // { a: none() }
-parse({ a: 1 }) // { a: some(1) }
-
-const encode = S.encodeSync(schema)
-
-encode({ a: O.none() }) // {}
-encode({ a: O.some(1) }) // { a: 1 }
-```
+- decoding
+  - `<missing value>` -> `<default value>`
+  - `i` -> `a`
+- encoding
+  - `a` -> `i`
 
 ### Renaming Properties
 
@@ -2459,103 +2491,64 @@ console.log(Equal.equals(person1, person2)); // true
 
 ## Option
 
-### Parsing from nullable fields
+**Cheatsheet**
 
-The `optionFromNullable` combinator in `@effect/schema/Schema` allows you to specify that a field in a schema is of type `Option<A>` and can be parsed from a required nullable field `A | null`. This is particularly useful when working with JSON data that may contain `null` values for optional fields.
+| Combinator           | From                                | To                                          |
+| -------------------- | ----------------------------------- | ------------------------------------------- |
+| `option`             | `Schema<I, A>`                      | `Schema<OptionFrom<I>, Option<A>>`          |
+| `optionFromSelf`     | `Schema<I, A>`                      | `Schema<Option<I>, Option<A>>`              |
+| `optionFromNullable` | `Schema<I, A>`                      | `Schema<I \| null, Option<A>>`              |
+| `optionFromNullish`  | `Schema<I, A>`, `null \| undefined` | `Schema<I \| null \| undefined, Option<A>>` |
 
-When parsing a nullable field, the `option` combinator follows these conversion rules:
-
-- `null` parses to `None`
-- `A` parses to `Some<A>`
-
-Here's an example that demonstrates how to use the `optionFromNullable` combinator:
+where
 
 ```ts
-import * as Schema from "@effect/schema/Schema";
-import { Option } from "effect";
-
-/*
-const schema: Schema<{
-    readonly a: string;
-    readonly b: number | null;
-}, {
-    readonly a: string;
-    readonly b: Option<number>;
-}>
-*/
-const schema = Schema.struct({
-  a: Schema.string,
-  b: Schema.optionFromNullable(Schema.number),
-});
-
-// parsing
-const parseOrThrow = Schema.parseSync(schema);
-
-console.log(parseOrThrow({ a: "hello", b: null }));
-/*
-Output:
-{
-  a: "hello",
-  b: {
-    _id: "Option",
-    _tag: "None"
-  }
-}
-*/
-
-console.log(parseOrThrow({ a: "hello", b: 1 }));
-/*
-Output:
-{
-  a: "hello",
-  b: {
-    _id: "Option",
-    _tag: "Some",
-    value: 1
-  }
-}
-*/
-
-parseOrThrow({ a: "hello", b: undefined });
-/*
-throws:
-Error: error(s) found
-└─ ["b"]
-   ├─ union member
-   │  └─ Expected null, actual undefined
-   └─ union member
-      └─ Expected number, actual undefined
-*/
-
-parseOrThrow({ a: "hello" });
-/*
-throws:
-Error: error(s) found
-└─ ["b"]
-   └─ is missing
-*/
-
-// encoding
-const encodeOrThrow = Schema.encodeSync(schema);
-
-console.log(encodeOrThrow({ a: "hello", b: Option.none() }));
-/*
-Output:
-{
-  a: "hello",
-  b: null
-}
-*/
-
-console.log(encodeOrThrow({ a: "hello", b: Option.some(1) }));
-/*
-Output:
-{
-  a: "hello",
-  b: 1
-}
-*/
+type OptionFrom<I> =
+  | {
+      readonly _tag: "None";
+    }
+  | {
+      readonly _tag: "Some";
+      readonly value: I;
+    };
 ```
+
+### option(schema)
+
+- decoding
+  - `{ _tag: "None" }` -> `Option.none()`
+  - `{ _tag: "Some", value: i }` -> `Option.some(a)`
+- encoding
+  - `Option.none()` -> `{ _tag: "None" }`
+  - `Option.some(a)` -> `{ _tag: "Some", value: i }`
+
+### optionFromSelf(schema)
+
+- decoding
+  - `Option.none()` -> `Option.none()`
+  - `Option.some(i)` -> `Option.some(a)`
+- encoding
+  - `Option.none()` -> `Option.none()`
+  - `Option.some(a)` -> `Option.some(i)`
+
+### optionFromNullable(schema)
+
+- decoding
+  - `null` -> `Option.none()`
+  - `i` -> `Option.some(a)`
+- encoding
+  - `Option.none()` -> `null`
+  - `Option.some(a)` -> `i`
+
+### optionFromNullish(schema, onNoneEncoding)
+
+- decoding
+  - `null` -> `Option.none()`
+  - `undefined` -> `Option.none()`
+  - `i` -> `Option.some(a)`
+- encoding
+  - `Option.none()` -> `<onNoneEncoding value>`
+  - `Option.some(a)` -> `i`
 
 ## ReadonlySet
 
