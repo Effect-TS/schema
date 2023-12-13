@@ -787,33 +787,33 @@ export const optionalToOption: {
  * @category optional
  * @since 1.0.0
  */
-export const optionalExactNullableToOption = <I, A>(
+export const optionalNullableToOption: {
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true }
+  ): PropertySignature<I | null, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>
+  ): PropertySignature<I | undefined | null, true, Option.Option<A>, false>
+} = <I, A>(
   schema: Schema<I, A>,
-  options?: DocAnnotations
-): PropertySignature<I | null, true, Option.Option<A>, false> =>
-  optionalToRequired(
-    nullable(schema),
-    optionFromSelf(to(schema)),
-    Option.filter(Predicate.isNotNull),
-    identity,
-    options
-  )
-
-/**
- * @category optional
- * @since 1.0.0
- */
-export const optionalNullableToOption = <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-): PropertySignature<I | undefined | null, true, Option.Option<A>, false> =>
-  optionalToRequired(
-    nullish(schema),
-    optionFromSelf(to(schema)),
-    Option.filter((a: A | null | undefined): a is A => a != null),
-    identity,
-    options
-  )
+  options?: { readonly exact?: true }
+): PropertySignature<any, true, Option.Option<A>, false> => {
+  const exact = options?.exact
+  return exact ?
+    optionalToRequired(
+      nullable(schema),
+      optionFromSelf(to(schema)),
+      Option.filter(Predicate.isNotNull),
+      identity
+    ) :
+    optionalToRequired(
+      nullish(schema),
+      optionFromSelf(to(schema)),
+      Option.filter((a: A | null | undefined): a is A => a != null),
+      identity
+    )
+}
 
 /**
  * @category optional

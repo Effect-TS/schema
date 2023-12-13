@@ -237,7 +237,6 @@ Added in v1.0.0
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring-1)
 - [optional](#optional)
-  - [optionalExactNullableToOption](#optionalexactnullabletooption)
   - [optionalExactNullableWithDefault](#optionalexactnullablewithdefault)
   - [optionalExactWithDefault](#optionalexactwithdefault)
   - [optionalNullableToOption](#optionalnullabletooption)
@@ -3015,19 +3014,6 @@ Added in v1.0.0
 
 # optional
 
-## optionalExactNullableToOption
-
-**Signature**
-
-```ts
-export declare const optionalExactNullableToOption: <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-) => PropertySignature<I | null, true, Option.Option<A>, false>
-```
-
-Added in v1.0.0
-
 ## optionalExactNullableWithDefault
 
 **Signature**
@@ -3061,10 +3047,13 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optionalNullableToOption: <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-) => PropertySignature<I | null | undefined, true, Option.Option<A>, false>
+export declare const optionalNullableToOption: {
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true }
+  ): PropertySignature<I | null, true, Option.Option<A>, false>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | null | undefined, true, Option.Option<A>, false>
+}
 ```
 
 Added in v1.0.0

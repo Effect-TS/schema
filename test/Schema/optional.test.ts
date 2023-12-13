@@ -62,9 +62,11 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalExactNullableToOption", () => {
+  describe("optionalNullableToOption > { exact: true }", () => {
     it("decoding / encoding", async () => {
-      const schema = S.struct({ a: S.optionalExactNullableToOption(S.NumberFromString) })
+      const schema = S.struct({
+        a: S.optionalNullableToOption(S.NumberFromString, { exact: true })
+      })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: null }, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: "1" }, { a: O.some(1) })
