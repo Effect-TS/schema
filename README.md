@@ -108,7 +108,9 @@ const schema: Schema.Schema<{
 }>
 */
 const schema = Schema.struct({
-  myfield: Schema.optionalExact(Schema.string.pipe(Schema.nonEmpty())),
+  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty()), {
+    exact: true,
+  }),
 });
 
 Schema.decodeSync(schema)({ myfield: undefined }); // Error: Type 'undefined' is not assignable to type 'string'.ts(2379)
@@ -131,7 +133,9 @@ const schema: Schema.Schema<{
 }>
 */
 const schema = Schema.struct({
-  myfield: Schema.optionalExact(Schema.string.pipe(Schema.nonEmpty())),
+  myfield: Schema.optional(Schema.string.pipe(Schema.nonEmpty()), {
+    exact: true,
+  }),
 });
 
 Schema.decodeSync(schema)({ myfield: undefined }); // No type error, but a decoding failure occurs
@@ -1492,7 +1496,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `undefined` -> `undefined`
   - `a` -> `i`
 
-#### optionalExact(schema)
+#### optional(schema, { exact: true })
 
 - decoding
   - `<missing value>` -> `<missing value>`
@@ -1520,7 +1524,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `Option.none()` -> `<missing value>`
   - `Option.some(a)` -> `i`
 
-#### optionalExactToOption(schema)
+#### optionalToOption(schema, { exact: true })
 
 - decoding
   - `<missing value>` -> `Option.none()`
@@ -1540,7 +1544,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `Option.none()` -> `<missing value>`
   - `Option.some(a)` -> `i`
 
-#### optionalExactNullableToOption(schema)
+#### optionalNullableToOption(schema, { exact: true })
 
 - decoding
   - `<missing value>` -> `Option.none()`
@@ -1552,12 +1556,12 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 
 ### Default values
 
-| Combinator                         | From                                         | To                                                          |
-| ---------------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
-| `optionalWithDefault`              | `Schema<I, A>`, `() => A`                    | `PropertySignature<I \| undefined, true, A, false>`         |
-| `optionalWithDefault`              | `Schema<I, A>`, `() => A`, `{ exact: true }` | `PropertySignature<I, true, A, false>`                      |
-| `optionalNullableWithDefault`      | `Schema<I, A>`, `() => A`                    | `PropertySignature<I \| null \| undefined, true, A, false>` |
-| `optionalExactNullableWithDefault` | `Schema<I, A>`, `() => A`                    | `PropertySignature<I \| null, true, A, false>`              |
+| Combinator                    | From                                         | To                                                          |
+| ----------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
+| `optionalWithDefault`         | `Schema<I, A>`, `() => A`                    | `PropertySignature<I \| undefined, true, A, false>`         |
+| `optionalWithDefault`         | `Schema<I, A>`, `() => A`, `{ exact: true }` | `PropertySignature<I, true, A, false>`                      |
+| `optionalNullableWithDefault` | `Schema<I, A>`, `() => A`                    | `PropertySignature<I \| null \| undefined, true, A, false>` |
+| `optionalNullableWithDefault` | `Schema<I, A>`, `() => A`, `{ exact: true }` | `PropertySignature<I \| null, true, A, false>`              |
 
 #### optionalWithDefault(schema, default)
 
@@ -1568,7 +1572,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 - encoding
   - `a` -> `i`
 
-#### optionalExactWithDefault(schema, default)
+#### optionalWithDefault(schema, default, { exact: true })
 
 - decoding
   - `<missing value>` -> `<default value>`
@@ -1586,7 +1590,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 - encoding
   - `a` -> `i`
 
-#### optionalExactNullableWithDefault(schema, default)
+#### optionalNullableWithDefault(schema, default, { exact: true })
 
 - decoding
   - `<missing value>` -> `<default value>`
@@ -1828,7 +1832,7 @@ The decision of which API to use, either `transform` or `transformFrom`, depends
 2. Using `transformFrom`:
    - The new transformation starts as soon as the initial input is handled.
    - You should provide a value `{ age?: number }`.
-   - Based on this fresh input, the subsequent transformation `{ age: S.optionalExactToOption(S.number) }` is executed.
+   - Based on this fresh input, the subsequent transformation `{ age: S.optionalToOption(S.number, { exact: true }) }` is executed.
    - This approach allows for immediate handling of the input, potentially influencing the subsequent transformations.
 
 ## Pick
