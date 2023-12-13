@@ -783,6 +783,22 @@ export const optionalToOption = <I, A>(
  * @category optional
  * @since 1.0.0
  */
+export const optionalNullableToOption = <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A | undefined | null>
+): PropertySignature<I | undefined | null, true, Option.Option<A>, false> =>
+  optionalExactToRequired(
+    nullish(schema),
+    optionFromSelf(to(schema)),
+    Option.filter((a: A | null | undefined): a is A => a != null),
+    identity,
+    options
+  )
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
 export const optionalExactWithDefault = <I, A>(
   schema: Schema<I, A>,
   value: () => A,

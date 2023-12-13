@@ -103,6 +103,26 @@ describe("optional APIs", () => {
     })
   })
 
+  describe("optionalNullableToOption", () => {
+    it("decoding / encoding", async () => {
+      const schema = S.struct({ a: S.optionalNullableToOption(S.NumberFromString) })
+      await Util.expectParseSuccess(schema, {}, { a: O.none() })
+      await Util.expectParseSuccess(schema, { a: undefined }, { a: O.none() })
+      await Util.expectParseSuccess(schema, { a: null }, { a: O.none() })
+      await Util.expectParseSuccess(schema, { a: "1" }, { a: O.some(1) })
+      await Util.expectParseFailure(
+        schema,
+        {
+          a: "a"
+        },
+        `/a union member: Expected null, actual "a", union member: Expected undefined, actual "a", union member: Expected string <-> number, actual "a"`
+      )
+
+      await Util.expectEncodeSuccess(schema, { a: O.some(1) }, { a: "1" })
+      await Util.expectEncodeSuccess(schema, { a: O.none() }, {})
+    })
+  })
+
   describe("optionalExactWithDefault", () => {
     it("should add annotations", () => {
       const schema = S.struct({
