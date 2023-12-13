@@ -228,6 +228,7 @@ Added in v1.0.0
 - [optional](#optional)
   - [optional](#optional-1)
   - [optionalExact](#optionalexact)
+  - [optionalExactNullableToOption](#optionalexactnullabletooption)
   - [optionalExactToOption](#optionalexacttooption)
   - [optionalExactToRequired](#optionalexacttorequired)
   - [optionalExactWithDefault](#optionalexactwithdefault)
@@ -2883,6 +2884,19 @@ export declare const optionalExact: <I, A>(
   schema: Schema<I, A>,
   options?: DocAnnotations<A> | undefined
 ) => PropertySignature<I, true, A, true>
+```
+
+Added in v1.0.0
+
+## optionalExactNullableToOption
+
+**Signature**
+
+```ts
+export declare const optionalExactNullableToOption: <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A | null> | undefined
+) => PropertySignature<I | null, true, Option.Option<A>, false>
 ```
 
 Added in v1.0.0

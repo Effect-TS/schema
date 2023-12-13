@@ -758,7 +758,23 @@ export const optionalExactToOption = <I, A>(
   optionalExactToRequired(
     schema,
     optionFromSelf(to(schema)),
-    Option.filter(Predicate.isNotUndefined),
+    identity,
+    identity,
+    options
+  )
+
+/**
+ * @category optional
+ * @since 1.0.0
+ */
+export const optionalExactNullableToOption = <I, A>(
+  schema: Schema<I, A>,
+  options?: DocAnnotations<A | null>
+): PropertySignature<I | null, true, Option.Option<A>, false> =>
+  optionalExactToRequired(
+    nullable(schema),
+    optionFromSelf(to(schema)),
+    Option.filter(Predicate.isNotNull),
     identity,
     options
   )
