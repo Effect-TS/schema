@@ -847,3 +847,13 @@ S.SecretFromSelf
 
 // $ExpectType Schema<string, Secret>
 S.secret(S.string)
+
+// ---------------------------------------------
+// propertySignatureAnnotations
+// ---------------------------------------------
+
+// $ExpectType PropertySignature<string, false, string, false>
+S.string.pipe(S.propertySignatureAnnotations({ description: 'description' }))
+
+// $ExpectType PropertySignature<string | undefined, true, string | undefined, true>
+S.optional(S.string).pipe(S.propertySignatureAnnotations({ description: 'description' }))

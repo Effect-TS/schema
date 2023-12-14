@@ -1308,16 +1308,16 @@ describe("JSONSchema", () => {
 
     it("struct properties support", () => {
       const schema = Schema.struct({
-        foo: Schema.propertySignature(Schema.string, {
+        foo: Schema.string.pipe(Schema.propertySignatureAnnotations({
           description: "foo description",
           title: "foo title",
           examples: ["foo example"]
-        }),
-        bar: Schema.propertySignature(JsonNumber, {
+        })),
+        bar: JsonNumber.pipe(Schema.propertySignatureAnnotations({
           description: "bar description",
           title: "bar title",
           examples: ["bar example"]
-        })
+        }))
       })
       const jsonSchema = JSONSchema.to(schema)
       expect(jsonSchema).toEqual({

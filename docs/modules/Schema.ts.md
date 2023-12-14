@@ -386,7 +386,7 @@ Added in v1.0.0
   - [ToStruct (type alias)](#tostruct-type-alias)
   - [from](#from)
   - [optional](#optional-1)
-  - [propertySignature](#propertysignature)
+  - [propertySignatureAnnotations](#propertysignatureannotations)
   - [readonlyMapFromSelf](#readonlymapfromself)
   - [to](#to)
 - [validation](#validation)
@@ -4598,15 +4598,22 @@ export declare const optional: {
 
 Added in v1.0.0
 
-## propertySignature
+## propertySignatureAnnotations
 
 **Signature**
 
 ```ts
-export declare const propertySignature: <I, A>(
-  schema: Schema<I, A>,
-  options: DocAnnotations
-) => PropertySignature<I, false, A, false>
+export declare const propertySignatureAnnotations: (
+  annotations: DocAnnotations
+) => <
+  S extends
+    | Schema<any, any>
+    | Schema<never, never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+>(
+  self: S
+) => S
 ```
 
 Added in v1.0.0

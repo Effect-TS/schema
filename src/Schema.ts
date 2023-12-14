@@ -731,16 +731,24 @@ export const optional: {
 /**
  * @since 1.0.0
  */
-export const propertySignature = <I, A>(
-  schema: Schema<I, A>,
-  options: DocAnnotations
-): PropertySignature<I, false, A, false> =>
-  new PropertySignatureImpl({
-    _tag: "Declaration",
-    from: schema.ast,
-    isOptional: false,
-    annotations: toAnnotations(options)
-  })
+export const propertySignatureAnnotations =
+  (annotations: DocAnnotations) =>
+  <S extends StructFields[PropertyKey]>(
+    self: S
+  ): S => {
+    if (isSchema(self)) {
+      return new PropertySignatureImpl({
+        _tag: "Declaration",
+        from: self.ast,
+        isOptional: false,
+        annotations: toAnnotations(annotations)
+      }) as any
+    }
+    return new PropertySignatureImpl({
+      ...(self as any).propertySignatureAST,
+      annotations: toAnnotations(annotations)
+    }) as any
+  }
 
 /**
  * @category optional
