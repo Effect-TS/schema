@@ -560,6 +560,14 @@ export const nullable = <From, To>(self: Schema<From, To>): Schema<From | null, 
  * @category combinators
  * @since 1.0.0
  */
+export const orUndefined = <From, To>(
+  self: Schema<From, To>
+): Schema<From | undefined, To | undefined> => union(_undefined, self)
+
+/**
+ * @category combinators
+ * @since 1.0.0
+ */
 export const nullish = <From, To>(
   self: Schema<From, To>
 ): Schema<From | null | undefined, To | null | undefined> => union(_null, _undefined, self)
@@ -714,7 +722,7 @@ export const optional: {
     }) :
     new PropertySignatureImpl({
       _tag: "Declaration",
-      from: union(_undefined, schema).ast,
+      from: orUndefined(schema).ast,
       isOptional: true
     })
 }
@@ -776,7 +784,7 @@ export const optionalToOption: {
       identity
     ) :
     optionalToRequired(
-      union(_undefined, schema),
+      orUndefined(schema),
       optionFromSelf(to(schema)),
       Option.filter(Predicate.isNotUndefined),
       identity
@@ -843,7 +851,7 @@ export const optionalWithDefault: {
       Option.some
     ) :
     optionalToRequired(
-      union(_undefined, schema),
+      orUndefined(schema),
       to(schema),
       Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
       Option.some

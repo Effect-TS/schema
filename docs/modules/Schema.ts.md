@@ -162,6 +162,7 @@ Added in v1.0.0
   - [nullish](#nullish)
   - [omit](#omit)
   - [optionalElement](#optionalelement)
+  - [orUndefined](#orundefined)
   - [partial](#partial)
   - [pick](#pick)
   - [record](#record)
@@ -2122,6 +2123,16 @@ export declare const optionalElement: <IE, E>(
 ) => <I extends readonly any[], A extends readonly any[]>(
   self: Schema<I, A>
 ) => Schema<readonly [...I, (IE | undefined)?], readonly [...A, (E | undefined)?]>
+```
+
+Added in v1.0.0
+
+## orUndefined
+
+**Signature**
+
+```ts
+export declare const orUndefined: <From, To>(self: Schema<From, To>) => Schema<From | undefined, To | undefined>
 ```
 
 Added in v1.0.0
