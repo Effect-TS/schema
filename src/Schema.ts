@@ -757,6 +757,14 @@ export const optional: {
   ): PropertySignature<I, true, A, false>
   <I, A>(
     schema: Schema<I, A>,
+    options: { readonly exact: true; readonly nullable: true; readonly toOption: true }
+  ): PropertySignature<I | null, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly toOption: true }
+  ): PropertySignature<I, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>,
     options: { readonly exact: true }
   ): PropertySignature<I, true, A, true>
   <I, A>(
@@ -767,109 +775,112 @@ export const optional: {
     schema: Schema<I, A>,
     options: { readonly default: () => A }
   ): PropertySignature<I | undefined, true, A, false>
-  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
-} = <I, A>(
-  schema: Schema<I, A>,
-  options?: { readonly exact?: boolean; readonly default?: () => A; readonly nullable?: boolean }
-): PropertySignature<any, any, any, any> => {
-  const isExact = options?.exact
-  const value = options?.default
-  const isNullable = options?.nullable
-  return isExact ?
-    value ?
-      isNullable ?
-        optionalToRequired(
-          nullable(schema),
-          to(schema),
-          Option.match({ onNone: value, onSome: (a) => a === null ? value() : a }),
-          Option.some
-        ) :
-        optionalToRequired(
-          schema,
-          to(schema),
-          Option.match({ onNone: value, onSome: identity }),
-          Option.some
-        ) :
-      new PropertySignatureImpl({
-        _tag: "Declaration",
-        from: schema.ast,
-        isOptional: true
-      }) :
-    value ?
-    isNullable ?
-      optionalToRequired(
-        nullish(schema),
-        to(schema),
-        Option.match({ onNone: value, onSome: (a) => (a == null ? value() : a) }),
-        Option.some
-      ) :
-      optionalToRequired(
-        orUndefined(schema),
-        to(schema),
-        Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
-        Option.some
-      ) :
-    new PropertySignatureImpl({
-      _tag: "Declaration",
-      from: orUndefined(schema).ast,
-      isOptional: true
-    })
-}
-
-/**
- * @category optional
- * @since 1.0.0
- */
-export const optionalToOption: {
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly exact: true; readonly nullable: true }
-  ): PropertySignature<I | null, true, Option.Option<A>, false>
-  <I, A>(
-    schema: Schema<I, A>,
-    options: { readonly exact: true }
-  ): PropertySignature<I, true, Option.Option<A>, false>
-  <I, A>(
-    schema: Schema<I, A>,
-    options: { readonly nullable: true }
+    options: { readonly nullable: true; readonly toOption: true }
   ): PropertySignature<I | undefined | null, true, Option.Option<A>, false>
-  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly toOption: true }
+  ): PropertySignature<I | undefined, true, Option.Option<A>, false>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
 } = <I, A>(
   schema: Schema<I, A>,
   options?: {
     readonly exact?: true
+    readonly default?: () => A
     readonly nullable?: true
+    readonly toOption?: true
   }
-): PropertySignature<any, true, Option.Option<A>, false> => {
+): PropertySignature<any, any, any, any> => {
   const isExact = options?.exact
+  const value = options?.default
   const isNullable = options?.nullable
-  return isExact ?
-    isNullable ?
-      optionalToRequired(
-        nullable(schema),
-        optionFromSelf(to(schema)),
-        Option.filter(Predicate.isNotNull),
-        identity
-      ) :
-      optionalToRequired(
-        schema,
-        optionFromSelf(to(schema)),
-        identity,
-        identity
-      ) :
-    isNullable ?
-    optionalToRequired(
-      nullish(schema),
-      optionFromSelf(to(schema)),
-      Option.filter((a: A | null | undefined): a is A => a != null),
-      identity
-    ) :
-    optionalToRequired(
-      orUndefined(schema),
-      optionFromSelf(to(schema)),
-      Option.filter(Predicate.isNotUndefined),
-      identity
-    )
+  const toOption = options?.toOption
+
+  if (isExact) {
+    if (value) {
+      if (isNullable) {
+        return optionalToRequired(
+          nullable(schema),
+          to(schema),
+          Option.match({ onNone: value, onSome: (a) => a === null ? value() : a }),
+          Option.some
+        )
+      } else {
+        return optionalToRequired(
+          schema,
+          to(schema),
+          Option.match({ onNone: value, onSome: identity }),
+          Option.some
+        )
+      }
+    } else {
+      if (toOption) {
+        if (isNullable) {
+          return optionalToRequired(
+            nullable(schema),
+            optionFromSelf(to(schema)),
+            Option.filter(Predicate.isNotNull),
+            identity
+          )
+        } else {
+          return optionalToRequired(
+            schema,
+            optionFromSelf(to(schema)),
+            identity,
+            identity
+          )
+        }
+      }
+      return new PropertySignatureImpl({
+        _tag: "Declaration",
+        from: schema.ast,
+        isOptional: true
+      })
+    }
+  } else {
+    if (value) {
+      if (isNullable) {
+        return optionalToRequired(
+          nullish(schema),
+          to(schema),
+          Option.match({ onNone: value, onSome: (a) => (a == null ? value() : a) }),
+          Option.some
+        )
+      } else {
+        return optionalToRequired(
+          orUndefined(schema),
+          to(schema),
+          Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
+          Option.some
+        )
+      }
+    } else {
+      if (toOption) {
+        if (isNullable) {
+          return optionalToRequired(
+            nullish(schema),
+            optionFromSelf(to(schema)),
+            Option.filter((a: A | null | undefined): a is A => a != null),
+            identity
+          )
+        } else {
+          return optionalToRequired(
+            orUndefined(schema),
+            optionFromSelf(to(schema)),
+            Option.filter(Predicate.isNotUndefined),
+            identity
+          )
+        }
+      }
+      return new PropertySignatureImpl({
+        _tag: "Declaration",
+        from: orUndefined(schema).ast,
+        isOptional: true
+      })
+    }
+  }
 }
 
 /**

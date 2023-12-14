@@ -1552,14 +1552,14 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 
 ### Optional fields as `Option`s
 
-| Combinator         | From                                              | To                                                                  |
-| ------------------ | ------------------------------------------------- | ------------------------------------------------------------------- |
-| `optionalToOption` | `Schema<I, A>`                                    | `PropertySignature<I \| undefined, true, Option<A>, false>`         |
-| `optionalToOption` | `Schema<I, A>`, `{ exact: true }`                 | `PropertySignature<I, true, Option<A>, false>`                      |
-| `optionalToOption` | `Schema<I, A>`, `{ nullable: true }`              | `PropertySignature<I \| undefined \| null, true, Option<A>, false>` |
-| `optionalToOption` | `Schema<I, A>`, `{ exact: true, nullable: true }` | `PropertySignature<I \| null, true, Option<A>, false>`              |
+| Combinator | From                                                              | To                                                                  |
+| ---------- | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `optional` | `Schema<I, A>`, `{ toOption: true }`                              | `PropertySignature<I \| undefined, true, Option<A>, false>`         |
+| `optional` | `Schema<I, A>`, `{ exact: true, toOption: true }`                 | `PropertySignature<I, true, Option<A>, false>`                      |
+| `optional` | `Schema<I, A>`, `{ nullable: true, toOption: true }`              | `PropertySignature<I \| undefined \| null, true, Option<A>, false>` |
+| `optional` | `Schema<I, A>`, `{ exact: true, nullable: true, toOption: true }` | `PropertySignature<I \| null, true, Option<A>, false>`              |
 
-#### optionalToOption(schema)
+#### optional(schema, { toOption: true })
 
 - decoding
   - `<missing value>` -> `Option.none()`
@@ -1569,7 +1569,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `Option.none()` -> `<missing value>`
   - `Option.some(a)` -> `i`
 
-#### optionalToOption(schema, { exact: true })
+#### optional(schema, { exact: true, toOption: true })
 
 - decoding
   - `<missing value>` -> `Option.none()`
@@ -1578,7 +1578,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `Option.none()` -> `<missing value>`
   - `Option.some(a)` -> `i`
 
-#### optionalToOption(schema, { nullable: true })
+#### optional(schema, { nullable: true, toOption: true })
 
 - decoding
   - `<missing value>` -> `Option.none()`
@@ -1589,7 +1589,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `Option.none()` -> `<missing value>`
   - `Option.some(a)` -> `i`
 
-#### optionalToOption(schema, { exact: true, nullable: true })
+#### optional(schema, { exact: true, nullable: true, toOption: true })
 
 - decoding
   - `<missing value>` -> `Option.none()`

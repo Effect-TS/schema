@@ -307,34 +307,38 @@ S.struct({ a: S.optional(S.NumberFromString, { nullable: true, default: () => 0 
 S.struct({ a: S.optional(S.NumberFromString, { exact: true, nullable: true, default: () => 0 }) })
 
 // ---------------------------------------------
-// optionalToOption { exact: true }
+// optional { exact: true, toOption: true }
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: Option<boolean>; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.boolean, { exact: true }) })
+S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean, { exact: true, toOption: true }) })
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: Option<number>; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.NumberFromString, { exact: true }) })
+S.struct({
+  a: S.string,
+  b: S.number,
+  c: S.optional(S.NumberFromString, { exact: true, toOption: true })
+})
 
 // ---------------------------------------------
-// optionalToOption
+// optional { toOption: true }
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean | undefined; }, { readonly a: string; readonly b: number; readonly c: Option<boolean>; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.boolean) })
+S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean, { toOption: true }) })
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string | undefined; }, { readonly a: string; readonly b: number; readonly c: Option<number>; }>
-S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.NumberFromString) })
+S.struct({ a: S.string, b: S.number, c: S.optional(S.NumberFromString, { toOption: true }) })
 
 // ---------------------------------------------
-// optionalToOption { nullable: true }
+// optional { nullable: true, toOption: true }
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a?: string | null | undefined; }, { readonly a: Option<number>; }>
-S.struct({ a: S.optionalToOption(S.NumberFromString, { nullable: true }) })
+S.struct({ a: S.optional(S.NumberFromString, { nullable: true, toOption: true }) })
 
 // $ExpectType Schema<{ readonly a?: string | null; }, { readonly a: Option<number>; }>
-S.struct({ a: S.optionalToOption(S.NumberFromString, { exact: true, nullable: true }) })
+S.struct({ a: S.optional(S.NumberFromString, { exact: true, nullable: true, toOption: true }) })
 
 // ---------------------------------------------
 // pick

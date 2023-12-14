@@ -243,7 +243,6 @@ Added in v1.0.0
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring-1)
 - [optional](#optional)
-  - [optionalToOption](#optionaltooption)
   - [optionalToRequired](#optionaltorequired)
 - [parsing](#parsing)
   - [parse](#parse)
@@ -3063,27 +3062,6 @@ Added in v1.0.0
 
 # optional
 
-## optionalToOption
-
-**Signature**
-
-```ts
-export declare const optionalToOption: {
-  <I, A>(
-    schema: Schema<I, A>,
-    options: { readonly exact: true; readonly nullable: true }
-  ): PropertySignature<I | null, true, Option.Option<A>, false>
-  <I, A>(schema: Schema<I, A>, options: { readonly exact: true }): PropertySignature<I, true, Option.Option<A>, false>
-  <I, A>(
-    schema: Schema<I, A>,
-    options: { readonly nullable: true }
-  ): PropertySignature<I | null | undefined, true, Option.Option<A>, false>
-  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, Option.Option<A>, false>
-}
-```
-
-Added in v1.0.0
-
 ## optionalToRequired
 
 **Signature**
@@ -4575,12 +4553,28 @@ export declare const optional: {
     schema: Schema<I, A>,
     options: { readonly exact: true; readonly default: () => A }
   ): PropertySignature<I, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly nullable: true; readonly toOption: true }
+  ): PropertySignature<I | null, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly toOption: true }
+  ): PropertySignature<I, true, Option.Option<A>, false>
   <I, A>(schema: Schema<I, A>, options: { readonly exact: true }): PropertySignature<I, true, A, true>
   <I, A>(
     schema: Schema<I, A>,
     options: { readonly default: () => A; readonly nullable: true }
   ): PropertySignature<I | null | undefined, true, A, false>
   <I, A>(schema: Schema<I, A>, options: { readonly default: () => A }): PropertySignature<I | undefined, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly nullable: true; readonly toOption: true }
+  ): PropertySignature<I | null | undefined, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly toOption: true }
+  ): PropertySignature<I | undefined, true, Option.Option<A>, false>
   <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
 }
 ```

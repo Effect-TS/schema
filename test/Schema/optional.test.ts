@@ -4,7 +4,7 @@ import * as O from "effect/Option"
 import { describe, it } from "vitest"
 
 describe("optional APIs", () => {
-  describe("optionalExact", () => {
+  describe("optional > { exact: true }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
         a: S.optional(S.NumberFromString, { exact: true })
@@ -48,9 +48,11 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalToOption > { exact: true }", () => {
+  describe("optional > { exact: true, toOption: true }", () => {
     it("decoding / encoding", async () => {
-      const schema = S.struct({ a: S.optionalToOption(S.NumberFromString, { exact: true }) })
+      const schema = S.struct({
+        a: S.optional(S.NumberFromString, { exact: true, toOption: true })
+      })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: "1" }, { a: O.some(1) })
       await Util.expectParseFailure(schema, {
@@ -62,10 +64,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalToOption > { exact: true, nullable: true }", () => {
+  describe("optionalToOption > { exact: true, nullable: true, toOption: true }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalToOption(S.NumberFromString, { exact: true, nullable: true })
+        a: S.optional(S.NumberFromString, { exact: true, nullable: true, toOption: true })
       })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: null }, { a: O.none() })
@@ -83,9 +85,9 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalToOption", () => {
+  describe("optional > { toOption: true }", () => {
     it("decoding / encoding", async () => {
-      const schema = S.struct({ a: S.optionalToOption(S.NumberFromString) })
+      const schema = S.struct({ a: S.optional(S.NumberFromString, { toOption: true }) })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: undefined }, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: "1" }, { a: O.some(1) })
@@ -102,9 +104,11 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalToOption > { nullable: true }", () => {
+  describe("optional > { nullable: true, toOption: true }", () => {
     it("decoding / encoding", async () => {
-      const schema = S.struct({ a: S.optionalToOption(S.NumberFromString, { nullable: true }) })
+      const schema = S.struct({
+        a: S.optional(S.NumberFromString, { nullable: true, toOption: true })
+      })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: undefined }, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: null }, { a: O.none() })
