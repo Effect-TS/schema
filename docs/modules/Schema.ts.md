@@ -4613,7 +4613,7 @@ export declare const propertySignatureAnnotations: (
     | PropertySignature<never, boolean, never, boolean>
 >(
   self: S
-) => S
+) => S extends Schema<infer I, infer A> ? PropertySignature<I, false, A, false> : S
 ```
 
 Added in v1.0.0

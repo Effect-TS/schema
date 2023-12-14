@@ -735,7 +735,7 @@ export const propertySignatureAnnotations =
   (annotations: DocAnnotations) =>
   <S extends StructFields[PropertyKey]>(
     self: S
-  ): S => {
+  ): S extends Schema<infer I, infer A> ? PropertySignature<I, false, A, false> : S => {
     if (isSchema(self)) {
       return new PropertySignatureImpl({
         _tag: "Declaration",
