@@ -1239,6 +1239,8 @@ Added in v1.0.0
 
 ## Secret
 
+A schema that transforms a `string` into a `Secret`.
+
 **Signature**
 
 ```ts
@@ -1260,6 +1262,8 @@ Added in v1.0.0
 # Secret transformations
 
 ## secret
+
+A combinator that transforms a `string` into a `Secret`.
 
 **Signature**
 
