@@ -245,7 +245,6 @@ Added in v1.0.0
 - [optional](#optional)
   - [optionalToOption](#optionaltooption)
   - [optionalToRequired](#optionaltorequired)
-  - [optionalWithDefault](#optionalwithdefault)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEither](#parseeither)
@@ -3101,29 +3100,6 @@ export declare const optionalToRequired: <I, A, B>(
 
 Added in v1.0.0
 
-## optionalWithDefault
-
-**Signature**
-
-```ts
-export declare const optionalWithDefault: {
-  <I, A>(
-    schema: Schema<I, A>,
-    value: () => A,
-    options: { readonly exact: true; readonly nullable: true }
-  ): PropertySignature<I | null, true, A, false>
-  <I, A>(schema: Schema<I, A>, value: () => A, options: { readonly exact: true }): PropertySignature<I, true, A, false>
-  <I, A>(
-    schema: Schema<I, A>,
-    value: () => A,
-    options: { readonly nullable: true }
-  ): PropertySignature<I | null | undefined, true, A, false>
-  <I, A>(schema: Schema<I, A>, value: () => A): PropertySignature<I | undefined, true, A, false>
-}
-```
-
-Added in v1.0.0
-
 # parsing
 
 ## parse
@@ -4591,7 +4567,20 @@ Added in v1.0.0
 
 ```ts
 export declare const optional: {
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly default: () => A; readonly nullable: true }
+  ): PropertySignature<I | null, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly default: () => A }
+  ): PropertySignature<I, true, A, false>
   <I, A>(schema: Schema<I, A>, options: { readonly exact: true }): PropertySignature<I, true, A, true>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly default: () => A; readonly nullable: true }
+  ): PropertySignature<I | null | undefined, true, A, false>
+  <I, A>(schema: Schema<I, A>, options: { readonly default: () => A }): PropertySignature<I | undefined, true, A, false>
   <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
 }
 ```

@@ -64,7 +64,7 @@ describe("Schema/pick", () => {
 
   it("struct with property signature transformations", async () => {
     const schema = S.struct({
-      a: S.optionalWithDefault(S.string, () => "", { exact: true }),
+      a: S.optional(S.string, { exact: true, default: () => "" }),
       b: S.NumberFromString,
       c: S.boolean
     }).pipe(

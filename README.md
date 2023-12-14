@@ -1505,6 +1505,51 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
   - `<missing value>` -> `<missing value>`
   - `a` -> `i`
 
+### Default values
+
+| Combinator | From                                                                | To                                                          |
+| ---------- | ------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `optional` | `Schema<I, A>`, `{ default: () => A }`                              | `PropertySignature<I \| undefined, true, A, false>`         |
+| `optional` | `Schema<I, A>`, `{ exact: true, default: () => A }`                 | `PropertySignature<I, true, A, false>`                      |
+| `optional` | `Schema<I, A>`, `{ nullable: true, default: () => A }`              | `PropertySignature<I \| null \| undefined, true, A, false>` |
+| `optional` | `Schema<I, A>`, `{ exact: true, nullable: true, default: () => A }` | `PropertySignature<I \| null, true, A, false>`              |
+
+#### optional(schema, { default: () => A })
+
+- decoding
+  - `<missing value>` -> `<default value>`
+  - `undefined` -> `<default value>`
+  - `i` -> `a`
+- encoding
+  - `a` -> `i`
+
+#### optional(schema, default, { exact: true, default: () => A })
+
+- decoding
+  - `<missing value>` -> `<default value>`
+  - `i` -> `a`
+- encoding
+  - `a` -> `i`
+
+#### optional(schema, default, { nullable: true, default: () => A })
+
+- decoding
+  - `<missing value>` -> `<default value>`
+  - `undefined` -> `<default value>`
+  - `null` -> `<default value>`
+  - `i` -> `a`
+- encoding
+  - `a` -> `i`
+
+#### optional(schema, default, { exact: true, nullable: true, default: () => A })
+
+- decoding
+  - `<missing value>` -> `<default value>`
+  - `null` -> `<default value>`
+  - `i` -> `a`
+- encoding
+  - `a` -> `i`
+
 ### Optional fields as `Option`s
 
 | Combinator         | From                                              | To                                                                  |
@@ -1553,51 +1598,6 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 - encoding
   - `Option.none()` -> `<missing value>`
   - `Option.some(a)` -> `i`
-
-### Default values
-
-| Combinator            | From                                                         | To                                                          |
-| --------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
-| `optionalWithDefault` | `Schema<I, A>`, `() => A`                                    | `PropertySignature<I \| undefined, true, A, false>`         |
-| `optionalWithDefault` | `Schema<I, A>`, `() => A`, `{ exact: true }`                 | `PropertySignature<I, true, A, false>`                      |
-| `optionalWithDefault` | `Schema<I, A>`, `() => A`, `{ nullable: true }`              | `PropertySignature<I \| null \| undefined, true, A, false>` |
-| `optionalWithDefault` | `Schema<I, A>`, `() => A`, `{ exact: true, nullable: true }` | `PropertySignature<I \| null, true, A, false>`              |
-
-#### optionalWithDefault(schema, default)
-
-- decoding
-  - `<missing value>` -> `<default value>`
-  - `undefined` -> `<default value>`
-  - `i` -> `a`
-- encoding
-  - `a` -> `i`
-
-#### optionalWithDefault(schema, default, { exact: true })
-
-- decoding
-  - `<missing value>` -> `<default value>`
-  - `i` -> `a`
-- encoding
-  - `a` -> `i`
-
-#### optionalWithDefault(schema, default, { nullable: true })
-
-- decoding
-  - `<missing value>` -> `<default value>`
-  - `undefined` -> `<default value>`
-  - `null` -> `<default value>`
-  - `i` -> `a`
-- encoding
-  - `a` -> `i`
-
-#### optionalWithDefault(schema, default, { exact: true, nullable: true })
-
-- decoding
-  - `<missing value>` -> `<default value>`
-  - `null` -> `<default value>`
-  - `i` -> `a`
-- encoding
-  - `a` -> `i`
 
 ### Renaming Properties
 

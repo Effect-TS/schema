@@ -704,33 +704,6 @@ export class PropertySignatureImpl<From, FromIsOptional, To, ToIsOptional> {
 /**
  * @since 1.0.0
  */
-export const optional: {
-  <I, A>(
-    schema: Schema<I, A>,
-    options: { readonly exact: true }
-  ): PropertySignature<I, true, A, true>
-  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
-} = <I, A>(
-  schema: Schema<I, A>,
-  options?: { readonly exact?: boolean }
-): PropertySignature<I | undefined, true, A | undefined, true> => {
-  const isExact = options?.exact
-  return isExact ?
-    new PropertySignatureImpl({
-      _tag: "Declaration",
-      from: schema.ast,
-      isOptional: true
-    }) :
-    new PropertySignatureImpl({
-      _tag: "Declaration",
-      from: orUndefined(schema).ast,
-      isOptional: true
-    })
-}
-
-/**
- * @since 1.0.0
- */
 export const propertySignatureAnnotations =
   (annotations: DocAnnotations) =>
   <S extends StructFields[PropertyKey]>(
@@ -769,6 +742,79 @@ export const optionalToRequired = <I, A, B>(
     encode: Option.flatMap(encode),
     annotations: toAnnotations(options)
   })
+
+/**
+ * @since 1.0.0
+ */
+export const optional: {
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly default: () => A; readonly nullable: true }
+  ): PropertySignature<I | null, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly default: () => A }
+  ): PropertySignature<I, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true }
+  ): PropertySignature<I, true, A, true>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly default: () => A; readonly nullable: true }
+  ): PropertySignature<I | null | undefined, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly default: () => A }
+  ): PropertySignature<I | undefined, true, A, false>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
+} = <I, A>(
+  schema: Schema<I, A>,
+  options?: { readonly exact?: boolean; readonly default?: () => A; readonly nullable?: boolean }
+): PropertySignature<any, any, any, any> => {
+  const isExact = options?.exact
+  const value = options?.default
+  const isNullable = options?.nullable
+  return isExact ?
+    value ?
+      isNullable ?
+        optionalToRequired(
+          nullable(schema),
+          to(schema),
+          Option.match({ onNone: value, onSome: (a) => a === null ? value() : a }),
+          Option.some
+        ) :
+        optionalToRequired(
+          schema,
+          to(schema),
+          Option.match({ onNone: value, onSome: identity }),
+          Option.some
+        ) :
+      new PropertySignatureImpl({
+        _tag: "Declaration",
+        from: schema.ast,
+        isOptional: true
+      }) :
+    value ?
+    isNullable ?
+      optionalToRequired(
+        nullish(schema),
+        to(schema),
+        Option.match({ onNone: value, onSome: (a) => (a == null ? value() : a) }),
+        Option.some
+      ) :
+      optionalToRequired(
+        orUndefined(schema),
+        to(schema),
+        Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
+        Option.some
+      ) :
+    new PropertySignatureImpl({
+      _tag: "Declaration",
+      from: orUndefined(schema).ast,
+      isOptional: true
+    })
+}
 
 /**
  * @category optional
@@ -823,69 +869,6 @@ export const optionalToOption: {
       optionFromSelf(to(schema)),
       Option.filter(Predicate.isNotUndefined),
       identity
-    )
-}
-
-/**
- * @category optional
- * @since 1.0.0
- */
-export const optionalWithDefault: {
-  <I, A>(
-    schema: Schema<I, A>,
-    value: () => A,
-    options: { readonly exact: true; readonly nullable: true }
-  ): PropertySignature<I | null, true, A, false>
-  <I, A>(
-    schema: Schema<I, A>,
-    value: () => A,
-    options: { readonly exact: true }
-  ): PropertySignature<I, true, A, false>
-  <I, A>(
-    schema: Schema<I, A>,
-    value: () => A,
-    options: { readonly nullable: true }
-  ): PropertySignature<I | null | undefined, true, A, false>
-  <I, A>(
-    schema: Schema<I, A>,
-    value: () => A
-  ): PropertySignature<I | undefined, true, A, false>
-} = <I, A>(
-  schema: Schema<I, A>,
-  value: () => A,
-  options?: {
-    readonly exact?: true
-    readonly nullable?: true
-  }
-): PropertySignature<any, true, A, false> => {
-  const isExact = options?.exact
-  const isNullable = options?.nullable
-  return isExact ?
-    isNullable ?
-      optionalToRequired(
-        nullable(schema),
-        to(schema),
-        Option.match({ onNone: value, onSome: (a) => a === null ? value() : a }),
-        Option.some
-      ) :
-      optionalToRequired(
-        schema,
-        to(schema),
-        Option.match({ onNone: value, onSome: identity }),
-        Option.some
-      ) :
-    isNullable ?
-    optionalToRequired(
-      nullish(schema),
-      to(schema),
-      Option.match({ onNone: value, onSome: (a) => (a == null ? value() : a) }),
-      Option.some
-    ) :
-    optionalToRequired(
-      orUndefined(schema),
-      to(schema),
-      Option.match({ onNone: value, onSome: (a) => (a === undefined ? value() : a) }),
-      Option.some
     )
 }
 

@@ -122,10 +122,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalWithDefault > { exact: true }", () => {
+  describe("optional > { exact: true, default: () => A }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalWithDefault(S.NumberFromString, () => 0, { exact: true })
+        a: S.optional(S.NumberFromString, { exact: true, default: () => 0 })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: "1" }, { a: 1 })
@@ -140,10 +140,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalWithDefault", () => {
+  describe("optional > { default: () => A }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalWithDefault(S.NumberFromString, () => 0)
+        a: S.optional(S.NumberFromString, { default: () => 0 })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: undefined }, { a: 0 })
@@ -159,10 +159,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalWithDefault > { nullable: true }", () => {
+  describe("optional > { nullable: true, default: () => A }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalWithDefault(S.NumberFromString, () => 0, { nullable: true })
+        a: S.optional(S.NumberFromString, { nullable: true, default: () => 0 })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: null }, { a: 0 })
@@ -179,10 +179,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalWithDefault > { exact: true, nullable: true }", () => {
+  describe("optional > { exact: true, nullable: true, default: () => A }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalWithDefault(S.NumberFromString, () => 0, { exact: true, nullable: true })
+        a: S.optional(S.NumberFromString, { exact: true, nullable: true, default: () => 0 })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: null }, { a: 0 })
