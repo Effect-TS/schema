@@ -273,10 +273,18 @@ S.struct({ a: S.optional(S.never) })
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: boolean; }, { readonly a: string; readonly b: number; readonly c: boolean; }>
-S.struct({ a: S.string, b: S.number, c: S.optional(S.boolean, { exact: true, default: () => false }) })
+S.struct({
+  a: S.string,
+  b: S.number,
+  c: S.optional(S.boolean, { exact: true, default: () => false })
+})
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; readonly c?: string; }, { readonly a: string; readonly b: number; readonly c: number; }>
-S.struct({ a: S.string, b: S.number, c: S.optional(S.NumberFromString, { exact: true, default: () => 0 }) })
+S.struct({
+  a: S.string,
+  b: S.number,
+  c: S.optional(S.NumberFromString, { exact: true, default: () => 0 })
+})
 
 // ---------------------------------------------
 // optional { default: () => A }
@@ -328,7 +336,6 @@ S.struct({ a: S.optionalToOption(S.NumberFromString, { nullable: true }) })
 // $ExpectType Schema<{ readonly a?: string | null; }, { readonly a: Option<number>; }>
 S.struct({ a: S.optionalToOption(S.NumberFromString, { exact: true, nullable: true }) })
 
-
 // ---------------------------------------------
 // pick
 // ---------------------------------------------
@@ -344,14 +351,24 @@ pipe(S.struct({ a: S.string, b: S.NumberFromString, c: S.boolean }), S.pick("a",
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a?: string; readonly b: number; }, { readonly a?: string; readonly b: number; }>
-pipe(S.struct({ a: S.optional(S.string, { exact: true }), b: S.number, c: S.boolean }), S.pick("a", "b"))
+pipe(
+  S.struct({ a: S.optional(S.string, { exact: true }), b: S.number, c: S.boolean }),
+  S.pick("a", "b")
+)
 
 // $ExpectType Schema<{ readonly a?: string; readonly b: string; }, { readonly a?: string; readonly b: number; }>
-pipe(S.struct({ a: S.optional(S.string, { exact: true }), b: S.NumberFromString, c: S.boolean }), S.pick("a", "b"))
+pipe(
+  S.struct({ a: S.optional(S.string, { exact: true }), b: S.NumberFromString, c: S.boolean }),
+  S.pick("a", "b")
+)
 
 // $ExpectType Schema<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
 pipe(
-  S.struct({ a: S.optional(S.string, { exact: true, default: () => "" }), b: S.NumberFromString, c: S.boolean }),
+  S.struct({
+    a: S.optional(S.string, { exact: true, default: () => "" }),
+    b: S.NumberFromString,
+    c: S.boolean
+  }),
   S.pick("a", "b")
 )
 
@@ -373,11 +390,18 @@ pipe(S.struct({ a: S.string, b: S.NumberFromString, c: S.boolean }), S.omit("c")
 pipe(S.struct({ a: S.optional(S.string, { exact: true }), b: S.number, c: S.boolean }), S.omit("c"))
 
 // $ExpectType Schema<{ readonly a?: string; readonly b: string; }, { readonly a?: string; readonly b: number; }>
-pipe(S.struct({ a: S.optional(S.string, { exact: true }), b: S.NumberFromString, c: S.boolean }), S.omit("c"))
+pipe(
+  S.struct({ a: S.optional(S.string, { exact: true }), b: S.NumberFromString, c: S.boolean }),
+  S.omit("c")
+)
 
 // $ExpectType Schema<{ readonly a?: string; readonly b: string; }, { readonly a: string; readonly b: number; }>
 pipe(
-  S.struct({ a: S.optional(S.string, { exact: true, default: () => "" }), b: S.NumberFromString, c: S.boolean }),
+  S.struct({
+    a: S.optional(S.string, { exact: true, default: () => "" }),
+    b: S.NumberFromString,
+    c: S.boolean
+  }),
   S.omit("c")
 )
 
@@ -406,11 +430,17 @@ S.partial(S.struct({ a: S.string, b: S.NumberFromString }))
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }, { readonly a: string; readonly b: number; }>
-S.required(S.struct({ a: S.optional(S.string, { exact: true }), b: S.optional(S.number, { exact: true }) }))
+S.required(
+  S.struct({ a: S.optional(S.string, { exact: true }), b: S.optional(S.number, { exact: true }) })
+)
 
 // $ExpectType Schema<{ readonly b: string; readonly a: string; readonly c: string; }, { readonly b: number; readonly a: string; readonly c: number; }>
 S.required(
-  S.struct({ a: S.optional(S.string, { exact: true }), b: S.NumberFromString, c: S.optional(S.NumberFromString, { exact: true }) })
+  S.struct({
+    a: S.optional(S.string, { exact: true }),
+    b: S.NumberFromString,
+    c: S.optional(S.NumberFromString, { exact: true })
+  })
 )
 
 // ---------------------------------------------
@@ -472,9 +502,9 @@ interface SuspendTo1 {
   readonly as: ReadonlyArray<SuspendTo1>
 }
 const suspend1: S.Schema<SuspendTo1> = S.struct({
-    a: S.number,
-    as: S.array(S.suspend(() => suspend1))
-  })
+  a: S.number,
+  as: S.array(S.suspend(() => suspend1))
+})
 
 interface LazyFrom2 {
   readonly a: string
@@ -484,12 +514,10 @@ interface LazyTo2 {
   readonly a: number
   readonly as: ReadonlyArray<LazyTo2>
 }
-const lazy2: S.Schema<LazyFrom2, LazyTo2> =
-  S.struct({
-    a: S.NumberFromString,
-    as: S.array(S.suspend(() => lazy2))
-  })
-
+const lazy2: S.Schema<LazyFrom2, LazyTo2> = S.struct({
+  a: S.NumberFromString,
+  as: S.array(S.suspend(() => lazy2))
+})
 
 // ---------------------------------------------
 // rename
@@ -499,33 +527,33 @@ const lazy2: S.Schema<LazyFrom2, LazyTo2> =
 S.rename(S.struct({ a: S.string, b: S.number }), {})
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }, { readonly c: string; readonly b: number; }>
-S.rename(S.struct({ a: S.string, b: S.number }), { a: 'c' })
+S.rename(S.struct({ a: S.string, b: S.number }), { a: "c" })
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }, { readonly c: string; readonly d: number; }>
-S.rename(S.struct({ a: S.string, b: S.number }), { a: 'c', b: 'd' })
+S.rename(S.struct({ a: S.string, b: S.number }), { a: "c", b: "d" })
 
-const a = Symbol.for('@effect/schema/dtslint/a')
+const a = Symbol.for("@effect/schema/dtslint/a")
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }, { readonly [a]: string; readonly b: number; }>
-S.rename(S.struct({ a: S.string, b: S.number }), { a: a })
+S.rename(S.struct({ a: S.string, b: S.number }), { a })
 
 // @ts-expect-error
-S.rename(S.struct({ a: S.string, b: S.number }), { c: 'd' })
+S.rename(S.struct({ a: S.string, b: S.number }), { c: "d" })
 
 // @ts-expect-error
-S.rename(S.struct({ a: S.string, b: S.number }), { a: 'c', d: 'e' })
+S.rename(S.struct({ a: S.string, b: S.number }), { a: "c", d: "e" })
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }, { readonly a: string; readonly b: number; }>
 S.struct({ a: S.string, b: S.number }).pipe(S.rename({}))
 
 // $ExpectType Schema<{ readonly a: string; readonly b: number; }, { readonly c: string; readonly b: number; }>
-S.struct({ a: S.string, b: S.number }).pipe(S.rename({ a: 'c' }))
+S.struct({ a: S.string, b: S.number }).pipe(S.rename({ a: "c" }))
 
 // @ts-expect-error
-S.struct({ a: S.string, b: S.number }).pipe(S.rename({ c: 'd' }))
+S.struct({ a: S.string, b: S.number }).pipe(S.rename({ c: "d" }))
 
 // @ts-expect-error
-S.struct({ a: S.string, b: S.number }).pipe(S.rename({ a: 'c', d: 'e' }))
+S.struct({ a: S.string, b: S.number }).pipe(S.rename({ a: "c", d: "e" }))
 
 // ---------------------------------------------
 // optionFromSelf
@@ -592,7 +620,10 @@ const FromFilter = S.union(S.string, S.number)
 // $ExpectType Schema<string | number, string | number>
 pipe(FromFilter, S.filter(predicateFilter1))
 
-const FromRefinement = S.struct({ a: S.optional(S.string, { exact: true }), b: S.optional(S.number, { exact: true }) })
+const FromRefinement = S.struct({
+  a: S.optional(S.string, { exact: true }),
+  b: S.optional(S.number, { exact: true })
+})
 
 // $ExpectType Schema<{ readonly a?: string; readonly b?: number; }, { readonly a?: string; readonly b?: number; } & { readonly b: number; }>
 pipe(FromRefinement, S.filter(S.is(S.struct({ b: S.number }))))
@@ -771,7 +802,6 @@ export type MyClassTo = S.Schema.To<typeof MyClass>
 // $ExpectType Schema<{ readonly a: string; }, { readonly a: string; }>
 MyClass.struct
 
-
 class MyTaggedClass extends S.TaggedClass<MyTaggedClass>()("MyTaggedClass", {
   a: S.string
 }) {}
@@ -787,7 +817,6 @@ export type MyTaggedClassTo = S.Schema.To<typeof MyTaggedClass>
 
 // $ExpectType Schema<{ readonly _tag: "MyTaggedClass"; readonly a: string; }, { readonly _tag: "MyTaggedClass"; readonly a: string; }>
 MyTaggedClass.struct
-
 
 class VoidTaggedClass extends S.TaggedClass<VoidTaggedClass>()("VoidTaggedClass", {}) {}
 
@@ -853,10 +882,7 @@ S.secret(S.string)
 // ---------------------------------------------
 
 // $ExpectType PropertySignature<string, false, string, false>
-S.string.pipe(S.propertySignatureAnnotations({ description: 'description' }))
+S.string.pipe(S.propertySignatureAnnotations({ description: "description" }))
 
 // $ExpectType PropertySignature<string | undefined, true, string | undefined, true>
-S.optional(S.string).pipe(S.propertySignatureAnnotations({ description: 'description' }))
-
-
-
+S.optional(S.string).pipe(S.propertySignatureAnnotations({ description: "description" }))
