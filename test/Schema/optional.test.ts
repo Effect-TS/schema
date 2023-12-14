@@ -62,10 +62,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalNullableToOption > { exact: true }", () => {
+  describe("optionalToOption > { exact: true, nullable: true }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalNullableToOption(S.NumberFromString, { exact: true })
+        a: S.optionalToOption(S.NumberFromString, { exact: true, nullable: true })
       })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: null }, { a: O.none() })
@@ -102,9 +102,9 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalNullableToOption", () => {
+  describe("optionalToOption > { nullable: true }", () => {
     it("decoding / encoding", async () => {
-      const schema = S.struct({ a: S.optionalNullableToOption(S.NumberFromString) })
+      const schema = S.struct({ a: S.optionalToOption(S.NumberFromString, { nullable: true }) })
       await Util.expectParseSuccess(schema, {}, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: undefined }, { a: O.none() })
       await Util.expectParseSuccess(schema, { a: null }, { a: O.none() })

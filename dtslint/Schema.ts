@@ -289,7 +289,7 @@ S.struct({ a: S.string, b: S.number, c: S.optionalWithDefault(S.boolean, () => f
 S.struct({ a: S.string, b: S.number, c: S.optionalWithDefault(S.NumberFromString, () => 0) })
 
 // ---------------------------------------------
-// optionalNullableWithDefault
+// optionalWithDefault { nullable: true }
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a?: string | null | undefined; }, { readonly a: number; }>
@@ -319,14 +319,15 @@ S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.boolean) })
 S.struct({ a: S.string, b: S.number, c: S.optionalToOption(S.NumberFromString) })
 
 // ---------------------------------------------
-// optionalNullableToOption
+// optionalToOption { nullable: true }
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a?: string | null | undefined; }, { readonly a: Option<number>; }>
-S.struct({ a: S.optionalNullableToOption(S.NumberFromString) })
+S.struct({ a: S.optionalToOption(S.NumberFromString, { nullable: true }) })
 
 // $ExpectType Schema<{ readonly a?: string | null; }, { readonly a: Option<number>; }>
-S.struct({ a: S.optionalNullableToOption(S.NumberFromString, { exact: true }) })
+S.struct({ a: S.optionalToOption(S.NumberFromString, { exact: true, nullable: true }) })
+
 
 // ---------------------------------------------
 // pick
