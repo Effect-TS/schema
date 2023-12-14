@@ -92,6 +92,11 @@ Added in v1.0.0
 - [ReadonlySet transformations](#readonlyset-transformations)
   - [readonlySet](#readonlyset)
   - [readonlySetFromSelf](#readonlysetfromself)
+- [Secret constructors](#secret-constructors)
+  - [Secret](#secret)
+  - [SecretFromSelf](#secretfromself)
+- [Secret transformations](#secret-transformations)
+  - [secret](#secret-1)
 - [Uint8Array constructors](#uint8array-constructors)
   - [Uint8Array](#uint8array)
   - [Uint8ArrayFromSelf](#uint8arrayfromself)
@@ -1226,6 +1231,44 @@ Added in v1.0.0
 
 ```ts
 export declare const readonlySetFromSelf: <I, A>(item: Schema<I, A>) => Schema<ReadonlySet<I>, ReadonlySet<A>>
+```
+
+Added in v1.0.0
+
+# Secret constructors
+
+## Secret
+
+A schema that transforms a `string` into a `Secret`.
+
+**Signature**
+
+```ts
+export declare const Secret: Schema<string, Secret.Secret>
+```
+
+Added in v1.0.0
+
+## SecretFromSelf
+
+**Signature**
+
+```ts
+export declare const SecretFromSelf: Schema<Secret.Secret, Secret.Secret>
+```
+
+Added in v1.0.0
+
+# Secret transformations
+
+## secret
+
+A combinator that transforms a `string` into a `Secret`.
+
+**Signature**
+
+```ts
+export declare const secret: <I, A extends string>(self: Schema<I, A>) => Schema<I, Secret.Secret>
 ```
 
 Added in v1.0.0

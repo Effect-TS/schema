@@ -2372,6 +2372,23 @@ parse(Duration.decode("6 seconds")); // 6 seconds
 parse(Duration.decode("11 seconds")); // 10 seconds
 ```
 
+### Secret transformations
+
+#### Secret
+
+Converts a `string` into a `Secret`.
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Secret from "effect/Secret";
+
+// $ExpectType Schema<string, Secret>
+const schema = S.Secret;
+
+const parse = S.parseSync(schema);
+parse("keep it secret, keep it safe"); // Secret
+```
+
 ### Symbol transformations
 
 #### symbol
