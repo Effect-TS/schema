@@ -159,10 +159,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalNullableWithDefault", () => {
+  describe("optionalWithDefault > { nullable: true }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalNullableWithDefault(S.NumberFromString, () => 0)
+        a: S.optionalWithDefault(S.NumberFromString, () => 0, { nullable: true })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: null }, { a: 0 })
@@ -179,10 +179,10 @@ describe("optional APIs", () => {
     })
   })
 
-  describe("optionalNullableWithDefault > { exact: true }", () => {
+  describe("optionalWithDefault > { exact: true, nullable: true }", () => {
     it("decoding / encoding", async () => {
       const schema = S.struct({
-        a: S.optionalNullableWithDefault(S.NumberFromString, () => 0, { exact: true })
+        a: S.optionalWithDefault(S.NumberFromString, () => 0, { exact: true, nullable: true })
       })
       await Util.expectParseSuccess(schema, {}, { a: 0 })
       await Util.expectParseSuccess(schema, { a: null }, { a: 0 })

@@ -293,10 +293,10 @@ S.struct({ a: S.string, b: S.number, c: S.optionalWithDefault(S.NumberFromString
 // ---------------------------------------------
 
 // $ExpectType Schema<{ readonly a?: string | null | undefined; }, { readonly a: number; }>
-S.struct({ a: S.optionalNullableWithDefault(S.NumberFromString, () => 0) })
+S.struct({ a: S.optionalWithDefault(S.NumberFromString, () => 0, { nullable: true }) })
 
 // $ExpectType Schema<{ readonly a?: string | null; }, { readonly a: number; }>
-S.struct({ a: S.optionalNullableWithDefault(S.NumberFromString, () => 0, { exact: true }) })
+S.struct({ a: S.optionalWithDefault(S.NumberFromString, () => 0, { exact: true, nullable: true }) })
 
 // ---------------------------------------------
 // optionalToOption { exact: true }

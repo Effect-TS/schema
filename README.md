@@ -1556,12 +1556,12 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 
 ### Default values
 
-| Combinator                    | From                                         | To                                                          |
-| ----------------------------- | -------------------------------------------- | ----------------------------------------------------------- |
-| `optionalWithDefault`         | `Schema<I, A>`, `() => A`                    | `PropertySignature<I \| undefined, true, A, false>`         |
-| `optionalWithDefault`         | `Schema<I, A>`, `() => A`, `{ exact: true }` | `PropertySignature<I, true, A, false>`                      |
-| `optionalNullableWithDefault` | `Schema<I, A>`, `() => A`                    | `PropertySignature<I \| null \| undefined, true, A, false>` |
-| `optionalNullableWithDefault` | `Schema<I, A>`, `() => A`, `{ exact: true }` | `PropertySignature<I \| null, true, A, false>`              |
+| Combinator            | From                                                         | To                                                          |
+| --------------------- | ------------------------------------------------------------ | ----------------------------------------------------------- |
+| `optionalWithDefault` | `Schema<I, A>`, `() => A`                                    | `PropertySignature<I \| undefined, true, A, false>`         |
+| `optionalWithDefault` | `Schema<I, A>`, `() => A`, `{ exact: true }`                 | `PropertySignature<I, true, A, false>`                      |
+| `optionalWithDefault` | `Schema<I, A>`, `() => A`, `{ nullable: true }`              | `PropertySignature<I \| null \| undefined, true, A, false>` |
+| `optionalWithDefault` | `Schema<I, A>`, `() => A`, `{ exact: true, nullable: true }` | `PropertySignature<I \| null, true, A, false>`              |
 
 #### optionalWithDefault(schema, default)
 
