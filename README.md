@@ -1523,7 +1523,7 @@ Optional fields can be configured to transform a value of type `A` into `Option<
 import * as O from "effect/Option"
 
 // $ExpectType Schema<{ readonly a?: number; }, { readonly a: Option<number>; }>
-const schema = S.struct({ a. S.optional(S.number).toOption() });
+const schema = S.struct({ a: S.optional(S.number).toOption() });
 
 const parse = S.parseSync(schema)
 
