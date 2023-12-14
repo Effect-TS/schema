@@ -1,5 +1,21 @@
 # @effect/schema
 
+## 0.53.2
+
+### Patch Changes
+
+- [#656](https://github.com/Effect-TS/schema/pull/656) [`5da1d36`](https://github.com/Effect-TS/schema/commit/5da1d36241889bdb333c001aaa512573541328be) Thanks [@gcanti](https://github.com/gcanti)! - Schema: fix `DocAnnotations` definition
+
+## 0.53.1
+
+### Patch Changes
+
+- [#655](https://github.com/Effect-TS/schema/pull/655) [`54f61d6`](https://github.com/Effect-TS/schema/commit/54f61d60cf495d486d30f9f04f518b49d89d89df) Thanks [@tim-smart](https://github.com/tim-smart)! - fix for never error types in TaggedRequest.Any
+
+- [#604](https://github.com/Effect-TS/schema/pull/604) [`88f61cc`](https://github.com/Effect-TS/schema/commit/88f61ccfaa615a189bf8851c1bddd3b779b20883) Thanks [@jessekelly881](https://github.com/jessekelly881)! - added filters for Duration
+
+- [#605](https://github.com/Effect-TS/schema/pull/605) [`c728880`](https://github.com/Effect-TS/schema/commit/c728880a9d8a996bc5ea5624a7241f7f3f3b90dc) Thanks [@jessekelly881](https://github.com/jessekelly881)! - added toString for schema classes
+
 ## 0.53.0
 
 ### Minor Changes
