@@ -441,11 +441,11 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
 ): Schema<InstanceType<A>, InstanceType<A>> => {
   return declare(
     [],
-    struct({}),
-    () => (input, _, ast) =>
-      input instanceof constructor ?
-        ParseResult.succeed(input)
-        : ParseResult.fail(ParseResult.type(ast, input)),
+    unknown,
+    () => (u, _, ast) =>
+      u instanceof constructor ?
+        ParseResult.succeed(u)
+        : ParseResult.fail(ParseResult.type(ast, u)),
     {
       [AST.TypeAnnotationId]: InstanceOfTypeId,
       [InstanceOfTypeId]: { constructor },
@@ -3121,7 +3121,7 @@ export const BigintFromNumber: Schema<number, bigint> = bigintFromNumber(number)
  */
 export const SecretFromSelf: Schema<Secret.Secret> = declare(
   [],
-  struct({}),
+  string,
   () => (u, _, ast) =>
     Secret.isSecret(u) ?
       ParseResult.succeed(u)
@@ -3173,7 +3173,21 @@ export {
  */
 export const DurationFromSelf: Schema<Duration.Duration> = declare(
   [],
-  struct({}),
+  struct({
+    value: union(
+      struct({
+        _tag: literal("Millis"),
+        millis: number
+      }),
+      struct({
+        _tag: literal("Nanos"),
+        nanos: bigintFromSelf
+      }),
+      struct({
+        _tag: literal("Infinity")
+      })
+    )
+  }),
   () => (u, _, ast) =>
     Duration.isDuration(u) ?
       ParseResult.succeed(u)
@@ -3213,8 +3227,8 @@ export const durationFromHrTime = <I, A extends readonly [seconds: number, nanos
   transform(
     self,
     DurationFromSelf,
-    ([s, n]) => Duration.nanos(BigInt(s) * BigInt(1e9) + BigInt(n)),
-    (n) => Duration.toHrTime(n),
+    ([seconds, nanos]) => Duration.nanos(BigInt(seconds) * BigInt(1e9) + BigInt(nanos)),
+    (duration) => Duration.toHrTime(duration),
     { strict: false }
   )
 
@@ -3233,10 +3247,10 @@ export const durationFromNanos = <I, A extends bigint>(
     DurationFromSelf,
     (nanos) => ParseResult.succeed(Duration.nanos(nanos)),
     (duration, _, ast) =>
-      Duration.toNanos(duration).pipe(Option.match({
+      Option.match(Duration.toNanos(duration), {
         onNone: () => ParseResult.fail(ParseResult.type(ast, duration)),
         onSome: (val) => ParseResult.succeed(val)
-      })),
+      }),
     { strict: false }
   )
 
@@ -3466,7 +3480,7 @@ export const betweenDuration = <A extends Duration.Duration>(
  */
 export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
   [],
-  struct({}),
+  array(number),
   () => (u, _, ast) =>
     Predicate.isUint8Array(u) ?
       ParseResult.succeed(u)
@@ -3497,7 +3511,7 @@ export const uint8ArrayFromNumbers = <I, A extends ReadonlyArray<number>>(
     self,
     Uint8ArrayFromSelf,
     (a) => Uint8Array.from(a),
-    (n) => Array.from(n),
+    (arr) => Array.from(arr),
     { strict: false }
   )
 
@@ -3750,7 +3764,9 @@ const datePretty = (): Pretty.Pretty<Date> => (date) => `new Date(${JSON.stringi
  */
 export const DateFromSelf: Schema<Date> = declare(
   [],
-  struct({}),
+  struct({
+    valueOf: number
+  }),
   () => (u, _, ast) =>
     Predicate.isDate(u) ?
       ParseResult.succeed(u)
@@ -4067,7 +4083,8 @@ export const readonlyMapFromSelf = <IK, K, IV, V>(
   return declare(
     [key, value],
     struct({
-      size: number
+      size: number,
+      entries: array(tuple(key, value))
     }),
     (isDecoding, key, value) => {
       const items = array(tuple(key, value))
@@ -4132,7 +4149,8 @@ export const readonlySetFromSelf = <I, A>(
   return declare(
     [item],
     struct({
-      size: number
+      size: number,
+      values: array(item)
     }),
     (isDecoding, item) => {
       const items = array(item)
@@ -4179,7 +4197,10 @@ const bigDecimalArbitrary = (): Arbitrary<BigDecimal.BigDecimal> => (fc) =>
  */
 export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
   [],
-  struct({}),
+  struct({
+    value: bigintFromSelf,
+    scale: number
+  }),
   () => (u, _, ast) =>
     BigDecimal.isBigDecimal(u) ?
       ParseResult.succeed(u)
@@ -4522,8 +4543,8 @@ export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk.Chunk<I>, 
   return declare(
     [item],
     struct({
-      _id: uniqueSymbol(Symbol.for("effect/Chunk")),
-      length: number
+      length: number,
+      values: array(item)
     }),
     (isDecoding, item) => {
       const items = array(item)
