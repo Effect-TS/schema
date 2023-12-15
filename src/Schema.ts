@@ -757,11 +757,11 @@ export const optional: {
   ): PropertySignature<I, true, A, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly exact: true; readonly nullable: true; readonly toOption: true }
+    options: { readonly exact: true; readonly nullable: true; readonly as: "Option" }
   ): PropertySignature<I | null, true, Option.Option<A>, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly exact: true; readonly toOption: true }
+    options: { readonly exact: true; readonly as: "Option" }
   ): PropertySignature<I, true, Option.Option<A>, false>
   <I, A>(
     schema: Schema<I, A>,
@@ -777,11 +777,11 @@ export const optional: {
   ): PropertySignature<I | undefined, true, A, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly nullable: true; readonly toOption: true }
+    options: { readonly nullable: true; readonly as: "Option" }
   ): PropertySignature<I | undefined | null, true, Option.Option<A>, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly toOption: true }
+    options: { readonly as: "Option" }
   ): PropertySignature<I | undefined, true, Option.Option<A>, false>
   <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
 } = <I, A>(
@@ -790,13 +790,13 @@ export const optional: {
     readonly exact?: true
     readonly default?: () => A
     readonly nullable?: true
-    readonly toOption?: true
+    readonly as?: "Option"
   }
 ): PropertySignature<any, any, any, any> => {
   const isExact = options?.exact
   const value = options?.default
   const isNullable = options?.nullable
-  const toOption = options?.toOption
+  const asOption = options?.as == "Option"
 
   if (isExact) {
     if (value) {
@@ -816,7 +816,7 @@ export const optional: {
         )
       }
     } else {
-      if (toOption) {
+      if (asOption) {
         if (isNullable) {
           return optionalToRequired(
             nullable(schema),
@@ -857,7 +857,7 @@ export const optional: {
         )
       }
     } else {
-      if (toOption) {
+      if (asOption) {
         if (isNullable) {
           return optionalToRequired(
             nullish(schema),

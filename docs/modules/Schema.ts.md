@@ -4555,11 +4555,11 @@ export declare const optional: {
   ): PropertySignature<I, true, A, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly exact: true; readonly nullable: true; readonly toOption: true }
+    options: { readonly exact: true; readonly nullable: true; readonly as: "Option" }
   ): PropertySignature<I | null, true, Option.Option<A>, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly exact: true; readonly toOption: true }
+    options: { readonly exact: true; readonly as: "Option" }
   ): PropertySignature<I, true, Option.Option<A>, false>
   <I, A>(schema: Schema<I, A>, options: { readonly exact: true }): PropertySignature<I, true, A, true>
   <I, A>(
@@ -4569,11 +4569,11 @@ export declare const optional: {
   <I, A>(schema: Schema<I, A>, options: { readonly default: () => A }): PropertySignature<I | undefined, true, A, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly nullable: true; readonly toOption: true }
+    options: { readonly nullable: true; readonly as: "Option" }
   ): PropertySignature<I | null | undefined, true, Option.Option<A>, false>
   <I, A>(
     schema: Schema<I, A>,
-    options: { readonly toOption: true }
+    options: { readonly as: "Option" }
   ): PropertySignature<I | undefined, true, Option.Option<A>, false>
   <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
 }
