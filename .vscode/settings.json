@@ -22,13 +22,9 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
-  "eslint.validate": [
-    "markdown",
-    "javascript",
-    "typescript"
-  ],
+  "eslint.validate": ["markdown", "javascript", "typescript"],
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.eslint": "explicit"
   },
   "editor.quickSuggestions": {
     "other": true,
@@ -42,7 +38,7 @@
   "editor.tabCompletion": "off",
   "editor.suggest.localityBonus": true,
   "editor.suggestSelection": "recentlyUsed",
-  "editor.wordBasedSuggestions": true,
+  "editor.wordBasedSuggestions": "matchingDocuments",
   "editor.parameterHints.enabled": true,
   "files.watcherExclude": {
     "**/target": true
