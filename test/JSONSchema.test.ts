@@ -1270,6 +1270,20 @@ describe("JSONSchema", () => {
       })).toEqual(true)
       propertyTo(Operation, { params: { numRuns: 5 } })
     })
+
+    it("should handle identifier annotations when generating a schema through `from()`", () => {
+      interface Category {
+        readonly name: string
+        readonly categories: ReadonlyArray<Category>
+      }
+
+      const schema: Schema.Schema<Category> = Schema.struct({
+        name: Schema.string,
+        categories: Schema.array(Schema.suspend(() => schema).pipe(Schema.identifier("Category")))
+      })
+      const jsonSchema = JSONSchema.from(schema)
+      console.log(jsonSchema)
+    })
   })
 
   it("Transform should raise an error", () => {
