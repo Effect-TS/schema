@@ -8,7 +8,6 @@ import * as Option from "effect/Option"
 import * as Order from "effect/Order"
 import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
-import type * as Types from "effect/Types"
 import * as Internal from "./internal/ast.js"
 import type * as ParseResult from "./ParseResult.js"
 
@@ -1514,17 +1513,11 @@ export const to = (ast: AST): AST => {
   return ast
 }
 
-const preservingAnnotations: ReadonlyArray<symbol> = [IdentifierAnnotationId]
-
-const preserveAnnotations = (annotated: Annotated): Annotations | undefined => {
-  const out: Types.Mutable<Annotations> = {}
-  for (const key of preservingAnnotations) {
-    const annotation = getAnnotation(annotated, key)
-    if (Option.isSome(annotation)) {
-      out[key] = annotation.value
-    }
-  }
-  return out
+const preserveIdentifierAnnotation = (annotated: Annotated): Annotations | undefined => {
+  return Option.match(getIdentifierAnnotation(annotated), {
+    onNone: () => undefined,
+    onSome: (identifier) => ({ [IdentifierAnnotationId]: identifier })
+  })
 }
 
 /**
@@ -1544,7 +1537,7 @@ export const from = (ast: AST): AST => {
         ast.elements.map((e) => createElement(from(e.type), e.isOptional)),
         Option.map(ast.rest, ReadonlyArray.map(from)),
         ast.isReadonly,
-        preserveAnnotations(ast)
+        preserveIdentifierAnnotation(ast)
       )
     case "TypeLiteral":
       return createTypeLiteral(
@@ -1554,12 +1547,12 @@ export const from = (ast: AST): AST => {
         ast.indexSignatures.map((is) =>
           createIndexSignature(is.parameter, from(is.type), is.isReadonly)
         ),
-        preserveAnnotations(ast)
+        preserveIdentifierAnnotation(ast)
       )
     case "Union":
-      return createUnion(ast.types.map(from), preserveAnnotations(ast))
+      return createUnion(ast.types.map(from), preserveIdentifierAnnotation(ast))
     case "Suspend":
-      return createSuspend(() => from(ast.f()), preserveAnnotations(ast))
+      return createSuspend(() => from(ast.f()), preserveIdentifierAnnotation(ast))
     case "Refinement":
     case "Transform":
       return from(ast.from)

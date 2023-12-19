@@ -1282,7 +1282,51 @@ describe("JSONSchema", () => {
         categories: Schema.array(Schema.suspend(() => schema).pipe(Schema.identifier("Category")))
       })
       const jsonSchema = JSONSchema.from(schema)
-      console.log(jsonSchema)
+      expect(jsonSchema).toEqual({
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "required": [
+          "name",
+          "categories"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "a string",
+            "title": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/Category"
+            }
+          }
+        },
+        "additionalProperties": false,
+        "$defs": {
+          "Category": {
+            "type": "object",
+            "required": [
+              "name",
+              "categories"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "a string",
+                "title": "string"
+              },
+              "categories": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Category"
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      })
     })
   })
 
