@@ -183,7 +183,7 @@ Added in v1.0.0
 
 ```ts
 export interface Annotations {
-  [_: symbol]: unknown
+  readonly [_: symbol]: unknown
 }
 ```
 
@@ -394,7 +394,10 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const getAnnotation: <A>(key: symbol) => (annotated: Annotated) => Option.Option<A>
+export declare const getAnnotation: {
+  <A>(key: symbol): (annotated: Annotated) => Option.Option<A>
+  <A>(annotated: Annotated, key: symbol): Option.Option<A>
+}
 ```
 
 Added in v1.0.0

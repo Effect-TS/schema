@@ -372,7 +372,6 @@ Added in v1.0.0
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
   - [JsonOptions (type alias)](#jsonoptions-type-alias)
-  - [Mutable (type alias)](#mutable-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Schema (namespace)](#schema-namespace)
     - [Variance (interface)](#variance-interface)
@@ -1337,9 +1336,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const annotations: (
-  annotations: AST.Annotated["annotations"]
-) => <I, A>(self: Schema<I, A>) => Schema<I, A>
+export declare const annotations: (annotations: AST.Annotations) => <I, A>(self: Schema<I, A>) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -2254,10 +2251,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const suspend: <I, A = I>(
-  f: () => Schema<I, A>,
-  annotations?: AST.Annotated["annotations"]
-) => Schema<I, A>
+export declare const suspend: <I, A = I>(f: () => Schema<I, A>, annotations?: AST.Annotations) => Schema<I, A>
 ```
 
 Added in v1.0.0
@@ -2379,7 +2373,7 @@ export declare const declare: (
     isDecoding: boolean,
     ...typeParameters: ReadonlyArray<Schema<any>>
   ) => (input: any, options: ParseOptions, ast: AST.AST) => ParseResult.ParseResult<any>,
-  annotations?: AST.Annotated["annotations"]
+  annotations?: AST.Annotations
 ) => Schema<any>
 ```
 
@@ -2511,10 +2505,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const uniqueSymbol: <S extends symbol>(
-  symbol: S,
-  annotations?: AST.Annotated["annotations"]
-) => Schema<S, S>
+export declare const uniqueSymbol: <S extends symbol>(symbol: S, annotations?: AST.Annotations) => Schema<S, S>
 ```
 
 Added in v1.0.0
@@ -4399,20 +4390,6 @@ export type JsonOptions = {
   readonly reviver?: Parameters<typeof JSON.parse>[1]
   readonly replacer?: Parameters<typeof JSON.stringify>[1]
   readonly space?: Parameters<typeof JSON.stringify>[2]
-}
-```
-
-Added in v1.0.0
-
-## Mutable (type alias)
-
-Make all properties in T mutable
-
-**Signature**
-
-```ts
-export type Mutable<T> = {
-  -readonly [P in keyof T]: T[P]
 }
 ```
 

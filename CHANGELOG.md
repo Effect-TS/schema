@@ -1,5 +1,23 @@
 # @effect/schema
 
+## 0.54.1
+
+### Patch Changes
+
+- [#665](https://github.com/Effect-TS/schema/pull/665) [`a238f20`](https://github.com/Effect-TS/schema/commit/a238f207be74f481313f0cffdebc3a985da3b312) Thanks [@gcanti](https://github.com/gcanti)! - AST: make Annotations readonly
+
+- [#665](https://github.com/Effect-TS/schema/pull/665) [`a238f20`](https://github.com/Effect-TS/schema/commit/a238f207be74f481313f0cffdebc3a985da3b312) Thanks [@gcanti](https://github.com/gcanti)! - AST: make getAnnotation dual
+
+- [#665](https://github.com/Effect-TS/schema/pull/665) [`a238f20`](https://github.com/Effect-TS/schema/commit/a238f207be74f481313f0cffdebc3a985da3b312) Thanks [@gcanti](https://github.com/gcanti)! - Schema: remove Mutable helper in favour of Types.Mutable
+
+- [#665](https://github.com/Effect-TS/schema/pull/665) [`a238f20`](https://github.com/Effect-TS/schema/commit/a238f207be74f481313f0cffdebc3a985da3b312) Thanks [@gcanti](https://github.com/gcanti)! - AST: preserve identifier annotations when calling `from`
+
+## 0.54.0
+
+### Minor Changes
+
+- [#662](https://github.com/Effect-TS/schema/pull/662) [`7f448dd`](https://github.com/Effect-TS/schema/commit/7f448dd437d64452a2818fdfae610a69f8ce2099) Thanks [@tim-smart](https://github.com/tim-smart)! - update effect
+
 ## 0.53.3
 
 ### Patch Changes
