@@ -2,12 +2,13 @@
  * @since 1.0.0
  */
 
-import { identity, pipe } from "effect/Function"
+import { dual, identity, pipe } from "effect/Function"
 import * as Number from "effect/Number"
 import * as Option from "effect/Option"
 import * as Order from "effect/Order"
 import * as Predicate from "effect/Predicate"
 import * as ReadonlyArray from "effect/ReadonlyArray"
+import type * as Types from "effect/Types"
 import * as Internal from "./internal/ast.js"
 import type * as ParseResult from "./ParseResult.js"
 
@@ -140,7 +141,7 @@ export const DocumentationAnnotationId = Symbol.for("@effect/schema/annotation/D
  * @since 1.0.0
  */
 export interface Annotations {
-  [_: symbol]: unknown
+  readonly [_: symbol]: unknown
 }
 
 /**
@@ -155,10 +156,16 @@ export interface Annotated {
  * @category annotations
  * @since 1.0.0
  */
-export const getAnnotation = <A>(key: symbol) => (annotated: Annotated): Option.Option<A> =>
-  Object.prototype.hasOwnProperty.call(annotated.annotations, key) ?
-    Option.some(annotated.annotations[key] as any) :
-    Option.none()
+export const getAnnotation: {
+  <A>(key: symbol): (annotated: Annotated) => Option.Option<A>
+  <A>(annotated: Annotated, key: symbol): Option.Option<A>
+} = dual(
+  2,
+  <A>(annotated: Annotated, key: symbol): Option.Option<A> =>
+    Object.prototype.hasOwnProperty.call(annotated.annotations, key) ?
+      Option.some(annotated.annotations[key] as any) :
+      Option.none()
+)
 
 /**
  * @category annotations
@@ -1507,6 +1514,19 @@ export const to = (ast: AST): AST => {
   return ast
 }
 
+const preservingAnnotations: ReadonlyArray<symbol> = [IdentifierAnnotationId]
+
+const preserveAnnotations = (annotated: Annotated): Annotations | undefined => {
+  const out: Types.Mutable<Annotations> = {}
+  for (const key of preservingAnnotations) {
+    const annotation = getAnnotation(annotated, key)
+    if (Option.isSome(annotation)) {
+      out[key] = annotation.value
+    }
+  }
+  return out
+}
+
 /**
  * @since 1.0.0
  */
@@ -1523,7 +1543,8 @@ export const from = (ast: AST): AST => {
       return createTuple(
         ast.elements.map((e) => createElement(from(e.type), e.isOptional)),
         Option.map(ast.rest, ReadonlyArray.map(from)),
-        ast.isReadonly
+        ast.isReadonly,
+        preserveAnnotations(ast)
       )
     case "TypeLiteral":
       return createTypeLiteral(
@@ -1532,12 +1553,13 @@ export const from = (ast: AST): AST => {
         ),
         ast.indexSignatures.map((is) =>
           createIndexSignature(is.parameter, from(is.type), is.isReadonly)
-        )
+        ),
+        preserveAnnotations(ast)
       )
     case "Union":
-      return createUnion(ast.types.map(from))
+      return createUnion(ast.types.map(from), preserveAnnotations(ast))
     case "Suspend":
-      return createSuspend(() => from(ast.f()))
+      return createSuspend(() => from(ast.f()), preserveAnnotations(ast))
     case "Refinement":
     case "Transform":
       return from(ast.from)

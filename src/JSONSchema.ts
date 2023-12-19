@@ -210,51 +210,12 @@ export type JsonSchema7Root = JsonSchema7 & {
  */
 export const to = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Root => goRoot(AST.to(schema.ast))
 
-const _from = (ast: AST.AST): AST.AST => {
-  switch (ast._tag) {
-    case "Declaration":
-      return AST.createDeclaration(
-        ast.typeParameters.map(_from),
-        _from(ast.type),
-        ast.decode,
-        ast.annotations
-      )
-    case "Tuple":
-      return AST.createTuple(
-        ast.elements.map((e) => AST.createElement(_from(e.type), e.isOptional)),
-        Option.map(ast.rest, ReadonlyArray.map(_from)),
-        ast.isReadonly
-      )
-    case "TypeLiteral":
-      return AST.createTypeLiteral(
-        ast.propertySignatures.map((p) =>
-          AST.createPropertySignature(p.name, _from(p.type), p.isOptional, p.isReadonly)
-        ),
-        ast.indexSignatures.map((is) =>
-          AST.createIndexSignature(is.parameter, _from(is.type), is.isReadonly)
-        )
-      )
-    case "Union":
-      return AST.createUnion(ast.types.map(_from))
-    case "Suspend":
-      return Option.match(AST.getIdentifierAnnotation(ast), {
-        onNone: () => AST.createSuspend(() => _from(ast.f())),
-        onSome: (identifier) =>
-          AST.createSuspend(() => _from(ast.f()), { [AST.IdentifierAnnotationId]: identifier })
-      })
-    case "Refinement":
-    case "Transform":
-      return _from(ast.from)
-  }
-  return ast
-}
-
 /**
  * @category encoding
  * @since 1.0.0
  */
 export const from = <I, A>(schema: Schema.Schema<I, A>): JsonSchema7Root =>
-  goRoot(_from(schema.ast))
+  goRoot(AST.from(schema.ast))
 
 const anyJsonSchema: JsonSchema7 = { $id: "/schemas/any" }
 
@@ -308,14 +269,13 @@ const goWithIdentifier = (ast: AST.AST, $defs: Record<string, JsonSchema7>): Jso
   })
 }
 
-const getMetaData = (annotated: AST.Annotated) => {
-  return ReadonlyRecord.getSomes<unknown>({
+const getMetaData = (annotated: AST.Annotated) =>
+  ReadonlyRecord.getSomes({
     description: AST.getDescriptionAnnotation(annotated),
     title: AST.getTitleAnnotation(annotated),
     examples: AST.getExamplesAnnotation(annotated),
     default: AST.getDefaultAnnotation(annotated)
   })
-}
 
 const goWithMetaData = (ast: AST.AST, $defs: Record<string, JsonSchema7>): JsonSchema7 => {
   const jsonSchema = go(ast, $defs)
