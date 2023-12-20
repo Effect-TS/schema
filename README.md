@@ -1061,7 +1061,7 @@ S.string.pipe(S.trimmed()); // verifies that a string contains no leading or tra
 S.string.pipe(S.lowercased()); // verifies that a string is lowercased
 ```
 
-**Note**: The `trimmed` combinator does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `trim` combinator ot the `Trim` schema.
+**Note**: The `trimmed` filter does not make any transformations, it only validates. If what you were looking for was a combinator to trim strings, then check out the `Trim` schema.
 
 ### Number filters
 
@@ -1946,7 +1946,7 @@ Combining and reusing schemas is a common requirement, the `compose` combinator 
 
 ```ts
 // $ExpectType Schema<string, readonly string[]>
-const schema1 = S.split(S.string, ",");
+const schema1 = S.split(",");
 
 // $ExpectType Schema<readonly string[], readonly number[]>
 const schema2 = S.array(S.NumberFromString);
@@ -2176,7 +2176,7 @@ The `split` combinator allows splitting a string into an array of strings.
 import * as S from "@effect/schema/Schema";
 
 // $ExpectType Schema<string, string[]>
-const schema = S.string.pipe(S.split(","));
+const schema = S.split(",");
 const parse = S.parseSync(schema);
 
 parse(""); // [""]
@@ -2202,11 +2202,11 @@ parse("a "); // "a"
 parse(" a "); // "a"
 ```
 
-**Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` combinator.
+**Note**. If you were looking for a combinator to check if a string is trimmed, check out the `trimmed` filter.
 
-#### Lowercase
+#### Lowercase / Uppercase
 
-The `Lowercase` schema converts a string to lowercase.
+The `Lowercase` / `Uppercase` schema converts a string to lowercase / uppercase.
 
 ```ts
 import * as S from "@effect/schema/Schema";
@@ -2221,7 +2221,7 @@ parse("Ab "); // "ab "
 parse(" ABc "); // " abc "
 ```
 
-**Note**. If you were looking for a combinator to check if a string is lowercased, check out the `lowercased` combinator.
+**Note**. If you were looking for a combinator to check if a string is lowercased / uppercased, check out the `lowercased` / `uppercased` filters.
 
 #### ParseJson
 

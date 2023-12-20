@@ -1974,10 +1974,7 @@ export const includes = <A extends string>(
 export const LowercasedTypeId = Symbol.for("@effect/schema/TypeId/Lowercased")
 
 /**
- * Verifies that a string is lowercased
- *
- * Note. This combinator does not make any transformations, it only validates.
- * If what you were looking for was a combinator to lowercase strings, then check out the `lowercase` combinator.
+ * Verifies that a string is lowercased.
  *
  * @category string filters
  * @since 1.0.0
@@ -1999,10 +1996,7 @@ export const lowercased =
 export const UppercasedTypeId = Symbol.for("@effect/schema/TypeId/Uppercased")
 
 /**
- * Verifies that a string is uppercased
- *
- * Note. This combinator does not make any transformations, it only validates.
- * If what you were looking for was a combinator to uppercase strings, then check out the `uppercase` combinator.
+ * Verifies that a string is uppercased.
  *
  * @category string filters
  * @since 1.0.0
@@ -2064,86 +2058,57 @@ export const nonEmpty = <A extends string>(
 // ---------------------------------------------
 
 /**
- * This combinator converts a string to lowercase
+ * This schema converts a string to lowercase.
  *
  * @category string transformations
  * @since 1.0.0
  */
-export const lowercase = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
-  transform(
-    self,
-    to(self).pipe(lowercased()),
-    (s) => s.toLowerCase(),
-    identity,
-    { strict: false }
-  )
-
-/**
- * This combinator converts a string to lowercase
- *
- * @category string transformations
- * @since 1.0.0
- */
-export const Lowercase: Schema<string> = lowercase(string)
-
-/**
- * This combinator converts a string to uppercase
- *
- * @category string transformations
- * @since 1.0.0
- */
-export const uppercase = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
-  transform(
-    self,
-    to(self).pipe(uppercased()),
-    (s) => s.toUpperCase(),
-    identity,
-    { strict: false }
-  )
-
-/**
- * This combinator converts a string to uppercase
- *
- * @category string transformations
- * @since 1.0.0
- */
-export const Uppercase: Schema<string> = uppercase(string)
-
-/**
- * This combinator allows removing whitespaces from the beginning and end of a string.
- *
- * @category string transformations
- * @since 1.0.0
- */
-export const trim = <I, A extends string>(self: Schema<I, A>): Schema<I, A> =>
-  transform(
-    self,
-    to(self).pipe(trimmed()),
-    (s) => s.trim(),
-    identity,
-    { strict: false }
-  )
-
-/**
- * This combinator allows splitting a string into an array of strings.
- *
- * @category string transformations
- * @since 1.0.0
- */
-export const split: {
-  (separator: string): <I, A extends string>(self: Schema<I, A>) => Schema<I, ReadonlyArray<string>>
-  <I, A extends string>(self: Schema<I, A>, separator: string): Schema<I, ReadonlyArray<string>>
-} = dual(
-  2,
-  <I, A extends string>(self: Schema<I, A>, separator: string): Schema<I, ReadonlyArray<string>> =>
-    transform(
-      self,
-      array(string),
-      S.split(separator),
-      ReadonlyArray.join(separator),
-      { strict: false }
-    )
+export const Lowercase: Schema<string> = transform(
+  string,
+  string.pipe(lowercased()),
+  (s) => s.toLowerCase(),
+  identity
 )
+
+/**
+ * This schema converts a string to uppercase.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+export const Uppercase: Schema<string> = transform(
+  string,
+  string.pipe(uppercased()),
+  (s) => s.toUpperCase(),
+  identity
+)
+
+/**
+ * This schema allows removing whitespaces from the beginning and end of a string.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+export const Trim: Schema<string> = transform(
+  string,
+  string.pipe(trimmed()),
+  (s) => s.trim(),
+  identity
+)
+
+/**
+ * Returns a achema that allows splitting a string into an array of strings.
+ *
+ * @category string transformations
+ * @since 1.0.0
+ */
+export const split = (separator: string): Schema<string, ReadonlyArray<string>> =>
+  transform(
+    string,
+    array(string),
+    S.split(separator),
+    ReadonlyArray.join(separator)
+  )
 
 /**
  * @since 1.0.0
@@ -2251,14 +2216,6 @@ export const ULID: Schema<string> = string.pipe(
     arbitrary: (): Arbitrary<string> => (fc) => fc.ulid()
   })
 )
-
-/**
- * This schema allows removing whitespaces from the beginning and end of a string.
- *
- * @category string constructors
- * @since 1.0.0
- */
-export const Trim: Schema<string> = trim(string)
 
 /**
  * The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying

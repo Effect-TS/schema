@@ -268,7 +268,6 @@ Added in v1.0.0
 - [string constructors](#string-constructors)
   - [NonEmpty](#nonempty)
   - [ParseJson](#parsejson)
-  - [Trim](#trim)
   - [Trimmed](#trimmed)
   - [ULID](#ulid)
   - [UUID](#uuid)
@@ -286,13 +285,11 @@ Added in v1.0.0
   - [uppercased](#uppercased)
 - [string transformations](#string-transformations)
   - [Lowercase](#lowercase)
+  - [Trim](#trim)
   - [Uppercase](#uppercase)
   - [fromJson](#fromjson)
-  - [lowercase](#lowercase-1)
   - [parseJson](#parsejson-1)
   - [split](#split)
-  - [trim](#trim-1)
-  - [uppercase](#uppercase-1)
 - [symbol](#symbol)
   - [TypeId](#typeid)
   - [TypeId (type alias)](#typeid-type-alias)
@@ -3307,18 +3304,6 @@ export declare const ParseJson: Schema<string, unknown>
 
 Added in v1.0.0
 
-## Trim
-
-This schema allows removing whitespaces from the beginning and end of a string.
-
-**Signature**
-
-```ts
-export declare const Trim: Schema<string, string>
-```
-
-Added in v1.0.0
-
 ## Trimmed
 
 **Signature**
@@ -3392,10 +3377,7 @@ Added in v1.0.0
 
 ## lowercased
 
-Verifies that a string is lowercased
-
-Note. This combinator does not make any transformations, it only validates.
-If what you were looking for was a combinator to lowercase strings, then check out the `lowercase` combinator.
+Verifies that a string is lowercased.
 
 **Signature**
 
@@ -3490,10 +3472,7 @@ Added in v1.0.0
 
 ## uppercased
 
-Verifies that a string is uppercased
-
-Note. This combinator does not make any transformations, it only validates.
-If what you were looking for was a combinator to uppercase strings, then check out the `uppercase` combinator.
+Verifies that a string is uppercased.
 
 **Signature**
 
@@ -3509,7 +3488,7 @@ Added in v1.0.0
 
 ## Lowercase
 
-This combinator converts a string to lowercase
+This schema converts a string to lowercase.
 
 **Signature**
 
@@ -3519,9 +3498,21 @@ export declare const Lowercase: Schema<string, string>
 
 Added in v1.0.0
 
+## Trim
+
+This schema allows removing whitespaces from the beginning and end of a string.
+
+**Signature**
+
+```ts
+export declare const Trim: Schema<string, string>
+```
+
+Added in v1.0.0
+
 ## Uppercase
 
-This combinator converts a string to uppercase
+This schema converts a string to uppercase.
 
 **Signature**
 
@@ -3544,18 +3535,6 @@ export declare const fromJson: <I, A>(schema: Schema<I, A>, options?: JsonOption
 
 Added in v1.0.0
 
-## lowercase
-
-This combinator converts a string to lowercase
-
-**Signature**
-
-```ts
-export declare const lowercase: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
 ## parseJson
 
 The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
@@ -3571,39 +3550,12 @@ Added in v1.0.0
 
 ## split
 
-This combinator allows splitting a string into an array of strings.
+Returns a achema that allows splitting a string into an array of strings.
 
 **Signature**
 
 ```ts
-export declare const split: {
-  (separator: string): <I, A extends string>(self: Schema<I, A>) => Schema<I, readonly string[]>
-  <I, A extends string>(self: Schema<I, A>, separator: string): Schema<I, readonly string[]>
-}
-```
-
-Added in v1.0.0
-
-## trim
-
-This combinator allows removing whitespaces from the beginning and end of a string.
-
-**Signature**
-
-```ts
-export declare const trim: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## uppercase
-
-This combinator converts a string to uppercase
-
-**Signature**
-
-```ts
-export declare const uppercase: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
+export declare const split: (separator: string) => Schema<string, ReadonlyArray<string>>
 ```
 
 Added in v1.0.0
