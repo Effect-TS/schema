@@ -2583,10 +2583,6 @@ export const Not: Schema<boolean> = transform(
   (self) => !self
 )
 
-// ---------------------------------------------
-// symbol transformations
-// ---------------------------------------------
-
 /**
  * This schema transforms a `string` into a `symbol`.
  *
@@ -2600,10 +2596,6 @@ export const symbol: Schema<string, symbol> = transform(
   (sym) => sym.description,
   { strict: false }
 )
-
-// ---------------------------------------------
-// bigint filters
-// ---------------------------------------------
 
 /**
  * @category type id
@@ -2786,10 +2778,6 @@ export const nonPositiveBigint = <A extends bigint>(
   options?: FilterAnnotations<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> => lessThanOrEqualToBigint(0n, options)
 
-// ---------------------------------------------
-// bigint transformations
-// ---------------------------------------------
-
 /**
  * Clamps a bigint between a minimum and a maximum value.
  *
@@ -2891,7 +2879,7 @@ export const NonNegativeBigint: Schema<string, bigint> = bigint.pipe(
  *
  * It returns an error if the value can't be safely encoded as a `number` due to being out of range.
  *
- * @category bigint constructors
+ * @category bigint transformations
  * @since 1.0.0
  */
 export const BigintFromNumber: Schema<number, bigint> = transformOrFail(
@@ -2910,10 +2898,6 @@ export const BigintFromNumber: Schema<number, bigint> = transformOrFail(
     return ParseResult.succeed(Number(b))
   }
 )
-
-// ---------------------------------------------
-// Secret
-// ---------------------------------------------
 
 /**
  * @category Secret constructors
@@ -2946,15 +2930,11 @@ export {
   /**
    * A schema that transforms a `string` into a `Secret`.
    *
-   * @category Secret constructors
+   * @category Secret transformations
    * @since 1.0.0
    */
   _Secret as Secret
 }
-
-// ---------------------------------------------
-// Duration constructors
-// ---------------------------------------------
 
 /**
  * @category Duration constructors
@@ -3000,15 +2980,11 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
   }
 )
 
-// ---------------------------------------------
-// Duration transformations
-// ---------------------------------------------
-
 /**
  * A schema that transforms a `bigint` tuple into a `Duration`.
  * Treats the value as the number of nanoseconds.
  *
- * @category Duration constructors
+ * @category Duration transformations
  * @since 1.0.0
  */
 export const DurationFromNanos: Schema<
@@ -3029,7 +3005,7 @@ export const DurationFromNanos: Schema<
  * A schema that transforms a `number` tuple into a `Duration`.
  * Treats the value as the number of milliseconds.
  *
- * @category Duration constructors
+ * @category Duration transformations
  * @since 1.0.0
  */
 export const DurationFromMillis: Schema<
@@ -3073,7 +3049,7 @@ export {
   /**
    * A schema that transforms a `[number, number]` tuple into a `Duration`.
    *
-   * @category Duration constructors
+   * @category Duration transformations
    * @since 1.0.0
    */
   _Duration as Duration
@@ -3095,10 +3071,6 @@ export const clampDuration =
       identity,
       { strict: false }
     )
-
-// ---------------------------------------------
-// Duration filters
-// ---------------------------------------------
 
 /**
  * @category type id
@@ -3220,10 +3192,6 @@ export const betweenDuration = <A extends Duration.Duration>(
     })
   )
 
-// ---------------------------------------------
-// Uint8Array constructors
-// ---------------------------------------------
-
 /**
  * @category Uint8Array constructors
  * @since 1.0.0
@@ -3244,10 +3212,6 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
   }
 )
 
-// ---------------------------------------------
-// Uint8Array transformations
-// ---------------------------------------------
-
 const _Uint8Array: Schema<ReadonlyArray<number>, Uint8Array> = transform(
   array(number.pipe(
     between(0, 255, {
@@ -3264,15 +3228,11 @@ export {
   /**
    * A schema that transforms a `number` array into a `Uint8Array`.
    *
-   * @category Uint8Array constructors
+   * @category Uint8Array transformations
    * @since 1.0.0
    */
   _Uint8Array as Uint8Array
 }
-
-// ---------------------------------------------
-// Encoding transformations
-// ---------------------------------------------
 
 const makeEncodingTransformation = (
   id: string,
@@ -3329,10 +3289,6 @@ export const Hex: Schema<string, Uint8Array> = makeEncodingTransformation(
   Encoding.encodeHex,
   (fc) => fc.hexaString().map((s) => Either.getOrThrow(Encoding.decodeHex(s)))
 )
-
-// ---------------------------------------------
-// ReadonlyArray filters
-// ---------------------------------------------
 
 /**
  * @category type id
@@ -3424,10 +3380,6 @@ export const itemsCount = <A>(
     })
   )
 
-// ---------------------------------------------
-// Date filters
-// ---------------------------------------------
-
 /**
  * @category type id
  * @since 1.0.0
@@ -3449,10 +3401,6 @@ export const validDate =
         ...options
       })
     )
-
-// ---------------------------------------------
-// Date constructors
-// ---------------------------------------------
 
 const dateArbitrary = (): Arbitrary<Date> => (fc) => fc.date({ noInvalidDate: false })
 
@@ -3489,10 +3437,6 @@ export const DateFromSelf: Schema<Date> = declare(
  */
 export const ValidDateFromSelf: Schema<Date> = DateFromSelf.pipe(validDate())
 
-// ---------------------------------------------
-// Date transformations
-// ---------------------------------------------
-
 /**
  * Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
  *
@@ -3518,12 +3462,8 @@ export {
   _Date as Date
 }
 
-// ---------------------------------------------
-// Option transformations
-// ---------------------------------------------
-
 /**
- * @category Option transformations
+ * @category Option utils
  * @since 1.0.0
  */
 export type OptionFrom<I> =
@@ -3629,12 +3569,8 @@ export const optionFromNullish = <I, A>(
     onNoneEncoding === null ? Option.getOrNull : Option.getOrUndefined
   )
 
-// ---------------------------------------------
-// Either transformations
-// ---------------------------------------------
-
 /**
- * @category Either transformations
+ * @category Either utils
  * @since 1.0.0
  */
 export type EitherFrom<IE, IA> =
@@ -3730,10 +3666,6 @@ export const either = <IE, E, IA, A>(
     })
   )
 
-// ---------------------------------------------
-// ReadonlyMap transformations
-// ---------------------------------------------
-
 const isMap = (u: unknown): u is Map<unknown, unknown> => u instanceof Map
 
 const readonlyMapArbitrary = <K, V>(
@@ -3766,6 +3698,7 @@ const readonlyMapEquivalence = <K, V>(
 }
 
 /**
+ * @category ReadonlyMap transformations
  * @since 1.0.0
  */
 export const readonlyMapFromSelf = <IK, K, IV, V>(
@@ -3809,10 +3742,6 @@ export const readonlyMap = <IK, K, IV, V>(
     (as) => new Map(as),
     (map) => Array.from(map.entries())
   )
-
-// ---------------------------------------------
-// ReadonlySet transformations
-// ---------------------------------------------
 
 const isSet = (u: unknown): u is Set<unknown> => u instanceof Set
 
@@ -3872,10 +3801,6 @@ export const readonlySet = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, 
     (as) => new Set(as),
     (set) => Array.from(set)
   )
-
-// ---------------------------------------------
-// BigDecimal transformations
-// ---------------------------------------------
 
 const bigDecimalPretty = (): Pretty.Pretty<BigDecimal.BigDecimal> => (val) =>
   `BigDecimal(${BigDecimal.format(BigDecimal.normalize(val))})`
@@ -4190,10 +4115,6 @@ export const negateBigDecimal = <I, A extends BigDecimal.BigDecimal>(
     { strict: false }
   )
 
-// ---------------------------------------------
-// Chunk transformations
-// ---------------------------------------------
-
 const chunkArbitrary = <A>(item: Arbitrary<A>): Arbitrary<Chunk.Chunk<A>> => (fc) =>
   fc.array(item(fc)).map(Chunk.fromIterable)
 
@@ -4201,7 +4122,7 @@ const chunkPretty = <A>(item: Pretty.Pretty<A>): Pretty.Pretty<Chunk.Chunk<A>> =
   `Chunk(${Chunk.toReadonlyArray(c).map(item).join(", ")})`
 
 /**
- * @category Chunk constructors
+ * @category Chunk transformations
  * @since 1.0.0
  */
 export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk.Chunk<I>, Chunk.Chunk<A>> => {
@@ -4242,10 +4163,6 @@ export const chunk = <I, A>(item: Schema<I, A>): Schema<ReadonlyArray<I>, Chunk.
     (as) => as.length === 0 ? Chunk.empty() : Chunk.fromIterable(as),
     Chunk.toReadonlyArray
   )
-
-// ---------------------------------------------
-// Data transformations
-// ---------------------------------------------
 
 const toData = <A extends Readonly<Record<string, any>> | ReadonlyArray<any>>(a: A): Data.Data<A> =>
   Array.isArray(a) ? Data.array(a) : Data.struct(a)
@@ -4306,10 +4223,6 @@ export const data = <
     (a) => Array.isArray(a) ? Array.from(a) : Object.assign({}, a),
     { strict: false }
   )
-
-// ---------------------------------------------
-// classes
-// ---------------------------------------------
 
 type MissingSelfGeneric<Usage extends string, Params extends string = ""> =
   `Missing \`Self\` generic - use \`class Self extends ${Usage}<Self>()(${Params}{ ... })\``
@@ -4602,10 +4515,6 @@ const makeClass = <I, A>(
   }
 }
 
-// ---------------------------------------------
-// FiberId
-// ---------------------------------------------
-
 /**
  * @category FiberId
  * @since 1.0.0
@@ -4664,7 +4573,7 @@ const fiberIdPretty: Pretty.Pretty<FiberId.FiberId> = (fiberId) => {
 }
 
 /**
- * @category FiberId
+ * @category FiberId constructors
  * @since 1.0.0
  */
 export const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId> = declare(
@@ -4717,18 +4626,14 @@ const _FiberId: Schema<FiberIdFrom, FiberId.FiberId> = transform(
 
 export {
   /**
-   * @category FiberId
+   * @category FiberId transformations
    * @since 1.0.0
    */
   _FiberId as FiberId
 }
 
-// ---------------------------------------------
-// Cause
-// ---------------------------------------------
-
 /**
- * @category Cause
+ * @category Cause utils
  * @since 1.0.0
  */
 export type CauseFrom<E> =
@@ -4821,7 +4726,7 @@ const causePretty = <E>(error: Pretty.Pretty<E>): Pretty.Pretty<Cause.Cause<E>> 
 }
 
 /**
- * @category Cause
+ * @category Cause transformations
  * @since 1.0.0
  */
 export const causeFromSelf = <IE, E>(
@@ -4904,7 +4809,7 @@ const causeDefectPretty: Schema<unknown, unknown> = transform(
 )
 
 /**
- * @category Cause
+ * @category Cause transformations
  * @since 1.0.0
  */
 export const cause = <EI, E>(
@@ -4918,12 +4823,8 @@ export const cause = <EI, E>(
     causeEncode
   )
 
-// ---------------------------------------------
-// Exit
-// ---------------------------------------------
-
 /**
- * @category Exit
+ * @category Exit utils
  * @since 1.0.0
  */
 export type ExitFrom<E, A> =
@@ -4980,7 +4881,7 @@ const exitPretty =
       : `Exit.succeed(${value(exit.value)})`
 
 /**
- * @category Exit
+ * @category Exit transformations
  * @since 1.0.0
  */
 export const exitFromSelf = <IE, E, IA, A>(
@@ -5011,7 +4912,7 @@ export const exitFromSelf = <IE, E, IA, A>(
   )
 
 /**
- * @category Exit
+ * @category Exit transformations
  * @since 1.0.0
  */
 export const exit = <IE, E, IA, A>(
