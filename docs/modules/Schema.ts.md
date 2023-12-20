@@ -27,7 +27,6 @@ Added in v1.0.0
 - [BigDecimal transformations](#bigdecimal-transformations)
   - [BigDecimal](#bigdecimal)
   - [BigDecimalFromNumber](#bigdecimalfromnumber)
-  - [bigDecimalFromString](#bigdecimalfromstring)
   - [clampBigDecimal](#clampbigdecimal)
   - [negateBigDecimal](#negatebigdecimal)
 - [Cause](#cause)
@@ -523,18 +522,6 @@ When encoding, this Schema will produce incorrect results if the BigDecimal exce
 
 ```ts
 export declare const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
-## bigDecimalFromString
-
-A schema that transforms a `string` into a `BigDecimal`.
-
-**Signature**
-
-```ts
-export declare const bigDecimalFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
 ```
 
 Added in v1.0.0

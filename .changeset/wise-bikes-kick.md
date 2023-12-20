@@ -21,3 +21,4 @@ Schema: remove useless combinators
 - `hex`
 - `dateFromString`
 - `bigDecimalFromNumber`
+- `bigDecimalFromString`

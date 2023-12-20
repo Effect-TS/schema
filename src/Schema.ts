@@ -3982,28 +3982,16 @@ export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
   }
 )
 
-/**
- * A schema that transforms a `string` into a `BigDecimal`.
- *
- * @category BigDecimal transformations
- * @since 1.0.0
- */
-export const bigDecimalFromString = <I, A extends string>(
-  self: Schema<I, A>
-): Schema<I, BigDecimal.BigDecimal> =>
-  transformOrFail(
-    self,
-    BigDecimalFromSelf,
-    (num, _, ast) =>
-      BigDecimal.fromString(num).pipe(Option.match({
-        onNone: () => ParseResult.fail(ParseResult.type(ast, num)),
-        onSome: (val) => ParseResult.succeed(BigDecimal.normalize(val))
-      })),
-    (val) => ParseResult.succeed(BigDecimal.format(BigDecimal.normalize(val))),
-    { strict: false }
-  )
-
-const _BigDecimal: Schema<string, BigDecimal.BigDecimal> = bigDecimalFromString(string)
+const _BigDecimal: Schema<string, BigDecimal.BigDecimal> = transformOrFail(
+  string,
+  BigDecimalFromSelf,
+  (num, _, ast) =>
+    BigDecimal.fromString(num).pipe(Option.match({
+      onNone: () => ParseResult.fail(ParseResult.type(ast, num)),
+      onSome: (val) => ParseResult.succeed(BigDecimal.normalize(val))
+    })),
+  (val) => ParseResult.succeed(BigDecimal.format(BigDecimal.normalize(val)))
+)
 
 export {
   /**
