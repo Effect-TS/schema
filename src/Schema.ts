@@ -43,10 +43,6 @@ import * as ParseResult from "./ParseResult.js"
 import * as Pretty from "./Pretty.js"
 import type * as Serializable from "./Serializable.js"
 
-// ---------------------------------------------
-// model
-// ---------------------------------------------
-
 /**
  * @since 1.0.0
  * @category symbol
@@ -112,10 +108,6 @@ export const from = <I, A>(schema: Schema<I, A>): Schema<I> => make(AST.from(sch
  * @since 1.0.0
  */
 export const to = <I, A>(schema: Schema<I, A>): Schema<A> => make(AST.to(schema.ast))
-
-// ---------------------------------------------
-// decoding / encoding / parsing / validating / asserts / guards
-// ---------------------------------------------
 
 /* c8 ignore start */
 export {
@@ -232,10 +224,6 @@ export {
 } from "./Parser.js"
 /* c8 ignore end */
 
-// ---------------------------------------------
-// guards
-// ---------------------------------------------
-
 /**
  * Tests if a value is a `Schema`.
  *
@@ -244,10 +232,6 @@ export {
  */
 export const isSchema = (u: unknown): u is Schema<unknown, unknown> =>
   Predicate.isObject(u) && TypeId in u && "ast" in u
-
-// ---------------------------------------------
-// constructors
-// ---------------------------------------------
 
 const variance = {
   From: (_: any) => _,
@@ -455,10 +439,6 @@ export const instanceOf = <A extends abstract new(...args: any) => any>(
   )
 }
 
-// ---------------------------------------------
-// primitives
-// ---------------------------------------------
-
 const _undefined: Schema<undefined> = make(AST.undefinedKeyword)
 
 const _void: Schema<void> = make(AST.voidKeyword)
@@ -536,10 +516,6 @@ export const symbolFromSelf: Schema<symbol> = make(AST.symbolKeyword)
  * @since 1.0.0
  */
 export const object: Schema<object> = make(AST.objectKeyword)
-
-// ---------------------------------------------
-// combinators
-// ---------------------------------------------
 
 /**
  * @category combinators
@@ -1539,10 +1515,6 @@ export const attachPropertySignature: {
     )
   )))
 
-// ---------------------------------------------
-// annotations
-// ---------------------------------------------
-
 const toAnnotations = <A>(
   options?: FilterAnnotations<A>
 ): Mutable<AST.Annotations> => {
@@ -1706,10 +1678,6 @@ export const equivalence =
   <A>(equivalence: Equivalence.Equivalence<A>) => <I>(self: Schema<I, A>): Schema<I, A> =>
     make(AST.setAnnotation(self.ast, hooks.EquivalenceHookId, () => equivalence))
 
-// ---------------------------------------------
-// property signature renaming
-// ---------------------------------------------
-
 type Rename<A, M> = {
   [
     K in keyof A as K extends keyof M ? M[K] extends PropertyKey ? M[K]
@@ -1756,10 +1724,6 @@ export const rename: {
     return make(AST.rename(self.ast, mapping))
   }
 )
-
-// ---------------------------------------------
-// string filters
-// ---------------------------------------------
 
 /**
  * @category type id
@@ -2053,10 +2017,6 @@ export const nonEmpty = <A extends string>(
     ...options
   })
 
-// ---------------------------------------------
-// string transformations
-// ---------------------------------------------
-
 /**
  * This schema converts a string to lowercase.
  *
@@ -2160,10 +2120,6 @@ export const parseJson: {
   )
 }
 
-// ---------------------------------------------
-// string constructors
-// ---------------------------------------------
-
 /**
  * @category string constructors
  * @since 1.0.0
@@ -2217,10 +2173,6 @@ export const ULID: Schema<string> = string.pipe(
     arbitrary: (): Arbitrary<string> => (fc) => fc.ulid()
   })
 )
-
-// ---------------------------------------------
-// number filters
-// ---------------------------------------------
 
 /**
  * @category type id
@@ -2495,10 +2447,6 @@ export const nonNegative = <A extends number>(
   options?: FilterAnnotations<A>
 ): <I>(self: Schema<I, A>) => Schema<I, A> => greaterThanOrEqualTo(0, options)
 
-// ---------------------------------------------
-// number transformations
-// ---------------------------------------------
-
 /**
  * Clamps a number between a minimum and a maximum value.
  *
@@ -2548,10 +2496,6 @@ export const NumberFromString: Schema<string, number> = transformOrFail(
   },
   (n) => ParseResult.succeed(String(n))
 )
-
-// ---------------------------------------------
-// number constructors
-// ---------------------------------------------
 
 /**
  * @category number constructors
@@ -2628,42 +2572,25 @@ export const JsonNumber: Schema<number> = number.pipe(
   })
 )
 
-// ---------------------------------------------
-// boolean transformations
-// ---------------------------------------------
-
 /**
- * Negates a boolean value.
- *
  * @category boolean transformations
  * @since 1.0.0
  */
-export const not = <I>(self: Schema<I, boolean>): Schema<I, boolean> =>
-  transform(
-    self,
-    to(self),
-    (self) => !self,
-    (self) => !self
-  )
+export const Not: Schema<boolean> = transform(
+  boolean,
+  boolean,
+  (self) => !self,
+  (self) => !self
+)
 
 // ---------------------------------------------
-// boolean constructors
-// ---------------------------------------------
-
-/**
- * @category boolean constructors
- * @since 1.0.0
- */
-export const Not: Schema<boolean> = not(boolean)
-
-// ---------------------------------------------
-// symbol constructors
+// symbol transformations
 // ---------------------------------------------
 
 /**
  * This schema transforms a `string` into a `symbol`.
  *
- * @category symbol constructors
+ * @category symbol transformations
  * @since 1.0.0
  */
 export const symbol: Schema<string, symbol> = transform(
@@ -2879,16 +2806,12 @@ export const clampBigint =
       { strict: false }
     )
 
-// ---------------------------------------------
-// bigint constructors
-// ---------------------------------------------
-
 /**
  * This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
  *
  * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
  *
- * @category bigint constructors
+ * @category bigint transformations
  * @since 1.0.0
  */
 export const bigint: Schema<string, bigint> = transformOrFail(
@@ -4278,7 +4201,7 @@ const chunkPretty = <A>(item: Pretty.Pretty<A>): Pretty.Pretty<Chunk.Chunk<A>> =
   `Chunk(${Chunk.toReadonlyArray(c).map(item).join(", ")})`
 
 /**
- * @category Chunk transformations
+ * @category Chunk constructors
  * @since 1.0.0
  */
 export const chunkFromSelf = <I, A>(item: Schema<I, A>): Schema<Chunk.Chunk<I>, Chunk.Chunk<A>> => {

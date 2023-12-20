@@ -33,9 +33,10 @@ Added in v1.0.0
   - [CauseFrom (type alias)](#causefrom-type-alias)
   - [cause](#cause-1)
   - [causeFromSelf](#causefromself)
+- [Chunk constructors](#chunk-constructors)
+  - [chunkFromSelf](#chunkfromself)
 - [Chunk transformations](#chunk-transformations)
   - [chunk](#chunk)
-  - [chunkFromSelf](#chunkfromself)
 - [Data transformations](#data-transformations)
   - [data](#data)
   - [dataFromSelf](#datafromself)
@@ -118,7 +119,6 @@ Added in v1.0.0
   - [NonPositiveBigintFromSelf](#nonpositivebigintfromself)
   - [PositiveBigint](#positivebigint)
   - [PositiveBigintFromSelf](#positivebigintfromself)
-  - [bigint](#bigint)
 - [bigint filters](#bigint-filters)
   - [betweenBigint](#betweenbigint)
   - [greaterThanBigint](#greaterthanbigint)
@@ -130,11 +130,10 @@ Added in v1.0.0
   - [nonPositiveBigint](#nonpositivebigint-1)
   - [positiveBigint](#positivebigint-1)
 - [bigint transformations](#bigint-transformations)
+  - [bigint](#bigint)
   - [clampBigint](#clampbigint)
-- [boolean constructors](#boolean-constructors)
-  - [Not](#not)
 - [boolean transformations](#boolean-transformations)
-  - [not](#not-1)
+  - [Not](#not)
 - [classes](#classes)
   - [Class](#class)
   - [Class (interface)](#class-interface)
@@ -274,7 +273,7 @@ Added in v1.0.0
 - [symbol](#symbol)
   - [TypeId](#typeid)
   - [TypeId (type alias)](#typeid-type-alias)
-- [symbol constructors](#symbol-constructors)
+- [symbol transformations](#symbol-transformations)
   - [symbol](#symbol-1)
 - [type id](#type-id)
   - [BetweenBigDecimalTypeId](#betweenbigdecimaltypeid)
@@ -616,6 +615,18 @@ export declare const causeFromSelf: <IE, E>(
 
 Added in v1.0.0
 
+# Chunk constructors
+
+## chunkFromSelf
+
+**Signature**
+
+```ts
+export declare const chunkFromSelf: <I, A>(item: Schema<I, A>) => Schema<Chunk.Chunk<I>, Chunk.Chunk<A>>
+```
+
+Added in v1.0.0
+
 # Chunk transformations
 
 ## chunk
@@ -624,16 +635,6 @@ Added in v1.0.0
 
 ```ts
 export declare const chunk: <I, A>(item: Schema<I, A>) => Schema<readonly I[], Chunk.Chunk<A>>
-```
-
-Added in v1.0.0
-
-## chunkFromSelf
-
-**Signature**
-
-```ts
-export declare const chunkFromSelf: <I, A>(item: Schema<I, A>) => Schema<Chunk.Chunk<I>, Chunk.Chunk<A>>
 ```
 
 Added in v1.0.0
@@ -1436,20 +1437,6 @@ export declare const PositiveBigintFromSelf: Schema<bigint, bigint>
 
 Added in v1.0.0
 
-## bigint
-
-This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
-
-It returns an error if the value can't be converted (for example when non-numeric characters are provided).
-
-**Signature**
-
-```ts
-export declare const bigint: Schema<string, bigint>
-```
-
-Added in v1.0.0
-
 # bigint filters
 
 ## betweenBigint
@@ -1568,6 +1555,20 @@ Added in v1.0.0
 
 # bigint transformations
 
+## bigint
+
+This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+
+It returns an error if the value can't be converted (for example when non-numeric characters are provided).
+
+**Signature**
+
+```ts
+export declare const bigint: Schema<string, bigint>
+```
+
+Added in v1.0.0
+
 ## clampBigint
 
 Clamps a bigint between a minimum and a maximum value.
@@ -1583,7 +1584,7 @@ export declare const clampBigint: (
 
 Added in v1.0.0
 
-# boolean constructors
+# boolean transformations
 
 ## Not
 
@@ -1591,20 +1592,6 @@ Added in v1.0.0
 
 ```ts
 export declare const Not: Schema<boolean, boolean>
-```
-
-Added in v1.0.0
-
-# boolean transformations
-
-## not
-
-Negates a boolean value.
-
-**Signature**
-
-```ts
-export declare const not: <I>(self: Schema<I, boolean>) => Schema<I, boolean>
 ```
 
 Added in v1.0.0
@@ -3362,7 +3349,7 @@ export type TypeId = typeof TypeId
 
 Added in v1.0.0
 
-# symbol constructors
+# symbol transformations
 
 ## symbol
 

@@ -22,3 +22,4 @@ Schema: remove useless combinators
 - `dateFromString`
 - `bigDecimalFromNumber`
 - `bigDecimalFromString`
+- `not`
