@@ -16,3 +16,7 @@ Schema: remove useless combinators
 - `durationFromMillis`
 - `durationFromNanos`
 - `uint8ArrayFromNumbers`
+- `base64`
+- `base64url`
+- `hex`
+- `dateFromString`

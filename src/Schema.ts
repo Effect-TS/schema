@@ -3571,27 +3571,17 @@ export const ValidDateFromSelf: Schema<Date> = DateFromSelf.pipe(validDate())
 // ---------------------------------------------
 
 /**
- * A combinator that converts a `string` into a potentially **invalid** `Date` (e.g., `new Date("Invalid Date")` is not rejected).
+ * Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
  *
  * @category Date transformations
  * @since 1.0.0
  */
-export const dateFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, Date> =>
-  transform(
-    self,
-    DateFromSelf,
-    (s) => new Date(s),
-    (n) => n.toISOString(),
-    { strict: false }
-  )
-
-/**
- * Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
- *
- * @category Date constructors
- * @since 1.0.0
- */
-export const DateFromString: Schema<string, Date> = dateFromString(string)
+export const DateFromString: Schema<string, Date> = transform(
+  string,
+  DateFromSelf,
+  (s) => new Date(s),
+  (n) => n.toISOString()
+)
 
 const _Date: Schema<string, Date> = DateFromString.pipe(validDate())
 
@@ -3599,7 +3589,7 @@ export {
   /**
    * A schema that transforms a `string` into a **valid** `Date`, ensuring that invalid dates, such as `new Date("Invalid Date")`, are rejected.
    *
-   * @category Date constructors
+   * @category Date transformations
    * @since 1.0.0
    */
   _Date as Date

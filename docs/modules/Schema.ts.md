@@ -42,14 +42,13 @@ Added in v1.0.0
   - [data](#data)
   - [dataFromSelf](#datafromself)
 - [Date constructors](#date-constructors)
-  - [Date](#date)
   - [DateFromSelf](#datefromself)
-  - [DateFromString](#datefromstring)
   - [ValidDateFromSelf](#validdatefromself)
 - [Date filters](#date-filters)
   - [validDate](#validdate)
 - [Date transformations](#date-transformations)
-  - [dateFromString](#datefromstring-1)
+  - [Date](#date)
+  - [DateFromString](#datefromstring)
 - [Duration constructors](#duration-constructors)
   - [Duration](#duration)
   - [DurationFromMillis](#durationfrommillis)
@@ -700,18 +699,6 @@ Added in v1.0.0
 
 # Date constructors
 
-## Date
-
-A schema that transforms a `string` into a **valid** `Date`, ensuring that invalid dates, such as `new Date("Invalid Date")`, are rejected.
-
-**Signature**
-
-```ts
-export declare const Date: Schema<string, Date>
-```
-
-Added in v1.0.0
-
 ## DateFromSelf
 
 Represents a schema for handling potentially **invalid** `Date` instances (e.g., `new Date("Invalid Date")` is not rejected).
@@ -720,18 +707,6 @@ Represents a schema for handling potentially **invalid** `Date` instances (e.g.,
 
 ```ts
 export declare const DateFromSelf: Schema<Date, Date>
-```
-
-Added in v1.0.0
-
-## DateFromString
-
-Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
-
-**Signature**
-
-```ts
-export declare const DateFromString: Schema<string, Date>
 ```
 
 Added in v1.0.0
@@ -764,14 +739,26 @@ Added in v1.0.0
 
 # Date transformations
 
-## dateFromString
+## Date
 
-A combinator that converts a `string` into a potentially **invalid** `Date` (e.g., `new Date("Invalid Date")` is not rejected).
+A schema that transforms a `string` into a **valid** `Date`, ensuring that invalid dates, such as `new Date("Invalid Date")`, are rejected.
 
 **Signature**
 
 ```ts
-export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
+export declare const Date: Schema<string, Date>
+```
+
+Added in v1.0.0
+
+## DateFromString
+
+Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
+
+**Signature**
+
+```ts
+export declare const DateFromString: Schema<string, Date>
 ```
 
 Added in v1.0.0
