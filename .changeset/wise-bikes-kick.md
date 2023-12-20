@@ -7,3 +7,4 @@ Schema: remove useless combinators
 - `lowercase`
 - `uppercase`
 - `trim`
+- `numberFromString`

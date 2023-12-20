@@ -2516,43 +2516,38 @@ export const clamp =
     )
 
 /**
- * This combinator transforms a `string` into a `number` by parsing the string using the `Number` function.
+ * This schema transforms a `string` into a `number` by parsing the string using the `Number` function.
  *
  * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
  *
  * The following special string values are supported: "NaN", "Infinity", "-Infinity".
  *
- * @param self - The schema representing the input string
- *
- * @category number transformations
+ * @category number constructors
  * @since 1.0.0
  */
-export const numberFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, number> => {
-  return transformOrFail(
-    self,
-    number,
-    (s, _, ast) => {
-      if (s === "NaN") {
-        return ParseResult.succeed(NaN)
-      }
-      if (s === "Infinity") {
-        return ParseResult.succeed(Infinity)
-      }
-      if (s === "-Infinity") {
-        return ParseResult.succeed(-Infinity)
-      }
-      if (s.trim() === "") {
-        return ParseResult.fail(ParseResult.type(ast, s))
-      }
-      const n = Number(s)
-      return Number.isNaN(n)
-        ? ParseResult.fail(ParseResult.type(ast, s))
-        : ParseResult.succeed(n)
-    },
-    (n) => ParseResult.succeed(String(n)),
-    { strict: false }
-  )
-}
+export const NumberFromString: Schema<string, number> = transformOrFail(
+  string,
+  number,
+  (s, _, ast) => {
+    if (s === "NaN") {
+      return ParseResult.succeed(NaN)
+    }
+    if (s === "Infinity") {
+      return ParseResult.succeed(Infinity)
+    }
+    if (s === "-Infinity") {
+      return ParseResult.succeed(-Infinity)
+    }
+    if (s.trim() === "") {
+      return ParseResult.fail(ParseResult.type(ast, s))
+    }
+    const n = Number(s)
+    return Number.isNaN(n)
+      ? ParseResult.fail(ParseResult.type(ast, s))
+      : ParseResult.succeed(n)
+  },
+  (n) => ParseResult.succeed(String(n))
+)
 
 // ---------------------------------------------
 // number constructors
@@ -2599,18 +2594,6 @@ export const NonPositive: Schema<number> = number.pipe(nonPositive())
  * @since 1.0.0
  */
 export const NonNegative: Schema<number> = number.pipe(nonNegative())
-
-/**
- * This schema transforms a `string` into a `number` by parsing the string using the `Number` function.
- *
- * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
- *
- * The following special string values are supported: "NaN", "Infinity", "-Infinity".
- *
- * @category number constructors
- * @since 1.0.0
- */
-export const NumberFromString: Schema<string, number> = numberFromString(string)
 
 /**
  * @category type id

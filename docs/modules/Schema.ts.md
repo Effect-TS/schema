@@ -241,7 +241,6 @@ Added in v1.0.0
   - [positive](#positive-1)
 - [number transformations](#number-transformations)
   - [clamp](#clamp)
-  - [numberFromString](#numberfromstring-1)
 - [optional](#optional)
   - [optionalToRequired](#optionaltorequired)
 - [parsing](#parsing)
@@ -267,7 +266,6 @@ Added in v1.0.0
   - [rename](#rename)
 - [string constructors](#string-constructors)
   - [NonEmpty](#nonempty)
-  - [ParseJson](#parsejson)
   - [Trimmed](#trimmed)
   - [ULID](#ulid)
   - [UUID](#uuid)
@@ -287,7 +285,7 @@ Added in v1.0.0
   - [Lowercase](#lowercase)
   - [Trim](#trim)
   - [Uppercase](#uppercase)
-  - [parseJson](#parsejson-1)
+  - [parseJson](#parsejson)
   - [split](#split)
 - [symbol](#symbol)
   - [TypeId](#typeid)
@@ -3031,22 +3029,6 @@ export declare const clamp: (
 
 Added in v1.0.0
 
-## numberFromString
-
-This combinator transforms a `string` into a `number` by parsing the string using the `Number` function.
-
-It returns an error if the value can't be converted (for example when non-numeric characters are provided).
-
-The following special string values are supported: "NaN", "Infinity", "-Infinity".
-
-**Signature**
-
-```ts
-export declare const numberFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, number>
-```
-
-Added in v1.0.0
-
 # optional
 
 ## optionalToRequired
@@ -3286,19 +3268,6 @@ Added in v1.0.0
 
 ```ts
 export declare const NonEmpty: Schema<string, string>
-```
-
-Added in v1.0.0
-
-## ParseJson
-
-The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
-functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
-
-**Signature**
-
-```ts
-export declare const ParseJson: Schema<string, unknown>
 ```
 
 Added in v1.0.0
