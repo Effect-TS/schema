@@ -3011,24 +3011,13 @@ export const SecretFromSelf: Schema<Secret.Secret> = declare(
   }
 )
 
-/**
- * A combinator that transforms a `string` into a `Secret`.
- *
- * @category Secret transformations
- * @since 1.0.0
- */
-export const secret = <I, A extends string>(
-  self: Schema<I, A>
-): Schema<I, Secret.Secret> =>
-  transform(
-    self,
-    SecretFromSelf,
-    (str) => Secret.fromString(str),
-    (secret) => Secret.value(secret),
-    { strict: false }
-  )
-
-const _Secret: Schema<string, Secret.Secret> = secret(string)
+const _Secret: Schema<string, Secret.Secret> = transform(
+  string,
+  SecretFromSelf,
+  (str) => Secret.fromString(str),
+  (secret) => Secret.value(secret),
+  { strict: false }
+)
 
 export {
   /**

@@ -11,3 +11,4 @@ Schema: remove useless combinators
 - `symbolFromString`
 - `bigintFromString`
 - `bigintFromNumber`
+- `secret`
