@@ -3351,17 +3351,14 @@ export {
 // Encoding transformations
 // ---------------------------------------------
 
-const makeEncodingTransform = <A extends string>(
+const makeEncodingTransformation = (
   id: string,
-  decode: (s: A) => Either.Either<Encoding.DecodeException, Uint8Array>,
+  decode: (s: string) => Either.Either<Encoding.DecodeException, Uint8Array>,
   encode: (u: Uint8Array) => string,
   arbitrary: Arbitrary<Uint8Array>
-) =>
-<I, A2 extends A>(
-  self: Schema<I, A2>
-): Schema<I, Uint8Array> =>
+): Schema<string, Uint8Array> =>
   transformOrFail(
-    self,
+    string,
     Uint8ArrayFromSelf,
     (s, _, ast) =>
       Either.mapLeft(
@@ -3378,68 +3375,37 @@ const makeEncodingTransform = <A extends string>(
   }))
 
 /**
- * Transforms a base64 `string` into a `Uint8Array`.
- *
- * @category encoding transformations
+ * @category Encoding transformations
  * @since 1.0.0
  */
-export const base64: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array> =
-  makeEncodingTransform(
-    "Base64",
-    Encoding.decodeBase64,
-    Encoding.encodeBase64,
-    (fc) => fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64(s)))
-  )
+export const Base64: Schema<string, Uint8Array> = makeEncodingTransformation(
+  "Base64",
+  Encoding.decodeBase64,
+  Encoding.encodeBase64,
+  (fc) => fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64(s)))
+)
 
 /**
- * Transforms a base64url `string` into a `Uint8Array`.
- *
- * @category encoding transformations
+ * @category Encoding transformations
  * @since 1.0.0
  */
-export const base64url: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array> =
-  makeEncodingTransform(
-    "Base64Url",
-    Encoding.decodeBase64Url,
-    Encoding.encodeBase64Url,
-    (fc) => fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64Url(s)))
-  )
+export const Base64Url: Schema<string, Uint8Array> = makeEncodingTransformation(
+  "Base64Url",
+  Encoding.decodeBase64Url,
+  Encoding.encodeBase64Url,
+  (fc) => fc.base64String().map((s) => Either.getOrThrow(Encoding.decodeBase64Url(s)))
+)
 
 /**
- * Transforms a hex `string` into a `Uint8Array`.
- *
- * @category encoding transformations
+ * @category Encoding transformations
  * @since 1.0.0
  */
-export const hex: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array> =
-  makeEncodingTransform(
-    "Hex",
-    Encoding.decodeHex,
-    Encoding.encodeHex,
-    (fc) => fc.hexaString().map((s) => Either.getOrThrow(Encoding.decodeHex(s)))
-  )
-
-// ---------------------------------------------
-// Encoding constructors
-// ---------------------------------------------
-
-/**
- * @category encoding constructors
- * @since 1.0.0
- */
-export const Base64: Schema<string, Uint8Array> = base64(string)
-
-/**
- * @category encoding constructors
- * @since 1.0.0
- */
-export const Base64Url: Schema<string, Uint8Array> = base64url(string)
-
-/**
- * @category encoding constructors
- * @since 1.0.0
- */
-export const Hex: Schema<string, Uint8Array> = hex(string)
+export const Hex: Schema<string, Uint8Array> = makeEncodingTransformation(
+  "Hex",
+  Encoding.decodeHex,
+  Encoding.encodeHex,
+  (fc) => fc.hexaString().map((s) => Either.getOrThrow(Encoding.decodeHex(s)))
+)
 
 // ---------------------------------------------
 // ReadonlyArray filters

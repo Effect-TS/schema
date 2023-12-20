@@ -67,6 +67,10 @@ Added in v1.0.0
   - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
+- [Encoding transformations](#encoding-transformations)
+  - [Base64](#base64)
+  - [Base64Url](#base64url)
+  - [Hex](#hex)
 - [Exit](#exit)
   - [ExitFrom (type alias)](#exitfrom-type-alias)
   - [exit](#exit-1)
@@ -193,14 +197,6 @@ Added in v1.0.0
   - [encodeOption](#encodeoption)
   - [encodePromise](#encodepromise)
   - [encodeSync](#encodesync)
-- [encoding constructors](#encoding-constructors)
-  - [Base64](#base64)
-  - [Base64Url](#base64url)
-  - [Hex](#hex)
-- [encoding transformations](#encoding-transformations)
-  - [base64](#base64-1)
-  - [base64url](#base64url-1)
-  - [hex](#hex-1)
 - [guards](#guards)
   - [isSchema](#isschema)
 - [model](#model)
@@ -957,6 +953,38 @@ export declare const eitherFromSelf: <IE, E, IA, A>(
   left: Schema<IE, E>,
   right: Schema<IA, A>
 ) => Schema<Either.Either<IE, IA>, Either.Either<E, A>>
+```
+
+Added in v1.0.0
+
+# Encoding transformations
+
+## Base64
+
+**Signature**
+
+```ts
+export declare const Base64: Schema<string, Uint8Array>
+```
+
+Added in v1.0.0
+
+## Base64Url
+
+**Signature**
+
+```ts
+export declare const Base64Url: Schema<string, Uint8Array>
+```
+
+Added in v1.0.0
+
+## Hex
+
+**Signature**
+
+```ts
+export declare const Hex: Schema<string, Uint8Array>
 ```
 
 Added in v1.0.0
@@ -2511,76 +2539,6 @@ Added in v1.0.0
 
 ```ts
 export declare const encodeSync: <I, A>(schema: Schema<I, A>) => (a: A, options?: ParseOptions | undefined) => I
-```
-
-Added in v1.0.0
-
-# encoding constructors
-
-## Base64
-
-**Signature**
-
-```ts
-export declare const Base64: Schema<string, Uint8Array>
-```
-
-Added in v1.0.0
-
-## Base64Url
-
-**Signature**
-
-```ts
-export declare const Base64Url: Schema<string, Uint8Array>
-```
-
-Added in v1.0.0
-
-## Hex
-
-**Signature**
-
-```ts
-export declare const Hex: Schema<string, Uint8Array>
-```
-
-Added in v1.0.0
-
-# encoding transformations
-
-## base64
-
-Transforms a base64 `string` into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const base64: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array>
-```
-
-Added in v1.0.0
-
-## base64url
-
-Transforms a base64url `string` into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const base64url: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array>
-```
-
-Added in v1.0.0
-
-## hex
-
-Transforms a hex `string` into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const hex: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array>
 ```
 
 Added in v1.0.0
