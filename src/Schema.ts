@@ -3082,23 +3082,6 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
 // ---------------------------------------------
 
 /**
- * A combinator that transforms a `[number, number]` tuple into a `Duration`.
- *
- * @category Duration transformations
- * @since 1.0.0
- */
-export const durationFromHrTime = <I, A extends readonly [seconds: number, nanos: number]>(
-  self: Schema<I, A>
-): Schema<I, Duration.Duration> =>
-  transform(
-    self,
-    DurationFromSelf,
-    ([seconds, nanos]) => Duration.nanos(BigInt(seconds) * BigInt(1e9) + BigInt(nanos)),
-    (duration) => Duration.toHrTime(duration),
-    { strict: false }
-  )
-
-/**
  * A combinator that transforms a `bigint` into a `Duration`.
  * Treats the value as the number of nanoseconds.
  *
@@ -3182,8 +3165,12 @@ const hrTime: Schema<readonly [seconds: number, nanos: number]> = tuple(
   [AST.DescriptionAnnotationId]: "a high resolution time tuple"
 }))
 
-const _Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration> =
-  durationFromHrTime(hrTime)
+const _Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration> = transform(
+  hrTime,
+  DurationFromSelf,
+  ([seconds, nanos]) => Duration.nanos(BigInt(seconds) * BigInt(1e9) + BigInt(nanos)),
+  (duration) => Duration.toHrTime(duration)
+)
 
 export {
   /**

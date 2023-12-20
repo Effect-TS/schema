@@ -63,7 +63,6 @@ Added in v1.0.0
   - [lessThanOrEqualToDuration](#lessthanorequaltoduration)
 - [Duration transformations](#duration-transformations)
   - [clampDuration](#clampduration)
-  - [durationFromHrTime](#durationfromhrtime)
   - [durationFromMillis](#durationfrommillis-1)
   - [durationFromNanos](#durationfromnanos-1)
 - [Either transformations](#either-transformations)
@@ -916,20 +915,6 @@ export declare const clampDuration: (
   minimum: Duration.DurationInput,
   maximum: Duration.DurationInput
 ) => <I, A extends Duration.Duration>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## durationFromHrTime
-
-A combinator that transforms a `[number, number]` tuple into a `Duration`.
-
-**Signature**
-
-```ts
-export declare const durationFromHrTime: <I, A extends readonly [seconds: number, nanos: number]>(
-  self: Schema<I, A>
-) => Schema<I, Duration.Duration>
 ```
 
 Added in v1.0.0
