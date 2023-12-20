@@ -63,7 +63,6 @@ Added in v1.0.0
   - [lessThanOrEqualToDuration](#lessthanorequaltoduration)
 - [Duration transformations](#duration-transformations)
   - [clampDuration](#clampduration)
-  - [durationFromNanos](#durationfromnanos-1)
 - [Either transformations](#either-transformations)
   - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
@@ -914,19 +913,6 @@ export declare const clampDuration: (
   minimum: Duration.DurationInput,
   maximum: Duration.DurationInput
 ) => <I, A extends Duration.Duration>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## durationFromNanos
-
-A combinator that transforms a `bigint` into a `Duration`.
-Treats the value as the number of nanoseconds.
-
-**Signature**
-
-```ts
-export declare const durationFromNanos: <I, A extends bigint>(self: Schema<I, A>) => Schema<I, Duration.Duration>
 ```
 
 Added in v1.0.0

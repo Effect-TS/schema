@@ -3082,28 +3082,6 @@ export const DurationFromSelf: Schema<Duration.Duration> = declare(
 // ---------------------------------------------
 
 /**
- * A combinator that transforms a `bigint` into a `Duration`.
- * Treats the value as the number of nanoseconds.
- *
- * @category Duration transformations
- * @since 1.0.0
- */
-export const durationFromNanos = <I, A extends bigint>(
-  self: Schema<I, A>
-): Schema<I, Duration.Duration> =>
-  transformOrFail(
-    self,
-    DurationFromSelf,
-    (nanos) => ParseResult.succeed(Duration.nanos(nanos)),
-    (duration, _, ast) =>
-      Option.match(Duration.toNanos(duration), {
-        onNone: () => ParseResult.fail(ParseResult.type(ast, duration)),
-        onSome: (val) => ParseResult.succeed(val)
-      }),
-    { strict: false }
-  )
-
-/**
  * A schema that transforms a `bigint` tuple into a `Duration`.
  * Treats the value as the number of nanoseconds.
  *
@@ -3113,7 +3091,16 @@ export const durationFromNanos = <I, A extends bigint>(
 export const DurationFromNanos: Schema<
   bigint,
   Duration.Duration
-> = durationFromNanos(bigintFromSelf)
+> = transformOrFail(
+  bigintFromSelf,
+  DurationFromSelf,
+  (nanos) => ParseResult.succeed(Duration.nanos(nanos)),
+  (duration, _, ast) =>
+    Option.match(Duration.toNanos(duration), {
+      onNone: () => ParseResult.fail(ParseResult.type(ast, duration)),
+      onSome: (val) => ParseResult.succeed(val)
+    })
+)
 
 /**
  * A schema that transforms a `number` tuple into a `Duration`.
