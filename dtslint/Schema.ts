@@ -849,13 +849,7 @@ S.Duration
 S.DurationFromSelf
 
 // $ExpectType Schema<number, Duration>
-S.durationFromMillis(S.number)
-
-// $ExpectType Schema<number, Duration>
 S.DurationFromMillis
-
-// $ExpectType Schema<bigint, Duration>
-S.durationFromNanos(S.bigintFromSelf)
 
 // $ExpectType Schema<bigint, Duration>
 S.DurationFromNanos
@@ -869,9 +863,6 @@ S.Secret
 
 // $ExpectType Schema<Secret, Secret>
 S.SecretFromSelf
-
-// $ExpectType Schema<string, Secret>
-S.secret(S.string)
 
 // ---------------------------------------------
 // propertySignatureAnnotations
