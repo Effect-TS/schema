@@ -82,6 +82,7 @@ Added in v1.0.0
   - [OptionFrom (type alias)](#optionfrom-type-alias)
   - [option](#option)
   - [optionFromNullable](#optionfromnullable)
+  - [optionFromNullish](#optionfromnullish)
   - [optionFromSelf](#optionfromself)
 - [ReadonlyArray filters](#readonlyarray-filters)
   - [itemsCount](#itemscount)
@@ -163,8 +164,10 @@ Added in v1.0.0
   - [mutable](#mutable)
   - [nonEmptyArray](#nonemptyarray)
   - [nullable](#nullable)
+  - [nullish](#nullish)
   - [omit](#omit)
   - [optionalElement](#optionalelement)
+  - [orUndefined](#orundefined)
   - [partial](#partial)
   - [pick](#pick)
   - [record](#record)
@@ -239,6 +242,8 @@ Added in v1.0.0
 - [number transformations](#number-transformations)
   - [clamp](#clamp)
   - [numberFromString](#numberfromstring-1)
+- [optional](#optional)
+  - [optionalToRequired](#optionaltorequired)
 - [parsing](#parsing)
   - [parse](#parse)
   - [parseEither](#parseeither)
@@ -367,7 +372,6 @@ Added in v1.0.0
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
   - [JsonOptions (type alias)](#jsonoptions-type-alias)
-  - [OptionalPropertySignature (interface)](#optionalpropertysignature-interface)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Schema (namespace)](#schema-namespace)
     - [Variance (interface)](#variance-interface)
@@ -378,8 +382,8 @@ Added in v1.0.0
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [ToStruct (type alias)](#tostruct-type-alias)
   - [from](#from)
-  - [optional](#optional)
-  - [propertySignature](#propertysignature)
+  - [optional](#optional-1)
+  - [propertySignatureAnnotations](#propertysignatureannotations)
   - [readonlyMapFromSelf](#readonlymapfromself)
   - [to](#to)
 - [validation](#validation)
@@ -1142,6 +1146,19 @@ Added in v1.0.0
 
 ```ts
 export declare const optionFromNullable: <I, A>(value: Schema<I, A>) => Schema<I | null, Option.Option<A>>
+```
+
+Added in v1.0.0
+
+## optionFromNullish
+
+**Signature**
+
+```ts
+export declare const optionFromNullish: <I, A>(
+  value: Schema<I, A>,
+  onNoneEncoding: null | undefined
+) => Schema<I | null | undefined, Option.Option<A>>
 ```
 
 Added in v1.0.0
@@ -2106,6 +2123,18 @@ export declare const nullable: <From, To>(self: Schema<From, To>) => Schema<From
 
 Added in v1.0.0
 
+## nullish
+
+**Signature**
+
+```ts
+export declare const nullish: <From, To>(
+  self: Schema<From, To>
+) => Schema<From | null | undefined, To | null | undefined>
+```
+
+Added in v1.0.0
+
 ## omit
 
 **Signature**
@@ -2130,6 +2159,16 @@ export declare const optionalElement: <IE, E>(
 ) => <I extends readonly any[], A extends readonly any[]>(
   self: Schema<I, A>
 ) => Schema<readonly [...I, (IE | undefined)?], readonly [...A, (E | undefined)?]>
+```
+
+Added in v1.0.0
+
+## orUndefined
+
+**Signature**
+
+```ts
+export declare const orUndefined: <From, To>(self: Schema<From, To>) => Schema<From | undefined, To | undefined>
 ```
 
 Added in v1.0.0
@@ -3008,6 +3047,24 @@ The following special string values are supported: "NaN", "Infinity", "-Infinity
 
 ```ts
 export declare const numberFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, number>
+```
+
+Added in v1.0.0
+
+# optional
+
+## optionalToRequired
+
+**Signature**
+
+```ts
+export declare const optionalToRequired: <I, A, B>(
+  from: Schema<I, A>,
+  to: Schema<B, B>,
+  decode: (o: Option.Option<A>) => B,
+  encode: (b: B) => Option.Option<A>,
+  options?: DocAnnotations
+) => PropertySignature<I, true, B, false>
 ```
 
 Added in v1.0.0
@@ -4338,26 +4395,12 @@ export type JsonOptions = {
 
 Added in v1.0.0
 
-## OptionalPropertySignature (interface)
-
-**Signature**
-
-```ts
-export interface OptionalPropertySignature<From, FromIsOptional, To, ToIsOptional>
-  extends PropertySignature<From, FromIsOptional, To, ToIsOptional> {
-  readonly withDefault: (value: () => To) => PropertySignature<From, true, To, false>
-  readonly toOption: () => PropertySignature<From, true, Option.Option<To>, false>
-}
-```
-
-Added in v1.0.0
-
 ## PropertySignature (interface)
 
 **Signature**
 
 ```ts
-export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> extends Schema.Variance<From, To> {
+export interface PropertySignature<From, FromIsOptional, To, ToIsOptional> extends Schema.Variance<From, To>, Pipeable {
   readonly FromIsOptional: FromIsOptional
   readonly ToIsOptional: ToIsOptional
 }
@@ -4478,23 +4521,59 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const optional: <I, A>(
-  schema: Schema<I, A>,
-  options?: DocAnnotations
-) => OptionalPropertySignature<I, true, A, true>
+export declare const optional: {
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly default: () => A; readonly nullable: true }
+  ): PropertySignature<I | null, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly default: () => A }
+  ): PropertySignature<I, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly nullable: true; readonly as: "Option" }
+  ): PropertySignature<I | null, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly exact: true; readonly as: "Option" }
+  ): PropertySignature<I, true, Option.Option<A>, false>
+  <I, A>(schema: Schema<I, A>, options: { readonly exact: true }): PropertySignature<I, true, A, true>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly default: () => A; readonly nullable: true }
+  ): PropertySignature<I | null | undefined, true, A, false>
+  <I, A>(schema: Schema<I, A>, options: { readonly default: () => A }): PropertySignature<I | undefined, true, A, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly nullable: true; readonly as: "Option" }
+  ): PropertySignature<I | null | undefined, true, Option.Option<A>, false>
+  <I, A>(
+    schema: Schema<I, A>,
+    options: { readonly as: "Option" }
+  ): PropertySignature<I | undefined, true, Option.Option<A>, false>
+  <I, A>(schema: Schema<I, A>): PropertySignature<I | undefined, true, A | undefined, true>
+}
 ```
 
 Added in v1.0.0
 
-## propertySignature
+## propertySignatureAnnotations
 
 **Signature**
 
 ```ts
-export declare const propertySignature: <I, A>(
-  schema: Schema<I, A>,
-  options: DocAnnotations
-) => PropertySignature<I, false, A, false>
+export declare const propertySignatureAnnotations: (
+  annotations: DocAnnotations
+) => <
+  S extends
+    | Schema<any, any>
+    | Schema<never, never>
+    | PropertySignature<any, boolean, any, boolean>
+    | PropertySignature<never, boolean, never, boolean>
+>(
+  self: S
+) => S extends Schema<infer I, infer A> ? PropertySignature<I, false, A, false> : S
 ```
 
 Added in v1.0.0
