@@ -20,3 +20,4 @@ Schema: remove useless combinators
 - `base64url`
 - `hex`
 - `dateFromString`
+- `bigDecimalFromNumber`

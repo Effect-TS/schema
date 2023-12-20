@@ -3983,27 +3983,9 @@ export const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal> = declare(
 )
 
 /**
- * A schema that transforms a `number` into a `BigDecimal`.
- * When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
- *
- * @category BigDecimal constructors
- * @since 1.0.0
- */
-export const bigDecimalFromNumber = <I, A extends number>(
-  self: Schema<I, A>
-): Schema<I, BigDecimal.BigDecimal> =>
-  transformOrFail(
-    self,
-    BigDecimalFromSelf,
-    (num) => ParseResult.succeed(BigDecimal.fromNumber(num)),
-    (val) => ParseResult.succeed(BigDecimal.unsafeToNumber(val)),
-    { strict: false }
-  )
-
-/**
  * A schema that transforms a `string` into a `BigDecimal`.
  *
- * @category BigDecimal constructors
+ * @category BigDecimal transformations
  * @since 1.0.0
  */
 export const bigDecimalFromString = <I, A extends string>(
@@ -4025,7 +4007,7 @@ const _BigDecimal: Schema<string, BigDecimal.BigDecimal> = bigDecimalFromString(
 
 export {
   /**
-   * @category BigDecimal constructors
+   * @category BigDecimal transformations
    * @since 1.0.0
    */
   _BigDecimal as BigDecimal
@@ -4035,11 +4017,14 @@ export {
  * A schema that transforms a `number` into a `BigDecimal`.
  * When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
  *
- * @category BigDecimal constructors
+ * @category BigDecimal transformations
  * @since 1.0.0
  */
-export const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal> = bigDecimalFromNumber(
-  number
+export const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal> = transformOrFail(
+  number,
+  BigDecimalFromSelf,
+  (num) => ParseResult.succeed(BigDecimal.fromNumber(num)),
+  (val) => ParseResult.succeed(BigDecimal.unsafeToNumber(val))
 )
 
 /**

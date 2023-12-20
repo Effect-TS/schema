@@ -830,13 +830,7 @@ S.BigDecimal
 S.BigDecimalFromSelf
 
 // $ExpectType Schema<number, BigDecimal>
-S.bigDecimalFromNumber(S.number)
-
-// $ExpectType Schema<number, BigDecimal>
 S.BigDecimalFromNumber
-
-// $ExpectType Schema<string, BigDecimal>
-S.bigDecimalFromString(S.string)
 
 // ---------------------------------------------
 // Duration

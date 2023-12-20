@@ -13,11 +13,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [BigDecimal constructors](#bigdecimal-constructors)
-  - [BigDecimal](#bigdecimal)
-  - [BigDecimalFromNumber](#bigdecimalfromnumber)
   - [BigDecimalFromSelf](#bigdecimalfromself)
-  - [bigDecimalFromNumber](#bigdecimalfromnumber-1)
-  - [bigDecimalFromString](#bigdecimalfromstring)
 - [BigDecimal filters](#bigdecimal-filters)
   - [betweenBigDecimal](#betweenbigdecimal)
   - [greaterThanBigDecimal](#greaterthanbigdecimal)
@@ -29,6 +25,9 @@ Added in v1.0.0
   - [nonPositiveBigDecimal](#nonpositivebigdecimal)
   - [positiveBigDecimal](#positivebigdecimal)
 - [BigDecimal transformations](#bigdecimal-transformations)
+  - [BigDecimal](#bigdecimal)
+  - [BigDecimalFromNumber](#bigdecimalfromnumber)
+  - [bigDecimalFromString](#bigdecimalfromstring)
   - [clampBigDecimal](#clampbigdecimal)
   - [negateBigDecimal](#negatebigdecimal)
 - [Cause](#cause)
@@ -377,60 +376,12 @@ Added in v1.0.0
 
 # BigDecimal constructors
 
-## BigDecimal
-
-**Signature**
-
-```ts
-export declare const BigDecimal: Schema<string, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
-## BigDecimalFromNumber
-
-A schema that transforms a `number` into a `BigDecimal`.
-When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
-
-**Signature**
-
-```ts
-export declare const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
 ## BigDecimalFromSelf
 
 **Signature**
 
 ```ts
 export declare const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
-## bigDecimalFromNumber
-
-A schema that transforms a `number` into a `BigDecimal`.
-When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
-
-**Signature**
-
-```ts
-export declare const bigDecimalFromNumber: <I, A extends number>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
-## bigDecimalFromString
-
-A schema that transforms a `string` into a `BigDecimal`.
-
-**Signature**
-
-```ts
-export declare const bigDecimalFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
 ```
 
 Added in v1.0.0
@@ -552,6 +503,41 @@ export declare const positiveBigDecimal: <A extends BigDecimal.BigDecimal>(
 Added in v1.0.0
 
 # BigDecimal transformations
+
+## BigDecimal
+
+**Signature**
+
+```ts
+export declare const BigDecimal: Schema<string, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## BigDecimalFromNumber
+
+A schema that transforms a `number` into a `BigDecimal`.
+When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
+
+**Signature**
+
+```ts
+export declare const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## bigDecimalFromString
+
+A schema that transforms a `string` into a `BigDecimal`.
+
+**Signature**
+
+```ts
+export declare const bigDecimalFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
 
 ## clampBigDecimal
 
