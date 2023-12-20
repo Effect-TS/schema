@@ -13,11 +13,7 @@ Added in v1.0.0
 <h2 class="text-delta">Table of contents</h2>
 
 - [BigDecimal constructors](#bigdecimal-constructors)
-  - [BigDecimal](#bigdecimal)
-  - [BigDecimalFromNumber](#bigdecimalfromnumber)
   - [BigDecimalFromSelf](#bigdecimalfromself)
-  - [bigDecimalFromNumber](#bigdecimalfromnumber-1)
-  - [bigDecimalFromString](#bigdecimalfromstring)
 - [BigDecimal filters](#bigdecimal-filters)
   - [betweenBigDecimal](#betweenbigdecimal)
   - [greaterThanBigDecimal](#greaterthanbigdecimal)
@@ -29,12 +25,15 @@ Added in v1.0.0
   - [nonPositiveBigDecimal](#nonpositivebigdecimal)
   - [positiveBigDecimal](#positivebigdecimal)
 - [BigDecimal transformations](#bigdecimal-transformations)
+  - [BigDecimal](#bigdecimal)
+  - [BigDecimalFromNumber](#bigdecimalfromnumber)
   - [clampBigDecimal](#clampbigdecimal)
   - [negateBigDecimal](#negatebigdecimal)
-- [Cause](#cause)
-  - [CauseFrom (type alias)](#causefrom-type-alias)
-  - [cause](#cause-1)
+- [Cause transformations](#cause-transformations)
+  - [cause](#cause)
   - [causeFromSelf](#causefromself)
+- [Cause utils](#cause-utils)
+  - [CauseFrom (type alias)](#causefrom-type-alias)
 - [Chunk transformations](#chunk-transformations)
   - [chunk](#chunk)
   - [chunkFromSelf](#chunkfromself)
@@ -42,18 +41,14 @@ Added in v1.0.0
   - [data](#data)
   - [dataFromSelf](#datafromself)
 - [Date constructors](#date-constructors)
-  - [Date](#date)
   - [DateFromSelf](#datefromself)
-  - [DateFromString](#datefromstring)
   - [ValidDateFromSelf](#validdatefromself)
 - [Date filters](#date-filters)
   - [validDate](#validdate)
 - [Date transformations](#date-transformations)
-  - [dateFromString](#datefromstring-1)
+  - [Date](#date)
+  - [DateFromString](#datefromstring)
 - [Duration constructors](#duration-constructors)
-  - [Duration](#duration)
-  - [DurationFromMillis](#durationfrommillis)
-  - [DurationFromNanos](#durationfromnanos)
   - [DurationFromSelf](#durationfromself)
 - [Duration filters](#duration-filters)
   - [betweenDuration](#betweenduration)
@@ -62,47 +57,55 @@ Added in v1.0.0
   - [lessThanDuration](#lessthanduration)
   - [lessThanOrEqualToDuration](#lessthanorequaltoduration)
 - [Duration transformations](#duration-transformations)
+  - [Duration](#duration)
+  - [DurationFromMillis](#durationfrommillis)
+  - [DurationFromNanos](#durationfromnanos)
   - [clampDuration](#clampduration)
-  - [durationFromHrTime](#durationfromhrtime)
-  - [durationFromMillis](#durationfrommillis-1)
-  - [durationFromNanos](#durationfromnanos-1)
 - [Either transformations](#either-transformations)
-  - [EitherFrom (type alias)](#eitherfrom-type-alias)
   - [either](#either)
   - [eitherFromSelf](#eitherfromself)
-- [Exit](#exit)
-  - [ExitFrom (type alias)](#exitfrom-type-alias)
-  - [exit](#exit-1)
+- [Either utils](#either-utils)
+  - [EitherFrom (type alias)](#eitherfrom-type-alias)
+- [Encoding transformations](#encoding-transformations)
+  - [Base64](#base64)
+  - [Base64Url](#base64url)
+  - [Hex](#hex)
+- [Exit transformations](#exit-transformations)
+  - [exit](#exit)
   - [exitFromSelf](#exitfromself)
+- [Exit utils](#exit-utils)
+  - [ExitFrom (type alias)](#exitfrom-type-alias)
 - [FiberId](#fiberid)
-  - [FiberId](#fiberid-1)
   - [FiberIdFrom (type alias)](#fiberidfrom-type-alias)
+- [FiberId constructors](#fiberid-constructors)
   - [FiberIdFromSelf](#fiberidfromself)
+- [FiberId transformations](#fiberid-transformations)
+  - [FiberId](#fiberid-1)
 - [Option transformations](#option-transformations)
-  - [OptionFrom (type alias)](#optionfrom-type-alias)
   - [option](#option)
   - [optionFromNullable](#optionfromnullable)
   - [optionFromNullish](#optionfromnullish)
   - [optionFromSelf](#optionfromself)
+- [Option utils](#option-utils)
+  - [OptionFrom (type alias)](#optionfrom-type-alias)
 - [ReadonlyArray filters](#readonlyarray-filters)
   - [itemsCount](#itemscount)
   - [maxItems](#maxitems)
   - [minItems](#minitems)
 - [ReadonlyMap transformations](#readonlymap-transformations)
   - [readonlyMap](#readonlymap)
+  - [readonlyMapFromSelf](#readonlymapfromself)
 - [ReadonlySet transformations](#readonlyset-transformations)
   - [readonlySet](#readonlyset)
   - [readonlySetFromSelf](#readonlysetfromself)
 - [Secret constructors](#secret-constructors)
-  - [Secret](#secret)
   - [SecretFromSelf](#secretfromself)
 - [Secret transformations](#secret-transformations)
-  - [secret](#secret-1)
+  - [Secret](#secret)
 - [Uint8Array constructors](#uint8array-constructors)
-  - [Uint8Array](#uint8array)
   - [Uint8ArrayFromSelf](#uint8arrayfromself)
 - [Uint8Array transformations](#uint8array-transformations)
-  - [uint8ArrayFromNumbers](#uint8arrayfromnumbers)
+  - [Uint8Array](#uint8array)
 - [annotations](#annotations)
   - [annotations](#annotations-1)
   - [default](#default)
@@ -115,7 +118,6 @@ Added in v1.0.0
   - [message](#message)
   - [title](#title)
 - [bigint constructors](#bigint-constructors)
-  - [BigintFromNumber](#bigintfromnumber)
   - [NegativeBigint](#negativebigint)
   - [NegativeBigintFromSelf](#negativebigintfromself)
   - [NonNegativeBigint](#nonnegativebigint)
@@ -124,7 +126,6 @@ Added in v1.0.0
   - [NonPositiveBigintFromSelf](#nonpositivebigintfromself)
   - [PositiveBigint](#positivebigint)
   - [PositiveBigintFromSelf](#positivebigintfromself)
-  - [bigint](#bigint)
 - [bigint filters](#bigint-filters)
   - [betweenBigint](#betweenbigint)
   - [greaterThanBigint](#greaterthanbigint)
@@ -136,13 +137,11 @@ Added in v1.0.0
   - [nonPositiveBigint](#nonpositivebigint-1)
   - [positiveBigint](#positivebigint-1)
 - [bigint transformations](#bigint-transformations)
-  - [bigintFromNumber](#bigintfromnumber-1)
-  - [bigintFromString](#bigintfromstring)
+  - [BigintFromNumber](#bigintfromnumber)
+  - [bigint](#bigint)
   - [clampBigint](#clampbigint)
-- [boolean constructors](#boolean-constructors)
-  - [Not](#not)
 - [boolean transformations](#boolean-transformations)
-  - [not](#not-1)
+  - [Not](#not)
 - [classes](#classes)
   - [Class](#class)
   - [Class (interface)](#class-interface)
@@ -202,14 +201,6 @@ Added in v1.0.0
   - [encodeOption](#encodeoption)
   - [encodePromise](#encodepromise)
   - [encodeSync](#encodesync)
-- [encoding constructors](#encoding-constructors)
-  - [Base64](#base64)
-  - [Base64Url](#base64url)
-  - [Hex](#hex)
-- [encoding transformations](#encoding-transformations)
-  - [base64](#base64-1)
-  - [base64url](#base64url-1)
-  - [hex](#hex-1)
 - [guards](#guards)
   - [isSchema](#isschema)
 - [model](#model)
@@ -241,7 +232,6 @@ Added in v1.0.0
   - [positive](#positive-1)
 - [number transformations](#number-transformations)
   - [clamp](#clamp)
-  - [numberFromString](#numberfromstring-1)
 - [optional](#optional)
   - [optionalToRequired](#optionaltorequired)
 - [parsing](#parsing)
@@ -267,8 +257,6 @@ Added in v1.0.0
   - [rename](#rename)
 - [string constructors](#string-constructors)
   - [NonEmpty](#nonempty)
-  - [ParseJson](#parsejson)
-  - [Trim](#trim)
   - [Trimmed](#trimmed)
   - [ULID](#ulid)
   - [UUID](#uuid)
@@ -286,20 +274,15 @@ Added in v1.0.0
   - [uppercased](#uppercased)
 - [string transformations](#string-transformations)
   - [Lowercase](#lowercase)
+  - [Trim](#trim)
   - [Uppercase](#uppercase)
-  - [fromJson](#fromjson)
-  - [lowercase](#lowercase-1)
-  - [parseJson](#parsejson-1)
+  - [parseJson](#parsejson)
   - [split](#split)
-  - [trim](#trim-1)
-  - [uppercase](#uppercase-1)
 - [symbol](#symbol)
   - [TypeId](#typeid)
   - [TypeId (type alias)](#typeid-type-alias)
-- [symbol constructors](#symbol-constructors)
-  - [symbol](#symbol-1)
 - [symbol transformations](#symbol-transformations)
-  - [symbolFromString](#symbolfromstring)
+  - [symbol](#symbol-1)
 - [type id](#type-id)
   - [BetweenBigDecimalTypeId](#betweenbigdecimaltypeid)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
@@ -371,7 +354,7 @@ Added in v1.0.0
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
-  - [JsonOptions (type alias)](#jsonoptions-type-alias)
+  - [ParseJsonOptions (type alias)](#parsejsonoptions-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Schema (namespace)](#schema-namespace)
     - [Variance (interface)](#variance-interface)
@@ -384,7 +367,6 @@ Added in v1.0.0
   - [from](#from)
   - [optional](#optional-1)
   - [propertySignatureAnnotations](#propertysignatureannotations)
-  - [readonlyMapFromSelf](#readonlymapfromself)
   - [to](#to)
 - [validation](#validation)
   - [asserts](#asserts)
@@ -399,60 +381,12 @@ Added in v1.0.0
 
 # BigDecimal constructors
 
-## BigDecimal
-
-**Signature**
-
-```ts
-export declare const BigDecimal: Schema<string, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
-## BigDecimalFromNumber
-
-A schema that transforms a `number` into a `BigDecimal`.
-When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
-
-**Signature**
-
-```ts
-export declare const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
 ## BigDecimalFromSelf
 
 **Signature**
 
 ```ts
 export declare const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
-## bigDecimalFromNumber
-
-A schema that transforms a `number` into a `BigDecimal`.
-When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
-
-**Signature**
-
-```ts
-export declare const bigDecimalFromNumber: <I, A extends number>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
-```
-
-Added in v1.0.0
-
-## bigDecimalFromString
-
-A schema that transforms a `string` into a `BigDecimal`.
-
-**Signature**
-
-```ts
-export declare const bigDecimalFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, BigDecimal.BigDecimal>
 ```
 
 Added in v1.0.0
@@ -575,6 +509,29 @@ Added in v1.0.0
 
 # BigDecimal transformations
 
+## BigDecimal
+
+**Signature**
+
+```ts
+export declare const BigDecimal: Schema<string, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## BigDecimalFromNumber
+
+A schema that transforms a `number` into a `BigDecimal`.
+When encoding, this Schema will produce incorrect results if the BigDecimal exceeds the 64-bit range of a number.
+
+**Signature**
+
+```ts
+export declare const BigDecimalFromNumber: Schema<number, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
 ## clampBigDecimal
 
 Clamps a `BigDecimal` between a minimum and a maximum value.
@@ -602,7 +559,35 @@ export declare const negateBigDecimal: <I, A extends BigDecimal.BigDecimal>(self
 
 Added in v1.0.0
 
-# Cause
+# Cause transformations
+
+## cause
+
+**Signature**
+
+```ts
+export declare const cause: <EI, E>(
+  error: Schema<EI, E>,
+  defect?: Schema<unknown, unknown>
+) => Schema<CauseFrom<EI>, Cause.Cause<E>>
+```
+
+Added in v1.0.0
+
+## causeFromSelf
+
+**Signature**
+
+```ts
+export declare const causeFromSelf: <IE, E>(
+  error: Schema<IE, E>,
+  defect?: Schema<unknown, unknown>
+) => Schema<Cause.Cause<IE>, Cause.Cause<E>>
+```
+
+Added in v1.0.0
+
+# Cause utils
 
 ## CauseFrom (type alias)
 
@@ -635,32 +620,6 @@ export type CauseFrom<E> =
       readonly left: CauseFrom<E>
       readonly right: CauseFrom<E>
     }
-```
-
-Added in v1.0.0
-
-## cause
-
-**Signature**
-
-```ts
-export declare const cause: <EI, E>(
-  error: Schema<EI, E>,
-  defect?: Schema<unknown, unknown>
-) => Schema<CauseFrom<EI>, Cause.Cause<E>>
-```
-
-Added in v1.0.0
-
-## causeFromSelf
-
-**Signature**
-
-```ts
-export declare const causeFromSelf: <IE, E>(
-  error: Schema<IE, E>,
-  defect?: Schema<unknown, unknown>
-) => Schema<Cause.Cause<IE>, Cause.Cause<E>>
 ```
 
 Added in v1.0.0
@@ -721,18 +680,6 @@ Added in v1.0.0
 
 # Date constructors
 
-## Date
-
-A schema that transforms a `string` into a **valid** `Date`, ensuring that invalid dates, such as `new Date("Invalid Date")`, are rejected.
-
-**Signature**
-
-```ts
-export declare const Date: Schema<string, Date>
-```
-
-Added in v1.0.0
-
 ## DateFromSelf
 
 Represents a schema for handling potentially **invalid** `Date` instances (e.g., `new Date("Invalid Date")` is not rejected).
@@ -741,18 +688,6 @@ Represents a schema for handling potentially **invalid** `Date` instances (e.g.,
 
 ```ts
 export declare const DateFromSelf: Schema<Date, Date>
-```
-
-Added in v1.0.0
-
-## DateFromString
-
-Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
-
-**Signature**
-
-```ts
-export declare const DateFromString: Schema<string, Date>
 ```
 
 Added in v1.0.0
@@ -785,57 +720,31 @@ Added in v1.0.0
 
 # Date transformations
 
-## dateFromString
+## Date
 
-A combinator that converts a `string` into a potentially **invalid** `Date` (e.g., `new Date("Invalid Date")` is not rejected).
+A schema that transforms a `string` into a **valid** `Date`, ensuring that invalid dates, such as `new Date("Invalid Date")`, are rejected.
 
 **Signature**
 
 ```ts
-export declare const dateFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, Date>
+export declare const Date: Schema<string, Date>
+```
+
+Added in v1.0.0
+
+## DateFromString
+
+Represents a schema that converts a `string` into a (potentially invalid) `Date` (e.g., `new Date("Invalid Date")` is not rejected).
+
+**Signature**
+
+```ts
+export declare const DateFromString: Schema<string, Date>
 ```
 
 Added in v1.0.0
 
 # Duration constructors
-
-## Duration
-
-A schema that transforms a `[number, number]` tuple into a `Duration`.
-
-**Signature**
-
-```ts
-export declare const Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration>
-```
-
-Added in v1.0.0
-
-## DurationFromMillis
-
-A schema that transforms a `number` tuple into a `Duration`.
-Treats the value as the number of milliseconds.
-
-**Signature**
-
-```ts
-export declare const DurationFromMillis: Schema<number, Duration.Duration>
-```
-
-Added in v1.0.0
-
-## DurationFromNanos
-
-A schema that transforms a `bigint` tuple into a `Duration`.
-Treats the value as the number of nanoseconds.
-
-**Signature**
-
-```ts
-export declare const DurationFromNanos: Schema<bigint, Duration.Duration>
-```
-
-Added in v1.0.0
 
 ## DurationFromSelf
 
@@ -917,6 +826,44 @@ Added in v1.0.0
 
 # Duration transformations
 
+## Duration
+
+A schema that transforms a `[number, number]` tuple into a `Duration`.
+
+**Signature**
+
+```ts
+export declare const Duration: Schema<readonly [seconds: number, nanos: number], Duration.Duration>
+```
+
+Added in v1.0.0
+
+## DurationFromMillis
+
+A schema that transforms a `number` tuple into a `Duration`.
+Treats the value as the number of milliseconds.
+
+**Signature**
+
+```ts
+export declare const DurationFromMillis: Schema<number, Duration.Duration>
+```
+
+Added in v1.0.0
+
+## DurationFromNanos
+
+A schema that transforms a `bigint` tuple into a `Duration`.
+Treats the value as the number of nanoseconds.
+
+**Signature**
+
+```ts
+export declare const DurationFromNanos: Schema<bigint, Duration.Duration>
+```
+
+Added in v1.0.0
+
 ## clampDuration
 
 Clamps a `Duration` between a minimum and a maximum value.
@@ -932,65 +879,7 @@ export declare const clampDuration: (
 
 Added in v1.0.0
 
-## durationFromHrTime
-
-A combinator that transforms a `[number, number]` tuple into a `Duration`.
-
-**Signature**
-
-```ts
-export declare const durationFromHrTime: <I, A extends readonly [seconds: number, nanos: number]>(
-  self: Schema<I, A>
-) => Schema<I, Duration.Duration>
-```
-
-Added in v1.0.0
-
-## durationFromMillis
-
-A combinator that transforms a `number` into a `Duration`.
-Treats the value as the number of milliseconds.
-
-**Signature**
-
-```ts
-export declare const durationFromMillis: <I, A extends number>(self: Schema<I, A>) => Schema<I, Duration.Duration>
-```
-
-Added in v1.0.0
-
-## durationFromNanos
-
-A combinator that transforms a `bigint` into a `Duration`.
-Treats the value as the number of nanoseconds.
-
-**Signature**
-
-```ts
-export declare const durationFromNanos: <I, A extends bigint>(self: Schema<I, A>) => Schema<I, Duration.Duration>
-```
-
-Added in v1.0.0
-
 # Either transformations
-
-## EitherFrom (type alias)
-
-**Signature**
-
-```ts
-export type EitherFrom<IE, IA> =
-  | {
-      readonly _tag: "Left"
-      readonly left: IE
-    }
-  | {
-      readonly _tag: "Right"
-      readonly right: IA
-    }
-```
-
-Added in v1.0.0
 
 ## either
 
@@ -1018,25 +907,59 @@ export declare const eitherFromSelf: <IE, E, IA, A>(
 
 Added in v1.0.0
 
-# Exit
+# Either utils
 
-## ExitFrom (type alias)
+## EitherFrom (type alias)
 
 **Signature**
 
 ```ts
-export type ExitFrom<E, A> =
+export type EitherFrom<IE, IA> =
   | {
-      readonly _tag: "Failure"
-      readonly cause: CauseFrom<E>
+      readonly _tag: "Left"
+      readonly left: IE
     }
   | {
-      readonly _tag: "Success"
-      readonly value: A
+      readonly _tag: "Right"
+      readonly right: IA
     }
 ```
 
 Added in v1.0.0
+
+# Encoding transformations
+
+## Base64
+
+**Signature**
+
+```ts
+export declare const Base64: Schema<string, Uint8Array>
+```
+
+Added in v1.0.0
+
+## Base64Url
+
+**Signature**
+
+```ts
+export declare const Base64Url: Schema<string, Uint8Array>
+```
+
+Added in v1.0.0
+
+## Hex
+
+**Signature**
+
+```ts
+export declare const Hex: Schema<string, Uint8Array>
+```
+
+Added in v1.0.0
+
+# Exit transformations
 
 ## exit
 
@@ -1066,17 +989,27 @@ export declare const exitFromSelf: <IE, E, IA, A>(
 
 Added in v1.0.0
 
-# FiberId
+# Exit utils
 
-## FiberId
+## ExitFrom (type alias)
 
 **Signature**
 
 ```ts
-export declare const FiberId: Schema<FiberIdFrom, FiberId.FiberId>
+export type ExitFrom<E, A> =
+  | {
+      readonly _tag: "Failure"
+      readonly cause: CauseFrom<E>
+    }
+  | {
+      readonly _tag: "Success"
+      readonly value: A
+    }
 ```
 
 Added in v1.0.0
+
+# FiberId
 
 ## FiberIdFrom (type alias)
 
@@ -1101,6 +1034,8 @@ export type FiberIdFrom =
 
 Added in v1.0.0
 
+# FiberId constructors
+
 ## FiberIdFromSelf
 
 **Signature**
@@ -1111,24 +1046,19 @@ export declare const FiberIdFromSelf: Schema<FiberId.FiberId, FiberId.FiberId>
 
 Added in v1.0.0
 
-# Option transformations
+# FiberId transformations
 
-## OptionFrom (type alias)
+## FiberId
 
 **Signature**
 
 ```ts
-export type OptionFrom<I> =
-  | {
-      readonly _tag: "None"
-    }
-  | {
-      readonly _tag: "Some"
-      readonly value: I
-    }
+export declare const FiberId: Schema<FiberIdFrom, FiberId.FiberId>
 ```
 
 Added in v1.0.0
+
+# Option transformations
 
 ## option
 
@@ -1169,6 +1099,25 @@ Added in v1.0.0
 
 ```ts
 export declare const optionFromSelf: <I, A>(value: Schema<I, A>) => Schema<Option.Option<I>, Option.Option<A>>
+```
+
+Added in v1.0.0
+
+# Option utils
+
+## OptionFrom (type alias)
+
+**Signature**
+
+```ts
+export type OptionFrom<I> =
+  | {
+      readonly _tag: "None"
+    }
+  | {
+      readonly _tag: "Some"
+      readonly value: I
+    }
 ```
 
 Added in v1.0.0
@@ -1229,6 +1178,19 @@ export declare const readonlyMap: <IK, K, IV, V>(
 
 Added in v1.0.0
 
+## readonlyMapFromSelf
+
+**Signature**
+
+```ts
+export declare const readonlyMapFromSelf: <IK, K, IV, V>(
+  key: Schema<IK, K>,
+  value: Schema<IV, V>
+) => Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
+```
+
+Added in v1.0.0
+
 # ReadonlySet transformations
 
 ## readonlySet
@@ -1253,18 +1215,6 @@ Added in v1.0.0
 
 # Secret constructors
 
-## Secret
-
-A schema that transforms a `string` into a `Secret`.
-
-**Signature**
-
-```ts
-export declare const Secret: Schema<string, Secret.Secret>
-```
-
-Added in v1.0.0
-
 ## SecretFromSelf
 
 **Signature**
@@ -1277,31 +1227,19 @@ Added in v1.0.0
 
 # Secret transformations
 
-## secret
+## Secret
 
-A combinator that transforms a `string` into a `Secret`.
+A schema that transforms a `string` into a `Secret`.
 
 **Signature**
 
 ```ts
-export declare const secret: <I, A extends string>(self: Schema<I, A>) => Schema<I, Secret.Secret>
+export declare const Secret: Schema<string, Secret.Secret>
 ```
 
 Added in v1.0.0
 
 # Uint8Array constructors
-
-## Uint8Array
-
-A schema that transforms a `number` array into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const Uint8Array: Schema<readonly number[], Uint8Array>
-```
-
-Added in v1.0.0
 
 ## Uint8ArrayFromSelf
 
@@ -1315,16 +1253,14 @@ Added in v1.0.0
 
 # Uint8Array transformations
 
-## uint8ArrayFromNumbers
+## Uint8Array
 
-A combinator that transforms a `number` array into a `Uint8Array`.
+A schema that transforms a `number` array into a `Uint8Array`.
 
 **Signature**
 
 ```ts
-export declare const uint8ArrayFromNumbers: <I, A extends readonly number[]>(
-  self: Schema<I, A>
-) => Schema<I, Uint8Array>
+export declare const Uint8Array: Schema<readonly number[], Uint8Array>
 ```
 
 Added in v1.0.0
@@ -1441,20 +1377,6 @@ Added in v1.0.0
 
 # bigint constructors
 
-## BigintFromNumber
-
-This schema transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
-
-It returns an error if the value can't be safely encoded as a `number` due to being out of range.
-
-**Signature**
-
-```ts
-export declare const BigintFromNumber: Schema<number, bigint>
-```
-
-Added in v1.0.0
-
 ## NegativeBigint
 
 **Signature**
@@ -1531,20 +1453,6 @@ Added in v1.0.0
 
 ```ts
 export declare const PositiveBigintFromSelf: Schema<bigint, bigint>
-```
-
-Added in v1.0.0
-
-## bigint
-
-This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
-
-It returns an error if the value can't be converted (for example when non-numeric characters are provided).
-
-**Signature**
-
-```ts
-export declare const bigint: Schema<string, bigint>
 ```
 
 Added in v1.0.0
@@ -1667,30 +1575,30 @@ Added in v1.0.0
 
 # bigint transformations
 
-## bigintFromNumber
+## BigintFromNumber
 
-This combinator transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
+This schema transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
 
 It returns an error if the value can't be safely encoded as a `number` due to being out of range.
 
 **Signature**
 
 ```ts
-export declare const bigintFromNumber: <I, A extends number>(self: Schema<I, A>) => Schema<I, bigint>
+export declare const BigintFromNumber: Schema<number, bigint>
 ```
 
 Added in v1.0.0
 
-## bigintFromString
+## bigint
 
-This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
+This schema transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
 
 It returns an error if the value can't be converted (for example when non-numeric characters are provided).
 
 **Signature**
 
 ```ts
-export declare const bigintFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, bigint>
+export declare const bigint: Schema<string, bigint>
 ```
 
 Added in v1.0.0
@@ -1710,7 +1618,7 @@ export declare const clampBigint: (
 
 Added in v1.0.0
 
-# boolean constructors
+# boolean transformations
 
 ## Not
 
@@ -1718,20 +1626,6 @@ Added in v1.0.0
 
 ```ts
 export declare const Not: Schema<boolean, boolean>
-```
-
-Added in v1.0.0
-
-# boolean transformations
-
-## not
-
-Negates a boolean value
-
-**Signature**
-
-```ts
-export declare const not: <I>(self: Schema<I, boolean>) => Schema<I, boolean>
 ```
 
 Added in v1.0.0
@@ -2630,76 +2524,6 @@ export declare const encodeSync: <I, A>(schema: Schema<I, A>) => (a: A, options?
 
 Added in v1.0.0
 
-# encoding constructors
-
-## Base64
-
-**Signature**
-
-```ts
-export declare const Base64: Schema<string, Uint8Array>
-```
-
-Added in v1.0.0
-
-## Base64Url
-
-**Signature**
-
-```ts
-export declare const Base64Url: Schema<string, Uint8Array>
-```
-
-Added in v1.0.0
-
-## Hex
-
-**Signature**
-
-```ts
-export declare const Hex: Schema<string, Uint8Array>
-```
-
-Added in v1.0.0
-
-# encoding transformations
-
-## base64
-
-Transforms a base64 `string` into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const base64: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array>
-```
-
-Added in v1.0.0
-
-## base64url
-
-Transforms a base64url `string` into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const base64url: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array>
-```
-
-Added in v1.0.0
-
-## hex
-
-Transforms a hex `string` into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const hex: <I, A extends string>(self: Schema<I, A>) => Schema<I, Uint8Array>
-```
-
-Added in v1.0.0
-
 # guards
 
 ## isSchema
@@ -3035,22 +2859,6 @@ export declare const clamp: (
 
 Added in v1.0.0
 
-## numberFromString
-
-This combinator transforms a `string` into a `number` by parsing the string using the `Number` function.
-
-It returns an error if the value can't be converted (for example when non-numeric characters are provided).
-
-The following special string values are supported: "NaN", "Infinity", "-Infinity".
-
-**Signature**
-
-```ts
-export declare const numberFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, number>
-```
-
-Added in v1.0.0
-
 # optional
 
 ## optionalToRequired
@@ -3294,31 +3102,6 @@ export declare const NonEmpty: Schema<string, string>
 
 Added in v1.0.0
 
-## ParseJson
-
-The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
-functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
-
-**Signature**
-
-```ts
-export declare const ParseJson: Schema<string, unknown>
-```
-
-Added in v1.0.0
-
-## Trim
-
-This schema allows removing whitespaces from the beginning and end of a string.
-
-**Signature**
-
-```ts
-export declare const Trim: Schema<string, string>
-```
-
-Added in v1.0.0
-
 ## Trimmed
 
 **Signature**
@@ -3392,10 +3175,7 @@ Added in v1.0.0
 
 ## lowercased
 
-Verifies that a string is lowercased
-
-Note. This combinator does not make any transformations, it only validates.
-If what you were looking for was a combinator to lowercase strings, then check out the `lowercase` combinator.
+Verifies that a string is lowercased.
 
 **Signature**
 
@@ -3490,10 +3270,7 @@ Added in v1.0.0
 
 ## uppercased
 
-Verifies that a string is uppercased
-
-Note. This combinator does not make any transformations, it only validates.
-If what you were looking for was a combinator to uppercase strings, then check out the `uppercase` combinator.
+Verifies that a string is uppercased.
 
 **Signature**
 
@@ -3509,7 +3286,7 @@ Added in v1.0.0
 
 ## Lowercase
 
-This combinator converts a string to lowercase
+This schema converts a string to lowercase.
 
 **Signature**
 
@@ -3519,9 +3296,21 @@ export declare const Lowercase: Schema<string, string>
 
 Added in v1.0.0
 
+## Trim
+
+This schema allows removing whitespaces from the beginning and end of a string.
+
+**Signature**
+
+```ts
+export declare const Trim: Schema<string, string>
+```
+
+Added in v1.0.0
+
 ## Uppercase
 
-This combinator converts a string to uppercase
+This schema converts a string to uppercase.
 
 **Signature**
 
@@ -3531,79 +3320,43 @@ export declare const Uppercase: Schema<string, string>
 
 Added in v1.0.0
 
-## fromJson
-
-The `fromJson` combinator offers a method to convert JSON strings into the `A` type using the underlying
-functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
-
-**Signature**
-
-```ts
-export declare const fromJson: <I, A>(schema: Schema<I, A>, options?: JsonOptions) => Schema<string, A>
-```
-
-Added in v1.0.0
-
-## lowercase
-
-This combinator converts a string to lowercase
-
-**Signature**
-
-```ts
-export declare const lowercase: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
 ## parseJson
 
-The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
-functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+The `parseJson` combinator provides a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also utilizes `JSON.stringify` for encoding.
+
+You can optionally provide a `ParseJsonOptions` to configure both `JSON.parse` and `JSON.stringify` executions.
+
+Optionally, you can pass a schema `Schema<I, A>` to obtain an `A` type instead of `unknown`.
 
 **Signature**
 
 ```ts
-export declare const parseJson: <I, A extends string>(self: Schema<I, A>, options?: JsonOptions) => Schema<I, unknown>
+export declare const parseJson: {
+  <I, A>(schema: Schema<I, A>, options?: ParseJsonOptions): Schema<string, A>
+  (options?: ParseJsonOptions): Schema<string, unknown>
+}
+```
+
+**Example**
+
+```ts
+import * as S from "@effect/schema/Schema"
+
+assert.deepStrictEqual(S.parseSync(S.parseJson())(`{"a":"1"}`), { a: "1" })
+assert.deepStrictEqual(S.parseSync(S.parseJson(S.struct({ a: S.NumberFromString })))(`{"a":"1"}`), { a: 1 })
 ```
 
 Added in v1.0.0
 
 ## split
 
-This combinator allows splitting a string into an array of strings.
+Returns a achema that allows splitting a string into an array of strings.
 
 **Signature**
 
 ```ts
-export declare const split: {
-  (separator: string): <I, A extends string>(self: Schema<I, A>) => Schema<I, readonly string[]>
-  <I, A extends string>(self: Schema<I, A>, separator: string): Schema<I, readonly string[]>
-}
-```
-
-Added in v1.0.0
-
-## trim
-
-This combinator allows removing whitespaces from the beginning and end of a string.
-
-**Signature**
-
-```ts
-export declare const trim: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## uppercase
-
-This combinator converts a string to uppercase
-
-**Signature**
-
-```ts
-export declare const uppercase: <I, A extends string>(self: Schema<I, A>) => Schema<I, A>
+export declare const split: (separator: string) => Schema<string, ReadonlyArray<string>>
 ```
 
 Added in v1.0.0
@@ -3630,7 +3383,7 @@ export type TypeId = typeof TypeId
 
 Added in v1.0.0
 
-# symbol constructors
+# symbol transformations
 
 ## symbol
 
@@ -3640,20 +3393,6 @@ This schema transforms a `string` into a `symbol`.
 
 ```ts
 export declare const symbol: Schema<string, symbol>
-```
-
-Added in v1.0.0
-
-# symbol transformations
-
-## symbolFromString
-
-This combinator transforms a `string` into a `symbol`.
-
-**Signature**
-
-```ts
-export declare const symbolFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, symbol>
 ```
 
 Added in v1.0.0
@@ -4381,12 +4120,12 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
-## JsonOptions (type alias)
+## ParseJsonOptions (type alias)
 
 **Signature**
 
 ```ts
-export type JsonOptions = {
+export type ParseJsonOptions = {
   readonly reviver?: Parameters<typeof JSON.parse>[1]
   readonly replacer?: Parameters<typeof JSON.stringify>[1]
   readonly space?: Parameters<typeof JSON.stringify>[2]
@@ -4574,19 +4313,6 @@ export declare const propertySignatureAnnotations: (
 >(
   self: S
 ) => S extends Schema<infer I, infer A> ? PropertySignature<I, false, A, false> : S
-```
-
-Added in v1.0.0
-
-## readonlyMapFromSelf
-
-**Signature**
-
-```ts
-export declare const readonlyMapFromSelf: <IK, K, IV, V>(
-  key: Schema<IK, K>,
-  value: Schema<IV, V>
-) => Schema<ReadonlyMap<IK, IV>, ReadonlyMap<K, V>>
 ```
 
 Added in v1.0.0
