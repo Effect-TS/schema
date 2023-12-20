@@ -287,7 +287,6 @@ Added in v1.0.0
   - [Lowercase](#lowercase)
   - [Trim](#trim)
   - [Uppercase](#uppercase)
-  - [fromJson](#fromjson)
   - [parseJson](#parsejson-1)
   - [split](#split)
 - [symbol](#symbol)
@@ -368,7 +367,7 @@ Added in v1.0.0
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
   - [FromStruct (type alias)](#fromstruct-type-alias)
   - [Join (type alias)](#join-type-alias)
-  - [JsonOptions (type alias)](#jsonoptions-type-alias)
+  - [ParseJsonOptions (type alias)](#parsejsonoptions-type-alias)
   - [PropertySignature (interface)](#propertysignature-interface)
   - [Schema (namespace)](#schema-namespace)
     - [Variance (interface)](#variance-interface)
@@ -3522,28 +3521,31 @@ export declare const Uppercase: Schema<string, string>
 
 Added in v1.0.0
 
-## fromJson
-
-The `fromJson` combinator offers a method to convert JSON strings into the `A` type using the underlying
-functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
-
-**Signature**
-
-```ts
-export declare const fromJson: <I, A>(schema: Schema<I, A>, options?: JsonOptions) => Schema<string, A>
-```
-
-Added in v1.0.0
-
 ## parseJson
 
-The `parseJson` combinator offers a method to convert JSON strings into the `unknown` type using the underlying
-functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+The `parseJson` combinator provides a method to convert JSON strings into the `unknown` type using the underlying
+functionality of `JSON.parse`. It also utilizes `JSON.stringify` for encoding.
+
+You can optionally provide a `ParseJsonOptions` to configure both `JSON.parse` and `JSON.stringify` executions.
+
+Optionally, you can pass a schema `Schema<I, A>` to obtain an `A` type instead of `unknown`.
 
 **Signature**
 
 ```ts
-export declare const parseJson: <I, A extends string>(self: Schema<I, A>, options?: JsonOptions) => Schema<I, unknown>
+export declare const parseJson: {
+  <I, A>(schema: Schema<I, A>, options?: ParseJsonOptions): Schema<string, A>
+  (options?: ParseJsonOptions): Schema<string, unknown>
+}
+```
+
+**Example**
+
+```ts
+import * as S from "@effect/schema/Schema"
+
+assert.deepStrictEqual(S.parseSync(S.parseJson())(`{"a":"1"}`), { a: "1" })
+assert.deepStrictEqual(S.parseSync(S.parseJson(S.struct({ a: S.NumberFromString })))(`{"a":"1"}`), { a: 1 })
 ```
 
 Added in v1.0.0
@@ -4333,12 +4335,12 @@ export type Join<T> = T extends [infer Head, ...infer Tail]
 
 Added in v1.0.0
 
-## JsonOptions (type alias)
+## ParseJsonOptions (type alias)
 
 **Signature**
 
 ```ts
-export type JsonOptions = {
+export type ParseJsonOptions = {
   readonly reviver?: Parameters<typeof JSON.parse>[1]
   readonly replacer?: Parameters<typeof JSON.stringify>[1]
   readonly space?: Parameters<typeof JSON.stringify>[2]
