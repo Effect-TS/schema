@@ -12,3 +12,5 @@ Schema: remove useless combinators
 - `bigintFromString`
 - `bigintFromNumber`
 - `secret`
+- `durationFromHrTime`
+- `durationFromMillis`

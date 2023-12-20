@@ -63,7 +63,6 @@ Added in v1.0.0
   - [lessThanOrEqualToDuration](#lessthanorequaltoduration)
 - [Duration transformations](#duration-transformations)
   - [clampDuration](#clampduration)
-  - [durationFromMillis](#durationfrommillis-1)
   - [durationFromNanos](#durationfromnanos-1)
 - [Either transformations](#either-transformations)
   - [EitherFrom (type alias)](#eitherfrom-type-alias)
@@ -915,19 +914,6 @@ export declare const clampDuration: (
   minimum: Duration.DurationInput,
   maximum: Duration.DurationInput
 ) => <I, A extends Duration.Duration>(self: Schema<I, A>) => Schema<I, A>
-```
-
-Added in v1.0.0
-
-## durationFromMillis
-
-A combinator that transforms a `number` into a `Duration`.
-Treats the value as the number of milliseconds.
-
-**Signature**
-
-```ts
-export declare const durationFromMillis: <I, A extends number>(self: Schema<I, A>) => Schema<I, Duration.Duration>
 ```
 
 Added in v1.0.0

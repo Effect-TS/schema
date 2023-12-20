@@ -3116,24 +3116,6 @@ export const DurationFromNanos: Schema<
 > = durationFromNanos(bigintFromSelf)
 
 /**
- * A combinator that transforms a `number` into a `Duration`.
- * Treats the value as the number of milliseconds.
- *
- * @category Duration transformations
- * @since 1.0.0
- */
-export const durationFromMillis = <I, A extends number>(
-  self: Schema<I, A>
-): Schema<I, Duration.Duration> =>
-  transform(
-    self,
-    DurationFromSelf,
-    (ms) => Duration.millis(ms),
-    (n) => Duration.toMillis(n),
-    { strict: false }
-  )
-
-/**
  * A schema that transforms a `number` tuple into a `Duration`.
  * Treats the value as the number of milliseconds.
  *
@@ -3143,7 +3125,12 @@ export const durationFromMillis = <I, A extends number>(
 export const DurationFromMillis: Schema<
   number,
   Duration.Duration
-> = durationFromMillis(number)
+> = transform(
+  number,
+  DurationFromSelf,
+  (ms) => Duration.millis(ms),
+  (n) => Duration.toMillis(n)
+)
 
 const hrTime: Schema<readonly [seconds: number, nanos: number]> = tuple(
   NonNegative.pipe(
