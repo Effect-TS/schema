@@ -642,6 +642,45 @@ Output:
 */
 ```
 
+### Troubleshooting: Dealing with `"type": "module"` in `package.json`
+
+If you have set the `"type"` field in your `package.json` to `"module"`, you might encounter the following error:
+
+```ts
+import * as S from "@effect/schema/Schema";
+import * as Arbitrary from "@effect/schema/Arbitrary";
+import * as fc from "fast-check";
+
+const arb = Arbitrary.to(S.string)(fc);
+/*
+...more lines...
+  Types have separate declarations of a private property 'internalRng'.
+*/
+```
+
+To address this issue, you can apply a patch, for example using `pnpm patch`, to the `fast-check` package in the `node_modules` directory:
+
+```diff
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index 41d6274a9d4bb2d9924fb82f77e502f232fd12f5..0000000000000000000000000000000000000000
+diff --git a/package.json b/package.json
+index e871dfde5f8877b1b7de9bd3d9a6e3e4f7f59843..819035d70e22d246c615bda25183db9b5e124287 100644
+--- a/package.json
++++ b/package.json
+@@ -12,7 +12,7 @@
+         "default": "./lib/fast-check.js"
+       },
+       "import": {
+-        "types": "./lib/esm/types/fast-check.d.ts",
++        "types": "./lib/types/fast-check.d.ts",
+         "default": "./lib/esm/fast-check.js"
+       }
+     }
+```
+
+This patch helps resolve the issue caused by the declaration of a private property 'internalRng' having separate declarations in the types when using `"type": "module"` in `package.json`.
+
 ## Pretty print
 
 The `to` function provided by the `@effect/schema/Pretty` module represents a way of pretty-printing values that conform to a given `Schema`.
