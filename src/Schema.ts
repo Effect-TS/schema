@@ -2160,15 +2160,6 @@ export const parseJson: {
   )
 }
 
-/**
- * The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
- * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
- *
- * @category string constructors
- * @since 1.0.0
- */
-export const ParseJson: Schema<string, unknown> = parseJson()
-
 // ---------------------------------------------
 // string constructors
 // ---------------------------------------------
