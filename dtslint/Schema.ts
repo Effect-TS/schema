@@ -659,10 +659,10 @@ pipe(S.number, S.filter((n): n is number & Brand.Brand<"MyNumber"> => n > 0))
 // plain
 
 // $ExpectType Schema<string, readonly number[]>
-S.compose(S.split(S.string, ","), S.array(S.NumberFromString))
+S.compose(S.split(","), S.array(S.NumberFromString))
 
 // $ExpectType Schema<string, readonly number[]>
-S.split(S.string, ",").pipe(S.compose(S.array(S.NumberFromString)))
+S.split(",").pipe(S.compose(S.array(S.NumberFromString)))
 
 // decoding
 
@@ -780,14 +780,6 @@ S.transformLiteral(0, "a")
 
 // $ExpectType Schema<0 | 1, "a" | "b">
 S.transformLiterals([0, "a"], [1, "b"])
-
-// ---------------------------------------------
-// split
-// ---------------------------------------------
-
-// should support subtypes of `string`
-// $ExpectType Schema<`a${string}`, readonly string[]>
-S.templateLiteral(S.literal("a"), S.string).pipe(S.split(":"))
 
 // ---------------------------------------------
 // Class

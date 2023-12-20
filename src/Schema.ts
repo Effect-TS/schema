@@ -2148,6 +2148,15 @@ export const parseJson = <I, A extends string>(
 }
 
 /**
+ * The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
+ * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
+ *
+ * @category string constructors
+ * @since 1.0.0
+ */
+export const ParseJson: Schema<string, unknown> = parseJson(string)
+
+/**
  * The `fromJson` combinator offers a method to convert JSON strings into the `A` type using the underlying
  * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
  *
@@ -2216,15 +2225,6 @@ export const ULID: Schema<string> = string.pipe(
     arbitrary: (): Arbitrary<string> => (fc) => fc.ulid()
   })
 )
-
-/**
- * The `ParseJson` schema offers a method to convert JSON strings into the `unknown` type using the underlying
- * functionality of `JSON.parse`. It also employs `JSON.stringify` for encoding.
- *
- * @category string constructors
- * @since 1.0.0
- */
-export const ParseJson: Schema<string, unknown> = parseJson(string)
 
 // ---------------------------------------------
 // number filters
