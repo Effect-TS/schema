@@ -96,8 +96,6 @@ Added in v1.0.0
 - [Uint8Array constructors](#uint8array-constructors)
   - [Uint8Array](#uint8array)
   - [Uint8ArrayFromSelf](#uint8arrayfromself)
-- [Uint8Array transformations](#uint8array-transformations)
-  - [uint8ArrayFromNumbers](#uint8arrayfromnumbers)
 - [annotations](#annotations)
   - [annotations](#annotations-1)
   - [default](#default)
@@ -1240,22 +1238,6 @@ Added in v1.0.0
 
 ```ts
 export declare const Uint8ArrayFromSelf: Schema<Uint8Array, Uint8Array>
-```
-
-Added in v1.0.0
-
-# Uint8Array transformations
-
-## uint8ArrayFromNumbers
-
-A combinator that transforms a `number` array into a `Uint8Array`.
-
-**Signature**
-
-```ts
-export declare const uint8ArrayFromNumbers: <I, A extends readonly number[]>(
-  self: Schema<I, A>
-) => Schema<I, Uint8Array>
 ```
 
 Added in v1.0.0

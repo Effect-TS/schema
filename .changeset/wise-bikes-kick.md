@@ -14,3 +14,5 @@ Schema: remove useless combinators
 - `secret`
 - `durationFromHrTime`
 - `durationFromMillis`
+- `durationFromNanos`
+- `uint8ArrayFromNumbers`

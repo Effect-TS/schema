@@ -3325,30 +3325,16 @@ export const Uint8ArrayFromSelf: Schema<Uint8Array> = declare(
 // Uint8Array transformations
 // ---------------------------------------------
 
-/**
- * A combinator that transforms a `number` array into a `Uint8Array`.
- *
- * @category Uint8Array transformations
- * @since 1.0.0
- */
-export const uint8ArrayFromNumbers = <I, A extends ReadonlyArray<number>>(
-  self: Schema<I, A>
-): Schema<I, Uint8Array> =>
-  transform(
-    self,
-    Uint8ArrayFromSelf,
-    (a) => Uint8Array.from(a),
-    (arr) => Array.from(arr),
-    { strict: false }
-  )
-
-const _Uint8Array: Schema<ReadonlyArray<number>, Uint8Array> = uint8ArrayFromNumbers(
+const _Uint8Array: Schema<ReadonlyArray<number>, Uint8Array> = transform(
   array(number.pipe(
     between(0, 255, {
       title: "8-bit unsigned integer",
       description: "a 8-bit unsigned integer"
     })
-  ))
+  )),
+  Uint8ArrayFromSelf,
+  (a) => Uint8Array.from(a),
+  (arr) => Array.from(arr)
 )
 
 export {
