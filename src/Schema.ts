@@ -2633,7 +2633,7 @@ export const JsonNumber: Schema<number> = number.pipe(
 // ---------------------------------------------
 
 /**
- * Negates a boolean value
+ * Negates a boolean value.
  *
  * @category boolean transformations
  * @since 1.0.0
@@ -2657,28 +2657,6 @@ export const not = <I>(self: Schema<I, boolean>): Schema<I, boolean> =>
 export const Not: Schema<boolean> = not(boolean)
 
 // ---------------------------------------------
-// symbol transformations
-// ---------------------------------------------
-
-/**
- * This combinator transforms a `string` into a `symbol`.
- *
- * @param self - The schema representing the input string
- *
- * @category symbol transformations
- * @since 1.0.0
- */
-export const symbolFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, symbol> => {
-  return transform(
-    self,
-    symbolFromSelf,
-    (s) => Symbol.for(s),
-    (sym) => sym.description,
-    { strict: false }
-  )
-}
-
-// ---------------------------------------------
 // symbol constructors
 // ---------------------------------------------
 
@@ -2688,7 +2666,13 @@ export const symbolFromString = <I, A extends string>(self: Schema<I, A>): Schem
  * @category symbol constructors
  * @since 1.0.0
  */
-export const symbol: Schema<string, symbol> = symbolFromString(string)
+export const symbol: Schema<string, symbol> = transform(
+  string,
+  symbolFromSelf,
+  (s) => Symbol.for(s),
+  (sym) => sym.description,
+  { strict: false }
+)
 
 // ---------------------------------------------
 // bigint filters
@@ -2895,65 +2879,6 @@ export const clampBigint =
       { strict: false }
     )
 
-/**
- * This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
- *
- * It returns an error if the value can't be converted (for example when non-numeric characters are provided).
- *
- * @param self - The schema representing the input string
- *
- * @category bigint transformations
- * @since 1.0.0
- */
-export const bigintFromString = <I, A extends string>(self: Schema<I, A>): Schema<I, bigint> => {
-  return transformOrFail(
-    self,
-    bigintFromSelf,
-    (s, _, ast) => {
-      if (s.trim() === "") {
-        return ParseResult.fail(ParseResult.type(ast, s))
-      }
-
-      return ParseResult.try({
-        try: () => BigInt(s),
-        catch: () => ParseResult.parseError([ParseResult.type(ast, s)])
-      })
-    },
-    (n) => ParseResult.succeed(String(n)),
-    { strict: false }
-  )
-}
-
-/**
- * This combinator transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
- *
- * It returns an error if the value can't be safely encoded as a `number` due to being out of range.
- *
- * @param self - The schema representing the input number
- *
- * @category bigint transformations
- * @since 1.0.0
- */
-export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schema<I, bigint> => {
-  return transformOrFail(
-    self,
-    bigintFromSelf,
-    (n, _, ast) =>
-      ParseResult.try({
-        try: () => BigInt(n),
-        catch: () => ParseResult.parseError([ParseResult.type(ast, n)])
-      }),
-    (b, _, ast) => {
-      if (b > InternalBigInt.maxSafeInteger || b < InternalBigInt.minSafeInteger) {
-        return ParseResult.fail(ParseResult.type(ast, b))
-      }
-
-      return ParseResult.succeed(Number(b))
-    },
-    { strict: false }
-  )
-}
-
 // ---------------------------------------------
 // bigint constructors
 // ---------------------------------------------
@@ -2966,7 +2891,21 @@ export const bigintFromNumber = <I, A extends number>(self: Schema<I, A>): Schem
  * @category bigint constructors
  * @since 1.0.0
  */
-export const bigint: Schema<string, bigint> = bigintFromString(string)
+export const bigint: Schema<string, bigint> = transformOrFail(
+  string,
+  bigintFromSelf,
+  (s, _, ast) => {
+    if (s.trim() === "") {
+      return ParseResult.fail(ParseResult.type(ast, s))
+    }
+
+    return ParseResult.try({
+      try: () => BigInt(s),
+      catch: () => ParseResult.parseError([ParseResult.type(ast, s)])
+    })
+  },
+  (n) => ParseResult.succeed(String(n))
+)
 
 /**
  * @category bigint constructors
@@ -3032,7 +2971,22 @@ export const NonNegativeBigint: Schema<string, bigint> = bigint.pipe(
  * @category bigint constructors
  * @since 1.0.0
  */
-export const BigintFromNumber: Schema<number, bigint> = bigintFromNumber(number)
+export const BigintFromNumber: Schema<number, bigint> = transformOrFail(
+  number,
+  bigintFromSelf,
+  (n, _, ast) =>
+    ParseResult.try({
+      try: () => BigInt(n),
+      catch: () => ParseResult.parseError([ParseResult.type(ast, n)])
+    }),
+  (b, _, ast) => {
+    if (b > InternalBigInt.maxSafeInteger || b < InternalBigInt.minSafeInteger) {
+      return ParseResult.fail(ParseResult.type(ast, b))
+    }
+
+    return ParseResult.succeed(Number(b))
+  }
+)
 
 // ---------------------------------------------
 // Secret

@@ -136,8 +136,6 @@ Added in v1.0.0
   - [nonPositiveBigint](#nonpositivebigint-1)
   - [positiveBigint](#positivebigint-1)
 - [bigint transformations](#bigint-transformations)
-  - [bigintFromNumber](#bigintfromnumber-1)
-  - [bigintFromString](#bigintfromstring)
   - [clampBigint](#clampbigint)
 - [boolean constructors](#boolean-constructors)
   - [Not](#not)
@@ -292,8 +290,6 @@ Added in v1.0.0
   - [TypeId (type alias)](#typeid-type-alias)
 - [symbol constructors](#symbol-constructors)
   - [symbol](#symbol-1)
-- [symbol transformations](#symbol-transformations)
-  - [symbolFromString](#symbolfromstring)
 - [type id](#type-id)
   - [BetweenBigDecimalTypeId](#betweenbigdecimaltypeid)
   - [BetweenBigintTypeId](#betweenbiginttypeid)
@@ -1661,34 +1657,6 @@ Added in v1.0.0
 
 # bigint transformations
 
-## bigintFromNumber
-
-This combinator transforms a `number` into a `bigint` by parsing the number using the `BigInt` function.
-
-It returns an error if the value can't be safely encoded as a `number` due to being out of range.
-
-**Signature**
-
-```ts
-export declare const bigintFromNumber: <I, A extends number>(self: Schema<I, A>) => Schema<I, bigint>
-```
-
-Added in v1.0.0
-
-## bigintFromString
-
-This combinator transforms a `string` into a `bigint` by parsing the string using the `BigInt` function.
-
-It returns an error if the value can't be converted (for example when non-numeric characters are provided).
-
-**Signature**
-
-```ts
-export declare const bigintFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, bigint>
-```
-
-Added in v1.0.0
-
 ## clampBigint
 
 Clamps a bigint between a minimum and a maximum value.
@@ -1720,7 +1688,7 @@ Added in v1.0.0
 
 ## not
 
-Negates a boolean value
+Negates a boolean value.
 
 **Signature**
 
@@ -3563,20 +3531,6 @@ This schema transforms a `string` into a `symbol`.
 
 ```ts
 export declare const symbol: Schema<string, symbol>
-```
-
-Added in v1.0.0
-
-# symbol transformations
-
-## symbolFromString
-
-This combinator transforms a `string` into a `symbol`.
-
-**Signature**
-
-```ts
-export declare const symbolFromString: <I, A extends string>(self: Schema<I, A>) => Schema<I, symbol>
 ```
 
 Added in v1.0.0

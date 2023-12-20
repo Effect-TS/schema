@@ -8,3 +8,6 @@ Schema: remove useless combinators
 - `uppercase`
 - `trim`
 - `numberFromString`
+- `symbolFromString`
+- `bigintFromString`
+- `bigintFromNumber`
