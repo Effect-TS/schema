@@ -1562,7 +1562,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 - encoding
   - `a` -> `i`
 
-#### optional(schema, default, { exact: true, default: () => A })
+#### optional(schema, { exact: true, default: () => A })
 
 - decoding
   - `<missing value>` -> `<default value>`
@@ -1570,7 +1570,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 - encoding
   - `a` -> `i`
 
-#### optional(schema, default, { nullable: true, default: () => A })
+#### optional(schema, { nullable: true, default: () => A })
 
 - decoding
   - `<missing value>` -> `<default value>`
@@ -1580,7 +1580,7 @@ S.mutable(S.struct({ a: S.string, b: S.number }));
 - encoding
   - `a` -> `i`
 
-#### optional(schema, default, { exact: true, nullable: true, default: () => A })
+#### optional(schema, { exact: true, nullable: true, default: () => A })
 
 - decoding
   - `<missing value>` -> `<default value>`
