@@ -1807,7 +1807,7 @@ function getAge(id: number): Effect.Effect<never, Error, number> {
 
 export class PersonWithTransform extends Person.transform<PersonWithTransform>()(
   {
-    age: S.optional(S.number).toOption(),
+    age: S.optional(S.number), { exact: true, as: "Option" }),
   },
   (input) =>
     Effect.mapBoth(getAge(input.id), {
@@ -1833,7 +1833,7 @@ PersonWithTransform {
 
 export class PersonWithTransformFrom extends Person.transformFrom<PersonWithTransformFrom>()(
   {
-    age: S.optional(S.number, { exact: true }).toOption(),
+    age: S.optional(S.number, { exact: true, as: "Option" }),
   },
   (input) =>
     Effect.mapBoth(getAge(input.id), {
