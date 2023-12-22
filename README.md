@@ -237,10 +237,10 @@ const _Person = S.struct({
   age: S.number,
 });
 
-interface Person extends S.Schema.To<typeof Person> {}
+interface Person extends S.Schema.To<typeof _Person> {}
 
 // Re-declare the schema to create a schema with an opaque type
-const Person: Schema.Schema<Person> = Person_;
+const Person: S.Schema<Person> = _Person;
 ```
 
 Alternatively, you can use `Schema.Class` (see the [Class](#classes) section below for more details).
