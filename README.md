@@ -217,13 +217,20 @@ interface Person {
 */
 ```
 
-In this example, we use `interface` instead of `type`:
+Alternatively you can also extract a `type` instead of an `interface`:
 
 ```ts
 type Person = S.Schema.To<typeof Person>;
+/*
+Equivalent to:
+type Person {
+  readonly name: string;
+  readonly age: number;
+}
+*/
 ```
 
-to create an opaque type.
+### Advanced extracting Inferred Types
 
 In cases where `I` differs from `A`, you can also extract the inferred `I` type using `Schema.From`.
 
