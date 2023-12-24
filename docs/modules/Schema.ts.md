@@ -151,6 +151,7 @@ Added in v1.0.0
   - [TaggedRequest (interface)](#taggedrequest-interface)
   - [TaggedRequest (namespace)](#taggedrequest-namespace)
     - [Any (type alias)](#any-type-alias)
+  - [withDefaultConstructor](#withdefaultconstructor)
 - [combinators](#combinators)
   - [array](#array)
   - [attachPropertySignature](#attachpropertysignature)
@@ -362,8 +363,10 @@ Added in v1.0.0
     - [To (type alias)](#to-type-alias)
     - [ToAsserts (type alias)](#toasserts-type-alias)
   - [StructFields (type alias)](#structfields-type-alias)
+  - [ToOptionalConstructorKeys (type alias)](#tooptionalconstructorkeys-type-alias)
   - [ToOptionalKeys (type alias)](#tooptionalkeys-type-alias)
   - [ToStruct (type alias)](#tostruct-type-alias)
+  - [ToStructConstructor (type alias)](#tostructconstructor-type-alias)
   - [from](#from)
   - [optional](#optional-1)
   - [propertySignatureAnnotations](#propertysignatureannotations)
@@ -1641,7 +1644,13 @@ export declare const Class: <Self>() => <Fields extends StructFields>(
   fields: Fields
 ) => [unknown] extends [Self]
   ? "Missing `Self` generic - use `class Self extends Class<Self>()({ ... })`"
-  : Class<Simplify<FromStruct<Fields>>, Simplify<ToStruct<Fields>>, Simplify<ToStruct<Fields>>, Self, Data.Case>
+  : Class<
+      Simplify<FromStruct<Fields>>,
+      Simplify<ToStruct<Fields>>,
+      Simplify<ToStructConstructor<Fields>>,
+      Self,
+      Data.Case
+    >
 ```
 
 Added in v1.0.0
@@ -1827,6 +1836,19 @@ Added in v1.0.0
 export type Any =
   | TaggedRequest<string, any, any, any, any, any, any>
   | TaggedRequest<string, any, any, never, never, any, any>
+```
+
+Added in v1.0.0
+
+## withDefaultConstructor
+
+**Signature**
+
+```ts
+export declare const withDefaultConstructor: <From, To>(
+  s: Schema<From, To>,
+  makeDefault: () => To
+) => ConstructorPropertyDescriptor<From, To>
 ```
 
 Added in v1.0.0
@@ -4214,7 +4236,20 @@ export type StructFields = Record<
   | Schema<never, never>
   | PropertySignature<any, boolean, any, boolean>
   | PropertySignature<never, boolean, never, boolean>
+  | ConstructorPropertyDescriptor<any> // TODO: variation for PropertySignature too
 >
+```
+
+Added in v1.0.0
+
+## ToOptionalConstructorKeys (type alias)
+
+**Signature**
+
+```ts
+export type ToOptionalConstructorKeys<Fields> = {
+  [K in keyof Fields]: Fields[K] extends ConstructorPropertyDescriptor<any, any> ? K : never
+}[keyof Fields]
 ```
 
 Added in v1.0.0
@@ -4243,6 +4278,22 @@ Added in v1.0.0
 export type ToStruct<Fields extends StructFields> = {
   readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
 } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> }
+```
+
+Added in v1.0.0
+
+## ToStructConstructor (type alias)
+
+**Signature**
+
+```ts
+export type ToStructConstructor<Fields extends StructFields> = {
+  readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields> | ToOptionalConstructorKeys<Fields>>]: Schema.To<
+    Fields[K]
+  >
+} & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> } & {
+  readonly [K in ToOptionalConstructorKeys<Fields>]?: Schema.To<Fields[K]>
+}
 ```
 
 Added in v1.0.0
@@ -4312,6 +4363,7 @@ export declare const propertySignatureAnnotations: (
     | Schema<never, never>
     | PropertySignature<any, boolean, any, boolean>
     | PropertySignature<never, boolean, never, boolean>
+    | ConstructorPropertyDescriptor<any, any>
 >(
   self: S
 ) => S extends Schema<infer I, infer A> ? PropertySignature<I, false, A, false> : S
