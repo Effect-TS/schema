@@ -1847,7 +1847,7 @@ Added in v1.0.0
 ```ts
 export declare const withDefaultConstructor: <From, To>(
   s: Schema<From, To>,
-  makeDefault: () => To
+  make: () => To
 ) => ConstructorPropertyDescriptor<From, To>
 ```
 
