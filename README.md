@@ -1264,7 +1264,6 @@ There are two ways to define a schema for a branded type, depending on whether y
 To define a schema for a branded type from scratch, you can use the `brand` combinator exported by the `@effect/schema/Schema` module. Here's an example:
 
 ```ts
-import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserId = S.string.pipe(S.brand("UserId"));
@@ -1274,7 +1273,6 @@ type UserId = S.Schema.To<typeof UserId>; // string & Brand<"UserId">
 Note that you can use `unique symbol`s as brands to ensure uniqueness across modules / packages:
 
 ```ts
-import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 const UserIdBrand = Symbol.for("UserId");
@@ -1293,7 +1291,6 @@ import * as B from "effect/Brand";
 type UserId = string & B.Brand<"UserId">;
 const UserId = B.nominal<UserId>();
 
-import { pipe } from "effect/Function";
 import * as S from "@effect/schema/Schema";
 
 // Define a schema for the branded type
