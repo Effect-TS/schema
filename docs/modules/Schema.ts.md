@@ -1734,7 +1734,7 @@ export declare const TaggedClass: <Self>() => <Tag extends string, Fields extend
           readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
         } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
       >,
-      Simplify<ToStruct<Fields>>,
+      Simplify<ToStructConstructor<Fields>>,
       Self,
       Data.Case
     >
@@ -1763,7 +1763,7 @@ export declare const TaggedError: <Self>() => <Tag extends string, Fields extend
           readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
         } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
       >,
-      Simplify<ToStruct<Fields>>,
+      Simplify<ToStructConstructor<Fields>>,
       Self,
       Effect.Effect<never, Self, never> & Error
     >
@@ -1794,7 +1794,7 @@ export declare const TaggedRequest: <Self>() => <Tag extends string, Fields exte
           readonly [K in Exclude<keyof Fields, ToOptionalKeys<Fields>>]: Schema.To<Fields[K]>
         } & { readonly [K in ToOptionalKeys<Fields>]?: Schema.To<Fields[K]> | undefined }
       >,
-      Simplify<ToStruct<Fields>>,
+      Simplify<ToStructConstructor<Fields>>,
       Self,
       TaggedRequest<
         Tag,
