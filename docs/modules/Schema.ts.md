@@ -1662,7 +1662,10 @@ Added in v1.0.0
 
 ```ts
 export interface Class<I, A, C, Self, Inherited = Data.Case> extends Schema<I, Self> {
-  new (props: Equals<C, {}> extends true ? void | {} : C, disableValidation?: boolean): A & Omit<Inherited, keyof A>
+  new (
+    props: Equals<FilterOptionalKeys<C>, {}> extends true ? void | {} : C,
+    disableValidation?: boolean
+  ): A & Omit<Inherited, keyof A>
 
   readonly struct: Schema<I, A>
 
