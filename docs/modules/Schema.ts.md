@@ -350,6 +350,7 @@ Added in v1.0.0
   - [UppercasedTypeId](#uppercasedtypeid)
   - [ValidDateTypeId](#validdatetypeid)
 - [utils](#utils)
+  - [ConstructorPropertyDescriptor (interface)](#constructorpropertydescriptor-interface)
   - [DocAnnotations (interface)](#docannotations-interface)
   - [FilterAnnotations (interface)](#filterannotations-interface)
   - [FromOptionalKeys (type alias)](#fromoptionalkeys-type-alias)
@@ -4064,6 +4065,18 @@ export declare const ValidDateTypeId: typeof ValidDateTypeId
 Added in v1.0.0
 
 # utils
+
+## ConstructorPropertyDescriptor (interface)
+
+**Signature**
+
+```ts
+export interface ConstructorPropertyDescriptor<From, To = From> extends Schema.Variance<From, To>, Pipeable {
+  make: () => To
+}
+```
+
+Added in v1.0.0
 
 ## DocAnnotations (interface)
 
