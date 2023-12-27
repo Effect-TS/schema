@@ -21,6 +21,7 @@ Added in v1.0.0
   - [missing](#missing)
   - [succeed](#succeed)
   - [try](#try)
+  - [tuple](#tuple)
   - [type](#type)
   - [unexpected](#unexpected)
   - [union](#union)
@@ -31,6 +32,7 @@ Added in v1.0.0
   - [Member (interface)](#member-interface)
   - [Missing (interface)](#missing-interface)
   - [ParseIssue (type alias)](#parseissue-type-alias)
+  - [Tuple (interface)](#tuple-interface)
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
   - [Union (interface)](#union-interface)
@@ -128,6 +130,16 @@ Added in v1.0.0
 
 ```ts
 export declare const try: <A>(options: { try: LazyArg<A>; catch: (e: unknown) => ParseError; }) => ParseResult<A>
+```
+
+Added in v1.0.0
+
+## tuple
+
+**Signature**
+
+```ts
+export declare const tuple: (ast: AST.Tuple, errors: readonly [Index, ...Index[]]) => Tuple
 ```
 
 Added in v1.0.0
@@ -259,7 +271,7 @@ Added in v1.0.0
 ```ts
 export type ParseIssue =
   // context
-  | Index
+  | Tuple
   | Key
   | Union
   // primitives
@@ -267,6 +279,20 @@ export type ParseIssue =
   | Missing
   | Unexpected
   | Forbidden
+```
+
+Added in v1.0.0
+
+## Tuple (interface)
+
+**Signature**
+
+```ts
+export interface Tuple {
+  readonly _tag: "Tuple"
+  readonly ast: AST.Tuple
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<Index>
+}
 ```
 
 Added in v1.0.0
