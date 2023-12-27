@@ -17,21 +17,21 @@ Added in v1.0.0
   - [forbidden](#forbidden)
   - [index](#index)
   - [key](#key)
+  - [member](#member)
   - [missing](#missing)
   - [succeed](#succeed)
   - [try](#try)
   - [type](#type)
   - [unexpected](#unexpected)
-  - [unionMember](#unionmember)
 - [model](#model)
   - [Forbidden (interface)](#forbidden-interface)
   - [Index (interface)](#index-interface)
   - [Key (interface)](#key-interface)
+  - [Member (interface)](#member-interface)
   - [Missing (interface)](#missing-interface)
   - [ParseIssue (type alias)](#parseissue-type-alias)
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
-  - [UnionMember (interface)](#unionmember-interface)
 - [optimisation](#optimisation)
   - [bimap](#bimap)
   - [eitherOrUndefined](#eitherorundefined)
@@ -90,6 +90,16 @@ export declare const key: (key: PropertyKey, errors: readonly [ParseIssue, ...Pa
 
 Added in v1.0.0
 
+## member
+
+**Signature**
+
+```ts
+export declare const member: (ast: AST.AST, errors: readonly [ParseIssue, ...ParseIssue[]]) => Member
+```
+
+Added in v1.0.0
+
 ## missing
 
 **Signature**
@@ -136,16 +146,6 @@ Added in v1.0.0
 
 ```ts
 export declare const unexpected: (ast: Option.Option<AST.AST>) => Unexpected
-```
-
-Added in v1.0.0
-
-## unionMember
-
-**Signature**
-
-```ts
-export declare const unionMember: (errors: readonly [ParseIssue, ...ParseIssue[]]) => UnionMember
 ```
 
 Added in v1.0.0
@@ -205,6 +205,22 @@ export interface Key {
 
 Added in v1.0.0
 
+## Member (interface)
+
+Error that occurs when a member in a union has an error.
+
+**Signature**
+
+```ts
+export interface Member {
+  readonly _tag: "Member"
+  readonly ast: AST.AST
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
+}
+```
+
+Added in v1.0.0
+
 ## Missing (interface)
 
 Error that occurs when a required key or index is missing.
@@ -226,7 +242,16 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export type ParseIssue = Type | Index | Key | Missing | Unexpected | UnionMember | Forbidden
+export type ParseIssue =
+  // context
+  | Index
+  | Key
+  | Member
+  // primitives
+  | Type
+  | Missing
+  | Unexpected
+  | Forbidden
 ```
 
 Added in v1.0.0
@@ -262,21 +287,6 @@ Error that occurs when an unexpected key or index is present.
 export interface Unexpected {
   readonly _tag: "Unexpected"
   readonly ast: Option.Option<AST.AST>
-}
-```
-
-Added in v1.0.0
-
-## UnionMember (interface)
-
-Error that occurs when a member in a union has an error.
-
-**Signature**
-
-```ts
-export interface UnionMember {
-  readonly _tag: "UnionMember"
-  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
 }
 ```
 
