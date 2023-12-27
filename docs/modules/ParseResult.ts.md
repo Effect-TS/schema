@@ -23,6 +23,7 @@ Added in v1.0.0
   - [try](#try)
   - [type](#type)
   - [unexpected](#unexpected)
+  - [union](#union)
 - [model](#model)
   - [Forbidden (interface)](#forbidden-interface)
   - [Index (interface)](#index-interface)
@@ -32,6 +33,7 @@ Added in v1.0.0
   - [ParseIssue (type alias)](#parseissue-type-alias)
   - [Type (interface)](#type-interface)
   - [Unexpected (interface)](#unexpected-interface)
+  - [Union (interface)](#union-interface)
 - [optimisation](#optimisation)
   - [bimap](#bimap)
   - [eitherOrUndefined](#eitherorundefined)
@@ -150,6 +152,19 @@ export declare const unexpected: (ast: Option.Option<AST.AST>) => Unexpected
 
 Added in v1.0.0
 
+## union
+
+**Signature**
+
+```ts
+export declare const union: (
+  ast: AST.Union,
+  errors: readonly [Key | Type | Member, ...(Key | Type | Member)[]]
+) => Union
+```
+
+Added in v1.0.0
+
 # model
 
 ## Forbidden (interface)
@@ -246,7 +261,7 @@ export type ParseIssue =
   // context
   | Index
   | Key
-  | Member
+  | Union
   // primitives
   | Type
   | Missing
@@ -287,6 +302,22 @@ Error that occurs when an unexpected key or index is present.
 export interface Unexpected {
   readonly _tag: "Unexpected"
   readonly ast: Option.Option<AST.AST>
+}
+```
+
+Added in v1.0.0
+
+## Union (interface)
+
+Error that occurs when a union has an error.
+
+**Signature**
+
+```ts
+export interface Union {
+  readonly _tag: "Union"
+  readonly ast: AST.Union
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<Member | Key | Type>
 }
 ```
 
