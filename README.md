@@ -1,18 +1,8 @@
-<h3 align="center">
-  <a href="https://effect-ts.github.io/schema/">
-    <img src="./docs/example.png" width="500">
-  </a>
-</h3>
+# ⚠️ @effect/schema has moved
 
-<p align="center">
-Modeling the schema of data structures as first-class values
-</p>
+This repository has been deprecated following the consolidation of its codebase into the [`effect` monorepo](https://github.com/Effect-TS/effect).
 
-<p align="center">
-  <a href="https://www.npmjs.com/package/@effect/schema">
-    <img src="https://img.shields.io/npm/dm/@effect/schema.svg" alt="npm downloads" height="20">
-  </a>
-</p>
+You can find `@effect/schema` here: https://github.com/effect-ts/effect/tree/main/packages/schema
 
 # Introduction
 
