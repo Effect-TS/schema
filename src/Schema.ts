@@ -1461,7 +1461,6 @@ export const transformLiterals = <
  *
  * @example
  * import * as S from "@effect/schema/Schema"
- * import { pipe } from "effect/Function"
  *
  * const Circle = S.struct({ radius: S.number })
  * const Square = S.struct({ sideLength: S.number })
