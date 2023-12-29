@@ -601,7 +601,7 @@ export declare const createRefinement: <From extends AST>(
   from: From,
   filter: Refinement["filter"],
   annotations?: Annotated["annotations"]
-) => Transform | Refinement<From>
+) => Refinement<From>
 ```
 
 Added in v1.0.0
