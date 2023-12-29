@@ -23,6 +23,7 @@ Added in v1.0.0
   - [try](#try)
   - [tuple](#tuple)
   - [type](#type)
+  - [typeLiteral](#typeliteral)
   - [unexpected](#unexpected)
   - [union](#union)
 - [model](#model)
@@ -34,6 +35,7 @@ Added in v1.0.0
   - [ParseIssue (type alias)](#parseissue-type-alias)
   - [Tuple (interface)](#tuple-interface)
   - [Type (interface)](#type-interface)
+  - [TypeLiteral (interface)](#typeliteral-interface)
   - [Unexpected (interface)](#unexpected-interface)
   - [Union (interface)](#union-interface)
 - [optimisation](#optimisation)
@@ -150,6 +152,16 @@ Added in v1.0.0
 
 ```ts
 export declare const type: (expected: AST.AST, actual: unknown, message?: string) => Type
+```
+
+Added in v1.0.0
+
+## typeLiteral
+
+**Signature**
+
+```ts
+export declare const typeLiteral: (ast: AST.TypeLiteral, errors: readonly [Key, ...Key[]]) => TypeLiteral
 ```
 
 Added in v1.0.0
@@ -273,6 +285,7 @@ export type ParseIssue =
   // context
   | Tuple
   | Key
+  | TypeLiteral
   | Union
   // primitives
   | Type
@@ -313,6 +326,20 @@ export interface Type {
   readonly expected: AST.AST
   readonly actual: unknown
   readonly message: Option.Option<string>
+}
+```
+
+Added in v1.0.0
+
+## TypeLiteral (interface)
+
+**Signature**
+
+```ts
+export interface TypeLiteral {
+  readonly _tag: "TypeLiteral"
+  readonly ast: AST.TypeLiteral
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<Key>
 }
 ```
 
