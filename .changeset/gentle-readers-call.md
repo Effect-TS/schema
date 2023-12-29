@@ -9,3 +9,4 @@ Refactor `ParseResult` module:
 - ast `ast` field to `Member`
 - replace `Index` with `Tuple`
 - `Unexpected`: rename `ast` to `expected` and make the field required
+- add `TypeLiteral`
