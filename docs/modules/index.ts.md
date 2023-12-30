@@ -1,6 +1,6 @@
 ---
 title: index.ts
-nav_order: 5
+nav_order: 6
 parent: Modules
 ---
 
@@ -17,6 +17,7 @@ Added in v1.0.0
   - [From "./Arbitrary.js"](#from-arbitraryjs)
   - [From "./ArrayFormatter.js"](#from-arrayformatterjs)
   - [From "./Equivalence.js"](#from-equivalencejs)
+  - [From "./Format.js"](#from-formatjs)
   - [From "./JSONSchema.js"](#from-jsonschemajs)
   - [From "./ParseResult.js"](#from-parseresultjs)
   - [From "./Parser.js"](#from-parserjs)
@@ -73,6 +74,18 @@ Re-exports all named exports from the "./Equivalence.js" module as `Equivalence`
 
 ```ts
 export * as Equivalence from "./Equivalence.js"
+```
+
+Added in v1.0.0
+
+## From "./Format.js"
+
+Re-exports all named exports from the "./Format.js" module as `Format`.
+
+**Signature**
+
+```ts
+export * as Format from "./Format.js"
 ```
 
 Added in v1.0.0

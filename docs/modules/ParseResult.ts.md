@@ -1,6 +1,6 @@
 ---
 title: ParseResult.ts
-nav_order: 8
+nav_order: 9
 parent: Modules
 ---
 
@@ -20,6 +20,7 @@ Added in v1.0.0
   - [member](#member)
   - [missing](#missing)
   - [succeed](#succeed)
+  - [transform](#transform)
   - [try](#try)
   - [tuple](#tuple)
   - [type](#type)
@@ -33,6 +34,7 @@ Added in v1.0.0
   - [Member (interface)](#member-interface)
   - [Missing (interface)](#missing-interface)
   - [ParseIssue (type alias)](#parseissue-type-alias)
+  - [Transform (interface)](#transform-interface)
   - [Tuple (interface)](#tuple-interface)
   - [Type (interface)](#type-interface)
   - [TypeLiteral (interface)](#typeliteral-interface)
@@ -126,6 +128,21 @@ export declare const succeed: <A>(a: A) => ParseResult<A>
 
 Added in v1.0.0
 
+## transform
+
+**Signature**
+
+```ts
+export declare const transform: (
+  ast: AST.Transform,
+  actual: unknown,
+  kind: "From" | "Transformation" | "To",
+  errors: readonly [ParseIssue, ...ParseIssue[]]
+) => Transform
+```
+
+Added in v1.0.0
+
 ## try
 
 **Signature**
@@ -141,7 +158,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const tuple: (ast: AST.Tuple, errors: readonly [Index, ...Index[]]) => Tuple
+export declare const tuple: (ast: AST.Tuple, actual: unknown, errors: readonly [Index, ...Index[]]) => Tuple
 ```
 
 Added in v1.0.0
@@ -161,7 +178,11 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const typeLiteral: (ast: AST.TypeLiteral, errors: readonly [Key, ...Key[]]) => TypeLiteral
+export declare const typeLiteral: (
+  ast: AST.TypeLiteral,
+  actual: unknown,
+  errors: readonly [Key, ...Key[]]
+) => TypeLiteral
 ```
 
 Added in v1.0.0
@@ -183,6 +204,7 @@ Added in v1.0.0
 ```ts
 export declare const union: (
   ast: AST.Union,
+  actual: unknown,
   errors: readonly [Key | Type | Member, ...(Key | Type | Member)[]]
 ) => Union
 ```
@@ -284,14 +306,33 @@ Added in v1.0.0
 export type ParseIssue =
   // context
   | Tuple
-  | Key
   | TypeLiteral
   | Union
+  | Key
+  | Transform
   // primitives
   | Type
   | Missing
   | Unexpected
   | Forbidden
+```
+
+Added in v1.0.0
+
+## Transform (interface)
+
+Error that occurs when a transformation has an error.
+
+**Signature**
+
+```ts
+export interface Transform {
+  readonly _tag: "Transform"
+  readonly ast: AST.Transform
+  readonly actual: unknown
+  readonly kind: "From" | "Transformation" | "To"
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
+}
 ```
 
 Added in v1.0.0
@@ -304,6 +345,7 @@ Added in v1.0.0
 export interface Tuple {
   readonly _tag: "Tuple"
   readonly ast: AST.Tuple
+  readonly actual: unknown
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<Index>
 }
 ```
@@ -339,6 +381,7 @@ Added in v1.0.0
 export interface TypeLiteral {
   readonly _tag: "TypeLiteral"
   readonly ast: AST.TypeLiteral
+  readonly actual: unknown
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<Key>
 }
 ```
@@ -370,6 +413,7 @@ Error that occurs when a union has an error.
 export interface Union {
   readonly _tag: "Union"
   readonly ast: AST.Union
+  readonly actual: unknown
   readonly errors: ReadonlyArray.NonEmptyReadonlyArray<Member | Key | Type>
 }
 ```
