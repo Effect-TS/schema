@@ -36,7 +36,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const formatAST: (ast: AST.AST) => string
+export declare const formatAST: (ast: AST.AST, verbose?: boolean) => string
 ```
 
 Added in v1.0.0

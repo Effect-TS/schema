@@ -14,6 +14,10 @@ Added in v1.0.0
 
 - [BigDecimal constructors](#bigdecimal-constructors)
   - [BigDecimalFromSelf](#bigdecimalfromself)
+  - [NegativeBigDecimalFromSelf](#negativebigdecimalfromself)
+  - [NonNegativeBigDecimalFromSelf](#nonnegativebigdecimalfromself)
+  - [NonPositiveBigDecimalFromSelf](#nonpositivebigdecimalfromself)
+  - [PositiveBigDecimalFromSelf](#positivebigdecimalfromself)
 - [BigDecimal filters](#bigdecimal-filters)
   - [betweenBigDecimal](#betweenbigdecimal)
   - [greaterThanBigDecimal](#greaterthanbigdecimal)
@@ -256,22 +260,24 @@ Added in v1.0.0
 - [renaming](#renaming)
   - [rename](#rename)
 - [string constructors](#string-constructors)
+  - [Lowercased](#lowercased)
   - [NonEmpty](#nonempty)
   - [Trimmed](#trimmed)
   - [ULID](#ulid)
   - [UUID](#uuid)
+  - [Uppercased](#uppercased)
 - [string filters](#string-filters)
   - [endsWith](#endswith)
   - [includes](#includes)
   - [length](#length)
-  - [lowercased](#lowercased)
+  - [lowercased](#lowercased-1)
   - [maxLength](#maxlength)
   - [minLength](#minlength)
   - [nonEmpty](#nonempty-1)
   - [pattern](#pattern)
   - [startsWith](#startswith)
   - [trimmed](#trimmed-1)
-  - [uppercased](#uppercased)
+  - [uppercased](#uppercased-1)
 - [string transformations](#string-transformations)
   - [Lowercase](#lowercase)
   - [Trim](#trim)
@@ -387,6 +393,46 @@ Added in v1.0.0
 
 ```ts
 export declare const BigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## NegativeBigDecimalFromSelf
+
+**Signature**
+
+```ts
+export declare const NegativeBigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## NonNegativeBigDecimalFromSelf
+
+**Signature**
+
+```ts
+export declare const NonNegativeBigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## NonPositiveBigDecimalFromSelf
+
+**Signature**
+
+```ts
+export declare const NonPositiveBigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
+```
+
+Added in v1.0.0
+
+## PositiveBigDecimalFromSelf
+
+**Signature**
+
+```ts
+export declare const PositiveBigDecimalFromSelf: Schema<BigDecimal.BigDecimal, BigDecimal.BigDecimal>
 ```
 
 Added in v1.0.0
@@ -3094,6 +3140,16 @@ Added in v1.0.0
 
 # string constructors
 
+## Lowercased
+
+**Signature**
+
+```ts
+export declare const Lowercased: Schema<string, string>
+```
+
+Added in v1.0.0
+
 ## NonEmpty
 
 **Signature**
@@ -3130,6 +3186,16 @@ Added in v1.0.0
 
 ```ts
 export declare const UUID: Schema<string, string>
+```
+
+Added in v1.0.0
+
+## Uppercased
+
+**Signature**
+
+```ts
+export declare const Uppercased: Schema<string, string>
 ```
 
 Added in v1.0.0

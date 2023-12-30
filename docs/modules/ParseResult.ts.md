@@ -19,6 +19,7 @@ Added in v1.0.0
   - [key](#key)
   - [member](#member)
   - [missing](#missing)
+  - [refinement](#refinement)
   - [succeed](#succeed)
   - [transform](#transform)
   - [try](#try)
@@ -34,6 +35,7 @@ Added in v1.0.0
   - [Member (interface)](#member-interface)
   - [Missing (interface)](#missing-interface)
   - [ParseIssue (type alias)](#parseissue-type-alias)
+  - [Refinement (interface)](#refinement-interface)
   - [Transform (interface)](#transform-interface)
   - [Tuple (interface)](#tuple-interface)
   - [Type (interface)](#type-interface)
@@ -118,6 +120,21 @@ export declare const missing: Missing
 
 Added in v1.0.0
 
+## refinement
+
+**Signature**
+
+```ts
+export declare const refinement: (
+  ast: AST.Refinement,
+  actual: unknown,
+  kind: "From" | "Predicate",
+  errors: readonly [ParseIssue, ...ParseIssue[]]
+) => Refinement
+```
+
+Added in v1.0.0
+
 ## succeed
 
 **Signature**
@@ -168,7 +185,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const type: (expected: AST.AST, actual: unknown, message?: string) => Type
+export declare const type: (ast: AST.AST, actual: unknown, message?: string) => Type
 ```
 
 Added in v1.0.0
@@ -305,6 +322,7 @@ Added in v1.0.0
 ```ts
 export type ParseIssue =
   // context
+  | Refinement
   | Tuple
   | TypeLiteral
   | Union
@@ -315,6 +333,22 @@ export type ParseIssue =
   | Missing
   | Unexpected
   | Forbidden
+```
+
+Added in v1.0.0
+
+## Refinement (interface)
+
+**Signature**
+
+```ts
+export interface Refinement {
+  readonly _tag: "Refinement"
+  readonly ast: AST.Refinement
+  readonly actual: unknown
+  readonly kind: "From" | "Predicate"
+  readonly errors: ReadonlyArray.NonEmptyReadonlyArray<ParseIssue>
+}
 ```
 
 Added in v1.0.0
@@ -365,7 +399,7 @@ is a number, a `Type` decode error would be returned.
 ```ts
 export interface Type {
   readonly _tag: "Type"
-  readonly expected: AST.AST
+  readonly ast: AST.AST
   readonly actual: unknown
   readonly message: Option.Option<string>
 }
