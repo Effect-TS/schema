@@ -15,7 +15,7 @@ Added in v1.0.0
 - [formatting](#formatting)
   - [format](#format)
   - [formatAST](#formatast)
-  - [formatSchema](#formatschema)
+  - [formatUnknown](#formatunknown)
 
 ---
 
@@ -26,7 +26,7 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const format: (u: unknown) => string
+export declare const format: <I, A>(schema: Schema.Schema<I, A>) => string
 ```
 
 Added in v1.0.0
@@ -41,12 +41,12 @@ export declare const formatAST: (ast: AST.AST, verbose?: boolean) => string
 
 Added in v1.0.0
 
-## formatSchema
+## formatUnknown
 
 **Signature**
 
 ```ts
-export declare const formatSchema: <I, A>(schema: Schema.Schema<I, A>) => string
+export declare const formatUnknown: (u: unknown) => string
 ```
 
 Added in v1.0.0
