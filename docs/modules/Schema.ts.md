@@ -260,6 +260,7 @@ Added in v1.0.0
 - [renaming](#renaming)
   - [rename](#rename)
 - [string constructors](#string-constructors)
+  - [Char](#char)
   - [Lowercased](#lowercased)
   - [NonEmpty](#nonempty)
   - [Trimmed](#trimmed)
@@ -2729,6 +2730,8 @@ Added in v1.0.0
 
 ## between
 
+This filter checks whether the provided number falls within the specified minimum and maximum values.
+
 **Signature**
 
 ```ts
@@ -2743,6 +2746,10 @@ Added in v1.0.0
 
 ## finite
 
+Ensures that the provided value is a finite number.
+
+This schema filters out non-finite numeric values, allowing only finite numbers to pass through.
+
 **Signature**
 
 ```ts
@@ -2754,6 +2761,8 @@ export declare const finite: <A extends number>(
 Added in v1.0.0
 
 ## greaterThan
+
+This filter checks whether the provided number is greater than the specified minimum.
 
 **Signature**
 
@@ -2767,6 +2776,8 @@ export declare const greaterThan: <A extends number>(
 Added in v1.0.0
 
 ## greaterThanOrEqualTo
+
+This filter checks whether the provided number is greater than or equal to the specified minimum.
 
 **Signature**
 
@@ -2793,6 +2804,8 @@ Added in v1.0.0
 
 ## lessThan
 
+This filter checks whether the provided number is less than the specified maximum.
+
 **Signature**
 
 ```ts
@@ -2805,6 +2818,8 @@ export declare const lessThan: <A extends number>(
 Added in v1.0.0
 
 ## lessThanOrEqualTo
+
+This schema checks whether the provided number is less than or equal to the specified maximum.
 
 **Signature**
 
@@ -3140,6 +3155,18 @@ Added in v1.0.0
 
 # string constructors
 
+## Char
+
+A schema representing a single character.
+
+**Signature**
+
+```ts
+export declare const Char: Schema<string, string>
+```
+
+Added in v1.0.0
+
 ## Lowercased
 
 **Signature**
@@ -3172,6 +3199,11 @@ Added in v1.0.0
 
 ## ULID
 
+Represents a Universally Unique Lexicographically Sortable Identifier (ULID).
+
+ULIDs are designed to be compact, URL-safe, and ordered, making them suitable for use as identifiers.
+This schema ensures that the provided string adheres to the standard ULID format.
+
 **Signature**
 
 ```ts
@@ -3181,6 +3213,10 @@ export declare const ULID: Schema<string, string>
 Added in v1.0.0
 
 ## UUID
+
+Represents a Universally Unique Identifier (UUID).
+
+This schema ensures that the provided string adheres to the standard UUID format.
 
 **Signature**
 
