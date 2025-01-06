@@ -2,8 +2,6 @@
 
 This repository has been deprecated following the consolidation of its codebase into the [`effect` monorepo](https://github.com/Effect-TS/effect).
 
-You can find `@effect/schema` here: https://github.com/effect-ts/effect/tree/main/packages/schema
-
 # Introduction
 
 Welcome to the documentation for `@effect/schema`, **a library for defining and using schemas** to validate and transform data in TypeScript.
